@@ -2,3 +2,7 @@ build/
 bin/
 ffmpeg/
 vlc-sdk/
+.vscode/
+.qtcreator/*
+.qtcreator/CMakeLists.txt.user
+/.qtcreator

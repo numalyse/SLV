@@ -116,11 +116,11 @@ endif()
 # Copier bin
 # ============================================
 
-# add_custom_command(TARGET SLV POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_directory
-#     "${CMAKE_SOURCE_DIR}/bin"
-#     "$<TARGET_FILE_DIR:SLV>/bin"
-# )
+add_custom_command(TARGET SLV POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/bin"
+    "$<TARGET_FILE_DIR:SLV>/bin"
+)
 
 add_custom_command(TARGET SLV POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -129,16 +129,16 @@ add_custom_command(TARGET SLV POST_BUILD
 )
 
 
-# # Copier libvlc.dll
-# add_custom_command(TARGET SLV POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#     "${CMAKE_SOURCE_DIR}/libvlc.dll"
-#     "$<TARGET_FILE_DIR:SLV>"
-# )
+# Copier libvlc.dll
+add_custom_command(TARGET SLV POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_SOURCE_DIR}/libvlc.dll"
+    "$<TARGET_FILE_DIR:SLV>"
+)
 
-# # Copier libvlccore.dll
-# add_custom_command(TARGET SLV POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#     "${CMAKE_SOURCE_DIR}/libvlccore.dll"
-#     "$<TARGET_FILE_DIR:SLV>"
-# )
+# Copier libvlccore.dll
+add_custom_command(TARGET SLV POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_SOURCE_DIR}/libvlccore.dll"
+    "$<TARGET_FILE_DIR:SLV>"
+)

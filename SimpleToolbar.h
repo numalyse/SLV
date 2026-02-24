@@ -3,6 +3,7 @@
 
 #include "Toolbar.h"
 #include "ToolbarButton.h"
+#include "ToolbarToggleButton.h"
 
 #include <QLayout>
 #include <QSlider>
@@ -17,6 +18,7 @@ Q_OBJECT
 
 public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
+    void emitSignal();
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
@@ -27,11 +29,15 @@ private:
 
     QSlider* m_slider = nullptr;
 
-    ToolbarButton* m_muteBtn = nullptr;
+    ToolbarToggleButton* m_muteBtn = nullptr;
+    // slider a afficher au survol du bouton mute
     QSlider* m_soundSlider = nullptr;
 
     ToolbarButton* m_slowDownBtn = nullptr;
     ToolbarButton* m_speedUpBtn = nullptr;
+
+    ToolbarButton* m_loopBtn = nullptr;
+
 };
 
 #endif

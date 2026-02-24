@@ -3,8 +3,13 @@
         <file alias="play.png">icons/play.png</file>
         <file alias="pause.png">icons/pause.png</file>
         <file alias="slow_down.png">icons/slow_down.png</file>
-        <file alias="no_sound.png">icons/no_sound.png</file>
+        <file alias="sound_on.png">icons/sound_on.png</file>
+        <file alias="sound_off.png">icons/sound_off.png</file>
         <file alias="speed_up.png">icons/speed_up.png</file>
         <file alias="fullscreen.png">icons/fullscreen.png</file>
+        <file alias="loop_on.png">icons/loop_on.png</file>
+        <file alias="loop_off.png">icons/loop_off.png</file>
+        <file alias="eject.png">icons/eject.png</file>
+        <file alias="stop.png">icons/stop.png</file>
     </qresource>
 </RCC>

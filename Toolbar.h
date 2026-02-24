@@ -2,6 +2,7 @@
 #define TOOLBAR_H 
 
 #include "ToolbarButton.h"
+#include "ToolbarToggleButton.h"
 
 #include <QToolBar>
 
@@ -25,11 +26,11 @@ protected:
     // Widget qui contient les layouts / boutons 
     QWidget* m_containerWidget = nullptr; 
 
-    ToolbarButton* m_playPauseBtn = nullptr;
+    ToolbarToggleButton* m_playPauseBtn = nullptr;
     ToolbarButton* m_stopBtn = nullptr;
     ToolbarButton* m_ejectBtn = nullptr;
     ToolbarButton* m_fullscreenBtn = nullptr;
-
+    
 };
 
 #endif // TOOLBAR_H

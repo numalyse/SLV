@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "GlobalPlayerManager.h"
 #include "PlayerWidget.h"
+#include "TextManager.h"
 
 #include <vlc/vlc.h>
 
@@ -32,7 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     // qDebug() << "Current Working Directory:" << QDir::currentPath();
     // qDebug() << QFile::exists("../icon/numal_logo.ico");
 
-
+    // TODO : stocker la langue que l'utilisateur choisie dans le preference manager ect. 
+    TextManager::instance().loadLanguage("en");
 
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);

@@ -2,7 +2,7 @@
 
 /// @brief Créer un bouton avec une icone et un tooltip
 /// @param parent QWidget*
-/// @param iconName const QString&, nom de l'image de l'icone ex : "pause.png"
+/// @param iconName const QString&, nom de l'icone ex : "pause.png"
 /// @param toolTipText const QString &
 ToolbarButton::ToolbarButton(QWidget *parent, const QString &iconName, const QString &toolTipText) : QPushButton(parent)
 {
@@ -14,3 +14,4 @@ ToolbarButton::ToolbarButton(QWidget *parent, const QString &iconName, const QSt
     }
     setToolTip(toolTipText);
 }
+

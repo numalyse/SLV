@@ -20,6 +20,7 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
         icon_ressources.qrc
+        translation_ressources.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -36,6 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Toolbar.h
         ToolbarButton.h ToolbarButton.cpp
         SimpleToolbar.h SimpleToolbar.cpp
+        TextManager.h TextManager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET SLV APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

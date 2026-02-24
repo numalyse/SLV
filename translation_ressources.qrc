@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/lang">
+        <file alias="fr.json">lang/fr.json</file>
+        <file alias="en.json">lang/en.json</file>
+    </qresource>
+</RCC>

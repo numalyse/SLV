@@ -1,0 +1,8 @@
+{
+    "tooltip_play": "Play",
+    "tooltip_pause": "Pause",
+    "tooltip_mute": "Mute video",
+    "tooltip_fullscreen": "Fullscreen",
+    "tooltip_slow_down": "Slow down by x0.25",
+    "tooltip_speed_up": "Speed up by x0.25"
+}

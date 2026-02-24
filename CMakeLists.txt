@@ -19,6 +19,7 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        translation_ressources.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -30,9 +31,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlayerLayoutManager.h PlayerLayoutManager.cpp
         Media.h Media.cpp
         PlaylistManager.h PlaylistManager.cpp
-
         Test.h Test.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
+        TextManager.h TextManager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET SLV APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

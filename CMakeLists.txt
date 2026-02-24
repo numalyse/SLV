@@ -19,6 +19,7 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        icon_ressources.qrc
         translation_ressources.qrc
 )
 
@@ -33,6 +34,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlaylistManager.h PlaylistManager.cpp
         Test.h Test.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
+        Toolbar.h
+        ToolbarButton.h ToolbarButton.cpp
+        SimpleToolbar.h SimpleToolbar.cpp
         TextManager.h TextManager.cpp
     )
 # Define target properties for Android with Qt 6 as:

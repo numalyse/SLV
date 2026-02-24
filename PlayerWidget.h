@@ -1,6 +1,9 @@
 #ifndef PLAYERWIDGET_H
 #define PLAYERWIDGET_H
 
+#include "SimpleToolbar.h"
+#include "Toolbar.h"
+
 #include <QWidget>
 #include <qmainwindow.h>
 #include <vlc/vlc.h>
@@ -34,9 +37,11 @@ private:
     libvlc_instance_t *m_vlc;
     libvlc_media_player_t *m_player;
 
-    QToolBar* m_toolBar = nullptr;
+    Toolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;
+    QAction* m_addPlayerAction;
+    QAction* m_removePlayerAction;
     QWidget* m_videoWidget = nullptr;
 
 };

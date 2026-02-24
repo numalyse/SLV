@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="play.png">icons/play.png</file>
+        <file alias="pause.png">icons/pause.png</file>
+        <file alias="slow_down.png">icons/slow_down.png</file>
+        <file alias="no_sound.png">icons/no_sound.png</file>
+        <file alias="speed_up.png">icons/speed_up.png</file>
+        <file alias="fullscreen.png">icons/fullscreen.png</file>
+    </qresource>
+</RCC>

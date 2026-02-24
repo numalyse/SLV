@@ -1,4 +1,6 @@
 #include "PlayerWidget.h"
+#include "SimpleToolbar.h"
+
 #include <QDebug>
 #include <QApplication>
 #include <QResizeEvent>
@@ -24,15 +26,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // ===== Toolbar ===== //
-    m_toolBar = new QToolBar(this);
-    m_actionPlayPause = m_toolBar->addAction("▶ / ⏸");
-    m_actionStop      = m_toolBar->addAction("⏹");
-
-    connect(m_actionPlayPause, &QAction::triggered,
-            this, &PlayerWidget::togglePlayPause);
-    connect(m_actionStop, &QAction::triggered,
-            this, &PlayerWidget::stop);
-
+    m_toolBar = new SimpleToolbar(this);
 
     m_videoWidget = new QWidget(this);
     m_videoWidget->setAttribute(Qt::WA_NativeWindow);

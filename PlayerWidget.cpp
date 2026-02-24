@@ -52,7 +52,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         return;
     }
 
-    QString path = "C:/Users/cmauri12/Videos/ici.mp4";
+    QString path = "C:/Users/kviguier/Videos/extraitavare.mp4";
     QFile f(path);
     qDebug() << "Fichier existe ?" << f.exists();
 

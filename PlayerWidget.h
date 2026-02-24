@@ -23,6 +23,8 @@ public:
 
 signals:
     void activated(PlayerWidget* self);
+    void addPlayer();
+    void removePlayer(PlayerWidget* self);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

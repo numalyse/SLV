@@ -3,23 +3,34 @@
 
 #include <QObject>
 
+#include "PlayerWidget.h"
+
 class PlayerWidget;
 
-class PlayerLayoutManager : public QObject
+class PlayerLayoutManager : public QWidget
 {
     Q_OBJECT
 public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
+    ~PlayerLayoutManager();
 
-    QWidget* createLayout(const QVector<PlayerWidget*> &players, int count);
+    QVector<PlayerWidget*> m_players;
+
+    QWidget* createLayout();
 
 private:
-    QWidget* create1(const QVector<PlayerWidget*>& players);
-    QWidget* create2(const QVector<PlayerWidget*>& players);
-    QWidget* create3(const QVector<PlayerWidget*>& players);
-    QWidget* create4(const QVector<PlayerWidget*>& players);
+    QWidget* create1();
+    QWidget* create2();
+    QWidget* create3();
+    QWidget* create4();
 
 signals:
+    void updateContainer(QWidget*);
+
+public slots:
+    void addPlayer2();
+    void removePlayer2(PlayerWidget* playerToDestroy);
+
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

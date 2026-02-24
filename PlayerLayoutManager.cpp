@@ -5,44 +5,62 @@
 #include <QWidget>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QDebug>
+
+// #include <iostream>
 
 PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
-    : QObject{parent}
+    : QWidget{}
 {
+    m_players.reserve(4);
+    PlayerWidget* player = new PlayerWidget();
+    PlayerWidget* player2 = new PlayerWidget();
+    m_players.append(player);
+    m_players.append(player2);
+    connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
+    connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
+}
+
+PlayerLayoutManager::~PlayerLayoutManager()
+{
+    for (size_t IPlayer = 0; IPlayer < m_players.size(); IPlayer++)
+    {
+        // fuite mÃ©moire ? peut etre ?
+    }
 
 }
 
 
-QWidget* PlayerLayoutManager::createLayout(const QVector<PlayerWidget*> &players, int count)
+QWidget* PlayerLayoutManager::createLayout()
 {
-    switch (count){
-    case 1: return create1(players);
-    case 2: return create2(players);
-    case 3: return create3(players);
-    case 4: return create4(players);
-        default: return nullptr;
+    switch (m_players.size()){
+    case 1: return create1();
+    case 2: return create2();
+    case 3: return create3();
+    case 4: return create4();
+    default: return nullptr;
     }
 }
 
-QWidget* PlayerLayoutManager::create1(const QVector<PlayerWidget*>& players)
+QWidget* PlayerLayoutManager::create1()
 {
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
     layout->setContentsMargins(0,0,0,0);
 
-    if (!players.isEmpty())
-        layout->addWidget(players[0]);
+    if (!m_players.isEmpty())
+        layout->addWidget(m_players[0]);
 
     return container;
 }
 
-QWidget* PlayerLayoutManager::create2(const QVector<PlayerWidget*>& players)
+QWidget* PlayerLayoutManager::create2()
 {
     auto *splitter = new QSplitter(Qt::Horizontal);
 
-    if (players.size() >= 2) {
-        splitter->addWidget(players[0]);
-        splitter->addWidget(players[1]);
+    if (m_players.size() >= 2) {
+        splitter->addWidget(m_players[0]);
+        splitter->addWidget(m_players[1]);
     }
 
     auto *container = new QWidget;
@@ -53,18 +71,18 @@ QWidget* PlayerLayoutManager::create2(const QVector<PlayerWidget*>& players)
     return container;
 }
 
-QWidget* PlayerLayoutManager::create3(const QVector<PlayerWidget*>& players)
+QWidget* PlayerLayoutManager::create3()
 {
-    if (players.size() < 3) return nullptr;
+    if (m_players.size() < 3) return nullptr;
 
     auto *mainSplitter = new QSplitter(Qt::Vertical);
 
     auto *top = new QSplitter(Qt::Horizontal);
-    top->addWidget(players[0]);
-    top->addWidget(players[1]);
+    top->addWidget(m_players[0]);
+    top->addWidget(m_players[1]);
 
     mainSplitter->addWidget(top);
-    mainSplitter->addWidget(players[2]);
+    mainSplitter->addWidget(m_players[2]);
 
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
@@ -74,20 +92,20 @@ QWidget* PlayerLayoutManager::create3(const QVector<PlayerWidget*>& players)
     return container;
 }
 
-QWidget* PlayerLayoutManager::create4(const QVector<PlayerWidget*>& players)
+QWidget* PlayerLayoutManager::create4()
 {
-    if (players.size() < 4) return nullptr;
+    if (m_players.size() < 4) return nullptr;
 
     auto *mainSplitter = new QSplitter(Qt::Vertical);
 
     auto *top = new QSplitter(Qt::Horizontal);
     auto *bottom = new QSplitter(Qt::Horizontal);
 
-    top->addWidget(players[0]);
-    top->addWidget(players[1]);
+    top->addWidget(m_players[0]);
+    top->addWidget(m_players[1]);
 
-    bottom->addWidget(players[2]);
-    bottom->addWidget(players[3]);
+    bottom->addWidget(m_players[2]);
+    bottom->addWidget(m_players[3]);
 
     mainSplitter->addWidget(top);
     mainSplitter->addWidget(bottom);
@@ -98,4 +116,26 @@ QWidget* PlayerLayoutManager::create4(const QVector<PlayerWidget*>& players)
     layout->addWidget(mainSplitter);
 
     return container;
+}
+
+
+// slots
+void PlayerLayoutManager::addPlayer2()
+{
+    if(m_players.size() < 4){
+        auto* player = new PlayerWidget();
+        m_players.append(player);
+        connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
+        connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
+        auto* container = createLayout();
+        emit updateContainer(container);
+    }
+}
+
+void PlayerLayoutManager::removePlayer2(PlayerWidget* playerToRemove){
+    if (m_players.size() > 1){
+        m_players.removeOne(playerToRemove);
+        auto* container = createLayout();
+        emit updateContainer(container);
+    }
 }

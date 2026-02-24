@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "PlayerLayoutManager.h"
+#include "GlobalPlayerManager.h"
 #include "PlayerWidget.h"
 
 #include <vlc/vlc.h>
@@ -37,40 +37,21 @@ MainWindow::MainWindow(QWidget *parent)
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);
 
-    m_layoutManager = new PlayerLayoutManager(this);
+    m_globalPlayerManager = new GlobalPlayerManager(this);
 
-    for (int i = 0; i < 4; ++i) {
-        auto *player = new PlayerWidget;
-        m_players.append(player);
-    }
-
-    setPlayers(1);
-
+    auto *layout = ui->centralwidget->layout();
+    layout->addWidget(m_globalPlayerManager);
 }
 
 MainWindow::~MainWindow()
 {
-    m_players.clear();
     delete ui;
 
 }
 
 
 
-void MainWindow::setPlayers(int count)
-{
-    auto *layout = ui->centralwidget->layout();
 
-    if (m_currentLayout) {
-        layout->removeWidget(m_currentLayout);
-        delete m_currentLayout;
-        m_currentLayout = nullptr;
-    }
-
-    m_currentLayout = m_layoutManager->createLayout(m_players, count);
-    if (m_currentLayout)
-        layout->addWidget(m_currentLayout);
-}
 
 
 

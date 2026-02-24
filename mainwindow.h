@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "PlayerWidget.h"
+#include "GlobalPlayerManager.h"
 #include <vlc/vlc.h>
 
 #include <QMainWindow>
@@ -26,7 +26,7 @@ public:
     ~MainWindow();
 
 public slots:
-    void setPlayers(int count);
+
 
 private:
     Ui::MainWindow *ui;
@@ -34,9 +34,9 @@ private:
     QSplitter* splitter = nullptr;
     QSplitter* splitter2 = nullptr;
 
-    PlayerLayoutManager* m_layoutManager = nullptr;
+    GlobalPlayerManager* m_globalPlayerManager = nullptr;
     QWidget* m_currentLayout = nullptr;
-    QVector<PlayerWidget*> m_players;
+    // QVector<PlayerWidget*> m_players;
 
 };
 #endif // MAINWINDOW_H

@@ -4,8 +4,8 @@
 #include <QJsonDocument>
 #include <QDebug>
 
-/// @brief Charge le json de la langue choisi
-/// @param langCode "fr","en"
+/// @brief Charge le JSON de la langue choisie
+/// @param langCode "fr", "en"
 void TextManager::loadLanguage(const QString& langCode) 
 {
     QString filePath = ":/lang/" + langCode + ".json";
@@ -21,9 +21,9 @@ void TextManager::loadLanguage(const QString& langCode)
     }
 }
 
-/// @brief Retrouve la valeur associé à la clé
+/// @brief Retrouve la valeur associée à la clé
 /// @param key QString
-/// @return QString, Si la valeur associé à la clé est trouvé, retourne la valeur, sinon retourne la clé
+/// @return QString. Si la valeur associée à la clé est trouvée, retourne la valeur, sinon retourne la clé.
 QString TextManager::get(const QString &key) const
 {
     if (m_texts.contains(key)) {

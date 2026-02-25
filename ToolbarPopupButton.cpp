@@ -16,7 +16,7 @@ ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QWidget *widgetToDisplay
 
     widgetToDisplay->setParent(nullptr);
     m_widgetToDisplay = widgetToDisplay;
-    m_widgetToDisplay->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);// Le widget ne sera plus dans une fenêtre séparé et sera au dessus des autres widgets
+    m_widgetToDisplay->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);// Le widget ne sera plus dans une fenêtre séparé et sera au dessus des autres widgets
     
     m_widgetToDisplay->installEventFilter(this);
     m_widgetToDisplay->hide();

@@ -28,11 +28,18 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     testWidget->setFixedSize(20,100);
     mainLayoutTest->addWidget(testWidget);
 
-    m_muteBtn = new ToolbarPopupButton(m_containerWidget, containerTest, "sound_off.png",  TextManager::instance().get("tooltip_sound_off"));
+    m_muteBtn = new ToolbarToggleHoverButton(
+        m_containerWidget, 
+        containerTest, 
+        false,
+        "sound_on.png",  
+        TextManager::instance().get("tooltip_sound_on"),
+        "sound_off.png",  
+        TextManager::instance().get("tooltip_sound_off")
+    );
 
     
     // ------- test speed btn, click show popup
-    
     QWidget* containerTest2 = new QWidget();
     QVBoxLayout* mainLayoutTest2 = new QVBoxLayout(containerTest2);
     mainLayoutTest2->setContentsMargins(0, 0, 0, 0);
@@ -63,10 +70,10 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_loopBtn = new ToolbarToggleButton(
         m_containerWidget, 
         false,
-        "loop_off.png", 
-        TextManager::instance().get("tooltip_loop_off"),
         "loop_on.png", 
-        TextManager::instance().get("tooltip_loop_on")
+        TextManager::instance().get("tooltip_loop_on"),
+        "loop_off.png", 
+        TextManager::instance().get("tooltip_loop_off")
     );
 
 

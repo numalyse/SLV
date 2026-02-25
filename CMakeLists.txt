@@ -38,6 +38,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ToolbarButton.h ToolbarButton.cpp
         ToolbarToggleButton.h ToolbarToggleButton.cpp
         ToolbarPopupButton.h ToolbarPopupButton.cpp
+        ToolbarToggleHoverButton.h ToolbarToggleHoverButton.cpp
         SimpleToolbar.h SimpleToolbar.cpp
         TextManager.h TextManager.cpp
     )

@@ -4,6 +4,7 @@
 #include "Toolbar.h"
 #include "ToolbarButton.h"
 #include "ToolbarToggleButton.h"
+#include "ToolbarPopupButton.h"
 
 #include <QLayout>
 #include <QSlider>
@@ -29,14 +30,13 @@ private:
 
     QSlider* m_slider = nullptr;
 
-    ToolbarToggleButton* m_muteBtn = nullptr;
-    // slider a afficher au survol du bouton mute
-    QSlider* m_soundSlider = nullptr;
+    ToolbarPopupButton* m_muteBtn = nullptr;
+    ToolbarPopupButton* m_speedBtn = nullptr;
 
     ToolbarButton* m_slowDownBtn = nullptr;
     ToolbarButton* m_speedUpBtn = nullptr;
 
-    ToolbarButton* m_loopBtn = nullptr;
+    ToolbarToggleButton* m_loopBtn = nullptr;
 
 };
 

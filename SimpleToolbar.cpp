@@ -2,6 +2,7 @@
 #include "TextManager.h"
 #include "ToolbarButton.h"
 #include "ToolbarToggleButton.h"
+#include "ToolbarPopupButton.h" 
 
 #include <QWidget>
 #include <QPushButton>
@@ -19,18 +20,30 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
-    m_muteBtn = new ToolbarToggleButton(
-        m_containerWidget, 
-        false,
-        "sound_on.png", 
-        TextManager::instance().get("tooltip_sound_on"),
-        "sound_off.png", 
-        TextManager::instance().get("tooltip_sound_off")
-    );
-    
+    // ------- test mute btn, hover et toggle
+    QWidget* containerTest = new QWidget();
+    QVBoxLayout* mainLayoutTest = new QVBoxLayout(containerTest);
+    mainLayoutTest->setContentsMargins(0, 0, 0, 0);
+    QSlider* testWidget = new QSlider(Qt::Vertical, containerTest);
+    testWidget->setFixedSize(20,100);
+    mainLayoutTest->addWidget(testWidget);
 
-    m_soundSlider = new QSlider(Qt::Vertical, m_containerWidget);
-    m_soundSlider->setFixedSize(20,100);
+    m_muteBtn = new ToolbarPopupButton(m_containerWidget, containerTest, "sound_off.png",  TextManager::instance().get("tooltip_sound_off"));
+
+    
+    // ------- test speed btn, click show popup
+    
+    QWidget* containerTest2 = new QWidget();
+    QVBoxLayout* mainLayoutTest2 = new QVBoxLayout(containerTest2);
+    mainLayoutTest2->setContentsMargins(0, 0, 0, 0);
+    QSlider* testWidget2 = new QSlider(Qt::Vertical, containerTest2);
+    testWidget2->setFixedSize(20,100);
+    mainLayoutTest2->addWidget(testWidget2);
+
+    m_speedBtn = new ToolbarPopupButton(m_containerWidget, containerTest2, "speed.png",  TextManager::instance().get("tooltip_speed"));
+
+    // exemple pour connecter le slider dans le widget popup connect(testWidget, &QSlider::valueChanged, this, [&] () { qDebug() << "oui"; });
+
     m_slowDownBtn = new ToolbarButton(m_containerWidget, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
     
     m_playPauseBtn = new ToolbarToggleButton(
@@ -46,13 +59,21 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_stopBtn = new ToolbarButton(m_containerWidget, "stop.png", TextManager::instance().get("tooltip_stop"));
     m_ejectBtn = new ToolbarButton(m_containerWidget, "eject.png", TextManager::instance().get("tooltip_eject"));
     m_fullscreenBtn = new ToolbarButton(m_containerWidget, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
-    m_loopBtn = new ToolbarButton(m_containerWidget, "loop_off", TextManager::instance().get("tooltip_loop_off"));
+
+    m_loopBtn = new ToolbarToggleButton(
+        m_containerWidget, 
+        false,
+        "loop_off.png", 
+        TextManager::instance().get("tooltip_loop_off"),
+        "loop_on.png", 
+        TextManager::instance().get("tooltip_loop_on")
+    );
 
 
     setDefaultUI();
 }
 
-
+/// @brief Met à jour le layout du slider pour afficher l'interface en plein écran
 void SimpleToolbar::setFullscreenUI()
 {
     if (m_containerWidget->layout() != nullptr) {
@@ -62,6 +83,7 @@ void SimpleToolbar::setFullscreenUI()
     // Créer un layout quand on est en fullscreen
 }
 
+/// @brief Met à jour le layout du slider pour afficher l'interface par défaut
 void SimpleToolbar::setDefaultUI()
 {
     if (m_containerWidget->layout() != nullptr) {
@@ -78,9 +100,9 @@ void SimpleToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_slider);
 
-    QHBoxLayout* buttonLayout =  new QHBoxLayout();   
+    QHBoxLayout* buttonLayout = new QHBoxLayout();   
     buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_soundSlider);
+    buttonLayout->addWidget(m_speedBtn);
     buttonLayout->addWidget(m_slowDownBtn);
     buttonLayout->addWidget(m_playPauseBtn);
     buttonLayout->addWidget(m_speedUpBtn);

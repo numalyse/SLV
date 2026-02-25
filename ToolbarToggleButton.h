@@ -30,6 +30,7 @@ private:
     QString m_iconPathOff;
     QString m_toolTipTextOff;
 
+protected:
     void updateIcons(bool checked);
 
 protected slots:

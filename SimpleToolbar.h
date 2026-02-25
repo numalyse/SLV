@@ -5,6 +5,7 @@
 #include "ToolbarButton.h"
 #include "ToolbarToggleButton.h"
 #include "ToolbarPopupButton.h"
+#include "ToolbarToggleHoverButton.h"
 
 #include <QLayout>
 #include <QSlider>
@@ -30,7 +31,7 @@ private:
 
     QSlider* m_slider = nullptr;
 
-    ToolbarPopupButton* m_muteBtn = nullptr;
+    ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
 
     ToolbarButton* m_slowDownBtn = nullptr;

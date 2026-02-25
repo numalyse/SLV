@@ -32,9 +32,9 @@ private:
 
     void updateIcons(bool checked);
 
-private slots:
-    void onButtonToggled(bool checked);
-    
+protected slots:
+    virtual void onButtonToggled(bool checked);
+
 };
 
 #endif

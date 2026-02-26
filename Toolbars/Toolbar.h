@@ -5,6 +5,7 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 
 #include <QWidget>
+#include <TextManager.h>
 
 /// @brief Classe abstraite qui sert de base pour les différentes toolbars.
 class Toolbar : public QWidget
@@ -13,6 +14,23 @@ Q_OBJECT
 
 public:
     explicit Toolbar(QWidget* parent = nullptr) : QWidget(parent) {
+        m_playPauseBtn = new ToolbarToggleButton(
+            this,
+            true,
+            "pause.png",
+            TextManager::instance().get("tooltip_pause"),
+            "play.png",
+            TextManager::instance().get("tooltip_play")
+        );
+
+        connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, [&](){
+            emit playRequested();
+        });
+        connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, [&](){emit pauseRequested();});
+        connect(m_stopBtn, &ToolbarButton::clicked, this, &Toolbar::stopRequested);
+        connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequested);
+        connect(m_fullscreenBtn, &ToolbarButton::clicked, this, &Toolbar::fullscreenRequested);
+        qDebug() << "connect successful";
     }
 
     virtual ~Toolbar() = default;
@@ -27,6 +45,14 @@ protected:
     ToolbarButton* m_stopBtn = nullptr;
     ToolbarButton* m_ejectBtn = nullptr;
     ToolbarButton* m_fullscreenBtn = nullptr;
+
+signals:
+
+    void playRequested();
+    void pauseRequested();
+    void stopRequested();
+    void ejectRequested();
+    void fullscreenRequested();
 };
 
 #endif // TOOLBAR_H

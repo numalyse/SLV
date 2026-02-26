@@ -10,6 +10,7 @@ class GlobalPlayerManager : public QWidget
 public:
     explicit GlobalPlayerManager(QWidget *parent = nullptr);
     QWidget* m_currentLayout = nullptr;
+
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
 

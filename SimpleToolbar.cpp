@@ -11,12 +11,10 @@
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
-    m_containerWidget = new QWidget(this);
+    m_currentTimeLabel = new QLabel("00:00:00", this);
+    m_durationLabel = new QLabel("00:00:00", this);
 
-    m_currentTimeLabel = new QLabel("00:00:00");
-    m_durationLabel = new QLabel("00:00:00");
-
-    m_slider = new QSlider(Qt::Horizontal, m_containerWidget);
+    m_slider = new QSlider(Qt::Horizontal, this);
 
     QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
@@ -29,7 +27,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     mainLayoutTest->addWidget(testWidget);
 
     m_muteBtn = new ToolbarToggleHoverButton(
-        m_containerWidget, 
+        this, 
         containerTest, 
         false,
         "sound_on.png",  
@@ -47,14 +45,14 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     testWidget2->setFixedSize(200,20);
     mainLayoutTest2->addWidget(testWidget2);
 
-    m_speedBtn = new ToolbarPopupButton(m_containerWidget, containerTest2, "speed.png",  TextManager::instance().get("tooltip_speed"));
+    m_speedBtn = new ToolbarPopupButton(this, containerTest2, "speed.png",  TextManager::instance().get("tooltip_speed"));
 
     // exemple pour connecter le slider dans le widget popup connect(testWidget, &QSlider::valueChanged, this, [&] () { qDebug() << "oui"; });
 
-    m_slowDownBtn = new ToolbarButton(m_containerWidget, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
+    m_slowDownBtn = new ToolbarButton(this, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
     
     m_playPauseBtn = new ToolbarToggleButton(
-        m_containerWidget, 
+        this, 
         false,
         "pause.png", 
         TextManager::instance().get("tooltip_pause"),
@@ -62,13 +60,13 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         TextManager::instance().get("tooltip_play")
     );
 
-    m_speedUpBtn = new ToolbarButton(m_containerWidget, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
-    m_stopBtn = new ToolbarButton(m_containerWidget, "stop.png", TextManager::instance().get("tooltip_stop"));
-    m_ejectBtn = new ToolbarButton(m_containerWidget, "eject.png", TextManager::instance().get("tooltip_eject"));
-    m_fullscreenBtn = new ToolbarButton(m_containerWidget, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
+    m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
+    m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
+    m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
+    m_fullscreenBtn = new ToolbarButton(this, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
 
     m_loopBtn = new ToolbarToggleButton(
-        m_containerWidget, 
+        this, 
         false,
         "loop_on.png", 
         TextManager::instance().get("tooltip_loop_on"),
@@ -76,15 +74,14 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         TextManager::instance().get("tooltip_loop_off")
     );
 
-
     setDefaultUI();
 }
 
 /// @brief Met à jour le layout du slider pour afficher l'interface en plein écran
 void SimpleToolbar::setFullscreenUI()
 {
-    if (m_containerWidget->layout() != nullptr) {
-        delete m_containerWidget->layout();
+    if (this->layout() != nullptr) {
+        delete this->layout();
     }
 
     // Créer un layout quand on est en fullscreen
@@ -93,11 +90,11 @@ void SimpleToolbar::setFullscreenUI()
 /// @brief Met à jour le layout du slider pour afficher l'interface par défaut
 void SimpleToolbar::setDefaultUI()
 {
-    if (m_containerWidget->layout() != nullptr) {
-        delete m_containerWidget->layout();
+    if (layout() != nullptr) {
+        delete layout();
     }
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(m_containerWidget);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
@@ -119,5 +116,4 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_loopBtn);
     mainLayout->addLayout(buttonLayout);
 
-    this->addWidget(m_containerWidget);
 }

@@ -14,5 +14,7 @@
         <file alias="speed.png">icons/speed.png</file>
         <file alias="next.png">icons/next.png</file>
         <file alias="prev.png">icons/prev.png</file>
+        <file alias="plus.png">icons/plus.png</file>
+        <file alias="minus.png">icons/minus.png</file>
     </qresource>
 </RCC>

@@ -38,6 +38,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp
         Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp
         Toolbars/SimpleToolbar.h Toolbars/SimpleToolbar.cpp
+        Toolbars/ExtensionToolbar.h Toolbars/ExtensionToolbar.cpp
 
         ToolbarButtons/ToolbarButton.h ToolbarButtons/ToolbarButton.cpp
         ToolbarButtons/ToolbarToggleButton.h ToolbarButtons/ToolbarToggleButton.cpp

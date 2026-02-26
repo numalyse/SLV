@@ -16,6 +16,8 @@
 #include <QSplitter>
 #include <QIcon>
 #include <QDir>
+#include <QAction>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -43,6 +45,36 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto *layout = ui->centralwidget->layout();
     layout->addWidget(m_globalPlayerManager);
+
+    createMenuBar();
+
+}
+
+void MainWindow::createMenuBar()
+{
+    auto *fileMenu = menuBar()->addMenu("&Fichier");
+    auto *openMediaAction = fileMenu->addAction("&Ouvrir une vidéo");
+    connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaFile);
+
+}
+
+void MainWindow::openMediaFile()
+{
+    QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob)");
+    if(files_paths.empty()){
+        qDebug() << "Pas de fichier sélectionné";
+        return;
+    }
+    if(files_paths.size() > 4){
+        qDebug() << "Trop de fichiers sélectionnés";
+        return;
+    }
+    qDebug() << "Fichiers sélectionnés : " << files_paths;
+    for(size_t IFilePath = 0; IFilePath < files_paths.size(); ++IFilePath){
+        qDebug() << files_paths.at(IFilePath);
+    }
+    m_globalPlayerManager->setPlayersFromPaths(files_paths);
+
 }
 
 MainWindow::~MainWindow()
@@ -50,11 +82,3 @@ MainWindow::~MainWindow()
     delete ui;
 
 }
-
-
-
-
-
-
-
-

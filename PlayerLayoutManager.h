@@ -16,13 +16,14 @@ public:
 
     QVector<PlayerWidget*> m_players;
 
-    QWidget* createLayout();
+    QWidget* createLayout(const int count);
+    QWidget* createLayoutFromPaths(const QStringList& filesPaths);
 
 private:
-    QWidget* create1();
-    QWidget* create2();
-    QWidget* create3();
-    QWidget* create4();
+    QWidget* create1(const QStringList& filePath = QStringList(""));
+    QWidget* create2(const QStringList& filesPaths = QStringList(""));
+    QWidget* create3(const QStringList& filesPaths = QStringList(""));
+    QWidget* create4(const QStringList& filesPaths = QStringList(""));
 
 signals:
     void updateContainer(QWidget*);

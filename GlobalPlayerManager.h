@@ -9,11 +9,14 @@ class GlobalPlayerManager : public QWidget
     Q_OBJECT
 public:
     explicit GlobalPlayerManager(QWidget *parent = nullptr);
+    QWidget* m_currentLayout = nullptr;
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
-    QWidget* m_currentLayout = nullptr;
+
+    QVBoxLayout* layout;
 public slots:
     void setPlayers();
+    void setPlayersFromPaths(QStringList);
 
 signals:
 };

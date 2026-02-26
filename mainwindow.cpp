@@ -53,14 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::createMenuBar()
 {
     auto *fileMenu = menuBar()->addMenu("&Fichier");
-    auto *openMediaAction = fileMenu->addAction("&Ouvrir une vidéo");
+    auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaFile);
 
 }
 
 void MainWindow::openMediaFile()
 {
-    QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob)");
+    QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";
         return;

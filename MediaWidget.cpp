@@ -14,7 +14,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     // ===== VLC ===== //
     const char* const vlc_args[] = {
         "--quiet",
-        "--aout=directsound"
+        "--no-video-title-show"
     };
 
     m_vlc = libvlc_new(2, vlc_args);
@@ -23,25 +23,8 @@ MediaWidget::MediaWidget(QWidget *parent)
         return;
     }
 
-    QString path = "C:/Users/mbiremba/Desktop/Films/The Kid (1921) 3 min.mp4";
-    QFile f(path);
-    qDebug() << "Fichier existe ?" << f.exists();
-
-    QUrl url = QUrl::fromLocalFile(path);
-    QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
-
-    libvlc_media_t *media =
-        libvlc_media_new_location(m_vlc, urlBytes.constData());
-    // qDebug() << "Metadata : " << libvlc_media_get_meta(media, libvlc_meta_t::libvlc_meta_Date);
-
-
-    if (!media) {
-        qDebug() << "Erreur chargement média";
-        return;
-    }
-
-    m_player = libvlc_media_player_new_from_media(media);
-    libvlc_media_release(media);
+    m_vlc = libvlc_new(2, vlc_args);
+    m_player = libvlc_media_player_new(m_vlc);
 
 #if defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(
@@ -137,8 +120,10 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
         libvlc_media_player_stop(m_player);
 
+
         QUrl url = QUrl::fromLocalFile(pathCopy);
-        QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
+        QByteArray urlBytes =
+            url.toString(QUrl::FullyEncoded).toUtf8();
 
         libvlc_media_t* media =
             libvlc_media_new_location(m_vlc, urlBytes.constData());
@@ -150,6 +135,5 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         libvlc_media_release(media);
 
         libvlc_media_player_play(m_player);
-
     }, Qt::QueuedConnection);
 }

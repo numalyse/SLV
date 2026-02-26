@@ -2,6 +2,7 @@
 #define ADVANCEDTOOLBAR_H 
 
 #include "Toolbars/SimpleToolbar.h"
+#include "Toolbars/ExtensionToolbar.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -24,10 +25,12 @@ public:
     void setDefaultUI() override;
 
 private:
-    ToolbarButton* m_prevMediaBtn;
-    ToolbarButton* m_nextMediaBtn;
-    // ToolbarExtension* m_toolbarExtension = nullptr;
+    ToolbarButton* m_prevMediaBtn = nullptr;
+    ToolbarButton* m_nextMediaBtn = nullptr;
 
+    ToolbarToggleButton* m_extensionBtn = nullptr;
+
+    ExtensionToolbar* m_extensionToolbar = nullptr;
 
 };
 

@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 
 
-GlobalToolbar::GlobalToolbar(QWidget *parent)
+GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
 {
     QHBoxLayout* buttonLayout =  new QHBoxLayout();
 

@@ -15,8 +15,7 @@ ToolbarToggleButton::ToolbarToggleButton(
     const QString &iconNameOn, 
     const QString &toolTipTextOn, 
     const QString &iconNameOff, 
-    const QString &toolTipTextOff)
-
+    const QString &toolTipTextOff)  : QPushButton(parent)
 {
 
     m_iconPathOn = ICONS_PATH + iconNameOn;

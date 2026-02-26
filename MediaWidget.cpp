@@ -62,6 +62,7 @@ void MediaWidget::removeMedia()
 
 void MediaWidget::play()
 {
+    qDebug()<<"m_player : " << m_player;
     if (!m_player) return;
     libvlc_media_player_play(m_player);
 }

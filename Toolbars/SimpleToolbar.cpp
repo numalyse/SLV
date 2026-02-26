@@ -52,14 +52,14 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     //m_slowDownBtn = new ToolbarButton(this, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
     
-    m_playPauseBtn = new ToolbarToggleButton(
-        this, 
-        false,
-        "pause.png", 
-        TextManager::instance().get("tooltip_pause"),
-        "play.png", 
-        TextManager::instance().get("tooltip_play")
-    );
+    // m_playPauseBtn = new ToolbarToggleButton(
+    //     this,
+    //     false,
+    //     "pause.png",
+    //     TextManager::instance().get("tooltip_pause"),
+    //     "play.png",
+    //     TextManager::instance().get("tooltip_play")
+    // );
 
     //m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
     m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));

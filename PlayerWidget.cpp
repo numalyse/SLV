@@ -30,6 +30,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     m_videoWidget = new MediaWidget(this);
 
+    connect(m_toolBar, &Toolbar::playRequested, m_videoWidget, &MediaWidget::play);
+    connect(m_toolBar, &Toolbar::pauseRequested, m_videoWidget, &MediaWidget::pause);
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(m_videoWidget);

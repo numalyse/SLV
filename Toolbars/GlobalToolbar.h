@@ -1,7 +1,7 @@
 #ifndef GLOBALTOOLBAR_H
 #define GLOBALTOOLBAR_H 
 
-#include "Toolbar.h"
+#include "Toolbars/Toolbar.h"
 
 #include <QWidget>
 

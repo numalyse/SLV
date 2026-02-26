@@ -1,4 +1,4 @@
-#include "ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
 
 
 /// @brief Créer un bouton qui change d'icone quand il est cliqué, comportement similaire à un QPushButton checkable.

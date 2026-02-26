@@ -23,7 +23,7 @@ MediaWidget::MediaWidget(QWidget *parent)
         return;
     }
 
-    QString path = "C:/Users/kviguier/Videos/extraitavare.mp4";
+    QString path = "C:/Users/mbiremba/Desktop/Films/The Kid (1921) 3 min.mp4";
     QFile f(path);
     qDebug() << "Fichier existe ?" << f.exists();
 

@@ -2,8 +2,8 @@
 #define PLAYERWIDGET_H
 
 #include "MediaWidget.h"
-#include "SimpleToolbar.h"
-#include "Toolbar.h"
+#include "Toolbars/SimpleToolbar.h"
+#include "Toolbars/Toolbar.h"
 #include "Media.h"
 
 #include <QWidget>

@@ -1,8 +1,9 @@
-#include "SimpleToolbar.h"
+#include "Toolbars/SimpleToolbar.h"
 #include "TextManager.h"
-#include "ToolbarButton.h"
-#include "ToolbarToggleButton.h"
-#include "ToolbarPopupButton.h" 
+
+#include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarPopupButton.h" 
 
 #include <QWidget>
 #include <QPushButton>
@@ -49,7 +50,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     // exemple pour connecter le slider dans le widget popup connect(testWidget, &QSlider::valueChanged, this, [&] () { qDebug() << "oui"; });
 
-    m_slowDownBtn = new ToolbarButton(this, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
+    //m_slowDownBtn = new ToolbarButton(this, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
     
     m_playPauseBtn = new ToolbarToggleButton(
         this, 
@@ -60,7 +61,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         TextManager::instance().get("tooltip_play")
     );
 
-    m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
+    //m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
     m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
     m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
     m_fullscreenBtn = new ToolbarButton(this, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
@@ -80,8 +81,8 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 /// @brief Met à jour le layout du slider pour afficher l'interface en plein écran
 void SimpleToolbar::setFullscreenUI()
 {
-    if (this->layout() != nullptr) {
-        delete this->layout();
+    if (layout() != nullptr) {
+        delete layout();
     }
 
     // Créer un layout quand on est en fullscreen
@@ -107,9 +108,9 @@ void SimpleToolbar::setDefaultUI()
     QHBoxLayout* buttonLayout = new QHBoxLayout();   
     buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_slowDownBtn);
+    //buttonLayout->addWidget(m_slowDownBtn);
     buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_speedUpBtn);
+    //buttonLayout->addWidget(m_speedUpBtn);
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
     buttonLayout->addWidget(m_fullscreenBtn);

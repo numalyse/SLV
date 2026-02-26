@@ -19,8 +19,8 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        icon_ressources.qrc
-        translation_ressources.qrc
+        Ressources/icon_ressources.qrc
+        Ressources/translation_ressources.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -32,18 +32,24 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlayerLayoutManager.h PlayerLayoutManager.cpp
         Media.h Media.cpp
         PlaylistManager.h PlaylistManager.cpp
-        Test.h Test.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
-        Toolbar.h
-        ToolbarButton.h ToolbarButton.cpp
-        ToolbarToggleButton.h ToolbarToggleButton.cpp
-        ToolbarPopupButton.h ToolbarPopupButton.cpp
-        ToolbarToggleHoverButton.h ToolbarToggleHoverButton.cpp
-        SimpleToolbar.h SimpleToolbar.cpp
+
+        Toolbars/Toolbar.h
+        Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp
+        Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp
+        Toolbars/SimpleToolbar.h Toolbars/SimpleToolbar.cpp
+
+        ToolbarButtons/ToolbarButton.h ToolbarButtons/ToolbarButton.cpp
+        ToolbarButtons/ToolbarToggleButton.h ToolbarButtons/ToolbarToggleButton.cpp
+        ToolbarButtons/ToolbarPopupButton.h ToolbarButtons/ToolbarPopupButton.cpp
+        ToolbarButtons/ToolbarToggleHoverButton.h ToolbarButtons/ToolbarToggleHoverButton.cpp
+
         TextManager.h TextManager.cpp
         MediaWidget.h MediaWidget.cpp
-        GlobalToolbar.h GlobalToolbar.cpp
+
     )
+
+
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET SLV APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
@@ -63,12 +69,18 @@ else()
 endif()
 
 # -----------------------------
+# Pour pouvoir avoir des includes non relatifs
+# -----------------------------
+target_include_directories(SLV PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# -----------------------------
 # Ajout FFMPEG
 # -----------------------------
 set(FFMPEG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg")
 
 #Includes
 target_include_directories(SLV PRIVATE "${FFMPEG_DIR}/include")
+
 
 #Librairies
 target_link_libraries(SLV PRIVATE

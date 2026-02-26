@@ -1,4 +1,4 @@
-#include "ToolbarPopupButton.h"
+#include "ToolbarButtons/ToolbarPopupButton.h"
 
 #include <QtAssert>
 #include <QWidget>

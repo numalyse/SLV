@@ -1,8 +1,8 @@
 #ifndef TOOLBARPOPUPBUTTON_H
 #define TOOLBARPOPUPBUTTON_H 
 
-#include "ToolbarButton.h"
-#include "ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
 
 #include <QPushButton>
 #include <QTimer>

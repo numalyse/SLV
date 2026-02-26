@@ -1,7 +1,7 @@
 #ifndef TOOLBARTOGGLEHOVERBUTTON_H
 #define TOOLBARTOGGLEHOVERBUTTON_H 
 
-#include "ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
 
 #include <QPushButton>
 #include <QTimer>

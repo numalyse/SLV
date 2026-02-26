@@ -24,8 +24,6 @@ void GlobalPlayerManager::setPlayers()
     m_playersWidget = m_layoutManager->createLayout(1);
     if (m_playersWidget){
         layout->addWidget(m_playersWidget);
-        // m_toolbarWidget = new AdvancedToolbar(this);
-        // layout->addWidget(m_toolbarWidget);
         this->setLayout(layout);
     }
 }

@@ -20,7 +20,7 @@ Q_OBJECT
 
 public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
-    void emitSignal();
+
     void setFullscreenUI() override;
     void setDefaultUI() override;
 

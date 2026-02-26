@@ -43,8 +43,8 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     QWidget* containerTest2 = new QWidget();
     QVBoxLayout* mainLayoutTest2 = new QVBoxLayout(containerTest2);
     mainLayoutTest2->setContentsMargins(0, 0, 0, 0);
-    QSlider* testWidget2 = new QSlider(Qt::Vertical, containerTest2);
-    testWidget2->setFixedSize(20,100);
+    QSlider* testWidget2 = new QSlider(Qt::Horizontal, containerTest2);
+    testWidget2->setFixedSize(200,20);
     mainLayoutTest2->addWidget(testWidget2);
 
     m_speedBtn = new ToolbarPopupButton(m_containerWidget, containerTest2, "speed.png",  TextManager::instance().get("tooltip_speed"));

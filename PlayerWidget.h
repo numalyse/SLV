@@ -1,8 +1,10 @@
 #ifndef PLAYERWIDGET_H
 #define PLAYERWIDGET_H
 
+#include "MediaWidget.h"
 #include "SimpleToolbar.h"
 #include "Toolbar.h"
+#include "Media.h"
 
 #include <QWidget>
 #include <qmainwindow.h>
@@ -14,7 +16,7 @@ class PlayerWidget : public QWidget
 
 public:
     explicit PlayerWidget(QWidget *parent = nullptr);
-    ~PlayerWidget();
+    // ~PlayerWidget();
 
     // Contrôle du média
     void play();
@@ -23,26 +25,23 @@ public:
     void togglePlayPause();
 
     void setActive(bool active);
+    void removeMedia();
+    void setMediaFromPath(const QString& filePath);
 
 signals:
-    void activated(PlayerWidget* self);
     void addPlayer();
     void removePlayer(PlayerWidget* self);
 
-protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-
 private:
-    libvlc_instance_t *m_vlc;
-    libvlc_media_player_t *m_player;
+    MediaWidget *m_mediaWidget;
 
+    Media *m_media = nullptr;
     Toolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
-    QWidget* m_videoWidget = nullptr;
+    MediaWidget* m_videoWidget = nullptr;
 
 };
 

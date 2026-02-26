@@ -24,9 +24,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void createMenuBar();
 
 public slots:
-
+    void openMediaFile();
 
 private:
     Ui::MainWindow *ui;

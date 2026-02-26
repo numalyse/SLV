@@ -132,12 +132,16 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
     QString pathCopy = filePath;
 
+    // La méthode stop de libvlc est bloquante, on utilise un appel asynchrone pour éviter un deadlock.
     QMetaObject::invokeMethod(this, [this, pathCopy]() {
 
         libvlc_media_player_stop(m_player);
 
+        QUrl url = QUrl::fromLocalFile(pathCopy);
+        QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
+
         libvlc_media_t* media =
-            libvlc_media_new_path(m_vlc, pathCopy.toUtf8().constData());
+            libvlc_media_new_location(m_vlc, urlBytes.constData());
 
         if (!media)
             return;

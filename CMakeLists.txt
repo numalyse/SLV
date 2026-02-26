@@ -42,6 +42,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         SimpleToolbar.h SimpleToolbar.cpp
         TextManager.h TextManager.cpp
         MediaWidget.h MediaWidget.cpp
+        GlobalToolbar.h GlobalToolbar.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET SLV APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

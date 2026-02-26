@@ -1,8 +1,8 @@
 #ifndef TOOLBAR_H
 #define TOOLBAR_H 
 
-#include "ToolbarButton.h"
-#include "ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
 
 #include <QWidget>
 

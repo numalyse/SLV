@@ -8,7 +8,7 @@
 /// @param langCode "fr", "en"
 void TextManager::loadLanguage(const QString& langCode) 
 {
-    QString filePath = ":/lang/" + langCode + ".json";
+    QString filePath = ":/Ressources/lang/" + langCode + ".json";
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly)) {

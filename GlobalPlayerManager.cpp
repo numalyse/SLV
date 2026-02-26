@@ -1,4 +1,8 @@
 #include "GlobalPlayerManager.h"
+
+#include "Toolbars/Toolbar.h"
+#include "Toolbars/AdvancedToolbar.h"
+
 #include <qlayout.h>
 
 GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
@@ -13,23 +17,25 @@ void GlobalPlayerManager::setPlayers()
 {
     layout = new QVBoxLayout();
 
-    layout->removeWidget(m_currentLayout);
-    delete m_currentLayout;
-    m_currentLayout = nullptr;
+    layout->removeWidget(m_playersWidget);
+    delete m_playersWidget;
+    m_playersWidget = nullptr;
 
-    m_currentLayout = m_layoutManager->createLayout(1);
-    if (m_currentLayout){
-        layout->addWidget(m_currentLayout);
+    m_playersWidget = m_layoutManager->createLayout(1);
+    if (m_playersWidget){
+        layout->addWidget(m_playersWidget);
+        m_toolbarWidget = new AdvancedToolbar(this);
+        layout->addWidget(m_toolbarWidget);
         this->setLayout(layout);
     }
 }
 
 void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 {
-    qDebug() << "Current Layout : " << m_currentLayout;
+    qDebug() << "Current Layout : " << m_playersWidget;
 
-    layout->removeWidget(m_currentLayout);
+    layout->removeWidget(m_playersWidget);
     qDebug() << "Allox";
-    m_currentLayout = m_layoutManager->createLayoutFromPaths(filesPaths);
-    layout->addWidget(m_currentLayout);
+    m_playersWidget = m_layoutManager->createLayoutFromPaths(filesPaths);
+    layout->addWidget(m_playersWidget);
 }

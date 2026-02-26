@@ -1,11 +1,12 @@
 #ifndef SIMPLETOOLBAR_H
 #define SIMPLETOOLBAR_H 
 
-#include "Toolbar.h"
-#include "ToolbarButton.h"
-#include "ToolbarToggleButton.h"
-#include "ToolbarPopupButton.h"
-#include "ToolbarToggleHoverButton.h"
+#include "Toolbars/Toolbar.h"
+
+#include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarPopupButton.h"
+#include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
 #include <QLayout>
 #include <QSlider>
@@ -24,7 +25,7 @@ public:
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
-private:
+protected:
     
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
@@ -34,8 +35,8 @@ private:
     ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
 
-    ToolbarButton* m_slowDownBtn = nullptr;
-    ToolbarButton* m_speedUpBtn = nullptr;
+    //ToolbarButton* m_slowDownBtn = nullptr;
+    //ToolbarButton* m_speedUpBtn = nullptr;
 
     ToolbarToggleButton* m_loopBtn = nullptr;
 

@@ -1,4 +1,4 @@
-#include "ToolbarToggleHoverButton.h"
+#include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
 #include <QtAssert>
 #include <QWidget>

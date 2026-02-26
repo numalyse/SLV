@@ -1,4 +1,4 @@
-#include "ToolbarButton.h"
+#include "ToolbarButtons/ToolbarButton.h"
 
 /// @brief Créer un bouton avec une icone et un tooltip
 /// @param parent QWidget*

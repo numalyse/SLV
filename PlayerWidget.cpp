@@ -1,5 +1,5 @@
 #include "PlayerWidget.h"
-#include "SimpleToolbar.h"
+#include "Toolbars/SimpleToolbar.h"
 
 #include <QDebug>
 #include <QApplication>

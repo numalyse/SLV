@@ -1,8 +1,8 @@
-#include "GlobalToolbar.h"
+#include "Toolbars/GlobalToolbar.h"
 
 #include "TextManager.h"
-#include "ToolbarToggleButton.h"
-#include "ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
+#include "ToolbarButtons/ToolbarButton.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>

@@ -35,8 +35,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_toolBar, &Toolbar::playRequested, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequested, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequested, m_videoWidget, &MediaWidget::stop);
-    connect(m_toolBar, &Toolbar::ejectRequested, m_videoWidget, &MediaWidget::eject);
+    connect(m_toolBar, &Toolbar::stopRequested, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::ejectRequested, m_mediaWidget, &MediaWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequested, this, &PlayerWidget::disablePlayerFullscreen);
 

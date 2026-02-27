@@ -34,12 +34,14 @@ protected:
 
     ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
-
-    //ToolbarButton* m_slowDownBtn = nullptr;
-    //ToolbarButton* m_speedUpBtn = nullptr;
-
     ToolbarToggleButton* m_loopBtn = nullptr;
+    ToolbarButton* m_removePlayerBtn = nullptr;
 
+    // ToolbarButton* m_slowDownBtn
+    // ToolbarButton* m_speedUpBtn;
+
+signals:
+    void removePlayerRequest();
 };
 
 #endif

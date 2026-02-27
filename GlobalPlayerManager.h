@@ -16,11 +16,17 @@ public:
 
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
-
     QVBoxLayout* layout;
+
 public slots:
-    void setPlayers();
+
+    ///@brief Supprime puis Remplace m_playersWidget par le widget retourné par m_layoutManager->createLayoutFromPaths(filesPaths); 
     void setPlayersFromPaths(QStringList);
+
+    /// @brief Supprime le QWidget m_playersWidget pour libérer la mémoire et met à jour m_playersWidget avec le Widget envoyé par PlayerLayoutManager
+    /// @param Le nombre de players dans le nouveau widget, permet de mettre à jour l'ui en fonction du nombre
+    /// @param Le Widget qui va remplacer m_playersWidget
+    void updateContainer(int, QWidget*);
 
 signals:
 };

@@ -27,6 +27,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
+    connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [&]() {
+        emit removePlayerRequest(this);
+    });
 
     m_videoWidget = new MediaWidget(this);
 

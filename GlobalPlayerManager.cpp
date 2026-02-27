@@ -10,30 +10,46 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
 {
     m_layoutManager = new PlayerLayoutManager();
-    setPlayers();
-}
+    connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
 
-void GlobalPlayerManager::setPlayers()
-{
-    layout = new QVBoxLayout();
-
-    layout->removeWidget(m_playersWidget);
-    delete m_playersWidget;
-    m_playersWidget = nullptr;
+    layout = new QVBoxLayout(this);
 
     m_playersWidget = m_layoutManager->createLayout(1);
     if (m_playersWidget){
         layout->addWidget(m_playersWidget);
-        this->setLayout(layout);
     }
 }
 
 void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 {
-    qDebug() << "Current Layout : " << m_playersWidget;
-
     layout->removeWidget(m_playersWidget);
-    qDebug() << "Allox";
+    if (m_playersWidget) { 
+        m_playersWidget->deleteLater();
+    }
     m_playersWidget = m_layoutManager->createLayoutFromPaths(filesPaths);
     layout->addWidget(m_playersWidget);
+}
+
+void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPlayersWidget)
+{
+
+    if(videoPlayersCount){
+        //mettre a jour barre d'outils ect.
+    }
+    else {
+        // mettre a jour barre d'outils si necessaire, modifier ui ect.
+    }
+
+    layout->removeWidget(m_playersWidget);
+
+    if (m_playersWidget) {
+
+        m_playersWidget->deleteLater(); 
+    }
+
+    m_playersWidget = newPlayersWidget;
+    if (m_playersWidget){
+        layout->addWidget(newPlayersWidget);
+    }
+
 }

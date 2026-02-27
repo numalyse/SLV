@@ -12,19 +12,6 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
 {
     QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
-    m_playPauseBtn = new ToolbarToggleButton(
-        this, 
-        false,
-        "pause.png", 
-        TextManager::instance().get("tooltip_pause"),
-        "play.png", 
-        TextManager::instance().get("tooltip_play")
-    );
-
-    m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
-    m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
-    m_fullscreenBtn = new ToolbarButton(this, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
-
     setDefaultUI();
 }
 

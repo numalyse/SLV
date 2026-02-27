@@ -9,8 +9,7 @@
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
-/// @brief Toolbar 
-/// @param parent 
+
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
     m_nextMediaBtn = new ToolbarButton(this, "next.png", TextManager::instance().get("tooltip_next_media"));

@@ -75,10 +75,13 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         TextManager::instance().get("tooltip_loop_off")
     );
 
+    m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));;
+    connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
+
     setDefaultUI();
 }
 
-/// @brief Met à jour le layout du slider pour afficher l'interface en plein écran
+
 void SimpleToolbar::setFullscreenUI()
 {
     if (layout() != nullptr) {
@@ -88,7 +91,7 @@ void SimpleToolbar::setFullscreenUI()
     // Créer un layout quand on est en fullscreen
 }
 
-/// @brief Met à jour le layout du slider pour afficher l'interface par défaut
+
 void SimpleToolbar::setDefaultUI()
 {
     if (layout() != nullptr) {
@@ -115,6 +118,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_ejectBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
+    buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);
 
 }

@@ -25,7 +25,6 @@ public:
     void togglePlayPause();
 
     void setActive(bool active);
-    void removeMedia();
     void setMediaFromPath(const QString& filePath);
 
 signals:

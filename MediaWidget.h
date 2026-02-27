@@ -20,7 +20,6 @@ public slots:
     void stop();
     void togglePlayPause();
 
-
 private:
     libvlc_instance_t *m_vlc;
     libvlc_media_player_t *m_player;

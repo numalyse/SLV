@@ -62,7 +62,6 @@ void MediaWidget::removeMedia()
 
 void MediaWidget::play()
 {
-    qDebug()<<"m_player : " << m_player;
     if (!m_player) return;
     libvlc_media_player_play(m_player);
 }
@@ -88,8 +87,12 @@ void MediaWidget::togglePlayPause()
 
 void MediaWidget::stop()
 {
-    if(!m_player) return;
-    libvlc_media_player_stop(m_player);
+    if (!m_player) return;
+
+    pause();
+    libvlc_media_player_set_position(m_player, 0.0);
+    libvlc_media_player_next_frame(m_player);
+
 }
 
 // ===== Event ===== //

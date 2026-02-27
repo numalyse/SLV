@@ -22,11 +22,12 @@ public:
             "play.png",
             TextManager::instance().get("tooltip_play")
         );
+        m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
+        m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
+        m_fullscreenBtn = new ToolbarButton(this, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
 
-        connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, [&](){
-            emit playRequested();
-        });
-        connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, [&](){emit pauseRequested();});
+        connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequested);
+        connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequested);
         connect(m_stopBtn, &ToolbarButton::clicked, this, &Toolbar::stopRequested);
         connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequested);
         connect(m_fullscreenBtn, &ToolbarButton::clicked, this, &Toolbar::fullscreenRequested);

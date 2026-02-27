@@ -22,8 +22,8 @@ public slots:
 
 
 private:
-    libvlc_instance_t *m_vlc;
-    libvlc_media_player_t *m_player;
+    libvlc_instance_t *m_vlc = nullptr;
+    libvlc_media_player_t *m_player = nullptr;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

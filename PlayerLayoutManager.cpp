@@ -1,5 +1,8 @@
 #include "PlayerLayoutManager.h"
 #include "PlayerWidget.h"
+#include "Toolbars/Toolbar.h"
+#include "Toolbars/GlobalToolbar.h"
+#include "Toolbars/AdvancedToolbar.h"
 
 #include <QObject>
 #include <QWidget>
@@ -45,32 +48,62 @@ void PlayerLayoutManager::activePlayerUpdate(const int activePlayersNeeded){
     }
 }
 
-QWidget* PlayerLayoutManager::createLayout(const int count)
+void PlayerLayoutManager::createLayout(const int count)
 {
      // les players vont etre détruit si on delete l'ancien widget, il faut d'abord modifier leurs parents
     detachAllPlayers();
     activePlayerUpdate(count);
+
+    QWidget* container = nullptr;
+
     switch (count){
-    case 1: return create1();
-    case 2: return create2();
-    case 3: return create3();
-    case 4: return create4();
-    default: return nullptr;
+        case 1: 
+            container = create1();
+            break;
+        case 2: 
+            container = create2();
+            break;
+        case 3: 
+            container = create3();
+            break;
+        case 4: 
+            container = create4();
+            break;
+
+        default: container = nullptr;
     }
+    auto* toolbar = createLayoutToolbar();
+    emit updateContainerRequest(m_activePlayers.size(), container, toolbar);
 }
 
-QWidget* PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
+void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
 {
     detachAllPlayers();
+
     int pathCount = filesPaths.size();
     activePlayerUpdate(pathCount);
+
+    QWidget* container = nullptr;
+
     switch (pathCount){
-    case 1: return create1(filesPaths);
-    case 2: return create2(filesPaths);
-    case 3: return create3(filesPaths);
-    case 4: return create4(filesPaths);
-    default: return nullptr;
+        case 1: 
+            container = create1(filesPaths);
+            break;
+        case 2: 
+            container = create2(filesPaths);
+            break;
+        case 3: 
+            container = create3(filesPaths);
+            break;
+        case 4: 
+            container = create4(filesPaths);
+            break;
+
+        default: container = nullptr;
     }
+    auto* toolbar = createLayoutToolbar();
+    emit updateContainerRequest(m_activePlayers.size(), container, toolbar);
+
 }
 
 void PlayerLayoutManager::detachAllPlayers()
@@ -184,14 +217,47 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
     return container;
 }
 
+Toolbar* PlayerLayoutManager::createGlobalToolbar(){
+    Toolbar* globalToolbar = new GlobalToolbar(nullptr);
+
+    for(auto& IActivePlayer : m_activePlayers){
+        IActivePlayer->getToolbar()->show();
+        connect(globalToolbar, &GlobalToolbar::playRequested, IActivePlayer, &PlayerWidget::play);
+        connect(globalToolbar, &GlobalToolbar::pauseRequested, IActivePlayer, &PlayerWidget::pause);
+    }
+
+    return globalToolbar;
+}
+
+Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
+    Q_ASSERT(m_activePlayers.size() == 1);
+
+    auto* activePlayer = m_activePlayers[0];
+    activePlayer->getToolbar()->hide();
+
+    Toolbar* advancedToolbar = new AdvancedToolbar(nullptr);
+
+    connect(advancedToolbar, &AdvancedToolbar::playRequested, activePlayer, &PlayerWidget::play);
+    connect(advancedToolbar, &AdvancedToolbar::pauseRequested, activePlayer, &PlayerWidget::pause);
+
+    return advancedToolbar;
+}
+
+Toolbar *PlayerLayoutManager::createLayoutToolbar()
+{
+    if(m_activePlayers.size() == 1 ){
+        return createAdvancedToolbar();
+    }else {
+        return createGlobalToolbar();
+    }
+}
+
 // slots
 void PlayerLayoutManager::addPlayer()
 {
     int activePlayerCount = m_activePlayers.size();
     if(activePlayerCount < 4){
-        activePlayerUpdate(activePlayerCount+1);
-        auto* container = createLayout(m_activePlayers.size());
-        emit updateContainerRequest(m_activePlayers.size(), container);
+        createLayout(activePlayerCount + 1 );
     }
 }
 
@@ -199,8 +265,6 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
     int activePlayerCount = m_activePlayers.size();
     if (activePlayerCount > 1){
         m_activePlayers.removeOne(playerToRemove);
-        activePlayerUpdate(m_activePlayers.size());
-        auto* container = createLayout(m_activePlayers.size());
-        emit updateContainerRequest(m_activePlayers.size(), container);
+        createLayout(m_activePlayers.size());
     }
 }

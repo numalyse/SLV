@@ -34,6 +34,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::pauseRequested, m_videoWidget, &MediaWidget::pause);
     connect(m_toolBar, &Toolbar::stopRequested, m_videoWidget, &MediaWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequested, m_videoWidget, &MediaWidget::eject);
+    connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
+    connect(m_toolBar, &Toolbar::disableFullscreenRequested, this, &PlayerWidget::disablePlayerFullscreen);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -66,4 +68,14 @@ void PlayerWidget::setActive(bool active)
 void PlayerWidget::setMediaFromPath(const QString& filePath)
 {
     m_videoWidget->setMediaFromPath(filePath);
+}
+
+void PlayerWidget::enablePlayerFullscreen()
+{
+    emit enablePlayerFullscreenRequested(this);
+}
+
+void PlayerWidget::disablePlayerFullscreen()
+{
+    emit disablePlayerFullscreenRequested(this);
 }

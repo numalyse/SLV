@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     createMenuBar();
 
+    connect(m_globalPlayerManager, &GlobalPlayerManager::enableFullscreenMainRequested, this, &MainWindow::enableFullscreenMain);
+    connect(m_globalPlayerManager, &GlobalPlayerManager::disableFullscreenMainRequested, this, &MainWindow::disableFullscreenMain);
+
 }
 
 void MainWindow::createMenuBar()
@@ -81,4 +84,16 @@ MainWindow::~MainWindow()
 {
     delete ui;
 
+}
+
+void MainWindow::enableFullscreenMain()
+{
+    ui->menubar->hide();
+    showFullScreen();
+}
+
+void MainWindow::disableFullscreenMain()
+{
+    ui->menubar->show();
+    showNormal();
 }

@@ -21,8 +21,12 @@ private:
 public slots:
     void setPlayers();
     void setPlayersFromPaths(QStringList);
+    void enableFullscreenGlobal();
+    void disableFullscreenGlobal();
 
 signals:
+    void enableFullscreenMainRequested();
+    void disableFullscreenMainRequested();
 };
 
 #endif // GLOBALPLAYERMANAGER_H

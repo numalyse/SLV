@@ -30,6 +30,8 @@ public:
 signals:
     void addPlayer();
     void removePlayer(PlayerWidget* self);
+    void enablePlayerFullscreenRequested(PlayerWidget* self);
+    void disablePlayerFullscreenRequested(PlayerWidget* self);
 
 private:
     MediaWidget *m_mediaWidget;
@@ -41,6 +43,10 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_videoWidget = nullptr;
+
+public slots:
+    void enablePlayerFullscreen();
+    void disablePlayerFullscreen();
 
 };
 

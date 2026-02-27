@@ -89,10 +89,8 @@ void MediaWidget::stop()
 
 void MediaWidget::eject(){
     if (!m_player || !libvlc_media_player_get_media(m_player)) return;
-    qDebug() << "Parent avant release : " << parent();
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(m_vlc);
-    qDebug() << "Parent après release : " << parent();
 }
 
 // ===== Event ===== //

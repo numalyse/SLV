@@ -2,9 +2,10 @@
 #define GLOBALPLAYERMANAGER_H
 
 #include "Toolbars/Toolbar.h"
+#include "PlayerLayoutManager.h"
 
 #include <QWidget>
-#include "PlayerLayoutManager.h"
+
 
 class GlobalPlayerManager : public QWidget
 {
@@ -26,7 +27,8 @@ public slots:
     /// @brief Supprime le QWidget m_playersWidget pour libérer la mémoire et met à jour m_playersWidget avec le Widget envoyé par PlayerLayoutManager
     /// @param Le nombre de players dans le nouveau widget, permet de mettre à jour l'ui en fonction du nombre
     /// @param Le Widget qui va remplacer m_playersWidget
-    void updateContainer(int, QWidget*);
+    /// @param La nouvelle toolbar globale, si 1 seul player la toolbar est une AdvancedToolBar 
+    void updateContainer(int, QWidget*, Toolbar*);
 
 signals:
 };

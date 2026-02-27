@@ -28,6 +28,8 @@ public:
 
 public slots:
     void openMediaFile();
+    void enableFullscreenMain();
+    void disableFullscreenMain();
 
 private:
     Ui::MainWindow *ui;

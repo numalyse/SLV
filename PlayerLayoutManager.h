@@ -27,10 +27,14 @@ private:
 
 signals:
     void updateContainer(QWidget*);
+    void enableFullscreenGlobalRequested();
+    void disableFullscreenGlobalRequested();
 
 public slots:
     void addPlayer2();
     void removePlayer2(PlayerWidget* playerToDestroy);
+    void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
 
 };
 

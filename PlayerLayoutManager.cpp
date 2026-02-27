@@ -24,6 +24,8 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     m_players.append(player4);
     connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
     connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
+    connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enableLayoutFullscreen);
+    connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disableLayoutFullscreen);
 }
 
 PlayerLayoutManager::~PlayerLayoutManager()
@@ -174,4 +176,19 @@ void PlayerLayoutManager::removePlayer2(PlayerWidget* playerToRemove){
         auto* container = createLayout(m_players.size());
         emit updateContainer(container);
     }
+}
+
+void PlayerLayoutManager::enableLayoutFullscreen(PlayerWidget* playerToFullscreen){
+    for(auto &IPlayer : m_players){
+        if(playerToFullscreen != IPlayer)
+            IPlayer->hide();
+    }
+    emit enableFullscreenGlobalRequested();
+}
+
+void PlayerLayoutManager::disableLayoutFullscreen(PlayerWidget* playerToFullscreen){
+    for(auto &IPlayer : m_players){
+        IPlayer->show();
+    }
+    emit disableFullscreenGlobalRequested();
 }

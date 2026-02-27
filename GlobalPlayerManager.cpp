@@ -11,6 +11,8 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 {
     m_layoutManager = new PlayerLayoutManager();
     setPlayers();
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenGlobal);
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenGlobal);
 }
 
 void GlobalPlayerManager::setPlayers()
@@ -36,4 +38,18 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
     qDebug() << "Allox";
     m_playersWidget = m_layoutManager->createLayoutFromPaths(filesPaths);
     layout->addWidget(m_playersWidget);
+}
+
+void GlobalPlayerManager::enableFullscreenGlobal()
+{
+    if(m_toolbarWidget)
+        m_toolbarWidget->hide();
+    emit enableFullscreenMainRequested();
+}
+
+void GlobalPlayerManager::disableFullscreenGlobal()
+{
+    if(m_toolbarWidget)
+        m_toolbarWidget->show();
+    emit disableFullscreenMainRequested();
 }

@@ -17,8 +17,8 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     m_players.reserve(s_maxPlayerCount);
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
         PlayerWidget* player = new PlayerWidget(this);
-        connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
-        connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
+        connect(player, &PlayerWidget::addPlayerRequest, this, &PlayerLayoutManager::addPlayer);
+        connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
         connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enableLayoutFullscreen);
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disableLayoutFullscreen);
         m_players.append(player);
@@ -204,7 +204,7 @@ void PlayerLayoutManager::addPlayer()
     if(activePlayerCount < 4){
         activePlayerUpdate(activePlayerCount+1);
         auto* container = createLayout(m_activePlayers.size());
-        emit updateContainerRequest(m_activePlayers.size(), container);
+        emit updateContainerRequest(m_activePlayers.size(), container, nullptr);
     }
 }
 
@@ -214,7 +214,7 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
         m_activePlayers.removeOne(playerToRemove);
         activePlayerUpdate(m_activePlayers.size());
         auto* container = createLayout(m_activePlayers.size());
-        emit updateContainerRequest(m_activePlayers.size(), container);
+        emit updateContainerRequest(m_activePlayers.size(), container, nullptr);
     }
 }
 

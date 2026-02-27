@@ -12,6 +12,7 @@ class PlayerLayoutManager : public QWidget
     Q_OBJECT
 public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
+    ~PlayerLayoutManager();
 
     QWidget* createLayout(const int count);
     QWidget* createLayoutFromPaths(const QStringList& filesPaths);
@@ -42,7 +43,7 @@ private:
     QWidget* create4(const QStringList& filesPaths = QStringList(""));
 
 signals:
-    void updateContainer(int, QWidget*, Toolbar*);
+    void updateContainerRequest(int, QWidget*, Toolbar*);
     void enableFullscreenGlobalRequested();
     void disableFullscreenGlobalRequested();
 

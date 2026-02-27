@@ -42,17 +42,15 @@ private:
     QWidget* create4(const QStringList& filesPaths = QStringList(""));
 
 signals:
-    void updateContainerRequest(int, QWidget*);
+    void updateContainer(int, QWidget*, Toolbar*);
+    void enableFullscreenGlobalRequested();
+    void disableFullscreenGlobalRequested();
 
 public slots:
-    /// @brief Créer un nouveau widget à envoyer
-    /// Le widget aura m_activePlayers.size()+1 PlayersWidgets
     void addPlayer();
-
-    /// @brief Créer un nouveau widget à envoyer 
-    /// Le widget aura m_activePlayers.size()-1 PlayersWidgets
-    /// @param playerToDestroy Le playerWidget à supprimer de l'affichage
     void removePlayer(PlayerWidget* playerToDestroy);
+    void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
 
 };
 

@@ -11,6 +11,10 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 {
     m_layoutManager = new PlayerLayoutManager();
     connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
+    setPlayers();
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenGlobal);
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenGlobal);
+}
 
     layout = new QVBoxLayout(this);
 
@@ -51,5 +55,18 @@ void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPl
     if (m_playersWidget){
         layout->addWidget(newPlayersWidget);
     }
+}
 
+void GlobalPlayerManager::enableFullscreenGlobal()
+{
+    if(m_toolbarWidget)
+        m_toolbarWidget->hide();
+    emit enableFullscreenMainRequested();
+}
+
+void GlobalPlayerManager::disableFullscreenGlobal()
+{
+    if(m_toolbarWidget)
+        m_toolbarWidget->show();
+    emit disableFullscreenMainRequested();
 }

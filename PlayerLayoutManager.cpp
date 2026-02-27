@@ -13,9 +13,22 @@
 PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     : QWidget{}
 {
-    
+
     m_players.reserve(s_maxPlayerCount);
-    for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++)
+    for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
+        PlayerWidget* player = new PlayerWidget(this);
+        connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
+        connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
+        connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enableLayoutFullscreen);
+        connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disableLayoutFullscreen);
+        m_players.append(player);
+    }
+    
+}
+
+PlayerLayoutManager::~PlayerLayoutManager()
+{
+    for (size_t IPlayer = 0; IPlayer < m_players.size(); IPlayer++)
     {
         PlayerWidget* player = new PlayerWidget(this);
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
@@ -203,4 +216,19 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
         auto* container = createLayout(m_activePlayers.size());
         emit updateContainerRequest(m_activePlayers.size(), container);
     }
+}
+
+void PlayerLayoutManager::enableLayoutFullscreen(PlayerWidget* playerToFullscreen){
+    for(auto &IPlayer : m_players){
+        if(playerToFullscreen != IPlayer)
+            IPlayer->hide();
+    }
+    emit enableFullscreenGlobalRequested();
+}
+
+void PlayerLayoutManager::disableLayoutFullscreen(PlayerWidget* playerToFullscreen){
+    for(auto &IPlayer : m_players){
+        IPlayer->show();
+    }
+    emit disableFullscreenGlobalRequested();
 }

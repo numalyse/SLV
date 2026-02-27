@@ -10,7 +10,6 @@ class MediaWidget : public QWidget
 public:
     explicit MediaWidget(QWidget *parent = nullptr);
     ~MediaWidget();
-    void removeMedia();
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
@@ -19,6 +18,7 @@ public slots:
     void pause();
     void stop();
     void togglePlayPause();
+    void eject();
 
 private:
     libvlc_instance_t *m_vlc;

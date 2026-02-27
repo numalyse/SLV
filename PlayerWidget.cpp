@@ -33,6 +33,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::playRequested, m_videoWidget, &MediaWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequested, m_videoWidget, &MediaWidget::pause);
     connect(m_toolBar, &Toolbar::stopRequested, m_videoWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::ejectRequested, m_videoWidget, &MediaWidget::eject);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -53,10 +54,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 //     }
 // }
 
-void PlayerWidget::removeMedia()
-{
-    m_videoWidget->removeMedia();
-}
+
 
 void PlayerWidget::setActive(bool active)
 {

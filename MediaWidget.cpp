@@ -46,18 +46,10 @@ MediaWidget::MediaWidget(QWidget *parent)
 
 MediaWidget::~MediaWidget()
 {
-    removeMedia();
 
     // if (m_vlc) {
     //     libvlc_release(m_vlc);
     // }
-}
-
-void MediaWidget::removeMedia()
-{
-    if (m_player) {
-        libvlc_media_player_stop(m_player);
-    }
 }
 
 void MediaWidget::play()
@@ -93,6 +85,14 @@ void MediaWidget::stop()
     libvlc_media_player_set_position(m_player, 0.0);
     libvlc_media_player_next_frame(m_player);
 
+}
+
+void MediaWidget::eject(){
+    if (!m_player || !libvlc_media_player_get_media(m_player)) return;
+    qDebug() << "Parent avant release : " << parent();
+    libvlc_media_player_release(m_player);
+    m_player = libvlc_media_player_new(m_vlc);
+    qDebug() << "Parent après release : " << parent();
 }
 
 // ===== Event ===== //

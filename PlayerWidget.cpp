@@ -31,10 +31,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         emit removePlayerRequest(this);
     });
 
-    m_videoWidget = new MediaWidget(this);
+    m_mediaWidget = new MediaWidget(this);
 
-    connect(m_toolBar, &Toolbar::playRequested, m_videoWidget, &MediaWidget::play);
-    connect(m_toolBar, &Toolbar::pauseRequested, m_videoWidget, &MediaWidget::pause);
+    connect(m_toolBar, &Toolbar::playRequested, this, &PlayerWidget::play);
+    connect(m_toolBar, &Toolbar::pauseRequested, this, &PlayerWidget::pause);
     connect(m_toolBar, &Toolbar::stopRequested, m_videoWidget, &MediaWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequested, m_videoWidget, &MediaWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
@@ -42,7 +42,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(m_videoWidget);
+    layout->addWidget(m_mediaWidget);
     layout->addWidget(m_toolBar);
 
 }
@@ -60,7 +60,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 // }
 
 
-
 void PlayerWidget::setActive(bool active)
 {
     setStyleSheet(active
@@ -70,7 +69,7 @@ void PlayerWidget::setActive(bool active)
 
 void PlayerWidget::setMediaFromPath(const QString& filePath)
 {
-    m_videoWidget->setMediaFromPath(filePath);
+    m_mediaWidget->setMediaFromPath(filePath);
 }
 
 void PlayerWidget::enablePlayerFullscreen()
@@ -81,4 +80,16 @@ void PlayerWidget::enablePlayerFullscreen()
 void PlayerWidget::disablePlayerFullscreen()
 {
     emit disablePlayerFullscreenRequested(this);
+}
+
+// slots 
+
+void PlayerWidget::play(){
+    m_mediaWidget->play();
+    // forcer la toolbar a être off
+}
+
+void PlayerWidget::pause(){
+    m_mediaWidget->pause();
+    //forcer la toolbar a êtr en on
 }

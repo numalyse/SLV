@@ -10,15 +10,15 @@
 #include <QWidget>
 
 /// @brief Extension de la Toolbar avancée.
-class ExtensionToolbar : public Toolbar
+class ExtensionToolbar : public QWidget
 {
 Q_OBJECT
 
 public:
     explicit ExtensionToolbar(QWidget* parent = nullptr);
 
-    void setFullscreenUI() override;
-    void setDefaultUI() override;
+    void setFullscreenUI();
+    void setDefaultUI();
 
 private:
     ToolbarToggleButton* m_zoomBtn = nullptr;

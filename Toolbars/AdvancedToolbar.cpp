@@ -28,6 +28,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, &QWidget::show);
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, &QWidget::hide);
 
+    delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
+    m_removePlayerBtn = nullptr;
+
     setDefaultUI();
 }
 

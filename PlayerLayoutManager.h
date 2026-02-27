@@ -14,8 +14,8 @@ public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
     ~PlayerLayoutManager();
 
-    QWidget* createLayout(const int count);
-    QWidget* createLayoutFromPaths(const QStringList& filesPaths);
+    void createLayout(const int count);
+    void createLayoutFromPaths(const QStringList& filesPaths);
 
 private:
 
@@ -41,6 +41,13 @@ private:
     QWidget* create2(const QStringList& filesPaths = QStringList(""));
     QWidget* create3(const QStringList& filesPaths = QStringList(""));
     QWidget* create4(const QStringList& filesPaths = QStringList(""));
+
+    /// @brief Créer une toolbar globale et la connecte aux players
+    Toolbar* createGlobalToolbar();
+    /// @brief Créer une toolbar avancée et la connecte au player
+    Toolbar* createAdvancedToolbar();
+    /// @brief Créer la bonne toolbar en fonction du nombre de players actifs
+    Toolbar* createLayoutToolbar();
 
 signals:
     void updateContainerRequest(int, QWidget*, Toolbar*);

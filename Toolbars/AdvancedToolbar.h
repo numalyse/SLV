@@ -29,7 +29,6 @@ private:
     ToolbarButton* m_nextMediaBtn = nullptr;
 
     ToolbarToggleButton* m_extensionBtn = nullptr;
-
     ExtensionToolbar* m_extensionToolbar = nullptr;
 
 };

@@ -18,25 +18,19 @@ public:
     explicit PlayerWidget(QWidget *parent = nullptr);
     // ~PlayerWidget();
 
-    // Contrôle du média
-    void play();
-    void pause();
-    void stop();
-    void togglePlayPause();
-
     void setActive(bool active);
     void removeMedia();
     void setMediaFromPath(const QString& filePath);
 
 signals:
-    void addPlayer();
-    void removePlayer(PlayerWidget* self);
+    void addPlayerRequest();
+    void removePlayerRequest(PlayerWidget* toBeRemoved);
 
 private:
     MediaWidget *m_mediaWidget;
 
     Media *m_media = nullptr;
-    Toolbar* m_toolBar = nullptr;
+    SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;
     QAction* m_addPlayerAction;

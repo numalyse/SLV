@@ -13,31 +13,43 @@
 PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     : QWidget{}
 {
-    m_players.reserve(4);
-    PlayerWidget* player = new PlayerWidget(this);
-    PlayerWidget* player2 = new PlayerWidget(this);
-    PlayerWidget* player3 = new PlayerWidget(this);
-    PlayerWidget* player4 = new PlayerWidget(this);
-    m_players.append(player);
-    m_players.append(player2);
-    m_players.append(player3);
-    m_players.append(player4);
-    connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
-    connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
-}
-
-PlayerLayoutManager::~PlayerLayoutManager()
-{
-    for (size_t IPlayer = 0; IPlayer < m_players.size(); IPlayer++)
+    
+    m_players.reserve(s_maxPlayerCount);
+    for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++)
     {
-        // fuite mÃ©moire ? peut etre ?
+        PlayerWidget* player = new PlayerWidget(this);
+        connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
+        m_players.append(player);
     }
-
 }
 
+
+void PlayerLayoutManager::activePlayerUpdate(const int activePlayersNeeded){
+    int activePlayerCount = m_activePlayers.size();
+    
+    if(activePlayersNeeded < activePlayerCount){
+
+        m_activePlayers.erase(m_activePlayers.begin() + activePlayersNeeded, m_activePlayers.end());
+
+    }else if(activePlayersNeeded > activePlayerCount){ 
+
+        for( auto & IPlayer : m_players){
+            if(!m_activePlayers.contains(IPlayer)){
+                m_activePlayers.append(IPlayer);
+                ++activePlayerCount;
+                if(activePlayersNeeded == activePlayerCount){
+                    return;
+                }
+            }
+        }
+    }
+}
 
 QWidget* PlayerLayoutManager::createLayout(const int count)
 {
+     // les players vont etre détruit si on delete l'ancien widget, il faut d'abord modifier leurs parents
+    detachAllPlayers();
+    activePlayerUpdate(count);
     switch (count){
     case 1: return create1();
     case 2: return create2();
@@ -49,7 +61,10 @@ QWidget* PlayerLayoutManager::createLayout(const int count)
 
 QWidget* PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
 {
-    switch (filesPaths.size()){
+    detachAllPlayers();
+    int pathCount = filesPaths.size();
+    activePlayerUpdate(pathCount);
+    switch (pathCount){
     case 1: return create1(filesPaths);
     case 2: return create2(filesPaths);
     case 3: return create3(filesPaths);
@@ -58,16 +73,25 @@ QWidget* PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPath
     }
 }
 
+void PlayerLayoutManager::detachAllPlayers()
+{
+    for(auto& IPlayer : m_players){
+        IPlayer->setParent(this);
+    }
+}
+
 QWidget* PlayerLayoutManager::create1(const QStringList& filePath)
 {
+    Q_ASSERT(m_activePlayers.size() == 1);
+
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
     layout->setContentsMargins(0,0,0,0);
 
-    if (!m_players.isEmpty()){
+    if (!m_activePlayers.isEmpty()){
         if(filePath != QStringList(""))
-            m_players[0]->setMediaFromPath(filePath.at(0));
-        layout->addWidget(m_players[0]);
+            m_activePlayers[0]->setMediaFromPath(filePath.at(0));
+        layout->addWidget(m_activePlayers[0]);
     }
 
     qDebug() << "Media set";
@@ -77,15 +101,17 @@ QWidget* PlayerLayoutManager::create1(const QStringList& filePath)
 
 QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths)
 {
+    Q_ASSERT(m_activePlayers.size() == 2);
+
     auto *splitter = new QSplitter(Qt::Horizontal);
 
-    if (m_players.size() >= 2) {
+    if (m_activePlayers.size() >= 2) {
         if(filesPaths != QStringList(""))
             for(size_t IFilePath = 0; IFilePath < filesPaths.size(); ++IFilePath){
-                m_players[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
+                m_activePlayers[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
             }
-        splitter->addWidget(m_players[0]);
-        splitter->addWidget(m_players[1]);
+        splitter->addWidget(m_activePlayers[0]);
+        splitter->addWidget(m_activePlayers[1]);
     }
 
     auto *container = new QWidget;
@@ -98,21 +124,23 @@ QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths)
 
 QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths)
 {
-    if (m_players.size() < 3) return nullptr;
+    Q_ASSERT(m_activePlayers.size() == 3);
+
+    if (m_activePlayers.size() < 3) return nullptr;
 
     if(filesPaths != QStringList(""))
         for(size_t IFilePath = 0; IFilePath < filesPaths.size(); ++IFilePath){
-            m_players[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
+            m_activePlayers[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
         }
 
     auto *mainSplitter = new QSplitter(Qt::Vertical);
 
     auto *top = new QSplitter(Qt::Horizontal);
-    top->addWidget(m_players[0]);
-    top->addWidget(m_players[1]);
+    top->addWidget(m_activePlayers[0]);
+    top->addWidget(m_activePlayers[1]);
 
     mainSplitter->addWidget(top);
-    mainSplitter->addWidget(m_players[2]);
+    mainSplitter->addWidget(m_activePlayers[2]);
 
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
@@ -124,12 +152,14 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths)
 
 QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
 {
-    if (m_players.size() < 4) return nullptr;
+    Q_ASSERT(m_activePlayers.size() == 4);
+
+    if (m_activePlayers.size() < 4) return nullptr;
 
     // S'il y a des paths d'un média en paramètre, charge les médias dans l'ordre
     if(filesPaths != QStringList(""))
         for(size_t IFilePath = 0; IFilePath < filesPaths.size(); ++IFilePath){
-            m_players[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
+            m_activePlayers[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
         }
 
     auto *mainSplitter = new QSplitter(Qt::Vertical);
@@ -137,11 +167,11 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
     auto *top = new QSplitter(Qt::Horizontal);
     auto *bottom = new QSplitter(Qt::Horizontal);
 
-    top->addWidget(m_players[0]);
-    top->addWidget(m_players[1]);
+    top->addWidget(m_activePlayers[0]);
+    top->addWidget(m_activePlayers[1]);
 
-    bottom->addWidget(m_players[2]);
-    bottom->addWidget(m_players[3]);
+    bottom->addWidget(m_activePlayers[2]);
+    bottom->addWidget(m_activePlayers[3]);
 
     mainSplitter->addWidget(top);
     mainSplitter->addWidget(bottom);
@@ -154,24 +184,23 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
     return container;
 }
 
-
 // slots
-void PlayerLayoutManager::addPlayer2()
+void PlayerLayoutManager::addPlayer()
 {
-    if(m_players.size() < 4){
-        auto* player = new PlayerWidget();
-        m_players.append(player);
-        connect(player, &PlayerWidget::addPlayer, this, &PlayerLayoutManager::addPlayer2);
-        connect(player, &PlayerWidget::removePlayer, this, &PlayerLayoutManager::removePlayer2);
-        auto* container = createLayout(m_players.size());
-        emit updateContainer(container);
+    int activePlayerCount = m_activePlayers.size();
+    if(activePlayerCount < 4){
+        activePlayerUpdate(activePlayerCount+1);
+        auto* container = createLayout(m_activePlayers.size());
+        emit updateContainerRequest(m_activePlayers.size(), container);
     }
 }
 
-void PlayerLayoutManager::removePlayer2(PlayerWidget* playerToRemove){
-    if (m_players.size() > 1){
-        m_players.removeOne(playerToRemove);
-        auto* container = createLayout(m_players.size());
-        emit updateContainer(container);
+void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
+    int activePlayerCount = m_activePlayers.size();
+    if (activePlayerCount > 1){
+        m_activePlayers.removeOne(playerToRemove);
+        activePlayerUpdate(m_activePlayers.size());
+        auto* container = createLayout(m_activePlayers.size());
+        emit updateContainerRequest(m_activePlayers.size(), container);
     }
 }

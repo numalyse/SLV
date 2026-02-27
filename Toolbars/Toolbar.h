@@ -35,19 +35,20 @@ public:
 
     virtual ~Toolbar() = default;
 
+    /// @brief Met à jour le layout pour afficher l'interface en plein écran
     virtual void setFullscreenUI() = 0;
+
+    /// @brief Met à jour le layout pour afficher l'interface par défaut
     virtual void setDefaultUI() = 0;
 
 // Les classes filles pourront modifier ces widgets
 protected: 
-
     ToolbarToggleButton* m_playPauseBtn = nullptr;
     ToolbarButton* m_stopBtn = nullptr;
     ToolbarButton* m_ejectBtn = nullptr;
     ToolbarButton* m_fullscreenBtn = nullptr;
 
 signals:
-
     void playRequested();
     void pauseRequested();
     void stopRequested();

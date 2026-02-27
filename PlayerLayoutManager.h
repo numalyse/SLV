@@ -12,6 +12,7 @@ class PlayerLayoutManager : public QWidget
     Q_OBJECT
 public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
+    ~PlayerLayoutManager();
 
     void createLayout(const int count);
     void createLayoutFromPaths(const QStringList& filesPaths);
@@ -49,18 +50,15 @@ private:
     Toolbar* createLayoutToolbar();
 
 signals:
-    /// @brief Envoie au globalPlayerManager le nouveau playersWidget et une toolbar connecté aux players
     void updateContainerRequest(int, QWidget*, Toolbar*);
+    void enableFullscreenGlobalRequested();
+    void disableFullscreenGlobalRequested();
 
 public slots:
-    /// @brief Créer un nouveau widget à envoyer
-    /// Le widget aura m_activePlayers.size()+1 PlayersWidgets
     void addPlayer();
-
-    /// @brief Créer un nouveau widget à envoyer 
-    /// Le widget aura m_activePlayers.size()-1 PlayersWidgets
-    /// @param playerToDestroy Le playerWidget à supprimer de l'affichage
     void removePlayer(PlayerWidget* playerToDestroy);
+    void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
 
 };
 

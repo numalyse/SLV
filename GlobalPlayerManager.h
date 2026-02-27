@@ -23,6 +23,8 @@ public slots:
 
     ///@brief Supprime puis Remplace m_playersWidget par le widget retourné par m_layoutManager->createLayoutFromPaths(filesPaths); 
     void setPlayersFromPaths(QStringList);
+    void enableFullscreenGlobal();
+    void disableFullscreenGlobal();
 
     /// @brief Supprime le QWidget m_playersWidget pour libérer la mémoire et met à jour m_playersWidget avec le Widget envoyé par PlayerLayoutManager
     /// @param Le nombre de players dans le nouveau widget, permet de mettre à jour l'ui en fonction du nombre
@@ -31,6 +33,8 @@ public slots:
     void updateContainer(int, QWidget*, Toolbar*);
 
 signals:
+    void enableFullscreenMainRequested();
+    void disableFullscreenMainRequested();
 };
 
 #endif // GLOBALPLAYERMANAGER_H

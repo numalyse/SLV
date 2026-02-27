@@ -19,7 +19,6 @@ public:
     // ~PlayerWidget();
 
     void setActive(bool active);
-    void removeMedia();
     void setMediaFromPath(const QString& filePath);
 
     SimpleToolbar* getToolbar() {return m_toolBar;};
@@ -31,6 +30,8 @@ public slots:
 signals:
     void addPlayerRequest();
     void removePlayerRequest(PlayerWidget* toBeRemoved);
+    void enablePlayerFullscreenRequested(PlayerWidget* self);
+    void disablePlayerFullscreenRequested(PlayerWidget* self);
 
 
 private:
@@ -41,6 +42,10 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
+
+public slots:
+    void enablePlayerFullscreen();
+    void disablePlayerFullscreen();
 
 };
 

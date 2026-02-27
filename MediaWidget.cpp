@@ -10,6 +10,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setStyleSheet("background-color: black");
 
     // ===== VLC ===== //
     const char* const vlc_args[] = {
@@ -25,6 +26,7 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     m_vlc = libvlc_new(2, vlc_args);
     m_player = libvlc_media_player_new(m_vlc);
+
 
 #if defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(
@@ -46,23 +48,14 @@ MediaWidget::MediaWidget(QWidget *parent)
 
 MediaWidget::~MediaWidget()
 {
-    removeMedia();
 
     // if (m_vlc) {
     //     libvlc_release(m_vlc);
     // }
 }
 
-void MediaWidget::removeMedia()
-{
-    if (m_player) {
-        libvlc_media_player_stop(m_player);
-    }
-}
-
 void MediaWidget::play()
 {
-    qDebug()<<"m_player : " << m_player;
     if (!m_player) return;
     libvlc_media_player_play(m_player);
 }
@@ -88,8 +81,18 @@ void MediaWidget::togglePlayPause()
 
 void MediaWidget::stop()
 {
-    if(!m_player) return;
-    libvlc_media_player_stop(m_player);
+    if (!m_player) return;
+
+    pause();
+    libvlc_media_player_set_position(m_player, 0.0);
+    libvlc_media_player_next_frame(m_player);
+
+}
+
+void MediaWidget::eject(){
+    if (!m_player || !libvlc_media_player_get_media(m_player)) return;
+    libvlc_media_player_release(m_player);
+    m_player = libvlc_media_player_new(m_vlc);
 }
 
 // ===== Event ===== //

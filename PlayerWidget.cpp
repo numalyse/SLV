@@ -35,6 +35,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_toolBar, &Toolbar::playRequested, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequested, this, &PlayerWidget::pause);
+    connect(m_toolBar, &Toolbar::stopRequested, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::ejectRequested, m_mediaWidget, &MediaWidget::eject);
+    connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
+    connect(m_toolBar, &Toolbar::disableFullscreenRequested, this, &PlayerWidget::disablePlayerFullscreen);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -55,10 +59,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 //     }
 // }
 
-void PlayerWidget::removeMedia()
-{
-    m_mediaWidget->removeMedia();
-}
 
 void PlayerWidget::setActive(bool active)
 {
@@ -72,6 +72,15 @@ void PlayerWidget::setMediaFromPath(const QString& filePath)
     m_mediaWidget->setMediaFromPath(filePath);
 }
 
+void PlayerWidget::enablePlayerFullscreen()
+{
+    emit enablePlayerFullscreenRequested(this);
+}
+
+void PlayerWidget::disablePlayerFullscreen()
+{
+    emit disablePlayerFullscreenRequested(this);
+}
 
 // slots 
 

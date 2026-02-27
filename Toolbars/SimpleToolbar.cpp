@@ -62,9 +62,6 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     // );
 
     //m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
-    m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
-    m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
-    m_fullscreenBtn = new ToolbarButton(this, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
 
     m_loopBtn = new ToolbarToggleButton(
         this, 

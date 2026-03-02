@@ -10,6 +10,7 @@ class MediaWidget : public QWidget
 public:
     explicit MediaWidget(QWidget *parent = nullptr);
     ~MediaWidget();
+    void managePlayerSystem();
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 

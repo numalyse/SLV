@@ -25,7 +25,6 @@ MediaWidget::MediaWidget(QWidget *parent)
         return;
     }
 
-    m_vlc = libvlc_new(2, vlc_args);
     m_player = libvlc_media_player_new(m_vlc);
 
     managePlayerSystem();
@@ -42,6 +41,8 @@ MediaWidget::~MediaWidget()
     // }
 }
 
+
+/// @brief Sets the media player in the application window instead of a new window
 void MediaWidget::managePlayerSystem()
 {
 #if defined(Q_OS_WIN)
@@ -84,6 +85,7 @@ void MediaWidget::togglePlayPause()
     }
 }
 
+/// @brief Set the media player position to 0 and pause
 void MediaWidget::stop()
 {
     if (!m_player) return;
@@ -94,6 +96,7 @@ void MediaWidget::stop()
 
 }
 
+/// @brief Release the media player and create a new one from MediaWidget instance
 void MediaWidget::eject()
 {
     if (!m_player || !libvlc_media_player_get_media(m_player)) return;
@@ -102,21 +105,34 @@ void MediaWidget::eject()
     managePlayerSystem();
 }
 
+/// @brief Mute the media player
 void MediaWidget::mute()
 {
     if (!m_player) return;
     libvlc_audio_set_mute(m_player, 1);
 }
 
+/// @brief Unmute the media player
 void MediaWidget::unmute()
 {
     if (!m_player) return;
     libvlc_audio_set_mute(m_player, 0);
 }
 
-void MediaWidget::setVolume(int vol){
+/// @brief Change media player volume
+/// @param int vol : volume
+void MediaWidget::setVolume(const int &vol)
+{
     if (!m_player) return;
     libvlc_audio_set_volume(m_player, vol);
+}
+
+/// @brief Change media player rate
+/// @param speedIndex = 0 : x0.25, 1 : x0.5, 2 : x0.75, 3 : x1, 4 : x1.25, 5 : x1.5, 6 : x2
+void MediaWidget::setSpeed(const unsigned int &speedIndex)
+{
+    if (!m_player) return;
+    libvlc_media_player_set_rate(m_player, speedSteps[speedIndex]);
 }
 
 // ===== Event ===== //
@@ -136,6 +152,8 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
+/// @brief Stops the current media player and load a new media from a path
+/// @param QString filePath : string containing the path of the media
 void MediaWidget::setMediaFromPath(const QString& filePath)
 {
     if (!m_player)

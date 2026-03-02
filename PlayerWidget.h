@@ -31,6 +31,8 @@ public slots:
     void mute();
     void unmute();
 
+    void setSpeed(const unsigned int &speed);
+
 signals:
     void addPlayerRequest();
     void removePlayerRequest(PlayerWidget* toBeRemoved);

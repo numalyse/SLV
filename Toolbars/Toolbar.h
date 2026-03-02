@@ -25,6 +25,7 @@ public:
         m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
         m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
         m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"), "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
+        m_screenshotBtn = new ToolbarButton(this, "capture.png", TextManager::instance().get("tooltip_capture"));
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
@@ -32,6 +33,8 @@ public:
         connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequest);
         connect(m_fullscreenBtn,&ToolbarToggleButton::stateActivated, this, &Toolbar::enableFullscreenRequest);
         connect(m_fullscreenBtn,&ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableFullscreenRequest);
+        connect(m_screenshotBtn, &ToolbarButton::clicked, this, &Toolbar::screenshotRequest);
+
         qDebug() << "connect successful";
     }
 
@@ -49,6 +52,7 @@ protected:
     ToolbarButton* m_stopBtn = nullptr;
     ToolbarButton* m_ejectBtn = nullptr;
     ToolbarToggleButton* m_fullscreenBtn = nullptr;
+    ToolbarButton* m_screenshotBtn = nullptr;
 
 signals:
     void playRequest();
@@ -58,6 +62,7 @@ signals:
     void enableFullscreenRequest();
     void disableFullscreenRequest();
     void enableMuteRequest();
+    void screenshotRequest();
 };
 
 #endif // TOOLBAR_H

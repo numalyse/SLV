@@ -3,6 +3,7 @@
 #include <QUrl>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QDir>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -133,6 +134,14 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
 {
     if (!m_player) return;
     libvlc_media_player_set_rate(m_player, speedSteps[speedIndex]);
+}
+
+/// @brief Take a screenshot of the current frame
+void MediaWidget::takeScreenshot()
+{
+    if (!m_player) return;
+    QString captureDirectory = QDir::homePath() + "/SLV_Content/screenshot.png"; // nommer comme il faut avec le format nom_film_HH_MM_SS_FF.png ou jpg
+    libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), 0, 0);
 }
 
 // ===== Event ===== //

@@ -125,6 +125,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
+    buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_loopBtn);
     buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);

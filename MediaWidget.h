@@ -24,6 +24,7 @@ public slots:
     void unmute();
     void setVolume(const int &vol);
     void setSpeed(const unsigned int &speedIndex);
+    void takeScreenshot();
 
 private:
     libvlc_instance_t *m_vlc = nullptr;

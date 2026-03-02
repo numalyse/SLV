@@ -30,6 +30,7 @@ public slots:
     void disablePlayerFullscreen();
     void mute();
     void unmute();
+    void setVolume(const int &vol);
 
     void setSpeed(const unsigned int &speed);
 

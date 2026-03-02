@@ -108,6 +108,11 @@ void PlayerWidget::unmute()
     m_mediaWidget->unmute();
 }
 
+void PlayerWidget::setVolume(const int &vol)
+{
+    m_mediaWidget->setVolume(vol);
+}
+
 void PlayerWidget::setSpeed(const unsigned int &speed)
 {
     m_mediaWidget->setSpeed(speed);

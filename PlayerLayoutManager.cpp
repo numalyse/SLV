@@ -256,6 +256,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::disableMuteRequest, activePlayer, &PlayerWidget::unmute);
     connect(advancedToolbar, &AdvancedToolbar::volumeChanged, activePlayer, &PlayerWidget::setVolume);
 
+    connect(advancedToolbar, &AdvancedToolbar::speedChanged, activePlayer, &PlayerWidget::setSpeed);
+
     return advancedToolbar;
 }
 

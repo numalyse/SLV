@@ -26,14 +26,18 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
+    if (m_toolbarWidget){
+        m_toolbarWidget->disconnect();
+        layout->removeWidget(m_toolbarWidget);
+        m_toolbarWidget->deleteLater(); 
+        m_toolbarWidget = nullptr;
+    }
     if (m_playersWidget) {
         layout->removeWidget(m_playersWidget);
         m_playersWidget->deleteLater(); 
+        m_playersWidget = nullptr;
     }
-    if (m_toolbarWidget){
-        layout->removeWidget(m_toolbarWidget);
-        m_toolbarWidget->deleteLater(); 
-    }
+
 
     // ajout du nouveau playerWidget et toolbar 
     if (newPlayersWidget){

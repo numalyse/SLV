@@ -1,5 +1,6 @@
 #include "Toolbars/SimpleToolbar.h"
 #include "TextManager.h"
+#include "TimeFormatter.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -16,6 +17,28 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_durationLabel = new QLabel("00:00:00", this);
 
     m_slider = new QSlider(Qt::Horizontal, this);
+
+    m_seekTimer = new QTimer(this);
+    m_seekTimer->setSingleShot(true);
+
+    connect(m_slider, &QSlider::sliderPressed, this, [this]() {
+        m_draggingSlider = true;
+        emit setPositionRequested(m_slider->value());
+    });
+    connect(m_slider, &QSlider::sliderReleased, this, [this]() {
+        m_draggingSlider = false;
+    });
+    
+
+
+    connect(m_slider, &QSlider::sliderMoved, this, [this](){
+        m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
+        m_seekTimer->start(50);
+    });
+
+    connect(m_seekTimer, &QTimer::timeout, this, [this](){
+        emit setPositionRequested(m_slider->value());
+    });
 
     QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
@@ -118,4 +141,39 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);
 
+}
+
+void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
+
+    Q_ASSERT(mediaDuration < static_cast<int64_t>(std::numeric_limits<int>::max()));
+
+    if (mediaDuration >= static_cast<int64_t>(std::numeric_limits<int>::max()))
+    {
+        m_slider->setMaximum(std::numeric_limits<int>::max());
+    }else {
+        m_slider->setMaximum(mediaDuration);
+    }
+    m_durationLabel->setText(TimeFormatter::msToHHMMSSFF(mediaDuration, m_media_fps));
+
+
+}
+
+void SimpleToolbar::updateSliderValue(int64_t currentTime){
+    
+    if( m_draggingSlider) return;
+
+    Q_ASSERT(currentTime < static_cast<int64_t>(std::numeric_limits<int>::max()));
+
+    if (currentTime >= static_cast<int64_t>(std::numeric_limits<int>::max()))
+    {
+        m_slider->setValue(static_cast<int64_t>(std::numeric_limits<int>::max()));
+    }
+
+    m_slider->setValue(currentTime);
+    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
+
+}
+
+void SimpleToolbar::updateFps(float newFps){
+    m_media_fps = newFps;
 }

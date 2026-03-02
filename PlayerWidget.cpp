@@ -37,6 +37,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::pauseRequested, this, &PlayerWidget::pause);
     connect(m_toolBar, &Toolbar::stopRequested, m_mediaWidget, &MediaWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequested, m_mediaWidget, &MediaWidget::eject);
+    connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
     connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequested, this, &PlayerWidget::disablePlayerFullscreen);
 
@@ -45,6 +46,13 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     layout->addWidget(m_mediaWidget);
     layout->addWidget(m_toolBar);
 
+    connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
+    connect(m_mediaWidget, &MediaWidget::updateSliderValueRequested, this, &PlayerWidget::updateSliderValueRequest);
+    connect(m_mediaWidget,  &MediaWidget::updateFpsRequested, this, &PlayerWidget::updateFpsRequest);
+
+    connect(this, &PlayerWidget::updateSliderRangeRequest, m_toolBar, &SimpleToolbar::updateSliderRange);
+    connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
+    connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -86,10 +94,20 @@ void PlayerWidget::disablePlayerFullscreen()
 
 void PlayerWidget::play(){
     m_mediaWidget->play();
-    // forcer la toolbar a être off
+    // forcer la toolbar a être off (emit un signal connecté à la toolbar pour mettre à jour l'icone)
 }
 
 void PlayerWidget::pause(){
     m_mediaWidget->pause();
-    //forcer la toolbar a êtr en on
+    //forcer la toolbar a êtr en on (pareil que play)
 }
+
+void PlayerWidget::setTime(int64_t time){
+    m_mediaWidget->setTime(time);
+}
+
+void PlayerWidget::updateFpsRequest(float newFps){
+    m_media_fps = newFps;
+    emit updateFpsRequested(newFps);
+}
+

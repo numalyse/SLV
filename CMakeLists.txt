@@ -46,6 +46,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ToolbarButtons/ToolbarToggleHoverButton.h ToolbarButtons/ToolbarToggleHoverButton.cpp
 
         TextManager.h TextManager.cpp
+        TimeFormatter.h
         MediaWidget.h MediaWidget.cpp
 
     )

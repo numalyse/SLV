@@ -45,6 +45,7 @@ signals:
     void enableMuteRequest();
     void disableMuteRequest();
     void volumeChanged(int);
+    void speedChanged(int);
 };
 
 #endif

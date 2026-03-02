@@ -22,12 +22,14 @@ public slots:
     void eject();
     void mute();
     void unmute();
-    void setVolume(int vol);
+    void setVolume(const int &vol);
+    void setSpeed(const unsigned int &speedIndex);
 
 private:
     libvlc_instance_t *m_vlc = nullptr;
     libvlc_media_player_t *m_player = nullptr;
     int lastVolume = 100;
+    const float speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

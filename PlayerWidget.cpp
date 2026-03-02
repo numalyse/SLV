@@ -42,6 +42,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableMuteRequest, m_mediaWidget, &MediaWidget::mute);
     connect(m_toolBar, &SimpleToolbar::disableMuteRequest, m_mediaWidget, &MediaWidget::unmute);
     connect(m_toolBar, &SimpleToolbar::volumeChanged, m_mediaWidget, &MediaWidget::setVolume);
+    connect(m_toolBar, &SimpleToolbar::speedChanged, m_mediaWidget, &MediaWidget::setSpeed);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -105,4 +106,9 @@ void PlayerWidget::mute()
 void PlayerWidget::unmute()
 {
     m_mediaWidget->unmute();
+}
+
+void PlayerWidget::setSpeed(const unsigned int &speed)
+{
+    m_mediaWidget->setSpeed(speed);
 }

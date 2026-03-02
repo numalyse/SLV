@@ -9,8 +9,7 @@
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
-/// @brief Toolbar 
-/// @param parent 
+
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
     m_nextMediaBtn = new ToolbarButton(this, "next.png", TextManager::instance().get("tooltip_next_media"));
@@ -28,6 +27,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, &QWidget::show);
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, &QWidget::hide);
+
+    delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
+    m_removePlayerBtn = nullptr;
 
     setDefaultUI();
 }

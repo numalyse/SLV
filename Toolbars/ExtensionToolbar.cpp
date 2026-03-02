@@ -3,7 +3,7 @@
 #include "TextManager.h"
 #include <QHBoxLayout>
 
-ExtensionToolbar::ExtensionToolbar(QWidget *parent) : Toolbar(parent)
+ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
 
     m_zoomBtn = new ToolbarToggleButton(

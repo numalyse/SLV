@@ -5,11 +5,7 @@
 #include <QTimer>
 #include <QEvent>
 
-/// @brief Créer un bouton qui affiche une popup lors du clique. Si le bouton est cliqué pendant que la popup est affichée, la popup est cachée.
-/// @param parent 
-/// @param widgetToDisplay QWidget* à afficher dans la popup lors du clique, il sera détruit par ce widget
-/// @param iconName QString Nom de l'icone
-/// @param toolTipText QString Texte du tooltip
+
 ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QWidget *widgetToDisplay, const QString &iconName, const QString &toolTipText) : ToolbarButton(parent, iconName, toolTipText)
 {
     Q_ASSERT(widgetToDisplay != nullptr);
@@ -24,8 +20,7 @@ ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QWidget *widgetToDisplay
     connect(this, &QPushButton::clicked, this, &ToolbarPopupButton::displayPopup);    
 }
 
-/// @brief Slot privé qui affiche la popup au dessus du bouton, sauf si la popup est déjà ouverte
-/// (cela aura pour effet de cacher la popup)
+
 void ToolbarPopupButton::displayPopup(){
     if (m_blockNextShow){
         m_blockNextShow = false;
@@ -36,7 +31,7 @@ void ToolbarPopupButton::displayPopup(){
     m_widgetToDisplay->show();
 }
 
-/// @brief Déplace le widget popup centré au dessus du bouton, offset sur la hauteur fixé a 10 px
+
 void ToolbarPopupButton::moveWidgetOnTop()
 {
     m_widgetToDisplay->adjustSize(); // Oblige Qt à calculer la taille réelle du widget en fonction de son contenu (sinon lors du premier enter, la position est incorrect)
@@ -55,10 +50,6 @@ void ToolbarPopupButton::moveWidgetOnTop()
 }
 
 
-/// @brief Detecte si l'on à recliqué sur le bouton pendant que la popup était ouverte. Si c'est le cas m_blockNextShow = true
-/// @param watched QWidget* de la popup
-/// @param event QEvent::Hide
-/// @return 
 bool ToolbarPopupButton::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_widgetToDisplay) {

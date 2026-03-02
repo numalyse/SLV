@@ -10,6 +10,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setStyleSheet("background-color: black");
 
     // ===== VLC ===== //
     const char* const vlc_args[] = {

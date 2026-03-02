@@ -14,23 +14,51 @@ public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
     ~PlayerLayoutManager();
 
-    QVector<PlayerWidget*> m_players;
-
-    QWidget* createLayout(const int count);
-    QWidget* createLayoutFromPaths(const QStringList& filesPaths);
+    void createLayout(const int count);
+    void createLayoutFromPaths(const QStringList& filesPaths);
 
 private:
+
+    // Les 4 players sont créer à l'initialisation de PlayerLayoutManager
+    // un peu plus lourd mais pas besoin de recréer des vlc instances / toolbar ect. à chaque ajout de lecteur
+    QVector<PlayerWidget*> m_players;
+
+    // Vecteur qui contient les addresses des players actuellement affichés.
+    // Permet de garder une cohérence d'affichage lors de l'ajout / suppression de player
+    QVector<PlayerWidget*> m_activePlayers;
+
+    static constexpr int s_maxPlayerCount = 4;
+
+    /// @brief Modifie le parent des playerWidgets
+    /// Evite qu'ils soient supprimé lorsque GlobalPlayerManager appelle deleteLater()
+    void detachAllPlayers();
+
+    /// @brief Ajoute ou Supprime des playerWidgets dans m_activePlayers 
+    /// @param activePlayersNeeded Le nombre de playerWidgets que doit avoir le nouveau widget
+    void activePlayerUpdate(const int activePlayersNeeded);
+
     QWidget* create1(const QStringList& filePath = QStringList(""));
     QWidget* create2(const QStringList& filesPaths = QStringList(""));
     QWidget* create3(const QStringList& filesPaths = QStringList(""));
     QWidget* create4(const QStringList& filesPaths = QStringList(""));
 
+    /// @brief Créer une toolbar globale et la connecte aux players
+    Toolbar* createGlobalToolbar();
+    /// @brief Créer une toolbar avancée et la connecte au player
+    Toolbar* createAdvancedToolbar();
+    /// @brief Créer la bonne toolbar en fonction du nombre de players actifs
+    Toolbar* createLayoutToolbar();
+
 signals:
-    void updateContainer(QWidget*);
+    void updateContainerRequest(int, QWidget*, Toolbar*);
+    void enableFullscreenGlobalRequested();
+    void disableFullscreenGlobalRequested();
 
 public slots:
-    void addPlayer2();
-    void removePlayer2(PlayerWidget* playerToDestroy);
+    void addPlayer();
+    void removePlayer(PlayerWidget* playerToDestroy);
+    void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
 
 };
 

@@ -9,31 +9,53 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     : QWidget{parent}
 
 {
+    layout = new QVBoxLayout(this);
     m_layoutManager = new PlayerLayoutManager();
-    setPlayers();
-}
+    connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenGlobal);
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenGlobal);
 
-void GlobalPlayerManager::setPlayers()
-{
-    layout = new QVBoxLayout();
-
-    layout->removeWidget(m_playersWidget);
-    delete m_playersWidget;
-    m_playersWidget = nullptr;
-
-    m_playersWidget = m_layoutManager->createLayout(1);
-    if (m_playersWidget){
-        layout->addWidget(m_playersWidget);
-        this->setLayout(layout);
-    }
+    m_layoutManager->createLayout(1);
 }
 
 void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 {
-    qDebug() << "Current Layout : " << m_playersWidget;
+    m_layoutManager->createLayoutFromPaths(filesPaths);
+}
 
-    layout->removeWidget(m_playersWidget);
-    qDebug() << "Allox";
-    m_playersWidget = m_layoutManager->createLayoutFromPaths(filesPaths);
-    layout->addWidget(m_playersWidget);
+void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPlayersWidget, Toolbar* newToolbar)
+{
+    // clean ancienne UI
+    if (m_playersWidget) {
+        layout->removeWidget(m_playersWidget);
+        m_playersWidget->deleteLater(); 
+    }
+    if (m_toolbarWidget){
+        layout->removeWidget(m_toolbarWidget);
+        m_toolbarWidget->deleteLater(); 
+    }
+
+    // ajout du nouveau playerWidget et toolbar 
+    if (newPlayersWidget){
+        m_playersWidget = newPlayersWidget;
+        layout->addWidget(m_playersWidget);
+    }
+    if (newToolbar){
+        m_toolbarWidget = newToolbar;
+        layout->addWidget(m_toolbarWidget);
+    }
+}
+
+void GlobalPlayerManager::enableFullscreenGlobal()
+{
+    if(m_toolbarWidget)
+        m_toolbarWidget->hide();
+    emit enableFullscreenMainRequested();
+}
+
+void GlobalPlayerManager::disableFullscreenGlobal()
+{
+    if(m_toolbarWidget)
+        m_toolbarWidget->show();
+    emit disableFullscreenMainRequested();
 }

@@ -24,36 +24,39 @@ public:
         );
         m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
         m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
-        m_fullscreenBtn = new ToolbarButton(this, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
+        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"), "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequested);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequested);
         connect(m_stopBtn, &ToolbarButton::clicked, this, &Toolbar::stopRequested);
         connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequested);
-        connect(m_fullscreenBtn, &ToolbarButton::clicked, this, &Toolbar::fullscreenRequested);
+        connect(m_fullscreenBtn,&ToolbarToggleButton::stateActivated, this, &Toolbar::enableFullscreenRequested);
+        connect(m_fullscreenBtn,&ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableFullscreenRequested);
         qDebug() << "connect successful";
     }
 
     virtual ~Toolbar() = default;
 
+    /// @brief Met à jour le layout pour afficher l'interface en plein écran
     virtual void setFullscreenUI() = 0;
+
+    /// @brief Met à jour le layout pour afficher l'interface par défaut
     virtual void setDefaultUI() = 0;
 
 // Les classes filles pourront modifier ces widgets
 protected: 
-
     ToolbarToggleButton* m_playPauseBtn = nullptr;
     ToolbarButton* m_stopBtn = nullptr;
     ToolbarButton* m_ejectBtn = nullptr;
-    ToolbarButton* m_fullscreenBtn = nullptr;
+    ToolbarToggleButton* m_fullscreenBtn = nullptr;
 
 signals:
-
     void playRequested();
     void pauseRequested();
     void stopRequested();
     void ejectRequested();
-    void fullscreenRequested();
+    void enableFullscreenRequested();
+    void disableFullscreenRequested();
 };
 
 #endif // TOOLBAR_H

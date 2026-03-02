@@ -15,10 +15,11 @@ MediaWidget::MediaWidget(QWidget *parent)
     // ===== VLC ===== //
     const char* const vlc_args[] = {
         "--quiet",
+        "--aout=directsound",
         "--no-video-title-show"
     };
 
-    m_vlc = libvlc_new(2, vlc_args);
+    m_vlc = libvlc_new(3, vlc_args);
     if (!m_vlc) {
         qDebug() << "Erreur création VLC";
         return;
@@ -93,11 +94,29 @@ void MediaWidget::stop()
 
 }
 
-void MediaWidget::eject(){
+void MediaWidget::eject()
+{
     if (!m_player || !libvlc_media_player_get_media(m_player)) return;
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(m_vlc);
     managePlayerSystem();
+}
+
+void MediaWidget::mute()
+{
+    if (!m_player) return;
+    libvlc_audio_set_mute(m_player, 1);
+}
+
+void MediaWidget::unmute()
+{
+    if (!m_player) return;
+    libvlc_audio_set_mute(m_player, 0);
+}
+
+void MediaWidget::setVolume(int vol){
+    if (!m_player) return;
+    libvlc_audio_set_volume(m_player, vol);
 }
 
 // ===== Event ===== //

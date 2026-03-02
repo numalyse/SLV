@@ -20,10 +20,14 @@ public slots:
     void stop();
     void togglePlayPause();
     void eject();
+    void mute();
+    void unmute();
+    void setVolume(int vol);
 
 private:
     libvlc_instance_t *m_vlc = nullptr;
     libvlc_media_player_t *m_player = nullptr;
+    int lastVolume = 100;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

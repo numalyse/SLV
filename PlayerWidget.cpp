@@ -33,12 +33,15 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     m_mediaWidget = new MediaWidget(this);
 
-    connect(m_toolBar, &Toolbar::playRequested, this, &PlayerWidget::play);
-    connect(m_toolBar, &Toolbar::pauseRequested, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequested, m_mediaWidget, &MediaWidget::stop);
-    connect(m_toolBar, &Toolbar::ejectRequested, m_mediaWidget, &MediaWidget::eject);
-    connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
-    connect(m_toolBar, &Toolbar::disableFullscreenRequested, this, &PlayerWidget::disablePlayerFullscreen);
+    connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
+    connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
+    connect(m_toolBar, &Toolbar::stopRequest, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::ejectRequest, m_mediaWidget, &MediaWidget::eject);
+    connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
+    connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
+    connect(m_toolBar, &SimpleToolbar::enableMuteRequest, m_mediaWidget, &MediaWidget::mute);
+    connect(m_toolBar, &SimpleToolbar::disableMuteRequest, m_mediaWidget, &MediaWidget::unmute);
+    connect(m_toolBar, &SimpleToolbar::volumeChanged, m_mediaWidget, &MediaWidget::setVolume);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -92,4 +95,14 @@ void PlayerWidget::play(){
 void PlayerWidget::pause(){
     m_mediaWidget->pause();
     //forcer la toolbar a êtr en on
+}
+
+void PlayerWidget::mute()
+{
+    m_mediaWidget->mute();
+}
+
+void PlayerWidget::unmute()
+{
+    m_mediaWidget->unmute();
 }

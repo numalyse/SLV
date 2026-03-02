@@ -42,6 +42,9 @@ protected:
 
 signals:
     void removePlayerRequest();
+    void enableMuteRequest();
+    void disableMuteRequest();
+    void volumeChanged(int);
 };
 
 #endif

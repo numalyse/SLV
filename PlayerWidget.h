@@ -26,6 +26,10 @@ public:
 public slots:
     void play();
     void pause();
+    void enablePlayerFullscreen();
+    void disablePlayerFullscreen();
+    void mute();
+    void unmute();
 
 signals:
     void addPlayerRequest();
@@ -42,10 +46,6 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
-
-public slots:
-    void enablePlayerFullscreen();
-    void disablePlayerFullscreen();
 
 };
 

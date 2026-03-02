@@ -44,6 +44,8 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     mainLayoutTest2->setContentsMargins(0, 0, 0, 0);
     QSlider* testWidget2 = new QSlider(Qt::Horizontal, containerTest2);
     testWidget2->setFixedSize(200,20);
+    testWidget->setRange(0, 100);
+    testWidget->setValue(100);
     mainLayoutTest2->addWidget(testWidget2);
 
     m_speedBtn = new ToolbarPopupButton(this, containerTest2, "speed.png",  TextManager::instance().get("tooltip_speed"));
@@ -74,6 +76,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));;
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
+    connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
+    connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
+    connect(testWidget, &QSlider::valueChanged, this, &SimpleToolbar::volumeChanged);
 
     setDefaultUI();
 }

@@ -235,8 +235,8 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
 
     for(auto& IActivePlayer : m_activePlayers){
         IActivePlayer->getToolbar()->show();
-        connect(globalToolbar, &GlobalToolbar::playRequested, IActivePlayer, &PlayerWidget::play);
-        connect(globalToolbar, &GlobalToolbar::pauseRequested, IActivePlayer, &PlayerWidget::pause);
+        connect(globalToolbar, &GlobalToolbar::playRequest, IActivePlayer, &PlayerWidget::play);
+        connect(globalToolbar, &GlobalToolbar::pauseRequest, IActivePlayer, &PlayerWidget::pause);
     }
 
     return globalToolbar;
@@ -248,10 +248,12 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     auto* activePlayer = m_activePlayers[0];
     activePlayer->getToolbar()->hide();
 
-    Toolbar* advancedToolbar = new AdvancedToolbar(nullptr);
+    AdvancedToolbar* advancedToolbar = new AdvancedToolbar(nullptr);
 
-    connect(advancedToolbar, &AdvancedToolbar::playRequested, activePlayer, &PlayerWidget::play);
-    connect(advancedToolbar, &AdvancedToolbar::pauseRequested, activePlayer, &PlayerWidget::pause);
+    connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::play);
+    connect(advancedToolbar, &AdvancedToolbar::pauseRequest, activePlayer, &PlayerWidget::pause);
+    connect(advancedToolbar, &AdvancedToolbar::enableMuteRequest, activePlayer, &PlayerWidget::mute);
+    connect(advancedToolbar, &AdvancedToolbar::disableMuteRequest, activePlayer, &PlayerWidget::unmute);
 
     return advancedToolbar;
 }

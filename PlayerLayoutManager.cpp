@@ -231,7 +231,7 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
 }
 
 Toolbar* PlayerLayoutManager::createGlobalToolbar(){
-    Toolbar* globalToolbar = new GlobalToolbar(nullptr);
+    GlobalToolbar* globalToolbar = new GlobalToolbar(nullptr);
 
     for(auto& IActivePlayer : m_activePlayers){
         IActivePlayer->getToolbar()->show();
@@ -239,26 +239,33 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::pauseRequested, IActivePlayer, &PlayerWidget::pause);
     }
 
-    return globalToolbar;
+    return static_cast<Toolbar*>(globalToolbar);
 }
 
 Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     Q_ASSERT(m_activePlayers.size() == 1);
 
     auto* activePlayer = m_activePlayers[0];
-    activePlayer->getToolbar()->hide();
+    if( activePlayer ){
+        activePlayer->getToolbar()->hide();
+    }
 
-    Toolbar* advancedToolbar = new AdvancedToolbar(nullptr);
+    AdvancedToolbar* advancedToolbar = new AdvancedToolbar(nullptr);
 
     connect(advancedToolbar, &AdvancedToolbar::playRequested, activePlayer, &PlayerWidget::play);
     connect(advancedToolbar, &AdvancedToolbar::pauseRequested, activePlayer, &PlayerWidget::pause);
+    connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
 
-    return advancedToolbar;
+    connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
+    connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
+    connect(activePlayer, &PlayerWidget::updateFpsRequest, advancedToolbar, &AdvancedToolbar::updateFps);
+
+    return static_cast<Toolbar*>(advancedToolbar);
 }
 
 Toolbar *PlayerLayoutManager::createLayoutToolbar()
 {
-    if(m_activePlayers.size() == 1 ){
+    if(m_activePlayers.size() == 1 ){ 
         return createAdvancedToolbar();
     }else {
         return createGlobalToolbar();

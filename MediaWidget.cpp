@@ -27,7 +27,22 @@ MediaWidget::MediaWidget(QWidget *parent)
     m_vlc = libvlc_new(2, vlc_args);
     m_player = libvlc_media_player_new(m_vlc);
 
+    managePlayerSystem();
 
+    libvlc_media_player_play(m_player);
+}
+
+
+MediaWidget::~MediaWidget()
+{
+
+    // if (m_vlc) {
+    //     libvlc_release(m_vlc);
+    // }
+}
+
+void MediaWidget::managePlayerSystem()
+{
 #if defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(
         m_player,
@@ -41,17 +56,6 @@ MediaWidget::MediaWidget(QWidget *parent)
         m_player,
         m_videoWidget->winId());
 #endif
-
-    libvlc_media_player_play(m_player);
-}
-
-
-MediaWidget::~MediaWidget()
-{
-
-    // if (m_vlc) {
-    //     libvlc_release(m_vlc);
-    // }
 }
 
 void MediaWidget::play()
@@ -93,6 +97,7 @@ void MediaWidget::eject(){
     if (!m_player || !libvlc_media_player_get_media(m_player)) return;
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(m_vlc);
+    managePlayerSystem();
 }
 
 // ===== Event ===== //

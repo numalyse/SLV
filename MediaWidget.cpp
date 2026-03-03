@@ -41,14 +41,6 @@ MediaWidget::MediaWidget(QWidget *parent)
 }
 
 
-MediaWidget::~MediaWidget()
-{
-
-    // if (m_vlc) {
-    //     libvlc_release(m_vlc);
-    // }
-}
-
 
 /// @brief Sets the media player in the application window instead of a new window
 void MediaWidget::managePlayerSystem()

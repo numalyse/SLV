@@ -77,6 +77,10 @@ MediaWidget::~MediaWidget()
     {
         libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
     }
+
+    if(m_media){
+        libvlc_media_release(m_media);
+    }
     
 
 }
@@ -303,10 +307,11 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         QByteArray urlBytes =
             url.toString(QUrl::FullyEncoded).toUtf8();
 
-        libvlc_media_t* media =
-            libvlc_media_new_location(m_vlc, urlBytes.constData());
+        if (m_media) libvlc_media_release(m_media);
 
-        if (!media)
+        m_media = libvlc_media_new_location(m_vlc, urlBytes.constData());
+
+        if (!m_media)
             return;
 
         if(m_parseEventManager){ 
@@ -314,13 +319,13 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
             m_parseEventManager = nullptr;
         }   
 
-        m_parseEventManager = libvlc_media_event_manager(media);
+        m_parseEventManager = libvlc_media_event_manager(m_media);
         libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-        libvlc_media_parse_with_options(media, libvlc_media_parse_local, 0);
+        libvlc_media_parse_with_options(m_media, libvlc_media_parse_local, 0);
 
-        libvlc_media_player_set_media(m_player, media);
+        libvlc_media_player_set_media(m_player, m_media);
 
-        libvlc_media_release(media);
+
 
         libvlc_media_player_play(m_player);
 

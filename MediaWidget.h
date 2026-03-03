@@ -30,6 +30,7 @@ public slots:
 private:
     libvlc_instance_t *m_vlc = nullptr;
     libvlc_media_player_t *m_player = nullptr;
+    libvlc_media_t *m_media = nullptr;
     int lastVolume = 100;
     const float speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     libvlc_event_manager_t* m_eventManager = nullptr;

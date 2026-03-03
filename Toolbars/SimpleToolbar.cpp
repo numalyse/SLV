@@ -186,6 +186,6 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
 
 }
 
-void SimpleToolbar::updateFps(float newFps){
+void SimpleToolbar::updateFps(double newFps){
     m_media_fps = newFps;
 }

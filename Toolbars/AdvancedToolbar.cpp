@@ -8,6 +8,7 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
+#include "AdvancedToolbar.h"
 
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
@@ -33,6 +34,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     setDefaultUI();
 }
+
+
+
 
 void AdvancedToolbar::setFullscreenUI()
 {

@@ -22,6 +22,7 @@ public:
     void setMediaFromPath(const QString& filePath);
 
     SimpleToolbar* getToolbar() {return m_toolBar;};
+    double getMediaFps() { return m_media_fps; };
 
 public slots:
     void play();
@@ -36,7 +37,7 @@ public slots:
     void takeScreenshot();
     void setSpeed(const unsigned int &speed);
     void setTime(int64_t time);
-    void updateFpsRequest(float);
+    void updateFpsRequest(double);
 
 signals:
     void addPlayerRequest();
@@ -49,7 +50,7 @@ signals:
 
 private:
     Media *m_media = nullptr;
-    float m_media_fps = 0;
+    double m_media_fps = 0.0;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;

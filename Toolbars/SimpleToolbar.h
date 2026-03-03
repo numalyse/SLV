@@ -25,12 +25,13 @@ public:
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
+
+
 protected:
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
-
+    float m_media_fps = 0.0;
     QTimer* m_seekTimer = nullptr;
-    float m_media_fps = 1.0;
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
 
@@ -45,7 +46,7 @@ protected:
 public slots:
     void updateSliderRange(int64_t);
     void updateSliderValue(int64_t);
-    void updateFps(float);
+    void updateFps(double);
 
 signals:
     void setPositionRequested(int64_t);

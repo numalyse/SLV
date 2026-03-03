@@ -271,8 +271,6 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
         advancedToolbar = new AdvancedToolbar(nullptr);
     }
 
-    AdvancedToolbar* advancedToolbar = new AdvancedToolbar(nullptr);
-
     connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::play);
     connect(advancedToolbar, &AdvancedToolbar::pauseRequest, activePlayer, &PlayerWidget::pause);
     connect(advancedToolbar, &AdvancedToolbar::stopRequest, activePlayer, &PlayerWidget::stop);

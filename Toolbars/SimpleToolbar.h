@@ -51,6 +51,10 @@ public slots:
 signals:
     void setPositionRequested(int64_t);
     void removePlayerRequest();
+    void enableMuteRequest();
+    void disableMuteRequest();
+    void volumeChanged(int);
+    void speedChanged(int);
 };
 
 #endif

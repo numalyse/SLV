@@ -33,13 +33,18 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     m_mediaWidget = new MediaWidget(this);
 
-    connect(m_toolBar, &Toolbar::playRequested, this, &PlayerWidget::play);
-    connect(m_toolBar, &Toolbar::pauseRequested, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequested, m_mediaWidget, &MediaWidget::stop);
-    connect(m_toolBar, &Toolbar::ejectRequested, m_mediaWidget, &MediaWidget::eject);
+    connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
+    connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
+    connect(m_toolBar, &Toolbar::stopRequest, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
+    connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
+    connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
+    connect(m_toolBar, &SimpleToolbar::enableMuteRequest, m_mediaWidget, &MediaWidget::mute);
+    connect(m_toolBar, &SimpleToolbar::disableMuteRequest, m_mediaWidget, &MediaWidget::unmute);
+    connect(m_toolBar, &SimpleToolbar::volumeChanged, m_mediaWidget, &MediaWidget::setVolume);
+    connect(m_toolBar, &SimpleToolbar::speedChanged, m_mediaWidget, &MediaWidget::setSpeed);
+    connect(m_toolBar, &Toolbar::screenshotRequest, m_mediaWidget, &MediaWidget::takeScreenshot);
     connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
-    connect(m_toolBar, &Toolbar::enableFullscreenRequested, this, &PlayerWidget::enablePlayerFullscreen);
-    connect(m_toolBar, &Toolbar::disableFullscreenRequested, this, &PlayerWidget::disablePlayerFullscreen);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -92,16 +97,47 @@ void PlayerWidget::disablePlayerFullscreen()
 
 // slots 
 
-void PlayerWidget::play(){
+void PlayerWidget::play()
+{
     m_mediaWidget->play();
     // forcer la toolbar a être off (emit un signal connecté à la toolbar pour mettre à jour l'icone)
 }
 
-void PlayerWidget::pause(){
+void PlayerWidget::pause()
+{
     m_mediaWidget->pause();
     //forcer la toolbar a êtr en on (pareil que play)
 }
 
+void PlayerWidget::stop()
+{
+    m_mediaWidget->stop();
+}
+
+void PlayerWidget::eject()
+{
+    m_mediaWidget->eject();
+}
+
+void PlayerWidget::mute()
+{
+    m_mediaWidget->mute();
+}
+
+void PlayerWidget::unmute()
+{
+    m_mediaWidget->unmute();
+}
+
+void PlayerWidget::setVolume(const int &vol)
+{
+    m_mediaWidget->setVolume(vol);
+}
+
+void PlayerWidget::setSpeed(const unsigned int &speed)
+{
+    m_mediaWidget->setSpeed(speed);
+}
 void PlayerWidget::setTime(int64_t time){
     m_mediaWidget->setTime(time);
 }
@@ -109,5 +145,10 @@ void PlayerWidget::setTime(int64_t time){
 void PlayerWidget::updateFpsRequest(double newFps){
     m_media_fps = newFps;
     emit updateFpsRequested(newFps);
+}
+
+void PlayerWidget::takeScreenshot()
+{
+    m_mediaWidget->takeScreenshot();
 }
 

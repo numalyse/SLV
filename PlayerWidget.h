@@ -27,6 +27,15 @@ public:
 public slots:
     void play();
     void pause();
+    void stop();
+    void eject();
+    void enablePlayerFullscreen();
+    void disablePlayerFullscreen();
+    void mute();
+    void unmute();
+    void setVolume(const int &vol);
+    void takeScreenshot();
+    void setSpeed(const unsigned int &speed);
     void setTime(int64_t time);
     void updateFpsRequest(double);
 
@@ -49,9 +58,6 @@ private:
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
 
-public slots:
-    void enablePlayerFullscreen();
-    void disablePlayerFullscreen();
 };
 
 #endif // PLAYERWIDGET_H

@@ -70,6 +70,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_nextMediaBtn);
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
     buttonLayout->addWidget(m_extensionBtn);

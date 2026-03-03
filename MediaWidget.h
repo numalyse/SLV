@@ -10,6 +10,7 @@ class MediaWidget : public QWidget
 public:
     explicit MediaWidget(QWidget *parent = nullptr);
     ~MediaWidget();
+    void managePlayerSystem();
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
@@ -19,11 +20,18 @@ public slots:
     void stop();
     void togglePlayPause();
     void eject();
+    void mute();
+    void unmute();
+    void setVolume(const int &vol);
+    void setSpeed(const unsigned int &speedIndex);
+    void takeScreenshot();
     void setTime(int64_t);
 
 private:
     libvlc_instance_t *m_vlc = nullptr;
     libvlc_media_player_t *m_player = nullptr;
+    int lastVolume = 100;
+    const float speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     libvlc_event_manager_t* m_eventManager = nullptr;
     libvlc_event_manager_t* m_parseEventManager = nullptr;
 

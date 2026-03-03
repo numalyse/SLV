@@ -235,8 +235,12 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
 
     for(auto& IActivePlayer : m_activePlayers){
         IActivePlayer->getToolbar()->show();
-        connect(globalToolbar, &GlobalToolbar::playRequested, IActivePlayer, &PlayerWidget::play);
-        connect(globalToolbar, &GlobalToolbar::pauseRequested, IActivePlayer, &PlayerWidget::pause);
+        connect(globalToolbar, &GlobalToolbar::playRequest, IActivePlayer, &PlayerWidget::play);
+        connect(globalToolbar, &GlobalToolbar::pauseRequest, IActivePlayer, &PlayerWidget::pause);
+        connect(globalToolbar, &GlobalToolbar::stopRequest, IActivePlayer, &PlayerWidget::stop);
+        connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
+        connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
+        connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
     }
 
     return static_cast<Toolbar*>(globalToolbar);
@@ -252,12 +256,19 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     AdvancedToolbar* advancedToolbar = new AdvancedToolbar(nullptr);
 
+    connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::play);
+    connect(advancedToolbar, &AdvancedToolbar::pauseRequest, activePlayer, &PlayerWidget::pause);
+    connect(advancedToolbar, &AdvancedToolbar::stopRequest, activePlayer, &PlayerWidget::stop);
+    connect(advancedToolbar, &AdvancedToolbar::ejectRequest, activePlayer, &PlayerWidget::eject);
+    connect(advancedToolbar, &AdvancedToolbar::enableMuteRequest, activePlayer, &PlayerWidget::mute);
+    connect(advancedToolbar, &AdvancedToolbar::disableMuteRequest, activePlayer, &PlayerWidget::unmute);
+    connect(advancedToolbar, &AdvancedToolbar::volumeChanged, activePlayer, &PlayerWidget::setVolume);
+    connect(advancedToolbar, &AdvancedToolbar::speedChanged, activePlayer, &PlayerWidget::setSpeed);
+    connect(advancedToolbar, &AdvancedToolbar::screenshotRequest, activePlayer, &PlayerWidget::takeScreenshot);
     connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
     connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
     connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
 
-    connect(advancedToolbar, &AdvancedToolbar::playRequested, activePlayer, &PlayerWidget::play);
-    connect(advancedToolbar, &AdvancedToolbar::pauseRequested, activePlayer, &PlayerWidget::pause);
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
 
     return static_cast<Toolbar*>(advancedToolbar);

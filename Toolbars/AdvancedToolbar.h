@@ -20,11 +20,12 @@ Q_OBJECT
 
 public:
     explicit AdvancedToolbar(QWidget* parent = nullptr);
-    //explicit AdvancedToolbar(QWidget* parent = nullptr, SimpleToolbar* toolbar);
+    explicit AdvancedToolbar(QWidget* parent, SimpleToolbar* toolbar);
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
+    
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;
     ToolbarButton* m_nextMediaBtn = nullptr;

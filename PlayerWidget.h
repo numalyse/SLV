@@ -23,6 +23,7 @@ public:
 
     SimpleToolbar* getToolbar() {return m_toolBar;};
     double getMediaFps() { return m_media_fps; };
+    bool getIsPlaying(){ return m_isPlaying; };
 
 public slots:
     void play();
@@ -38,10 +39,14 @@ signals:
     void updateSliderRangeRequest(int64_t);
     void updateSliderValueRequest(int64_t);
     void updateFpsRequested(float);
+    void setPlayUIRequested();
+    void setPauseUIRequested();
+    void checkPlayersStatusRequested();
 
 private:
     Media *m_media = nullptr;
     double m_media_fps = 0.0;
+    bool m_isPlaying = false;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;

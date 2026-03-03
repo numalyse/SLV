@@ -35,8 +35,55 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     setDefaultUI();
 }
 
+/// @brief Constructeur qui va copier les états des boutons de le toolbar passé en paramète 
+/// @param parent 
+/// @param toolbar 
+AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar) 
+    : AdvancedToolbar(parent)
+{
+    if (!toolbar) return;
 
+    m_media_fps = toolbar->getMediaFps();
 
+    QSlider* oldSlider = toolbar->getSlider();
+    if (oldSlider && m_slider) {
+        m_slider->setRange(oldSlider->minimum(), oldSlider->maximum());
+        m_slider->setValue(oldSlider->value());
+    }
+
+    QLabel* oldTimeLabel = toolbar->getCurrentTimeLabel();
+    if (oldTimeLabel && m_currentTimeLabel) {
+        m_currentTimeLabel->setText(oldTimeLabel->text());
+    }
+
+    QLabel* oldDurationLabel = toolbar->getDurationLabel();
+    if (oldDurationLabel && m_durationLabel) {
+        m_durationLabel->setText(oldDurationLabel->text());
+    }
+
+    ToolbarToggleButton* oldPlayPause = toolbar->getPlayPauseBtn();
+    if (oldPlayPause && m_playPauseBtn) {
+        m_playPauseBtn->setButtonState(oldPlayPause->isChecked());
+    }
+
+    ToolbarToggleButton* oldFullscreen = toolbar->getFullscreenBtn();
+    if (oldFullscreen && m_fullscreenBtn) {
+        m_fullscreenBtn->setButtonState(oldFullscreen->isChecked());
+    }
+
+    ToolbarToggleButton* oldLoop = toolbar->getLoopBtn();
+    if (oldLoop && m_loopBtn) {
+        m_loopBtn->setButtonState(oldLoop->isChecked());
+    }
+
+    ToolbarToggleHoverButton* oldMute = toolbar->getMuteBtn();
+    if (oldMute && m_muteBtn) {
+        m_muteBtn->setButtonState(oldMute->isChecked());
+    }
+
+    // TODO : voir pour copier les états des sliders dans muteBtn et speedBtn
+
+}
 
 void AdvancedToolbar::setFullscreenUI()
 {

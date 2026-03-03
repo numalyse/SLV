@@ -24,6 +24,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
         connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enableLayoutFullscreen);
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disableLayoutFullscreen);
+        connect(player, &PlayerWidget::checkPlayersStatusRequested, this, &PlayerLayoutManager::checkPlayersStatus);
         m_players.append(player);
     }
     
@@ -233,11 +234,19 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
 Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     GlobalToolbar* globalToolbar = new GlobalToolbar(nullptr);
 
+    bool onePlayerPlaying = false;
+
+    // Parcours les players pour connecter le play / play de la global a ses players
     for(auto& IActivePlayer : m_activePlayers){
         IActivePlayer->getToolbar()->show();
         connect(globalToolbar, &GlobalToolbar::playRequested, IActivePlayer, &PlayerWidget::play);
         connect(globalToolbar, &GlobalToolbar::pauseRequested, IActivePlayer, &PlayerWidget::pause);
+        if(IActivePlayer->getIsPlaying()) onePlayerPlaying = true;
     }
+
+    ToolbarToggleButton* globalPlayPause = globalToolbar->getPlayPauseBtn();
+    // Si un des players est en train de jouer, on change l'état par défaut du bouton play de la barre globale
+    globalPlayPause->setButtonState(onePlayerPlaying);
 
     return static_cast<Toolbar*>(globalToolbar);
 }
@@ -246,11 +255,17 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     Q_ASSERT(m_activePlayers.size() == 1);
 
     auto* activePlayer = m_activePlayers[0];
-    if( activePlayer ){
-        activePlayer->getToolbar()->hide();
-    }
+    auto* activePlayerToolbar = activePlayer->getToolbar();
 
-    AdvancedToolbar* advancedToolbar = new AdvancedToolbar(nullptr);
+    AdvancedToolbar* advancedToolbar = nullptr;
+
+    if( activePlayer ){
+        activePlayerToolbar->hide();
+        advancedToolbar = new AdvancedToolbar(nullptr, activePlayerToolbar); // la toolbar avancée aura les mêmes états que la simple toolbar du player
+        
+    } else {
+        advancedToolbar = new AdvancedToolbar(nullptr);
+    }
 
     connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
     connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
@@ -270,6 +285,27 @@ Toolbar *PlayerLayoutManager::createLayoutToolbar()
     }else {
         return createGlobalToolbar();
     }
+}
+
+/// @brief Vérifie combien de players sont en pause / play
+/// puis émet un signal pour mettre à jour la toolbarglobal
+void PlayerLayoutManager::checkPlayersStatus(){
+
+    int activePlayerCount = static_cast<int>(m_activePlayers.size());
+
+    if( activePlayerCount == 1 ) return;
+
+    int paused = 0;
+    for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
+        if ( ! m_activePlayers[Iplayer]->getIsPlaying() ) ++paused; 
+    }
+
+    if (paused == activePlayerCount ) {
+        emit setGlobalPlayStateRequested(false);
+    }else {
+        emit setGlobalPlayStateRequested(true);
+    }
+    
 }
 
 // slots

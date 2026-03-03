@@ -37,6 +37,7 @@ void GlobalToolbar::setDefaultUI()
     buttonLayout->addWidget(m_playPauseBtn);
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     mainLayout->addLayout(buttonLayout);
 }

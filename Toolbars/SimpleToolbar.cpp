@@ -56,10 +56,10 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         this, 
         volumeSliderContainer,
         false,
-        "sound_on.png",  
-        TextManager::instance().get("tooltip_sound_on"),
         "sound_off.png",  
-        TextManager::instance().get("tooltip_sound_off")
+        TextManager::instance().get("tooltip_sound_off"),
+        "sound_on.png",
+        TextManager::instance().get("tooltip_sound_on")
     );
 
     
@@ -147,8 +147,8 @@ void SimpleToolbar::setDefaultUI()
     //buttonLayout->addWidget(m_speedUpBtn);
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_screenshotBtn);
+    buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
     buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);

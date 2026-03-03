@@ -55,6 +55,8 @@ signals:
     void disableMuteRequest();
     void volumeChanged(int);
     void speedChanged(int);
+    void enableLoopModeRequest();
+    void disableLoopModeRequest();
 };
 
 #endif

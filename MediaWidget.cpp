@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QDir>
 #include <QMap>
 
 MediaWidget::MediaWidget(QWidget *parent)
@@ -17,11 +18,12 @@ MediaWidget::MediaWidget(QWidget *parent)
     // ===== VLC ===== //
     const char* const vlc_args[] = {
         "--quiet",
+        "--aout=directsound",
         "--no-video-title-show",
         "--no-input-fast-seek"
     };
 
-    m_vlc = libvlc_new(3, vlc_args);
+    m_vlc = libvlc_new(4, vlc_args);
     if (!m_vlc) {
         qDebug() << "Erreur création VLC";
         return;
@@ -29,12 +31,21 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     m_player = libvlc_media_player_new(m_vlc);
 
+    managePlayerSystem();
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
     // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
 
+    libvlc_media_player_play(m_player);
+}
+
+
+
+/// @brief Sets the media player in the application window instead of a new window
+void MediaWidget::managePlayerSystem()
+{
 #if defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(
         m_player,
@@ -48,7 +59,6 @@ MediaWidget::MediaWidget(QWidget *parent)
         m_player,
         m_videoWidget->winId());
 #endif
-    libvlc_media_player_play(m_player);
 
 }
 
@@ -96,6 +106,7 @@ void MediaWidget::togglePlayPause()
     }
 }
 
+/// @brief Set the media player position to 0 and pause
 void MediaWidget::stop()
 {
     if (!m_player) return;
@@ -106,10 +117,51 @@ void MediaWidget::stop()
 
 }
 
-void MediaWidget::eject(){
+/// @brief Release the media player and create a new one from MediaWidget instance
+void MediaWidget::eject()
+{
     if (!m_player || !libvlc_media_player_get_media(m_player)) return;
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(m_vlc);
+    managePlayerSystem();
+}
+
+/// @brief Mute the media player
+void MediaWidget::mute()
+{
+    if (!m_player) return;
+    libvlc_audio_set_mute(m_player, 1);
+}
+
+/// @brief Unmute the media player
+void MediaWidget::unmute()
+{
+    if (!m_player) return;
+    libvlc_audio_set_mute(m_player, 0);
+}
+
+/// @brief Change media player volume
+/// @param int vol : volume
+void MediaWidget::setVolume(const int &vol)
+{
+    if (!m_player) return;
+    libvlc_audio_set_volume(m_player, vol);
+}
+
+/// @brief Change media player rate
+/// @param speedIndex = 0 : x0.25, 1 : x0.5, 2 : x0.75, 3 : x1, 4 : x1.25, 5 : x1.5, 6 : x2
+void MediaWidget::setSpeed(const unsigned int &speedIndex)
+{
+    if (!m_player) return;
+    libvlc_media_player_set_rate(m_player, speedSteps[speedIndex]);
+}
+
+/// @brief Take a screenshot of the current frame
+void MediaWidget::takeScreenshot()
+{
+    if (!m_player) return;
+    QString captureDirectory = QDir::homePath() + "/SLV_Content/screenshot.png"; // nommer comme il faut avec le format nom_film_HH_MM_SS_FF.png ou jpg
+    libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), 0, 0);
 }
 
 void MediaWidget::setTime(int64_t time)
@@ -233,6 +285,8 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
+/// @brief Stops the current media player and load a new media from a path
+/// @param QString filePath : string containing the path of the media
 void MediaWidget::setMediaFromPath(const QString& filePath)
 {
     if (!m_player)

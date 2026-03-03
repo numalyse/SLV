@@ -43,33 +43,40 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
     // ------- test mute btn, hover et toggle
-    QWidget* containerTest = new QWidget();
-    QVBoxLayout* mainLayoutTest = new QVBoxLayout(containerTest);
-    mainLayoutTest->setContentsMargins(0, 0, 0, 0);
-    QSlider* testWidget = new QSlider(Qt::Vertical, containerTest);
-    testWidget->setFixedSize(20,100);
-    mainLayoutTest->addWidget(testWidget);
+    QWidget* volumeSliderContainer = new QWidget();
+    QVBoxLayout* volumeSliderLayout = new QVBoxLayout(volumeSliderContainer);
+    volumeSliderLayout->setContentsMargins(0, 0, 0, 0);
+    QSlider* volumeSlider = new QSlider(Qt::Vertical, volumeSliderContainer);
+    volumeSlider->setFixedSize(20,100);
+    volumeSlider->setRange(0, 100);
+    volumeSlider->setValue(100);
+    volumeSliderLayout->addWidget(volumeSlider);
 
     m_muteBtn = new ToolbarToggleHoverButton(
         this, 
-        containerTest, 
+        volumeSliderContainer,
         false,
-        "sound_on.png",  
-        TextManager::instance().get("tooltip_sound_on"),
         "sound_off.png",  
-        TextManager::instance().get("tooltip_sound_off")
+        TextManager::instance().get("tooltip_sound_off"),
+        "sound_on.png",
+        TextManager::instance().get("tooltip_sound_on")
     );
 
     
     // ------- test speed btn, click show popup
-    QWidget* containerTest2 = new QWidget();
-    QVBoxLayout* mainLayoutTest2 = new QVBoxLayout(containerTest2);
-    mainLayoutTest2->setContentsMargins(0, 0, 0, 0);
-    QSlider* testWidget2 = new QSlider(Qt::Horizontal, containerTest2);
-    testWidget2->setFixedSize(200,20);
-    mainLayoutTest2->addWidget(testWidget2);
+    QWidget* speedSliderContainer = new QWidget();
+    QVBoxLayout* speedSliderLayout = new QVBoxLayout(speedSliderContainer);
+    speedSliderLayout->setContentsMargins(0, 0, 0, 0);
+    QSlider* speedSlider = new QSlider(Qt::Horizontal, speedSliderContainer);
+    speedSlider->setFixedSize(200,20);
+    speedSlider->setRange(0, 6);
+    speedSlider->setValue(3);
+    speedSlider->setTickPosition(QSlider::TicksAbove);
+    speedSlider->setTickInterval(1);
 
-    m_speedBtn = new ToolbarPopupButton(this, containerTest2, "speed.png",  TextManager::instance().get("tooltip_speed"));
+    speedSliderLayout->addWidget(speedSlider);
+
+    m_speedBtn = new ToolbarPopupButton(this, speedSliderContainer, "speed.png",  TextManager::instance().get("tooltip_speed"));
 
     // exemple pour connecter le slider dans le widget popup connect(testWidget, &QSlider::valueChanged, this, [&] () { qDebug() << "oui"; });
 
@@ -97,6 +104,10 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));;
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
+    connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
+    connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
+    connect(volumeSlider, &QSlider::valueChanged, this, &SimpleToolbar::volumeChanged);
+    connect(speedSlider, &QSlider::valueChanged, this, &SimpleToolbar::speedChanged);
 
     setDefaultUI();
 }
@@ -136,6 +147,7 @@ void SimpleToolbar::setDefaultUI()
     //buttonLayout->addWidget(m_speedUpBtn);
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
     buttonLayout->addWidget(m_removePlayerBtn);

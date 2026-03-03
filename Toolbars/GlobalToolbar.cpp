@@ -10,6 +10,18 @@
 
 GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
 {
+    m_muteBtn = new ToolbarToggleButton(
+        this,
+        false,
+        "sound_off.png",
+        TextManager::instance().get("tooltip_sound_off"),
+        "sound_on.png",
+        TextManager::instance().get("tooltip_sound_on")
+    );
+
+    connect(m_muteBtn, &ToolbarToggleButton::stateActivated, this, &GlobalToolbar::enableMute);
+    connect(m_muteBtn, &ToolbarToggleButton::stateDeactivated, this, &GlobalToolbar::disableMute);
+
     setDefaultUI();
 }
 
@@ -33,10 +45,12 @@ void GlobalToolbar::setDefaultUI()
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout();   
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_playPauseBtn);
     buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     mainLayout->addLayout(buttonLayout);
 }

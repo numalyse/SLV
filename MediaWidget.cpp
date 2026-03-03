@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QMap>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -134,41 +135,19 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             libvlc_media_t* parsedMedia = static_cast<libvlc_media_t*>(event->p_obj);
 
             if (parsedMedia) {
+
                 libvlc_time_t duration = libvlc_media_get_duration(parsedMedia);
-                emit mediaWidget->updateSliderRangeRequested(duration);
+                double mediaFps = getFpsParsedMedia(parsedMedia);
+
+                //auto metaMap = getMetaMedia(parsedMedia);
+
+                if (mediaFps > 0.0) {
+                    emit mediaWidget->updateFpsRequested(mediaFps); // met à jour les fps dans le playerwidget
+                    emit mediaWidget->updateSliderRangeRequested(duration); // envoie les ms au playerwidget qui lui les envoie à la toolbar avec les fps
+                }else {
+                    qDebug() << "Impossible de récuperer les fps du média";
+                }
                 
-                // récup métadonnées
-                //libvlc_meta_t meta;
-                //libvlc_media_get_meta(parsedMedia, meta);
-
-
-                libvlc_media_track_t** tracks = nullptr;
-                unsigned int tracksCount = libvlc_media_tracks_get(parsedMedia, &tracks);
-                float mediaFps = 0.0f;
-
-                for (unsigned int ITrack = 0; ITrack < tracksCount; ++ITrack) 
-                {
-                    
-                    if (tracks[ITrack]->i_type == libvlc_track_video) 
-                    {
-                        unsigned int num = tracks[ITrack]->video->i_frame_rate_num;
-                        unsigned int den = tracks[ITrack]->video->i_frame_rate_den;
-                        
-                        if (den > 0) {
-                            mediaFps = static_cast<float>(num) / static_cast<float>(den);
-                        }
-                    
-                        break; 
-                    }
-                }
-
-                if (tracksCount > 0) {
-                    libvlc_media_tracks_release(tracks, tracksCount);
-                }
-
-                if (mediaFps > 0.0f) {
-                    emit mediaWidget->updateFpsRequested(mediaFps);
-                }
 
             }
         }
@@ -178,6 +157,60 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
     }
 }
+
+/// @brief Helper pour parcourir les métadonnées et récuperer les non vides.
+/// @param parsedMedia event->type == libvlc_MediaParsedChanged
+/// @return Map avec clé enum libvlc et valeur QString son contenu
+QMap<libvlc_meta_t, QString> MediaWidget::getMetaParsedMedia( libvlc_media_t* parsedMedia ){
+    QMap<libvlc_meta_t, QString> metaMap;
+    for (int IMeta = libvlc_meta_Title; IMeta != libvlc_meta_DiscTotal ; IMeta++) {
+        
+        libvlc_meta_t metaType = static_cast<libvlc_meta_t>(IMeta);
+        char* metaCStr = libvlc_media_get_meta(parsedMedia, metaType);
+        
+        if (metaCStr) {
+            QString metaText = QString::fromUtf8(metaCStr);
+            metaMap[metaType] = metaText;
+            libvlc_free(metaCStr);
+        }
+    }
+    return metaMap;
+    
+}
+
+/// @brief Helper pour parcourir les streams d'un média et récuperer ses fps
+/// @param parsedMedia 
+/// @return double qui représente les fps moyens de la vidéo, -1 si le parsed média est null, 0.0 si pas de fps retrouvé, 
+double MediaWidget::getFpsParsedMedia( libvlc_media_t* parsedMedia ){
+
+    if (!parsedMedia) return -1;
+
+    libvlc_media_track_t** tracks = nullptr;
+    unsigned int tracksCount = libvlc_media_tracks_get(parsedMedia, &tracks);
+    double mediaFps = 0.0;
+
+    for (unsigned int ITrack = 0; ITrack < tracksCount; ++ITrack) {
+        
+        if (tracks[ITrack]->i_type == libvlc_track_video) {
+
+            unsigned int num = tracks[ITrack]->video->i_frame_rate_num;
+            unsigned int den = tracks[ITrack]->video->i_frame_rate_den;
+            
+            if (den > 0) {
+                mediaFps = static_cast<float>(num) / static_cast<float>(den);
+            }
+        
+            break; 
+        }
+    }
+
+    if (tracksCount > 0) {
+        libvlc_media_tracks_release(tracks, tracksCount);
+    }
+
+    return mediaFps;
+}
+
 
 // ===== Event ===== //
 
@@ -235,5 +268,3 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
     }, Qt::QueuedConnection);
 }
-
-

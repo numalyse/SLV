@@ -106,7 +106,7 @@ void PlayerWidget::setTime(int64_t time){
     m_mediaWidget->setTime(time);
 }
 
-void PlayerWidget::updateFpsRequest(float newFps){
+void PlayerWidget::updateFpsRequest(double newFps){
     m_media_fps = newFps;
     emit updateFpsRequested(newFps);
 }

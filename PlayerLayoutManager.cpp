@@ -252,13 +252,13 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     AdvancedToolbar* advancedToolbar = new AdvancedToolbar(nullptr);
 
+    connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
+    connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
+    connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
+
     connect(advancedToolbar, &AdvancedToolbar::playRequested, activePlayer, &PlayerWidget::play);
     connect(advancedToolbar, &AdvancedToolbar::pauseRequested, activePlayer, &PlayerWidget::pause);
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
-
-    connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
-    connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
-    connect(activePlayer, &PlayerWidget::updateFpsRequest, advancedToolbar, &AdvancedToolbar::updateFps);
 
     return static_cast<Toolbar*>(advancedToolbar);
 }

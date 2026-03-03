@@ -28,7 +28,7 @@ public slots:
     void setTime(int64_t);
 
 private:
-    libvlc_instance_t *m_vlc = nullptr;
+    //libvlc_instance_t *m_vlc = nullptr;
     libvlc_media_player_t *m_player = nullptr;
     libvlc_media_t *m_media = nullptr;
     int lastVolume = 100;
@@ -37,8 +37,6 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
-    static QMap<libvlc_meta_t, QString> getMetaParsedMedia(libvlc_media_t *parsedMedia);
-    static double getFpsParsedMedia(libvlc_media_t *parsedMedia);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

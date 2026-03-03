@@ -286,8 +286,6 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
     connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
 
-
-
     return static_cast<Toolbar*>(advancedToolbar);
 }
 

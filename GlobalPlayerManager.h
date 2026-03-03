@@ -21,16 +21,14 @@ private:
 
 public slots:
 
-    ///@brief Supprime puis Remplace m_playersWidget par le widget retourné par m_layoutManager->createLayoutFromPaths(filesPaths); 
+
     void setPlayersFromPaths(QStringList);
     void enableFullscreenGlobal();
     void disableFullscreenGlobal();
 
-    /// @brief Supprime le QWidget m_playersWidget pour libérer la mémoire et met à jour m_playersWidget avec le Widget envoyé par PlayerLayoutManager
-    /// @param Le nombre de players dans le nouveau widget, permet de mettre à jour l'ui en fonction du nombre
-    /// @param Le Widget qui va remplacer m_playersWidget
-    /// @param La nouvelle toolbar globale, si 1 seul player la toolbar est une AdvancedToolBar 
     void updateContainer(int, QWidget*, Toolbar*);
+
+    void setGlobalPlayState(bool);
 
 signals:
     void enableFullscreenMainRequested();

@@ -49,10 +49,13 @@ private:
     /// @brief Créer la bonne toolbar en fonction du nombre de players actifs
     Toolbar* createLayoutToolbar();
 
+    void checkPlayersStatus();
+
 signals:
     void updateContainerRequest(int, QWidget*, Toolbar*);
     void enableFullscreenGlobalRequested();
     void disableFullscreenGlobalRequested();
+    void setGlobalPlayStateRequested(bool);
 
 public slots:
     void addPlayer();

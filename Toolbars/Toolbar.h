@@ -13,6 +13,7 @@ class Toolbar : public QWidget
 Q_OBJECT
 
 public:
+
     explicit Toolbar(QWidget* parent = nullptr) : QWidget(parent) {
         m_playPauseBtn = new ToolbarToggleButton(
             this,
@@ -37,6 +38,11 @@ public:
 
         qDebug() << "connect successful";
     }
+
+    ToolbarToggleButton* getPlayPauseBtn() const { return m_playPauseBtn; }
+    ToolbarButton* getStopBtn() const { return m_stopBtn; }
+    ToolbarButton* getEjectBtn() const { return m_ejectBtn; }
+    ToolbarToggleButton* getFullscreenBtn() const { return m_fullscreenBtn; }
 
     virtual ~Toolbar() = default;
 

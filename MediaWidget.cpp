@@ -62,7 +62,7 @@ void MediaWidget::managePlayerSystem()
 
 }
 
-
+/// @brief Destructeur qui détache les event managers vlc
 MediaWidget::~MediaWidget()
 {
 
@@ -170,6 +170,10 @@ void MediaWidget::setTime(int64_t time)
     libvlc_media_player_set_time(m_player, time);
 }
 
+/// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
+/// Ecoute quand la lecture asychrone des métadonnées est terminée et envoie un signal.
+/// @param event 
+/// @param userData 
 void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 {
     MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);

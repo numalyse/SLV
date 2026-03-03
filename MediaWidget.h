@@ -28,6 +28,8 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
+    static QMap<libvlc_meta_t, QString> getMetaParsedMedia(libvlc_media_t *parsedMedia);
+    static double getFpsParsedMedia(libvlc_media_t *parsedMedia);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

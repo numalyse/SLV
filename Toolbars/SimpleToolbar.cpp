@@ -94,9 +94,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     //m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
 
     m_loopBtn = new ToolbarToggleButton(
-        this, 
-        false,
-        "loop_on.png", 
+        this,
+        true,
+        "loop_on.png",
         TextManager::instance().get("tooltip_loop_on"),
         "loop_off.png", 
         TextManager::instance().get("tooltip_loop_off")
@@ -108,6 +108,8 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
     connect(volumeSlider, &QSlider::valueChanged, this, &SimpleToolbar::volumeChanged);
     connect(speedSlider, &QSlider::valueChanged, this, &SimpleToolbar::speedChanged);
+    connect(m_loopBtn, &ToolbarToggleButton::stateActivated, this, &SimpleToolbar::enableLoopModeRequest);
+    connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
 
     setDefaultUI();
 }

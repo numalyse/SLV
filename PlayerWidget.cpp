@@ -45,6 +45,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::speedChanged, m_mediaWidget, &MediaWidget::setSpeed);
     connect(m_toolBar, &Toolbar::screenshotRequest, m_mediaWidget, &MediaWidget::takeScreenshot);
     connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
+    connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
+    connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -152,3 +154,12 @@ void PlayerWidget::takeScreenshot()
     m_mediaWidget->takeScreenshot();
 }
 
+void PlayerWidget::enableLoopMode()
+{
+    m_mediaWidget->enableLoopMode();
+}
+
+void PlayerWidget::disableLoopMode()
+{
+    m_mediaWidget->disableLoopMode();
+}

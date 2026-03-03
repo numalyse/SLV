@@ -14,6 +14,8 @@ public:
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
+
+
 public slots:
     void play();
     void pause();
@@ -37,6 +39,8 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
+    
+    void releaseMedia();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

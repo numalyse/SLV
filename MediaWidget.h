@@ -39,7 +39,7 @@ signals:
     void updateSliderValueRequested(int64_t newTime);
     void activated(MediaWidget* self);
     void updateSliderRangeRequested(int64_t mediaDuration);
-    void updateFpsRequested(float fps);
+    void updateFpsRequested(double fps);
 };
 
 #endif // MEDIAWIDGET_H

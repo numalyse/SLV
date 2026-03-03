@@ -19,9 +19,10 @@ MediaWidget::MediaWidget(QWidget *parent)
     setStyleSheet("background-color: black");
 
     // ===== VLC ===== //
-    m_player = libvlc_media_player_new(VlcInstance::instance().get());
+    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
 
     managePlayerSystem();
+
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
     // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
@@ -106,7 +107,7 @@ void MediaWidget::eject()
 
     releaseMedia();
     libvlc_media_player_release(m_player);
-    m_player = libvlc_media_player_new(VlcInstance::instance().get());
+    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
     managePlayerSystem();
 }
 
@@ -234,7 +235,7 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
         if (m_media) libvlc_media_release(m_media);
 
-        m_media = libvlc_media_new_location(VlcInstance::instance().get(), urlBytes.constData());
+        m_media = libvlc_media_new_location(SLV::VlcInstance::get(), urlBytes.constData());
 
         if (!m_media)
             return;

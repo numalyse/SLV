@@ -13,7 +13,7 @@ Media::Media(const QString &filePath){
     QUrl url = QUrl::fromLocalFile(m_filePath);
     QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
 
-    libvlc_media_t *media = libvlc_media_new_location(VlcInstance::instance().get(), urlBytes.constData());
+    libvlc_media_t *media = libvlc_media_new_location(SLV::VlcInstance::get(), urlBytes.constData());
 
     if (!media){
         qDebug() << "Media ";

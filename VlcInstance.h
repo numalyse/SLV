@@ -3,17 +3,20 @@
 #include <vlc/vlc.h>
 #include <QDebug>
 
+namespace SLV
+{
+    
+
+
 class VlcInstance
 {
 
 public:
 
-    static VlcInstance& instance() {
+    static libvlc_instance_t* get() {
         static VlcInstance _instance;
-        return _instance;
+        return _instance.m_instance;
     };
-
-    libvlc_instance_t* get(){ return m_vlcInstance ;};
 
 private:
     VlcInstance() {
@@ -24,14 +27,20 @@ private:
             "--no-input-fast-seek"
         };
 
-        m_vlcInstance = libvlc_new(4, vlc_args);
-        if (!m_vlcInstance) {
+        m_instance = libvlc_new(4, vlc_args);
+        if (!m_instance) {
             qDebug() << "Erreur création VLC";
             return;
         }
 
-    } ;
-    libvlc_instance_t* m_vlcInstance  = nullptr;
+    };
+
+    ~VlcInstance() { libvlc_release(m_instance); };
+
+    libvlc_instance_t* m_instance  = nullptr;
 
 };
+} // namespace SLV
+
+
 

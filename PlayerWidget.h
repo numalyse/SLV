@@ -26,6 +26,7 @@ public:
 public slots:
     void play();
     void pause();
+    void eject();
     void enablePlayerFullscreen();
     void disablePlayerFullscreen();
     void mute();

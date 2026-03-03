@@ -135,3 +135,8 @@ void PlayerWidget::updateFpsRequest(float newFps){
     emit updateFpsRequested(newFps);
 }
 
+void PlayerWidget::takeScreenshot()
+{
+    m_mediaWidget->takeScreenshot();
+}
+

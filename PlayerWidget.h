@@ -31,7 +31,7 @@ public slots:
     void mute();
     void unmute();
     void setVolume(const int &vol);
-
+    void takeScreenshot();
     void setSpeed(const unsigned int &speed);
     void setTime(int64_t time);
     void updateFpsRequest(float);

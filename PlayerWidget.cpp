@@ -109,6 +109,11 @@ void PlayerWidget::pause()
     //forcer la toolbar a êtr en on (pareil que play)
 }
 
+void PlayerWidget::stop()
+{
+    m_mediaWidget->stop();
+}
+
 void PlayerWidget::eject()
 {
     m_mediaWidget->eject();

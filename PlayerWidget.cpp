@@ -36,7 +36,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
     connect(m_toolBar, &Toolbar::stopRequest, m_mediaWidget, &MediaWidget::stop);
-    connect(m_toolBar, &Toolbar::ejectRequest, m_mediaWidget, &MediaWidget::eject);
+    connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
     connect(m_toolBar, &SimpleToolbar::enableMuteRequest, m_mediaWidget, &MediaWidget::mute);
@@ -97,14 +97,21 @@ void PlayerWidget::disablePlayerFullscreen()
 
 // slots 
 
-void PlayerWidget::play(){
+void PlayerWidget::play()
+{
     m_mediaWidget->play();
     // forcer la toolbar a être off (emit un signal connecté à la toolbar pour mettre à jour l'icone)
 }
 
-void PlayerWidget::pause(){
+void PlayerWidget::pause()
+{
     m_mediaWidget->pause();
     //forcer la toolbar a êtr en on (pareil que play)
+}
+
+void PlayerWidget::eject()
+{
+    m_mediaWidget->eject();
 }
 
 void PlayerWidget::mute()

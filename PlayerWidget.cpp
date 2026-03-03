@@ -44,12 +44,20 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::volumeChanged, m_mediaWidget, &MediaWidget::setVolume);
     connect(m_toolBar, &SimpleToolbar::speedChanged, m_mediaWidget, &MediaWidget::setSpeed);
     connect(m_toolBar, &Toolbar::screenshotRequest, m_mediaWidget, &MediaWidget::takeScreenshot);
+    connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(m_mediaWidget);
     layout->addWidget(m_toolBar);
 
+    connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
+    connect(m_mediaWidget, &MediaWidget::updateSliderValueRequested, this, &PlayerWidget::updateSliderValueRequest);
+    connect(m_mediaWidget,  &MediaWidget::updateFpsRequested, this, &PlayerWidget::updateFpsRequest);
+
+    connect(this, &PlayerWidget::updateSliderRangeRequest, m_toolBar, &SimpleToolbar::updateSliderRange);
+    connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
+    connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -91,12 +99,12 @@ void PlayerWidget::disablePlayerFullscreen()
 
 void PlayerWidget::play(){
     m_mediaWidget->play();
-    // forcer la toolbar a être off
+    // forcer la toolbar a être off (emit un signal connecté à la toolbar pour mettre à jour l'icone)
 }
 
 void PlayerWidget::pause(){
     m_mediaWidget->pause();
-    //forcer la toolbar a êtr en on
+    //forcer la toolbar a êtr en on (pareil que play)
 }
 
 void PlayerWidget::mute()
@@ -118,3 +126,12 @@ void PlayerWidget::setSpeed(const unsigned int &speed)
 {
     m_mediaWidget->setSpeed(speed);
 }
+void PlayerWidget::setTime(int64_t time){
+    m_mediaWidget->setTime(time);
+}
+
+void PlayerWidget::updateFpsRequest(float newFps){
+    m_media_fps = newFps;
+    emit updateFpsRequested(newFps);
+}
+

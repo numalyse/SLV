@@ -26,11 +26,13 @@ public:
     void setDefaultUI() override;
 
 protected:
-    
+    QSlider* m_slider = nullptr;
+    bool m_draggingSlider = false;
+
+    QTimer* m_seekTimer = nullptr;
+    float m_media_fps = 1.0;
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
-
-    QSlider* m_slider = nullptr;
 
     ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
@@ -40,7 +42,13 @@ protected:
     // ToolbarButton* m_slowDownBtn
     // ToolbarButton* m_speedUpBtn;
 
+public slots:
+    void updateSliderRange(int64_t);
+    void updateSliderValue(int64_t);
+    void updateFps(float);
+
 signals:
+    void setPositionRequested(int64_t);
     void removePlayerRequest();
     void enableMuteRequest();
     void disableMuteRequest();

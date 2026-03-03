@@ -33,16 +33,21 @@ public slots:
     void setVolume(const int &vol);
 
     void setSpeed(const unsigned int &speed);
+    void setTime(int64_t time);
+    void updateFpsRequest(float);
 
 signals:
     void addPlayerRequest();
     void removePlayerRequest(PlayerWidget* toBeRemoved);
     void enablePlayerFullscreenRequested(PlayerWidget* self);
     void disablePlayerFullscreenRequested(PlayerWidget* self);
-
+    void updateSliderRangeRequest(int64_t);
+    void updateSliderValueRequest(int64_t);
+    void updateFpsRequested(float);
 
 private:
     Media *m_media = nullptr;
+    float m_media_fps = 0;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;

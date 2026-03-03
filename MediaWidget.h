@@ -25,19 +25,27 @@ public slots:
     void setVolume(const int &vol);
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
+    void setTime(int64_t);
 
 private:
     libvlc_instance_t *m_vlc = nullptr;
     libvlc_media_player_t *m_player = nullptr;
     int lastVolume = 100;
     const float speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
+    libvlc_event_manager_t* m_eventManager = nullptr;
+    libvlc_event_manager_t* m_parseEventManager = nullptr;
+
+    static void onVlcEvent(const libvlc_event_t* event, void* userData);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
 
 signals:
+    void updateSliderValueRequested(int64_t newTime);
     void activated(MediaWidget* self);
+    void updateSliderRangeRequested(int64_t mediaDuration);
+    void updateFpsRequested(float fps);
 };
 
 #endif // MEDIAWIDGET_H

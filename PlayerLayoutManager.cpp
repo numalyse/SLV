@@ -288,6 +288,14 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
     connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
 
+    connect(activePlayer, &PlayerWidget::playUiUpdateRequested, advancedToolbar, &SimpleToolbar::playUiUpdate);
+    connect(activePlayer, &PlayerWidget::pauseUiUpdateRequested, advancedToolbar, &SimpleToolbar::pauseUiUpdate);
+    connect(activePlayer, &PlayerWidget::muteUiUpdateRequested, advancedToolbar, &SimpleToolbar::muteUiUpdate);
+    connect(activePlayer, &PlayerWidget::unmuteUiUpdateRequested, advancedToolbar, &SimpleToolbar::unmuteUiUpdate);
+    connect(activePlayer, &PlayerWidget::ejectUiUpdateRequested, advancedToolbar, &SimpleToolbar::ejectUiUpdate);
+    connect(activePlayer, &PlayerWidget::stopUiUpdateRequested, advancedToolbar, &SimpleToolbar::stopUiUpdate);
+
+
     return static_cast<Toolbar*>(advancedToolbar);
 }
 
@@ -383,16 +391,12 @@ void PlayerLayoutManager::checkPlayersPlayStatus(){
 bool PlayerLayoutManager::newGlobalMuteState(){
     int activePlayerCount = static_cast<int>(m_activePlayers.size());
 
-    int muted = 0;
     for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
-        if ( ! m_activePlayers[Iplayer]->muted() ) ++muted; 
+        if ( ! m_activePlayers[Iplayer]->muted() ) return false; 
     }
 
-    if (muted >= 1 ) {
-        return false;
-    }else {
-        return true;
-    }
+    return true;
+    
 }
 
 /// @brief Envoie le nouvel état du bouton mute à la toolbar globale

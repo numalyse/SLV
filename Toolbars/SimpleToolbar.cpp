@@ -192,3 +192,35 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
 void SimpleToolbar::updateFps(double newFps){
     m_media_fps = newFps;
 }
+
+void SimpleToolbar::playUiUpdate()
+{
+    m_playPauseBtn->setButtonState(true);
+}
+
+void SimpleToolbar::pauseUiUpdate()
+{
+    m_playPauseBtn->setButtonState(false);
+}
+
+void SimpleToolbar::muteUiUpdate()
+{
+    m_muteBtn->setButtonState(true);
+}
+
+void SimpleToolbar::unmuteUiUpdate()
+{
+    m_muteBtn->setButtonState(false);
+}
+
+void SimpleToolbar::ejectUiUpdate()
+{
+    resetSlider();
+    pauseUiUpdate();
+}
+
+void SimpleToolbar::stopUiUpdate()
+{
+    stopSlider();
+    pauseUiUpdate();
+}

@@ -58,6 +58,13 @@ public slots:
     void updateSliderValue(int64_t);
     void updateFps(double);
 
+    void playUiUpdate();
+    void pauseUiUpdate();
+    void muteUiUpdate();
+    void unmuteUiUpdate();
+    void ejectUiUpdate();
+    void stopUiUpdate();
+
 signals:
     void setPositionRequested(int64_t);
     void removePlayerRequest();

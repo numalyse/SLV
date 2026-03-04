@@ -46,7 +46,13 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::screenshotRequest, m_mediaWidget, &MediaWidget::takeScreenshot);
     connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
-    connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
+
+    connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
+    connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
+    connect(this, &PlayerWidget::muteUiUpdateRequested, m_toolBar, &SimpleToolbar::muteUiUpdate);
+    connect(this, &PlayerWidget::unmuteUiUpdateRequested, m_toolBar, &SimpleToolbar::unmuteUiUpdate);
+    connect(this, &PlayerWidget::ejectUiUpdateRequested, m_toolBar, &SimpleToolbar::ejectUiUpdate);
+    connect(this, &PlayerWidget::stopUiUpdateRequested, m_toolBar, &SimpleToolbar::stopUiUpdate);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -109,7 +115,7 @@ void PlayerWidget::disablePlayerFullscreen()
 void PlayerWidget::play()
 {
     m_mediaWidget->play();
-    m_toolBar->playPauseBtn()->setButtonState(true);
+    emit playUiUpdateRequested();
     m_playing = true;
     emit checkPlayersPlayStatusRequested();
 }
@@ -117,7 +123,7 @@ void PlayerWidget::play()
 void PlayerWidget::pause()
 {
     m_mediaWidget->pause();
-    m_toolBar->playPauseBtn()->setButtonState(false);
+    emit pauseUiUpdateRequested();
     m_playing = false;
     emit checkPlayersPlayStatusRequested();
 }
@@ -125,8 +131,7 @@ void PlayerWidget::pause()
 void PlayerWidget::stop()
 {
     m_mediaWidget->stop();
-    m_toolBar->stopSlider();
-    m_toolBar->playPauseBtn()->setButtonState(false);
+    emit stopUiUpdateRequested();
     m_playing = false;
     emit checkPlayersPlayStatusRequested();
 }
@@ -134,8 +139,7 @@ void PlayerWidget::stop()
 void PlayerWidget::eject()
 {
     m_mediaWidget->eject();
-    m_toolBar->resetSlider();
-    m_toolBar->playPauseBtn()->setButtonState(false);
+    emit ejectUiUpdateRequested();
     m_playing = false;
     emit checkPlayersPlayStatusRequested();
 }
@@ -143,7 +147,7 @@ void PlayerWidget::eject()
 void PlayerWidget::mute()
 {
     m_mediaWidget->mute();
-    m_toolBar->muteBtn()->setButtonState(true);
+    emit muteUiUpdateRequested();
     m_muted = true;
     emit checkPlayersMuteStatusRequested();
 }
@@ -151,7 +155,7 @@ void PlayerWidget::mute()
 void PlayerWidget::unmute()
 {
     m_mediaWidget->unmute();
-    m_toolBar->muteBtn()->setButtonState(false);
+    emit unmuteUiUpdateRequested();
     m_muted = false;
     emit checkPlayersMuteStatusRequested();
 }

@@ -56,6 +56,13 @@ signals:
     void checkPlayersPlayStatusRequested();
     void checkPlayersMuteStatusRequested();
 
+    void playUiUpdateRequested();
+    void pauseUiUpdateRequested();
+    void stopUiUpdateRequested();
+    void ejectUiUpdateRequested();
+    void muteUiUpdateRequested();
+    void unmuteUiUpdateRequested();
+
 private:
     Media *m_media = nullptr;
     double m_media_fps {};

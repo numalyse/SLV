@@ -54,7 +54,7 @@ void ToolbarToggleButton::updateIcons(bool checked)
 
 void ToolbarToggleButton::onButtonToggled(bool checked)
 {
-    updateIcons(checked);
+    //updateIcons(checked);
 
     if (checked) {
         emit stateActivated();

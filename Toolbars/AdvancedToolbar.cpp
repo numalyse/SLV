@@ -43,40 +43,40 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
 {
     if (!toolbar) return;
 
-    m_media_fps = toolbar->getMediaFps();
+    m_media_fps = toolbar->mediaFps();
 
-    QSlider* oldSlider = toolbar->getSlider();
+    QSlider* oldSlider = toolbar->slider();
     if (oldSlider && m_slider) {
         m_slider->setRange(oldSlider->minimum(), oldSlider->maximum());
         m_slider->setValue(oldSlider->value());
     }
 
-    QLabel* oldTimeLabel = toolbar->getCurrentTimeLabel();
+    QLabel* oldTimeLabel = toolbar->currentTimeLabel();
     if (oldTimeLabel && m_currentTimeLabel) {
         m_currentTimeLabel->setText(oldTimeLabel->text());
     }
 
-    QLabel* oldDurationLabel = toolbar->getDurationLabel();
+    QLabel* oldDurationLabel = toolbar->durationLabel();
     if (oldDurationLabel && m_durationLabel) {
         m_durationLabel->setText(oldDurationLabel->text());
     }
 
-    ToolbarToggleButton* oldPlayPause = toolbar->getPlayPauseBtn();
+    ToolbarToggleButton* oldPlayPause = toolbar->playPauseBtn();
     if (oldPlayPause && m_playPauseBtn) {
         m_playPauseBtn->setButtonState(oldPlayPause->isChecked());
     }
 
-    ToolbarToggleButton* oldFullscreen = toolbar->getFullscreenBtn();
+    ToolbarToggleButton* oldFullscreen = toolbar->fullscreenBtn();
     if (oldFullscreen && m_fullscreenBtn) {
         m_fullscreenBtn->setButtonState(oldFullscreen->isChecked());
     }
 
-    ToolbarToggleButton* oldLoop = toolbar->getLoopBtn();
+    ToolbarToggleButton* oldLoop = toolbar->loopBtn();
     if (oldLoop && m_loopBtn) {
         m_loopBtn->setButtonState(oldLoop->isChecked());
     }
 
-    ToolbarToggleHoverButton* oldMute = toolbar->getMuteBtn();
+    ToolbarToggleHoverButton* oldMute = toolbar->muteBtn();
     if (oldMute && m_muteBtn) {
         m_muteBtn->setButtonState(oldMute->isChecked());
     }

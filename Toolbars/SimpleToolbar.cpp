@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include "SimpleToolbar.h"
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
@@ -156,6 +157,7 @@ void SimpleToolbar::setDefaultUI()
     mainLayout->addLayout(buttonLayout);
 
 }
+
 
 void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
 

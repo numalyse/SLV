@@ -39,10 +39,10 @@ public:
         qDebug() << "connect successful";
     }
 
-    ToolbarToggleButton* getPlayPauseBtn() const { return m_playPauseBtn; }
-    ToolbarButton* getStopBtn() const { return m_stopBtn; }
-    ToolbarButton* getEjectBtn() const { return m_ejectBtn; }
-    ToolbarToggleButton* getFullscreenBtn() const { return m_fullscreenBtn; }
+    ToolbarToggleButton* playPauseBtn() const { return m_playPauseBtn; }
+    ToolbarButton* stopBtn() const { return m_stopBtn; }
+    ToolbarButton* ejectBtn() const { return m_ejectBtn; }
+    ToolbarToggleButton* fullscreenBtn() const { return m_fullscreenBtn; }
 
     virtual ~Toolbar() = default;
 

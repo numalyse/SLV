@@ -2,6 +2,7 @@
 
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
+#include "Toolbars/GlobalToolbar.h"
 
 #include <qlayout.h>
 
@@ -15,6 +16,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenGlobal);
     connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenGlobal);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
+    connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
 
     m_layoutManager->createLayout(1);
 }
@@ -55,12 +57,23 @@ void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPl
     }
 }
 
+// slots
+
 /// @brief Met à jour l'état du bouton play pause 
 /// @param state 
 void GlobalPlayerManager::setGlobalPlayState(bool state)
 {
     if(m_toolbarWidget){
-        m_toolbarWidget->getPlayPauseBtn()->setButtonState(state);
+        m_toolbarWidget->playPauseBtn()->setButtonState(state);
+    }
+}
+
+/// @brief Met à jour l'état du bouton mute 
+/// @param state 
+void GlobalPlayerManager::setGlobalMuteState(bool state)
+{
+    if(m_toolbarWidget){
+        static_cast<GlobalToolbar*>(m_toolbarWidget)->muteBtn()->setButtonState(state);
     }
 }
 

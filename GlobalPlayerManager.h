@@ -29,6 +29,7 @@ public slots:
     void updateContainer(int, QWidget*, Toolbar*);
 
     void setGlobalPlayState(bool);
+    void setGlobalMuteState(bool);
 
 signals:
     void enableFullscreenMainRequested();

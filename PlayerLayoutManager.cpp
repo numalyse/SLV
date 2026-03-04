@@ -24,7 +24,8 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
         connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enableLayoutFullscreen);
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disableLayoutFullscreen);
-        connect(player, &PlayerWidget::checkPlayersStatusRequested, this, &PlayerLayoutManager::checkPlayersStatus);
+        connect(player, &PlayerWidget::checkPlayersPlayStatusRequested, this, &PlayerLayoutManager::checkPlayersPlayStatus);
+        connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
         m_players.append(player);
     }
     
@@ -238,8 +239,8 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
 
     // Parcours les players pour connecter le play / play de la global a ses players
     for(auto& IActivePlayer : m_activePlayers){
-        IActivePlayer->getToolbar()->show();
-        if(IActivePlayer->getIsPlaying()) onePlayerPlaying = true;
+        IActivePlayer->toolbar()->show();
+        if(IActivePlayer->playing()) onePlayerPlaying = true;
         connect(globalToolbar, &GlobalToolbar::playRequest, IActivePlayer, &PlayerWidget::play);
         connect(globalToolbar, &GlobalToolbar::pauseRequest, IActivePlayer, &PlayerWidget::pause);
         connect(globalToolbar, &GlobalToolbar::stopRequest, IActivePlayer, &PlayerWidget::stop);
@@ -248,7 +249,7 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
     }
 
-    ToolbarToggleButton* globalPlayPause = globalToolbar->getPlayPauseBtn();
+    ToolbarToggleButton* globalPlayPause = globalToolbar->playPauseBtn();
     // Si un des players est en train de jouer, on change l'état par défaut du bouton play de la barre globale
     globalPlayPause->setButtonState(onePlayerPlaying);
 
@@ -259,7 +260,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     Q_ASSERT(m_activePlayers.size() == 1);
 
     auto* activePlayer = m_activePlayers[0];
-    auto* activePlayerToolbar = activePlayer->getToolbar();
+    auto* activePlayerToolbar = activePlayer->toolbar();
 
     AdvancedToolbar* advancedToolbar = nullptr;
 
@@ -300,26 +301,6 @@ Toolbar *PlayerLayoutManager::createLayoutToolbar()
     }
 }
 
-/// @brief Vérifie combien de players sont en pause / play
-/// puis émet un signal pour mettre à jour la toolbarglobal
-void PlayerLayoutManager::checkPlayersStatus(){
-
-    int activePlayerCount = static_cast<int>(m_activePlayers.size());
-
-    if( activePlayerCount == 1 ) return;
-
-    int paused = 0;
-    for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
-        if ( ! m_activePlayers[Iplayer]->getIsPlaying() ) ++paused; 
-    }
-
-    if (paused == activePlayerCount ) {
-        emit setGlobalPlayStateRequested(false);
-    }else {
-        emit setGlobalPlayStateRequested(true);
-    }
-    
-}
 
 // slots
 void PlayerLayoutManager::addPlayer()
@@ -351,4 +332,47 @@ void PlayerLayoutManager::disableLayoutFullscreen(PlayerWidget* playerToFullscre
         IPlayer->show();
     }
     emit disableFullscreenGlobalRequested();
+}
+
+
+/// @brief Vérifie combien de players sont en pause / play
+/// puis émet un signal pour mettre à jour la toolbar globale
+void PlayerLayoutManager::checkPlayersPlayStatus(){
+
+    int activePlayerCount = static_cast<int>(m_activePlayers.size());
+
+    if( activePlayerCount == 1 ) return;
+
+    int paused = 0;
+    for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
+        if ( ! m_activePlayers[Iplayer]->playing() ) ++paused; 
+    }
+
+    if (paused == activePlayerCount ) {
+        emit setGlobalPlayStateRequested(false);
+    }else {
+        emit setGlobalPlayStateRequested(true);
+    }
+    
+}
+
+/// @brief Vérifie combien de players sont mute
+/// puis émet un signal pour mettre à jour la toolbar globale
+void PlayerLayoutManager::checkPlayersMuteStatus(){
+
+    int activePlayerCount = static_cast<int>(m_activePlayers.size());
+
+    if( activePlayerCount == 1 ) return;
+
+    int muted = 0;
+    for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
+        if ( ! m_activePlayers[Iplayer]->muted() ) ++muted; 
+    }
+
+    if (muted >= 1 ) {
+        emit setGlobalMuteStateRequested(false);
+    }else {
+        emit setGlobalMuteStateRequested(true);
+    }
+    
 }

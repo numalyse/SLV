@@ -37,6 +37,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
 
     libvlc_media_player_play(m_player);
 }
@@ -69,6 +70,16 @@ MediaWidget::~MediaWidget()
     // if (m_vlc) {
     //     libvlc_release(m_vlc);
     // }
+    if(m_eventManager){
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+    }
+
+    if (m_parseEventManager)
+    {
+        libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
+    }
+    
     releaseMedia();
 
 }
@@ -147,7 +158,7 @@ void MediaWidget::setVolume(const int &vol)
 void MediaWidget::setSpeed(const unsigned int &speedIndex)
 {
     if (!m_player) return;
-    libvlc_media_player_set_rate(m_player, speedSteps[speedIndex]);
+    libvlc_media_player_set_rate(m_player, m_speedSteps[speedIndex]);
 }
 
 /// @brief Take a screenshot of the current frame
@@ -162,6 +173,16 @@ void MediaWidget::setTime(int64_t time)
 {
     if(!m_player) return;
     libvlc_media_player_set_time(m_player, time);
+}
+
+void MediaWidget::enableLoopMode()
+{
+    m_loopActivated = true;
+}
+
+void MediaWidget::disableLoopMode()
+{
+    m_loopActivated = false;
 }
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
@@ -204,6 +225,25 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
         else  {
             qDebug() << "Le parsing a changé de statut, mais n'est pas terminé. Statut :" << parseStatus;
         }
+
+    }
+    else if(event->type == libvlc_MediaPlayerEndReached){
+
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+            qDebug() << "Vidéo terminée" << mediaWidget->m_loopActivated;
+
+            // cas où on est pas en mode loop
+            if (!mediaWidget->m_loopActivated){
+                libvlc_media_player_stop(mediaWidget->m_player);
+                mediaWidget->play();
+                mediaWidget->pause();
+            }
+            // cas où on loop le média
+            else{
+                libvlc_media_player_stop(mediaWidget->m_player);
+                libvlc_media_player_play(mediaWidget->m_player);
+            }
+        }, Qt::QueuedConnection);
 
     }
 }

@@ -39,6 +39,8 @@ public slots:
     void setSpeed(const unsigned int &speed);
     void setTime(int64_t time);
     void updateFpsRequest(double);
+    void enableLoopMode();
+    void disableLoopMode();
 
 signals:
     void addPlayerRequest();

@@ -85,6 +85,10 @@ void PlayerWidget::setActive(bool active)
 void PlayerWidget::setMediaFromPath(const QString& filePath)
 {
     m_mediaWidget->setMediaFromPath(filePath);
+    // TODO : modifier les lignes suivantes pour emettre un signal dans media quand la load est validé
+    m_isPlaying = true;
+    m_toolBar->getPlayPauseBtn()->setButtonState(true);
+    emit checkPlayersStatusRequested();
 }
 
 void PlayerWidget::enablePlayerFullscreen()
@@ -102,13 +106,17 @@ void PlayerWidget::disablePlayerFullscreen()
 void PlayerWidget::play()
 {
     m_mediaWidget->play();
-    // forcer la toolbar a être off (emit un signal connecté à la toolbar pour mettre à jour l'icone)
+    m_toolBar->getPlayPauseBtn()->setButtonState(true);
+    m_isPlaying = true;
+    emit checkPlayersStatusRequested();
 }
 
 void PlayerWidget::pause()
 {
     m_mediaWidget->pause();
-    //forcer la toolbar a êtr en on (pareil que play)
+    m_toolBar->getPlayPauseBtn()->setButtonState(false);
+    m_isPlaying = false;
+    emit checkPlayersStatusRequested();
 }
 
 void PlayerWidget::stop()

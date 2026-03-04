@@ -21,6 +21,9 @@ public:
         const QString& toolTipTextOff = "ToolTipOff"
     );
 
+    /// @brief Modifie l'état du bouton sans avoir besoin d'utiliser les signaux
+    /// @param state 
+    void setButtonState(bool state);
 
     inline static const QString ICONS_PATH = ":/icons/";
 
@@ -37,6 +40,8 @@ private:
 protected:
     /// @brief Met à jour les icones en fonction de l'état
     void updateIcons(bool checked);
+
+
 
 protected slots:
     /// @brief Appelé lorsque le bouton est cliqué. Met à jour les icônes puis emet le signal stateActivated ou stateDeactivated

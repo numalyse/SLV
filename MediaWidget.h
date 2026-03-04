@@ -14,6 +14,8 @@ public:
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
+
+
 public slots:
     void play();
     void pause();
@@ -40,6 +42,8 @@ private:
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     static QMap<libvlc_meta_t, QString> getMetaParsedMedia(libvlc_media_t *parsedMedia);
     static double getFpsParsedMedia(libvlc_media_t *parsedMedia);
+    
+    void releaseMedia();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

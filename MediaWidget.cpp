@@ -63,7 +63,7 @@ void MediaWidget::managePlayerSystem()
 
 }
 
-
+/// @brief Destructeur qui détache les event managers vlc
 MediaWidget::~MediaWidget()
 {
 
@@ -80,6 +80,7 @@ MediaWidget::~MediaWidget()
         libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
     }
     
+    releaseMedia();
 
 }
 
@@ -123,6 +124,8 @@ void MediaWidget::stop()
 void MediaWidget::eject()
 {
     if (!m_player || !libvlc_media_player_get_media(m_player)) return;
+
+    releaseMedia();
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(m_vlc);
     managePlayerSystem();
@@ -182,6 +185,10 @@ void MediaWidget::disableLoopMode()
     m_loopActivated = false;
 }
 
+/// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
+/// Ecoute quand la lecture asychrone des métadonnées est terminée et envoie un signal.
+/// @param event 
+/// @param userData 
 void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 {
     MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);
@@ -330,10 +337,11 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         QByteArray urlBytes =
             url.toString(QUrl::FullyEncoded).toUtf8();
 
-        libvlc_media_t* media =
-            libvlc_media_new_location(m_vlc, urlBytes.constData());
+        if (m_media) libvlc_media_release(m_media);
 
-        if (!media)
+        m_media = libvlc_media_new_location(m_vlc, urlBytes.constData());
+
+        if (!m_media)
             return;
 
         if(m_parseEventManager){ 
@@ -341,15 +349,34 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
             m_parseEventManager = nullptr;
         }   
 
-        m_parseEventManager = libvlc_media_event_manager(media);
+        m_parseEventManager = libvlc_media_event_manager(m_media);
         libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-        libvlc_media_parse_with_options(media, libvlc_media_parse_local, 0);
+        libvlc_media_parse_with_options(m_media, libvlc_media_parse_local, 0);
 
-        libvlc_media_player_set_media(m_player, media);
+        libvlc_media_player_set_media(m_player, m_media);
 
-        libvlc_media_release(media);
+
 
         libvlc_media_player_play(m_player);
 
     }, Qt::QueuedConnection);
+}
+
+/// @brief detach les event manager avant de release le média
+void MediaWidget::releaseMedia(){
+    if(m_eventManager){
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        m_eventManager = nullptr;
+    }
+
+    if (m_parseEventManager)
+    {
+        libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
+        m_parseEventManager = nullptr;
+    }
+
+    if(m_media){
+        libvlc_media_release(m_media);
+        m_media = nullptr;
+    }
 }

@@ -1,4 +1,5 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
+#include "ToolbarToggleButton.h"
 
 
 
@@ -60,4 +61,11 @@ void ToolbarToggleButton::onButtonToggled(bool checked)
     } else {
         emit stateDeactivated();
     }
+}
+
+
+void ToolbarToggleButton::setButtonState(bool state)
+{
+    setChecked(state);
+    updateIcons(state);
 }

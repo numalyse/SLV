@@ -42,9 +42,12 @@ private:
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     
-    void releaseMedia();
 
-    void createMediaMeta(const QString& filePath);
+    void createEventManager();
+    void createMedia(const QString& filePath);
+
+    void releaseMedia();
+    void releaseEventManager();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

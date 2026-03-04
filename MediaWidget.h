@@ -11,6 +11,7 @@ class MediaWidget : public QWidget
     Q_OBJECT
 public:
     explicit MediaWidget(QWidget *parent = nullptr);
+
     ~MediaWidget();
     void managePlayerSystem();
     void setActive(bool active);
@@ -48,6 +49,7 @@ private:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 signals:
     void updateSliderValueRequested(int64_t newTime);

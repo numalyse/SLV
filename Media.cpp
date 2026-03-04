@@ -5,41 +5,41 @@
 #include <qurl.h>
 
 
-Media::Media(const QString &filePath){
-    m_filePath = filePath;
+Media::Media(const QString &filePath, QObject *parent) : QObject(parent), m_filePath(filePath)
+{
+
     QFile f(m_filePath);
     qDebug() << "Fichier existe ?" << f.exists();
 
     QUrl url = QUrl::fromLocalFile(m_filePath);
     QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
 
-    libvlc_media_t *media = libvlc_media_new_location(SLV::VlcInstance::get(), urlBytes.constData());
+    m_vlcMedia = libvlc_media_new_location(SLV::VlcInstance::get(), urlBytes.constData());
 
-    if (!media){
-        qDebug() << "Media ";
+    if (!m_vlcMedia){
+        qDebug() << "Erreur lors de l'allocation du média";
         return;
     }
- 
-    if(m_parseEventManager){ 
-        libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-        m_parseEventManager = nullptr;
-    }   
 
-    m_parseEventManager = libvlc_media_event_manager(media);
+    m_parseEventManager = libvlc_media_event_manager(m_vlcMedia);
     libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-    libvlc_media_parse_with_options(media, libvlc_media_parse_local, 0);
+    libvlc_media_parse_with_options(m_vlcMedia, libvlc_media_parse_local, 0);
 
-    QFileInfo *fileInfo = new QFileInfo(filePath);
-    m_name = fileInfo->baseName();
-    m_duration = libvlc_media_get_duration(media);
-
+    m_fileInfo = new QFileInfo(filePath);
+    m_name = m_fileInfo->baseName();
 }
 
 Media::~Media()
 {
     if (m_parseEventManager){
         libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
+        m_parseEventManager = nullptr;
     }
+    if(m_vlcMedia){
+        libvlc_media_release(m_vlcMedia);
+        m_vlcMedia = nullptr;
+    }
+    delete m_fileInfo;
 }
 
 
@@ -60,11 +60,15 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
             libvlc_media_t* parsedMedia = static_cast<libvlc_media_t*>(event->p_obj);
 
             if (parsedMedia) {
-
-                media->setDuration(libvlc_media_get_duration(parsedMedia));
-                media->setFps(VlcParseHelper::getFpsParsedMedia(parsedMedia));
+                auto fps = VlcParseHelper::getFpsParsedMedia(parsedMedia);
+                auto duration = libvlc_media_get_duration(parsedMedia);
+                
+                media->setDuration(duration);
+                media->setFps(fps);
                 media->setMeta(VlcParseHelper::getMetaParsedMedia(parsedMedia));
-
+                
+                emit media->fpsParsed(fps);
+                emit media->durationParsed(duration);
             }
         }
         else  {

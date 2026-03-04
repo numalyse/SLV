@@ -266,6 +266,9 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
         libvlc_media_release(media);
 
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+        
         libvlc_media_player_play(m_player);
 
     }, Qt::QueuedConnection);
@@ -290,6 +293,7 @@ void MediaWidget::createMediaMeta(const QString& filePath){
         delete m_media;
     }
     m_media = new Media(filePath, this);
+    
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
 }

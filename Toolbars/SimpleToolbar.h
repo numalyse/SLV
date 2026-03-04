@@ -25,17 +25,18 @@ public:
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
-    QSlider* getSlider() const { return m_slider; }
-    bool isDraggingSlider() const { return m_draggingSlider; }
-    QTimer* getSeekTimer() const { return m_seekTimer; }
-    double getMediaFps() const { return m_media_fps; }
-    QLabel* getCurrentTimeLabel() const { return m_currentTimeLabel; }
-    QLabel* getDurationLabel() const { return m_durationLabel; }
+    QSlider* slider() const { return m_slider; }
+    double mediaFps() const { return m_media_fps; }
+    QLabel* currentTimeLabel() const { return m_currentTimeLabel; }
+    QLabel* durationLabel() const { return m_durationLabel; }
 
-    ToolbarToggleHoverButton* getMuteBtn() const { return m_muteBtn; }
-    ToolbarPopupButton* getSpeedBtn() const { return m_speedBtn; }
-    ToolbarToggleButton* getLoopBtn() const { return m_loopBtn; }
-    ToolbarButton* getRemovePlayerBtn() const { return m_removePlayerBtn; }
+    ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
+    ToolbarPopupButton* speedBtn() const { return m_speedBtn; }
+    ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
+    ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
+    
+    void resetSlider();
+    void stopSlider();
 
 protected:
     QSlider* m_slider = nullptr;
@@ -45,7 +46,6 @@ protected:
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
 
-    ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;

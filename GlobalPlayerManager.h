@@ -23,12 +23,13 @@ public slots:
 
 
     void setPlayersFromPaths(QStringList);
-    void enableFullscreenGlobal();
-    void disableFullscreenGlobal();
+    void enableFullscreenPlayer();
+    void disableFullscreenPlayer();
 
     void updateContainer(int, QWidget*, Toolbar*);
 
     void setGlobalPlayState(bool);
+    void setGlobalMuteState(bool);
 
 signals:
     void enableFullscreenMainRequested();

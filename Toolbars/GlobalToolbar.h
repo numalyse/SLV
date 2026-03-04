@@ -20,9 +20,6 @@ signals:
     void enableMute();
     void disableMute();
 
-protected:
-    ToolbarToggleButton *m_muteBtn = nullptr;
-
 };
 
 #endif

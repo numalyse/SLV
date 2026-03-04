@@ -2,6 +2,7 @@
 
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
+#include "Toolbars/GlobalToolbar.h"
 
 #include <qlayout.h>
 
@@ -12,9 +13,15 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     layout = new QVBoxLayout(this);
     m_layoutManager = new PlayerLayoutManager();
     connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
-    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenGlobal);
-    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenGlobal);
+
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenPlayerRequested, this, &GlobalPlayerManager::enableFullscreenPlayer);
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenPlayerRequested, this, &GlobalPlayerManager::disableFullscreenPlayer);
+
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenMainRequested);
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenMainRequested);
+
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
+    connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
 
     m_layoutManager->createLayout(1);
 }
@@ -55,17 +62,28 @@ void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPl
     }
 }
 
+// slots
+
 /// @brief Met à jour l'état du bouton play pause 
 /// @param state 
 void GlobalPlayerManager::setGlobalPlayState(bool state)
 {
     if(m_toolbarWidget){
-        m_toolbarWidget->getPlayPauseBtn()->setButtonState(state);
+        m_toolbarWidget->playPauseBtn()->setButtonState(state);
+    }
+}
+
+/// @brief Met à jour l'état du bouton mute
+/// @param state 
+void GlobalPlayerManager::setGlobalMuteState(bool state)
+{
+    if(m_toolbarWidget){
+        m_toolbarWidget->muteBtn()->setButtonState(state);
     }
 }
 
 /// @brief Cache la toolbar si elle est présente et envoie un signal à la mainWindow
-void GlobalPlayerManager::enableFullscreenGlobal()
+void GlobalPlayerManager::enableFullscreenPlayer()
 {
     if(m_toolbarWidget)
         m_toolbarWidget->hide();
@@ -73,9 +91,11 @@ void GlobalPlayerManager::enableFullscreenGlobal()
 }
 
 /// @brief Affiche la toolbar si elle est présente et envoie un signal à la mainWindow
-void GlobalPlayerManager::disableFullscreenGlobal()
+void GlobalPlayerManager::disableFullscreenPlayer()
 {
     if(m_toolbarWidget)
         m_toolbarWidget->show();
     emit disableFullscreenMainRequested();
 }
+
+

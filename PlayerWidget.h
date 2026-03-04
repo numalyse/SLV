@@ -21,9 +21,10 @@ public:
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
-    SimpleToolbar* getToolbar() {return m_toolBar;};
-    double getMediaFps() { return m_media_fps; };
-    bool getIsPlaying(){ return m_isPlaying; };
+    SimpleToolbar* toolbar() {return m_toolBar;};
+    double mediaFps() { return m_media_fps; };
+    bool playing(){ return m_playing; };
+    bool muted() { return m_muted; };
 
 public slots:
     void play();
@@ -52,12 +53,14 @@ signals:
     void updateFpsRequested(float);
     void setPlayUIRequested();
     void setPauseUIRequested();
-    void checkPlayersStatusRequested();
+    void checkPlayersPlayStatusRequested();
+    void checkPlayersMuteStatusRequested();
 
 private:
     Media *m_media = nullptr;
     double m_media_fps {};
-    bool m_isPlaying = false;
+    bool m_playing = false;
+    bool m_muted = false;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;

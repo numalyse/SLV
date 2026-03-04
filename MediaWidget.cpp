@@ -10,14 +10,22 @@
 #include <QTimer>
 #include <QDir>
 #include <QMap>
+#include <QPainter>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
+
+    setAutoFillBackground(true);
+    QPalette pal = palette();
+    pal.setColor(QPalette::Window, Qt::black);
+    setPalette(pal);
+
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
+    setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setStyleSheet("background-color: black");
+
 
     // ===== VLC ===== //
     m_player = libvlc_media_player_new(SLV::VlcInstance::get());
@@ -32,6 +40,11 @@ MediaWidget::MediaWidget(QWidget *parent)
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
 
     libvlc_media_player_play(m_player);
+}
+
+void MediaWidget::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.fillRect(rect(), Qt::black);
 }
 
 

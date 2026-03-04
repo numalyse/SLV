@@ -47,6 +47,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         TextManager.h TextManager.cpp
         TimeFormatter.h
+        VlcParseHelper.h
+        VlcInstance.h
+        Shot.h
+        Project.h
+
         MediaWidget.h MediaWidget.cpp
 
     )

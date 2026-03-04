@@ -56,7 +56,7 @@ signals:
 
 private:
     Media *m_media = nullptr;
-    double m_media_fps = 0.0;
+    double m_media_fps {};
     bool m_isPlaying = false;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;

@@ -55,18 +55,28 @@ private:
 
 signals:
     void updateContainerRequest(int, QWidget*, Toolbar*);
+
+    void enableFullscreenPlayerRequested();
+    void disableFullscreenPlayerRequested();
+
     void enableFullscreenGlobalRequested();
     void disableFullscreenGlobalRequested();
+
     void setGlobalPlayStateRequested(bool);
     void setGlobalMuteStateRequested(bool);
 
 public slots:
     void addPlayer();
-    void removePlayer(PlayerWidget* playerToDestroy);
-    void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
-    void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
-    void checkPlayersPlayStatus();
 
+    void removePlayer(PlayerWidget* playerToDestroy);
+
+    void enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void disablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
+
+    void enableGlobalLayoutFullscreen();
+    void disableGlobalLayoutFullscreen();
+
+    void checkPlayersPlayStatus();
     void checkPlayersMuteStatus();
 };
 

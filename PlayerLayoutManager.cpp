@@ -22,8 +22,8 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         PlayerWidget* player = new PlayerWidget(this);
         connect(player, &PlayerWidget::addPlayerRequest, this, &PlayerLayoutManager::addPlayer);
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
-        connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enableLayoutFullscreen);
-        connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disableLayoutFullscreen);
+        connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enablePlayerLayoutFullscreen);
+        connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::checkPlayersPlayStatusRequested, this, &PlayerLayoutManager::checkPlayersPlayStatus);
         connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
         m_players.append(player);
@@ -245,6 +245,8 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
         connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
+        connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
+        connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
     }
 
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
@@ -316,20 +318,38 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
     }
 }
 
-void PlayerLayoutManager::enableLayoutFullscreen(PlayerWidget* playerToFullscreen){
+void PlayerLayoutManager::enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen){
     for(auto &IPlayer : m_players){
         if(playerToFullscreen != IPlayer)
             IPlayer->hide();
     }
-    emit enableFullscreenGlobalRequested();
+    emit enableFullscreenPlayerRequested();
 }
 
-void PlayerLayoutManager::disableLayoutFullscreen(PlayerWidget* playerToFullscreen){
+void PlayerLayoutManager::disablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen){
     for(auto &IPlayer : m_players){
         IPlayer->show();
     }
+    emit disableFullscreenPlayerRequested();
+}
+
+void PlayerLayoutManager::enableGlobalLayoutFullscreen(){
+    for(auto &IPlayer : m_players){
+        IPlayer->show();
+        // TODO : set toolbar fullscreen ui
+    }
+    emit enableFullscreenGlobalRequested();
+}
+
+void PlayerLayoutManager::disableGlobalLayoutFullscreen(){
+    for(auto &IPlayer : m_players){
+        IPlayer->show();
+        // TODO : set toolbar default ui
+    }
     emit disableFullscreenGlobalRequested();
 }
+
+
 
 /// @brief Vérifie combien de players sont paused
 /// puis retourne un bool correspondant au nouvel état du bouton play/pause de la toolbar globale

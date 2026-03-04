@@ -20,7 +20,6 @@ signals:
     void enableMute();
     void disableMute();
 
-
 };
 
 #endif

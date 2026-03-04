@@ -35,7 +35,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequest, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
@@ -122,11 +122,19 @@ void PlayerWidget::pause()
 void PlayerWidget::stop()
 {
     m_mediaWidget->stop();
+    m_toolBar->stopSlider();
+    m_toolBar->playPauseBtn()->setButtonState(false);
+    m_playing = false;
+    emit checkPlayersPlayStatusRequested();
 }
 
 void PlayerWidget::eject()
 {
     m_mediaWidget->eject();
+    m_toolBar->resetSlider();
+    m_toolBar->playPauseBtn()->setButtonState(false);
+    m_playing = false;
+    emit checkPlayersPlayStatusRequested();
 }
 
 void PlayerWidget::mute()

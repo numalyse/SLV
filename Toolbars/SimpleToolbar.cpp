@@ -158,6 +158,19 @@ void SimpleToolbar::setDefaultUI()
 
 }
 
+void SimpleToolbar::resetSlider()
+{
+    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(0,1));
+    m_durationLabel->setText(TimeFormatter::msToHHMMSSFF(0,1));
+    m_slider->setRange(0,0);
+    m_slider->setValue(0);
+}
+
+void SimpleToolbar::stopSlider()
+{
+    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(0,m_media_fps));
+    m_slider->setValue(0);
+}
 
 void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
 

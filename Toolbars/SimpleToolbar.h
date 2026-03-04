@@ -35,6 +35,8 @@ public:
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
 
+    void resetSlider();
+    void stopSlider();
 
 protected:
     QSlider* m_slider = nullptr;

@@ -79,21 +79,23 @@ MediaWidget::~MediaWidget()
 
 }
 
-void MediaWidget::play()
+bool MediaWidget::play()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media) return false;
     libvlc_media_player_play(m_player);
+    return true;
 }
 
-void MediaWidget::pause()
+bool MediaWidget::pause()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media)  return false;
     libvlc_media_player_set_pause(m_player, 1);
+    return true;
 }
 
 void MediaWidget::togglePlayPause()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return;
 
     if (libvlc_media_player_is_playing(m_player)) {
         libvlc_media_player_pause(m_player);
@@ -105,20 +107,20 @@ void MediaWidget::togglePlayPause()
 }
 
 /// @brief Set the media player position to 0 and pause
-void MediaWidget::stop()
+bool MediaWidget::stop()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
 
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
     libvlc_media_player_next_frame(m_player);
-
+    return true;
 }
 
 /// @brief Release the media player and create a new one from MediaWidget instance
-void MediaWidget::eject()
+bool MediaWidget::eject()
 {
-    if (!m_player || !libvlc_media_player_get_media(m_player)) return;
+    if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
     releaseEventManager();
     releaseMedia();
@@ -126,20 +128,23 @@ void MediaWidget::eject()
     m_player = libvlc_media_player_new(SLV::VlcInstance::get());
     createEventManager();
     managePlayerSystem();
+    return true;
 }
 
 /// @brief Mute the media player
-void MediaWidget::mute()
+bool MediaWidget::mute()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 1);
+    return true;
 }
 
 /// @brief Unmute the media player
-void MediaWidget::unmute()
+bool MediaWidget::unmute()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 0);
+    return true;
 }
 
 /// @brief Change media player volume

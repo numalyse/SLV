@@ -13,8 +13,6 @@ Q_OBJECT
 public:
     explicit GlobalToolbar(QWidget* parent = nullptr);
 
-    ToolbarToggleButton* muteBtn() { return m_muteBtn; };
-
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
@@ -22,8 +20,6 @@ signals:
     void enableMute();
     void disableMute();
 
-protected:
-    ToolbarToggleButton *m_muteBtn = nullptr;
 
 };
 

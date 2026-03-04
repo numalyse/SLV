@@ -49,6 +49,9 @@ private:
     /// @brief Créer la bonne toolbar en fonction du nombre de players actifs
     Toolbar* createLayoutToolbar();
 
+    bool newGlobalMuteState();
+    bool newGlobalPlayState();
+
 
 signals:
     void updateContainerRequest(int, QWidget*, Toolbar*);
@@ -63,6 +66,7 @@ public slots:
     void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
     void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
     void checkPlayersPlayStatus();
+
     void checkPlayersMuteStatus();
 };
 

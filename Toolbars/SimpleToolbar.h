@@ -30,11 +30,11 @@ public:
     QLabel* currentTimeLabel() const { return m_currentTimeLabel; }
     QLabel* durationLabel() const { return m_durationLabel; }
 
-    ToolbarToggleHoverButton* muteBtn() const { return m_muteBtn; }
+    ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
     ToolbarPopupButton* speedBtn() const { return m_speedBtn; }
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
-
+    
     void resetSlider();
     void stopSlider();
 
@@ -46,7 +46,6 @@ protected:
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
 
-    ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;

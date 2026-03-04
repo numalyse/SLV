@@ -87,8 +87,11 @@ void PlayerWidget::setMediaFromPath(const QString& filePath)
     m_mediaWidget->setMediaFromPath(filePath);
     // TODO : modifier les lignes suivantes pour emettre un signal dans media quand la load est validé
     m_playing = true;
+    m_muted = false;
     m_toolBar->playPauseBtn()->setButtonState(true);
+    m_toolBar->muteBtn()->setButtonState(false);
     emit checkPlayersPlayStatusRequested();
+    emit checkPlayersMuteStatusRequested();
 }
 
 void PlayerWidget::enablePlayerFullscreen()

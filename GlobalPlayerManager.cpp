@@ -68,12 +68,12 @@ void GlobalPlayerManager::setGlobalPlayState(bool state)
     }
 }
 
-/// @brief Met à jour l'état du bouton mute 
+/// @brief Met à jour l'état du bouton mute
 /// @param state 
 void GlobalPlayerManager::setGlobalMuteState(bool state)
 {
     if(m_toolbarWidget){
-        static_cast<GlobalToolbar*>(m_toolbarWidget)->muteBtn()->setButtonState(state);
+        m_toolbarWidget->muteBtn()->setButtonState(state);
     }
 }
 

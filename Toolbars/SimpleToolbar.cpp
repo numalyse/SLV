@@ -79,21 +79,6 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_speedBtn = new ToolbarPopupButton(this, speedSliderContainer, "speed.png",  TextManager::instance().get("tooltip_speed"));
 
-    // exemple pour connecter le slider dans le widget popup connect(testWidget, &QSlider::valueChanged, this, [&] () { qDebug() << "oui"; });
-
-    //m_slowDownBtn = new ToolbarButton(this, "slow_down.png", TextManager::instance().get("tooltip_slow_down"));
-    
-    // m_playPauseBtn = new ToolbarToggleButton(
-    //     this,
-    //     false,
-    //     "pause.png",
-    //     TextManager::instance().get("tooltip_pause"),
-    //     "play.png",
-    //     TextManager::instance().get("tooltip_play")
-    // );
-
-    //m_speedUpBtn = new ToolbarButton(this, "speed_up.png", TextManager::instance().get("tooltip_speed_up"));
-
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
@@ -104,6 +89,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     );
 
     m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));;
+    
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);

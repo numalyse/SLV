@@ -28,12 +28,14 @@ public slots:
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
     void setTime(int64_t);
+    void enableLoopMode();
+    void disableLoopMode();
 
 private:
 
     libvlc_media_player_t *m_player = nullptr;
-    int lastVolume = 100;
-    const float speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
+    bool m_loopActivated = true;
+    const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     libvlc_event_manager_t* m_eventManager = nullptr;
     Media* m_media = nullptr;
 

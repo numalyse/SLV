@@ -18,13 +18,13 @@ public:
     void setMediaFromPath(const QString& filePath);
 
 public slots:
-    void play();
-    void pause();
-    void stop();
+    bool play();
+    bool pause();
+    bool stop();
+    bool eject();
+    bool mute();
+    bool unmute();
     void togglePlayPause();
-    void eject();
-    void mute();
-    void unmute();
     void setVolume(const int &vol);
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();

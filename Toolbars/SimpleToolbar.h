@@ -64,6 +64,8 @@ public slots:
     void unmuteUiUpdate();
     void ejectUiUpdate();
     void stopUiUpdate();
+    void enableLoopUiUpdate();
+    void disableLoopUiUpdate();
 
 signals:
     void setPositionRequested(int64_t);

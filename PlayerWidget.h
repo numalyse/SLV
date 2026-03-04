@@ -62,6 +62,8 @@ signals:
     void ejectUiUpdateRequested();
     void muteUiUpdateRequested();
     void unmuteUiUpdateRequested();
+    void enableLoopUiUpdateRequested();
+    void disableLoopUiUpdateRequested();
 
 private:
     Media *m_media = nullptr;

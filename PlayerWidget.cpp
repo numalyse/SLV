@@ -53,6 +53,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::unmuteUiUpdateRequested, m_toolBar, &SimpleToolbar::unmuteUiUpdate);
     connect(this, &PlayerWidget::ejectUiUpdateRequested, m_toolBar, &SimpleToolbar::ejectUiUpdate);
     connect(this, &PlayerWidget::stopUiUpdateRequested, m_toolBar, &SimpleToolbar::stopUiUpdate);
+    connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
+    connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
+
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -114,50 +117,60 @@ void PlayerWidget::disablePlayerFullscreen()
 
 void PlayerWidget::play()
 {
-    m_mediaWidget->play();
-    emit playUiUpdateRequested();
-    m_playing = true;
-    emit checkPlayersPlayStatusRequested();
+    if (m_mediaWidget->play()){
+        m_playing = true;
+        emit playUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
 }
 
 void PlayerWidget::pause()
 {
-    m_mediaWidget->pause();
-    emit pauseUiUpdateRequested();
-    m_playing = false;
-    emit checkPlayersPlayStatusRequested();
+    if (m_mediaWidget->pause()){
+        m_playing = false;
+        emit pauseUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
+
 }
 
 void PlayerWidget::stop()
 {
-    m_mediaWidget->stop();
-    emit stopUiUpdateRequested();
-    m_playing = false;
-    emit checkPlayersPlayStatusRequested();
+    if(m_mediaWidget->stop()){
+        m_playing = false;
+        emit stopUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    };
+
 }
 
 void PlayerWidget::eject()
 {
-    m_mediaWidget->eject();
-    emit ejectUiUpdateRequested();
-    m_playing = false;
-    emit checkPlayersPlayStatusRequested();
+    if(m_mediaWidget->eject()){
+        m_playing = false;
+        emit ejectUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
+
 }
 
 void PlayerWidget::mute()
 {
-    m_mediaWidget->mute();
-    emit muteUiUpdateRequested();
-    m_muted = true;
-    emit checkPlayersMuteStatusRequested();
+    if(m_mediaWidget->mute()){
+        m_muted = true;
+        emit muteUiUpdateRequested();
+        emit checkPlayersMuteStatusRequested();
+    }
+
 }
 
 void PlayerWidget::unmute()
 {
-    m_mediaWidget->unmute();
-    emit unmuteUiUpdateRequested();
-    m_muted = false;
-    emit checkPlayersMuteStatusRequested();
+    if(m_mediaWidget->unmute()){
+        m_muted = false;
+        emit unmuteUiUpdateRequested();
+        emit checkPlayersMuteStatusRequested();
+    }
 }
 
 void PlayerWidget::setVolume(const int &vol)
@@ -186,9 +199,11 @@ void PlayerWidget::takeScreenshot()
 void PlayerWidget::enableLoopMode()
 {
     m_mediaWidget->enableLoopMode();
+    emit enableLoopUiUpdateRequested();
 }
 
 void PlayerWidget::disableLoopMode()
 {
     m_mediaWidget->disableLoopMode();
+    emit disableLoopUiUpdateRequested();
 }

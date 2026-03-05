@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 
 PlayerWidget::PlayerWidget(QWidget *parent)
@@ -27,7 +28,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
-    
+
     connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [this]() {
         emit removePlayerRequest(this);
     });
@@ -125,6 +126,11 @@ void PlayerWidget::play()
         m_playing = true;
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
+    }else {
+        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+        if(file_path != ""){
+            setMediaFromPath(file_path);
+        }
     }
 }
 

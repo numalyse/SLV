@@ -67,10 +67,6 @@ MediaWidget::~MediaWidget()
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
     }
 
-    if (m_parseEventManager)
-    {
-        libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-    }
     
     releaseMedia();
 

@@ -25,6 +25,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void createMenuBar();
+    void createToolBar();
 
 public slots:
     void openMediaFile();
@@ -37,8 +38,10 @@ private:
     QSplitter* splitter = nullptr;
     QSplitter* splitter2 = nullptr;
 
+    QToolBar* m_toolbarQt = nullptr;
     GlobalPlayerManager* m_globalPlayerManager = nullptr;
     QWidget* m_currentLayout = nullptr;
+    ToolbarToggleButton *m_navPanelBtn = nullptr; // Utilisation d'un toggle button pour le bouton de menu
     // QVector<PlayerWidget*> m_players;
 
 };

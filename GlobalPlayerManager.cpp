@@ -9,7 +9,12 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     : QWidget{parent}
 
 {
-    layout = new QVBoxLayout(this);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    layout = new QVBoxLayout();
+    mainLayout->addLayout(layout);
+    m_navPanel = new NavPanel(this);
+    mainLayout->addWidget(m_navPanel);
+
     m_layoutManager = new PlayerLayoutManager();
     connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenGlobal);
@@ -53,6 +58,17 @@ void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPl
         m_toolbarWidget = newToolbar;
         layout->addWidget(m_toolbarWidget);
     }
+}
+
+/// @brief Ouvre la fenêtre à droite de l'écran contenant des infos sur la playlist ou sur le plan sélectionné en fonction du mode
+void GlobalPlayerManager::openNavPanel()
+{
+    m_navPanel->showPanel();
+}
+
+void GlobalPlayerManager::closeNavPanel()
+{
+    m_navPanel->hidePanel();
 }
 
 /// @brief Met à jour l'état du bouton play pause 

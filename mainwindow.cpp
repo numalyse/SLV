@@ -128,11 +128,13 @@ MainWindow::~MainWindow()
 void MainWindow::enableFullscreenMain()
 {
     ui->menubar->hide();
+    m_toolbarQt->hide();
     showFullScreen();
 }
 
 void MainWindow::disableFullscreenMain()
 {
     ui->menubar->show();
+    m_toolbarQt->show();
     showNormal();
 }

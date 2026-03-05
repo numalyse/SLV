@@ -17,5 +17,7 @@
         <file alias="plus.png">icons/plus.png</file>
         <file alias="minus.png">icons/minus.png</file>
         <file alias="capture.png">icons/capture.png</file>
+        <file alias="nav_panel_menu_closed.png">icons/nav_panel_menu_closed.png</file>
+        <file alias="nav_panel_menu_open.png">icons/nav_panel_menu_open.png</file>
     </qresource>
 </RCC>

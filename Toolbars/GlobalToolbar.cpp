@@ -22,6 +22,8 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_muteBtn, &ToolbarToggleButton::stateActivated, this, &GlobalToolbar::enableMute);
     connect(m_muteBtn, &ToolbarToggleButton::stateDeactivated, this, &GlobalToolbar::disableMute);
 
+    setMaximumHeight(50);
+
     setDefaultUI();
 }
 

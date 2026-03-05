@@ -327,6 +327,7 @@ Toolbar *PlayerLayoutManager::createLayoutToolbar()
 // slots
 void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
 {
+    if ( ! toBeDuplicated->mediaWidget()->media() ) return;
     int activePlayerCount = m_activePlayers.size();
     
     if(activePlayerCount < 4) {

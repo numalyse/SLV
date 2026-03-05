@@ -21,6 +21,7 @@ public:
 
     ~Media();
 
+    void parse();
 
     QString fileName() const { return m_name; }
     QString filePath() const { return m_filePath; }

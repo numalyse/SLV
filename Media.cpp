@@ -21,10 +21,6 @@ Media::Media(const QString &filePath, QObject *parent) : QObject(parent), m_file
         return;
     }
 
-    m_parseEventManager = libvlc_media_event_manager(m_vlcMedia);
-    libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-    libvlc_media_parse_with_options(m_vlcMedia, libvlc_media_parse_local, 0);
-
     m_fileInfo = new QFileInfo(filePath);
     m_name = m_fileInfo->baseName();
 }
@@ -42,6 +38,13 @@ Media::~Media()
     delete m_fileInfo;
 }
 
+void Media::parse(){
+    if(m_vlcMedia){
+        m_parseEventManager = libvlc_media_event_manager(m_vlcMedia);
+        libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
+        libvlc_media_parse_with_options(m_vlcMedia, libvlc_media_parse_local, 0);
+    }
+}
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
 /// Ecoute quand la lecture asychrone des métadonnées est terminée et envoie un signal.

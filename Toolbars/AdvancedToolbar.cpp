@@ -81,6 +81,11 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
         m_muteBtn->setButtonState(oldMute->isChecked());
     }
 
+    QLabel* oldNameLabel = toolbar->nameLabel();
+    if (oldTimeLabel && m_nameLabel) {
+        m_nameLabel->setText(oldNameLabel->text());
+    }
+
     // TODO : voir pour copier les états des sliders dans muteBtn et speedBtn
 
 }
@@ -103,8 +108,9 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_currentTimeLabel, 1);
-    timecodeLayout->addWidget(m_durationLabel, 0);
+    timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
+    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
+    timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);
 
     mainLayout->addWidget(m_slider);

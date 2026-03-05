@@ -64,6 +64,7 @@ signals:
     void updateSliderRangeRequested(int64_t mediaDuration);
     void updateFpsRequested(double fps);
     void mediaPlayerLoaded();
+    void nameUiUpdateRequested(const QString&);
 };
 
 #endif // MEDIAWIDGET_H

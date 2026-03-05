@@ -29,6 +29,7 @@ public:
     double mediaFps() const { return m_media_fps; }
     QLabel* currentTimeLabel() const { return m_currentTimeLabel; }
     QLabel* durationLabel() const { return m_durationLabel; }
+    QLabel* nameLabel() const { return m_nameLabel; }
 
     ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
     ToolbarPopupButton* speedBtn() const { return m_speedBtn; }
@@ -45,6 +46,7 @@ protected:
     QTimer* m_seekTimer = nullptr;
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
+    QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
 
     ToolbarPopupButton* m_speedBtn = nullptr;
@@ -68,6 +70,7 @@ public slots:
     void stopUiUpdate();
     void enableLoopUiUpdate();
     void disableLoopUiUpdate();
+    void nameUiUpdate(const QString &);
 
 signals:
     void setPositionRequested(int64_t);

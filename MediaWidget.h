@@ -17,6 +17,10 @@ public:
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
+    libvlc_media_player_t *m_player = nullptr;
+
+    Media* media(){ return m_media;};
+
 public slots:
     bool play();
     bool pause();
@@ -34,7 +38,7 @@ public slots:
 
 private:
 
-    libvlc_media_player_t *m_player = nullptr;
+
     bool m_loopActivated = true;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     libvlc_event_manager_t* m_eventManager = nullptr;
@@ -59,6 +63,7 @@ signals:
     void activated(MediaWidget* self);
     void updateSliderRangeRequested(int64_t mediaDuration);
     void updateFpsRequested(double fps);
+    void mediaPlayerLoaded();
 };
 
 #endif // MEDIAWIDGET_H

@@ -20,7 +20,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     m_players.reserve(s_maxPlayerCount);
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
         PlayerWidget* player = new PlayerWidget(this);
-        connect(player, &PlayerWidget::addPlayerRequest, this, &PlayerLayoutManager::addPlayer);
+        connect(player, &PlayerWidget::duplicatePlayerRequest, this, &PlayerLayoutManager::duplicatePlayer);
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
         connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
@@ -311,13 +311,50 @@ Toolbar *PlayerLayoutManager::createLayoutToolbar()
 
 
 // slots
-void PlayerLayoutManager::addPlayer()
+void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
 {
     int activePlayerCount = m_activePlayers.size();
-    if(activePlayerCount < 4){
-        createLayout(activePlayerCount + 1 );
+    
+    if(activePlayerCount < 4) {
+        bool wasPlaying = toBeDuplicated->playing();
+        toBeDuplicated->pause();
+    
+        createLayout(activePlayerCount + 1);
+        auto player = m_activePlayers.last();
+
+        bool wasMuted = toBeDuplicated->muted();
+        
+        int64_t currentTime = 0;
+        currentTime = libvlc_media_player_get_time(toBeDuplicated->mediaWidget()->m_player);
+    
+        bool wasLooping = false;
+        if (toBeDuplicated->toolbar() && toBeDuplicated->toolbar()->loopBtn()) {
+            wasLooping = toBeDuplicated->toolbar()->loopBtn()->isChecked();
+        }
+
+
+        connect(player->mediaWidget(), &MediaWidget::mediaPlayerLoaded, player, [=]() {
+            player->play();
+  
+            if (!wasPlaying) {
+                QTimer::singleShot(150, player, [player]() {
+                    player->pause();
+                });
+            }
+
+            player->setTime(currentTime);
+
+            wasPlaying ? player->play() : player->pause();
+            wasPlaying ? toBeDuplicated->play() : toBeDuplicated->pause();
+            wasMuted ? player->mute() : player->unmute();
+            wasLooping ? player->enableLoopMode() : player->disableLoopMode();
+
+        }, Qt::SingleShotConnection); 
+
+        player->setMediaFromPath(toBeDuplicated->mediaWidget()->media()->filePath());
     }
 }
+
 
 void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
     int activePlayerCount = m_activePlayers.size();

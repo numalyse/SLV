@@ -66,7 +66,7 @@ signals:
     void setGlobalMuteStateRequested(bool);
 
 public slots:
-    void addPlayer();
+    void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
     void removePlayer(PlayerWidget* playerToDestroy);
 

@@ -22,6 +22,7 @@ public:
     void setMediaFromPath(const QString& filePath);
 
     SimpleToolbar* toolbar() {return m_toolBar;};
+    MediaWidget* mediaWidget() { return m_mediaWidget; };
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
@@ -46,6 +47,7 @@ public slots:
 signals:
     void addPlayerRequest();
     void removePlayerRequest(PlayerWidget* toBeRemoved);
+    void duplicatePlayerRequest(PlayerWidget* toBeDuplicated);
     void enablePlayerFullscreenRequested(PlayerWidget* self);
     void disablePlayerFullscreenRequested(PlayerWidget* self);
     void updateSliderRangeRequest(int64_t);
@@ -66,7 +68,6 @@ signals:
     void disableLoopUiUpdateRequested();
 
 private:
-    Media *m_media = nullptr;
     double m_media_fps {};
     bool m_playing = false;
     bool m_muted = false;

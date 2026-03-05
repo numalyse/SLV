@@ -11,19 +11,20 @@ class MediaWidget : public QWidget
     Q_OBJECT
 public:
     explicit MediaWidget(QWidget *parent = nullptr);
+
     ~MediaWidget();
     void managePlayerSystem();
     void setActive(bool active);
     void setMediaFromPath(const QString& filePath);
 
 public slots:
-    void play();
-    void pause();
-    void stop();
+    bool play();
+    bool pause();
+    bool stop();
+    bool eject();
+    bool mute();
+    bool unmute();
     void togglePlayPause();
-    void eject();
-    void mute();
-    void unmute();
     void setVolume(const int &vol);
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
@@ -41,13 +42,17 @@ private:
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     
-    void releaseMedia();
 
-    void createMediaMeta(const QString& filePath);
+    void createEventManager();
+    void createMedia(const QString& filePath);
+
+    void releaseMedia();
+    void releaseEventManager();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 signals:
     void updateSliderValueRequested(int64_t newTime);

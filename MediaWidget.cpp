@@ -10,28 +10,36 @@
 #include <QTimer>
 #include <QDir>
 #include <QMap>
+#include <QPainter>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
+
+    setAutoFillBackground(true);
+    QPalette pal = palette();
+    pal.setColor(QPalette::Window, Qt::black);
+    setPalette(pal);
+
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
+    setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setStyleSheet("background-color: black");
+
 
     // ===== VLC ===== //
     m_player = libvlc_media_player_new(SLV::VlcInstance::get());
 
+    createEventManager();
+
     managePlayerSystem();
 
-    m_eventManager = libvlc_media_player_event_manager(m_player);
-
-    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
-    // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-
     libvlc_media_player_play(m_player);
+}
+
+void MediaWidget::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.fillRect(rect(), Qt::black);
 }
 
 
@@ -66,27 +74,28 @@ MediaWidget::~MediaWidget()
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
     }
-
     
     releaseMedia();
 
 }
 
-void MediaWidget::play()
+bool MediaWidget::play()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media) return false;
     libvlc_media_player_play(m_player);
+    return true;
 }
 
-void MediaWidget::pause()
+bool MediaWidget::pause()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media)  return false;
     libvlc_media_player_set_pause(m_player, 1);
+    return true;
 }
 
 void MediaWidget::togglePlayPause()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return;
 
     if (libvlc_media_player_is_playing(m_player)) {
         libvlc_media_player_pause(m_player);
@@ -98,39 +107,44 @@ void MediaWidget::togglePlayPause()
 }
 
 /// @brief Set the media player position to 0 and pause
-void MediaWidget::stop()
+bool MediaWidget::stop()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
 
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
     libvlc_media_player_next_frame(m_player);
-
+    return true;
 }
 
 /// @brief Release the media player and create a new one from MediaWidget instance
-void MediaWidget::eject()
+bool MediaWidget::eject()
 {
-    if (!m_player || !libvlc_media_player_get_media(m_player)) return;
+    if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
+    releaseEventManager();
     releaseMedia();
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+    createEventManager();
     managePlayerSystem();
+    return true;
 }
 
 /// @brief Mute the media player
-void MediaWidget::mute()
+bool MediaWidget::mute()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 1);
+    return true;
 }
 
 /// @brief Unmute the media player
-void MediaWidget::unmute()
+bool MediaWidget::unmute()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 0);
+    return true;
 }
 
 /// @brief Change media player volume
@@ -234,7 +248,7 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
     (filePath);
 
-    createMediaMeta(filePath);
+    createMedia(filePath);
 
     // La méthode stop de libvlc est bloquante, on utilise un appel asynchrone pour éviter un deadlock.
     QMetaObject::invokeMethod(this, [this, pathCopy]() {
@@ -245,39 +259,57 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         QByteArray urlBytes =
             url.toString(QUrl::FullyEncoded).toUtf8();
 
-        libvlc_media_t  *media = libvlc_media_new_location(SLV::VlcInstance::get(), urlBytes.constData());
+        libvlc_media_t *vlcMedia = m_media->vlcMedia();
 
-        if (!media)
+        if (!vlcMedia)
             return;
 
-        libvlc_media_player_set_media(m_player, media);
-
-        libvlc_media_release(media);
+        libvlc_media_player_set_media(m_player, vlcMedia);
 
         libvlc_media_player_play(m_player);
 
     }, Qt::QueuedConnection);
 }
 
-/// @brief detach l'event manager avant de release le média
+/// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
 void MediaWidget::releaseMedia(){
-    if(m_eventManager){
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-        m_eventManager = nullptr;
-    }
     if(m_media){
         delete m_media;
         m_media = nullptr;
     }
 }
 
+
+/// @brief detach les event et free l'event manager
+void MediaWidget::releaseEventManager(){
+    if(m_eventManager){
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+        m_eventManager = nullptr;
+    }else {
+        qDebug() << "MediaWidget : detach event manager alors que le media player est null";
+    }
+}
+
+/// @brief initialise m_eventManager et attach les events
+void MediaWidget::createEventManager(){
+    if(m_player){
+        m_eventManager = libvlc_media_player_event_manager(m_player);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+    }else {
+        qDebug() << "MediaWidget : Create event manager alors que le media player est null";
+    }
+
+}
+
+
 /// @brief Helper pour recréer une classe média et connecter ses signaux
 /// @param filePath 
-void MediaWidget::createMediaMeta(const QString& filePath){
-    if(m_media){
-        delete m_media;
-    }
+void MediaWidget::createMedia(const QString& filePath){
+    releaseMedia();
     m_media = new Media(filePath, this);
+    
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
 }

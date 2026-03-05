@@ -35,18 +35,27 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequest, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
-    connect(m_toolBar, &SimpleToolbar::enableMuteRequest, m_mediaWidget, &MediaWidget::mute);
-    connect(m_toolBar, &SimpleToolbar::disableMuteRequest, m_mediaWidget, &MediaWidget::unmute);
+    connect(m_toolBar, &SimpleToolbar::enableMuteRequest, this, &PlayerWidget::mute);
+    connect(m_toolBar, &SimpleToolbar::disableMuteRequest, this, &PlayerWidget::unmute);
     connect(m_toolBar, &SimpleToolbar::volumeChanged, m_mediaWidget, &MediaWidget::setVolume);
     connect(m_toolBar, &SimpleToolbar::speedChanged, m_mediaWidget, &MediaWidget::setSpeed);
     connect(m_toolBar, &Toolbar::screenshotRequest, m_mediaWidget, &MediaWidget::takeScreenshot);
     connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
-    connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
+
+    connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
+    connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
+    connect(this, &PlayerWidget::muteUiUpdateRequested, m_toolBar, &SimpleToolbar::muteUiUpdate);
+    connect(this, &PlayerWidget::unmuteUiUpdateRequested, m_toolBar, &SimpleToolbar::unmuteUiUpdate);
+    connect(this, &PlayerWidget::ejectUiUpdateRequested, m_toolBar, &SimpleToolbar::ejectUiUpdate);
+    connect(this, &PlayerWidget::stopUiUpdateRequested, m_toolBar, &SimpleToolbar::stopUiUpdate);
+    connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
+    connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
+
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -86,9 +95,12 @@ void PlayerWidget::setMediaFromPath(const QString& filePath)
 {
     m_mediaWidget->setMediaFromPath(filePath);
     // TODO : modifier les lignes suivantes pour emettre un signal dans media quand la load est validé
-    m_isPlaying = true;
-    m_toolBar->getPlayPauseBtn()->setButtonState(true);
-    emit checkPlayersStatusRequested();
+    m_playing = true;
+    m_muted = false;
+    m_toolBar->playPauseBtn()->setButtonState(true);
+    m_toolBar->muteBtn()->setButtonState(false);
+    emit checkPlayersPlayStatusRequested();
+    emit checkPlayersMuteStatusRequested();
 }
 
 void PlayerWidget::enablePlayerFullscreen()
@@ -105,38 +117,60 @@ void PlayerWidget::disablePlayerFullscreen()
 
 void PlayerWidget::play()
 {
-    m_mediaWidget->play();
-    m_toolBar->getPlayPauseBtn()->setButtonState(true);
-    m_isPlaying = true;
-    emit checkPlayersStatusRequested();
+    if (m_mediaWidget->play()){
+        m_playing = true;
+        emit playUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
 }
 
 void PlayerWidget::pause()
 {
-    m_mediaWidget->pause();
-    m_toolBar->getPlayPauseBtn()->setButtonState(false);
-    m_isPlaying = false;
-    emit checkPlayersStatusRequested();
+    if (m_mediaWidget->pause()){
+        m_playing = false;
+        emit pauseUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
+
 }
 
 void PlayerWidget::stop()
 {
-    m_mediaWidget->stop();
+    if(m_mediaWidget->stop()){
+        m_playing = false;
+        emit stopUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    };
+
 }
 
 void PlayerWidget::eject()
 {
-    m_mediaWidget->eject();
+    if(m_mediaWidget->eject()){
+        m_playing = false;
+        emit ejectUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
+
 }
 
 void PlayerWidget::mute()
 {
-    m_mediaWidget->mute();
+    if(m_mediaWidget->mute()){
+        m_muted = true;
+        emit muteUiUpdateRequested();
+        emit checkPlayersMuteStatusRequested();
+    }
+
 }
 
 void PlayerWidget::unmute()
 {
-    m_mediaWidget->unmute();
+    if(m_mediaWidget->unmute()){
+        m_muted = false;
+        emit unmuteUiUpdateRequested();
+        emit checkPlayersMuteStatusRequested();
+    }
 }
 
 void PlayerWidget::setVolume(const int &vol)
@@ -165,9 +199,11 @@ void PlayerWidget::takeScreenshot()
 void PlayerWidget::enableLoopMode()
 {
     m_mediaWidget->enableLoopMode();
+    emit enableLoopUiUpdateRequested();
 }
 
 void PlayerWidget::disableLoopMode()
 {
     m_mediaWidget->disableLoopMode();
+    emit disableLoopUiUpdateRequested();
 }

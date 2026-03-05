@@ -45,6 +45,7 @@ protected:
     QTimer* m_seekTimer = nullptr;
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
+    bool m_discardVlcUiUpdates = false;
 
     ToolbarPopupButton* m_speedBtn = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;

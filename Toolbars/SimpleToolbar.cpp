@@ -162,8 +162,9 @@ void SimpleToolbar::stopSlider()
 }
 
 void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
-
     Q_ASSERT(mediaDuration < static_cast<int64_t>(std::numeric_limits<int>::max()));
+    
+    m_discardVlcUiUpdates = false;
 
     if (mediaDuration >= static_cast<int64_t>(std::numeric_limits<int>::max()))
     {
@@ -178,7 +179,7 @@ void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
 
 void SimpleToolbar::updateSliderValue(int64_t currentTime){
     
-    if( m_draggingSlider) return;
+    if( m_draggingSlider || m_discardVlcUiUpdates) return;
 
     Q_ASSERT(currentTime < static_cast<int64_t>(std::numeric_limits<int>::max()));
 
@@ -218,6 +219,7 @@ void SimpleToolbar::unmuteUiUpdate()
 
 void SimpleToolbar::ejectUiUpdate()
 {
+    m_discardVlcUiUpdates = true;
     resetSlider();
     pauseUiUpdate();
 }

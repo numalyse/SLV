@@ -18,6 +18,7 @@ NavPanel::NavPanel(QWidget *parent)
     mainLayout->addWidget(m_sideWidget);
     setStyleSheet("border: 1px solid grey;");
     m_sideWidget->hide();
+    setFixedWidth(0);
 }
 
 void NavPanel::showPanel()

@@ -61,6 +61,8 @@ signals:
 
     void enableFullscreenGlobalRequested();
     void disableFullscreenGlobalRequested();
+    void enableFullscreenAdvancedRequested();
+    void disableFullscreenAdvancedRequested();
 
     void setGlobalPlayStateRequested(bool);
     void setGlobalMuteStateRequested(bool);

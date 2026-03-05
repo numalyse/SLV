@@ -3,6 +3,8 @@
 
 #include "Toolbars/Toolbar.h"
 #include "PlayerLayoutManager.h"
+#include "Media.h"
+#include "Project.h"
 
 #include <QWidget>
 
@@ -14,7 +16,7 @@ public:
     explicit GlobalPlayerManager(QWidget *parent = nullptr);
     QWidget* m_playersWidget = nullptr;
     Toolbar* m_toolbarWidget = nullptr;
-
+    Project* m_project = nullptr;
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
     QVBoxLayout* layout;
@@ -26,7 +28,7 @@ public slots:
     void enableFullscreenPlayer();
     void disableFullscreenPlayer();
 
-    void updateContainer(int, QWidget*, Toolbar*);
+    void updateContainer(Media*, QWidget*, Toolbar*);
 
     void setGlobalPlayState(bool);
     void setGlobalMuteState(bool);

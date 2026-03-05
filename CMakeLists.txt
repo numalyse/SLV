@@ -50,7 +50,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         VlcParseHelper.h
         VlcInstance.h
         Shot.h
-        Project.h
+        Project.h Project.cpp
 
         MediaWidget.h MediaWidget.cpp
 

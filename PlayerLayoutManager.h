@@ -1,9 +1,10 @@
 #ifndef PLAYERLAYOUTMANAGER_H
 #define PLAYERLAYOUTMANAGER_H
 
-#include <QObject>
-
 #include "PlayerWidget.h"
+#include "Media.h"
+
+#include <QObject>
 
 class PlayerWidget;
 
@@ -54,7 +55,7 @@ private:
 
 
 signals:
-    void updateContainerRequest(int, QWidget*, Toolbar*);
+    void updateContainerRequest(Media*, QWidget*, Toolbar*);
 
     void enableFullscreenPlayerRequested();
     void disableFullscreenPlayerRequested();

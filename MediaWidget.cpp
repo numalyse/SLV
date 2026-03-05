@@ -124,6 +124,7 @@ bool MediaWidget::eject()
 
     releaseEventManager();
     releaseMedia();
+    emit updateMediaRequested(nullptr);
     libvlc_media_player_release(m_player);
     m_player = libvlc_media_player_new(SLV::VlcInstance::get());
     createEventManager();
@@ -271,10 +272,10 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
     }, Qt::QueuedConnection);
 }
 
-/// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
+/// @brief delete le m_media, ne fait rien si déjà null
 void MediaWidget::releaseMedia(){
     if(m_media){
-        delete m_media;
+        m_media->deleteLater();
         m_media = nullptr;
     }
 }
@@ -309,7 +310,8 @@ void MediaWidget::createEventManager(){
 void MediaWidget::createMedia(const QString& filePath){
     releaseMedia();
     m_media = new Media(filePath, this);
-    
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
+    m_media->parse();
+    emit updateMediaRequested(m_media);
 }

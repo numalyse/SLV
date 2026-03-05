@@ -18,9 +18,9 @@ Q_OBJECT
 
 public:
     explicit Media(const QString &filePath, QObject *parent = nullptr);
-
     ~Media();
 
+    void parse();
 
     QString fileName() const { return m_name; }
     QString filePath() const { return m_filePath; }
@@ -29,12 +29,10 @@ public:
     bool exists() const { return m_fileInfo->exists(); }
     MediaType type() const { return m_type; }
     int64_t duration() const { return m_duration; }
-    double fps() const { return m_fps; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }
-    void setFps(double fps) { m_fps = fps; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
 
 signals:
@@ -47,7 +45,6 @@ private:
     QFileInfo* m_fileInfo = nullptr;
     MediaType m_type = MediaType::Unknown;
     int64_t m_duration {}; 
-    double m_fps {};
 
     QMap<libvlc_meta_t, QString> m_metaData;
 

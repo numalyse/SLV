@@ -65,6 +65,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
     connect(m_mediaWidget, &MediaWidget::updateSliderValueRequested, this, &PlayerWidget::updateSliderValueRequest);
     connect(m_mediaWidget,  &MediaWidget::updateFpsRequested, this, &PlayerWidget::updateFpsRequest);
+    connect(m_mediaWidget,  &MediaWidget::updateMediaRequested, this, &PlayerWidget::updateMedia);
 
     connect(this, &PlayerWidget::updateSliderRangeRequest, m_toolBar, &SimpleToolbar::updateSliderRange);
     connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
@@ -94,11 +95,10 @@ void PlayerWidget::setActive(bool active)
 void PlayerWidget::setMediaFromPath(const QString& filePath)
 {
     m_mediaWidget->setMediaFromPath(filePath);
-    // TODO : modifier les lignes suivantes pour emettre un signal dans media quand la load est validé
     m_playing = true;
     m_muted = false;
-    m_toolBar->playPauseBtn()->setButtonState(true);
-    m_toolBar->muteBtn()->setButtonState(false);
+    emit playUiUpdateRequested();
+    emit unmuteUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit checkPlayersMuteStatusRequested();
 }
@@ -207,3 +207,10 @@ void PlayerWidget::disableLoopMode()
     m_mediaWidget->disableLoopMode();
     emit disableLoopUiUpdateRequested();
 }
+
+void PlayerWidget::updateMedia(Media * newMedia)
+{   
+    m_media = newMedia;
+}
+
+

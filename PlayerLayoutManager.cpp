@@ -70,10 +70,12 @@ void PlayerLayoutManager::createLayout(const int count)
     activePlayerUpdate(count);
 
     QWidget* container = nullptr;
+    Media* media = nullptr;
 
     switch (count){
         case 1: 
             container = create1();
+            media = m_activePlayers[0]->media();
             break;
         case 2: 
             container = create2();
@@ -88,7 +90,7 @@ void PlayerLayoutManager::createLayout(const int count)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(m_activePlayers.size(), container, toolbar);
+    emit updateContainerRequest(media, container, toolbar);
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -99,10 +101,12 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     activePlayerUpdate(pathCount);
 
     QWidget* container = nullptr;
+    Media* media = nullptr;
 
     switch (pathCount){
         case 1: 
             container = create1(filesPaths);
+            media = m_activePlayers[0]->media();
             break;
         case 2: 
             container = create2(filesPaths);
@@ -117,7 +121,7 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(m_activePlayers.size(), container, toolbar);
+    emit updateContainerRequest(media, container, toolbar);
 
 }
 

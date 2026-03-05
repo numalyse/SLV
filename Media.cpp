@@ -21,12 +21,14 @@ Media::Media(const QString &filePath, QObject *parent) : QObject(parent), m_file
         return;
     }
 
+    m_fileInfo = new QFileInfo(filePath);
+    m_name = m_fileInfo->baseName();
+}
+
+void Media::parse(){
     m_parseEventManager = libvlc_media_event_manager(m_vlcMedia);
     libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
     libvlc_media_parse_with_options(m_vlcMedia, libvlc_media_parse_local, 0);
-
-    m_fileInfo = new QFileInfo(filePath);
-    m_name = m_fileInfo->baseName();
 }
 
 Media::~Media()
@@ -64,7 +66,6 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                 auto duration = libvlc_media_get_duration(parsedMedia);
                 
                 media->setDuration(duration);
-                media->setFps(fps);
                 media->setMeta(VlcParseHelper::getMetaParsedMedia(parsedMedia));
                 
                 emit media->fpsParsed(fps);

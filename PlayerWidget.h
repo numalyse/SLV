@@ -22,6 +22,7 @@ public:
     void setMediaFromPath(const QString& filePath);
 
     SimpleToolbar* toolbar() {return m_toolBar;};
+    Media* media(){ return m_media;};
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
@@ -42,6 +43,7 @@ public slots:
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
+    void updateMedia(Media*);
 
 signals:
     void addPlayerRequest();

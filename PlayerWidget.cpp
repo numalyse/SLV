@@ -27,8 +27,13 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
-    connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [&]() {
+    
+    connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [this]() {
         emit removePlayerRequest(this);
+    });
+
+    connect(m_toolBar, &SimpleToolbar::duplicatePlayerRequested, this, [this](){
+        emit duplicatePlayerRequest(this);
     });
 
     m_mediaWidget = new MediaWidget(this);
@@ -94,11 +99,10 @@ void PlayerWidget::setActive(bool active)
 void PlayerWidget::setMediaFromPath(const QString& filePath)
 {
     m_mediaWidget->setMediaFromPath(filePath);
-    // TODO : modifier les lignes suivantes pour emettre un signal dans media quand la load est validé
     m_playing = true;
     m_muted = false;
-    m_toolBar->playPauseBtn()->setButtonState(true);
-    m_toolBar->muteBtn()->setButtonState(false);
+    emit playUiUpdateRequested();
+    emit unmuteUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit checkPlayersMuteStatusRequested();
 }

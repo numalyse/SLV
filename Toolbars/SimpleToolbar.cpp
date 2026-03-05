@@ -88,8 +88,10 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         TextManager::instance().get("tooltip_loop_off")
     );
 
-    m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));;
-    
+    m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));
+    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate.png", TextManager::instance().get("tooltip_duplicate_player"));
+
+    connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerRequested);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
@@ -139,6 +141,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
+    buttonLayout->addWidget(m_duplicatePlayerBtn);
     buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);
 

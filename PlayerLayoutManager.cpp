@@ -20,7 +20,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     m_players.reserve(s_maxPlayerCount);
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
         PlayerWidget* player = new PlayerWidget(this);
-        connect(player, &PlayerWidget::addPlayerRequest, this, &PlayerLayoutManager::addPlayer);
+        connect(player, &PlayerWidget::duplicatePlayerRequest, this, &PlayerLayoutManager::duplicatePlayer);
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
         connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
@@ -285,6 +285,12 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableLoopModeRequest, activePlayer, &PlayerWidget::enableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::disableLoopModeRequest, activePlayer, &PlayerWidget::disableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
+
+    connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {
+        this->duplicatePlayer(activePlayer);
+    });
+
+    
   
     connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
     connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
@@ -313,17 +319,50 @@ Toolbar *PlayerLayoutManager::createLayoutToolbar()
 
 
 // slots
-void PlayerLayoutManager::addPlayer()
+void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
 {
     int activePlayerCount = m_activePlayers.size();
-    if(activePlayerCount < 4){
-        createLayout(activePlayerCount + 1 );
+    
+    if(activePlayerCount < 4) {
+        toBeDuplicated->pause(); // le dupliqué mis en pause
+
+        createLayout(activePlayerCount + 1);
+        auto player = m_activePlayers.last();
+
+        bool wasMuted = toBeDuplicated->muted();
+        int64_t currentTime = libvlc_media_player_get_time(toBeDuplicated->mediaWidget()->m_player);
+        
+        bool wasLooping = false;
+        if (toBeDuplicated->toolbar() && toBeDuplicated->toolbar()->loopBtn()) {
+            wasLooping = toBeDuplicated->toolbar()->loopBtn()->isChecked();
+        }
+
+        connect(player->mediaWidget(), &MediaWidget::mediaPlayerLoaded, player, [=]() {// quand le media player est chargé pret a être utilisé :
+            
+            wasMuted ? player->mute() : player->unmute();
+            wasLooping ? player->enableLoopMode() : player->disableLoopMode();
+
+            // on lance puis set time pour trouver la frame
+            player->play();
+            player->setTime(currentTime);
+
+            // dès que le slider bouge (le chargement est de setTime est fini car vlc a detecté timeChanged), on met en pause 
+            connect(player, &PlayerWidget::updateSliderValueRequest, player, [player](int64_t) {
+                player->pause(); 
+            }, Qt::SingleShotConnection); 
+
+        }, Qt::SingleShotConnection); 
+
+        
+        player->setMediaFromPath(toBeDuplicated->mediaWidget()->media()->filePath());
     }
 }
+
 
 void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
     int activePlayerCount = m_activePlayers.size();
     if (activePlayerCount > 1){
+        playerToRemove->eject();
         m_activePlayers.removeOne(playerToRemove);
         createLayout(m_activePlayers.size());
     }

@@ -49,6 +49,7 @@ protected:
     ToolbarPopupButton* m_speedBtn = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
+    ToolbarButton* m_duplicatePlayerBtn = nullptr;
 
     // ToolbarButton* m_slowDownBtn
     // ToolbarButton* m_speedUpBtn;
@@ -76,6 +77,7 @@ signals:
     void speedChanged(int);
     void enableLoopModeRequest();
     void disableLoopModeRequest();
+    void duplicatePlayerRequested();
 };
 
 #endif

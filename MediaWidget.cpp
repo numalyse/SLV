@@ -82,7 +82,7 @@ MediaWidget::~MediaWidget()
 bool MediaWidget::play()
 {
     if (!m_player || !m_media) return false;
-    libvlc_media_player_play(m_player);
+    if (libvlc_media_player_play(m_player) == -1) return false;
     return true;
 }
 
@@ -267,6 +267,8 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         libvlc_media_player_set_media(m_player, vlcMedia);
 
         libvlc_media_player_play(m_player);
+
+        emit mediaPlayerLoaded();
 
     }, Qt::QueuedConnection);
 }

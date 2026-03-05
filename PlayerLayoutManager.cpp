@@ -160,6 +160,8 @@ QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths)
             }
         splitter->addWidget(m_activePlayers[0]);
         splitter->addWidget(m_activePlayers[1]);
+        splitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
+
     }
 
     auto *container = new QWidget;
@@ -186,9 +188,11 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths)
     auto *top = new QSplitter(Qt::Horizontal);
     top->addWidget(m_activePlayers[0]);
     top->addWidget(m_activePlayers[1]);
+    top->setSizes(QList<int>({INT_MAX, INT_MAX}));
 
     mainSplitter->addWidget(top);
     mainSplitter->addWidget(m_activePlayers[2]);
+    mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
 
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
@@ -217,12 +221,15 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
 
     top->addWidget(m_activePlayers[0]);
     top->addWidget(m_activePlayers[1]);
+    top->setSizes(QList<int>({INT_MAX, INT_MAX}));
 
     bottom->addWidget(m_activePlayers[2]);
     bottom->addWidget(m_activePlayers[3]);
+    bottom->setSizes(QList<int>({INT_MAX, INT_MAX}));
 
     mainSplitter->addWidget(top);
     mainSplitter->addWidget(bottom);
+    mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
 
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);

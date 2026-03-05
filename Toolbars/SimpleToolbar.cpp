@@ -16,6 +16,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
     m_currentTimeLabel = new QLabel("00:00:00", this);
     m_durationLabel = new QLabel("00:00:00", this);
+    m_nameLabel = new QLabel("", this);
 
     m_slider = new QSlider(Qt::Horizontal, this);
     m_slider->setRange(0,0);
@@ -124,8 +125,9 @@ void SimpleToolbar::setDefaultUI()
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_currentTimeLabel, 1);
-    timecodeLayout->addWidget(m_durationLabel, 0);
+    timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
+    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
+    timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);
 
     mainLayout->addWidget(m_slider);
@@ -220,6 +222,7 @@ void SimpleToolbar::unmuteUiUpdate()
 void SimpleToolbar::ejectUiUpdate()
 {
     m_discardVlcUiUpdates = true;
+    m_nameLabel->setText("");
     resetSlider();
     pauseUiUpdate();
 }
@@ -238,4 +241,9 @@ void SimpleToolbar::enableLoopUiUpdate()
 void SimpleToolbar::disableLoopUiUpdate()
 {
     m_loopBtn->setButtonState(false);
+}
+
+void SimpleToolbar::nameUiUpdate(const QString & mediaName)
+{
+    m_nameLabel->setText(mediaName);
 }

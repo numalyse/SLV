@@ -66,6 +66,7 @@ signals:
     void unmuteUiUpdateRequested();
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
+    void nameUiUpdateRequest(const QString& );
 
 private:
     double m_media_fps {};

@@ -314,4 +314,5 @@ void MediaWidget::createMedia(const QString& filePath){
     emit nameUiUpdateRequested(m_media->fileName());
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
+    m_media->parse();
 }

@@ -27,9 +27,11 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
+    
     connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [this]() {
         emit removePlayerRequest(this);
     });
+
     connect(m_toolBar, &SimpleToolbar::duplicatePlayerRequested, this, [this](){
         emit duplicatePlayerRequest(this);
     });

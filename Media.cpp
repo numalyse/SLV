@@ -36,6 +36,7 @@ Media::~Media()
         m_vlcMedia = nullptr;
     }
     delete m_fileInfo;
+    m_fileInfo = nullptr;
 }
 
 void Media::parse(){

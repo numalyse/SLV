@@ -15,7 +15,6 @@ public:
     ~PlayerLayoutManager();
 
     void createLayout(const int count);
-    void createLayoutFromPaths(const QStringList& filesPaths);
 
 private:
 
@@ -80,6 +79,8 @@ public slots:
 
     void checkPlayersPlayStatus();
     void checkPlayersMuteStatus();
+
+    void createLayoutFromPaths(const QStringList& filesPaths);
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

@@ -56,6 +56,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp
+        PlaylistItem.h PlaylistItem.cpp
+        Playlist.h Playlist.cpp
 
 
     )

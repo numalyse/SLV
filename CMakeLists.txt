@@ -53,6 +53,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Project.h
         ProjectManager.h ProjectManager.cpp
         Timeline.h Timeline.cpp
+        TimelineRuler.h TimelineRuler.cpp
+        TimelineVideoTrack.h TimelineVideoTrack.cpp
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp

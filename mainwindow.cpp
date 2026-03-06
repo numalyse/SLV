@@ -55,8 +55,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_globalPlayerManager, &GlobalPlayerManager::enableFullscreenMainRequested, this, &MainWindow::enableFullscreenMain);
     connect(m_globalPlayerManager, &GlobalPlayerManager::disableFullscreenMainRequested, this, &MainWindow::disableFullscreenMain);
-    connect(m_navPanelBtn, &ToolbarToggleButton::stateActivated, m_globalPlayerManager, &GlobalPlayerManager::openNavPanel);
-    connect(m_navPanelBtn, &ToolbarToggleButton::stateDeactivated, m_globalPlayerManager, &GlobalPlayerManager::closeNavPanel);
+    connect(m_navPanelBtn, &ToolbarToggleButton::stateActivated, this, [this]{
+        m_globalPlayerManager->openNavPanel();
+        m_navPanelBtn->setButtonState(true);
+    });
+    connect(m_navPanelBtn, &ToolbarToggleButton::stateDeactivated, this, [this]{
+        m_globalPlayerManager->closeNavPanel();
+        m_navPanelBtn->setButtonState(false);
+    });
 
 }
 
@@ -76,13 +82,13 @@ void MainWindow::createToolBar()
     m_toolbarQt = new QToolBar(this);
 
     m_navPanelBtn = new ToolbarToggleButton(
-        menuBar(),
+        m_toolbarQt,
         false,
         "nav_panel_menu_open.png",
         TextManager::instance().get("tooltip_nav_panel_open"),
         "nav_panel_menu_closed.png",
         TextManager::instance().get("tooltip_nav_panel_close")
-        );
+    );
     m_navPanelBtn->setFixedSize(30, 30);
     m_navPanelBtn->setIconSize(QSize(20, 20));
     m_navPanelBtn->setStyleSheet("border: none;");

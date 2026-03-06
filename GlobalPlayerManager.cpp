@@ -1,8 +1,6 @@
 #include "GlobalPlayerManager.h"
 
 #include "Toolbars/Toolbar.h"
-#include "Toolbars/AdvancedToolbar.h"
-#include "Toolbars/GlobalToolbar.h"
 
 #include <qlayout.h>
 
@@ -11,6 +9,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
 {
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(0);
     layout = new QVBoxLayout();
     mainLayout->addLayout(layout);
     m_navPanel = new NavPanel(this);
@@ -27,6 +26,10 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
+
+    connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
+            { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }
+    );
 
     m_layoutManager->createLayout(1);
 }

@@ -32,6 +32,16 @@ void ProjectManager::createProject(Media* media)
     m_project->media->parse();
 }
 
+
+
+void ProjectManager::deleteProject() { 
+    delete m_project;
+    m_project = nullptr;
+    emit projectDeleted();
+}
+
+// slots
+
 /// @brief Créer un plan de la durée de la vidéo quand media a fini de parse pour la durée.
 /// @param mediaDuration 
 void ProjectManager::initProjectShot(int64_t mediaDuration){
@@ -49,4 +59,6 @@ void ProjectManager::initProjectShot(int64_t mediaDuration){
     }
 
     qDebug() << "project initialisé";
+    emit projectInitialized();
 }
+

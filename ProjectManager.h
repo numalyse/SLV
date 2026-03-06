@@ -18,14 +18,23 @@ public:
 
     void createProject(Media *media);
 
+    void deleteProject();
+
+    Project* projet(){ return m_project;}
+
+
+
 private:
     ProjectManager(QObject* parent = nullptr);
     ~ProjectManager();
 
     Project* m_project = nullptr;
 
-
     void initProjectShot(int64_t mediaDuration);
+
+signals:
+    void projectInitialized();
+    void projectDeleted();
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "PlayerWidget.h"
 #include "Toolbars/SimpleToolbar.h"
+#include "ProjectManager.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -99,15 +100,18 @@ void PlayerWidget::setActive(bool active)
                       : "border: none;");
 }
 
-void PlayerWidget::setMediaFromPath(const QString& filePath)
+bool PlayerWidget::setMediaFromPath(const QString& filePath)
 {
-    m_mediaWidget->setMediaFromPath(filePath);
-    m_playing = true;
-    m_muted = false;
-    emit playUiUpdateRequested();
-    emit unmuteUiUpdateRequested();
-    emit checkPlayersPlayStatusRequested();
-    emit checkPlayersMuteStatusRequested();
+    if (m_mediaWidget->setMediaFromPath(filePath)){
+        m_playing = true;
+        m_muted = false;
+        emit playUiUpdateRequested();
+        emit unmuteUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+        emit checkPlayersMuteStatusRequested();
+        return true;
+    }
+    return false;
 }
 
 void PlayerWidget::enablePlayerFullscreen()
@@ -122,6 +126,7 @@ void PlayerWidget::disablePlayerFullscreen()
 
 // slots 
 
+/// @brief Play la video, si pas de media dans le player : créer un QFileDialog pour choisir un fichier à charger.
 void PlayerWidget::play()
 {
     if (m_mediaWidget->play()){
@@ -132,6 +137,23 @@ void PlayerWidget::play()
         QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
         if(file_path != ""){
             setMediaFromPath(file_path);
+        }
+    }
+}
+
+/// @brief Play la video connecté à une advanced toolbar, créer un projet en plus de l'aciton de base
+void PlayerWidget::playFromAdvanced()
+{
+    if (m_mediaWidget->play()){
+        m_playing = true;
+        emit playUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }else {
+        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+        if(file_path != ""){
+            if (setMediaFromPath(file_path)){
+                ProjectManager::instance().createProject(m_mediaWidget->media());
+            }
         }
     }
 }

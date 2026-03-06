@@ -4,6 +4,8 @@
 #include "Toolbars/AdvancedToolbar.h"
 #include "Toolbars/GlobalToolbar.h"
 
+#include "ProjectManager.h"
+
 #include <qlayout.h>
 
 GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
@@ -41,7 +43,7 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 /// @param videoPlayersCount Nombre de PlayerWidgets dans le container
 /// @param newPlayersWidget Le widget à ajouter au layout
 /// @param newToolbar La GlobalToolbar si videoPlayersCount != 1, AdvancedToolbar sinon
-void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPlayersWidget, Toolbar* newToolbar)
+void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
     if (m_toolbarWidget){
@@ -64,6 +66,10 @@ void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPl
     if (newToolbar){
         m_toolbarWidget = newToolbar;
         layout->addWidget(m_toolbarWidget);
+    }
+
+    if(media){
+        ProjectManager::instance().createProject(media);
     }
 }
 

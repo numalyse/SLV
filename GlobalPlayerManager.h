@@ -4,6 +4,7 @@
 #include "Toolbars/Toolbar.h"
 #include "PlayerLayoutManager.h"
 #include "NavPanel.h"
+#include "Media.h"
 
 #include <QWidget>
 
@@ -28,7 +29,7 @@ public slots:
     void enableFullscreenPlayer();
     void disableFullscreenPlayer();
 
-    void updateContainer(int, QWidget*, Toolbar*);
+    void updateContainer(Media*, QWidget*, Toolbar*);
     void openNavPanel();
     void closeNavPanel();
 

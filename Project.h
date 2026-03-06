@@ -13,8 +13,6 @@ struct Project
     Media* media = nullptr;
     QString name = "";
     QString path = "";
-
-    Project() {};
 };
 
 

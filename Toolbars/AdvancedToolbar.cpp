@@ -10,6 +10,8 @@
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 #include "AdvancedToolbar.h"
 
+#include "ProjectManager.h"
+
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -26,8 +28,23 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     m_extensionToolbar = new ExtensionToolbar(this);
 
-    connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, &QWidget::show);
-    connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, &QWidget::hide);
+
+    
+    connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, [this](){
+        // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
+        m_extensionToolbar->show();
+        m_extensionBtn->setButtonState(true);
+        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr) emit enableSegmentationRequest();
+    });
+    connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
+        // cache l'extension et cache le mode segmentation
+        m_extensionToolbar->hide();
+        m_extensionBtn->setButtonState(false);
+        emit disableSegmentationRequest();
+    });
+
+    connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, &AdvancedToolbar::enableSegmentationRequest);
+    connect(m_extensionToolbar, &ExtensionToolbar::disableSegmentationRequested, this, &AdvancedToolbar::disableSegmentationRequest);
 
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
     m_removePlayerBtn = nullptr;

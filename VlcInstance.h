@@ -1,4 +1,6 @@
-#pragma once
+
+#ifndef VLCINSTANCE_H
+#define VLCINSTANCE_H
 
 #include <vlc/vlc.h>
 #include <QDebug>
@@ -43,4 +45,4 @@ private:
 } // namespace SLV
 
 
-
+#endif

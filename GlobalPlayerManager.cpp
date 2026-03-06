@@ -2,6 +2,8 @@
 
 #include "Toolbars/Toolbar.h"
 
+#include "ProjectManager.h"
+
 #include <qlayout.h>
 
 GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
@@ -30,6 +32,8 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
             { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }
     );
+    connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
+    connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
 
     m_layoutManager->createLayout(1);
 }
@@ -44,7 +48,7 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 /// @param videoPlayersCount Nombre de PlayerWidgets dans le container
 /// @param newPlayersWidget Le widget à ajouter au layout
 /// @param newToolbar La GlobalToolbar si videoPlayersCount != 1, AdvancedToolbar sinon
-void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPlayersWidget, Toolbar* newToolbar)
+void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
     if (m_toolbarWidget){
@@ -67,6 +71,10 @@ void GlobalPlayerManager::updateContainer(int videoPlayersCount, QWidget * newPl
     if (newToolbar){
         m_toolbarWidget = newToolbar;
         layout->addWidget(m_toolbarWidget);
+    }
+
+    if(media){
+        ProjectManager::instance().createProject(media);
     }
 }
 
@@ -114,6 +122,38 @@ void GlobalPlayerManager::disableFullscreenPlayer()
     if(m_toolbarWidget)
         m_toolbarWidget->show();
     emit disableFullscreenMainRequested();
+}
+
+/// @brief Cache la toolbar si elle est présente et envoie un signal à la mainWindow
+void GlobalPlayerManager::enableSegmentation()
+{
+    if(m_timeline){
+        m_timeline->show();
+    }
+}
+
+void GlobalPlayerManager::disableSegmentation()
+{
+    if(m_timeline){
+        m_timeline->hide();
+    }
+}
+
+void GlobalPlayerManager::createTimelineWidget()
+{
+    auto* toolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
+    connect(toolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
+    connect(toolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
+    
+    if(m_timeline){
+        m_timeline->deleteLater();
+        m_timeline = nullptr;
+    }
+    
+    m_timeline = new Timeline(this);
+    m_timeline->setFixedHeight(150);
+    layout->addWidget(m_timeline);
+    m_timeline->hide();
 }
 
 

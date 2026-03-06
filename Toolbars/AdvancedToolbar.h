@@ -33,6 +33,10 @@ private:
     ToolbarToggleButton* m_extensionBtn = nullptr;
     ExtensionToolbar* m_extensionToolbar = nullptr;
 
+signals:
+    void enableSegmentationRequest();
+    void disableSegmentationRequest();
+
 };
 
 #endif

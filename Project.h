@@ -10,9 +10,9 @@
 struct Project
 {
     QVector<Shot> shots;
-    Media media;
-    QString name;
-    QString path;
+    Media* media = nullptr;
+    QString name = "";
+    QString path = "";
 };
 
 

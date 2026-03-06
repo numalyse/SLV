@@ -4,6 +4,8 @@
 #include "Toolbars/Toolbar.h"
 #include "PlayerLayoutManager.h"
 #include "NavPanel.h"
+#include "Media.h"
+#include "Timeline.h"
 
 #include <QWidget>
 
@@ -19,6 +21,7 @@ private:
     QWidget* m_playersWidget = nullptr;
     Toolbar* m_toolbarWidget = nullptr;
     NavPanel* m_navPanel = nullptr;
+    Timeline* m_timeline = nullptr;
     QVBoxLayout* layout;
 
 public slots:
@@ -28,12 +31,19 @@ public slots:
     void enableFullscreenPlayer();
     void disableFullscreenPlayer();
 
-    void updateContainer(int, QWidget*, Toolbar*);
+    void enableSegmentation();
+    void disableSegmentation();
+
+    void updateContainer(Media*, QWidget*, Toolbar*);
     void openNavPanel();
     void closeNavPanel();
 
     void setGlobalPlayState(bool);
     void setGlobalMuteState(bool);
+
+
+private slots:
+    void createTimelineWidget();
 
 signals:
     void enableFullscreenMainRequested();

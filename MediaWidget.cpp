@@ -239,10 +239,10 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
 
 /// @brief Stops the current media player and load a new media from a path
 /// @param QString filePath : string containing the path of the media
-void MediaWidget::setMediaFromPath(const QString& filePath)
+bool MediaWidget::setMediaFromPath(const QString& filePath)
 {
     if (!m_player)
-        return;
+        return false;
 
     QString pathCopy = filePath;
 
@@ -250,8 +250,10 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
 
     createMedia(filePath);
 
+    if(!m_media->vlcMedia()) return false;
+
     // La méthode stop de libvlc est bloquante, on utilise un appel asynchrone pour éviter un deadlock.
-    QMetaObject::invokeMethod(this, [this, pathCopy]() {
+    QMetaObject::invokeMethod(this, [this, pathCopy](){
 
         libvlc_media_player_stop(m_player);
 
@@ -271,6 +273,9 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         emit mediaPlayerLoaded();
 
     }, Qt::QueuedConnection);
+
+    return true;
+
 }
 
 /// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
@@ -314,4 +319,5 @@ void MediaWidget::createMedia(const QString& filePath){
     emit nameUiUpdateRequested(m_media->fileName());
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
+    m_media->parse();
 }

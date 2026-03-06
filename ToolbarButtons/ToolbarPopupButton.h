@@ -22,7 +22,10 @@ public:
         const QString& toolTipText = "ToolTipOn"
     );
 
-    ~ToolbarPopupButton() { delete m_widgetToDisplay; }; // Le widget n'a pas de parent, il doit être détruit manuellement
+    ~ToolbarPopupButton() { 
+        delete m_widgetToDisplay; 
+        m_widgetToDisplay = nullptr;
+    }; // Le widget n'a pas de parent, il doit être détruit manuellement
 
 private:
     QWidget* m_widgetToDisplay = nullptr;

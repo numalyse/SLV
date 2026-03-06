@@ -15,7 +15,7 @@ public:
     ~MediaWidget();
     void managePlayerSystem();
     void setActive(bool active);
-    void setMediaFromPath(const QString& filePath);
+    bool setMediaFromPath(const QString& filePath);
 
     libvlc_media_player_t *m_player = nullptr;
 

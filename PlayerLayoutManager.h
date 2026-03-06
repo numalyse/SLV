@@ -53,7 +53,7 @@ private:
 
 
 signals:
-    void updateContainerRequest(int, QWidget*, Toolbar*);
+    void updateContainerRequest(Media*, QWidget*, Toolbar*);
 
     void enableFullscreenPlayerRequested();
     void disableFullscreenPlayerRequested();

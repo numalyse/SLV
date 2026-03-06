@@ -19,8 +19,7 @@ public:
 
     void setFullscreenUI();
     void setDefaultUI();
-
-private:
+    
     ToolbarToggleButton* m_zoomBtn = nullptr;
     ToolbarToggleButton* m_hideImgBtn= nullptr;
     ToolbarButton* m_prevFrameBtn= nullptr;
@@ -28,12 +27,17 @@ private:
     ToolbarButton* m_backwardBtn= nullptr;
     ToolbarButton* m_forwardBtn= nullptr;
     ToolbarButton* m_rotateBtn= nullptr;
-    ToolbarButton* m_segmBtn= nullptr;
+    ToolbarToggleButton* m_segmBtn= nullptr;
     ToolbarButton* m_compoRuleBtn= nullptr;
     ToolbarButton* m_verticalInvBtn= nullptr;
     ToolbarButton* m_horizontalInvBtn= nullptr;
+
     // playlist btn ?
     // A / B Button voir comment
+
+signals:
+    void enableSegmentationRequested();
+    void disableSegmentationRequested();
 
 };
 

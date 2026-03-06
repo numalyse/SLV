@@ -19,7 +19,7 @@ public:
     // ~PlayerWidget();
 
     void setActive(bool active);
-    void setMediaFromPath(const QString& filePath);
+    bool setMediaFromPath(const QString& filePath);
 
     SimpleToolbar* toolbar() {return m_toolBar;};
     MediaWidget* mediaWidget() { return m_mediaWidget; };
@@ -29,6 +29,7 @@ public:
 
 public slots:
     void play();
+    void playFromAdvanced();
     void pause();
     void stop();
     void eject();

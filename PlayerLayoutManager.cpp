@@ -70,10 +70,11 @@ void PlayerLayoutManager::createLayout(const int count)
     activePlayerUpdate(count);
 
     QWidget* container = nullptr;
-
+    Media* media = nullptr;
     switch (count){
         case 1: 
             container = create1();
+            media = m_activePlayers[0]->mediaWidget()->media();
             break;
         case 2: 
             container = create2();
@@ -88,7 +89,7 @@ void PlayerLayoutManager::createLayout(const int count)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(m_activePlayers.size(), container, toolbar);
+    emit updateContainerRequest(media, container, toolbar);
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -99,10 +100,11 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     activePlayerUpdate(pathCount);
 
     QWidget* container = nullptr;
-
+    Media* media = nullptr;
     switch (pathCount){
         case 1: 
             container = create1(filesPaths);
+            media = m_activePlayers[0]->mediaWidget()->media();
             break;
         case 2: 
             container = create2(filesPaths);
@@ -117,7 +119,7 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(m_activePlayers.size(), container, toolbar);
+    emit updateContainerRequest(media, container, toolbar);
 
 }
 
@@ -278,7 +280,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
         advancedToolbar = new AdvancedToolbar(nullptr);
     }
 
-    connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::play);
+    connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::playFromAdvanced);
     connect(advancedToolbar, &AdvancedToolbar::pauseRequest, activePlayer, &PlayerWidget::pause);
     connect(advancedToolbar, &AdvancedToolbar::stopRequest, activePlayer, &PlayerWidget::stop);
     connect(advancedToolbar, &AdvancedToolbar::ejectRequest, activePlayer, &PlayerWidget::eject);
@@ -297,7 +299,6 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
         this->duplicatePlayer(activePlayer);
     });
 
-    
     connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
     connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
     connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
@@ -310,6 +311,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::stopUiUpdateRequested, advancedToolbar, &SimpleToolbar::stopUiUpdate);
     connect(activePlayer, &PlayerWidget::enableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::enableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
+    connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
 
     return static_cast<Toolbar*>(advancedToolbar);
 }
@@ -327,6 +329,7 @@ Toolbar *PlayerLayoutManager::createLayoutToolbar()
 // slots
 void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
 {
+    if ( ! toBeDuplicated->mediaWidget()->media() ) return;
     int activePlayerCount = m_activePlayers.size();
     
     if(activePlayerCount < 4) {

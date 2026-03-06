@@ -180,10 +180,12 @@ void PlayerWidget::stop()
 
 void PlayerWidget::eject()
 {
+    // TODO : demander à l'utilisateur s'il veut ejecter car cela va supprimer le project
     if(m_mediaWidget->eject()){
         m_playing = false;
         emit ejectUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
+        ProjectManager::instance().deleteProject();
     }
 
 }

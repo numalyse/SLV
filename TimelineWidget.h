@@ -38,6 +38,7 @@ private:
     int m_sceneWidth = 2000;
     int m_sceneHeight = 150;
     int m_rulerHeight = 30;
+    double m_minPxBetweenTicks = 100.0;
     double m_currentScale = 1;
     int64_t m_vlcTime{};
 };

@@ -8,9 +8,10 @@ class RulerItem : public QGraphicsItem
 
 public:
 
-    RulerItem(int width, int height);
+    RulerItem(int width, int height, double minPxBetweenTicks);
 
     QRectF boundingRect() const override;
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(int width, int height);
@@ -18,7 +19,9 @@ public:
 private:
     int m_width;
     int m_height;
-
+    double m_minPxBetweenTicks;
+    
+    void computeZoomSteps(double newFps, double &cachedFps, std::vector<int64_t> &zoomSteps);
 };
 
 

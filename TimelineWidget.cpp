@@ -31,7 +31,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     m_testButton = new ToolbarButton(this);
     layout->addWidget(m_testButton);
 
-    m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight);
+    m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks);
     m_ruler->setPos(0, 0); 
     m_scene->addItem(m_ruler);
 
@@ -73,28 +73,40 @@ bool TimelineWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport()) {
         if (event->type() == QEvent::Wheel ) {
+            
+            //QPoint centerViewPort = m_view->transform()
+            //QPoint mousePos = QCursor::pos(); 
 
-            m_currentScale = m_view->transform().m11();
-
+            // infos de la molette
             QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
             QPoint numDegrees = wheelEvent->angleDelta() / 8;
             
-            double factor{};
-            numDegrees.y() > 0 ? factor=1.15 : factor = 1 / 1.15 ;
+            double zoomFactor = (numDegrees.y() > 0) ? 1.15 : (1.0 / 1.15);
 
-            double newSceneWidth = m_scene->width() * factor;
+            double newSceneWidth = m_scene->width() * zoomFactor;
 
-            if(newSceneWidth < m_view->viewport()->width()){
-                m_sceneWidth = m_view->viewport()->width();
-                m_scene->setSceneRect(0,0, m_sceneWidth, m_scene->height());
-                m_ruler->setSize(m_view->viewport()->width(), m_rulerHeight);
-            }else {
-                m_sceneWidth = newSceneWidth > std::numeric_limits<int>().max() ? std::numeric_limits<int>().max() : newSceneWidth;
-                m_scene->setSceneRect(0,0, m_sceneWidth, m_scene->height());
-                m_ruler->setSize(m_sceneWidth, m_rulerHeight);
+            double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
+            double maxWidth = std::numeric_limits<int>::max(); // en cas de vidéo très très longue le zoom peut causer des problèmes
+            
+            int64_t duration = ProjectManager::instance().projet()->media->duration();
+            double fps = ProjectManager::instance().projet()->media->fps();
+            
+            if (duration > 0 && fps > 0) {
+                double frameMs = 1000.0 / fps;
+                double totalFrames = static_cast<double>(duration) / frameMs;
+                
+                maxWidth = std::min( maxWidth, (totalFrames * m_minPxBetweenTicks)); 
+                // la scene fera au maximum : nb de frames * l'espacement entre les ticks
+                
+                // si vidéo courte, le taille du view port peut être supérieur à maxWidth
+                if (maxWidth < minWidth) maxWidth = minWidth;
             }
-            updateCursorPos(m_vlcTime);
-            return true;
+            //limite la taille avec les valeurs précédentes
+            m_sceneWidth = std::clamp(newSceneWidth, minWidth, maxWidth);
+
+            m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
+            m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
+            updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
 
         }
         

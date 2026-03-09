@@ -69,6 +69,9 @@ signals:
     void disableNavPanelRequested();
     void enableNavPanelRequested();
 
+    void previousMediaRequested();
+    void nextMediaRequested();
+
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 

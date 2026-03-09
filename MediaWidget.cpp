@@ -12,6 +12,7 @@
 #include <QMap>
 #include <QPainter>
 
+
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
@@ -33,6 +34,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     createEventManager();
 
     managePlayerSystem();
+    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetFinishedToPlaylistPlayNextMedia);
 
     libvlc_media_player_play(m_player);
 }
@@ -208,6 +210,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 libvlc_media_player_stop(mediaWidget->m_player);
                 mediaWidget->play();
                 mediaWidget->pause();
+                emit mediaWidget->mediaFinished();
             }
             // cas où on loop le média
             else{

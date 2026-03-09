@@ -79,6 +79,10 @@ void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidg
 
     if(media){
         ProjectManager::instance().createProject(media);
+        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
+        connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
+        connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
+        connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
     }
 }
 
@@ -141,6 +145,16 @@ void GlobalPlayerManager::disableSegmentation()
     if(m_timeline){
         m_timeline->hide();
     }
+}
+
+void GlobalPlayerManager::playPreviousMedia()
+{
+    m_navPanel->playPreviousMedia();
+}
+
+void GlobalPlayerManager::playNextMedia()
+{
+    m_navPanel->playNextMedia();
 }
 
 void GlobalPlayerManager::createTimelineWidget()

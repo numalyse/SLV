@@ -5,6 +5,7 @@
 
 #include <vlc/vlc.h>
 #include <QWidget>
+#include <SignalManager.h>
 
 class MediaWidget : public QWidget
 {
@@ -65,6 +66,7 @@ signals:
     void updateFpsRequested(double fps);
     void mediaPlayerLoaded();
     void nameUiUpdateRequested(const QString&);
+    void mediaFinished();
 };
 
 #endif // MEDIAWIDGET_H

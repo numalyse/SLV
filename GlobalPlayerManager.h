@@ -43,6 +43,8 @@ public slots:
 
 private slots:
     void createTimelineWidget();
+    void playPreviousMedia();
+    void playNextMedia();
 
 signals:
     void enableFullscreenMainRequested();

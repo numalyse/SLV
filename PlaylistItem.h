@@ -38,10 +38,12 @@ public slots:
     void setDurationLabel();
     void computeThumbnail();
     void setIndex(int);
+    void playMedia();
 
 signals:
     void deleteItemRequested(const unsigned int &index);
     void playPlaylistItemRequested(const QString &filePath);
+    void updatePlaylistCurrentIndex(unsigned int index);
 };
 
 #endif // PLAYLISTITEM_H

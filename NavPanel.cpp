@@ -13,6 +13,7 @@ NavPanel::NavPanel(QWidget *parent)
     setFixedWidth(0);
 
     connect(m_playlistWidget, &Playlist::openMediaFileRequested, this, &NavPanel::openMediaFileRequested);
+    connect(m_playlistWidget, &Playlist::disableToolbarLoopRequested, this, &NavPanel::disableToolbarLoopRequested);
 }
 
 void NavPanel::showPanel()
@@ -32,4 +33,14 @@ void NavPanel::hidePanel()
 void NavPanel::setPlaylistNewItem()
 {
 
+}
+
+void NavPanel::playPreviousMedia()
+{
+    m_playlistWidget->playPreviousMedia();
+}
+
+void NavPanel::playNextMedia()
+{
+    m_playlistWidget->playNextMedia();
 }

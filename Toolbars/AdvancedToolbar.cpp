@@ -43,6 +43,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         emit disableSegmentationRequest();
     });
 
+    connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
+    connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
+
     connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, &AdvancedToolbar::enableSegmentationRequest);
     connect(m_extensionToolbar, &ExtensionToolbar::disableSegmentationRequested, this, &AdvancedToolbar::disableSegmentationRequest);
 

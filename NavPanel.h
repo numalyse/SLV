@@ -24,9 +24,12 @@ public slots:
     // void displayPlaylist();
     // void displayShotDetail();
     void setPlaylistNewItem();
+    void playPreviousMedia();
+    void playNextMedia();
 
 signals:
     void openMediaFileRequested(const QString &filePath);
+    void disableToolbarLoopRequested();
 };
 
 #endif // NAVPANEL_H

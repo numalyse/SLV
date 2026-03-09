@@ -75,8 +75,14 @@ void PlaylistItem::mousePressEvent(QMouseEvent *event)
 void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
 {
     if(m_isClicked && rect().contains(event->pos())){
-        emit playPlaylistItemRequested(m_mediaData->filePath());
+        playMedia();
+        emit updatePlaylistCurrentIndex(m_itemIndex);
     }
+}
+
+void PlaylistItem::playMedia()
+{
+    emit playPlaylistItemRequested(m_mediaData->filePath());
 }
 
 void PlaylistItem::initStyle()

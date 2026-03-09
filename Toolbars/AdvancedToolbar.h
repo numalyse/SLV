@@ -36,6 +36,8 @@ private:
 signals:
     void enableSegmentationRequest();
     void disableSegmentationRequest();
+    void previousMediaRequested();
+    void nextMediaRequested();
 
 };
 

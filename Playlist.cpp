@@ -46,7 +46,7 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
             m_currentMediaIndex = index;
             // newItem->setStyleSheet("border-width: 2px;");
         });
-        connect(&SignalManager::instance(), &SignalManager::mediaWidgetFinishedToPlaylistPlayNextMedia, this, &Playlist::playNextMedia);
+        connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     }
     if(!filesPaths.empty()){
         m_items[0]->playMedia();

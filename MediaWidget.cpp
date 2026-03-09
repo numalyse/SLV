@@ -34,7 +34,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     createEventManager();
 
     managePlayerSystem();
-    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetFinishedToPlaylistPlayNextMedia);
+    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
 
     libvlc_media_player_play(m_player);
 }

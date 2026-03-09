@@ -8,7 +8,7 @@ CursorItem::CursorItem(int height) : m_height{height}
 }
 
 QRectF CursorItem::boundingRect() const {
-    return QRectF(-1, 0, 3, m_height);
+    return QRectF(-3, 0, 6, m_height);
 }
 
 void CursorItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) {

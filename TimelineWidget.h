@@ -4,10 +4,13 @@
 #include "RulerItem.h"
 #include "CursorItem.h"
 
+#include "ToolbarButtons/ToolbarButton.h"
+
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QGraphicsScene>
 #include <QVBoxLayout>
+
 
 class TimelineWidget : public QWidget
 {
@@ -27,14 +30,16 @@ private:
     QGraphicsView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;
 
+    ToolbarButton* m_testButton = nullptr;
+
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
 
-    int m_cursorPosition = 250;
-    int m_sceneWidth = 5000;
+    int m_sceneWidth = 2000;
     int m_sceneHeight = 150;
     int m_rulerHeight = 30;
     double m_currentScale = 1;
+    int64_t m_vlcTime{};
 };
 
 

@@ -37,6 +37,7 @@ signals:
     void enableSegmentationRequest();
     void disableSegmentationRequest();
 
+
 };
 
 #endif

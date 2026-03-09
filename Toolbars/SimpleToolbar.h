@@ -82,6 +82,7 @@ signals:
     void enableLoopModeRequest();
     void disableLoopModeRequest();
     void duplicatePlayerRequested();
+    void setCursorPositionRequested(int64_t);
 };
 
 #endif

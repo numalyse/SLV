@@ -52,9 +52,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Shot.h
         Project.h
         ProjectManager.h ProjectManager.cpp
-        Timeline.h Timeline.cpp
-        TimelineRuler.h TimelineRuler.cpp
-        TimelineVideoTrack.h TimelineVideoTrack.cpp
+        TimelineWidget.h TimelineWidget.cpp
+        RulerItem.h RulerItem.cpp
+        CursorItem.h CursorItem.cpp
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp

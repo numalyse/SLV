@@ -193,6 +193,8 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
     m_slider->setValue(currentTime);
     m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
 
+    emit setCursorPositionRequested(currentTime);
+
 }
 
 void SimpleToolbar::updateFps(double newFps){

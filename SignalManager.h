@@ -17,7 +17,7 @@ private:
     SignalManager(QObject* parent = nullptr) : QObject(parent){};
 
 signals:
-    void mediaWidgetFinishedToPlaylistPlayNextMedia();
+    void mediaWidgetMediaFinished();
 };
 
 

@@ -46,8 +46,17 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
     connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
 
-    connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, &AdvancedToolbar::enableSegmentationRequest);
-    connect(m_extensionToolbar, &ExtensionToolbar::disableSegmentationRequested, this, &AdvancedToolbar::disableSegmentationRequest);
+    connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, [this](){
+        emit AdvancedToolbar::enableSegmentationRequest();
+        m_prevMediaBtn->setEnabled(false);
+        m_nextMediaBtn->setEnabled(false);
+    });
+
+    connect(m_extensionToolbar, &ExtensionToolbar::disableSegmentationRequested, this, [this](){
+        emit AdvancedToolbar::disableSegmentationRequest();
+        m_prevMediaBtn->setEnabled(true);
+        m_nextMediaBtn->setEnabled(true);
+    });
 
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
     m_removePlayerBtn = nullptr;

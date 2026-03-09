@@ -31,6 +31,8 @@ public slots:
     void openMediaFile();
     void enableFullscreenMain();
     void disableFullscreenMain();
+    void disableNavPanel();
+    void enableNavPanel();
 
 private:
     Ui::MainWindow *ui;
@@ -42,6 +44,7 @@ private:
     GlobalPlayerManager* m_globalPlayerManager = nullptr;
     QWidget* m_currentLayout = nullptr;
     ToolbarToggleButton *m_navPanelBtn = nullptr; // Utilisation d'un toggle button pour le bouton de menu
+    bool wasMaximized = false;
     // QVector<PlayerWidget*> m_players;
 
 };

@@ -41,13 +41,14 @@ public slots:
     void setGlobalPlayState(bool);
     void setGlobalMuteState(bool);
 
-
 private slots:
     void createTimelineWidget();
 
 signals:
     void enableFullscreenMainRequested();
     void disableFullscreenMainRequested();
+    void disableNavPanelRequested();
+    void enableNavPanelRequested();
 };
 
 #endif // GLOBALPLAYERMANAGER_H

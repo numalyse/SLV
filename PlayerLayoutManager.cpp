@@ -75,15 +75,19 @@ void PlayerLayoutManager::createLayout(const int count)
         case 1: 
             container = create1();
             media = m_activePlayers[0]->mediaWidget()->media();
+            emit enableNavPanelRequested();
             break;
         case 2: 
             container = create2();
+            emit disableNavPanelRequested();
             break;
         case 3: 
             container = create3();
+            emit disableNavPanelRequested();
             break;
         case 4: 
             container = create4();
+            emit disableNavPanelRequested();
             break;
 
         default: container = nullptr;
@@ -105,15 +109,19 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         case 1: 
             container = create1(filesPaths);
             media = m_activePlayers[0]->mediaWidget()->media();
+            emit enableNavPanelRequested();
             break;
         case 2: 
             container = create2(filesPaths);
+            emit disableNavPanelRequested();
             break;
         case 3: 
             container = create3(filesPaths);
+            emit disableNavPanelRequested();
             break;
         case 4: 
             container = create4(filesPaths);
+            emit disableNavPanelRequested();
             break;
 
         default: container = nullptr;

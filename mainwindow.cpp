@@ -55,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_globalPlayerManager, &GlobalPlayerManager::enableFullscreenMainRequested, this, &MainWindow::enableFullscreenMain);
     connect(m_globalPlayerManager, &GlobalPlayerManager::disableFullscreenMainRequested, this, &MainWindow::disableFullscreenMain);
+    connect(m_globalPlayerManager, &GlobalPlayerManager::disableNavPanelRequested, this, &MainWindow::disableNavPanel);
+    connect(m_globalPlayerManager, &GlobalPlayerManager::enableNavPanelRequested, this, &MainWindow::enableNavPanel);
     connect(m_navPanelBtn, &ToolbarToggleButton::stateActivated, this, [this]{
         m_globalPlayerManager->openNavPanel();
         m_navPanelBtn->setButtonState(true);
@@ -133,8 +135,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::enableFullscreenMain()
 {
+    wasMaximized = isMaximized();
     ui->menubar->hide();
     m_toolbarQt->hide();
+    emit m_navPanelBtn->stateDeactivated();
     showFullScreen();
 }
 
@@ -142,5 +146,19 @@ void MainWindow::disableFullscreenMain()
 {
     ui->menubar->show();
     m_toolbarQt->show();
-    showNormal();
+    if(!wasMaximized)
+        showNormal();
+    else
+        showMaximized();
+}
+
+void MainWindow::disableNavPanel()
+{
+    emit m_navPanelBtn->stateDeactivated();
+    m_navPanelBtn->blockSignals(true);
+}
+
+void MainWindow::enableNavPanel()
+{
+    m_navPanelBtn->blockSignals(false);
 }

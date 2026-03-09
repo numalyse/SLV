@@ -66,6 +66,9 @@ signals:
     void setGlobalPlayStateRequested(bool);
     void setGlobalMuteStateRequested(bool);
 
+    void disableNavPanelRequested();
+    void enableNavPanelRequested();
+
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 

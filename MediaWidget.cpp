@@ -20,6 +20,8 @@ MediaWidget::MediaWidget(QWidget *parent)
     m_blackFrame = new QFrame(this);
     m_blackFrame->setStyleSheet("background: black;");
     m_blackFrame->lower();
+    m_mediaSurface = new QWidget(this);
+    m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
     setAutoFillBackground(true);
     QPalette pal = palette();
     pal.setColor(QPalette::Window, Qt::black);
@@ -46,9 +48,6 @@ MediaWidget::MediaWidget(QWidget *parent)
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
-    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
-    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
-    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
 
     libvlc_media_player_play(m_player);
 }
@@ -66,15 +65,15 @@ void MediaWidget::managePlayerSystem()
 #if defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(
         m_player,
-        reinterpret_cast<void*>(winId()));
+        reinterpret_cast<void*>(m_mediaSurface->winId()));
 #elif defined(Q_OS_MAC)
     libvlc_media_player_set_nsobject(
         m_player,
-        reinterpret_cast<void*>(m_videoWidget->winId()));
+        reinterpret_cast<void*>(m_mediaSurface->winId()));
 #else
     libvlc_media_player_set_xwindow(
         m_player,
-        m_videoWidget->winId());
+        m_mediaSurface->winId());
 #endif
 
 }
@@ -203,6 +202,17 @@ void MediaWidget::disableLoopMode()
     m_loopActivated = false;
 }
 
+void MediaWidget::hideMedia()
+{
+    qDebug() << "hide Media";
+    m_blackFrame->raise();
+}
+
+void MediaWidget::showMedia()
+{
+    m_blackFrame->lower();
+}
+
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
 /// @param event 
 /// @param userData 
@@ -236,17 +246,6 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
 }
 
-void MediaWidget::hideMedia()
-{
-    qDebug() << "hide Media";
-    m_blackFrame->raise();
-}
-
-void MediaWidget::showMedia()
-{
-    m_blackFrame->lower();
-}
-
 
 // ===== Event ===== //
 
@@ -263,6 +262,13 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     } else {
         QWidget::keyPressEvent(event);
     }
+}
+
+void MediaWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    m_mediaSurface->setGeometry(rect());
+    m_blackFrame->setGeometry(rect());
 }
 
 /// @brief Stops the current media player and load a new media from a path

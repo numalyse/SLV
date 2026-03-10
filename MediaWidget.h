@@ -48,6 +48,7 @@ private:
     libvlc_event_manager_t* m_eventManager = nullptr;
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
+    QWidget* m_mediaSurface = nullptr;
     QFrame* m_blackFrame = nullptr;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
@@ -63,6 +64,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void updateSliderValueRequested(int64_t newTime);

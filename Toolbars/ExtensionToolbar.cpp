@@ -32,7 +32,31 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     
     m_rotateBtn = new ToolbarButton(this, "rotate.png", TextManager::instance().get("tooltip_rotate"));
     
-    m_segmBtn = new ToolbarButton(this, "segmentation.png", TextManager::instance().get("tooltip_segmentation"));
+    m_segmBtn = new ToolbarToggleButton(
+        this, 
+        false,
+        "segmentation_on.png", 
+        TextManager::instance().get("tooltip_segmentation_on"),
+        "segmentation_off.png", 
+        TextManager::instance().get("tooltip_segmentation_off")
+    );
+
+    connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
+        if(ProjectManager::instance().projet() != nullptr){
+            emit enableSegmentationRequested();
+        }
+    });
+
+    connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
+    connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
+
+    connect(&ProjectManager::instance(), &ProjectManager::deleteProject, this, [this] { // quand le projet est détruit, on force le button segmentation en false
+            m_segmBtn->setButtonState(false);
+    });
+
+    connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableSegmentationRequested);
+
+
     m_compoRuleBtn = new ToolbarButton(this, "composition.png", TextManager::instance().get("tooltip_composition"));
     
     m_verticalInvBtn = new ToolbarButton(this, "flip_vertical.png", TextManager::instance().get("tooltip_flip_vertical"));

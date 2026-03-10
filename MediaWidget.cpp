@@ -10,6 +10,15 @@
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
+
+    m_blackFrame = new QFrame(this);
+    m_blackFrame->setStyleSheet("background: black;");
+    m_blackFrame->lower();
+    setAutoFillBackground(true);
+    QPalette pal = palette();
+    pal.setColor(QPalette::Window, Qt::black);
+    setPalette(pal);
+
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -38,6 +47,9 @@ MediaWidget::MediaWidget(QWidget *parent)
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
+    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
+    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
 
     libvlc_media_player_play(m_player);
 }
@@ -299,6 +311,15 @@ double MediaWidget::getFpsParsedMedia( libvlc_media_t* parsedMedia ){
     }
 
     return mediaFps;
+void MediaWidget::hideMedia()
+{
+    qDebug() << "hide Media";
+    m_blackFrame->raise();
+}
+
+void MediaWidget::showMedia()
+{
+    m_blackFrame->lower();
 }
 
 

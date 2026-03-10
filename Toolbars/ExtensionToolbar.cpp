@@ -49,6 +49,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         }
     });
 
+    connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
+    connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
+
     connect(&ProjectManager::instance(), &ProjectManager::deleteProject, this, [this] { // quand le projet est détruit, on force le button segmentation en false
             m_segmBtn->setButtonState(false);
     });

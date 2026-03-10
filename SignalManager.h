@@ -18,6 +18,9 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
+    void extendedToolbarHideImageEnabled();
+    void extendedToolbarHideImageDisabled();
+    void playerWidgetSelectFileCanceled();
 };
 
 

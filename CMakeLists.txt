@@ -53,6 +53,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Project.h
         ProjectManager.h ProjectManager.cpp
         TimelineWidget.h TimelineWidget.cpp
+        TimelineView.h TimelineView.cpp
         RulerItem.h RulerItem.cpp
         CursorItem.h CursorItem.cpp
         ShotItem.h ShotItem.cpp

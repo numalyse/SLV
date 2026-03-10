@@ -6,6 +6,7 @@
 #include "RulerItem.h"
 #include "CursorItem.h"
 #include "ShotItem.h"
+#include "TimelineView.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -25,19 +26,19 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
+    void applyZoom(double zoomFactor);
 
 signals:
     void updateShotDetailRequested(Shot*);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
-    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void updateCurrentShot();
 
     QGraphicsScene* m_scene = nullptr;
-    QGraphicsView* m_view = nullptr;
+    TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;
 
     ToolbarButton* m_testButton = nullptr;

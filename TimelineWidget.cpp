@@ -22,15 +22,15 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     m_scene = new QGraphicsScene(this);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
 
-    m_view = new QGraphicsView(m_scene, this);
+    m_view = new TimelineView(m_scene, this);
     m_view->setRenderHint(QPainter::Antialiasing);
     m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop); 
     m_view->setFrameShape(QFrame::NoFrame);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_view->viewport()->installEventFilter(this);
-    m_view->installEventFilter(this);
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
+    connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
+
     layout->addWidget(m_view); 
 
     m_testButton = new ToolbarButton(this);
@@ -83,53 +83,6 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
 }
 
 
-bool TimelineWidget::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == m_view->viewport()) {
-        if (event->type() == QEvent::Wheel ) {
-            // infos de la molette
-            QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
-            QPoint numDegrees = wheelEvent->angleDelta() / 8;
-
-            double viewportX = wheelEvent->position().x();
-            double scrollbarValue = (m_view->horizontalScrollBar()->isVisible()) ? m_view->horizontalScrollBar()->value() : 0 ;
-            qDebug() << "Timeline Scrollbar event position x : " << viewportX ;
-            qDebug() << "Timeline Scrollbar value : " << scrollbarValue ;
-            
-            double zoomFactor = (numDegrees.y() > 0) ? 1.15 : (1.0 / 1.15);
-
-            double newSceneWidth = m_scene->width() * zoomFactor;
-
-            double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
-            double maxWidth = std::numeric_limits<int>::max() - 1000000.0; // en cas de vidéo très très longue le zoom peut causer des problèmes, -1 000 000 pour de la marge au cas ou
-            
-            int64_t duration = ProjectManager::instance().projet()->media->duration();
-            double fps = ProjectManager::instance().projet()->media->fps();
-            
-            if (duration > 0 && fps > 0) {
-                double frameMs = 1000.0 / fps;
-                double totalFrames = static_cast<double>(duration) / frameMs;
-                
-                maxWidth = std::min( maxWidth, (totalFrames * m_minPxBetweenTicks)); 
-                // la scene fera au maximum : nb de frames * l'espacement entre les ticks
-                
-                // si vidéo courte, le taille du view port peut être supérieur à maxWidth
-                if (maxWidth < minWidth) maxWidth = minWidth;
-            }
-            //limite la taille avec les valeurs précédentes
-            m_sceneWidth = std::clamp(newSceneWidth, minWidth, maxWidth);
-            m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
-
-
-            m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
-            updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
-        }
-        
-    }
-    return QWidget::eventFilter(watched, event);
-}
-
-
 void TimelineWidget::updateCurrentShot(){
     int shotItemCount = static_cast<int>(m_shotItems.size());
 
@@ -156,4 +109,34 @@ void TimelineWidget::updateCurrentShot(){
         m_currentShot = closestLeftShot;
         emit updateShotDetailRequested(m_currentShot->shot());
     }
+}
+
+
+void TimelineWidget::applyZoom(double zoomFactor){
+
+    double newSceneWidth = m_scene->width() * zoomFactor;
+
+    double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
+    double maxWidth = std::numeric_limits<int>::max() - 1000000.0; // en cas de vidéo très très longue le zoom peut causer des problèmes, -1 000 000 pour de la marge au cas ou
+    
+    int64_t duration = ProjectManager::instance().projet()->media->duration();
+    double fps = ProjectManager::instance().projet()->media->fps();
+    
+    if (duration > 0 && fps > 0) {
+        double frameMs = 1000.0 / fps;
+        double totalFrames = static_cast<double>(duration) / frameMs;
+        
+        maxWidth = std::min( maxWidth, (totalFrames * m_minPxBetweenTicks)); 
+        // la scene fera au maximum : nb de frames * l'espacement entre les ticks
+        
+        // si vidéo courte, le taille du view port peut être supérieur à maxWidth
+        if (maxWidth < minWidth) maxWidth = minWidth;
+    }
+    //limite la taille avec les valeurs précédentes
+    m_sceneWidth = std::clamp(newSceneWidth, minWidth, maxWidth);
+    m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
+
+
+    m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
+    updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
 }

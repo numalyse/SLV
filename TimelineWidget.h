@@ -1,6 +1,8 @@
 #ifndef TIMELINE_H
 #define TIMELINE_H
 
+#include "Shot.h"
+
 #include "RulerItem.h"
 #include "CursorItem.h"
 #include "ShotItem.h"
@@ -16,6 +18,7 @@
 
 class TimelineWidget : public QWidget
 {
+Q_OBJECT
 
 public:
     explicit TimelineWidget(QWidget* parent = nullptr);
@@ -23,9 +26,14 @@ public:
 public slots:
     void updateCursorPos(int64_t vlcTime);
 
+signals:
+    void updateShotDetailRequested(Shot*);
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
+
+    ShotItem *getCurrentShot();
 
 private:
     QGraphicsScene* m_scene = nullptr;

@@ -1,6 +1,8 @@
 #include "TimelineWidget.h"
 
 #include "ProjectManager.h"
+#include "SignalManager.h"
+
 #include "RulerItem.h"
 #include "CursorItem.h"
 
@@ -44,12 +46,11 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 
     int startShotHeight = m_sceneHeight - m_rulerHeight;
     for ( auto& IShot : ProjectManager::instance().projet()->shots ){
-        ShotItem* shot = new ShotItem(IShot, startShotHeight);
+        ShotItem* shot = new ShotItem(&IShot, startShotHeight); // stocke ptr non owner dans les shotItem => modification dans projet modifie le shot et inversement
         m_scene->addItem(shot);
         m_shotItems.append(shot);
     }
     
-
 }
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
@@ -78,6 +79,15 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
     int posCursor = static_cast<int>(ratio * m_scene->width()); 
     
     m_cursor->setPos(posCursor, 0);
+
+    // TODO : mettre un timer pour par spam getCurrentshot ? 
+    ShotItem * shotItem = getCurrentShot();
+    if(shotItem != m_currentShot) { // on a changé de plan => modifie l'ui de plan data
+        m_currentShot = shotItem;
+        qDebug() << "Changement de plan => début du plan : " << shotItem->shot()->start;
+        emit updateShotDetailRequested(m_currentShot->shot());
+    } 
+
 
 }
 
@@ -126,4 +136,26 @@ bool TimelineWidget::eventFilter(QObject *watched, QEvent *event)
         
     }
     return QWidget::eventFilter(watched, event);
+}
+
+
+ShotItem* TimelineWidget::getCurrentShot(){
+    int shotItemCount = static_cast<int>(m_shotItems.size());
+    Q_ASSERT(shotItemCount >= 1);
+
+
+    ShotItem* closestLeftShot = m_shotItems[0];
+    int64_t distanceToClosest = m_vlcTime - closestLeftShot->shot()->start;
+
+    for (int IShotItem = 1; IShotItem < shotItemCount; ++IShotItem){
+        int64_t currentShotStart = m_shotItems[IShotItem]->shot()->start;
+        if( m_vlcTime < currentShotStart ) break; // si le vlc time < start on est avant le plan donc on quitte
+
+        int64_t distance = m_vlcTime - currentShotStart;
+        if(distance < distanceToClosest){
+            distanceToClosest = distance;
+            closestLeftShot = m_shotItems[IShotItem];
+        }
+    }
+    return closestLeftShot;
 }

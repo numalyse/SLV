@@ -1,8 +1,9 @@
 #ifndef SIGNALMANAGER_H
 #define SIGNALMANAGER_H
 
-
+#include "Shot.h"
 #include <QObject.h>
+
 class SignalManager: public QObject
 {
 Q_OBJECT
@@ -18,6 +19,9 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
+    void timelineWidgetUpdateShotDetail(Shot*);
+    void extensionToolbarDisplayShotDetail();
+    void displayPlaylist();
 };
 
 

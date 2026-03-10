@@ -1,6 +1,7 @@
 #include "PlayerWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "ProjectManager.h"
+#include "SignalManager.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -186,6 +187,7 @@ void PlayerWidget::eject()
         m_playing = false;
         emit ejectUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
+        emit SignalManager::instance().displayPlaylist();
         ProjectManager::instance().deleteProject();
     }
 

@@ -1,7 +1,9 @@
 #include "Toolbars/ExtensionToolbar.h"
+#include "ProjectManager.h"
 
 #include "TextManager.h"
 #include <QHBoxLayout>
+#include <SignalManager.h>
 
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
@@ -11,7 +13,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         false,
         "zoom_on.png", 
         TextManager::instance().get("tooltip_zoom_on"),
-        "zoom_off.png", 
+        "zoom_on.png",
         TextManager::instance().get("tooltip_zoom_off")
     );
 

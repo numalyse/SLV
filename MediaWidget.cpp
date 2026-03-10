@@ -1,11 +1,17 @@
 #include "MediaWidget.h"
 
+#include "VlcParseHelper.h"
+#include "VlcInstance.h"
+#include "Media.h"
+
 #include <QFile>
 #include <QUrl>
 #include <QKeyEvent>
 #include <QTimer>
 #include <QDir>
 #include <QMap>
+#include <QPainter>
+
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -21,24 +27,14 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_DontCreateNativeAncestors);
+    setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setStyleSheet("background-color: black");
+
 
     // ===== VLC ===== //
-    const char* const vlc_args[] = {
-        "--quiet",
-        "--aout=directsound",
-        "--no-video-title-show",
-        "--no-input-fast-seek"
-    };
+    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
 
-    m_vlc = libvlc_new(4, vlc_args);
-    if (!m_vlc) {
-        qDebug() << "Erreur création VLC";
-        return;
-    }
-
-    m_player = libvlc_media_player_new(m_vlc);
+    createEventManager();
 
     managePlayerSystem();
     m_eventManager = libvlc_media_player_event_manager(m_player);
@@ -50,8 +46,14 @@ MediaWidget::MediaWidget(QWidget *parent)
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
+    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
 
     libvlc_media_player_play(m_player);
+}
+
+void MediaWidget::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.fillRect(rect(), Qt::black);
 }
 
 
@@ -86,31 +88,28 @@ MediaWidget::~MediaWidget()
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
     }
-
-    if (m_parseEventManager)
-    {
-        libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-    }
     
     releaseMedia();
 
 }
 
-void MediaWidget::play()
+bool MediaWidget::play()
 {
-    if (!m_player) return;
-    libvlc_media_player_play(m_player);
+    if (!m_player || !m_media) return false;
+    if (libvlc_media_player_play(m_player) == -1) return false;
+    return true;
 }
 
-void MediaWidget::pause()
+bool MediaWidget::pause()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media)  return false;
     libvlc_media_player_set_pause(m_player, 1);
+    return true;
 }
 
 void MediaWidget::togglePlayPause()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return;
 
     if (libvlc_media_player_is_playing(m_player)) {
         libvlc_media_player_pause(m_player);
@@ -122,39 +121,44 @@ void MediaWidget::togglePlayPause()
 }
 
 /// @brief Set the media player position to 0 and pause
-void MediaWidget::stop()
+bool MediaWidget::stop()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
 
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
     libvlc_media_player_next_frame(m_player);
-
+    return true;
 }
 
 /// @brief Release the media player and create a new one from MediaWidget instance
-void MediaWidget::eject()
+bool MediaWidget::eject()
 {
-    if (!m_player || !libvlc_media_player_get_media(m_player)) return;
+    if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
+    releaseEventManager();
     releaseMedia();
     libvlc_media_player_release(m_player);
-    m_player = libvlc_media_player_new(m_vlc);
+    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+    createEventManager();
     managePlayerSystem();
+    return true;
 }
 
 /// @brief Mute the media player
-void MediaWidget::mute()
+bool MediaWidget::mute()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 1);
+    return true;
 }
 
 /// @brief Unmute the media player
-void MediaWidget::unmute()
+bool MediaWidget::unmute()
 {
-    if (!m_player) return;
+    if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 0);
+    return true;
 }
 
 /// @brief Change media player volume
@@ -198,7 +202,6 @@ void MediaWidget::disableLoopMode()
 }
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
-/// Ecoute quand la lecture asychrone des métadonnées est terminée et envoie un signal.
 /// @param event 
 /// @param userData 
 void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
@@ -208,36 +211,6 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {
         emit mediaWidget->updateSliderValueRequested(event->u.media_player_time_changed.new_time);
-
-    }else if(event->type == libvlc_MediaParsedChanged ){
-
-        int parseStatus = event->u.media_parsed_changed.new_status;
-
-        if (parseStatus == 4){
-
-            libvlc_media_t* parsedMedia = static_cast<libvlc_media_t*>(event->p_obj);
-
-            if (parsedMedia) {
-
-                libvlc_time_t duration = libvlc_media_get_duration(parsedMedia);
-                double mediaFps = getFpsParsedMedia(parsedMedia);
-
-                //auto metaMap = getMetaMedia(parsedMedia);
-
-                if (mediaFps > 0.0) {
-                    emit mediaWidget->updateFpsRequested(mediaFps); // met à jour les fps dans le playerwidget
-                    emit mediaWidget->updateSliderRangeRequested(duration); // envoie les ms au playerwidget qui lui les envoie à la toolbar avec les fps
-                }else {
-                    qDebug() << "Impossible de récuperer les fps du média";
-                }
-                
-
-            }
-        }
-        else  {
-            qDebug() << "Le parsing a changé de statut, mais n'est pas terminé. Statut :" << parseStatus;
-        }
-
     }
     else if(event->type == libvlc_MediaPlayerEndReached){
 
@@ -249,6 +222,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 libvlc_media_player_stop(mediaWidget->m_player);
                 mediaWidget->play();
                 mediaWidget->pause();
+                emit mediaWidget->mediaFinished();
             }
             // cas où on loop le média
             else{
@@ -342,15 +316,21 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
 
 /// @brief Stops the current media player and load a new media from a path
 /// @param QString filePath : string containing the path of the media
-void MediaWidget::setMediaFromPath(const QString& filePath)
+bool MediaWidget::setMediaFromPath(const QString& filePath)
 {
     if (!m_player)
-        return;
+        return false;
 
     QString pathCopy = filePath;
 
+    (filePath);
+
+    createMedia(filePath);
+
+    if(!m_media->vlcMedia()) return false;
+
     // La méthode stop de libvlc est bloquante, on utilise un appel asynchrone pour éviter un deadlock.
-    QMetaObject::invokeMethod(this, [this, pathCopy]() {
+    QMetaObject::invokeMethod(this, [this, pathCopy](){
 
         libvlc_media_player_stop(m_player);
 
@@ -358,46 +338,63 @@ void MediaWidget::setMediaFromPath(const QString& filePath)
         QByteArray urlBytes =
             url.toString(QUrl::FullyEncoded).toUtf8();
 
-        if (m_media) libvlc_media_release(m_media);
+        libvlc_media_t *vlcMedia = m_media->vlcMedia();
 
-        m_media = libvlc_media_new_location(m_vlc, urlBytes.constData());
-
-        if (!m_media)
+        if (!vlcMedia)
             return;
 
-        if(m_parseEventManager){ 
-            libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-            m_parseEventManager = nullptr;
-        }   
-
-        m_parseEventManager = libvlc_media_event_manager(m_media);
-        libvlc_event_attach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-        libvlc_media_parse_with_options(m_media, libvlc_media_parse_local, 0);
-
-        libvlc_media_player_set_media(m_player, m_media);
-
-
+        libvlc_media_player_set_media(m_player, vlcMedia);
 
         libvlc_media_player_play(m_player);
 
+        emit mediaPlayerLoaded();
+
     }, Qt::QueuedConnection);
+
+    return true;
+
 }
 
-/// @brief detach les event manager avant de release le média
+/// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
 void MediaWidget::releaseMedia(){
-    if(m_eventManager){
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-        m_eventManager = nullptr;
-    }
-
-    if (m_parseEventManager)
-    {
-        libvlc_event_detach(m_parseEventManager, libvlc_MediaParsedChanged, onVlcEvent, this);
-        m_parseEventManager = nullptr;
-    }
-
     if(m_media){
-        libvlc_media_release(m_media);
+        delete m_media;
         m_media = nullptr;
     }
+}
+
+
+/// @brief detach les event et free l'event manager
+void MediaWidget::releaseEventManager(){
+    if(m_eventManager){
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+        m_eventManager = nullptr;
+    }else {
+        qDebug() << "MediaWidget : detach event manager alors que le media player est null";
+    }
+}
+
+/// @brief initialise m_eventManager et attach les events
+void MediaWidget::createEventManager(){
+    if(m_player){
+        m_eventManager = libvlc_media_player_event_manager(m_player);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+    }else {
+        qDebug() << "MediaWidget : Create event manager alors que le media player est null";
+    }
+
+}
+
+
+/// @brief Helper pour recréer une classe média et connecter ses signaux
+/// @param filePath 
+void MediaWidget::createMedia(const QString& filePath){
+    releaseMedia();
+    m_media = new Media(filePath, this);
+    emit nameUiUpdateRequested(m_media->fileName());
+    connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
+    connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
+    m_media->parse();
 }

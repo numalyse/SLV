@@ -15,7 +15,6 @@ public:
     ~PlayerLayoutManager();
 
     void createLayout(const int count);
-    void createLayoutFromPaths(const QStringList& filesPaths);
 
 private:
 
@@ -49,20 +48,45 @@ private:
     /// @brief Créer la bonne toolbar en fonction du nombre de players actifs
     Toolbar* createLayoutToolbar();
 
-    void checkPlayersStatus();
+    bool newGlobalMuteState();
+    bool newGlobalPlayState();
+
 
 signals:
-    void updateContainerRequest(int, QWidget*, Toolbar*);
+    void updateContainerRequest(Media*, QWidget*, Toolbar*);
+
+    void enableFullscreenPlayerRequested();
+    void disableFullscreenPlayerRequested();
+
     void enableFullscreenGlobalRequested();
     void disableFullscreenGlobalRequested();
+    void enableFullscreenAdvancedRequested();
+    void disableFullscreenAdvancedRequested();
+
     void setGlobalPlayStateRequested(bool);
+    void setGlobalMuteStateRequested(bool);
+
+    void disableNavPanelRequested();
+    void enableNavPanelRequested();
+
+    void previousMediaRequested();
+    void nextMediaRequested();
 
 public slots:
-    void addPlayer();
-    void removePlayer(PlayerWidget* playerToDestroy);
-    void enableLayoutFullscreen(PlayerWidget* playerToFullscreen);
-    void disableLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
+    void removePlayer(PlayerWidget* playerToDestroy);
+
+    void enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
+    void disablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
+
+    void enableGlobalLayoutFullscreen();
+    void disableGlobalLayoutFullscreen();
+
+    void checkPlayersPlayStatus();
+    void checkPlayersMuteStatus();
+
+    void createLayoutFromPaths(const QStringList& filesPaths);
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

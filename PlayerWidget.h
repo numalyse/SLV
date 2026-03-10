@@ -19,14 +19,17 @@ public:
     // ~PlayerWidget();
 
     void setActive(bool active);
-    void setMediaFromPath(const QString& filePath);
+    bool setMediaFromPath(const QString& filePath);
 
-    SimpleToolbar* getToolbar() {return m_toolBar;};
-    double getMediaFps() { return m_media_fps; };
-    bool getIsPlaying(){ return m_isPlaying; };
+    SimpleToolbar* toolbar() {return m_toolBar;};
+    MediaWidget* mediaWidget() { return m_mediaWidget; };
+    double mediaFps() { return m_media_fps; };
+    bool playing(){ return m_playing; };
+    bool muted() { return m_muted; };
 
 public slots:
     void play();
+    void playFromAdvanced();
     void pause();
     void stop();
     void eject();
@@ -45,6 +48,7 @@ public slots:
 signals:
     void addPlayerRequest();
     void removePlayerRequest(PlayerWidget* toBeRemoved);
+    void duplicatePlayerRequest(PlayerWidget* toBeDuplicated);
     void enablePlayerFullscreenRequested(PlayerWidget* self);
     void disablePlayerFullscreenRequested(PlayerWidget* self);
     void updateSliderRangeRequest(int64_t);
@@ -52,12 +56,23 @@ signals:
     void updateFpsRequested(float);
     void setPlayUIRequested();
     void setPauseUIRequested();
-    void checkPlayersStatusRequested();
+    void checkPlayersPlayStatusRequested();
+    void checkPlayersMuteStatusRequested();
+
+    void playUiUpdateRequested();
+    void pauseUiUpdateRequested();
+    void stopUiUpdateRequested();
+    void ejectUiUpdateRequested();
+    void muteUiUpdateRequested();
+    void unmuteUiUpdateRequested();
+    void enableLoopUiUpdateRequested();
+    void disableLoopUiUpdateRequested();
+    void nameUiUpdateRequest(const QString& );
 
 private:
-    Media *m_media = nullptr;
-    double m_media_fps = 0.0;
-    bool m_isPlaying = false;
+    double m_media_fps {};
+    bool m_playing = false;
+    bool m_muted = false;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;
     QAction* m_actionStop;

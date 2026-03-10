@@ -25,11 +25,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void createMenuBar();
+    void createToolBar();
 
 public slots:
     void openMediaFile();
     void enableFullscreenMain();
     void disableFullscreenMain();
+    void disableNavPanel();
+    void enableNavPanel();
 
 private:
     Ui::MainWindow *ui;
@@ -37,8 +40,11 @@ private:
     QSplitter* splitter = nullptr;
     QSplitter* splitter2 = nullptr;
 
+    QToolBar* m_toolbarQt = nullptr;
     GlobalPlayerManager* m_globalPlayerManager = nullptr;
     QWidget* m_currentLayout = nullptr;
+    ToolbarToggleButton *m_navPanelBtn = nullptr; // Utilisation d'un toggle button pour le bouton de menu
+    bool wasMaximized = false;
     // QVector<PlayerWidget*> m_players;
 
 };

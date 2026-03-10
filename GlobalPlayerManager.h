@@ -3,6 +3,9 @@
 
 #include "Toolbars/Toolbar.h"
 #include "PlayerLayoutManager.h"
+#include "NavPanel.h"
+#include "Media.h"
+#include "Timeline.h"
 
 #include <QWidget>
 
@@ -12,27 +15,42 @@ class GlobalPlayerManager : public QWidget
     Q_OBJECT
 public:
     explicit GlobalPlayerManager(QWidget *parent = nullptr);
-    QWidget* m_playersWidget = nullptr;
-    Toolbar* m_toolbarWidget = nullptr;
 
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
+    QWidget* m_playersWidget = nullptr;
+    Toolbar* m_toolbarWidget = nullptr;
+    NavPanel* m_navPanel = nullptr;
+    Timeline* m_timeline = nullptr;
     QVBoxLayout* layout;
 
 public slots:
 
 
     void setPlayersFromPaths(QStringList);
-    void enableFullscreenGlobal();
-    void disableFullscreenGlobal();
+    void enableFullscreenPlayer();
+    void disableFullscreenPlayer();
 
-    void updateContainer(int, QWidget*, Toolbar*);
+    void enableSegmentation();
+    void disableSegmentation();
+
+    void updateContainer(Media*, QWidget*, Toolbar*);
+    void openNavPanel();
+    void closeNavPanel();
 
     void setGlobalPlayState(bool);
+    void setGlobalMuteState(bool);
+
+private slots:
+    void createTimelineWidget();
+    void playPreviousMedia();
+    void playNextMedia();
 
 signals:
     void enableFullscreenMainRequested();
     void disableFullscreenMainRequested();
+    void disableNavPanelRequested();
+    void enableNavPanelRequested();
 };
 
 #endif // GLOBALPLAYERMANAGER_H

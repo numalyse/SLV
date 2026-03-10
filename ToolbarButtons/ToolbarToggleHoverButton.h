@@ -26,7 +26,10 @@ public:
         int timerDuration = 100
     );
 
-    ~ToolbarToggleHoverButton() { delete m_widgetToDisplay; }; // Le widget n'a pas de parent, il doit être détruit manuellement
+    ~ToolbarToggleHoverButton() { 
+        delete m_widgetToDisplay; 
+        m_widgetToDisplay = nullptr; 
+    }; // Le widget n'a pas de parent, il doit être détruit manuellement
 
 private:
     QWidget* m_widgetToDisplay = nullptr;

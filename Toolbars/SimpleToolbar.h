@@ -25,30 +25,34 @@ public:
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
-    QSlider* getSlider() const { return m_slider; }
-    bool isDraggingSlider() const { return m_draggingSlider; }
-    QTimer* getSeekTimer() const { return m_seekTimer; }
-    double getMediaFps() const { return m_media_fps; }
-    QLabel* getCurrentTimeLabel() const { return m_currentTimeLabel; }
-    QLabel* getDurationLabel() const { return m_durationLabel; }
+    QSlider* slider() const { return m_slider; }
+    double mediaFps() const { return m_media_fps; }
+    QLabel* currentTimeLabel() const { return m_currentTimeLabel; }
+    QLabel* durationLabel() const { return m_durationLabel; }
+    QLabel* nameLabel() const { return m_nameLabel; }
 
-    ToolbarToggleHoverButton* getMuteBtn() const { return m_muteBtn; }
-    ToolbarPopupButton* getSpeedBtn() const { return m_speedBtn; }
-    ToolbarToggleButton* getLoopBtn() const { return m_loopBtn; }
-    ToolbarButton* getRemovePlayerBtn() const { return m_removePlayerBtn; }
+    ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
+    ToolbarPopupButton* speedBtn() const { return m_speedBtn; }
+    ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
+    ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
+    
+    void resetSlider();
+    void stopSlider();
 
 protected:
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
-    float m_media_fps = 0.0;
+    float m_media_fps {};
     QTimer* m_seekTimer = nullptr;
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;
+    QLabel* m_nameLabel = nullptr;
+    bool m_discardVlcUiUpdates = false;
 
-    ToolbarToggleHoverButton* m_muteBtn = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
+    ToolbarButton* m_duplicatePlayerBtn = nullptr;
 
     // ToolbarButton* m_slowDownBtn
     // ToolbarButton* m_speedUpBtn;
@@ -57,6 +61,17 @@ public slots:
     void updateSliderRange(int64_t);
     void updateSliderValue(int64_t);
     void updateFps(double);
+
+    void playUiUpdate();
+    void pauseUiUpdate();
+    void muteUiUpdate();
+    void unmuteUiUpdate();
+    void ejectUiUpdate();
+    void stopUiUpdate();
+    void enableLoopUiUpdate();
+    void disableLoopUiUpdate();
+    void nameUiUpdate(const QString &);
+    void disableLoopMode();
 
 signals:
     void setPositionRequested(int64_t);
@@ -67,6 +82,7 @@ signals:
     void speedChanged(int);
     void enableLoopModeRequest();
     void disableLoopModeRequest();
+    void duplicatePlayerRequested();
 };
 
 #endif

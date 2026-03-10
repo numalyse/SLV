@@ -1,5 +1,6 @@
 #include "PlayerWidget.h"
 #include "Toolbars/SimpleToolbar.h"
+#include "ProjectManager.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -9,6 +10,7 @@
 #include <QKeyEvent>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 
 PlayerWidget::PlayerWidget(QWidget *parent)
@@ -27,26 +29,41 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
-    connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [&]() {
+
+    connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [this]() {
         emit removePlayerRequest(this);
+    });
+
+    connect(m_toolBar, &SimpleToolbar::duplicatePlayerRequested, this, [this](){
+        emit duplicatePlayerRequest(this);
     });
 
     m_mediaWidget = new MediaWidget(this);
 
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequest, m_mediaWidget, &MediaWidget::stop);
+    connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
-    connect(m_toolBar, &SimpleToolbar::enableMuteRequest, m_mediaWidget, &MediaWidget::mute);
-    connect(m_toolBar, &SimpleToolbar::disableMuteRequest, m_mediaWidget, &MediaWidget::unmute);
+    connect(m_toolBar, &SimpleToolbar::enableMuteRequest, this, &PlayerWidget::mute);
+    connect(m_toolBar, &SimpleToolbar::disableMuteRequest, this, &PlayerWidget::unmute);
     connect(m_toolBar, &SimpleToolbar::volumeChanged, m_mediaWidget, &MediaWidget::setVolume);
     connect(m_toolBar, &SimpleToolbar::speedChanged, m_mediaWidget, &MediaWidget::setSpeed);
     connect(m_toolBar, &Toolbar::screenshotRequest, m_mediaWidget, &MediaWidget::takeScreenshot);
     connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
+
+    connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
+    connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
+    connect(this, &PlayerWidget::muteUiUpdateRequested, m_toolBar, &SimpleToolbar::muteUiUpdate);
+    connect(this, &PlayerWidget::unmuteUiUpdateRequested, m_toolBar, &SimpleToolbar::unmuteUiUpdate);
+    connect(this, &PlayerWidget::ejectUiUpdateRequested, m_toolBar, &SimpleToolbar::ejectUiUpdate);
+    connect(this, &PlayerWidget::stopUiUpdateRequested, m_toolBar, &SimpleToolbar::stopUiUpdate);
+    connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
+    connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
+    connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -55,11 +72,13 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
     connect(m_mediaWidget, &MediaWidget::updateSliderValueRequested, this, &PlayerWidget::updateSliderValueRequest);
-    connect(m_mediaWidget,  &MediaWidget::updateFpsRequested, this, &PlayerWidget::updateFpsRequest);
+    connect(m_mediaWidget, &MediaWidget::updateFpsRequested, this, &PlayerWidget::updateFpsRequest);
+    connect(m_mediaWidget, &MediaWidget::nameUiUpdateRequested, this, &PlayerWidget::nameUiUpdateRequest);
 
     connect(this, &PlayerWidget::updateSliderRangeRequest, m_toolBar, &SimpleToolbar::updateSliderRange);
     connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
     connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
+
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -82,13 +101,18 @@ void PlayerWidget::setActive(bool active)
                       : "border: none;");
 }
 
-void PlayerWidget::setMediaFromPath(const QString& filePath)
+bool PlayerWidget::setMediaFromPath(const QString& filePath)
 {
-    m_mediaWidget->setMediaFromPath(filePath);
-    // TODO : modifier les lignes suivantes pour emettre un signal dans media quand la load est validé
-    m_isPlaying = true;
-    m_toolBar->getPlayPauseBtn()->setButtonState(true);
-    emit checkPlayersStatusRequested();
+    if (m_mediaWidget->setMediaFromPath(filePath)){
+        m_playing = true;
+        m_muted = false;
+        emit playUiUpdateRequested();
+        emit unmuteUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+        emit checkPlayersMuteStatusRequested();
+        return true;
+    }
+    return false;
 }
 
 void PlayerWidget::enablePlayerFullscreen()
@@ -103,40 +127,87 @@ void PlayerWidget::disablePlayerFullscreen()
 
 // slots 
 
+/// @brief Play la video, si pas de media dans le player : créer un QFileDialog pour choisir un fichier à charger.
 void PlayerWidget::play()
 {
-    m_mediaWidget->play();
-    m_toolBar->getPlayPauseBtn()->setButtonState(true);
-    m_isPlaying = true;
-    emit checkPlayersStatusRequested();
+    if (m_mediaWidget->play()){
+        m_playing = true;
+        emit playUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }else {
+        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+        if(file_path != ""){
+            setMediaFromPath(file_path);
+        }
+    }
+}
+
+/// @brief Play la video connecté à une advanced toolbar, créer un projet en plus de l'aciton de base
+void PlayerWidget::playFromAdvanced()
+{
+    if (m_mediaWidget->play()){
+        m_playing = true;
+        emit playUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }else {
+        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+        if(file_path != ""){
+            if (setMediaFromPath(file_path)){
+                ProjectManager::instance().createProject(m_mediaWidget->media());
+            }
+        }
+    }
 }
 
 void PlayerWidget::pause()
 {
-    m_mediaWidget->pause();
-    m_toolBar->getPlayPauseBtn()->setButtonState(false);
-    m_isPlaying = false;
-    emit checkPlayersStatusRequested();
+    if (m_mediaWidget->pause()){
+        m_playing = false;
+        emit pauseUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    }
+
 }
 
 void PlayerWidget::stop()
 {
-    m_mediaWidget->stop();
+    if(m_mediaWidget->stop()){
+        m_playing = false;
+        emit stopUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    };
+
 }
 
 void PlayerWidget::eject()
 {
-    m_mediaWidget->eject();
+    // TODO : demander à l'utilisateur s'il veut ejecter car cela va supprimer le project
+    if(m_mediaWidget->eject()){
+        m_playing = false;
+        emit ejectUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+        ProjectManager::instance().deleteProject();
+    }
+
 }
 
 void PlayerWidget::mute()
 {
-    m_mediaWidget->mute();
+    if(m_mediaWidget->mute()){
+        m_muted = true;
+        emit muteUiUpdateRequested();
+        emit checkPlayersMuteStatusRequested();
+    }
+
 }
 
 void PlayerWidget::unmute()
 {
-    m_mediaWidget->unmute();
+    if(m_mediaWidget->unmute()){
+        m_muted = false;
+        emit unmuteUiUpdateRequested();
+        emit checkPlayersMuteStatusRequested();
+    }
 }
 
 void PlayerWidget::setVolume(const int &vol)
@@ -165,9 +236,11 @@ void PlayerWidget::takeScreenshot()
 void PlayerWidget::enableLoopMode()
 {
     m_mediaWidget->enableLoopMode();
+    emit enableLoopUiUpdateRequested();
 }
 
 void PlayerWidget::disableLoopMode()
 {
     m_mediaWidget->disableLoopMode();
+    emit disableLoopUiUpdateRequested();
 }

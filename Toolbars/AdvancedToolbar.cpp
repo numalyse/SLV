@@ -10,6 +10,8 @@
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 #include "AdvancedToolbar.h"
 
+#include "ProjectManager.h"
+
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -26,8 +28,35 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     m_extensionToolbar = new ExtensionToolbar(this);
 
-    connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, &QWidget::show);
-    connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, &QWidget::hide);
+
+    
+    connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, [this](){
+        // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
+        m_extensionToolbar->show();
+        m_extensionBtn->setButtonState(true);
+        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr) emit enableSegmentationRequest();
+    });
+    connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
+        // cache l'extension et cache le mode segmentation
+        m_extensionToolbar->hide();
+        m_extensionBtn->setButtonState(false);
+        emit disableSegmentationRequest();
+    });
+
+    connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
+    connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
+
+    connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, [this](){
+        emit AdvancedToolbar::enableSegmentationRequest();
+        m_prevMediaBtn->setEnabled(false);
+        m_nextMediaBtn->setEnabled(false);
+    });
+
+    connect(m_extensionToolbar, &ExtensionToolbar::disableSegmentationRequested, this, [this](){
+        emit AdvancedToolbar::disableSegmentationRequest();
+        m_prevMediaBtn->setEnabled(true);
+        m_nextMediaBtn->setEnabled(true);
+    });
 
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
     m_removePlayerBtn = nullptr;
@@ -43,42 +72,47 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
 {
     if (!toolbar) return;
 
-    m_media_fps = toolbar->getMediaFps();
+    m_media_fps = toolbar->mediaFps();
 
-    QSlider* oldSlider = toolbar->getSlider();
+    QSlider* oldSlider = toolbar->slider();
     if (oldSlider && m_slider) {
         m_slider->setRange(oldSlider->minimum(), oldSlider->maximum());
         m_slider->setValue(oldSlider->value());
     }
 
-    QLabel* oldTimeLabel = toolbar->getCurrentTimeLabel();
+    QLabel* oldTimeLabel = toolbar->currentTimeLabel();
     if (oldTimeLabel && m_currentTimeLabel) {
         m_currentTimeLabel->setText(oldTimeLabel->text());
     }
 
-    QLabel* oldDurationLabel = toolbar->getDurationLabel();
+    QLabel* oldDurationLabel = toolbar->durationLabel();
     if (oldDurationLabel && m_durationLabel) {
         m_durationLabel->setText(oldDurationLabel->text());
     }
 
-    ToolbarToggleButton* oldPlayPause = toolbar->getPlayPauseBtn();
+    ToolbarToggleButton* oldPlayPause = toolbar->playPauseBtn();
     if (oldPlayPause && m_playPauseBtn) {
         m_playPauseBtn->setButtonState(oldPlayPause->isChecked());
     }
 
-    ToolbarToggleButton* oldFullscreen = toolbar->getFullscreenBtn();
+    ToolbarToggleButton* oldFullscreen = toolbar->fullscreenBtn();
     if (oldFullscreen && m_fullscreenBtn) {
         m_fullscreenBtn->setButtonState(oldFullscreen->isChecked());
     }
 
-    ToolbarToggleButton* oldLoop = toolbar->getLoopBtn();
+    ToolbarToggleButton* oldLoop = toolbar->loopBtn();
     if (oldLoop && m_loopBtn) {
         m_loopBtn->setButtonState(oldLoop->isChecked());
     }
 
-    ToolbarToggleHoverButton* oldMute = toolbar->getMuteBtn();
+    ToolbarToggleHoverButton* oldMute = toolbar->muteBtn();
     if (oldMute && m_muteBtn) {
         m_muteBtn->setButtonState(oldMute->isChecked());
+    }
+
+    QLabel* oldNameLabel = toolbar->nameLabel();
+    if (oldTimeLabel && m_nameLabel) {
+        m_nameLabel->setText(oldNameLabel->text());
     }
 
     // TODO : voir pour copier les états des sliders dans muteBtn et speedBtn
@@ -103,8 +137,9 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_currentTimeLabel, 1);
-    timecodeLayout->addWidget(m_durationLabel, 0);
+    timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
+    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
+    timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);
 
     mainLayout->addWidget(m_slider);
@@ -120,6 +155,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
+    buttonLayout->addWidget(m_duplicatePlayerBtn);
     buttonLayout->addWidget(m_extensionBtn);
 
     mainLayout->addLayout(buttonLayout);

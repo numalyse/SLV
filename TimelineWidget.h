@@ -3,6 +3,7 @@
 
 #include "RulerItem.h"
 #include "CursorItem.h"
+#include "ShotItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -10,6 +11,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsScene>
 #include <QVBoxLayout>
+#include <QVector>
 
 
 class TimelineWidget : public QWidget
@@ -37,10 +39,13 @@ private:
 
     int m_sceneWidth = 2000;
     int m_sceneHeight = 150;
-    int m_rulerHeight = 30;
+
+    int m_rulerHeight = 25;
     double m_minPxBetweenTicks = 100.0;
-    double m_currentScale = 1;
     int64_t m_vlcTime{};
+
+    QVector<ShotItem*> m_shotItems;
+    ShotItem* m_currentShot = nullptr;
 };
 
 

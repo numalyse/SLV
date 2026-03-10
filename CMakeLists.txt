@@ -55,7 +55,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         TimelineWidget.h TimelineWidget.cpp
         RulerItem.h RulerItem.cpp
         CursorItem.h CursorItem.cpp
-
+        ShotItem.h ShotItem.cpp
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp
 

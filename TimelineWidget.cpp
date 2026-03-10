@@ -4,10 +4,13 @@
 #include "RulerItem.h"
 #include "CursorItem.h"
 
+#include "Shot.h"
+
 #include <QVBoxLayout>
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QWheelEvent>
+#include <QScrollBar>
 
 TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 {
@@ -35,9 +38,17 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     m_ruler->setPos(0, 0); 
     m_scene->addItem(m_ruler);
 
-    m_cursor = new CursorItem(100);
+    m_cursor = new CursorItem(m_sceneHeight);
     m_cursor->setPos(200, 0);
     m_scene->addItem(m_cursor);
+
+    int startShotHeight = m_sceneHeight - m_rulerHeight;
+    for ( auto& IShot : ProjectManager::instance().projet()->shots ){
+        ShotItem* shot = new ShotItem(IShot, startShotHeight);
+        m_scene->addItem(shot);
+        m_shotItems.append(shot);
+    }
+    
 
 }
 
@@ -45,13 +56,13 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event); 
 
-    int realViewportHeight = m_view->viewport()->height();
+    int viewportHeight = m_view->viewport()->height();
 
     if (m_scene) {
-        m_scene->setSceneRect(0, 0, m_sceneWidth, realViewportHeight);
+        m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
     }
     if (m_cursor) {
-        m_cursor->setHeight(realViewportHeight);
+        //m_cursor->setHeight(viewportHeight);
     }
 }
 
@@ -67,26 +78,29 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
     int posCursor = static_cast<int>(ratio * m_scene->width()); 
     
     m_cursor->setPos(posCursor, 0);
+
 }
+
 
 bool TimelineWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport()) {
         if (event->type() == QEvent::Wheel ) {
-            
-            //QPoint centerViewPort = m_view->transform()
-            //QPoint mousePos = QCursor::pos(); 
-
             // infos de la molette
             QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
             QPoint numDegrees = wheelEvent->angleDelta() / 8;
+
+            double viewportX = wheelEvent->position().x();
+            double scrollbarValue = (m_view->horizontalScrollBar()->isVisible()) ? m_view->horizontalScrollBar()->value() : 0 ;
+            qDebug() << "Timeline Scrollbar event position x : " << viewportX ;
+            qDebug() << "Timeline Scrollbar value : " << scrollbarValue ;
             
             double zoomFactor = (numDegrees.y() > 0) ? 1.15 : (1.0 / 1.15);
 
             double newSceneWidth = m_scene->width() * zoomFactor;
 
             double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
-            double maxWidth = std::numeric_limits<int>::max(); // en cas de vidéo très très longue le zoom peut causer des problèmes
+            double maxWidth = std::numeric_limits<int>::max() - 1000000.0; // en cas de vidéo très très longue le zoom peut causer des problèmes, -1 000 000 pour de la marge au cas ou
             
             int64_t duration = ProjectManager::instance().projet()->media->duration();
             double fps = ProjectManager::instance().projet()->media->fps();
@@ -103,11 +117,11 @@ bool TimelineWidget::eventFilter(QObject *watched, QEvent *event)
             }
             //limite la taille avec les valeurs précédentes
             m_sceneWidth = std::clamp(newSceneWidth, minWidth, maxWidth);
-
             m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
+
+
             m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
             updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
-
         }
         
     }

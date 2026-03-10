@@ -84,6 +84,7 @@ signals:
     void disableLoopModeRequest();
     void duplicatePlayerRequested();
     void setCursorPositionRequested(int64_t);
+    void simpleToolbarUpdateCursorPosition(int);
 };
 
 #endif

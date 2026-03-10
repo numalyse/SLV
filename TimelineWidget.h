@@ -34,6 +34,9 @@ signals:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+private slots:
+    void splitCurrentShotItem();
+
 private:
     void updateCurrentShot();
 
@@ -41,7 +44,7 @@ private:
     TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;
 
-    ToolbarButton* m_testButton = nullptr;
+    ToolbarButton* m_splitShotBtn = nullptr;
 
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
@@ -54,7 +57,7 @@ private:
     int64_t m_vlcTime{};
 
     QVector<ShotItem*> m_shotItems;
-    ShotItem* m_currentShot = nullptr;
+    ShotItem* m_currentShotItem = nullptr;
 };
 
 

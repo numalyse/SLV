@@ -1,5 +1,6 @@
 #include "TimelineWidget.h"
 
+#include "TimeFormatter.h"
 #include "ProjectManager.h"
 #include "SignalManager.h"
 
@@ -33,8 +34,9 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 
     layout->addWidget(m_view); 
 
-    m_testButton = new ToolbarButton(this);
-    layout->addWidget(m_testButton);
+    m_splitShotBtn = new ToolbarButton(this);
+    connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
+    layout->addWidget(m_splitShotBtn);
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks);
     m_ruler->setPos(0, 0); 
@@ -50,6 +52,8 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
         m_scene->addItem(shot);
         m_shotItems.append(shot);
     }
+
+    connect(&SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition, this, &TimelineWidget::updateCursorPos);
 }
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
@@ -105,9 +109,9 @@ void TimelineWidget::updateCurrentShot(){
         }
     }
     
-    if(m_currentShot != closestLeftShot){
-        m_currentShot = closestLeftShot;
-        emit updateShotDetailRequested(m_currentShot->shot());
+    if(m_currentShotItem != closestLeftShot){
+        m_currentShotItem = closestLeftShot;
+        emit updateShotDetailRequested(m_currentShotItem->shot());
     }
 }
 
@@ -139,4 +143,25 @@ void TimelineWidget::applyZoom(double zoomFactor){
 
     m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
     updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
+}
+
+void TimelineWidget::splitCurrentShotItem(){
+    Shot* currShot = m_currentShotItem->shot();
+
+/*     // position du curseur = position du début du plan
+    double cursorPos = m_cursor->pos().x();
+
+    int64_t duration = ProjectManager::instance().projet()->media->duration();
+    double pixelPerMs =  duration / static_cast<double>(m_scene->width());
+
+    int64_t timeAtCursor = static_cast<int64_t>( cursorPos * pixelPerMs ); */
+
+    int64_t timeAtCursor = m_vlcTime;
+    qDebug() << "Ms au curseur " << timeAtCursor;
+    qDebug() << "Temps au curseur " << TimeFormatter::msToHHMMSSFF(timeAtCursor, ProjectManager::instance().projet()->media->fps());
+
+    //int64_t currShotEnd = timeAtCursor-1; // la fin du plan est la position du curseur-1
+
+
+
 }

@@ -11,3 +11,8 @@ void TimelineView::wheelEvent(QWheelEvent *event)
 
     emit zoomRequested(zoomFactor);
 }
+
+/* void TimelineView::mousePressEvent(QMouseEvent *event)
+{
+    emit 
+} */

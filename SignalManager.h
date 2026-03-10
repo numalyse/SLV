@@ -22,6 +22,7 @@ signals:
     void timelineWidgetUpdateShotDetail(Shot*);
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
+    void simpleToolbarUpdateCursorPosition(int);
 };
 
 

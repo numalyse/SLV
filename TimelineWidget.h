@@ -33,9 +33,9 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
-    ShotItem *getCurrentShot();
-
 private:
+    void updateCurrentShot();
+
     QGraphicsScene* m_scene = nullptr;
     QGraphicsView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;

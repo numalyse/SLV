@@ -50,7 +50,6 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
         m_scene->addItem(shot);
         m_shotItems.append(shot);
     }
-    
 }
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
@@ -80,15 +79,7 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
     
     m_cursor->setPos(posCursor, 0);
 
-    // TODO : mettre un timer pour par spam getCurrentshot ? 
-    ShotItem * shotItem = getCurrentShot();
-    if(shotItem != m_currentShot) { // on a changé de plan => modifie l'ui de plan data
-        m_currentShot = shotItem;
-        qDebug() << "Changement de plan => début du plan : " << shotItem->shot()->start;
-        emit updateShotDetailRequested(m_currentShot->shot());
-    } 
-
-
+    updateCurrentShot();
 }
 
 
@@ -139,16 +130,19 @@ bool TimelineWidget::eventFilter(QObject *watched, QEvent *event)
 }
 
 
-ShotItem* TimelineWidget::getCurrentShot(){
+void TimelineWidget::updateCurrentShot(){
     int shotItemCount = static_cast<int>(m_shotItems.size());
-    Q_ASSERT(shotItemCount >= 1);
 
+    Q_ASSERT(shotItemCount >= 1);
+    if (shotItemCount <= 0 ) return;
 
     ShotItem* closestLeftShot = m_shotItems[0];
     int64_t distanceToClosest = m_vlcTime - closestLeftShot->shot()->start;
 
     for (int IShotItem = 1; IShotItem < shotItemCount; ++IShotItem){
+        
         int64_t currentShotStart = m_shotItems[IShotItem]->shot()->start;
+
         if( m_vlcTime < currentShotStart ) break; // si le vlc time < start on est avant le plan donc on quitte
 
         int64_t distance = m_vlcTime - currentShotStart;
@@ -157,5 +151,9 @@ ShotItem* TimelineWidget::getCurrentShot(){
             closestLeftShot = m_shotItems[IShotItem];
         }
     }
-    return closestLeftShot;
+    
+    if(m_currentShot != closestLeftShot){
+        m_currentShot = closestLeftShot;
+        emit updateShotDetailRequested(m_currentShot->shot());
+    }
 }

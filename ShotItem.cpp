@@ -4,7 +4,7 @@
 
 #include <QPainter>
 
-ShotItem::ShotItem(Shot* shot, int height) : m_shotData{shot}, m_height{height}
+ShotItem::ShotItem(Shot* shot, int height, QGraphicsItem* parent) : QGraphicsItem(parent), m_shotData{shot}, m_height{height}
 {
     int m_height = height;
     setZValue(0);

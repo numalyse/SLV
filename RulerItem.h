@@ -8,7 +8,7 @@ class RulerItem : public QGraphicsItem
 
 public:
 
-    RulerItem(int width, int height, double minPxBetweenTicks);
+    explicit RulerItem(int width, int height, double minPxBetweenTicks, QGraphicsItem* parent= nullptr);
 
     QRectF boundingRect() const override;
 

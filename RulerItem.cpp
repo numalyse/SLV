@@ -8,8 +8,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
-RulerItem::RulerItem(int width, int height, double minPxBetweenTicks) 
-: m_width{width}, m_height{height}, m_minPxBetweenTicks{minPxBetweenTicks}
+RulerItem::RulerItem(int width, int height, double minPxBetweenTicks, QGraphicsItem* parent) 
+: QGraphicsItem(parent), m_width{width}, m_height{height}, m_minPxBetweenTicks{minPxBetweenTicks}
 {
     setZValue(1);
 }

@@ -8,7 +8,7 @@
 class ShotItem : public QGraphicsItem
 {
 public:
-    ShotItem(Shot* shot, int height);
+    explicit ShotItem(Shot* shot, int height, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

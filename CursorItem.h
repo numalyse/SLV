@@ -6,7 +6,7 @@
 class CursorItem : public QGraphicsItem
 {
 public:
-    CursorItem(int height);
+    explicit CursorItem(int height, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

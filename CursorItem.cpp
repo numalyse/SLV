@@ -2,7 +2,7 @@
 
 #include <QPainter>
 
-CursorItem::CursorItem(int height) : m_height{height}
+CursorItem::CursorItem(int height, QGraphicsItem* parent) : QGraphicsItem(parent), m_height{height}
 {
     setZValue(5);
 }

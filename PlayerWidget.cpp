@@ -139,6 +139,8 @@ void PlayerWidget::play()
         if(file_path != ""){
             setMediaFromPath(file_path);
         }
+        else
+            emit m_toolBar->selectFilePlayCanceled();
     }
 }
 
@@ -156,6 +158,8 @@ void PlayerWidget::playFromAdvanced()
                 ProjectManager::instance().createProject(m_mediaWidget->media());
             }
         }
+        else
+            emit m_toolBar->selectFilePlayCanceled();
     }
 }
 

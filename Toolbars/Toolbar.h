@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <TextManager.h>
+#include <SignalManager.h>
 
 /// @brief Classe abstraite qui sert de base pour les différentes toolbars.
 class Toolbar : public QWidget
@@ -37,8 +38,8 @@ public:
         connect(m_fullscreenBtn,&ToolbarToggleButton::stateActivated, this, &Toolbar::enableFullscreenRequest);
         connect(m_fullscreenBtn,&ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableFullscreenRequest);
         connect(m_screenshotBtn, &ToolbarButton::clicked, this, &Toolbar::screenshotRequest);
-
-        qDebug() << "connect successful";
+        connect(&SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled, m_playPauseBtn, [this](){ m_playPauseBtn->setButtonState(false); });
+        connect(this, &Toolbar::selectFilePlayCanceled, &SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled);
     }
 
     ToolbarToggleButton* playPauseBtn() const { return m_playPauseBtn; }
@@ -73,6 +74,7 @@ signals:
     void disableFullscreenRequest();
     void enableMuteRequest();
     void screenshotRequest();
+    void selectFilePlayCanceled();
 };
 
 #endif // TOOLBAR_H

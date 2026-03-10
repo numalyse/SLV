@@ -4,21 +4,16 @@
 NavPanel::NavPanel(QWidget *parent)
     : QWidget{parent}
 {
-
-
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
-
-    QVBoxLayout *sideWidgetLayout = new QVBoxLayout();
-    QLabel *label1 = new QLabel("Test pour l'arrangement du navpanel");
-    QLabel *label2 = new QLabel("2ème test pour l'arrangement du navpanel");
-    sideWidgetLayout->addWidget(label1);
-    sideWidgetLayout->addWidget(label2);
-    m_sideWidget = new QWidget();
-    m_sideWidget->setLayout(sideWidgetLayout);
-    mainLayout->addWidget(m_sideWidget);
-    setStyleSheet("border: 1px solid grey;");
+    m_mainLayout = new QHBoxLayout(this);
+    m_playlistWidget = new Playlist(this);
+    m_sideWidget = m_playlistWidget;
+    m_mainLayout->addWidget(m_sideWidget);
+    m_mainLayout->setSpacing(0);
     m_sideWidget->hide();
     setFixedWidth(0);
+
+    connect(m_playlistWidget, &Playlist::openMediaFileRequested, this, &NavPanel::openMediaFileRequested);
+    connect(m_playlistWidget, &Playlist::disableToolbarLoopRequested, this, &NavPanel::disableToolbarLoopRequested);
 }
 
 void NavPanel::showPanel()
@@ -32,4 +27,20 @@ void NavPanel::hidePanel()
 {
     m_sideWidget->hide();
     setFixedWidth(0);
+}
+
+// Fichiers chargés depuis le menuBar de mainWindow
+void NavPanel::setPlaylistNewItem()
+{
+
+}
+
+void NavPanel::playPreviousMedia()
+{
+    m_playlistWidget->playPreviousMedia();
+}
+
+void NavPanel::playNextMedia()
+{
+    m_playlistWidget->playNextMedia();
 }

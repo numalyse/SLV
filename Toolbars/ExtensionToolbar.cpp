@@ -3,6 +3,7 @@
 
 #include "TextManager.h"
 #include <QHBoxLayout>
+#include <SignalManager.h>
 
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
@@ -12,7 +13,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         false,
         "zoom_on.png", 
         TextManager::instance().get("tooltip_zoom_on"),
-        "zoom_off.png", 
+        "zoom_on.png",
         TextManager::instance().get("tooltip_zoom_off")
     );
 
@@ -47,7 +48,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
             emit enableSegmentationRequested();
         }
     });
-
 
     connect(&ProjectManager::instance(), &ProjectManager::deleteProject, this, [this] { // quand le projet est détruit, on force le button segmentation en false
             m_segmBtn->setButtonState(false);

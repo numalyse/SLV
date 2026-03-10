@@ -2,7 +2,6 @@
 
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
-#include "Toolbars/GlobalToolbar.h"
 
 #include "ProjectManager.h"
 
@@ -13,6 +12,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
 {
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(0);
     layout = new QVBoxLayout();
     mainLayout->addLayout(layout);
     m_navPanel = new NavPanel(this);
@@ -30,6 +30,12 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
 
+    connect(m_layoutManager, &PlayerLayoutManager::disableNavPanelRequested, this, &GlobalPlayerManager::disableNavPanelRequested);
+    connect(m_layoutManager, &PlayerLayoutManager::enableNavPanelRequested, this, &GlobalPlayerManager::enableNavPanelRequested);
+
+    connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
+        { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }
+    );
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
 
@@ -73,6 +79,10 @@ void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidg
 
     if(media){
         ProjectManager::instance().createProject(media);
+        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
+        connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
+        connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
+        connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
     }
 }
 
@@ -135,6 +145,16 @@ void GlobalPlayerManager::disableSegmentation()
     if(m_timeline){
         m_timeline->hide();
     }
+}
+
+void GlobalPlayerManager::playPreviousMedia()
+{
+    m_navPanel->playPreviousMedia();
+}
+
+void GlobalPlayerManager::playNextMedia()
+{
+    m_navPanel->playNextMedia();
 }
 
 void GlobalPlayerManager::createTimelineWidget()

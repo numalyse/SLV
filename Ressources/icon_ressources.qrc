@@ -19,5 +19,6 @@
         <file alias="capture.png">icons/capture.png</file>
         <file alias="nav_panel_menu_closed.png">icons/nav_panel_menu_closed.png</file>
         <file alias="nav_panel_menu_open.png">icons/nav_panel_menu_open.png</file>
+        <file alias="zoom_on.png">icons/zoom.png</file>
     </qresource>
 </RCC>

@@ -71,6 +71,7 @@ public slots:
     void enableLoopUiUpdate();
     void disableLoopUiUpdate();
     void nameUiUpdate(const QString &);
+    void disableLoopMode();
 
 signals:
     void setPositionRequested(int64_t);

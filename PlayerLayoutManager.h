@@ -15,7 +15,6 @@ public:
     ~PlayerLayoutManager();
 
     void createLayout(const int count);
-    void createLayoutFromPaths(const QStringList& filesPaths);
 
 private:
 
@@ -67,6 +66,12 @@ signals:
     void setGlobalPlayStateRequested(bool);
     void setGlobalMuteStateRequested(bool);
 
+    void disableNavPanelRequested();
+    void enableNavPanelRequested();
+
+    void previousMediaRequested();
+    void nextMediaRequested();
+
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
@@ -80,6 +85,8 @@ public slots:
 
     void checkPlayersPlayStatus();
     void checkPlayersMuteStatus();
+
+    void createLayoutFromPaths(const QStringList& filesPaths);
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

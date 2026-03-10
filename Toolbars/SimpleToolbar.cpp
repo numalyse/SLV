@@ -249,3 +249,8 @@ void SimpleToolbar::nameUiUpdate(const QString & mediaName)
 {
     m_nameLabel->setText(mediaName);
 }
+
+void SimpleToolbar::disableLoopMode()
+{
+    emit m_loopBtn->stateDeactivated();
+}

@@ -30,14 +30,17 @@ public slots:
 
 signals:
     void updateShotDetailRequested(Shot*);
-
+    void timelineSetPosition(int64_t);
+    
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void splitCurrentShotItem();
+    void moveCursor(double cursorPosX);
 
 private:
+    int64_t timeAtCursor();
     void updateCurrentShot();
 
     QGraphicsScene* m_scene = nullptr;

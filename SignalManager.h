@@ -23,6 +23,7 @@ signals:
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void simpleToolbarUpdateCursorPosition(int);
+    void timelineSetPosition(int64_t);
 };
 
 

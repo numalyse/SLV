@@ -80,6 +80,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
     connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 
+    connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
+
 }
 
 // PlayerWidget::~PlayerWidget()

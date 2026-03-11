@@ -31,6 +31,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
+    connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
 
     layout->addWidget(m_view); 
 
@@ -54,6 +55,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     }
 
     connect(&SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition, this, &TimelineWidget::updateCursorPos);
+    connect(this, &TimelineWidget::timelineSetPosition, &SignalManager::instance(), &SignalManager::timelineSetPosition);
 }
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
@@ -143,6 +145,20 @@ void TimelineWidget::applyZoom(double zoomFactor){
 
     m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
     updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
+}
+
+
+int64_t TimelineWidget::timeAtCursor(){
+    double cursorPos = m_cursor->pos().x();
+    int64_t duration = ProjectManager::instance().projet()->media->duration();
+    double pixelPerMs =  duration / static_cast<double>(m_scene->width());
+
+    return static_cast<int64_t>( cursorPos * pixelPerMs );
+}
+
+void TimelineWidget::moveCursor(double cursorPosX){
+    m_cursor->setPos(cursorPosX,0);
+    emit timelineSetPosition(timeAtCursor());
 }
 
 void TimelineWidget::splitCurrentShotItem(){

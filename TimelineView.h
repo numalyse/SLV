@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QGraphicsItem>
+#include <QTimer>
 
 class TimelineView : public QGraphicsView
 {
@@ -14,10 +15,16 @@ public:
 
 signals:
     void zoomRequested(double zoomFactor);
-
+    void cursorPositionRequested(double);
+    
 protected:
     void wheelEvent(QWheelEvent *event) override;
-/*     void mousePressEvent(QMouseEvent *event) override; */
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+private: 
+    bool m_isDragging = false;
 };
 
 #endif

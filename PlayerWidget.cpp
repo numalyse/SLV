@@ -250,3 +250,13 @@ void PlayerWidget::disableLoopMode()
     m_mediaWidget->disableLoopMode();
     emit disableLoopUiUpdateRequested();
 }
+
+void PlayerWidget::startRecord()
+{
+    m_mediaWidget->startRecord();
+}
+
+void PlayerWidget::endRecord()
+{
+    m_mediaWidget->endRecord();
+}

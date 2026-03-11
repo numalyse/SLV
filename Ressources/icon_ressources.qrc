@@ -23,5 +23,7 @@
         <file alias="hide_image.png">icons/hide_image_off.png</file>
         <file alias="show_image.png">icons/hide_image_on.png</file>
         <file alias="slow.png">icons/slow.png</file>
+        <file alias="record_off.png">icons/record-off.png</file>
+        <file alias="record_on.png">icons/record-on.png</file>
     </qresource>
 </RCC>

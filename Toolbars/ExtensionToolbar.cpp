@@ -33,6 +33,15 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_forwardBtn = new ToolbarButton(this, "forward.png", TextManager::instance().get("tooltip_forward"));
     
     m_rotateBtn = new ToolbarButton(this, "rotate.png", TextManager::instance().get("tooltip_rotate"));
+
+    m_recordBtn = new ToolbarToggleButton(
+        this,
+        false,
+        "record_off.png",
+        TextManager::instance().get("tooltip_record_off"),
+        "record_on.png",
+        TextManager::instance().get("tooltip_record_on.png")
+    );
     
     m_segmBtn = new ToolbarToggleButton(
         this, 
@@ -51,6 +60,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
     connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
+    connect(m_recordBtn, &ToolbarToggleButton::stateActivated, this, &ExtensionToolbar::enableRecordRequested);
+    connect(m_recordBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableRecordRequested);
 
     connect(&ProjectManager::instance(), &ProjectManager::deleteProject, this, [this] { // quand le projet est détruit, on force le button segmentation en false
             m_segmBtn->setButtonState(false);
@@ -96,9 +107,10 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_forwardBtn);
     
     mainLayout->addWidget(m_rotateBtn);
+    mainLayout->addWidget(m_recordBtn);
     mainLayout->addWidget(m_verticalInvBtn);
     mainLayout->addWidget(m_horizontalInvBtn);
-    
+    mainLayout->addWidget(m_abloopBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);
 

@@ -17,7 +17,7 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QWidget *wid
 
     widgetToDisplay->setParent(nullptr);
     m_widgetToDisplay = widgetToDisplay;
-    m_widgetToDisplay->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
+
     
     m_widgetToDisplay->installEventFilter(this);
 

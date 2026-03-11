@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "SimpleToolbar.h"
+#include <QGraphicsDropShadowEffect>
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
@@ -42,17 +43,38 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         emit setPositionRequested(m_slider->value());
     });
 
-    QHBoxLayout* buttonLayout =  new QHBoxLayout();
+    // QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
     // ------- test mute btn, hover et toggle
     QWidget* volumeSliderContainer = new QWidget();
-    QVBoxLayout* volumeSliderLayout = new QVBoxLayout(volumeSliderContainer);
-    volumeSliderLayout->setContentsMargins(0, 0, 0, 0);
-    QSlider* volumeSlider = new QSlider(Qt::Vertical, volumeSliderContainer);
-    volumeSlider->setFixedSize(20,100);
-    volumeSlider->setRange(0, 100);
+
+    volumeSliderContainer->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
+    volumeSliderContainer->setAttribute(Qt::WA_TranslucentBackground);
+
+    QFrame* volumeSliderBackground = new QFrame(volumeSliderContainer);
+    volumeSliderBackground->setStyleSheet(
+        "QFrame{ background-color: palette(base); border-radius: 6px; border-style: solid; border-color: lightgray; border-width: 1px;}"
+        "QLabel{ border: none; }"
+    );
+
+    QVBoxLayout* volumeContainerLayout = new QVBoxLayout(volumeSliderContainer);
+    volumeContainerLayout->setContentsMargins(0,0,0,0);
+    volumeContainerLayout->addWidget(volumeSliderBackground);
+
+    QVBoxLayout* volumeFrameLayout = new QVBoxLayout(volumeSliderBackground);
+    volumeFrameLayout->setContentsMargins(6,6,6,6);
+
+
+    QSlider* volumeSlider = new QSlider(Qt::Vertical);
+    volumeSlider->setRange(0,100);
     volumeSlider->setValue(100);
-    volumeSliderLayout->addWidget(volumeSlider);
+    volumeSlider->adjustSize();
+
+    volumeFrameLayout->addWidget(volumeSlider);
+    m_volumeLabel = new QLabel("100%");
+    volumeFrameLayout->addWidget(m_volumeLabel);
+    volumeFrameLayout->setAlignment(volumeSlider, Qt::AlignHCenter);
+    volumeFrameLayout->setAlignment(m_volumeLabel, Qt::AlignHCenter);
 
     m_muteBtn = new ToolbarToggleHoverButton(
         this, 
@@ -66,17 +88,51 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     
     // ------- test speed btn, click show popup
+
     QWidget* speedSliderContainer = new QWidget();
-    QVBoxLayout* speedSliderLayout = new QVBoxLayout(speedSliderContainer);
-    speedSliderLayout->setContentsMargins(0, 0, 0, 0);
-    QSlider* speedSlider = new QSlider(Qt::Horizontal, speedSliderContainer);
-    speedSlider->setFixedSize(200,20);
-    speedSlider->setRange(0, 6);
+
+    speedSliderContainer->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
+    speedSliderContainer->setAttribute(Qt::WA_TranslucentBackground);
+
+    QFrame* speedSliderBackground = new QFrame(speedSliderContainer);
+    speedSliderBackground->setStyleSheet(
+        "QFrame {"
+        " background-color: palette(base);"
+        " border-radius: 6px;"
+        " border: 1px solid lightgray;"
+        "}"
+        "QLabel {"
+        " border: none;"
+        "}"
+        );
+
+    QVBoxLayout* speedContainerLayout = new QVBoxLayout(speedSliderContainer);
+    speedContainerLayout->setContentsMargins(0,0,0,0);
+    speedContainerLayout->addWidget(speedSliderBackground);
+
+    QVBoxLayout* speedFrameLayout = new QVBoxLayout(speedSliderBackground);
+    speedFrameLayout->setContentsMargins(6,6,6,6);
+
+    QHBoxLayout* speedInfoLayout = new QHBoxLayout();
+    speedFrameLayout->addLayout(speedInfoLayout);
+    m_speedLabel = new QLabel("x1");
+    QLabel* slowIcon = new QLabel();
+    slowIcon->setPixmap(QPixmap(":/icons/slow.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    QLabel* fastIcon = new QLabel();
+    fastIcon->setPixmap(QPixmap(":/icons/speed.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    speedInfoLayout->addWidget(slowIcon);
+    speedInfoLayout->addStretch();
+    speedInfoLayout->addWidget(m_speedLabel);
+    speedInfoLayout->addStretch();
+    speedInfoLayout->addWidget(fastIcon);
+
+    QSlider* speedSlider = new QSlider(Qt::Horizontal);
+    speedSlider->setRange(0,6);
     speedSlider->setValue(3);
     speedSlider->setTickPosition(QSlider::TicksAbove);
     speedSlider->setTickInterval(1);
 
-    speedSliderLayout->addWidget(speedSlider);
+    speedFrameLayout->addWidget(speedSlider);
 
     m_speedBtn = new ToolbarPopupButton(this, speedSliderContainer, "speed.png",  TextManager::instance().get("tooltip_speed"));
 
@@ -246,6 +302,16 @@ void SimpleToolbar::disableLoopUiUpdate()
 void SimpleToolbar::nameUiUpdate(const QString & mediaName)
 {
     m_nameLabel->setText(mediaName);
+}
+
+void SimpleToolbar::volumeUiUpdate(const QString & newVolume)
+{
+    m_volumeLabel->setText(newVolume + "%");
+}
+
+void SimpleToolbar::speedUiUpdate(const QString & newSpeed)
+{
+    m_speedLabel->setText("x" + newSpeed);
 }
 
 void SimpleToolbar::disableLoopMode()

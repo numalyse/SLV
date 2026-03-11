@@ -168,6 +168,9 @@ void MediaWidget::setVolume(const int &vol)
 {
     if (!m_player) return;
     libvlc_audio_set_volume(m_player, vol);
+    const QString & volStr = QString::number(vol);
+    emit volumeChanged(volStr);
+    emit SignalManager::instance().mediaVolumeChanged(volStr);
 }
 
 /// @brief Change media player rate
@@ -175,7 +178,12 @@ void MediaWidget::setVolume(const int &vol)
 void MediaWidget::setSpeed(const unsigned int &speedIndex)
 {
     if (!m_player) return;
-    libvlc_media_player_set_rate(m_player, m_speedSteps[speedIndex]);
+    int err = libvlc_media_player_set_rate(m_player, m_speedSteps[speedIndex]);
+    if(err != -1){
+        const QString & speedStr = QString::number(m_speedSteps[speedIndex]);
+        emit speedChanged(speedStr);
+        emit SignalManager::instance().mediaSpeedChanged(speedStr);
+    }
 }
 
 /// @brief Take a screenshot of the current frame

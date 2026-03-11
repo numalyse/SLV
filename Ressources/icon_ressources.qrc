@@ -22,5 +22,6 @@
         <file alias="zoom_on.png">icons/zoom.png</file>
         <file alias="hide_image.png">icons/hide_image_off.png</file>
         <file alias="show_image.png">icons/hide_image_on.png</file>
+        <file alias="slow.png">icons/slow.png</file>
     </qresource>
 </RCC>

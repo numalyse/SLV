@@ -319,6 +319,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::unmuteUiUpdateRequested, advancedToolbar, &SimpleToolbar::unmuteUiUpdate);
     connect(activePlayer, &PlayerWidget::ejectUiUpdateRequested, advancedToolbar, &SimpleToolbar::ejectUiUpdate);
     connect(activePlayer, &PlayerWidget::stopUiUpdateRequested, advancedToolbar, &SimpleToolbar::stopUiUpdate);
+    connect(&SignalManager::instance(), &SignalManager::mediaVolumeChanged, advancedToolbar, &AdvancedToolbar::volumeUiUpdate);
+    connect(&SignalManager::instance(), &SignalManager::mediaSpeedChanged, advancedToolbar, &AdvancedToolbar::speedUiUpdate);
     connect(activePlayer, &PlayerWidget::enableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::enableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);

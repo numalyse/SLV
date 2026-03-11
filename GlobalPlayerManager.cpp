@@ -77,12 +77,14 @@ void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidg
         layout->addWidget(m_toolbarWidget);
     }
 
+    auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
     if(media){
         ProjectManager::instance().createProject(media);
-        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
+
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+
     }
 }
 

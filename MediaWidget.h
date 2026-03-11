@@ -74,6 +74,8 @@ signals:
     void mediaPlayerLoaded();
     void nameUiUpdateRequested(const QString&);
     void mediaFinished();
+    void volumeChanged(const QString&);
+    void speedChanged(const QString&);
 };
 
 #endif // MEDIAWIDGET_H

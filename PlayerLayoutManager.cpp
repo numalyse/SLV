@@ -323,6 +323,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
 
+    connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, advancedToolbar, &SimpleToolbar::updateSliderValue);
+
     return static_cast<Toolbar*>(advancedToolbar);
 }
 

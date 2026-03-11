@@ -145,7 +145,7 @@ void PlayerWidget::play()
     }
 }
 
-/// @brief Play la video connecté à une advanced toolbar, créer un projet en plus de l'aciton de base
+/// @brief Play la video connecté à une advanced toolbar, créer un projet en plus de l'action de base
 void PlayerWidget::playFromAdvanced()
 {
     if (m_mediaWidget->play()){

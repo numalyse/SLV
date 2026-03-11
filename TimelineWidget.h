@@ -54,6 +54,7 @@ private:
 
     int m_sceneWidth = 2000;
     int m_sceneHeight = 150;
+    double m_pixelsPerMs {};
 
     int m_rulerHeight = 25;
     double m_minPxBetweenTicks = 100.0;

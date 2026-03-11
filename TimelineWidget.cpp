@@ -15,12 +15,16 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 
+#include <algorithm> 
+
 TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0); 
 
     m_scene = new QGraphicsScene(this);
+    auto duration = ProjectManager::instance().projet()->media->duration();
+    m_pixelsPerMs = m_sceneWidth / static_cast<double>(duration);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
 
     m_view = new TimelineView(m_scene, this);
@@ -79,15 +83,12 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
 
     if (duration <= 0) return;
 
-    double ratio = static_cast<double>(vlcTime) / static_cast<double>(duration);
-    
-    int posCursor = static_cast<int>(ratio * m_scene->width()); 
+    double posCursor = static_cast<double>(vlcTime) * m_pixelsPerMs; 
     
     m_cursor->setPos(posCursor, 0);
 
     updateCurrentShot();
 }
-
 
 void TimelineWidget::updateCurrentShot(){
     int shotItemCount = static_cast<int>(m_shotItems.size());
@@ -118,17 +119,17 @@ void TimelineWidget::updateCurrentShot(){
 }
 
 
-void TimelineWidget::applyZoom(double zoomFactor){
+void TimelineWidget::applyZoom(double zoomFactor) {
+    int64_t duration = ProjectManager::instance().projet()->media->duration();
+    if (duration <= 0) return; 
 
-    double newSceneWidth = m_scene->width() * zoomFactor;
+    double newPixelsPerMs = m_pixelsPerMs * zoomFactor;
 
     double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
     double maxWidth = std::numeric_limits<int>::max() - 1000000.0; // en cas de vidéo très très longue le zoom peut causer des problèmes, -1 000 000 pour de la marge au cas ou
     
-    int64_t duration = ProjectManager::instance().projet()->media->duration();
     double fps = ProjectManager::instance().projet()->media->fps();
-    
-    if (duration > 0 && fps > 0) {
+    if (fps > 0) {
         double frameMs = 1000.0 / fps;
         double totalFrames = static_cast<double>(duration) / frameMs;
         
@@ -138,22 +139,27 @@ void TimelineWidget::applyZoom(double zoomFactor){
         // si vidéo courte, le taille du view port peut être supérieur à maxWidth
         if (maxWidth < minWidth) maxWidth = minWidth;
     }
-    //limite la taille avec les valeurs précédentes
-    m_sceneWidth = std::clamp(newSceneWidth, minWidth, maxWidth);
+
+    // limite toujours la taille mais via le ratio et plus la taille de la scene
+    double minRatio = minWidth / static_cast<double>(duration);
+    double maxRatio = maxWidth / static_cast<double>(duration);
+
+    m_pixelsPerMs = std::clamp(newPixelsPerMs, minRatio, maxRatio);
+
+    m_sceneWidth = duration * m_pixelsPerMs;
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
-
-    m_ruler->setSize(m_sceneWidth, m_rulerHeight); // on met à jour la taille de la ruler pour fit la scene
-    updateCursorPos(m_vlcTime); // on met à jour la position du curseur, apres un zoom/dezoom la position change
+    m_ruler->setSize(m_sceneWidth, m_rulerHeight);
+    updateCursorPos(m_vlcTime);
 }
 
-
-int64_t TimelineWidget::timeAtCursor(){
+int64_t TimelineWidget::timeAtCursor() {
     double cursorPos = m_cursor->pos().x();
+    
+    double ms = cursorPos / m_pixelsPerMs; 
     int64_t duration = ProjectManager::instance().projet()->media->duration();
-    double pixelPerMs =  duration / static_cast<double>(m_scene->width());
-
-    return static_cast<int64_t>( cursorPos * pixelPerMs );
+    
+    return std::clamp(static_cast<int64_t>(ms), static_cast<int64_t>(0), duration);
 }
 
 void TimelineWidget::moveCursor(double cursorPosX){
@@ -164,17 +170,8 @@ void TimelineWidget::moveCursor(double cursorPosX){
 void TimelineWidget::splitCurrentShotItem(){
     Shot* currShot = m_currentShotItem->shot();
 
-/*     // position du curseur = position du début du plan
-    double cursorPos = m_cursor->pos().x();
-
-    int64_t duration = ProjectManager::instance().projet()->media->duration();
-    double pixelPerMs =  duration / static_cast<double>(m_scene->width());
-
-    int64_t timeAtCursor = static_cast<int64_t>( cursorPos * pixelPerMs ); */
-
-    int64_t timeAtCursor = m_vlcTime;
-    qDebug() << "Ms au curseur " << timeAtCursor;
-    qDebug() << "Temps au curseur " << TimeFormatter::msToHHMMSSFF(timeAtCursor, ProjectManager::instance().projet()->media->fps());
+    qDebug() << "Ms au curseur " << timeAtCursor();
+    qDebug() << "Temps au curseur " << TimeFormatter::msToHHMMSSFF( timeAtCursor(), ProjectManager::instance().projet()->media->fps());
 
     //int64_t currShotEnd = timeAtCursor-1; // la fin du plan est la position du curseur-1
 

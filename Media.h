@@ -39,7 +39,7 @@ public:
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
 
 signals:
-    void fpsParsed(int64_t);
+    void fpsParsed(double);
     void durationParsed(int64_t);
     
 private:

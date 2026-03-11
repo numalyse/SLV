@@ -8,42 +8,41 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
-RulerItem::RulerItem(int width, int height, double minPxBetweenTicks, QGraphicsItem* parent) 
-: QGraphicsItem(parent), m_width{width}, m_height{height}, m_minPxBetweenTicks{minPxBetweenTicks}
+RulerItem::RulerItem(int width, int height, double minPxBetweenTicks, double pixelsPerMs, int64_t duration ,double fps ,QGraphicsItem* parent) 
+: QGraphicsItem(parent), m_width{width}, m_height{height}, m_minPxBetweenTicks{minPxBetweenTicks}, m_pixelsPerMs{pixelsPerMs}, m_duration{duration}, m_fps{fps}
 {
     setZValue(1);
+    computeZoomSteps(m_fps, m_zoomSteps);
 }
 
 QRectF RulerItem::boundingRect() const {
     return QRectF(0, 0, m_width, m_height);
 }
 
-/// @brief Modifie le cached fps avec le newFps, modifie le vecteur de zooms
-/// @param newFps 
-/// @param cachedFps 
+/// @brief Initialise les echelles de zoom
+/// @param fps 
 /// @param zoomSteps 
-void RulerItem::computeZoomSteps(double newFps, double& cachedFps, std::vector<int64_t>& zoomSteps){
-    cachedFps = newFps;
+void RulerItem::computeZoomSteps(double fps, std::vector<double>& zoomSteps){
     zoomSteps.clear();
 
-    int64_t frameMs = (newFps > 0) ? static_cast<int64_t>(1000 / newFps) : 40; 
+    double frameMs = (fps > 0) ? (1000.0 / fps) : 40.0; 
     
     zoomSteps.push_back(frameMs);
     zoomSteps.push_back(frameMs * 2);
     zoomSteps.push_back(frameMs * 5);
     zoomSteps.push_back(frameMs * 10);
     
-    if (frameMs * 25 < 1000) {
-        zoomSteps.push_back(frameMs * 25);
+    if (frameMs * 25.0 < 1000.0) {
+        zoomSteps.push_back(frameMs * 25.0);
     }
 
-    static const std::array<int64_t, 11> fixedTimeStep = {
-        1000, 2000, 5000, 10000, 30000, // Secondes
-        60000, 120000, 300000, 600000,  // Minutes
-        1800000, 3600000                // Heures
+    static const std::array<double, 11> fixedTimeStep = {
+        1000.0, 2000.0, 5000.0, 10000.0, 30000.0, // Secondes
+        60000.0, 120000.0, 300000.0, 600000.0,  // Minutes
+        1800000.0, 3600000.0                // Heures
     };
 
-    for (int64_t t : fixedTimeStep) {
+    for (double t : fixedTimeStep) {
         zoomSteps.push_back(t);
     }
 }
@@ -68,29 +67,15 @@ void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
     p->setPen(QPen(Qt::black, 2));
     p->drawLine(visibleZone.left(), m_height, visibleZone.right(), m_height); 
 
-    int64_t duration = ProjectManager::instance().projet()->media->duration();
-    double fps = ProjectManager::instance().projet()->media->fps();
+
+    double msPerPixels = 1.0 / m_pixelsPerMs;
+
+    double minTimeStep = m_minPxBetweenTicks * msPerPixels;
     
-    // ratio ms / px
-    double msPerPixels = static_cast<double>(duration) / static_cast<double>(m_width);
-    // ratio px / ms
-    double pixelsPerMs = static_cast<double>(m_width) / static_cast<double>(duration);
+    double maxZoomStep = m_zoomSteps[m_zoomSteps.size()-1];
 
-    int64_t minTimeStep = static_cast<int64_t>(m_minPxBetweenTicks * msPerPixels);
-
-    int64_t frameMs = (fps > 0) ? static_cast<int64_t>(1000 / fps) : 40; 
-    
-    // variables statiques recalculée quand on le media change de fps ou à l'initialisation
-    // évite d'allouer un tableau à chaque appelle de paint
-    static std::vector<int64_t> zoomSteps;
-    static double cachedFps = -1.0;
-    if (fps != cachedFps || zoomSteps.empty()) {
-        computeZoomSteps(fps, cachedFps, zoomSteps);
-    }
-    int64_t maxZoomStep = zoomSteps[zoomSteps.size()-1];
-
-    int64_t stepMs = maxZoomStep; 
-    for (int64_t zoomStep : zoomSteps) {
+    double stepMs = maxZoomStep; 
+    for (double zoomStep : m_zoomSteps) {
         if (zoomStep >= minTimeStep) {
             stepMs = zoomStep;
             break;
@@ -98,32 +83,48 @@ void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
     }
 
     if (minTimeStep > maxZoomStep) {
-        stepMs = ((minTimeStep / maxZoomStep) + 1) * maxZoomStep; 
+        stepMs = (std::floor(minTimeStep / maxZoomStep) + 1.0) * maxZoomStep; 
     }
 
-    int64_t startTime = static_cast<int64_t>(visibleZone.left() * msPerPixels);
-    startTime = (startTime / stepMs) * stepMs; 
-    int64_t endTime = static_cast<int64_t>(visibleZone.right() * msPerPixels);
+    double startTime = visibleZone.left() * msPerPixels;
+    startTime = std::floor(startTime / stepMs) * stepMs; 
+    startTime = ( startTime < 0) ? 0 : startTime;
 
-    for(int64_t t = startTime; t <= endTime; t += stepMs) {
-        
-        int px = static_cast<int>(t * pixelsPerMs);
+    double endTime = visibleZone.right() * msPerPixels;
 
-        p->drawLine(px, m_height/1.3, px, m_height);
+    // dessin des traits verticaux et du texte
+    for(double t = startTime; t <= endTime; t += stepMs) {
 
-        QString txt = TimeFormatter::msToHHMMSSFF(t, fps);
+        double px = t * m_pixelsPerMs;
+
+         // on snap le temps retrouvé à un temps de la frametime la plus proche => évite d'avoir 2 timecode 00:00:00[00]
+        double rawMs = px / m_pixelsPerMs;
+        if (m_fps > 0) {
+            double frameMs = 1000.0 / m_fps;
+            double nearestFrameIndex = std::round(rawMs / frameMs);
+            rawMs = nearestFrameIndex * frameMs; 
+        } 
+        int64_t finalMs = static_cast<int64_t>(rawMs);
+        p->drawLine(QPointF(px, m_height / 1.3), QPointF(px, m_height));
+
+        QString txt = TimeFormatter::msToHHMMSSFF(finalMs, m_fps);
         p->save();
-        p->translate(px - 25, 2 * m_height / 3);
-        p->drawText(0, 0, txt);
+        
+        double textX = px - 25.0;
+        textX = (textX < 0.0)  ? 2.0 : textX; // décale vers la droite le text de gauche
+
+        p->translate(textX, 2.0 * m_height / 3.0);
+        p->drawText(0.0, 0.0, txt);
         p->restore();
     }
 }
 
 
-void RulerItem::setSize(int width, int height) {
-    if (m_width == width && m_height == height) return;
+void RulerItem::setSize(int width, int height, double pixelsPerMs) {
+    if (m_width == width && m_height == height && m_pixelsPerMs == pixelsPerMs) return;
     prepareGeometryChange(); 
     m_width = width;
     m_height = height;
+    m_pixelsPerMs = pixelsPerMs;
     update();
 }

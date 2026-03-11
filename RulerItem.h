@@ -8,20 +8,24 @@ class RulerItem : public QGraphicsItem
 
 public:
 
-    explicit RulerItem(int width, int height, double minPxBetweenTicks, QGraphicsItem* parent= nullptr);
+    explicit RulerItem(int width, int height, double minPxBetweenTicks, double pixelsPerMs, int64_t duration, double fps, QGraphicsItem *parent = nullptr);
 
     QRectF boundingRect() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void setSize(int width, int height);
+    void setSize(int width, int height, double pixelsPerMs);
 
 private:
     int m_width;
     int m_height;
     double m_minPxBetweenTicks;
+    double m_pixelsPerMs;
+    double m_fps;
+    int64_t m_duration;
+    std::vector<double> m_zoomSteps;
     
-    void computeZoomSteps(double newFps, double &cachedFps, std::vector<int64_t> &zoomSteps);
+    void computeZoomSteps(double fps, std::vector<double> &zoomSteps);
 };
 
 

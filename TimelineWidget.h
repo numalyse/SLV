@@ -52,6 +52,9 @@ private:
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
 
+    double m_fps{};
+    int64_t m_duration{};
+
     int m_sceneWidth = 2000;
     int m_sceneHeight = 150;
     double m_pixelsPerMs {};

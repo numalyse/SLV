@@ -22,9 +22,16 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0); 
 
+    m_fps = ProjectManager::instance().projet()->media->fps();
+    m_duration = ProjectManager::instance().projet()->media->duration();
+    if(m_fps == 0.0 || m_duration == 0){
+        qDebug() << "Creation timeline : Fps ou durée du film = 0";
+        return;
+    }
+
+    m_pixelsPerMs = m_sceneWidth / static_cast<double>(m_duration);
+
     m_scene = new QGraphicsScene(this);
-    auto duration = ProjectManager::instance().projet()->media->duration();
-    m_pixelsPerMs = m_sceneWidth / static_cast<double>(duration);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
 
     m_view = new TimelineView(m_scene, this);
@@ -43,7 +50,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
     layout->addWidget(m_splitShotBtn);
 
-    m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks);
+    m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_pixelsPerMs, m_duration, m_fps);
     m_ruler->setPos(0, 0); 
     m_scene->addItem(m_ruler);
 
@@ -53,7 +60,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 
     int startShotHeight = m_sceneHeight - m_rulerHeight;
     for ( auto& IShot : ProjectManager::instance().projet()->shots ){
-        ShotItem* shot = new ShotItem(&IShot, startShotHeight); // stocke ptr non owner dans les shotItem => modification dans projet modifie le shot et inversement
+        ShotItem* shot = new ShotItem(IShot, startShotHeight); // stocke ptr non owner dans les shotItem => modification dans projet modifie le shot et inversement
         m_scene->addItem(shot);
         m_shotItems.append(shot);
     }
@@ -79,9 +86,6 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
     m_vlcTime = vlcTime;
-    int64_t duration = ProjectManager::instance().projet()->media->duration();
-
-    if (duration <= 0) return;
 
     double posCursor = static_cast<double>(vlcTime) * m_pixelsPerMs; 
     
@@ -120,9 +124,6 @@ void TimelineWidget::updateCurrentShot(){
 
 
 void TimelineWidget::applyZoom(double zoomFactor) {
-    int64_t duration = ProjectManager::instance().projet()->media->duration();
-    if (duration <= 0) return; 
-
     double newPixelsPerMs = m_pixelsPerMs * zoomFactor;
 
     double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
@@ -131,7 +132,7 @@ void TimelineWidget::applyZoom(double zoomFactor) {
     double fps = ProjectManager::instance().projet()->media->fps();
     if (fps > 0) {
         double frameMs = 1000.0 / fps;
-        double totalFrames = static_cast<double>(duration) / frameMs;
+        double totalFrames = static_cast<double>(m_duration) / frameMs;
         
         maxWidth = std::min( maxWidth, (totalFrames * m_minPxBetweenTicks)); 
         // la scene fera au maximum : nb de frames * l'espacement entre les ticks
@@ -141,25 +142,33 @@ void TimelineWidget::applyZoom(double zoomFactor) {
     }
 
     // limite toujours la taille mais via le ratio et plus la taille de la scene
-    double minRatio = minWidth / static_cast<double>(duration);
-    double maxRatio = maxWidth / static_cast<double>(duration);
+    double minRatio = minWidth / static_cast<double>(m_duration);
+    double maxRatio = maxWidth / static_cast<double>(m_duration);
 
     m_pixelsPerMs = std::clamp(newPixelsPerMs, minRatio, maxRatio);
 
-    m_sceneWidth = duration * m_pixelsPerMs;
+    m_sceneWidth = m_duration * m_pixelsPerMs;
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
-    m_ruler->setSize(m_sceneWidth, m_rulerHeight);
+    m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_pixelsPerMs);
     updateCursorPos(m_vlcTime);
 }
+
 
 int64_t TimelineWidget::timeAtCursor() {
     double cursorPos = m_cursor->pos().x();
     
-    double ms = cursorPos / m_pixelsPerMs; 
-    int64_t duration = ProjectManager::instance().projet()->media->duration();
-    
-    return std::clamp(static_cast<int64_t>(ms), static_cast<int64_t>(0), duration);
+    double rawMs = cursorPos / m_pixelsPerMs; 
+
+    // snap à la frame la plus proche
+    if (m_fps > 0) {
+        double frameMs = 1000.0 / m_fps;
+        double nearestFrameIndex = std::round(rawMs / frameMs);
+        rawMs = nearestFrameIndex * frameMs; 
+    }
+
+    int64_t finalMs = static_cast<int64_t>(rawMs);
+    return std::clamp(finalMs, static_cast<int64_t>(0), m_duration);
 }
 
 void TimelineWidget::moveCursor(double cursorPosX){

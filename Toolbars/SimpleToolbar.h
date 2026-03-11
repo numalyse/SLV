@@ -42,7 +42,7 @@ public:
 protected:
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
-    float m_media_fps {};
+    double m_media_fps {};
     QTimer* m_seekTimer = nullptr;
     QLabel* m_currentTimeLabel = nullptr;
     QLabel* m_durationLabel = nullptr;

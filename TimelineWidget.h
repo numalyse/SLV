@@ -26,7 +26,7 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
-    void applyZoom(double zoomFactor);
+    void applyZoom(double zoomFactor, int mouseX);
 
 signals:
     void updateShotDetailRequested(Shot*);

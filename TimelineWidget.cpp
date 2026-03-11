@@ -123,7 +123,8 @@ void TimelineWidget::updateCurrentShot(){
 }
 
 
-void TimelineWidget::applyZoom(double zoomFactor) {
+void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
+    double currentTimeUnderMouse = (m_view->horizontalScrollBar()->value() + mouseX) / m_pixelsPerMs;
     double newPixelsPerMs = m_pixelsPerMs * zoomFactor;
 
     double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
@@ -152,6 +153,9 @@ void TimelineWidget::applyZoom(double zoomFactor) {
 
     m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_pixelsPerMs);
     updateCursorPos(m_vlcTime);
+
+    double newPixelPos = currentTimeUnderMouse * m_pixelsPerMs;
+    m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
 }
 
 

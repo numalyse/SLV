@@ -14,7 +14,7 @@ public:
     explicit TimelineView(QGraphicsScene *scene, QWidget *parent = nullptr);
 
 signals:
-    void zoomRequested(double zoomFactor);
+    void zoomRequested(double zoomFactor, int mouseX);
     void cursorPositionRequested(double);
     
 protected:
@@ -24,7 +24,12 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private: 
+
     bool m_isDragging = false;
+
+    bool m_isPanning = false;
+    QPoint m_lastPanPos;
+
 };
 
 #endif

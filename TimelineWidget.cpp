@@ -60,7 +60,7 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
 
     int startShotHeight = m_sceneHeight - m_rulerHeight;
     for ( auto& IShot : ProjectManager::instance().projet()->shots ){
-        ShotItem* shot = new ShotItem(IShot, startShotHeight); // stocke ptr non owner dans les shotItem => modification dans projet modifie le shot et inversement
+        ShotItem* shot = new ShotItem(&IShot, startShotHeight); // stocke ptr non owner dans les shotItem => modification dans projet modifie le shot et inversement
         m_scene->addItem(shot);
         m_shotItems.append(shot);
     }
@@ -173,7 +173,8 @@ int64_t TimelineWidget::timeAtCursor() {
 
 void TimelineWidget::moveCursor(double cursorPosX){
     m_cursor->setPos(cursorPosX,0);
-    emit timelineSetPosition(timeAtCursor());
+    m_vlcTime = timeAtCursor();
+    emit timelineSetPosition(m_vlcTime);
 }
 
 void TimelineWidget::splitCurrentShotItem(){

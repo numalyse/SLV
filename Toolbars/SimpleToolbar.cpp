@@ -64,16 +64,16 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     QVBoxLayout* volumeFrameLayout = new QVBoxLayout(volumeSliderBackground);
     volumeFrameLayout->setContentsMargins(6,6,6,6);
 
+    m_volumeSlider = new QSlider(Qt::Vertical);
+    m_volumeSlider->setRange(0,100);
+    m_volumeSlider->setValue(100);
+    m_volumeSlider->adjustSize();
 
-    QSlider* volumeSlider = new QSlider(Qt::Vertical);
-    volumeSlider->setRange(0,100);
-    volumeSlider->setValue(100);
-    volumeSlider->adjustSize();
-
-    volumeFrameLayout->addWidget(volumeSlider);
     m_volumeLabel = new QLabel("100%");
     volumeFrameLayout->addWidget(m_volumeLabel);
-    volumeFrameLayout->setAlignment(volumeSlider, Qt::AlignHCenter);
+    volumeFrameLayout->addWidget(m_volumeSlider);
+
+    volumeFrameLayout->setAlignment(m_volumeSlider, Qt::AlignHCenter);
     volumeFrameLayout->setAlignment(m_volumeLabel, Qt::AlignHCenter);
 
     m_muteBtn = new ToolbarToggleHoverButton(
@@ -199,6 +199,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
+    buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);
     buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);

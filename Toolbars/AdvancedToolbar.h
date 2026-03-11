@@ -34,6 +34,8 @@ private:
     ExtensionToolbar* m_extensionToolbar = nullptr;
 
 signals:
+    void enableRecordRequested();
+    void disableRecordRequested();
     void enableSegmentationRequest();
     void disableSegmentationRequest();
     void previousMediaRequested();

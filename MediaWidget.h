@@ -39,6 +39,8 @@ public slots:
     void disableLoopMode();
     void hideMedia();
     void showMedia();
+    void startRecord();
+    void endRecord();
 
 private:
 
@@ -50,6 +52,7 @@ private:
     Media* m_media = nullptr;
     QWidget* m_mediaSurface = nullptr;
     QFrame* m_blackFrame = nullptr;
+    int m_startRecordTime = -1;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     

@@ -44,6 +44,8 @@ public slots:
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
+    void startRecord();
+    void endRecord();
 
 signals:
     void addPlayerRequest();

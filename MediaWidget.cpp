@@ -221,6 +221,22 @@ void MediaWidget::showMedia()
     m_blackFrame->lower();
 }
 
+void MediaWidget::startRecord()
+{
+    if(!m_player || !m_media) return;
+    m_startRecordTime = libvlc_media_player_get_time(m_player);
+    if(m_media->type() != MediaType::Image){
+        libvlc_media_add_option(m_media->vlcMedia(), (":sout=#duplicate{dst=display,dst=std{access=file,mux=ps,dst=C:/Users/kviguier/Desktop/test.mp4}"));
+        libvlc_media_add_option(m_media->vlcMedia(), ":sout-keep");
+    }
+}
+
+void MediaWidget::endRecord()
+{
+    if(!m_player) return;
+    int endRecordTime = libvlc_media_player_get_time(m_player);
+}
+
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
 /// @param event 
 /// @param userData 

@@ -136,7 +136,8 @@ void AdvancedToolbar::setDefaultUI()
     }
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(5,5,5,5);
+    mainLayout->setSpacing(1);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
     timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
@@ -146,7 +147,10 @@ void AdvancedToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_slider);
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout();   
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->setContentsMargins(0,0,0,0);
+    buttonLayout->setSpacing(1);
+    buttonLayout->addStretch();
     buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_speedBtn);
     buttonLayout->addWidget(m_prevMediaBtn);
@@ -160,7 +164,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_duplicatePlayerBtn);
     buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_extensionBtn);
-
+    buttonLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
 
     mainLayout->addWidget(m_extensionToolbar);

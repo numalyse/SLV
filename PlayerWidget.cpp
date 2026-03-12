@@ -69,6 +69,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(1);
     layout->addWidget(m_mediaWidget);
     layout->addWidget(m_toolBar);
 

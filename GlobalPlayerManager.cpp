@@ -12,8 +12,11 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
 {
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
     layout = new QVBoxLayout();
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(1);
     mainLayout->addLayout(layout);
     m_navPanel = new NavPanel(this);
     mainLayout->addWidget(m_navPanel);

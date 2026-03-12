@@ -97,6 +97,8 @@ void ExtensionToolbar::setDefaultUI()
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(1);
+    mainLayout->addStretch();
 
     mainLayout->addWidget(m_zoomBtn);
     mainLayout->addWidget(m_hideImgBtn);
@@ -113,5 +115,6 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_abloopBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);
+    mainLayout->addStretch();
 
 }

@@ -39,12 +39,12 @@ void ToolbarPopupButton::moveWidgetOnTop()
     QPoint globalPos = mapToGlobal(QPoint(0, 0));
 
     int width = this->width();
-    int height = this->height();
+    // int height = this->height();
 
     int height_offset = 10;
 
     int x = globalPos.x() + (width/2) - (m_widgetToDisplay->width()/2);
-    int y = globalPos.y() - m_widgetToDisplay->height() + height_offset;
+    int y = globalPos.y() - m_widgetToDisplay->height() /*+ height_offset*/;
 
     m_widgetToDisplay->move(x, y);
 }

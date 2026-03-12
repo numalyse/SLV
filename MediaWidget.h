@@ -6,6 +6,7 @@
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <SignalManager.h>
+#include <QFrame>
 
 class MediaWidget : public QWidget
 {
@@ -36,6 +37,10 @@ public slots:
     void setTime(int64_t);
     void enableLoopMode();
     void disableLoopMode();
+    void hideMedia();
+    void showMedia();
+    void startRecord();
+    void endRecord();
 
 private:
 
@@ -43,7 +48,11 @@ private:
     bool m_loopActivated = true;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     libvlc_event_manager_t* m_eventManager = nullptr;
+    libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
+    QWidget* m_mediaSurface = nullptr;
+    QFrame* m_blackFrame = nullptr;
+    int m_startRecordTime = -1;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     
@@ -58,6 +67,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void updateSliderValueRequested(int64_t newTime);
@@ -67,6 +77,8 @@ signals:
     void mediaPlayerLoaded();
     void nameUiUpdateRequested(const QString&);
     void mediaFinished();
+    void volumeChanged(const QString&);
+    void speedChanged(const QString&);
 };
 
 #endif // MEDIAWIDGET_H

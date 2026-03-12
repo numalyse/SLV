@@ -22,17 +22,21 @@ ToolbarToggleButton::ToolbarToggleButton(
 
     setStyleSheet(
         "QPushButton {"
-        "   background-color: white;"
+        "   background-color: palette(button);"
         "}"
         "QPushButton:checked {"
-        "   background-color: white;"
+        "   background-color: palette(button);"
         "}"
         "QPushButton:pressed {"
-        "   background-color: white;"
+        "   background-color: palette(button);"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: palette(button);"
         "}"
     );
 
-    setIconSize(QSize(10,30));
+    setIconSize(QSize(12,30));
+    setFixedSize(30, 30);
 
     updateIcons(state);
 

@@ -49,10 +49,14 @@ protected:
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
 
+    QSlider* m_volumeSlider = nullptr;
+    QLabel* m_volumeLabel = nullptr;
     ToolbarPopupButton* m_speedBtn = nullptr;
+    QLabel* m_speedLabel = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;
+    ToolbarPopupButton* m_langBtn = nullptr;
 
     // ToolbarButton* m_slowDownBtn
     // ToolbarButton* m_speedUpBtn;
@@ -71,6 +75,8 @@ public slots:
     void enableLoopUiUpdate();
     void disableLoopUiUpdate();
     void nameUiUpdate(const QString &);
+    void volumeUiUpdate(const QString &);
+    void speedUiUpdate(const QString &);
     void disableLoopMode();
 
 signals:

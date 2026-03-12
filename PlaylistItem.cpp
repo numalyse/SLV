@@ -7,32 +7,58 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     m_mediaData = new Media(mediaFilePath);
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
-    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(6,4,6,4);
+    mainLayout->setSpacing(8);
+
+    // index
     m_indexLabel = new QLabel("0");
+    m_indexLabel->setFixedWidth(24);
+    m_indexLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_indexLabel);
-    m_mediaThumbnailLabel = new QLabel("Miniature indisponible");
+
+    // thumbnail
+    m_mediaThumbnailLabel = new QLabel();
+    m_mediaThumbnailLabel->setFixedSize(64,36);
+    m_mediaThumbnailLabel->setText("No preview");
+    m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
 
-    // infos titre, durée et type
-    QVBoxLayout *mediaInfoLayout = new QVBoxLayout();
-    m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
-    mediaInfoLayout->addWidget(m_mediaTitleLabel);
-    QHBoxLayout *mediaDurationLayout = new QHBoxLayout();
-    m_mediaDurationLabel = new QLabel("00:00:00");
-    mediaInfoLayout->addWidget(m_mediaDurationLabel);
-    m_mediaTypeIcon = new QLabel();
-    m_mediaThumbnailImage = new QPixmap("speed.png");
-    m_mediaTypeIcon->setPixmap(*m_mediaThumbnailImage);
-    mediaInfoLayout->addWidget(m_mediaTypeIcon);
-    mediaInfoLayout->addLayout(mediaDurationLayout);
-    mainLayout->addLayout(mediaInfoLayout);
-    m_deleteBtn = new QPushButton("X");
-    mainLayout->addWidget(m_deleteBtn);
-    initStyle();
+    // bloc info media
+    QVBoxLayout *infoLayout = new QVBoxLayout();
+    infoLayout->setSpacing(2);
 
+    m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
+    m_mediaTitleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    infoLayout->addWidget(m_mediaTitleLabel);
+
+    QHBoxLayout *metaLayout = new QHBoxLayout();
+
+    m_mediaTypeIcon = new QLabel();
+    m_mediaThumbnailImage = new QPixmap(":/icon/show_image.png");
+    m_mediaTypeIcon->setPixmap(m_mediaThumbnailImage->scaled(16,16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    m_mediaDurationLabel = new QLabel("00:00:00");
+
+    metaLayout->addWidget(m_mediaTypeIcon);
+    metaLayout->addWidget(m_mediaDurationLabel);
+    metaLayout->addStretch();
+
+    infoLayout->addLayout(metaLayout);
+
+    mainLayout->addLayout(infoLayout);
+    mainLayout->addStretch();
+
+    // bouton delete
+    m_deleteBtn = new QPushButton("✕");
+    m_deleteBtn->setFixedSize(24,24);
+    mainLayout->addWidget(m_deleteBtn);
+
+    initStyle();
     connect(m_mediaData, &Media::durationParsed, this, &PlaylistItem::setDurationLabel);
     connect(m_mediaData, &Media::fpsParsed, this, &PlaylistItem::computeThumbnail);
     connect(m_deleteBtn, &QPushButton::clicked, this, [this]{ deleteItemRequested(m_itemIndex); });
+
+    m_mediaData->parse();
 }
 
 void PlaylistItem::setDurationLabel()

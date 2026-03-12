@@ -27,15 +27,21 @@ public:
     ToolbarButton* m_backwardBtn= nullptr;
     ToolbarButton* m_forwardBtn= nullptr;
     ToolbarButton* m_rotateBtn= nullptr;
+    ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
     ToolbarButton* m_compoRuleBtn= nullptr;
     ToolbarButton* m_verticalInvBtn= nullptr;
     ToolbarButton* m_horizontalInvBtn= nullptr;
+    ToolbarButton* m_abloopBtn = nullptr;
+    // ToolbarPopupButton* m_multiviewBtn;
+
 
     // playlist btn ?
     // A / B Button voir comment
 
 signals:
+    void enableRecordRequested();
+    void disableRecordRequested();
     void enableSegmentationRequested();
     void disableSegmentationRequested();
 

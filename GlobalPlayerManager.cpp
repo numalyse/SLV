@@ -12,8 +12,11 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
 {
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
     layout = new QVBoxLayout();
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(1);
     mainLayout->addLayout(layout);
     m_navPanel = new NavPanel(this);
     mainLayout->addWidget(m_navPanel);
@@ -77,12 +80,14 @@ void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidg
         layout->addWidget(m_toolbarWidget);
     }
 
+    auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
     if(media){
         ProjectManager::instance().createProject(media);
-        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
+
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+
     }
 }
 

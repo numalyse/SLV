@@ -17,6 +17,11 @@ MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
 
+    m_blackFrame = new QFrame(this);
+    m_blackFrame->setStyleSheet("background: black;");
+    m_blackFrame->lower();
+    m_mediaSurface = new QWidget(this);
+    m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
     setAutoFillBackground(true);
     QPalette pal = palette();
     pal.setColor(QPalette::Window, Qt::black);
@@ -34,7 +39,15 @@ MediaWidget::MediaWidget(QWidget *parent)
     createEventManager();
 
     managePlayerSystem();
+    m_eventManager = libvlc_media_player_event_manager(m_player);
+
+    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
+    // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
+    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
+    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
+    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
+    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
 
     libvlc_media_player_play(m_player);
 }
@@ -52,15 +65,15 @@ void MediaWidget::managePlayerSystem()
 #if defined(Q_OS_WIN)
     libvlc_media_player_set_hwnd(
         m_player,
-        reinterpret_cast<void*>(winId()));
+        reinterpret_cast<void*>(m_mediaSurface->winId()));
 #elif defined(Q_OS_MAC)
     libvlc_media_player_set_nsobject(
         m_player,
-        reinterpret_cast<void*>(m_videoWidget->winId()));
+        reinterpret_cast<void*>(m_mediaSurface->winId()));
 #else
     libvlc_media_player_set_xwindow(
         m_player,
-        m_videoWidget->winId());
+        m_mediaSurface->winId());
 #endif
 
 }
@@ -155,6 +168,9 @@ void MediaWidget::setVolume(const int &vol)
 {
     if (!m_player) return;
     libvlc_audio_set_volume(m_player, vol);
+    const QString & volStr = QString::number(vol);
+    emit volumeChanged(volStr);
+    emit SignalManager::instance().mediaVolumeChanged(volStr);
 }
 
 /// @brief Change media player rate
@@ -162,7 +178,12 @@ void MediaWidget::setVolume(const int &vol)
 void MediaWidget::setSpeed(const unsigned int &speedIndex)
 {
     if (!m_player) return;
-    libvlc_media_player_set_rate(m_player, m_speedSteps[speedIndex]);
+    int err = libvlc_media_player_set_rate(m_player, m_speedSteps[speedIndex]);
+    if(err != -1){
+        const QString & speedStr = QString::number(m_speedSteps[speedIndex]);
+        emit speedChanged(speedStr);
+        emit SignalManager::instance().mediaSpeedChanged(speedStr);
+    }
 }
 
 /// @brief Take a screenshot of the current frame
@@ -187,6 +208,33 @@ void MediaWidget::enableLoopMode()
 void MediaWidget::disableLoopMode()
 {
     m_loopActivated = false;
+}
+
+void MediaWidget::hideMedia()
+{
+    qDebug() << "hide Media";
+    m_blackFrame->raise();
+}
+
+void MediaWidget::showMedia()
+{
+    m_blackFrame->lower();
+}
+
+void MediaWidget::startRecord()
+{
+    if(!m_player || !m_media) return;
+    m_startRecordTime = libvlc_media_player_get_time(m_player);
+    if(m_media->type() != MediaType::Image){
+        libvlc_media_add_option(m_media->vlcMedia(), (":sout=#duplicate{dst=display,dst=std{access=file,mux=ps,dst=C:/Users/kviguier/Desktop/test.mp4}"));
+        libvlc_media_add_option(m_media->vlcMedia(), ":sout-keep");
+    }
+}
+
+void MediaWidget::endRecord()
+{
+    if(!m_player) return;
+    int endRecordTime = libvlc_media_player_get_time(m_player);
 }
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
@@ -238,6 +286,13 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     } else {
         QWidget::keyPressEvent(event);
     }
+}
+
+void MediaWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    m_mediaSurface->setGeometry(rect());
+    m_blackFrame->setGeometry(rect());
 }
 
 /// @brief Stops the current media player and load a new media from a path

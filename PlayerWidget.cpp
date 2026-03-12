@@ -65,9 +65,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
     connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
     connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
+    connect(m_mediaWidget, &MediaWidget::volumeChanged, m_toolBar, &SimpleToolbar::volumeUiUpdate);
+    connect(m_mediaWidget, &MediaWidget::speedChanged, m_toolBar, &SimpleToolbar::speedUiUpdate);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(1);
     layout->addWidget(m_mediaWidget);
     layout->addWidget(m_toolBar);
 
@@ -142,6 +145,8 @@ void PlayerWidget::play()
         if(file_path != ""){
             setMediaFromPath(file_path);
         }
+        else
+            emit m_toolBar->selectFilePlayCanceled();
     }
 }
 
@@ -159,6 +164,8 @@ void PlayerWidget::playFromAdvanced()
                 ProjectManager::instance().createProject(m_mediaWidget->media());
             }
         }
+        else
+            emit m_toolBar->selectFilePlayCanceled();
     }
 }
 
@@ -247,4 +254,14 @@ void PlayerWidget::disableLoopMode()
 {
     m_mediaWidget->disableLoopMode();
     emit disableLoopUiUpdateRequested();
+}
+
+void PlayerWidget::startRecord()
+{
+    m_mediaWidget->startRecord();
+}
+
+void PlayerWidget::endRecord()
+{
+    m_mediaWidget->endRecord();
 }

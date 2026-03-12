@@ -33,13 +33,22 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_forwardBtn = new ToolbarButton(this, "forward.png", TextManager::instance().get("tooltip_forward"));
     
     m_rotateBtn = new ToolbarButton(this, "rotate.png", TextManager::instance().get("tooltip_rotate"));
+
+    m_recordBtn = new ToolbarToggleButton(
+        this,
+        false,
+        "record_off.png",
+        TextManager::instance().get("tooltip_record_off"),
+        "record_on.png",
+        TextManager::instance().get("tooltip_record_on.png")
+    );
     
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
-        "segmentation_on.png", 
+        "segmentation.png",
         TextManager::instance().get("tooltip_segmentation_on"),
-        "segmentation_off.png", 
+        "segmentation.png",
         TextManager::instance().get("tooltip_segmentation_off")
     );
 
@@ -55,6 +64,12 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
             m_segmBtn->setButtonState(false); 
     });
 
+    connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
+    connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
+    connect(m_recordBtn, &ToolbarToggleButton::stateActivated, this, &ExtensionToolbar::enableRecordRequested);
+    connect(m_recordBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableRecordRequested);
+
+
     connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableSegmentationRequested);
 
     connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
@@ -63,10 +78,10 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         emit SignalManager::instance().displayPlaylist();
     });
 
-    m_compoRuleBtn = new ToolbarButton(this, "composition.png", TextManager::instance().get("tooltip_composition"));
+    m_compoRuleBtn = new ToolbarButton(this, "compo_rule.png", TextManager::instance().get("tooltip_composition"));
     
-    m_verticalInvBtn = new ToolbarButton(this, "flip_vertical.png", TextManager::instance().get("tooltip_flip_vertical"));
-    m_horizontalInvBtn = new ToolbarButton(this, "flip_horizontal.png", TextManager::instance().get("tooltip_flip_horizontal"));
+    m_verticalInvBtn = new ToolbarButton(this, "invert_v.png", TextManager::instance().get("tooltip_flip_vertical"));
+    m_horizontalInvBtn = new ToolbarButton(this, "invert_h.png", TextManager::instance().get("tooltip_flip_horizontal"));
 
     setDefaultUI();
     hide();
@@ -90,6 +105,8 @@ void ExtensionToolbar::setDefaultUI()
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(1);
+    mainLayout->addStretch();
 
     mainLayout->addWidget(m_zoomBtn);
     mainLayout->addWidget(m_hideImgBtn);
@@ -100,10 +117,12 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_forwardBtn);
     
     mainLayout->addWidget(m_rotateBtn);
+    mainLayout->addWidget(m_recordBtn);
     mainLayout->addWidget(m_verticalInvBtn);
     mainLayout->addWidget(m_horizontalInvBtn);
-    
+    mainLayout->addWidget(m_abloopBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);
+    mainLayout->addStretch();
 
 }

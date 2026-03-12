@@ -51,7 +51,7 @@ void ProjectManager::initProjectShot(int64_t mediaDuration){
         return;
     }
 
-    Shot shot{"Plan 1", 0, mediaDuration};
+    Shot shot{"Titre", 0, mediaDuration};
     m_project->shots.append(shot);
     
     for (size_t i = 0; i < m_project->shots.size(); i++) {

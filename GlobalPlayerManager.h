@@ -5,7 +5,7 @@
 #include "PlayerLayoutManager.h"
 #include "NavPanel.h"
 #include "Media.h"
-#include "Timeline.h"
+#include "TimelineWidget.h"
 
 #include <QWidget>
 
@@ -21,7 +21,7 @@ private:
     QWidget* m_playersWidget = nullptr;
     Toolbar* m_toolbarWidget = nullptr;
     NavPanel* m_navPanel = nullptr;
-    Timeline* m_timeline = nullptr;
+    TimelineWidget* m_timeline = nullptr;
     QVBoxLayout* layout;
 
 public slots:

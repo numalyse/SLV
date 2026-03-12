@@ -328,6 +328,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
 
+    connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, advancedToolbar, &SimpleToolbar::updateSliderValue);
+
     return static_cast<Toolbar*>(advancedToolbar);
 }
 
@@ -351,7 +353,7 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
         toBeDuplicated->pause(); // le dupliqué mis en pause
 
         createLayout(activePlayerCount + 1);
-        auto player = m_activePlayers.last();
+        auto* player = m_activePlayers.last();
 
         bool wasMuted = toBeDuplicated->muted();
         int64_t currentTime = libvlc_media_player_get_time(toBeDuplicated->mediaWidget()->m_player);

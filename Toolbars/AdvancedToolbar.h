@@ -41,6 +41,7 @@ signals:
     void previousMediaRequested();
     void nextMediaRequested();
 
+
 };
 
 #endif

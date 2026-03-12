@@ -1,9 +1,13 @@
 #ifndef NAVPANEL_H
 #define NAVPANEL_H
 
+#include "Shot.h"
+#include "ShotDetail.h"
+
 #include <QWidget>
 #include <QBoxLayout>
 #include <Playlist.h>
+#include <QStackedWidget>
 
 class NavPanel : public QWidget
 {
@@ -13,10 +17,10 @@ public:
 private:
 
     bool m_isOpen = false;
-    QWidget *m_sideWidget = nullptr;
+    QStackedWidget *m_sideWidget = nullptr;
     QLayout *m_mainLayout = nullptr;
     Playlist *m_playlistWidget = nullptr;
-    // ShotDetail *m_shotDetail = nullptr;
+    ShotDetail *m_shotDetail = nullptr;
 
 public slots:
     void showPanel();
@@ -26,6 +30,8 @@ public slots:
     void setPlaylistNewItem();
     void playPreviousMedia();
     void playNextMedia();
+    void displayShotDetail();
+    void displayPlaylist();
 
 signals:
     void openMediaFileRequested(const QString &filePath);

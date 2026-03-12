@@ -54,8 +54,14 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
         if(ProjectManager::instance().projet() != nullptr){
+            m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
+            emit SignalManager::instance().extensionToolbarDisplayShotDetail();
         }
+    });
+
+    connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this] { // quand le projet est détruit, on force le button segmentation en false   
+            m_segmBtn->setButtonState(false); 
     });
 
     connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
@@ -63,12 +69,14 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(m_recordBtn, &ToolbarToggleButton::stateActivated, this, &ExtensionToolbar::enableRecordRequested);
     connect(m_recordBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableRecordRequested);
 
-    connect(&ProjectManager::instance(), &ProjectManager::deleteProject, this, [this] { // quand le projet est détruit, on force le button segmentation en false
-            m_segmBtn->setButtonState(false);
-    });
 
     connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableSegmentationRequested);
 
+    connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
+        emit disableSegmentationRequested();
+        m_segmBtn->setButtonState(false);
+        emit SignalManager::instance().displayPlaylist();
+    });
 
     m_compoRuleBtn = new ToolbarButton(this, "compo_rule.png", TextManager::instance().get("tooltip_composition"));
     

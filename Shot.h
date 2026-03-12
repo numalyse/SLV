@@ -10,7 +10,7 @@ struct Shot
     int64_t start;
     int64_t end;
     QString note;
-    QColor color;
+    QColor color = QColor(100, 150, 255, 150);
     // image ?
 };
 

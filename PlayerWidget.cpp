@@ -1,6 +1,7 @@
 #include "PlayerWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "ProjectManager.h"
+#include "SignalManager.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -82,6 +83,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
     connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 
+    connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
+
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -147,7 +150,7 @@ void PlayerWidget::play()
     }
 }
 
-/// @brief Play la video connecté à une advanced toolbar, créer un projet en plus de l'aciton de base
+/// @brief Play la video connecté à une advanced toolbar, créer un projet en plus de l'action de base
 void PlayerWidget::playFromAdvanced()
 {
     if (m_mediaWidget->play()){
@@ -193,6 +196,7 @@ void PlayerWidget::eject()
         m_playing = false;
         emit ejectUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
+        emit SignalManager::instance().displayPlaylist();
         ProjectManager::instance().deleteProject();
     }
 

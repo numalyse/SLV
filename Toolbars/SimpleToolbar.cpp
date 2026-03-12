@@ -1,6 +1,7 @@
 #include "Toolbars/SimpleToolbar.h"
 #include "TextManager.h"
 #include "TimeFormatter.h"
+#include "SignalManager.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -28,14 +29,20 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     connect(m_slider, &QSlider::sliderPressed, this, [this]() {
         m_draggingSlider = true;
+        m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
         emit setPositionRequested(m_slider->value());
+        emit simpleToolbarUpdateCursorPosition(m_slider->value());
     });
+
+    connect(this, &SimpleToolbar::simpleToolbarUpdateCursorPosition, &SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition);
+
     connect(m_slider, &QSlider::sliderReleased, this, [this]() {
         m_draggingSlider = false;
     });
 
     connect(m_slider, &QSlider::sliderMoved, this, [this](){
         m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
+        emit simpleToolbarUpdateCursorPosition(m_slider->value());
         m_seekTimer->start(50);
     });
 
@@ -257,6 +264,8 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
 
     m_slider->setValue(currentTime);
     m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
+
+    emit setCursorPositionRequested(currentTime);
 
 }
 

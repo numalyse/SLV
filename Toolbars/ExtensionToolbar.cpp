@@ -46,9 +46,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
-        "segmentation_on.png", 
+        "segmentation.png",
         TextManager::instance().get("tooltip_segmentation_on"),
-        "segmentation_off.png", 
+        "segmentation.png",
         TextManager::instance().get("tooltip_segmentation_off")
     );
 
@@ -70,10 +70,10 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableSegmentationRequested);
 
 
-    m_compoRuleBtn = new ToolbarButton(this, "composition.png", TextManager::instance().get("tooltip_composition"));
+    m_compoRuleBtn = new ToolbarButton(this, "compo_rule.png", TextManager::instance().get("tooltip_composition"));
     
-    m_verticalInvBtn = new ToolbarButton(this, "flip_vertical.png", TextManager::instance().get("tooltip_flip_vertical"));
-    m_horizontalInvBtn = new ToolbarButton(this, "flip_horizontal.png", TextManager::instance().get("tooltip_flip_horizontal"));
+    m_verticalInvBtn = new ToolbarButton(this, "invert_v.png", TextManager::instance().get("tooltip_flip_vertical"));
+    m_horizontalInvBtn = new ToolbarButton(this, "invert_h.png", TextManager::instance().get("tooltip_flip_horizontal"));
 
     setDefaultUI();
     hide();

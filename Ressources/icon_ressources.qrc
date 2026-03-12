@@ -25,5 +25,19 @@
         <file alias="slow.png">icons/slow.png</file>
         <file alias="record_off.png">icons/record-off.png</file>
         <file alias="record_on.png">icons/record-on.png</file>
+        <file alias="abloop.png">icons/abloop.png</file>
+        <file alias="lang.png">icons/lang.png</file>
+        <file alias="segmentation.png">icons/segmentation.png</file>
+        <file alias="add_media.png">icons/add_media.png</file>
+        <file alias="duplicate_media.png">icons/duplicate_media.png</file>
+        <file alias="remove_media.png">icons/remove_media.png</file>
+        <file alias="backward.png">icons/backward.png</file>
+        <file alias="invert_v.png">icons/BiSymmetryHorizontal.png</file>
+        <file alias="invert_h.png">icons/BiSymmetryVertical.png</file>
+        <file alias="next_frame.png">icons/next_frame.png</file>
+        <file alias="prev_frame.png">icons/prev_frame.png</file>
+        <file alias="forward.png">icons/forward.png</file>
+        <file alias="compo_rule.png">icons/compo_rule.png</file>
+        <file alias="rotate.png">icons/rotate.png</file>
     </qresource>
 </RCC>

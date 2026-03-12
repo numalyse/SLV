@@ -158,6 +158,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);
+    buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_extensionBtn);
 
     mainLayout->addLayout(buttonLayout);

@@ -22,13 +22,16 @@ ToolbarToggleButton::ToolbarToggleButton(
 
     setStyleSheet(
         "QPushButton {"
-        "   background-color: white;"
+        "   background-color: palette(button);"
         "}"
         "QPushButton:checked {"
-        "   background-color: white;"
+        "   background-color: palette(button);"
         "}"
         "QPushButton:pressed {"
-        "   background-color: white;"
+        "   background-color: palette(button);"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: palette(button);"
         "}"
     );
 

@@ -144,15 +144,17 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         "loop_off.png", 
         TextManager::instance().get("tooltip_loop_off")
     );
+    QWidget* langWidget = new QWidget();
+    m_langBtn = new ToolbarPopupButton(this, langWidget, "lang.png", TextManager::instance().get("tooltip_lang"));
 
-    m_removePlayerBtn = new ToolbarButton(this, "delete.png", TextManager::instance().get("tooltip_delete_player"));
-    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate.png", TextManager::instance().get("tooltip_duplicate_player"));
+    m_removePlayerBtn = new ToolbarButton(this, "remove_media.png", TextManager::instance().get("tooltip_delete_player"));
+    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media.png", TextManager::instance().get("tooltip_duplicate_player"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerRequested);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
-    connect(volumeSlider, &QSlider::valueChanged, this, &SimpleToolbar::volumeChanged);
+    connect(m_volumeSlider, &QSlider::valueChanged, this, &SimpleToolbar::volumeChanged);
     connect(speedSlider, &QSlider::valueChanged, this, &SimpleToolbar::speedChanged);
     connect(m_loopBtn, &ToolbarToggleButton::stateActivated, this, &SimpleToolbar::enableLoopModeRequest);
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
@@ -199,8 +201,8 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
-    buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);
+    buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_removePlayerBtn);
     mainLayout->addLayout(buttonLayout);
 
@@ -269,11 +271,16 @@ void SimpleToolbar::pauseUiUpdate()
 void SimpleToolbar::muteUiUpdate()
 {
     m_muteBtn->setButtonState(true);
+    QPalette p = m_volumeSlider->palette();
+    p.setColor(QPalette::Highlight, Qt::darkGray);
+    m_volumeSlider->setPalette(p);
 }
 
 void SimpleToolbar::unmuteUiUpdate()
 {
     m_muteBtn->setButtonState(false);
+    m_volumeSlider->setStyleSheet("");
+
 }
 
 void SimpleToolbar::ejectUiUpdate()

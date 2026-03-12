@@ -15,7 +15,7 @@ void CursorItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(option); 
     Q_UNUSED(widget);
 
-    p->setRenderHint(QPainter::Antialiasing);
+    p->setRenderHint(QPainter::Antialiasing, false);
 
     p->setPen(QPen(Qt::red, 2));
 

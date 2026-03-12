@@ -17,7 +17,7 @@
 
 #include <algorithm> 
 
-TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
+TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0); 
@@ -58,12 +58,20 @@ TimelineWidget::TimelineWidget(QWidget *parent) : QWidget(parent)
     m_cursor->setPos(200, 0);
     m_scene->addItem(m_cursor);
 
-    int startShotHeight = m_sceneHeight - m_rulerHeight;
-    for ( auto& IShot : ProjectManager::instance().projet()->shots ){
-        ShotItem* shot = new ShotItem(&IShot, startShotHeight); // stocke ptr non owner dans les shotItem => modification dans projet modifie le shot et inversement
+    int startShotHeight = 50;
+
+    for ( auto& IShot : projectShots ){
+        double pos = timeToPosition(IShot.start);
+        double width = timeToPosition(IShot.end) - pos;
+        
+        ShotItem* shot = new ShotItem(IShot, width, startShotHeight);
+
         m_scene->addItem(shot);
+        shot->setPos(pos, 0);
+
         m_shotItems.append(shot);
     }
+
 
     connect(&SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition, this, &TimelineWidget::updateCursorPos);
     connect(this, &TimelineWidget::timelineSetPosition, &SignalManager::instance(), &SignalManager::timelineSetPosition);
@@ -86,11 +94,8 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
     m_vlcTime = vlcTime;
-
     double posCursor = static_cast<double>(vlcTime) * m_pixelsPerMs; 
-    
     m_cursor->setPos(posCursor, 0);
-
     updateCurrentShot();
 }
 
@@ -98,28 +103,32 @@ void TimelineWidget::updateCurrentShot(){
     int shotItemCount = static_cast<int>(m_shotItems.size());
 
     Q_ASSERT(shotItemCount >= 1);
-    if (shotItemCount <= 0 ) return;
 
-    ShotItem* closestLeftShot = m_shotItems[0];
-    int64_t distanceToClosest = m_vlcTime - closestLeftShot->shot()->start;
+    int currentShotId = 0;
+    int64_t distanceToClosest = m_vlcTime - m_shotItems[0]->shot().start;
 
-    for (int IShotItem = 1; IShotItem < shotItemCount; ++IShotItem){
+    for (int IShot = 1; IShot < shotItemCount; ++IShot){
         
-        int64_t currentShotStart = m_shotItems[IShotItem]->shot()->start;
+        int64_t currentShotStart = m_shotItems[IShot]->shot().start;
 
-        if( m_vlcTime < currentShotStart ) break; // si le vlc time < start on est avant le plan donc on quitte
+        if( m_vlcTime < currentShotStart ) break; // si le vlc time < start on est avant le plan donc on quitte la boucle
 
         int64_t distance = m_vlcTime - currentShotStart;
         if(distance < distanceToClosest){
             distanceToClosest = distance;
-            closestLeftShot = m_shotItems[IShotItem];
+            currentShotId = IShot;
         }
     }
-    
-    if(m_currentShotItem != closestLeftShot){
-        m_currentShotItem = closestLeftShot;
-        emit updateShotDetailRequested(m_currentShotItem->shot());
+    ShotItem* closestShotItem =  m_shotItems[currentShotId];
+    if(m_currentShotItem != closestShotItem){
+        m_currentShotItem =  closestShotItem;
+        emit updateShotDetailRequested(&m_shotItems[currentShotId]->shot());
     }
+} 
+
+
+double TimelineWidget::timeToPosition(int64_t time){
+    return static_cast<double>(time) * m_pixelsPerMs; 
 }
 
 
@@ -154,6 +163,8 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_pixelsPerMs);
     updateCursorPos(m_vlcTime);
 
+    updateShotItems();
+
     double newPixelPos = currentTimeUnderMouse * m_pixelsPerMs;
     m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
 }
@@ -181,14 +192,60 @@ void TimelineWidget::moveCursor(double cursorPosX){
     emit timelineSetPosition(m_vlcTime);
 }
 
-void TimelineWidget::splitCurrentShotItem(){
-    Shot* currShot = m_currentShotItem->shot();
-
+void TimelineWidget::splitCurrentShotItem() {
     qDebug() << "Ms au curseur " << timeAtCursor();
-    qDebug() << "Temps au curseur " << TimeFormatter::msToHHMMSSFF( timeAtCursor(), ProjectManager::instance().projet()->media->fps());
+    
+    if (!m_currentShotItem) {
+        qDebug() << "Aucun plan courant";
+        return;
+    }
 
-    //int64_t currShotEnd = timeAtCursor-1; // la fin du plan est la position du curseur-1
+    int index = m_shotItems.indexOf(m_currentShotItem);
+    if (index == -1) {
+        qDebug() << "Impossible de retrouver l'index du plan courant dans la liste des shotItems";
+        return;
+    }
 
+    auto cutTime = timeAtCursor();
 
+    if (cutTime <=  m_shotItems[index]->shot().start || cutTime >=  m_shotItems[index]->shot().end) {
+        qDebug() << "Curseur n'est pas sur le plan courant";
+        return;
+    }
 
+    auto oldEnd =  m_shotItems[index]->shot().end;
+    m_shotItems[index]->shot().end = cutTime - 1; 
+
+    double newWidth1 = timeToPosition(m_shotItems[index]->shot().end) - timeToPosition(m_shotItems[index]->shot().start);
+    m_currentShotItem->setWidth(newWidth1);
+
+    Shot newShotData =  m_shotItems[index]->shot(); 
+    newShotData.start = cutTime;
+    newShotData.end = oldEnd;
+
+    double pos2 = timeToPosition(newShotData.start);
+    double width2 = timeToPosition(newShotData.end) - pos2;
+    int startShotHeight = 50;
+
+    ShotItem* newShotItem = new ShotItem(newShotData, width2, startShotHeight);
+    newShotItem->setPos(pos2, m_currentShotItem->y());
+    // on insère le plan juste apres le plan cut
+    m_shotItems.insert(index + 1, newShotItem);
+    m_scene->addItem(newShotItem);
+}
+
+void TimelineWidget::updateShotItems(){
+    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    m_view->setUpdatesEnabled(false);
+    double newXPos{};
+    double newWidth{};
+    for(int IShotItem = 0; IShotItem < m_shotItems.size(); ++IShotItem){
+        newXPos = m_shotItems[IShotItem]->shot().start * m_pixelsPerMs;
+        m_shotItems[IShotItem]->setPos(newXPos,0.0);
+        newWidth =  (m_shotItems[IShotItem]->shot().end - m_shotItems[IShotItem]->shot().start) * m_pixelsPerMs;
+        m_shotItems[IShotItem]->setWidth(newWidth);
+    }
+    m_view->setUpdatesEnabled(true);
+    m_scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
+    m_scene->update();
 }

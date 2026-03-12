@@ -8,17 +8,19 @@
 class ShotItem : public QGraphicsItem
 {
 public:
-    explicit ShotItem(Shot* shot, int height, QGraphicsItem* parent = nullptr);
+    explicit ShotItem(Shot shot, double width, double height, double topMargin = 40, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    Shot* shot(){return m_shotData;};
+    void setWidth(double width);
+    double width(){return m_width;}
+    Shot& shot(){return m_shot;};
 
 private:
-    Shot* m_shotData;
-    int m_width;
-    int m_height;
-    int m_startPos;
+    Shot m_shot;
+    double m_width{};
+    double m_height{};
+    double m_topMargin{};
 };
 
 

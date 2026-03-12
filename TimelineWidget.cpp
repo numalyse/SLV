@@ -3,6 +3,7 @@
 #include "TimeFormatter.h"
 #include "ProjectManager.h"
 #include "SignalManager.h"
+#include "TextManager.h"
 
 #include "RulerItem.h"
 #include "CursorItem.h"
@@ -46,7 +47,8 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     layout->addWidget(m_view); 
 
-    m_splitShotBtn = new ToolbarButton(this);
+    m_splitShotBtn = new ToolbarButton(this, "split_shot.png", TextManager::instance().get("tooltip_split_shot"));
+
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
     layout->addWidget(m_splitShotBtn);
 
@@ -71,7 +73,6 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
         m_shotItems.append(shot);
     }
-
 
     connect(&SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition, this, &TimelineWidget::updateCursorPos);
     connect(this, &TimelineWidget::timelineSetPosition, &SignalManager::instance(), &SignalManager::timelineSetPosition);

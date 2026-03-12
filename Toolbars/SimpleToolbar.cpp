@@ -167,6 +167,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
 
     setDefaultUI();
+    disableButtons();
 }
 
 
@@ -346,8 +347,8 @@ void SimpleToolbar::enableButtons()
 {
     m_playPauseBtn->setEnabled(true);
     m_stopBtn->setEnabled(true);
-    // m_ejectBtn->setEnabled(true);
-    m_muteBtn->setEnabled(true);
+    m_ejectBtn->setEnabled(true);
+    // m_muteBtn->setEnabled(true);
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);

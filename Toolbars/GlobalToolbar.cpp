@@ -26,6 +26,7 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     setMaximumHeight(50);
 
     setDefaultUI();
+    disableButtons();
 }
 
 void GlobalToolbar::setFullscreenUI()

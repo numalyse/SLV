@@ -84,6 +84,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_horizontalInvBtn = new ToolbarButton(this, "invert_h.png", TextManager::instance().get("tooltip_flip_horizontal"));
 
     setDefaultUI();
+    disableButtons();
     hide();
 }
 

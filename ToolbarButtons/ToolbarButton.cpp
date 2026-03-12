@@ -9,7 +9,6 @@ ToolbarButton::ToolbarButton(QWidget *parent, const QString &iconName, const QSt
         setIcon(QIcon(ICONS_PATH + iconName));
         setIconSize(QSize(12,30));
         setFixedSize(30, 30);
-        setEnabled(false);
     }
     setToolTip(toolTipText);
 }

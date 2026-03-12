@@ -64,6 +64,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     m_removePlayerBtn = nullptr;
 
     setDefaultUI();
+    disableButtons();
 }
 
 /// @brief Constructeur qui va copier les états des boutons de le toolbar passé en paramète 

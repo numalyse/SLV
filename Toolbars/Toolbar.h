@@ -25,6 +25,7 @@ public:
             TextManager::instance().get("tooltip_play")
         );
         m_playPauseBtn->setButtonState(false);
+        m_playPauseBtn->setEnabled(true);
         
         m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
         m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));

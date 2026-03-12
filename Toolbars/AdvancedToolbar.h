@@ -6,8 +6,6 @@
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
-#include "ToolbarButtons/ToolbarPopupButton.h"
-#include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -25,6 +23,9 @@ public:
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
+public slots:
+    void enableButtons();
+    void disableButtons();
     
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;

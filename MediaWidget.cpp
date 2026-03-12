@@ -143,6 +143,7 @@ bool MediaWidget::eject()
     m_player = libvlc_media_player_new(SLV::VlcInstance::get());
     createEventManager();
     managePlayerSystem();
+    emit mediaPlayerEjected();
     return true;
 }
 

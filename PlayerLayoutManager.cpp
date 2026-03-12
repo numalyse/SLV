@@ -264,6 +264,10 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
         connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
         connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
+        connect(IActivePlayer, &PlayerWidget::mediaPlayerLoaded, globalToolbar, &GlobalToolbar::enableButtons);
+        connect(IActivePlayer, &PlayerWidget::mediaPlayerEjected, this, &PlayerLayoutManager::disableGlobalToolbarButtons);
+        connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
+
     }
 
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
@@ -280,14 +284,9 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     AdvancedToolbar* advancedToolbar = nullptr;
 
-
-    if( activePlayer ){
-        activePlayerToolbar->hide();
-        advancedToolbar = new AdvancedToolbar(nullptr, activePlayerToolbar); // la toolbar avancée aura les mêmes états que la simple toolbar du player
-        
-    } else {
-        advancedToolbar = new AdvancedToolbar(nullptr);
-    }
+    activePlayerToolbar->hide();
+    advancedToolbar = new AdvancedToolbar(nullptr, activePlayerToolbar); // la toolbar avancée aura les mêmes états que la simple toolbar du player
+    if(activePlayer->mediaWidget()->media()) advancedToolbar->enableButtons();
 
     connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::playFromAdvanced);
     connect(advancedToolbar, &AdvancedToolbar::pauseRequest, activePlayer, &PlayerWidget::pause);
@@ -307,6 +306,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);
     connect(advancedToolbar, &AdvancedToolbar::disableRecordRequested, activePlayer, &PlayerWidget::endRecord);
+    connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
+    connect(activePlayer, &PlayerWidget::mediaPlayerEjected, advancedToolbar, &AdvancedToolbar::disableButtons);
 
     connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {
         this->duplicatePlayer(activePlayer);
@@ -472,4 +473,15 @@ void PlayerLayoutManager::checkPlayersMuteStatus(){
     if( m_activePlayers.size() == 1 ) return;
 
     emit setGlobalMuteStateRequested(newGlobalMuteState());
+}
+
+void PlayerLayoutManager::disableGlobalToolbarButtons()
+{
+    bool allEmpty = true;
+    for(unsigned int IPlayer = 0; IPlayer < m_activePlayers.size(); ++IPlayer){
+        if(m_activePlayers[IPlayer]->mediaWidget()->media()){
+            return;
+        }
+    }
+    emit buttonsDisabled();
 }

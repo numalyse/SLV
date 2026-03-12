@@ -72,6 +72,8 @@ signals:
     void previousMediaRequested();
     void nextMediaRequested();
 
+    void buttonsDisabled();
+
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
@@ -87,6 +89,9 @@ public slots:
     void checkPlayersMuteStatus();
 
     void createLayoutFromPaths(const QStringList& filesPaths);
+
+    // void enableButtons();
+    void disableGlobalToolbarButtons();
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

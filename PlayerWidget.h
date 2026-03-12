@@ -46,6 +46,8 @@ public slots:
     void disableLoopMode();
     void startRecord();
     void endRecord();
+    void enableButtons();
+    void disableButtons();
 
 signals:
     void addPlayerRequest();
@@ -70,6 +72,9 @@ signals:
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
     void nameUiUpdateRequest(const QString& );
+
+    void mediaPlayerLoaded();
+    void mediaPlayerEjected();
 
 private:
     double m_media_fps {};

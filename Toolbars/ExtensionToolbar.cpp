@@ -112,9 +112,43 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_recordBtn);
     mainLayout->addWidget(m_verticalInvBtn);
     mainLayout->addWidget(m_horizontalInvBtn);
-    mainLayout->addWidget(m_abloopBtn);
+    // mainLayout->addWidget(m_abloopBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);
     mainLayout->addStretch();
 
+}
+
+void ExtensionToolbar::enableButtons()
+{
+    // m_abloopBtn->setEnabled(true);
+    m_backwardBtn->setEnabled(true);
+    m_forwardBtn->setEnabled(true);
+    m_recordBtn->setEnabled(true);
+    m_rotateBtn->setEnabled(true);
+    m_segmBtn->setEnabled(true);
+    m_zoomBtn->setEnabled(true);
+    m_compoRuleBtn->setEnabled(true);
+    m_hideImgBtn->setEnabled(true);
+    m_horizontalInvBtn->setEnabled(true);
+    m_verticalInvBtn->setEnabled(true);
+    m_nextFrameBtn->setEnabled(true);
+    m_prevFrameBtn->setEnabled(true);
+}
+
+void ExtensionToolbar::disableButtons()
+{
+    // m_abloopBtn->setEnabled(false);
+    m_backwardBtn->setEnabled(false);
+    m_forwardBtn->setEnabled(false);
+    m_recordBtn->setEnabled(false);
+    m_rotateBtn->setEnabled(false);
+    m_segmBtn->setEnabled(false);
+    m_zoomBtn->setEnabled(false);
+    m_compoRuleBtn->setEnabled(false);
+    m_hideImgBtn->setEnabled(false);
+    m_horizontalInvBtn->setEnabled(false);
+    m_verticalInvBtn->setEnabled(false);
+    m_nextFrameBtn->setEnabled(false);
+    m_prevFrameBtn->setEnabled(false);
 }

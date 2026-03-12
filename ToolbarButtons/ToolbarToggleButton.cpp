@@ -19,6 +19,7 @@ ToolbarToggleButton::ToolbarToggleButton(
 
     setCheckable(true);
     setChecked(state);
+    setEnabled(false);
 
     setStyleSheet(
         "QPushButton {"

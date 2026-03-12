@@ -66,6 +66,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
     connect(m_mediaWidget, &MediaWidget::volumeChanged, m_toolBar, &SimpleToolbar::volumeUiUpdate);
     connect(m_mediaWidget, &MediaWidget::speedChanged, m_toolBar, &SimpleToolbar::speedUiUpdate);
+    connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::enableButtons);
+    connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
+    connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
+    connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjected);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -260,4 +264,14 @@ void PlayerWidget::startRecord()
 void PlayerWidget::endRecord()
 {
     m_mediaWidget->endRecord();
+}
+
+void PlayerWidget::enableButtons()
+{
+    m_toolBar->enableButtons();
+}
+
+void PlayerWidget::disableButtons()
+{
+    m_toolBar->disableButtons();
 }

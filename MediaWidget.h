@@ -75,6 +75,7 @@ signals:
     void updateSliderRangeRequested(int64_t mediaDuration);
     void updateFpsRequested(double fps);
     void mediaPlayerLoaded();
+    void mediaPlayerEjected();
     void nameUiUpdateRequested(const QString&);
     void mediaFinished();
     void volumeChanged(const QString&);

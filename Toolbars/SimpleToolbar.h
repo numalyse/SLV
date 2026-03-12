@@ -79,6 +79,9 @@ public slots:
     void speedUiUpdate(const QString &);
     void disableLoopMode();
 
+    void enableButtons();
+    void disableButtons();
+
 signals:
     void setPositionRequested(int64_t);
     void removePlayerRequest();

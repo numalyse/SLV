@@ -32,19 +32,22 @@ public:
     ToolbarButton* m_compoRuleBtn= nullptr;
     ToolbarButton* m_verticalInvBtn= nullptr;
     ToolbarButton* m_horizontalInvBtn= nullptr;
-    ToolbarButton* m_abloopBtn = nullptr;
+    // ToolbarButton* m_abloopBtn = nullptr;
     // ToolbarPopupButton* m_multiviewBtn;
 
 
     // playlist btn ?
     // A / B Button voir comment
 
+public slots:
+    void enableButtons();
+    void disableButtons();
+
 signals:
     void enableRecordRequested();
     void disableRecordRequested();
     void enableSegmentationRequested();
     void disableSegmentationRequested();
-
 };
 
 #endif

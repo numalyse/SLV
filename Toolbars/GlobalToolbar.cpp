@@ -18,6 +18,7 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
         "sound_on.png",
         TextManager::instance().get("tooltip_sound_on")
     );
+    m_muteBtn->setEnabled(true);
 
     connect(m_muteBtn, &ToolbarToggleButton::stateActivated, this, &GlobalToolbar::enableMute);
     connect(m_muteBtn, &ToolbarToggleButton::stateDeactivated, this, &GlobalToolbar::disableMute);
@@ -62,3 +63,22 @@ void GlobalToolbar::setDefaultUI()
 
 }
 
+void GlobalToolbar::enableButtons()
+{
+    m_playPauseBtn->setEnabled(true);
+    m_stopBtn->setEnabled(true);
+    m_ejectBtn->setEnabled(true);
+    // m_muteBtn->setEnabled(true);
+    m_fullscreenBtn->setEnabled(true);
+    m_screenshotBtn->setEnabled(true);
+}
+
+void GlobalToolbar::disableButtons()
+{
+    m_playPauseBtn->setEnabled(true);
+    m_stopBtn->setEnabled(false);
+    m_ejectBtn->setEnabled(false);
+    // m_muteBtn->setEnabled(false);
+    m_fullscreenBtn->setEnabled(false);
+    m_screenshotBtn->setEnabled(false);
+}

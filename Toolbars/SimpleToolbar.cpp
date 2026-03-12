@@ -85,7 +85,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         "sound_on.png",
         TextManager::instance().get("tooltip_sound_on")
     );
-
+    m_muteBtn->setEnabled(true);
     
     // ------- test speed btn, click show popup
 
@@ -331,4 +331,33 @@ void SimpleToolbar::speedUiUpdate(const QString & newSpeed)
 void SimpleToolbar::disableLoopMode()
 {
     emit m_loopBtn->stateDeactivated();
+}
+
+void SimpleToolbar::enableButtons()
+{
+    m_playPauseBtn->setEnabled(true);
+    m_stopBtn->setEnabled(true);
+    // m_ejectBtn->setEnabled(true);
+    m_muteBtn->setEnabled(true);
+    m_langBtn->setEnabled(true);
+    m_loopBtn->setEnabled(true);
+    m_duplicatePlayerBtn->setEnabled(true);
+    m_removePlayerBtn->setEnabled(true);
+    m_speedBtn->setEnabled(true);
+    m_fullscreenBtn->setEnabled(true);
+    m_screenshotBtn->setEnabled(true);
+}
+
+void SimpleToolbar::disableButtons()
+{
+    m_stopBtn->setEnabled(false);
+    m_ejectBtn->setEnabled(false);
+    // m_muteBtn->setEnabled(false);
+    m_langBtn->setEnabled(false);
+    m_loopBtn->setEnabled(false);
+    m_duplicatePlayerBtn->setEnabled(false);
+    m_removePlayerBtn->setEnabled(false);
+    m_speedBtn->setEnabled(false);
+    m_fullscreenBtn->setEnabled(false);
+    m_screenshotBtn->setEnabled(false);
 }

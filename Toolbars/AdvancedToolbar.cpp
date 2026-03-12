@@ -170,3 +170,47 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->addWidget(m_extensionToolbar);
 
 }
+
+void AdvancedToolbar::enableButtons()
+{
+
+    m_playPauseBtn->setEnabled(true);
+    m_stopBtn->setEnabled(true);
+    m_ejectBtn->setEnabled(true);
+    // m_muteBtn->setEnabled(true);
+    m_langBtn->setEnabled(true);
+    m_loopBtn->setEnabled(true);
+    m_duplicatePlayerBtn->setEnabled(true);
+    // m_removePlayerBtn->setEnabled(true);
+    m_speedBtn->setEnabled(true);
+    m_fullscreenBtn->setEnabled(true);
+    m_extensionBtn->setEnabled(true);
+    m_nextMediaBtn->setEnabled(true);
+    m_prevMediaBtn->setEnabled(true);
+    m_screenshotBtn->setEnabled(true);
+    m_prevMediaBtn->setEnabled(true);
+    m_nextMediaBtn->setEnabled(true);
+    m_extensionToolbar->enableButtons();
+}
+
+void AdvancedToolbar::disableButtons()
+{
+
+    m_playPauseBtn->setEnabled(true);
+    m_stopBtn->setEnabled(false);
+    m_ejectBtn->setEnabled(false);
+    // m_muteBtn->setEnabled(false);
+    m_langBtn->setEnabled(false);
+    m_loopBtn->setEnabled(false);
+    m_duplicatePlayerBtn->setEnabled(false);
+    // m_removePlayerBtn->setEnabled(false);
+    m_speedBtn->setEnabled(false);
+    m_fullscreenBtn->setEnabled(false);
+    m_extensionBtn->setEnabled(false);
+    m_nextMediaBtn->setEnabled(false);
+    m_prevMediaBtn->setEnabled(false);
+    m_screenshotBtn->setEnabled(false);
+    m_prevMediaBtn->setEnabled(false);
+    m_nextMediaBtn->setEnabled(false);
+    m_extensionToolbar->disableButtons();
+}

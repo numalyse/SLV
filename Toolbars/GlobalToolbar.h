@@ -16,6 +16,10 @@ public:
     void setFullscreenUI() override;
     void setDefaultUI() override;
 
+public slots:
+    void enableButtons();
+    void disableButtons();
+
 signals:
     void enableMute();
     void disableMute();

@@ -2,6 +2,7 @@
 #define SHOTITEM_H
 
 #include "Shot.h"
+#include "ItemTypes.h"
 
 #include <QGraphicsItem>
 
@@ -15,6 +16,8 @@ public:
     void setWidth(double width);
     double width(){return m_width;}
     Shot& shot(){return m_shot;};
+
+   int type() const override { return SLV::TypeShotItem; }
 
 private:
     Shot m_shot;

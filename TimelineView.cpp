@@ -27,7 +27,9 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             
         } else if (event->modifiers() & Qt::ShiftModifier) {
             
-            
+            if (QGraphicsItem *item = itemAt(event->pos())) {
+                emit itemClicked(item);
+            } 
         } else {
             m_isDragging = true;
             double clickPosition = static_cast<double>(mapToScene(event->pos()).x());

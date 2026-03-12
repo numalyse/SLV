@@ -8,6 +8,8 @@
 #include "RulerItem.h"
 #include "CursorItem.h"
 
+#include "ItemTypes.h"
+
 #include "Shot.h"
 
 #include <QVBoxLayout>
@@ -18,6 +20,9 @@
 
 #include <algorithm> 
 
+/// @brief Créer une timeline avec les plan du projet
+/// @param projectShots 
+/// @param parent 
 TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -44,6 +49,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
+    connect(m_view, &TimelineView::itemClicked, this, &TimelineWidget::itemClicked);
 
     layout->addWidget(m_view); 
 
@@ -78,6 +84,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     connect(this, &TimelineWidget::timelineSetPosition, &SignalManager::instance(), &SignalManager::timelineSetPosition);
 }
 
+
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event); 
@@ -87,12 +94,10 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
     if (m_scene) {
         m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
     }
-    if (m_cursor) {
-        //m_cursor->setHeight(viewportHeight);
-    }
 }
 
-
+/// @brief Reçoit le temps vlc et met à jour la position en conséquence
+/// @param vlcTime 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
     m_vlcTime = vlcTime;
     double posCursor = static_cast<double>(vlcTime) * m_pixelsPerMs; 
@@ -100,6 +105,7 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
     updateCurrentShot();
 }
 
+/// @brief Parcours les plan pour trouver le plan courant de gauche a droite pour trouver le plan à la ms actuelle
 void TimelineWidget::updateCurrentShot(){
     int shotItemCount = static_cast<int>(m_shotItems.size());
 
@@ -123,16 +129,21 @@ void TimelineWidget::updateCurrentShot(){
     ShotItem* closestShotItem =  m_shotItems[currentShotId];
     if(m_currentShotItem != closestShotItem){
         m_currentShotItem =  closestShotItem;
-        emit updateShotDetailRequested(&m_shotItems[currentShotId]->shot());
+        emit updateShotDetailRequested( currentShotId, &m_shotItems[currentShotId]->shot());
     }
 } 
 
 
+/// @brief Retourne une position dans la scène depuis un temps ms 
+/// @param time 
+/// @return 
 double TimelineWidget::timeToPosition(int64_t time){
     return static_cast<double>(time) * m_pixelsPerMs; 
 }
 
-
+/// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
+/// @param zoomFactor 
+/// @param mouseX 
 void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     double currentTimeUnderMouse = (m_view->horizontalScrollBar()->value() + mouseX) / m_pixelsPerMs;
     double newPixelsPerMs = m_pixelsPerMs * zoomFactor;
@@ -170,7 +181,8 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
 }
 
-
+/// @brief retourne le temps en ms de la frame le plus proche du curseur
+/// @return 
 int64_t TimelineWidget::timeAtCursor() {
     double cursorPos = m_cursor->pos().x();
     
@@ -187,12 +199,28 @@ int64_t TimelineWidget::timeAtCursor() {
     return std::clamp(finalMs, static_cast<int64_t>(0), m_duration);
 }
 
+/// @brief déplace le curseur, met à jour le temps et et envoie à la toolbar le nouveau temps
+/// @param cursorPosX 
 void TimelineWidget::moveCursor(double cursorPosX){
     m_cursor->setPos(cursorPosX,0);
     m_vlcTime = timeAtCursor();
     emit timelineSetPosition(m_vlcTime);
 }
 
+/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
+/// @param item 
+void TimelineWidget::itemClicked(QGraphicsItem * item)
+{
+    switch( item->type() ) {
+        case SLV::TypeShotItem: 
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            qDebug() << "clicked shot num : " << m_shotItems.indexOf(shotItem);
+            moveCursor(timeToPosition(shotItem->shot().start));
+            break;
+    }
+}
+
+/// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur
 void TimelineWidget::splitCurrentShotItem() {
     qDebug() << "Ms au curseur " << timeAtCursor();
     
@@ -220,9 +248,7 @@ void TimelineWidget::splitCurrentShotItem() {
     double newWidth1 = timeToPosition(m_shotItems[index]->shot().end) - timeToPosition(m_shotItems[index]->shot().start);
     m_currentShotItem->setWidth(newWidth1);
 
-    Shot newShotData =  m_shotItems[index]->shot(); 
-    newShotData.start = cutTime;
-    newShotData.end = oldEnd;
+    Shot newShotData =  Shot{ "Titre", cutTime, oldEnd};
 
     double pos2 = timeToPosition(newShotData.start);
     double width2 = timeToPosition(newShotData.end) - pos2;
@@ -235,6 +261,7 @@ void TimelineWidget::splitCurrentShotItem() {
     m_scene->addItem(newShotItem);
 }
 
+/// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage
 void TimelineWidget::updateShotItems(){
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_view->setUpdatesEnabled(false);

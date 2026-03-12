@@ -16,6 +16,7 @@ public:
 signals:
     void zoomRequested(double zoomFactor, int mouseX);
     void cursorPositionRequested(double);
+    void itemClicked(QGraphicsItem*);
     
 protected:
     void wheelEvent(QWheelEvent *event) override;

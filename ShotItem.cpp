@@ -12,7 +12,7 @@ ShotItem::ShotItem(Shot shot, double width, double height, double topMargin , QG
 
 QRectF ShotItem::boundingRect() const
 {
-    return QRectF(0, 0, m_width, m_height);
+    return QRectF(0, m_topMargin, m_width, m_height);
 }
 
 void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -22,7 +22,7 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    p->setBrush(QBrush(QColor(100, 150, 255, 150))); 
+    p->setBrush(QBrush(m_shot.color)); 
 
     p->drawRect(0, m_topMargin, m_width, m_height);
 }

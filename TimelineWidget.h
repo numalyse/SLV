@@ -30,7 +30,7 @@ public slots:
 
 
 signals:
-    void updateShotDetailRequested(Shot*);
+    void updateShotDetailRequested(int shotId, Shot*);
     void timelineSetPosition(int64_t);
     
 protected:
@@ -39,6 +39,7 @@ protected:
 private slots:
     void splitCurrentShotItem();
     void moveCursor(double cursorPosX);
+    void itemClicked(QGraphicsItem*);
 
 
 
@@ -61,6 +62,7 @@ private:
 
     double m_fps{};
     int64_t m_duration{};
+    int64_t m_vlcTime{};
 
     int m_sceneWidth = 2000;
     int m_sceneHeight = 150;
@@ -68,7 +70,7 @@ private:
 
     int m_rulerHeight = 25;
     double m_minPxBetweenTicks = 100.0;
-    int64_t m_vlcTime{};
+
 
 
 

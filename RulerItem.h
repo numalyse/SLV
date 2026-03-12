@@ -1,6 +1,8 @@
 #ifndef RULERITEM_H
 #define RULERITEM_H
 
+#include "ItemTypes.h"
+
 #include <QGraphicsItem>
 
 class RulerItem : public QGraphicsItem
@@ -15,6 +17,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(int width, int height, double pixelsPerMs);
+
+    int type() const override { return SLV::TypeRulerItem;}
 
 private:
     int m_width;

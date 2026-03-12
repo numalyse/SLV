@@ -14,9 +14,10 @@ public:
     explicit ShotDetail(QWidget* parent = nullptr);
 
 public slots:
-    void updateShotDetail(Shot*);
+    void updateShotDetail(int shotId, Shot *shotData);
 
 private:
+    QLabel* m_shotIdLabel = nullptr;
     QLabel* m_titleLabel = nullptr;
     QLabel* m_startLabel = nullptr;
     QLabel* m_endLabel = nullptr;

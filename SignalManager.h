@@ -19,7 +19,7 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
-    void timelineWidgetUpdateShotDetail(Shot*);
+    void timelineWidgetUpdateShotDetail(int, Shot*);
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void simpleToolbarUpdateCursorPosition(int);

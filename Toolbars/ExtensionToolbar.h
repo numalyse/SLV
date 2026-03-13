@@ -30,6 +30,7 @@ public:
     ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
     ToolbarButton* m_compoRuleBtn= nullptr;
+    ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarButton* m_verticalInvBtn= nullptr;
     ToolbarButton* m_horizontalInvBtn= nullptr;
     // ToolbarButton* m_abloopBtn = nullptr;

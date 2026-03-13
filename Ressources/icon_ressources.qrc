@@ -42,5 +42,17 @@
         <file alias="forward.png">icons/forward.png</file>
         <file alias="compo_rule.png">icons/compo_rule.png</file>
         <file alias="rotate.png">icons/rotate.png</file>
+        <file alias="timeline_off.png">icons/timeline_off.png</file>
+        <file alias="timeline_on.png">icons/timeline_on.png</file>
+        <file alias="view_1.png">icons/view_1.png</file>
+        <file alias="view_3_left.png">icons/view_3_left.png</file>
+        <file alias="view_3_right.png">icons/view_3_right.png</file>
+        <file alias="view_3_top.png">icons/view_3_top.png</file>
+        <file alias="view_4.png">icons/view_4.png</file>
+        <file alias="view_2_h.png">icons/view_2_h.png</file>
+        <file alias="view_3_h.png">icons/view_3_h.png</file>
+        <file alias="view_2_v.png">icons/view_2_v.png</file>
+        <file alias="view_3_bot.png">icons/view_3_bot.png</file>
+        <file alias="view_3_v.png">icons/view_3_v.png</file>
     </qresource>
 </RCC>

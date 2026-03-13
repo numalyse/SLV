@@ -4,6 +4,7 @@
 #include "TextManager.h"
 #include <QHBoxLayout>
 #include <SignalManager.h>
+#include <qframe.h>
 
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
@@ -46,9 +47,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
-        "segmentation.png",
+        "timeline_on.png",
         TextManager::instance().get("tooltip_segmentation_on"),
-        "segmentation.png",
+        "timeline_off.png",
         TextManager::instance().get("tooltip_segmentation_off")
     );
 
@@ -79,9 +80,14 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     });
 
     m_compoRuleBtn = new ToolbarButton(this, "compo_rule.png", TextManager::instance().get("tooltip_composition"));
-    
+
+    QHBoxLayout* invFrameLayout = new QHBoxLayout();
+
     m_verticalInvBtn = new ToolbarButton(this, "invert_v.png", TextManager::instance().get("tooltip_flip_vertical"));
     m_horizontalInvBtn = new ToolbarButton(this, "invert_h.png", TextManager::instance().get("tooltip_flip_horizontal"));
+    invFrameLayout->addWidget(m_verticalInvBtn);
+    invFrameLayout->addWidget(m_horizontalInvBtn);
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h.png", TextManager::instance().get("tooltip_flip_vertical"));
 
     setDefaultUI();
     disableButtons();
@@ -119,8 +125,7 @@ void ExtensionToolbar::setDefaultUI()
     
     mainLayout->addWidget(m_rotateBtn);
     mainLayout->addWidget(m_recordBtn);
-    mainLayout->addWidget(m_verticalInvBtn);
-    mainLayout->addWidget(m_horizontalInvBtn);
+    mainLayout->addWidget(m_invBtn);
     // mainLayout->addWidget(m_abloopBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);

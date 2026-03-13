@@ -32,7 +32,7 @@ public:
     QLabel* nameLabel() const { return m_nameLabel; }
 
     ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
-    ToolbarPopupButton* speedBtn() const { return m_speedBtn; }
+    ToolbarToggleHoverButton* speedBtn() const { return m_speedBtn; }
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
     
@@ -51,7 +51,7 @@ protected:
 
     QSlider* m_volumeSlider = nullptr;
     QLabel* m_volumeLabel = nullptr;
-    ToolbarPopupButton* m_speedBtn = nullptr;
+    ToolbarToggleHoverButton* m_speedBtn = nullptr;
     QLabel* m_speedLabel = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;

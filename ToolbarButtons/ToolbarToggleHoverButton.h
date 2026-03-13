@@ -17,7 +17,7 @@ public:
     /// @param timerDuration Durée pendant laquelle la popup reste affiché après être sortie du survol du bouton ou de la popup
     explicit ToolbarToggleHoverButton(
         QWidget* parent = nullptr,
-        QWidget* widgetToDisplay = nullptr,
+        QLayout* layoutToDisplay = nullptr,
         bool state = false,
         const QString& iconNameOn = "", 
         const QString& toolTipTextOn = "ToolTipOn",
@@ -31,6 +31,8 @@ public:
         m_widgetToDisplay = nullptr; 
     }; // Le widget n'a pas de parent, il doit être détruit manuellement
 
+    void setOnTop(const bool &onTop);
+
 private:
     QWidget* m_widgetToDisplay = nullptr;
 
@@ -38,7 +40,10 @@ private:
     QTimer* m_hideTimer = nullptr; 
 
     /// @brief Déplace le widget popup centré au dessus du bouton, offset sur la hauteur fixé a 10 px
-    void moveWidgetOnTop();
+    void moveWidget();
+
+    /// @brief pour savoir où déplacer le widget
+    bool m_onTop = true;
 
 protected:
     /// @brief Lorsque la souris survole le bouton, arret du timer et show de la popup

@@ -17,6 +17,8 @@
 #include <QResizeEvent>
 #include <QWheelEvent>
 #include <QScrollBar>
+#include <QMenu>
+#include <QAction>
 
 #include <algorithm> 
 
@@ -49,7 +51,8 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
-    connect(m_view, &TimelineView::itemClicked, this, &TimelineWidget::itemClicked);
+    connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
+    connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
 
     layout->addWidget(m_view); 
 
@@ -209,7 +212,7 @@ void TimelineWidget::moveCursor(double cursorPosX){
 
 /// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
 /// @param item 
-void TimelineWidget::itemClicked(QGraphicsItem * item)
+void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {
     switch( item->type() ) {
         case SLV::TypeShotItem: 
@@ -219,6 +222,18 @@ void TimelineWidget::itemClicked(QGraphicsItem * item)
             break;
     }
 }
+
+void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
+{
+    switch( item->type() ) {
+        case SLV::TypeShotItem: 
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            qDebug() << "Right click";
+            showContextMenuForShot(globalPos, shotItem);
+            break;
+    }
+}
+
 
 /// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur
 void TimelineWidget::splitCurrentShotItem() {
@@ -287,4 +302,17 @@ void TimelineWidget::goToShot(int idShot){
 
     moveCursor(timeToPosition(m_shotItems[idShot]->shot().start));
 
+}
+
+
+void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
+{
+    QMenu menu;
+    QAction *actionSplit = menu.addAction(TextManager::instance().get("split_shot_at_cursor"));
+
+    QAction *selectedAction = menu.exec(globalPos);
+
+    if (selectedAction == actionSplit) {
+        splitCurrentShotItem();
+    } 
 }

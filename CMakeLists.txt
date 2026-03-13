@@ -63,6 +63,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlaylistItem.h PlaylistItem.cpp
         Playlist.h Playlist.cpp
         ShotDetail.h ShotDetail.cpp
+        FormLineEditWidget.h FormLineEditWidget.cpp
+        FormLineEdit.h FormLineEdit.cpp
+        FormTextEditWidget.h FormTextEditWidget.cpp
+        FormTextEdit.h FormTextEdit.cpp
         SignalManager.h
 
 

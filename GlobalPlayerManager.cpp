@@ -18,6 +18,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
     mainLayout->addLayout(layout);
+    //m_navPanel = new NavPanel(this, m_shotInfoController);
     m_navPanel = new NavPanel(this);
     mainLayout->addWidget(m_navPanel);
 
@@ -176,7 +177,8 @@ void GlobalPlayerManager::createTimelineWidget()
     m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
     m_timeline->setFixedHeight(150);
     connect(toolbar, &SimpleToolbar::setCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorPos);
-    connect(m_timeline, &TimelineWidget::updateShotDetailRequested, &SignalManager::instance(), &SignalManager::timelineWidgetUpdateShotDetail);
+    connect(m_timeline, &TimelineWidget::updateShotDetailRequested, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+    connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
     layout->addWidget(m_timeline);
     m_timeline->hide();
 }

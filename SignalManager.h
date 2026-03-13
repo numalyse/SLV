@@ -19,7 +19,6 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
-    void timelineWidgetUpdateShotDetail(int, Shot*);
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void simpleToolbarUpdateCursorPosition(int);
@@ -29,6 +28,8 @@ signals:
     void playerWidgetSelectFileCanceled();
     void mediaVolumeChanged(const QString&);
     void mediaSpeedChanged(const QString&);
+    void formLineEditPlay();
+    void formLineEditPause();
 };
 
 

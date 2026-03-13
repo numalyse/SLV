@@ -35,7 +35,7 @@ ToolbarToggleButton::ToolbarToggleButton(
         "}"
     );
 
-    setIconSize(QSize(12,30));
+    // setIconSize(QSize(12,30));
     setFixedSize(30, 30);
 
     updateIcons(state);

@@ -50,16 +50,18 @@ void GlobalToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0,0,0,0);
+    buttonLayout->setContentsMargins(5,0,5,0);
     buttonLayout->setSpacing(1);
-    buttonLayout->addStretch();
     buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
+    buttonLayout->addSpacing(m_muteBtn->width());
+    buttonLayout->addStretch();
     buttonLayout->addWidget(m_stopBtn);
+    buttonLayout->addWidget(m_playPauseBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addStretch();
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
-    buttonLayout->addStretch();
+
     mainLayout->addLayout(buttonLayout);
 
 }

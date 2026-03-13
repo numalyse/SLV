@@ -11,12 +11,6 @@ class ShotItem : public QGraphicsItem
 {
 public:
     explicit ShotItem(Shot shot, double width, double height, double topMargin = 40, QGraphicsItem* parent = nullptr);
-    ~ShotItem(){
-        if(m_pixmap){
-            delete m_pixmap; 
-            m_pixmap = nullptr;
-        }
-    }
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -28,7 +22,7 @@ public:
 
 private:
     Shot m_shot;
-    QPixmap* m_pixmap= nullptr;
+    QPixmap m_pixmap;
     double m_width{};
     double m_height{};
     double m_topMargin{};

@@ -11,6 +11,7 @@ struct Shot
     int64_t end;
     QString note;
     QColor color = QColor(100, 150, 255, 150);
+    QImage tagImage;
     // image ?
 };
 

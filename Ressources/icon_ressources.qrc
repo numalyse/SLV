@@ -54,5 +54,8 @@
         <file alias="view_2_v.png">icons/view_2_v.png</file>
         <file alias="view_3_bot.png">icons/view_3_bot.png</file>
         <file alias="view_3_v.png">icons/view_3_v.png</file>
+        <file alias="to_prev_shot.png">icons/to_prev_shot.png</file>
+        <file alias="to_next_shot.png">icons/to_next_shot.png</file>
+        <file alias="test.png">icons/test.png</file>
     </qresource>
 </RCC>

@@ -18,6 +18,15 @@ public:
 
 private:
     int m_height;
+
+    static constexpr QPointF s_points[5] {
+        QPointF(1.5*-3.0, 0.0),
+        QPointF(1.5*-3.0, 1.5*5.0),
+        QPointF(0.0, 1.5*7.5),
+        QPointF(1.5*3.0, 1.5*5.0),
+        QPointF(1.5*3.0, 0.0),
+    };
+
 };
 
 

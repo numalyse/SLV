@@ -1,5 +1,7 @@
 #include "TimelineView.h"
 
+#include "ItemTypes.h"
+
 #include <QDebug>
 #include <QScrollbar>
 
@@ -28,12 +30,19 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
         } else if (event->modifiers() & Qt::ShiftModifier) {
             
             if (QGraphicsItem *item = itemAt(event->pos())) {
-                emit itemClicked(item);
+                emit itemLeftClick(item);
             } 
         } else {
             m_isDragging = true;
             double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
             emit cursorPositionRequested(clickPosition);
+        }
+    }else if (event->button() == Qt::RightButton) {
+        QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
+        for (auto* item : itemsAtCursor){ 
+            if(item->type() == SLV::TypeShotItem){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
+                emit itemRightClick( event->globalPos() , item);
+            }
         }
     }
 }

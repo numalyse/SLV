@@ -5,6 +5,7 @@
 #include "ItemTypes.h"
 
 #include <QGraphicsItem>
+#include <QPixmap>
 
 class ShotItem : public QGraphicsItem
 {
@@ -21,9 +22,12 @@ public:
 
 private:
     Shot m_shot;
+    QPixmap m_pixmap;
     double m_width{};
     double m_height{};
     double m_topMargin{};
+
+    constexpr static int s_minSizeForImage{100};
 };
 
 

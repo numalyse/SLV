@@ -15,6 +15,7 @@
 #include <QGraphicsScene>
 #include <QVBoxLayout>
 #include <QVector>
+#include <QPoint>
 
 
 class TimelineWidget : public QWidget
@@ -27,7 +28,7 @@ public:
 public slots:
     void updateCursorPos(int64_t vlcTime);
     double timeToPosition(int64_t time);
-
+    void goToShot(int);
 
 signals:
     void updateShotDetailRequested(int shotId, Shot*);
@@ -39,15 +40,15 @@ protected:
 private slots:
     void splitCurrentShotItem();
     void moveCursor(double cursorPosX);
-    void itemClicked(QGraphicsItem*);
-
-
+    void itemLeftClick(QGraphicsItem*);
+    void itemRightClick(QPoint, QGraphicsItem*);
 
 private:
     void applyZoom(double zoomFactor, int mouseX);
     int64_t timeAtCursor();
     void updateCurrentShot();
     void updateShotItems();
+    void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
@@ -64,7 +65,7 @@ private:
     int64_t m_duration{};
     int64_t m_vlcTime{};
 
-    int m_sceneWidth = 2000;
+    int m_sceneWidth = 10000;
     int m_sceneHeight = 150;
     double m_pixelsPerMs {};
 

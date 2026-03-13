@@ -27,7 +27,7 @@ public:
 public slots:
     void updateCursorPos(int64_t vlcTime);
     double timeToPosition(int64_t time);
-
+    void goToShot(int);
 
 signals:
     void updateShotDetailRequested(int shotId, Shot*);
@@ -64,7 +64,7 @@ private:
     int64_t m_duration{};
     int64_t m_vlcTime{};
 
-    int m_sceneWidth = 2000;
+    int m_sceneWidth = 10000;
     int m_sceneHeight = 150;
     double m_pixelsPerMs {};
 

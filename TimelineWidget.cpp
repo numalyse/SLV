@@ -44,7 +44,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_view->setRenderHint(QPainter::Antialiasing);
     m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop); 
     m_view->setFrameShape(QFrame::NoFrame);
-    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
@@ -276,4 +276,15 @@ void TimelineWidget::updateShotItems(){
     m_view->setUpdatesEnabled(true);
     m_scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
     m_scene->update();
+}
+
+void TimelineWidget::goToShot(int idShot){
+    if(idShot < 0 ){
+        idShot = 0;
+    }else if( idShot >= m_shotItems.size()){
+        idShot = m_shotItems.size()-1;
+    }
+
+    moveCursor(timeToPosition(m_shotItems[idShot]->shot().start));
+
 }

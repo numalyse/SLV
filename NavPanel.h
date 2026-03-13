@@ -32,10 +32,13 @@ public slots:
     void playNextMedia();
     void displayShotDetail();
     void displayPlaylist();
+    void timelineWidgetUpdateShotDetail(int, Shot*);
 
 signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
+    void goToShotRequest(int);
+
 };
 
 #endif // NAVPANEL_H

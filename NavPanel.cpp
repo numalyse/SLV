@@ -24,6 +24,9 @@ NavPanel::NavPanel(QWidget *parent)
 
     connect(m_playlistWidget, &Playlist::openMediaFileRequested, this, &NavPanel::openMediaFileRequested);
     connect(m_playlistWidget, &Playlist::disableToolbarLoopRequested, this, &NavPanel::disableToolbarLoopRequested);
+    
+    connect(m_shotDetail, &ShotDetail::goToShotRequested, this, &NavPanel::goToShotRequest);
+
     connect(&SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail, this, &NavPanel::displayShotDetail);
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
 }
@@ -67,3 +70,7 @@ void NavPanel::displayPlaylist()
     m_sideWidget->setCurrentWidget(m_playlistWidget);
 }
 
+void NavPanel::timelineWidgetUpdateShotDetail(int shotId, Shot * shot)
+{
+    m_shotDetail->updateShotDetail(shotId, shot);
+}

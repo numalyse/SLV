@@ -7,9 +7,9 @@
 ShotItem::ShotItem(Shot shot, double width, double height, double topMargin , QGraphicsItem* parent) 
 : QGraphicsItem(parent), m_shot{shot}, m_width{width}, m_height{height}, m_topMargin{topMargin}
 {
-    m_pixmap = new QPixmap(":/icons/test.png");
+    m_pixmap = QPixmap(":/icons/test.png");
     if (!shot.tagImage.isNull()) {
-        m_pixmap = new QPixmap(QPixmap::fromImage(shot.tagImage));
+        m_pixmap = QPixmap(QPixmap::fromImage(shot.tagImage));
     }
     setZValue(0);
 }
@@ -30,13 +30,13 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->drawRect(0, m_topMargin, m_width, m_height);
 
 
-    if(m_pixmap && m_width > s_minSizeForImage){
+    if(!m_pixmap.isNull() && m_width > s_minSizeForImage){
 
         QRectF target(0.0, m_topMargin, m_width, m_height/1.5);
 
         QSize targetImgSize(100, 30);
         
-        QPixmap resizedPixmap = m_pixmap->scaled(
+        QPixmap resizedPixmap = m_pixmap.scaled(
             targetImgSize,                      
             Qt::KeepAspectRatio,      
             Qt::FastTransformation          
@@ -55,8 +55,6 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
         } 
 
         p->drawPixmap(target, resizedPixmap, srcRectf);
-
-
 
     }
 

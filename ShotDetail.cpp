@@ -3,6 +3,7 @@
 #include "TimeFormatter.h"
 #include "ProjectManager.h"
 #include "SignalManager.h"
+#include "TextManager.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
 #include <QLabel>
@@ -19,12 +20,15 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    m_shotIdForm = new FormLineEditWidget("Numéro du plan" , "", false, this);
-    m_shotTitle = new FormLineEditWidget("Nom du plan" , "", true, this);
-    m_startTime = new FormLineEditWidget("Début du plan" , "", false, this);
-    m_endTime = new FormLineEditWidget("Fin du plan" , "", false, this);
-    m_duration = new FormLineEditWidget("Durée du plan" , "", false, this);
-    m_notes = new FormTextEditWidget("Note" , "", true, this);
+    TextManager& textManager = TextManager::instance();
+
+    m_shotIdForm = new FormLineEditWidget(textManager.get("shot_detail_id_name") , "", false, this);
+    m_shotTitle = new FormLineEditWidget(textManager.get("shot_detail_title_name") , "", true, this);
+    m_startTime = new FormLineEditWidget(textManager.get("shot_detail_start_time_name") , "", false, this);
+    m_endTime = new FormLineEditWidget(textManager.get("shot_detail_end_time_name"), "", false, this);
+    m_duration = new FormLineEditWidget(textManager.get("shot_detail_duration_time_name") , "", false, this);
+    m_notes = new FormTextEditWidget(textManager.get("shot_detail_note_name") , "", true, this);
+
     m_notes->setMaximumHeight(200);
 
     connect(m_notes->textEdit(), &QTextEdit::textChanged, this, [this](){
@@ -76,7 +80,7 @@ void ShotDetail::updateShotDetail(int shotId, Shot * shotData)
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(QString("Plan n°%1").arg(shotId+1));
+    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text").arg(shotId+1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));

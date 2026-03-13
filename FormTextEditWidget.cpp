@@ -11,11 +11,12 @@ FormTextEditWidget::FormTextEditWidget(const QString &name, const QString &text,
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setAlignment(Qt::AlignLeft);
-    m_nameLabel->setStyleSheet("font-weight: bold;");
+    m_nameLabel->setStyleSheet("font-weight: bold; padding-left: 10px;");
     m_nameLabel->setText(name);
 
     m_textEdit = new FormTextEdit(text, editable, this);
     m_textEdit->setAlignment(Qt::AlignRight);
+    m_textEdit->setStyleSheet("padding-left: 10px;");
     
     m_frameLayout->addWidget(m_nameLabel);
     m_frameLayout->addWidget(m_textEdit);

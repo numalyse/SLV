@@ -15,11 +15,14 @@ void CursorItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(option); 
     Q_UNUSED(widget);
 
-    p->setRenderHint(QPainter::Antialiasing, false);
+    p->setRenderHint(QPainter::Antialiasing, true);
 
     p->setPen(QPen(Qt::red, 2));
-
     p->drawLine(0, 0, 0, m_height);
+
+    p->setBrush(Qt::red);
+    p->drawPolygon(s_points, 5);
+
 
 }
 

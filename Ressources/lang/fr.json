@@ -3,5 +3,17 @@
     "tooltip_pause": "Pause",
     "tooltip_mute": "Couper le son",
     "tooltip_fullscreen": "Plein écran",
-    "tooltip_slow_down": "Ralentir x0.25"
+
+
+
+    
+    "shot_detail_id_name" : "Numéro du plan",
+    "shot_detail_title_name" : "Titre",
+    "shot_detail_start_time_name" : "Début",
+    "shot_detail_end_time_name" : "Fin",
+    "shot_detail_duration_time_name" : "Durée",
+    "shot_detail_note_name" : "Note",
+    
+    "shot_detail_id_text" : "Plan n°"
+
 }

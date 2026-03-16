@@ -29,7 +29,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_duration = new FormLineEditWidget(textManager.get("shot_detail_duration_time_name") , "", false, this);
     m_notes = new FormTextEditWidget(textManager.get("shot_detail_note_name") , "", true, this);
 
-    m_notes->setMaximumHeight(200);
+    m_notes->setMaximumHeight(250);
 
     connect(m_notes->textEdit(), &QTextEdit::textChanged, this, [this](){
         if(m_shotData) {
@@ -72,7 +72,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
 }
 
-void ShotDetail::updateShotDetail(int shotId, Shot * shotData)
+void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
     m_shotData = shotData;
     m_shotId = shotId;
@@ -80,12 +80,21 @@ void ShotDetail::updateShotDetail(int shotId, Shot * shotData)
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text").arg(shotId+1));
+    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text") + QString::number(shotId + 1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));
     m_duration->setText(TimeFormatter::msToHHMMSSFF(duration, fps));
     m_notes->setText(shotData->note);
+
+    m_toNextShotBtn->show();
+    m_toPrevShotBtn->show();
+    if(shotId == 0){
+        m_toPrevShotBtn->hide();
+    }
+    if(shotId == shotCount-1){
+        m_toNextShotBtn->hide();
+    }
 
 
 }

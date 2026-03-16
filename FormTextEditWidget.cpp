@@ -11,7 +11,7 @@ FormTextEditWidget::FormTextEditWidget(const QString &name, const QString &text,
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setAlignment(Qt::AlignLeft);
-    m_nameLabel->setStyleSheet("font-weight: bold; padding-left: 10px;");
+    m_nameLabel->setStyleSheet("font-weight: bold; padding-left: 10px; padding-top: 10px;");
     m_nameLabel->setText(name);
 
     m_textEdit = new FormTextEdit(text, editable, this);

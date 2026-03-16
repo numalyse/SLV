@@ -71,9 +71,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         this, 
         volumeFrameLayout,
         false,
-        "sound_off.png",  
+        "sound_off_white",
         TextManager::instance().get("tooltip_sound_off"),
-        "sound_on.png",
+        "sound_on_white",
         TextManager::instance().get("tooltip_sound_on")
     );
     m_muteBtn->setEnabled(true);
@@ -85,9 +85,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     speedFrameLayout->addLayout(speedInfoLayout);
     m_speedLabel = new QLabel("x1");
     QLabel* slowIcon = new QLabel();
-    slowIcon->setPixmap(QPixmap(":/icons/slow.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    slowIcon->setPixmap(QPixmap(":/icons/slow_white").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     QLabel* fastIcon = new QLabel();
-    fastIcon->setPixmap(QPixmap(":/icons/speed.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    fastIcon->setPixmap(QPixmap(":/icons/speed_white").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     speedInfoLayout->addWidget(slowIcon);
     speedInfoLayout->addStretch();
     speedInfoLayout->addWidget(m_speedLabel);
@@ -102,21 +102,21 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     speedFrameLayout->addWidget(speedSlider);
 
-    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed.png",  TextManager::instance().get("tooltip_speed"), "speed.png", TextManager::instance().get("tooltip_speed"));
+    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  TextManager::instance().get("tooltip_speed"), "speed_white", TextManager::instance().get("tooltip_speed"));
 
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
         "loop_on.png",
         TextManager::instance().get("tooltip_loop_on"),
-        "loop_off.png", 
+        "loop_off_white",
         TextManager::instance().get("tooltip_loop_off")
     );
     QVBoxLayout* langLayout = new QVBoxLayout();
-    m_langBtn = new ToolbarPopupButton(this, langLayout, "lang.png", TextManager::instance().get("tooltip_lang"));
+    m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", TextManager::instance().get("tooltip_lang"));
 
-    m_removePlayerBtn = new ToolbarButton(this, "remove_media.png", TextManager::instance().get("tooltip_delete_player"));
-    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media.png", TextManager::instance().get("tooltip_duplicate_player"));
+    m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", TextManager::instance().get("tooltip_delete_player"));
+    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", TextManager::instance().get("tooltip_duplicate_player"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerRequested);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);

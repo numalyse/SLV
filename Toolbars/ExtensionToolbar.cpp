@@ -12,44 +12,44 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_zoomBtn = new ToolbarToggleButton(
         this, 
         false,
-        "zoom_on.png", 
+        "zoom_white",
         TextManager::instance().get("tooltip_zoom_on"),
-        "zoom_on.png",
+        "zoom_white",
         TextManager::instance().get("tooltip_zoom_off")
     );
 
     m_hideImgBtn = new ToolbarToggleButton(
         this, 
         false,
-        "hide_image.png", 
+        "hide_image_white",
         TextManager::instance().get("tooltip_hide_image"),
-        "show_image.png", 
+        "show_image_white",
         TextManager::instance().get("tooltip_show_image")
     );
 
-    m_prevFrameBtn = new ToolbarButton(this, "prev_frame.png", TextManager::instance().get("tooltip_prev_frame"));
-    m_nextFrameBtn = new ToolbarButton(this, "next_frame.png", TextManager::instance().get("tooltip_next_frame"));
+    m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", TextManager::instance().get("tooltip_prev_frame"));
+    m_nextFrameBtn = new ToolbarButton(this, "next_frame_white", TextManager::instance().get("tooltip_next_frame"));
     
-    m_backwardBtn = new ToolbarButton(this, "backward.png", TextManager::instance().get("tooltip_backward"));
-    m_forwardBtn = new ToolbarButton(this, "forward.png", TextManager::instance().get("tooltip_forward"));
+    m_backwardBtn = new ToolbarButton(this, "backward_white", TextManager::instance().get("tooltip_backward"));
+    m_forwardBtn = new ToolbarButton(this, "forward_white", TextManager::instance().get("tooltip_forward"));
     
-    m_rotateBtn = new ToolbarButton(this, "rotate.png", TextManager::instance().get("tooltip_rotate"));
+    m_rotateBtn = new ToolbarButton(this, "rotate_white", TextManager::instance().get("tooltip_rotate"));
 
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
-        "record_off.png",
+        "record_off_white",
         TextManager::instance().get("tooltip_record_off"),
         "record_on.png",
-        TextManager::instance().get("tooltip_record_on.png")
+        TextManager::instance().get("tooltip_record_on")
     );
     
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
-        "timeline_on.png",
+        "timeline_on_white",
         TextManager::instance().get("tooltip_segmentation_on"),
-        "timeline_off.png",
+        "timeline_off_white",
         TextManager::instance().get("tooltip_segmentation_off")
     );
 
@@ -79,15 +79,15 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         emit SignalManager::instance().displayPlaylist();
     });
 
-    m_compoRuleBtn = new ToolbarButton(this, "compo_rule.png", TextManager::instance().get("tooltip_composition"));
+    m_compoRuleBtn = new ToolbarButton(this, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
 
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
-    m_verticalInvBtn = new ToolbarButton(this, "invert_v.png", TextManager::instance().get("tooltip_flip_vertical"));
-    m_horizontalInvBtn = new ToolbarButton(this, "invert_h.png", TextManager::instance().get("tooltip_flip_horizontal"));
+    m_verticalInvBtn = new ToolbarButton(this, "invert_v_white", TextManager::instance().get("tooltip_flip_vertical"));
+    m_horizontalInvBtn = new ToolbarButton(this, "invert_h_white", TextManager::instance().get("tooltip_flip_horizontal"));
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
-    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h.png", TextManager::instance().get("tooltip_flip_vertical"));
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", TextManager::instance().get("tooltip_flip_vertical"));
 
     setDefaultUI();
     disableButtons();

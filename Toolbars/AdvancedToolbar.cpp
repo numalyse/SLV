@@ -15,14 +15,14 @@
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
-    m_nextMediaBtn = new ToolbarButton(this, "next.png", TextManager::instance().get("tooltip_next_media"));
-    m_prevMediaBtn = new ToolbarButton(this, "prev.png", TextManager::instance().get("tooltip_prev_media"));
+    m_nextMediaBtn = new ToolbarButton(this, "next_white", TextManager::instance().get("tooltip_next_media"));
+    m_prevMediaBtn = new ToolbarButton(this, "prev_white", TextManager::instance().get("tooltip_prev_media"));
 
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
-        "minus.png",
+        "minus_white",
         TextManager::instance().get("tooltip_expand_toolbar"),
-        "plus.png",
+        "plus_white",
         TextManager::instance().get("tooltip_minimize_toolbar")
     );
 

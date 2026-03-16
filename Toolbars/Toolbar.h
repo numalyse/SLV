@@ -19,18 +19,18 @@ public:
         m_playPauseBtn = new ToolbarToggleButton(
             this,
             true,
-            "pause.png",
+            "pause_white",
             TextManager::instance().get("tooltip_pause"),
-            "play.png",
+            "play_white",
             TextManager::instance().get("tooltip_play")
         );
         m_playPauseBtn->setButtonState(false);
         m_playPauseBtn->setEnabled(true);
         
-        m_stopBtn = new ToolbarButton(this, "stop.png", TextManager::instance().get("tooltip_stop"));
-        m_ejectBtn = new ToolbarButton(this, "eject.png", TextManager::instance().get("tooltip_eject"));
-        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"), "fullscreen.png", TextManager::instance().get("tooltip_fullscreen"));
-        m_screenshotBtn = new ToolbarButton(this, "capture.png", TextManager::instance().get("tooltip_capture"));
+        m_stopBtn = new ToolbarButton(this, "stop_white", TextManager::instance().get("tooltip_stop"));
+        m_ejectBtn = new ToolbarButton(this, "eject_white", TextManager::instance().get("tooltip_eject"));
+        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_white", TextManager::instance().get("tooltip_fullscreen"), "fullscreen_white", TextManager::instance().get("tooltip_fullscreen"));
+        m_screenshotBtn = new ToolbarButton(this, "capture_white", TextManager::instance().get("tooltip_capture"));
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);

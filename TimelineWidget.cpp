@@ -36,6 +36,10 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
         qDebug() << "Creation timeline : Fps ou durée du film = 0";
         return;
     }
+    
+    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
+    connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
+    layout->addWidget(m_splitShotBtn);
 
     m_pixelsPerMs = m_sceneWidth / static_cast<double>(m_duration);
 
@@ -56,10 +60,6 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     layout->addWidget(m_view);
 
-    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
-
-    connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
-    layout->addWidget(m_splitShotBtn);
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_pixelsPerMs, m_duration, m_fps);
     m_ruler->setPos(0, 0); 

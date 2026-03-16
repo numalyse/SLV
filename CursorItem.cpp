@@ -17,10 +17,10 @@ void CursorItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWid
 
     p->setRenderHint(QPainter::Antialiasing, true);
 
-    p->setPen(QPen(Qt::red, 2));
+    p->setPen(QPen(QColor(220, 220 , 220, 255), 2));
     p->drawLine(0, 0, 0, m_height);
 
-    p->setBrush(Qt::red);
+    p->setBrush(QColor(220, 220 , 220, 255));
     p->drawPolygon(s_points, 5);
 
 

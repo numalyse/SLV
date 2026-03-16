@@ -175,7 +175,7 @@ void TimelineWidget::updateCurrentShot(){
     }
     ShotItem* closestShotItem =  m_shotItems[currentShotId];
     if(m_currentShotItem != closestShotItem){
-        m_currentShotItem =  closestShotItem;
+        m_currentShotItem = closestShotItem;
         emit updateShotDetailRequested( shotItemCount, currentShotId, &m_shotItems[currentShotId]->shot());
     }
 } 
@@ -321,6 +321,8 @@ void TimelineWidget::splitCurrentShotItem() {
     // on insère le plan juste apres le plan cut
     m_shotItems.insert(index + 1, newShotItem);
     m_scene->addItem(newShotItem);
+
+    updateCurrentShot();
 }
 
 /// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage

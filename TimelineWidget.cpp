@@ -102,6 +102,17 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
 /// @brief Reçoit le temps vlc et met à jour la position en conséquence
 /// @param vlcTime 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
+    
+    auto abData = getABLoopData();
+    if(abData.has_value()){
+        auto [aTime, aXPos, bTime] = abData.value();
+        if( vlcTime >= bTime || vlcTime < aTime ){
+            moveCursor( aXPos );
+            updateCurrentShot();
+            return;
+        }
+    }
+
     m_vlcTime = vlcTime;
     double posCursor = static_cast<double>(vlcTime) * m_pixelsPerMs; 
     m_cursor->setPos(posCursor, 0);
@@ -176,6 +187,7 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
     m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_pixelsPerMs);
+    updateMarkerPos();
     updateCursorPos(m_vlcTime);
 
     updateShotItems();
@@ -309,10 +321,76 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 {
     QMenu menu;
     QAction *actionSplit = menu.addAction(TextManager::instance().get("split_shot_at_cursor"));
+    QAction *actionAB = menu.addAction(TextManager::instance().get("ab_action"));
+    QAction *actionExtractAB = nullptr;
+
+    if(m_abMarkersItems.size() == 2){
+        actionExtractAB = menu.addAction(TextManager::instance().get("ab_extraxt"));
+    }
 
     QAction *selectedAction = menu.exec(globalPos);
 
     if (selectedAction == actionSplit) {
         splitCurrentShotItem();
-    } 
+    }else if (selectedAction == actionAB){
+        ABAction();
+    }else if (selectedAction == actionExtractAB){
+        qDebug() << "Extract ab segment";
+    }
+}
+
+/// @brief Ajoute un marqueur si 0 ou 1 marqueur présent. Si 1 marqueur déjà présent, garde l'ordre tel que element de 0 de m_abMarkersItems est le "A".
+/// Si 2 marqueurs présents, les supprimes.
+void TimelineWidget::ABAction(){
+
+    switch (m_abMarkersItems.size())
+    {
+    case 2:{
+        for (auto* marker : m_abMarkersItems)
+        {
+            m_scene->removeItem(marker);
+            delete marker;
+            marker = nullptr;
+        }
+        m_abMarkersItems.clear();
+        break;
+    }
+    case 1 :{
+        QPointF cursorPos = m_cursor->pos();
+        ABMarkerItem* newMarker = new ABMarkerItem(m_sceneHeight, timeAtCursor());
+        if(newMarker->time() >= m_abMarkersItems[0]->time()){
+            m_abMarkersItems.append(newMarker); 
+        }else if(newMarker->time() < m_abMarkersItems[0]->time()){
+            m_abMarkersItems.insert(0, newMarker);
+        }
+        newMarker->setPos(cursorPos);
+        m_scene->addItem(newMarker);
+        break;
+    }
+    case 0 :{
+        QPointF cursorPosDefault = m_cursor->pos();
+        ABMarkerItem* newMarkerDefault = new ABMarkerItem(m_sceneHeight, timeAtCursor());
+        m_abMarkersItems.append(newMarkerDefault);
+        newMarkerDefault->setPos(cursorPosDefault);
+        m_scene->addItem(newMarkerDefault);
+        break;
+    }
+
+    }
+}
+
+
+std::optional<ABLoopData> TimelineWidget::getABLoopData(){
+    if (m_abMarkersItems.size() < 2) return std::nullopt;
+
+    return ABLoopData{m_abMarkersItems[0]->time(), m_abMarkersItems[0]->pos().x(), m_abMarkersItems[1]->time()};
+
+}
+
+void TimelineWidget::updateMarkerPos(){
+    double newXPos{};
+    for( auto* marker : m_abMarkersItems){
+        newXPos = marker->time() * m_pixelsPerMs;
+        marker->setX(newXPos);
+    }
 }

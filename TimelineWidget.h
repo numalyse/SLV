@@ -74,6 +74,7 @@ private:
     QVector<ABMarkerItem*> m_abMarkersItems;
 
     ToolbarButton* m_splitShotBtn = nullptr;
+    ToolbarButton* m_abLoopBtn = nullptr;
 
     double m_fps{};
     int64_t m_duration{};

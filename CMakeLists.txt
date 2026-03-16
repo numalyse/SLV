@@ -57,6 +57,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         RulerItem.h RulerItem.cpp
         CursorItem.h CursorItem.cpp
         ShotItem.h ShotItem.cpp
+        ABMarkerItem.h ABMarkerItem.cpp
         ItemTypes.h
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp

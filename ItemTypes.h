@@ -9,6 +9,7 @@ namespace SLV {
         TypeRulerItem = QGraphicsItem::UserType + 1,
         TypeCursorItem = QGraphicsItem::UserType + 2,
         TypeShotItem = QGraphicsItem::UserType + 3,
+        TypeABMarkerItem = QGraphicsItem::UserType + 4,
     };
 }
 

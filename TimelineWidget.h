@@ -7,6 +7,7 @@
 #include "CursorItem.h"
 #include "ShotItem.h"
 #include "TimelineView.h"
+#include "ABMarkerItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -17,6 +18,11 @@
 #include <QVector>
 #include <QPoint>
 
+struct ABLoopData{
+    int64_t aTime;
+    double aXPos;
+    int64_t bTime;
+};
 
 class TimelineWidget : public QWidget
 {
@@ -33,6 +39,8 @@ public slots:
 signals:
     void updateShotDetailRequested(int shotId, Shot*);
     void timelineSetPosition(int64_t);
+    void enableSliderRequested();
+    void disableSliderRequested();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -50,6 +58,10 @@ private:
     void updateShotItems();
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
+    void ABAction();
+    std::optional<ABLoopData> getABLoopData();
+    void updateMarkerPos();
+
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;
@@ -58,6 +70,8 @@ private:
     CursorItem* m_cursor = nullptr;
     QVector<ShotItem*> m_shotItems;
     ShotItem* m_currentShotItem = nullptr;
+
+    QVector<ABMarkerItem*> m_abMarkersItems;
 
     ToolbarButton* m_splitShotBtn = nullptr;
 

@@ -223,3 +223,11 @@ void AdvancedToolbar::disableButtons()
     m_nextMediaBtn->setEnabled(false);
     m_extensionToolbar->disableButtons();
 }
+
+void AdvancedToolbar::enableSlider(){
+    m_slider->setDisabled(false);
+}
+
+void AdvancedToolbar::disableSlider(){
+    m_slider->setDisabled(true);
+}

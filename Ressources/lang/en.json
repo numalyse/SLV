@@ -51,6 +51,11 @@
     "tooltip_to_prev_shot" : "Go to the previous shot",
 
     "tooltip_split_shot" : "Split the shot",
+    "timeline_split_shot_at_cursor" : "Cut at cursor",
+    "timeline_ab_action_0": "Add marker A at cursor",
+    "timeline_ab_action_1": "Add marker B at cursor",
+    "timeline_ab_action_2": "Remove markers",
+    "timeline_ab_extraxt": "Extract AB sequence",
 
     "shot_detail_id_name" : "Shot numbering",
     "shot_detail_title_name" : "Title",
@@ -60,4 +65,4 @@
     "shot_detail_note_name" : "Note",
 
     "shot_detail_id_text" : "Shot n°"
-    }
+}

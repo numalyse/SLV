@@ -29,7 +29,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_duration = new FormLineEditWidget(textManager.get("shot_detail_duration_time_name") , "", false, this);
     m_notes = new FormTextEditWidget(textManager.get("shot_detail_note_name") , "", true, this);
 
-    m_notes->setMaximumHeight(200);
+    m_notes->setMaximumHeight(250);
 
     connect(m_notes->textEdit(), &QTextEdit::textChanged, this, [this](){
         if(m_shotData) {

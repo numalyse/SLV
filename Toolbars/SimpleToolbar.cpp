@@ -318,7 +318,7 @@ void SimpleToolbar::enableButtons()
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
     m_removePlayerBtn->setEnabled(true);
-    m_speedBtn->setEnabled(true);
+    // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
     m_screenshotBtn->setEnabled(true);
 }
@@ -332,7 +332,7 @@ void SimpleToolbar::disableButtons()
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
     m_removePlayerBtn->setEnabled(false);
-    m_speedBtn->setEnabled(false);
+    // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
 }

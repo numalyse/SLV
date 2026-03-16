@@ -28,7 +28,7 @@ ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QLayout *layoutToDisplay
         "QFrame {"
         " background-color: palette(base);"
         " border-radius: 6px;"
-        " border: 1px solid lightgray;"
+        " border: 1px solid palette(button);"
         "}"
         );
     containerLayout->addWidget(containerBackground);

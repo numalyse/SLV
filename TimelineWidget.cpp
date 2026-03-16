@@ -107,7 +107,9 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
     if(abData.has_value()){
         auto [aTime, aXPos, bTime] = abData.value();
         if( vlcTime >= bTime || vlcTime < aTime ){
-            moveCursor( aXPos );
+            m_cursor->setPos(aXPos,m_cursor->pos().y());
+            m_vlcTime = timeAtCursor();
+            emit timelineSetPosition(m_vlcTime);
             updateCurrentShot();
             return;
         }
@@ -214,10 +216,12 @@ int64_t TimelineWidget::timeAtCursor() {
     return std::clamp(finalMs, static_cast<int64_t>(0), m_duration);
 }
 
-/// @brief déplace le curseur, met à jour le temps et et envoie à la toolbar le nouveau temps
+/// @brief déplace le curseur si l'ab loop n'est pas activé, met à jour le temps et et envoie à la toolbar le nouveau temps
 /// @param cursorPosX 
 void TimelineWidget::moveCursor(double cursorPosX){
-    m_cursor->setPos(cursorPosX,0);
+    if(m_abMarkersItems.size() >= 2 ) return;
+
+    m_cursor->setPos(cursorPosX,m_cursor->pos().y());
     m_vlcTime = timeAtCursor();
     emit timelineSetPosition(m_vlcTime);
 }
@@ -353,6 +357,7 @@ void TimelineWidget::ABAction(){
             marker = nullptr;
         }
         m_abMarkersItems.clear();
+        emit enableSliderRequested();
         break;
     }
     case 1 :{
@@ -365,6 +370,7 @@ void TimelineWidget::ABAction(){
         }
         newMarker->setPos(cursorPos);
         m_scene->addItem(newMarker);
+        emit disableSliderRequested();
         break;
     }
     case 0 :{

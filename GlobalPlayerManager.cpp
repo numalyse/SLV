@@ -176,9 +176,15 @@ void GlobalPlayerManager::createTimelineWidget()
     
     m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
     m_timeline->setFixedHeight(150);
-    connect(toolbar, &SimpleToolbar::setCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorPos);
+
     connect(m_timeline, &TimelineWidget::updateShotDetailRequested, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+
+    connect(toolbar, &SimpleToolbar::setCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorPos);
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
+    connect(m_timeline, &TimelineWidget::enableSliderRequested, toolbar, &AdvancedToolbar::enableSlider);
+    connect(m_timeline, &TimelineWidget::disableSliderRequested, toolbar, &AdvancedToolbar::disableSlider);
+
+
     layout->addWidget(m_timeline);
     m_timeline->hide();
 }

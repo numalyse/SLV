@@ -26,6 +26,8 @@ public:
 public slots:
     void enableButtons();
     void disableButtons();
+    void enableSlider();
+    void disableSlider();
     
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;

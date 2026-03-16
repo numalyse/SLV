@@ -39,6 +39,8 @@ public slots:
 signals:
     void updateShotDetailRequested(int shotId, Shot*);
     void timelineSetPosition(int64_t);
+    void enableSliderRequested();
+    void disableSliderRequested();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;

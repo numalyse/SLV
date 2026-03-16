@@ -20,10 +20,10 @@ void ABMarkerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QW
 
     p->setRenderHint(QPainter::Antialiasing, true);
 
-    p->setPen(QPen(Qt::green, 2));
+    p->setPen(QPen(QColor(255,140,56), 2));
     p->drawLine(0, 0, 0, m_height);
 
-    p->setBrush(Qt::green);
+    p->setBrush(QColor(255,140,56));
     p->drawPolygon(s_points, 5);
 }
 

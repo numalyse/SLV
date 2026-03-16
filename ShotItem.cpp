@@ -26,6 +26,7 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
+    p->setPen(Qt::black);
     p->setBrush(QBrush(m_shot.color)); 
     p->drawRect(0, m_topMargin, m_width, m_height);
 

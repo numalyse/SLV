@@ -64,7 +64,7 @@ void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
 
     // dessin de la ligne horizontale du ruler
     p->setRenderHint(QPainter::Antialiasing);
-    p->setPen(QPen(Qt::black, 2));
+    p->setPen(QPen(QColor( 181, 181, 181, 255), 2));
     p->drawLine(visibleZone.left(), m_height, visibleZone.right(), m_height); 
 
 

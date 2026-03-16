@@ -18,7 +18,7 @@ namespace TimeFormatter
         double tf = 1000.0 / fps;
         int frame = static_cast<int>((ms % 1000) / tf);
 
-        return QString("%1:%2:%3[%4]")
+        return QString("%1:%2:%3.%4")
                 .arg(h, 2, 10, QChar('0'))
                 .arg(m, 2, 10, QChar('0'))
                 .arg(s, 2, 10, QChar('0'))

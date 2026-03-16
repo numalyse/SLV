@@ -176,7 +176,7 @@ void TimelineWidget::updateCurrentShot(){
     ShotItem* closestShotItem =  m_shotItems[currentShotId];
     if(m_currentShotItem != closestShotItem){
         m_currentShotItem =  closestShotItem;
-        emit updateShotDetailRequested( currentShotId, &m_shotItems[currentShotId]->shot());
+        emit updateShotDetailRequested( shotItemCount, currentShotId, &m_shotItems[currentShotId]->shot());
     }
 } 
 

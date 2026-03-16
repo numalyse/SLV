@@ -20,21 +20,6 @@ ToolbarToggleButton::ToolbarToggleButton(
     setCheckable(true);
     setChecked(state);
 
-    setStyleSheet(
-        "QPushButton {"
-        "   background-color: palette(button);"
-        "}"
-        "QPushButton:checked {"
-        "   background-color: palette(button);"
-        "}"
-        "QPushButton:pressed {"
-        "   background-color: palette(button);"
-        "}"
-        "QPushButton:hover {"
-        "   background-color: palette(button);"
-        "}"
-    );
-
     // setIconSize(QSize(12,30));
     setFixedSize(30, 30);
 

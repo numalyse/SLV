@@ -70,7 +70,7 @@ void NavPanel::displayPlaylist()
     m_sideWidget->setCurrentWidget(m_playlistWidget);
 }
 
-void NavPanel::timelineWidgetUpdateShotDetail(int shotId, Shot * shot)
+void NavPanel::timelineWidgetUpdateShotDetail(int shotCount, int shotId, Shot * shot)
 {
-    m_shotDetail->updateShotDetail(shotId, shot);
+    m_shotDetail->updateShotDetail(shotCount, shotId, shot);
 }

@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     // qDebug() << QFile::exists("../icon/numal_logo.ico");
 
     // TODO : stocker la langue que l'utilisateur choisie dans le preference manager ect.
-    TextManager::instance().loadLanguage("en");
+    TextManager::instance().loadLanguage("fr");
 
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);

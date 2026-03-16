@@ -32,7 +32,7 @@ public slots:
     void playNextMedia();
     void displayShotDetail();
     void displayPlaylist();
-    void timelineWidgetUpdateShotDetail(int, Shot*);
+    void timelineWidgetUpdateShotDetail(int, int, Shot*);
 
 signals:
     void openMediaFileRequested(const QString &filePath);

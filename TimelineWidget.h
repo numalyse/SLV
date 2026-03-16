@@ -37,7 +37,7 @@ public slots:
     void goToShot(int);
 
 signals:
-    void updateShotDetailRequested(int shotId, Shot*);
+    void updateShotDetailRequested(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
     void enableSliderRequested();
     void disableSliderRequested();

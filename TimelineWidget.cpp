@@ -109,7 +109,24 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
     int viewportWidth = m_view->viewport()->width();
 
     if (m_scene) {
-        m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
+        if(m_sceneWidth < viewportWidth){
+            if(m_duration > 0.0){
+                m_pixelsPerMs = viewportWidth / static_cast<double>(m_duration);
+            }
+            m_scene->setSceneRect(0, 0, viewportWidth, viewportHeight);
+        }else {
+            m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
+        }
+        if(m_ruler){
+            m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_pixelsPerMs);
+        }
+        
+        updateMarkerPos();
+        updateShotItems();
+        
+        if(m_cursor){
+            updateCursorPos(m_vlcTime);
+        }
     }
 }
 

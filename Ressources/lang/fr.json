@@ -4,8 +4,11 @@
     "tooltip_mute": "Couper le son",
     "tooltip_fullscreen": "Plein écran",
 
-
-
+    "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
+    "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
+    "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
+    "timeline_ab_action_2": "Supprimer les marqueurs",
+    "timeline_ab_extraxt": "Extraire la séquence AB",
     
     "shot_detail_id_name" : "Numéro du plan",
     "shot_detail_title_name" : "Titre",

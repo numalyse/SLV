@@ -13,6 +13,7 @@
 #include "Shot.h"
 
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QWheelEvent>
@@ -37,9 +38,21 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
         return;
     }
     
+    QHBoxLayout* ButtonLayout = new QHBoxLayout(this);
+    ButtonLayout->setContentsMargins(0, 0, 0, 0); 
+
     m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
-    layout->addWidget(m_splitShotBtn);
+    m_splitShotBtn->setContentsMargins(0, 0, 0, 0); 
+    ButtonLayout->addWidget(m_splitShotBtn);
+
+    m_abLoopBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_ab_loop"));
+    connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
+    m_abLoopBtn->setContentsMargins(0, 0, 0, 0); 
+    ButtonLayout->addWidget(m_abLoopBtn);
+
+    ButtonLayout->addStretch(1);
+    layout->addLayout(ButtonLayout);
 
     m_pixelsPerMs = m_sceneWidth / static_cast<double>(m_duration);
 
@@ -93,9 +106,27 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event); 
 
     int viewportHeight = m_view->viewport()->height();
+    int viewportWidth = m_view->viewport()->width();
 
     if (m_scene) {
-        m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
+        if(m_sceneWidth < viewportWidth){
+            if(m_duration > 0.0){
+                m_pixelsPerMs = viewportWidth / static_cast<double>(m_duration);
+            }
+            m_scene->setSceneRect(0, 0, viewportWidth, viewportHeight);
+        }else {
+            m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
+        }
+        if(m_ruler){
+            m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_pixelsPerMs);
+        }
+        
+        updateMarkerPos();
+        updateShotItems();
+        
+        if(m_cursor){
+            updateCursorPos(m_vlcTime);
+        }
     }
 }
 
@@ -324,12 +355,22 @@ void TimelineWidget::goToShot(int idShot){
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
-    QAction *actionSplit = menu.addAction(TextManager::instance().get("split_shot_at_cursor"));
-    QAction *actionAB = menu.addAction(TextManager::instance().get("ab_action"));
+    QAction *actionSplit = menu.addAction(TextManager::instance().get("timeline_split_shot_at_cursor"));
+    QAction *actionAB = nullptr;
     QAction *actionExtractAB = nullptr;
 
-    if(m_abMarkersItems.size() == 2){
-        actionExtractAB = menu.addAction(TextManager::instance().get("ab_extraxt"));
+    switch (m_abMarkersItems.size() )
+    {
+    case 0:
+        actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_0"));
+        break;
+    case 1:
+        actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_1"));
+        break;
+    case 2:
+        actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
+        actionExtractAB = menu.addAction(TextManager::instance().get("timeline_ab_extraxt"));
+        break;
     }
 
     QAction *selectedAction = menu.exec(globalPos);

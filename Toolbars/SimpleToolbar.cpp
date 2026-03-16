@@ -52,23 +52,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     // QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
-    // ------- test mute btn, hover et toggle
-    QWidget* volumeSliderContainer = new QWidget();
-
-    volumeSliderContainer->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
-    volumeSliderContainer->setAttribute(Qt::WA_TranslucentBackground);
-
-    QFrame* volumeSliderBackground = new QFrame(volumeSliderContainer);
-    volumeSliderBackground->setStyleSheet(
-        "QFrame{ background-color: palette(base); border-radius: 6px; border-style: solid; border-color: lightgray; border-width: 1px;}"
-        "QLabel{ border: none; }"
-    );
-
-    QVBoxLayout* volumeContainerLayout = new QVBoxLayout(volumeSliderContainer);
-    volumeContainerLayout->setContentsMargins(0,0,0,0);
-    volumeContainerLayout->addWidget(volumeSliderBackground);
-
-    QVBoxLayout* volumeFrameLayout = new QVBoxLayout(volumeSliderBackground);
+    QVBoxLayout* volumeFrameLayout = new QVBoxLayout();
     volumeFrameLayout->setContentsMargins(6,6,6,6);
 
     m_volumeSlider = new QSlider(Qt::Vertical);
@@ -85,48 +69,25 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_muteBtn = new ToolbarToggleHoverButton(
         this, 
-        volumeSliderContainer,
+        volumeFrameLayout,
         false,
-        "sound_off.png",  
+        "sound_off_white",
         TextManager::instance().get("tooltip_sound_off"),
-        "sound_on.png",
+        "sound_on_white",
         TextManager::instance().get("tooltip_sound_on")
     );
     m_muteBtn->setEnabled(true);
     
-    // ------- test speed btn, click show popup
-
-    QWidget* speedSliderContainer = new QWidget();
-
-    speedSliderContainer->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
-    speedSliderContainer->setAttribute(Qt::WA_TranslucentBackground);
-
-    QFrame* speedSliderBackground = new QFrame(speedSliderContainer);
-    speedSliderBackground->setStyleSheet(
-        "QFrame {"
-        " background-color: palette(base);"
-        " border-radius: 6px;"
-        " border: 1px solid lightgray;"
-        "}"
-        "QLabel {"
-        " border: none;"
-        "}"
-        );
-
-    QVBoxLayout* speedContainerLayout = new QVBoxLayout(speedSliderContainer);
-    speedContainerLayout->setContentsMargins(0,0,0,0);
-    speedContainerLayout->addWidget(speedSliderBackground);
-
-    QVBoxLayout* speedFrameLayout = new QVBoxLayout(speedSliderBackground);
+    QVBoxLayout* speedFrameLayout = new QVBoxLayout();
     speedFrameLayout->setContentsMargins(6,6,6,6);
 
     QHBoxLayout* speedInfoLayout = new QHBoxLayout();
     speedFrameLayout->addLayout(speedInfoLayout);
     m_speedLabel = new QLabel("x1");
     QLabel* slowIcon = new QLabel();
-    slowIcon->setPixmap(QPixmap(":/icons/slow.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    slowIcon->setPixmap(QPixmap(":/icons/slow_white").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     QLabel* fastIcon = new QLabel();
-    fastIcon->setPixmap(QPixmap(":/icons/speed.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    fastIcon->setPixmap(QPixmap(":/icons/speed_white").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     speedInfoLayout->addWidget(slowIcon);
     speedInfoLayout->addStretch();
     speedInfoLayout->addWidget(m_speedLabel);
@@ -141,21 +102,21 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     speedFrameLayout->addWidget(speedSlider);
 
-    m_speedBtn = new ToolbarPopupButton(this, speedSliderContainer, "speed.png",  TextManager::instance().get("tooltip_speed"));
+    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  TextManager::instance().get("tooltip_speed"), "speed_white", TextManager::instance().get("tooltip_speed"));
 
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
         "loop_on.png",
         TextManager::instance().get("tooltip_loop_on"),
-        "loop_off.png", 
+        "loop_off_white",
         TextManager::instance().get("tooltip_loop_off")
     );
-    QWidget* langWidget = new QWidget();
-    m_langBtn = new ToolbarPopupButton(this, langWidget, "lang.png", TextManager::instance().get("tooltip_lang"));
+    QVBoxLayout* langLayout = new QVBoxLayout();
+    m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", TextManager::instance().get("tooltip_lang"));
 
-    m_removePlayerBtn = new ToolbarButton(this, "remove_media.png", TextManager::instance().get("tooltip_delete_player"));
-    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media.png", TextManager::instance().get("tooltip_duplicate_player"));
+    m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", TextManager::instance().get("tooltip_delete_player"));
+    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", TextManager::instance().get("tooltip_duplicate_player"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerRequested);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
@@ -202,21 +163,25 @@ void SimpleToolbar::setDefaultUI()
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->setContentsMargins(0,0,0,0);
     buttonLayout->setSpacing(1);
-    buttonLayout->addStretch();
     buttonLayout->addWidget(m_muteBtn);
+    buttonLayout->addWidget(m_langBtn);
+    buttonLayout->addSpacing(m_langBtn->width());
+    buttonLayout->addSpacing(m_langBtn->width());
+    buttonLayout->addStretch();
     buttonLayout->addWidget(m_speedBtn);
+    buttonLayout->addWidget(m_stopBtn);
     //buttonLayout->addWidget(m_slowDownBtn);
     buttonLayout->addWidget(m_playPauseBtn);
     //buttonLayout->addWidget(m_speedUpBtn);
-    buttonLayout->addWidget(m_stopBtn);
+
     buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addWidget(m_removePlayerBtn);
+
     buttonLayout->addStretch();
+    buttonLayout->addWidget(m_screenshotBtn);
+    buttonLayout->addWidget(m_duplicatePlayerBtn);
+    buttonLayout->addWidget(m_removePlayerBtn);
+    buttonLayout->addWidget(m_fullscreenBtn);
     mainLayout->addLayout(buttonLayout);
 
 

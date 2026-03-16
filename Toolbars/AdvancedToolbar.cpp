@@ -15,14 +15,14 @@
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
-    m_nextMediaBtn = new ToolbarButton(this, "next.png", TextManager::instance().get("tooltip_next_media"));
-    m_prevMediaBtn = new ToolbarButton(this, "prev.png", TextManager::instance().get("tooltip_prev_media"));
+    m_nextMediaBtn = new ToolbarButton(this, "next_white", TextManager::instance().get("tooltip_next_media"));
+    m_prevMediaBtn = new ToolbarButton(this, "prev_white", TextManager::instance().get("tooltip_prev_media"));
 
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
-        "minus.png",
+        "minus_white",
         TextManager::instance().get("tooltip_expand_toolbar"),
-        "plus.png",
+        "plus_white",
         TextManager::instance().get("tooltip_minimize_toolbar")
     );
 
@@ -151,21 +151,29 @@ void AdvancedToolbar::setDefaultUI()
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->setContentsMargins(0,0,0,0);
     buttonLayout->setSpacing(1);
-    buttonLayout->addStretch();
     buttonLayout->addWidget(m_muteBtn);
+    buttonLayout->addWidget(m_langBtn);
+    buttonLayout->addSpacing(m_speedBtn->size().width());
+    buttonLayout->addSpacing(m_speedBtn->size().width());
+
+
+    buttonLayout->addStretch();
+
     buttonLayout->addWidget(m_speedBtn);
+    buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_prevMediaBtn);
     buttonLayout->addWidget(m_playPauseBtn);
     buttonLayout->addWidget(m_nextMediaBtn);
-    buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_loopBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addWidget(m_extensionBtn);
+
     buttonLayout->addStretch();
+
+    buttonLayout->addWidget(m_screenshotBtn);
+
+    buttonLayout->addWidget(m_duplicatePlayerBtn);
+    buttonLayout->addWidget(m_fullscreenBtn);
+    buttonLayout->addWidget(m_extensionBtn);
     mainLayout->addLayout(buttonLayout);
 
     mainLayout->addWidget(m_extensionToolbar);

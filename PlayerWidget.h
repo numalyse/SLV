@@ -3,8 +3,6 @@
 
 #include "MediaWidget.h"
 #include "Toolbars/SimpleToolbar.h"
-#include "Toolbars/Toolbar.h"
-#include "Media.h"
 
 #include <QWidget>
 #include <qmainwindow.h>

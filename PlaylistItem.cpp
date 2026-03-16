@@ -34,7 +34,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     QHBoxLayout *metaLayout = new QHBoxLayout();
 
     m_mediaTypeIcon = new QLabel();
-    m_mediaThumbnailImage = new QPixmap(":/icon/show_image.png");
+    m_mediaThumbnailImage = new QPixmap(":/icon/show_image_white");
     m_mediaTypeIcon->setPixmap(m_mediaThumbnailImage->scaled(16,16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     m_mediaDurationLabel = new QLabel("00:00:00");
@@ -118,7 +118,7 @@ void PlaylistItem::initStyle()
     setContentsMargins(0,0,0,0);
     setStyleSheet("PlaylistItem{border-style: solid; border-color: black; border-radius: 3px; border-width: 1px;}");
     m_indexLabel->setMaximumWidth(15);
-    m_mediaThumbnailLabel->setStyleSheet("background: lightgrey;");
+    m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
     m_deleteBtn->setStyleSheet("background: tomato");
     m_deleteBtn->setMaximumWidth(20);
 }

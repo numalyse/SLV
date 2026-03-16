@@ -32,7 +32,7 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
         "QFrame {"
         " background-color: palette(base);"
         " border-radius: 6px;"
-        " border: 1px solid lightgray;"
+        " border: 1px solid palette(button);"
         "}"
         "QLabel {"
         " border: none;"

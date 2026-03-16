@@ -72,9 +72,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         volumeFrameLayout,
         false,
         "sound_off_white",
-        TextManager::instance().get("tooltip_sound_off"),
+        TextManager::instance().get("tooltip_sound_on"),
         "sound_on_white",
-        TextManager::instance().get("tooltip_sound_on")
+        TextManager::instance().get("tooltip_sound_off")
     );
     m_muteBtn->setEnabled(true);
     

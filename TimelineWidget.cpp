@@ -54,9 +54,9 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
 
-    layout->addWidget(m_view); 
+    layout->addWidget(m_view);
 
-    m_splitShotBtn = new ToolbarButton(this, "split_shot.png", TextManager::instance().get("tooltip_split_shot"));
+    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
 
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
     layout->addWidget(m_splitShotBtn);

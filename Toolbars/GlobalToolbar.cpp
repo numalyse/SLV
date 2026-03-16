@@ -13,9 +13,9 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     m_muteBtn = new ToolbarToggleButton(
         this,
         false,
-        "sound_off.png",
+        "sound_off_white",
         TextManager::instance().get("tooltip_sound_off"),
-        "sound_on.png",
+        "sound_on_white",
         TextManager::instance().get("tooltip_sound_on")
     );
     m_muteBtn->setEnabled(true);

@@ -88,9 +88,9 @@ void MainWindow::createToolBar()
     m_navPanelBtn = new ToolbarToggleButton(
         m_toolbarQt,
         false,
-        "nav_panel_menu_open.png",
+        "nav_panel_menu_open_white",
         TextManager::instance().get("tooltip_nav_panel_open"),
-        "nav_panel_menu_closed.png",
+        "nav_panel_menu_closed_white",
         TextManager::instance().get("tooltip_nav_panel_close")
     );
     m_navPanelBtn->setFixedSize(30, 30);
@@ -170,40 +170,40 @@ void MainWindow::createViewGridBtn()
 {
     QHBoxLayout *viewLayout = new QHBoxLayout();
 
-    m_view1 = new ToolbarButton(nullptr, "view_1.png", TextManager::instance().get("tooltip_view_1"));
+    m_view1 = new ToolbarButton(nullptr, "view_1_white", TextManager::instance().get("tooltip_view_1"));
     viewLayout->addWidget(m_view1);
 
     QHBoxLayout *view2Layout = new QHBoxLayout();
-    m_view2H = new ToolbarButton(nullptr, "view_2_h.png", TextManager::instance().get("tooltip_view_2_h"));
-    m_view2V = new ToolbarButton(nullptr, "view_2_v.png", TextManager::instance().get("tooltip_view_2_v"));
+    m_view2H = new ToolbarButton(nullptr, "view_2_h_white", TextManager::instance().get("tooltip_view_2_h"));
+    m_view2V = new ToolbarButton(nullptr, "view_2_v_white", TextManager::instance().get("tooltip_view_2_v"));
     view2Layout->addWidget(m_view2H);
     view2Layout->addWidget(m_view2V);
-    m_view2 = new ToolbarToggleHoverButton(nullptr, view2Layout, false, "view_2_h.png", TextManager::instance().get("tooltip_view_2"), "view_2_h.png", TextManager::instance().get("tooltip_view_2"));
+    m_view2 = new ToolbarToggleHoverButton(nullptr, view2Layout, false, "view_2_h_white", TextManager::instance().get("tooltip_view_2"), "view_2_h_white", TextManager::instance().get("tooltip_view_2"));
     m_view2->setOnTop(false);
     m_view2->setToolTip("");
     viewLayout->addWidget(m_view2);
 
     QGridLayout *view3Layout = new QGridLayout();
-    m_view3HAlign = new ToolbarButton(nullptr, "view_3_h.png", TextManager::instance().get("tooltip_view_3_h"));
-    m_view3VAlign = new ToolbarButton(nullptr, "view_3_v.png", TextManager::instance().get("tooltip_view_3_v"));
-    m_view3Bot = new ToolbarButton(nullptr, "view_3_bot.png", TextManager::instance().get("tooltip_view_3_bot"));
-    m_view3Top = new ToolbarButton(nullptr, "view_3_top.png", TextManager::instance().get("tooltip_view_3_top"));
-    m_view3Left = new ToolbarButton(nullptr, "view_3_left.png", TextManager::instance().get("tooltip_view_3_left"));
-    m_view3Right = new ToolbarButton(nullptr, "view_3_right.png", TextManager::instance().get("tooltip_view_3_right"));
+    m_view3HAlign = new ToolbarButton(nullptr, "view_3_h_white", TextManager::instance().get("tooltip_view_3_h"));
+    m_view3VAlign = new ToolbarButton(nullptr, "view_3_v_white", TextManager::instance().get("tooltip_view_3_v"));
+    m_view3Bot = new ToolbarButton(nullptr, "view_3_bot_white", TextManager::instance().get("tooltip_view_3_bot"));
+    m_view3Top = new ToolbarButton(nullptr, "view_3_top_white", TextManager::instance().get("tooltip_view_3_top"));
+    m_view3Left = new ToolbarButton(nullptr, "view_3_left_white", TextManager::instance().get("tooltip_view_3_left"));
+    m_view3Right = new ToolbarButton(nullptr, "view_3_right_white", TextManager::instance().get("tooltip_view_3_right"));
     view3Layout->addWidget(m_view3HAlign, 0, 0);
     view3Layout->addWidget(m_view3VAlign, 1, 0);
     view3Layout->addWidget(m_view3Bot, 0, 1);
     view3Layout->addWidget(m_view3Top, 1, 1);
     view3Layout->addWidget(m_view3Left, 0, 2);
     view3Layout->addWidget(m_view3Right, 1, 2);
-    m_view3 = new ToolbarToggleHoverButton(nullptr, view3Layout, false, "view_3_bot.png", TextManager::instance().get("tooltip_view_3"), "view_3_bot.png", TextManager::instance().get("tooltip_view_3"));
+    m_view3 = new ToolbarToggleHoverButton(nullptr, view3Layout, false, "view_3_bot_white", TextManager::instance().get("tooltip_view_3"), "view_3_bot_white", TextManager::instance().get("tooltip_view_3"));
     m_view3->setOnTop(false);
     m_view3->setToolTip("");
     viewLayout->addWidget(m_view3);
 
-    m_view4 = new ToolbarButton(nullptr, "view_4.png", TextManager::instance().get("tooltip_view_4"));
+    m_view4 = new ToolbarButton(nullptr, "view_4_white", TextManager::instance().get("tooltip_view_4"));
     viewLayout->addWidget(m_view4);
 
-    m_viewGridBtn = new ToolbarPopupButton(m_toolbarQt, viewLayout, "view_4.png", TextManager::instance().get("tooltip_view_grid"));
+    m_viewGridBtn = new ToolbarPopupButton(m_toolbarQt, viewLayout, "view_4_white", TextManager::instance().get("tooltip_view_grid"));
     m_viewGridBtn->setOnTop(false);
 }

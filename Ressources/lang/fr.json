@@ -20,8 +20,8 @@
     "tooltip_segmentation_on" : "Afficher la timeline",
     "tooltip_segmentation_off" : "Cacher la timeline",
     "tooltip_composition" : "Outil de composition",
-    "tooltip_flip_vertical" : "Symétrie verticale",
-    "tooltip_flip_horizontal" : "Symétrie horizontale",
+    "tooltip_flip_vertical" : "Retourner verticalement",
+    "tooltip_flip_horizontal" : "Retourner horizontalement",
     "tooltip_expand_toolbar" : "Étendre la barre d'outils",
     "tooltip_minimize_toolbar" : "Minimiser la barre d'outils",
     "tooltip_sound_off" : "Désactiver le son",
@@ -52,8 +52,6 @@
 
     "tooltip_split_shot" : "Scinder le plan",
 
-
-
     "shot_detail_id_name" : "Numéro du plan",
     "shot_detail_title_name" : "Titre",
     "shot_detail_start_time_name" : "Début",
@@ -62,5 +60,4 @@
     "shot_detail_note_name" : "Note",
     
     "shot_detail_id_text" : "Plan n°"
-
 }

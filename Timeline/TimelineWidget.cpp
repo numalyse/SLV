@@ -33,12 +33,20 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     auto fps = ProjectManager::instance().projet()->media->fps();
     auto duration = ProjectManager::instance().projet()->media->duration();
-    //if(m_fps == 0.0 || m_duration == 0){
-        //qDebug() << "Creation timeline : Fps ou durée du film = 0";
-        //return;
-    //}
 
-    
+    if(fps == 0.0 || duration == 0){
+        qDebug() << "Creation timeline : Fps ou durée du film = 0";
+        return;
+    }
+
+    m_scene = new QGraphicsScene(this);
+    m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
+
+    m_mathManager = new TimelineMath(fps, duration, this);
+    m_mathManager->fitToWidth(m_scene->width());
+
+    m_abManager = new ABManager(m_scene, m_mathManager, this);
+
     QHBoxLayout* ButtonLayout = new QHBoxLayout(this);
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
 
@@ -52,12 +60,6 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     ButtonLayout->addStretch(1);
     layout->addLayout(ButtonLayout);
-
-    m_scene = new QGraphicsScene(this);
-    m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
-
-    m_mathManager = new TimelineMath(fps, duration, this);
-    m_mathManager->fitToWidth(m_scene->width());
 
     m_view = new TimelineView(m_scene, this);
     m_view->setRenderHint(QPainter::Antialiasing);
@@ -74,6 +76,9 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     layout->addWidget(m_view);
 
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectShots, this);
+
+    connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
     m_ruler->setPos(0, 0); 
@@ -83,10 +88,6 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_cursor->setPos(200, 0);
     m_scene->addItem(m_cursor);
 
-
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectShots, this);
-
-    connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
 }
 
 
@@ -109,7 +110,7 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
             m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
         }
         
-        updateMarkerPos();
+
 
         m_shotManager->updateShotItemsPosition();
         
@@ -119,28 +120,7 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
-/// @brief Reçoit le temps vlc et met à jour la position en conséquence
-/// @param vlcTime 
-void TimelineWidget::updateCursorPos(int64_t vlcTime){
-    m_vlcTime = vlcTime;
 
-    auto abData = getABLoopData();
-    if(abData.has_value()){
-        auto [aTime, aXPos, bTime, bXPos] = abData.value();
-        if( vlcTime >= bTime || vlcTime < aTime ){
-            m_cursor->setPos(aXPos,m_cursor->pos().y());
-            m_vlcTime = aTime;
-            emit timelineSetPosition(aTime);
-            m_shotManager->updateCurrentShot(m_vlcTime);
-            return;
-        }
-    }
-
-    double posCursor = static_cast<double>(m_vlcTime) * m_mathManager->pixelsPerMs(); 
-    m_cursor->setPos(posCursor, 0);
-
-    m_shotManager->updateCurrentShot(m_vlcTime);
-}
 
 
 
@@ -177,7 +157,9 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
     m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
-    updateMarkerPos();
+
+    m_abManager->updateMarkersPosition();
+
     updateCursorPos(m_vlcTime);
 
     m_shotManager->updateShotItemsPosition();
@@ -192,16 +174,15 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
 
 /// @brief déplace le curseur si l'ab loop n'est pas activé, met à jour le temps et et envoie à la toolbar le nouveau temps
 /// @param cursorPosX 
-void TimelineWidget::moveCursor(double cursorPosX){
-    auto abData = getABLoopData();
-    if(abData.has_value()){
-        auto [aTime, aXPos, bTime, bXPos] = abData.value();
-        if( cursorPosX >= bXPos || cursorPosX <= aXPos ){
-            return;
-        }
+void TimelineWidget::moveCursor(double newCursorPosX){
+    int64_t newCursorTime = m_mathManager->posToTime(newCursorPosX);
+    auto restartTime = m_abManager->getLoopRestartTime(newCursorTime);
+
+    if(restartTime.has_value()){ 
+        return;
     }
 
-    m_vlcTime = m_mathManager->posToTimeSnapped(cursorPosX);
+    m_vlcTime = m_mathManager->posToTimeSnapped(newCursorPosX);
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
     emit timelineSetPosition(m_vlcTime);
     m_shotManager->updateCurrentShot(m_vlcTime);
@@ -213,9 +194,8 @@ void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {
     switch( item->type() ) {
         case SLV::TypeShotItem: 
-            //ShotItem* shotItem = static_cast<ShotItem*>(item);
-            //qDebug() << "clicked shot num : " << m_shotItems.indexOf(shotItem);
-            //moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
             break;
     }
 }
@@ -225,17 +205,9 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
     switch( item->type() ) {
         case SLV::TypeShotItem: 
             ShotItem* shotItem = static_cast<ShotItem*>(item);
-            qDebug() << "Right click";
             showContextMenuForShot(globalPos, shotItem);
             break;
     }
-}
-
-
-
-void TimelineWidget::goToShot(int idShot){
-    auto posX = m_shotManager->getStartPosOf(idShot);
-    if(posX.has_value())  moveCursor( posX.value() ); 
 }
 
 
@@ -246,7 +218,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionAB = nullptr;
     QAction *actionExtractAB = nullptr;
 
-    switch (m_abMarkersItems.size() )
+    switch (m_abManager->getMarkerCount())
     {
     case 0:
         actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_0"));
@@ -271,63 +243,37 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     }
 }
 
-/// @brief Ajoute un marqueur si 0 ou 1 marqueur présent. Si 1 marqueur déjà présent, garde l'ordre tel que element de 0 de m_abMarkersItems est le "A".
-/// Si 2 marqueurs présents, les supprimes.
-void TimelineWidget::ABAction(){
+// public slots 
 
-    switch (m_abMarkersItems.size())
-    {
-    case 2:{
-        for (auto* marker : m_abMarkersItems)
-        {
-            m_scene->removeItem(marker);
-            delete marker;
-            marker = nullptr;
-        }
-        m_abMarkersItems.clear();
-        emit enableSliderRequested();
-        break;
-    }
-    case 1 :{
-        QPointF cursorPos = m_cursor->pos();
-        ABMarkerItem* newMarker = new ABMarkerItem(m_sceneHeight, m_mathManager->posToTime(m_cursor->pos().x()));
-        if(newMarker->time() >= m_abMarkersItems[0]->time()){
-            m_abMarkersItems.append(newMarker); 
-        }else if(newMarker->time() < m_abMarkersItems[0]->time()){
-            m_abMarkersItems.insert(0, newMarker);
-        }
-        newMarker->setPos(cursorPos);
-        m_scene->addItem(newMarker);
-        emit disableSliderRequested();
-        break;
-    }
-    case 0 :{
-        QPointF cursorPosDefault = m_cursor->pos();
-        ABMarkerItem* newMarkerDefault = new ABMarkerItem(m_sceneHeight, m_mathManager->posToTime(m_cursor->pos().x()));
-        m_abMarkersItems.append(newMarkerDefault);
-        newMarkerDefault->setPos(cursorPosDefault);
-        m_scene->addItem(newMarkerDefault);
-        break;
+/// @brief Reçoit le temps vlc et met à jour la position en conséquence
+/// @param vlcTime 
+void TimelineWidget::updateCursorPos(int64_t vlcTime){
+    auto restartTime = m_abManager->getLoopRestartTime(vlcTime);
+
+    if(restartTime.has_value()){ // si on a une value, on a dépassé le marqueur B, on revient a A
+        m_vlcTime = restartTime.value();
+        m_shotManager->updateCurrentShot(m_vlcTime);
+        emit timelineSetPosition(m_vlcTime);
+    }else {
+        m_vlcTime = vlcTime;
     }
 
-    }
+    m_cursor->setX(m_mathManager->timeToPos(m_vlcTime));
+    m_shotManager->updateCurrentShot(m_vlcTime);
+}
+
+void TimelineWidget::goToShot(int idShot){
+    auto posX = m_shotManager->getStartXOf(idShot);
+    if(posX.has_value())  moveCursor( posX.value() ); 
 }
 
 
-std::optional<ABLoopData> TimelineWidget::getABLoopData(){
-    if (m_abMarkersItems.size() < 2) return std::nullopt;
+// private slots 
 
-    return ABLoopData{m_abMarkersItems[0]->time(), m_abMarkersItems[0]->pos().x(), m_abMarkersItems[1]->time(), m_abMarkersItems[1]->pos().x()};
+void TimelineWidget::ABAction() {
+    int64_t markerTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
+    m_abManager->cycleMarkers(markerTime);
 }
-
-void TimelineWidget::updateMarkerPos(){
-    double newXPos{};
-    for( auto* marker : m_abMarkersItems){
-        newXPos = marker->time() * m_mathManager->pixelsPerMs();
-        marker->setX(newXPos);
-    }
-}
-
 
 void TimelineWidget::splitShotAtCursor() {
     int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());

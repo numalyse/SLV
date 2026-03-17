@@ -7,6 +7,7 @@
 #include "Timeline/TimelineView.h"
 #include "Timeline/TimelineMath.h"
 #include "Timeline/ShotManager.h"
+#include "Timeline/ABManager.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -22,13 +23,6 @@
 #include <QVector>
 #include <QPoint>
 
-struct ABLoopData{
-    int64_t aTime;
-    double aXPos;
-    int64_t bTime;
-    double bXPos;
-};
-
 class TimelineWidget : public QWidget
 {
 Q_OBJECT
@@ -38,7 +32,6 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
-
     void goToShot(int);
 
 signals:
@@ -52,6 +45,7 @@ protected:
 
 private slots:
     void splitShotAtCursor();
+    void ABAction();
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
@@ -61,10 +55,6 @@ private:
     
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
-    void ABAction();
-    std::optional<ABLoopData> getABLoopData();
-    void updateMarkerPos();
-
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;
@@ -72,24 +62,21 @@ private:
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
 
-    QVector<ABMarkerItem*> m_abMarkersItems;
+    TimelineMath* m_mathManager = nullptr;
+    ShotManager* m_shotManager = nullptr;
+    ABManager* m_abManager = nullptr;
 
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
 
-    TimelineMath* m_mathManager = nullptr;
-    ShotManager* m_shotManager = nullptr;
-
     int64_t m_vlcTime{};
+
+    double m_minPxBetweenTicks = 100.0;
 
     int m_sceneWidth = 10000;
     int m_sceneHeight = 150;
-    //double m_pixelsPerMs {};
 
     int m_rulerHeight = 25;
-    double m_minPxBetweenTicks = 100.0;
-
-
 
 
 };

@@ -21,7 +21,7 @@ public:
 
     void updateShotItemsPosition();
 
-    std::optional<double> getStartPosOf(int idShot);
+    std::optional<double> getStartXOf(int idShot);
 
 signals:
     void updateShotDetailRequested(int shotCount, int shotId, Shot*);

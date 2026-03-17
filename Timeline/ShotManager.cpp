@@ -10,13 +10,13 @@ ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath
 
     for ( auto& IShot : projectShots ){
 
-        double pos =  p_mathManager->timeToPos(IShot.start);
+        double xPos =  p_mathManager->timeToPos(IShot.start);
         double width = p_mathManager->timeToPos(IShot.end - IShot.start);
         
         ShotItem* shot = new ShotItem(IShot, width, shotHeight);
 
         p_scene->addItem(shot);
-        shot->setPos(pos, 0);
+        shot->setX(xPos);
 
         m_shotItems.append(shot);
 
@@ -126,7 +126,7 @@ void ShotManager::updateShotItemsPosition(){
 }
 
 
-std::optional<double> ShotManager::getStartPosOf(int idShot){
+std::optional<double> ShotManager::getStartXOf(int idShot){
     if(idShot < 0 || idShot >= m_shotItems.size() ) return {};
 
     return p_mathManager->timeToPos(m_shotItems[idShot]->shot().start); 

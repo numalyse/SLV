@@ -56,7 +56,7 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 /// @param videoPlayersCount Nombre de PlayerWidgets dans le container
 /// @param newPlayersWidget Le widget à ajouter au layout
 /// @param newToolbar La GlobalToolbar si videoPlayersCount != 1, AdvancedToolbar sinon
-void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidget, Toolbar* newToolbar)
+void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
     if (m_toolbarWidget){
@@ -81,8 +81,11 @@ void GlobalPlayerManager::updateContainer(Media* media, QWidget * newPlayersWidg
         layout->addWidget(m_toolbarWidget);
     }
 
-    auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
-    if(media){
+    m_player = player;
+
+    if( media ){
+        m_player = player;
+        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
         ProjectManager::instance().createProject(media);
 
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
@@ -169,6 +172,8 @@ void GlobalPlayerManager::playNextMedia()
 
 void GlobalPlayerManager::createTimelineWidget()
 {
+    Q_ASSERT( m_player );
+
     auto* toolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
     connect(toolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
     connect(toolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
@@ -181,13 +186,16 @@ void GlobalPlayerManager::createTimelineWidget()
     m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
     m_timeline->setFixedHeight(150);
 
-    connect(m_timeline, &TimelineWidget::updateShotDetailRequested, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+    connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 
-    connect(toolbar, &SimpleToolbar::setCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorPos);
+    connect(m_timeline, &TimelineWidget::updateShotDetailRequested, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
+
     connect(m_timeline, &TimelineWidget::enableSliderRequested, toolbar, &AdvancedToolbar::enableSlider);
     connect(m_timeline, &TimelineWidget::disableSliderRequested, toolbar, &AdvancedToolbar::disableSlider);
+    connect( m_timeline, &TimelineWidget::updateCursorPos, toolbar, &AdvancedToolbar::timelineUpdateSliderValue);
 
+    connect(toolbar, &SimpleToolbar::setCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorPos);
 
     layout->addWidget(m_timeline);
     m_timeline->hide();

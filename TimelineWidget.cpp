@@ -95,9 +95,6 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
         m_shotItems.append(shot);
     }
-
-    connect(&SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition, this, &TimelineWidget::updateCursorPos);
-    connect(this, &TimelineWidget::timelineSetPosition, &SignalManager::instance(), &SignalManager::timelineSetPosition);
 }
 
 
@@ -136,7 +133,7 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
     
     auto abData = getABLoopData();
     if(abData.has_value()){
-        auto [aTime, aXPos, bTime] = abData.value();
+        auto [aTime, aXPos, bTime, bXPos] = abData.value();
         if( vlcTime >= bTime || vlcTime < aTime ){
             m_cursor->setPos(aXPos,m_cursor->pos().y());
             m_vlcTime = timeAtCursor();
@@ -250,7 +247,13 @@ int64_t TimelineWidget::timeAtCursor() {
 /// @brief déplace le curseur si l'ab loop n'est pas activé, met à jour le temps et et envoie à la toolbar le nouveau temps
 /// @param cursorPosX 
 void TimelineWidget::moveCursor(double cursorPosX){
-    if(m_abMarkersItems.size() >= 2 ) return;
+    auto abData = getABLoopData();
+    if(abData.has_value()){
+        auto [aTime, aXPos, bTime, bXPos] = abData.value();
+        if( cursorPosX >= bXPos || cursorPosX <= aXPos ){
+            return;
+        }
+    }
 
     m_cursor->setPos(cursorPosX,m_cursor->pos().y());
     m_vlcTime = timeAtCursor();
@@ -430,8 +433,7 @@ void TimelineWidget::ABAction(){
 std::optional<ABLoopData> TimelineWidget::getABLoopData(){
     if (m_abMarkersItems.size() < 2) return std::nullopt;
 
-    return ABLoopData{m_abMarkersItems[0]->time(), m_abMarkersItems[0]->pos().x(), m_abMarkersItems[1]->time()};
-
+    return ABLoopData{m_abMarkersItems[0]->time(), m_abMarkersItems[0]->pos().x(), m_abMarkersItems[1]->time(), m_abMarkersItems[1]->pos().x()};
 }
 
 void TimelineWidget::updateMarkerPos(){

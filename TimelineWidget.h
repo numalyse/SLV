@@ -22,6 +22,7 @@ struct ABLoopData{
     int64_t aTime;
     double aXPos;
     int64_t bTime;
+    double bXPos;
 };
 
 class TimelineWidget : public QWidget

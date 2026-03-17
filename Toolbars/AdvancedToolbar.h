@@ -28,7 +28,9 @@ public slots:
     void disableButtons();
     void enableSlider();
     void disableSlider();
-    
+
+    void timelineUpdateSliderValue(int64_t currentTime);
+
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;
     ToolbarButton* m_nextMediaBtn = nullptr;

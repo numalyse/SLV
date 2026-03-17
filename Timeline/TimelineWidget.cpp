@@ -43,7 +43,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
 
     m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
-    connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitCurrentShotItem);
+    connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitShotAtCursor);
     ButtonLayout->addWidget(m_splitShotBtn);
 
     m_abLoopBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_ab_loop"));
@@ -83,19 +83,10 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_cursor->setPos(200, 0);
     m_scene->addItem(m_cursor);
 
-    int startShotHeight = 50;
 
-    for ( auto& IShot : projectShots ){
-        double pos =  m_mathManager->timeToPos(IShot.start);
-        double width = m_mathManager->timeToPos(IShot.end) - pos;
-        
-        ShotItem* shot = new ShotItem(IShot, width, startShotHeight);
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectShots, this);
 
-        m_scene->addItem(shot);
-        shot->setPos(pos, 0);
-
-        m_shotItems.append(shot);
-    }
+    connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
 }
 
 
@@ -119,7 +110,8 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
         }
         
         updateMarkerPos();
-        updateShotItems();
+
+        m_shotManager->updateShotItemsPosition();
         
         if(m_cursor){
             updateCursorPos(m_vlcTime);
@@ -130,7 +122,8 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
 /// @brief Reçoit le temps vlc et met à jour la position en conséquence
 /// @param vlcTime 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
-    
+    m_vlcTime = vlcTime;
+
     auto abData = getABLoopData();
     if(abData.has_value()){
         auto [aTime, aXPos, bTime, bXPos] = abData.value();
@@ -138,44 +131,17 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
             m_cursor->setPos(aXPos,m_cursor->pos().y());
             m_vlcTime = aTime;
             emit timelineSetPosition(aTime);
-            updateCurrentShot();
+            m_shotManager->updateCurrentShot(m_vlcTime);
             return;
         }
     }
 
-    m_vlcTime = vlcTime;
-    double posCursor = static_cast<double>(vlcTime) * m_mathManager->pixelsPerMs(); 
+    double posCursor = static_cast<double>(m_vlcTime) * m_mathManager->pixelsPerMs(); 
     m_cursor->setPos(posCursor, 0);
-    updateCurrentShot();
+
+    m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
-/// @brief Parcours les plan pour trouver le plan courant de gauche a droite pour trouver le plan à la ms actuelle
-void TimelineWidget::updateCurrentShot(){
-    int shotItemCount = static_cast<int>(m_shotItems.size());
-
-    Q_ASSERT(shotItemCount >= 1);
-
-    int currentShotId = 0;
-    int64_t distanceToClosest = m_vlcTime - m_shotItems[0]->shot().start;
-
-    for (int IShot = 1; IShot < shotItemCount; ++IShot){
-        
-        int64_t currentShotStart = m_shotItems[IShot]->shot().start;
-
-        if( m_vlcTime < currentShotStart ) break; // si le vlc time < start on est avant le plan donc on quitte la boucle
-
-        int64_t distance = m_vlcTime - currentShotStart;
-        if(distance < distanceToClosest){
-            distanceToClosest = distance;
-            currentShotId = IShot;
-        }
-    }
-    ShotItem* closestShotItem =  m_shotItems[currentShotId];
-    if(m_currentShotItem != closestShotItem){
-        m_currentShotItem =  closestShotItem;
-        emit updateShotDetailRequested( shotItemCount, currentShotId, &m_shotItems[currentShotId]->shot());
-    }
-} 
 
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
@@ -214,7 +180,7 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     updateMarkerPos();
     updateCursorPos(m_vlcTime);
 
-    updateShotItems();
+    m_shotManager->updateShotItemsPosition();
 
     double newPixelPos = currentTimeUnderMouse * m_mathManager->pixelsPerMs();
     m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
@@ -238,7 +204,7 @@ void TimelineWidget::moveCursor(double cursorPosX){
     m_vlcTime = m_mathManager->posToTimeSnapped(cursorPosX);
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
     emit timelineSetPosition(m_vlcTime);
-    updateCurrentShot();
+    m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
 /// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
@@ -247,9 +213,9 @@ void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {
     switch( item->type() ) {
         case SLV::TypeShotItem: 
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            qDebug() << "clicked shot num : " << m_shotItems.indexOf(shotItem);
-            moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
+            //ShotItem* shotItem = static_cast<ShotItem*>(item);
+            //qDebug() << "clicked shot num : " << m_shotItems.indexOf(shotItem);
+            //moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
             break;
     }
 }
@@ -266,83 +232,10 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 }
 
 
-/// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur
-void TimelineWidget::splitCurrentShotItem() {
-    //qDebug() << "Ms au curseur " << timeAtCursor();
-    
-    if (!m_currentShotItem) {
-        qDebug() << "Aucun plan courant";
-        return;
-    }
-
-    int index = m_shotItems.indexOf(m_currentShotItem);
-    if (index == -1) {
-        qDebug() << "Impossible de retrouver l'index du plan courant dans la liste des shotItems";
-        return;
-    }
-
-    auto cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
-
-    if (cutTime <=  m_shotItems[index]->shot().start || cutTime >=  m_shotItems[index]->shot().end) {
-        qDebug() << "Cut time :" <<  TimeFormatter::msToHHMMSSFF(cutTime, 1);
-        qDebug() << "Current shot start :" << TimeFormatter::msToHHMMSSFF(m_shotItems[index]->shot().start, 1);
-        qDebug() << "current shot end : " << TimeFormatter::msToHHMMSSFF(m_shotItems[index]->shot().end, 1);
-        
-        qDebug() << "Curseur n'est pas sur le plan courant";
-        return;
-    }
-
-    auto oldEnd =  m_shotItems[index]->shot().end;
-    m_shotItems[index]->shot().end = cutTime - 1; 
-
-    
-
-    double newWidth1 = m_mathManager->timeToPos(m_shotItems[index]->shot().end) - m_mathManager->timeToPos(m_shotItems[index]->shot().start);
-    m_currentShotItem->setWidth(newWidth1);
-
-    Shot newShotData =  Shot{ "Titre", cutTime, oldEnd};
-
-    double pos2 = m_mathManager->timeToPos(newShotData.start);
-    double width2 = m_mathManager->timeToPos(newShotData.end) - pos2;
-    int startShotHeight = 50;
-
-    ShotItem* newShotItem = new ShotItem(newShotData, width2, startShotHeight);
-    newShotItem->setPos(pos2, m_currentShotItem->y());
-    // on insère le plan juste apres le plan cut
-    m_shotItems.insert(index + 1, newShotItem);
-    m_scene->addItem(newShotItem);
-
-    updateCurrentShot();
-}
-
-/// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage
-void TimelineWidget::updateShotItems(){
-    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    m_view->setUpdatesEnabled(false);
-    double newXPos{};
-    double newWidth{};
-    for(int IShotItem = 0; IShotItem < m_shotItems.size(); ++IShotItem){
-        newXPos = m_shotItems[IShotItem]->shot().start * m_mathManager->pixelsPerMs();
-        m_shotItems[IShotItem]->setPos(newXPos,0.0);
-        newWidth =  (m_shotItems[IShotItem]->shot().end - m_shotItems[IShotItem]->shot().start) * m_mathManager->pixelsPerMs();
-        m_shotItems[IShotItem]->setWidth(newWidth);
-    }
-    m_view->setUpdatesEnabled(true);
-    m_scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
-    m_scene->update();
-}
 
 void TimelineWidget::goToShot(int idShot){
-    if(idShot < 0 ){
-        idShot = 0;
-    }else if( idShot >= m_shotItems.size()){
-        idShot = m_shotItems.size()-1;
-    }
-
-
-
-    moveCursor( m_mathManager->timeToPos(m_shotItems[idShot]->shot().start));
-
+    auto posX = m_shotManager->getStartPosOf(idShot);
+    if(posX.has_value())  moveCursor( posX.value() ); 
 }
 
 
@@ -370,7 +263,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *selectedAction = menu.exec(globalPos);
 
     if (selectedAction == actionSplit) {
-        splitCurrentShotItem();
+        splitShotAtCursor();
     }else if (selectedAction == actionAB){
         ABAction();
     }else if (selectedAction == actionExtractAB){
@@ -434,4 +327,9 @@ void TimelineWidget::updateMarkerPos(){
         marker->setX(newXPos);
     }
 }
-    
+
+
+void TimelineWidget::splitShotAtCursor() {
+    int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
+    m_shotManager->splitShotAt(cutTime);
+}

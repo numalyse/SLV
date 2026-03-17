@@ -6,6 +6,7 @@
 
 #include "Timeline/TimelineView.h"
 #include "Timeline/TimelineMath.h"
+#include "Timeline/ShotManager.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -37,11 +38,11 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
-    //double timeToPosition(int64_t time);
+
     void goToShot(int);
 
 signals:
-    void updateShotDetailRequested(int shotCount, int shotId, Shot*);
+    void updateShotDetailRequest(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
     void enableSliderRequested();
     void disableSliderRequested();
@@ -50,7 +51,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void splitCurrentShotItem();
+    void splitShotAtCursor();
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
@@ -58,8 +59,6 @@ private slots:
 private:
     void applyZoom(double zoomFactor, int mouseX);
     
-    void updateCurrentShot();
-    void updateShotItems();
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
     void ABAction();
@@ -72,8 +71,6 @@ private:
 
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
-    QVector<ShotItem*> m_shotItems;
-    ShotItem* m_currentShotItem = nullptr;
 
     QVector<ABMarkerItem*> m_abMarkersItems;
 
@@ -81,6 +78,7 @@ private:
     ToolbarButton* m_abLoopBtn = nullptr;
 
     TimelineMath* m_mathManager = nullptr;
+    ShotManager* m_shotManager = nullptr;
 
     int64_t m_vlcTime{};
 

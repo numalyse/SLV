@@ -5,6 +5,7 @@
 
 class TimelineMath : public QObject
 {
+Q_OBJECT
 
 public:
     explicit TimelineMath(double fps, int64_t duration, QObject* parent = nullptr);

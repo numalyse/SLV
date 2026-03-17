@@ -3,11 +3,14 @@
 
 #include "Shot.h"
 
-#include "RulerItem.h"
-#include "CursorItem.h"
-#include "ShotItem.h"
-#include "TimelineView.h"
-#include "ABMarkerItem.h"
+
+#include "Timeline/TimelineView.h"
+#include "Timeline/TimelineMath.h"
+
+#include "Timeline/Items/ABMarkerItem.h"
+#include "Timeline/Items/RulerItem.h"
+#include "Timeline/Items/CursorItem.h"
+#include "Timeline/Items/ShotItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -34,7 +37,7 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
-    double timeToPosition(int64_t time);
+    //double timeToPosition(int64_t time);
     void goToShot(int);
 
 signals:
@@ -54,7 +57,7 @@ private slots:
 
 private:
     void applyZoom(double zoomFactor, int mouseX);
-    int64_t timeAtCursor();
+    
     void updateCurrentShot();
     void updateShotItems();
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
@@ -77,13 +80,13 @@ private:
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
 
-    double m_fps{};
-    int64_t m_duration{};
+    TimelineMath* m_mathManager = nullptr;
+
     int64_t m_vlcTime{};
 
     int m_sceneWidth = 10000;
     int m_sceneHeight = 150;
-    double m_pixelsPerMs {};
+    //double m_pixelsPerMs {};
 
     int m_rulerHeight = 25;
     double m_minPxBetweenTicks = 100.0;

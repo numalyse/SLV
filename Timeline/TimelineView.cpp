@@ -1,6 +1,6 @@
-#include "TimelineView.h"
+#include "Timeline/TimelineView.h"
 
-#include "ItemTypes.h"
+#include "Timeline/ItemTypes.h"
 
 #include <QDebug>
 #include <QScrollbar>

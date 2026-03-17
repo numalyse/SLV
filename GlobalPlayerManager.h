@@ -5,7 +5,7 @@
 #include "PlayerLayoutManager.h"
 #include "NavPanel.h"
 #include "Media.h"
-#include "TimelineWidget.h"
+#include "Timeline/TimelineWidget.h"
 #include "PlayerWidget.h"
 
 #include <QWidget>

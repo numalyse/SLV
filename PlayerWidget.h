@@ -74,6 +74,12 @@ signals:
     void mediaPlayerLoaded();
     void mediaPlayerEjected();
 
+    void mediaDropped(const QStringList&);
+
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+
 private:
     double m_media_fps {};
     bool m_playing = false;

@@ -30,6 +30,7 @@ signals:
     void mediaSpeedChanged(const QString&);
     void formLineEditPlay();
     void formLineEditPause();
+    void playerWidgetMediaDropped(const QStringList&);
 };
 
 

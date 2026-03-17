@@ -49,6 +49,8 @@ signals:
     void disableRecordRequested();
     void enableSegmentationRequested();
     void disableSegmentationRequested();
+    void moveTimeBackwardRequested();
+    void moveTimeForwardRequested();
 };
 
 #endif

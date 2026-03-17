@@ -245,6 +245,14 @@ void PlayerWidget::setTime(int64_t time){
     m_mediaWidget->setTime(time);
 }
 
+void PlayerWidget::moveTimeBackward(){
+    m_mediaWidget->moveTimeBackward();
+}
+
+void PlayerWidget::moveTimeForward(){
+    m_mediaWidget->moveTimeForward();
+}
+
 void PlayerWidget::updateFpsRequest(double newFps){
     m_media_fps = newFps;
     emit updateFpsRequested(newFps);
@@ -317,3 +325,33 @@ void PlayerWidget::dropEvent(QDropEvent *event)
         event->ignore();
     }
 }
+
+void PlayerWidget::keyPressEvent(QKeyEvent *event)
+{
+    // if (event->key() == Qt::Key_Space) {
+    //     togglePlayPause();
+    // } else {
+    //     QWidget::keyPressEvent(event);
+    // }
+
+    if (event->key() == Qt::LeftArrow) {
+        moveTimeBackward();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+
+    if (event->key() == Qt::RightArrow) {
+        moveTimeForward();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+
+    if (event->key() == Qt::Key_C) {
+        takeScreenshot();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+}
+
+
+

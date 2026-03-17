@@ -47,6 +47,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
     connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
 
+    connect(m_extensionToolbar, &ExtensionToolbar::moveTimeBackwardRequested, this, &AdvancedToolbar::moveTimeBackwardRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::moveTimeForwardRequested, this, &AdvancedToolbar::moveTimeForwardRequested);
+
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, [this](){

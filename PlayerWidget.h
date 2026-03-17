@@ -39,6 +39,8 @@ public slots:
     void takeScreenshot();
     void setSpeed(const unsigned int &speed);
     void setTime(int64_t time);
+    void moveTimeBackward();
+    void moveTimeForward();
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
@@ -77,6 +79,7 @@ signals:
     void mediaDropped(const QStringList&);
 
 protected:
+    void keyPressEvent(QKeyEvent *event) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 

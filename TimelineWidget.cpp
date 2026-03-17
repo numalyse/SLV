@@ -258,6 +258,7 @@ void TimelineWidget::moveCursor(double cursorPosX){
 
     m_cursor->setPos(cursorPosX,m_cursor->pos().y());
     m_vlcTime = timeAtCursor();
+    m_cursor->setPos(timeToPosition(m_vlcTime), m_cursor->pos().y());
     emit timelineSetPosition(m_vlcTime);
     updateCurrentShot();
 }
@@ -330,6 +331,8 @@ void TimelineWidget::splitCurrentShotItem() {
     // on insère le plan juste apres le plan cut
     m_shotItems.insert(index + 1, newShotItem);
     m_scene->addItem(newShotItem);
+
+    updateCurrentShot();
 }
 
 /// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage

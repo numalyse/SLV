@@ -110,7 +110,7 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
             m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
         }
         
-
+        m_abManager->updateMarkersPosition();
 
         m_shotManager->updateShotItemsPosition();
         
@@ -119,9 +119,6 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
         }
     }
 }
-
-
-
 
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
@@ -179,6 +176,8 @@ void TimelineWidget::moveCursor(double newCursorPosX){
     auto restartTime = m_abManager->getLoopRestartTime(newCursorTime);
 
     if(restartTime.has_value()){ 
+        m_vlcTime = restartTime.value();
+        m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
         return;
     }
 
@@ -272,7 +271,7 @@ void TimelineWidget::goToShot(int idShot){
 
 void TimelineWidget::ABAction() {
     int64_t markerTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
-    m_abManager->cycleMarkers(markerTime);
+    m_abManager->cycleMarkers(markerTime, m_sceneHeight);
 }
 
 void TimelineWidget::splitShotAtCursor() {

@@ -30,7 +30,7 @@ std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 
 /// @brief Ajoute un marqueur si 0 ou 1 marqueur présent. Si 1 marqueur déjà présent, garde l'ordre tel que element de 0 de m_abMarkersItems est le "A".
 /// Si 2 marqueurs présents, les supprimes.
-void ABManager::cycleMarkers(int64_t time){
+void ABManager::cycleMarkers(int64_t time, int markerHeight){
 
     switch (m_abMarkersItems.size())
     {
@@ -46,7 +46,7 @@ void ABManager::cycleMarkers(int64_t time){
         break;
     }
     case 1 :{
-        ABMarkerItem* newMarker = new ABMarkerItem(p_scene->height(), time);
+        ABMarkerItem* newMarker = new ABMarkerItem(markerHeight, time);
 
         if(newMarker->time() >= m_abMarkersItems[0]->time()){
             m_abMarkersItems.append(newMarker); 
@@ -60,7 +60,7 @@ void ABManager::cycleMarkers(int64_t time){
         break;
     }
     case 0 :{
-        ABMarkerItem* newMarker = new ABMarkerItem(p_scene->height(), time);
+        ABMarkerItem* newMarker = new ABMarkerItem(markerHeight, time);
 
         m_abMarkersItems.append(newMarker);
         newMarker->setX(p_mathManager->timeToPos(time));

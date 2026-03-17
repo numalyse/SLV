@@ -27,7 +27,7 @@ public:
     std::optional<int64_t> getLoopRestartTime(int64_t currentTime);
     int getMarkerCount() { return static_cast<int>(m_abMarkersItems.size());}
 
-    void cycleMarkers(int64_t time);
+    void cycleMarkers(int64_t time, int markerHeight);
     void updateMarkersPosition();
 
 signals:

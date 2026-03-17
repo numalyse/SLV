@@ -43,6 +43,8 @@ signals:
     void disableRecordRequested();
     void enableSegmentationRequest();
     void disableSegmentationRequest();
+    void moveTimeBackwardRequested();
+    void moveTimeForwardRequested();
     void previousMediaRequested();
     void nextMediaRequested();
 

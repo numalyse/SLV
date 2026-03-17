@@ -66,6 +66,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
+    
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
@@ -257,7 +258,9 @@ void TimelineWidget::moveCursor(double cursorPosX){
 
     m_cursor->setPos(cursorPosX,m_cursor->pos().y());
     m_vlcTime = timeAtCursor();
+    m_cursor->setPos(timeToPosition(m_vlcTime), m_cursor->pos().y());
     emit timelineSetPosition(m_vlcTime);
+    updateCurrentShot();
 }
 
 /// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
@@ -303,6 +306,10 @@ void TimelineWidget::splitCurrentShotItem() {
     auto cutTime = timeAtCursor();
 
     if (cutTime <=  m_shotItems[index]->shot().start || cutTime >=  m_shotItems[index]->shot().end) {
+        qDebug() << "Cut time :" <<  TimeFormatter::msToHHMMSSFF(cutTime, 1);
+        qDebug() << "Current shot start :" << TimeFormatter::msToHHMMSSFF(m_shotItems[index]->shot().start, 1);
+        qDebug() << "current shot end : " << TimeFormatter::msToHHMMSSFF(m_shotItems[index]->shot().end, 1);
+        
         qDebug() << "Curseur n'est pas sur le plan courant";
         return;
     }

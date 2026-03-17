@@ -187,13 +187,14 @@ void GlobalPlayerManager::createTimelineWidget()
     m_timeline->setFixedHeight(150);
 
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
+    connect(m_timeline, &TimelineWidget::timelineSetPosition, toolbar, &AdvancedToolbar::timelineUpdateSliderValue );
 
     connect(m_timeline, &TimelineWidget::updateShotDetailRequested, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
 
     connect(m_timeline, &TimelineWidget::enableSliderRequested, toolbar, &AdvancedToolbar::enableSlider);
     connect(m_timeline, &TimelineWidget::disableSliderRequested, toolbar, &AdvancedToolbar::disableSlider);
-    connect( m_timeline, &TimelineWidget::updateCursorPos, toolbar, &AdvancedToolbar::timelineUpdateSliderValue);
+    connect(m_timeline, &TimelineWidget::updateCursorPos, toolbar, &AdvancedToolbar::timelineUpdateSliderValue );
 
     connect(toolbar, &SimpleToolbar::setCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorPos);
 

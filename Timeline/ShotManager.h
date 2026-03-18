@@ -19,14 +19,21 @@ public:
 
     void splitShotAt(int64_t time);
 
+    void mergeCurrentWithPrevShot(int64_t cursorTime);
+
+    void mergeCurrentWithNextShot(int64_t cursorTime);
+
     void updateShotItemsPosition();
 
     std::optional<double> getStartXOf(int idShot);
 
 signals:
     void updateShotDetailRequested(int shotCount, int shotId, Shot*);
+    void showMergeWithPreviousShotAction(bool);
+    void showMergeWithNextShotAction(bool);
 
 private:
+    void mergeCurrentInto(int ShotItemId);
 
     QVector<ShotItem*> m_shotItems;
     ShotItem* m_currentShotItem = nullptr;

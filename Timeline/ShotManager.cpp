@@ -3,6 +3,8 @@
 #include "ShotManager.h"
 #include "TimeFormatter.h"
 
+#include <QtAssert>
+
 ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, QVector<Shot> &projectShots, QObject *parent) 
 : QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}
 {
@@ -51,6 +53,18 @@ void ShotManager::updateCurrentShot(int64_t time){
         m_currentShotItem =  closestShotItem;
         emit updateShotDetailRequested( shotItemCount, currentShotId, &m_shotItems[currentShotId]->shot());
     }
+
+    if(currentShotId == 0){
+        emit showMergeWithPreviousShotAction( false );
+    }else {
+        emit showMergeWithPreviousShotAction( true );
+    }
+    if(currentShotId == m_shotItems.size() - 1){
+        emit showMergeWithNextShotAction( false );
+    }else {
+        emit showMergeWithNextShotAction( true );
+    }
+
 } 
 
 
@@ -99,6 +113,44 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     updateCurrentShot(cutTime);
 }
+
+void ShotManager::mergeCurrentInto(int ShotItemId){
+    Q_ASSERT( ShotItemId >= 0 && ShotItemId < m_shotItems.size() );
+
+    ShotItem* item =  m_shotItems[ShotItemId];
+
+    item->shot().start = (m_currentShotItem->shot().start > item->shot().start) ? item->shot().start: m_currentShotItem->shot().start ;
+    item->shot().end = (m_currentShotItem->shot().end > item->shot().end) ? m_currentShotItem->shot().end : item->shot().end ;
+
+    p_scene->removeItem(m_currentShotItem);
+    m_shotItems.removeOne(m_currentShotItem);
+    m_currentShotItem = nullptr;
+    
+    updateShotItemsPosition();
+}
+
+void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
+{
+    Q_ASSERT( m_currentShotItem );
+
+    int indexOfPrev = m_shotItems.indexOf(m_currentShotItem) - 1;
+
+    mergeCurrentInto(indexOfPrev);
+
+    updateCurrentShot(cursorTime);
+}
+
+void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
+{
+    Q_ASSERT( m_currentShotItem );
+
+    int indexOfNext = m_shotItems.indexOf(m_currentShotItem) + 1;
+
+    mergeCurrentInto(indexOfNext);
+
+    updateCurrentShot(cursorTime);
+}
+
 
 
 /// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage

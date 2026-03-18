@@ -18,6 +18,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
 {
 
     m_players.reserve(s_maxPlayerCount);
+    connect(&SignalManager::instance(), &SignalManager::newArrangementRequested, this, &PlayerLayoutManager::arrangePlayerLayout);
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
         PlayerWidget* player = new PlayerWidget(this);
         connect(player, &PlayerWidget::duplicatePlayerRequest, this, &PlayerLayoutManager::duplicatePlayer);
@@ -48,6 +49,9 @@ void PlayerLayoutManager::activePlayerUpdate(const int activePlayersNeeded){
     
     if(activePlayersNeeded < activePlayerCount){
 
+        for(int IActivePlayer = activePlayersNeeded; IActivePlayer < activePlayerCount; ++IActivePlayer){
+            m_activePlayers[IActivePlayer]->eject();
+        }
         m_activePlayers.erase(m_activePlayers.begin() + activePlayersNeeded, m_activePlayers.end());
 
     }else if(activePlayersNeeded > activePlayerCount){ 
@@ -64,7 +68,7 @@ void PlayerLayoutManager::activePlayerUpdate(const int activePlayersNeeded){
     }
 }
 
-void PlayerLayoutManager::createLayout(const int count)
+void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrangement& arrangement)
 {
      // les players vont etre détruit si on delete l'ancien widget, il faut d'abord modifier leurs parents
     detachAllPlayers();
@@ -80,12 +84,15 @@ void PlayerLayoutManager::createLayout(const int count)
             media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
-        case 2: 
-            container = create2();
-            emit disableNavPanelRequested();
+        case 2:
+            {
+                Qt::Orientation orientation = arrangement == PlayerLayoutArrangement::Arrangement2H ? Qt::Horizontal : Qt::Vertical;
+                container = create2(QStringList(), orientation);
+                emit disableNavPanelRequested();
+            }
             break;
-        case 3: 
-            container = create3();
+        case 3:
+            container = create3(QStringList(), arrangement);
             emit disableNavPanelRequested();
             break;
         case 4: 
@@ -162,11 +169,11 @@ QWidget* PlayerLayoutManager::create1(const QStringList& filePath)
     return container;
 }
 
-QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths)
+QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths, const Qt::Orientation& orientation)
 {
     Q_ASSERT(m_activePlayers.size() == 2);
 
-    auto *splitter = new QSplitter(Qt::Horizontal);
+    auto *splitter = new QSplitter(orientation);
 
     if (m_activePlayers.size() >= 2) {
         if(filesPaths != QStringList(""))
@@ -187,7 +194,7 @@ QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths)
     return container;
 }
 
-QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths)
+QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const PlayerLayoutArrangement& arrangement)
 {
     Q_ASSERT(m_activePlayers.size() == 3);
 
@@ -198,21 +205,67 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths)
             m_activePlayers[IFilePath]->setMediaFromPath(filesPaths.at(IFilePath));
         }
 
-    auto *mainSplitter = new QSplitter(Qt::Vertical);
+    auto *mainSplitter = new QSplitter();
+    if(arrangement == PlayerLayoutArrangement::Arrangement3Bot || arrangement == PlayerLayoutArrangement::Arrangement3Top || arrangement == PlayerLayoutArrangement::Arrangement3V){
 
-    auto *top = new QSplitter(Qt::Horizontal);
-    top->addWidget(m_activePlayers[0]);
-    top->addWidget(m_activePlayers[1]);
-    top->setSizes(QList<int>({INT_MAX, INT_MAX}));
+        mainSplitter->setOrientation(Qt::Vertical);
 
-    mainSplitter->addWidget(top);
-    mainSplitter->addWidget(m_activePlayers[2]);
+        auto *adjacentPlayers = new QSplitter(Qt::Horizontal);
+        if(arrangement == PlayerLayoutArrangement::Arrangement3V){
+            adjacentPlayers->setOrientation(Qt::Vertical);
+            // m_activePlayers[0]->sizePolicy().setHorizontalStretch(1);
+            // adjacentPlayers->sizePolicy().setHorizontalStretch(2);
+        }
+        if(arrangement == PlayerLayoutArrangement::Arrangement3Bot){
+            adjacentPlayers->addWidget(m_activePlayers[0]);
+            adjacentPlayers->addWidget(m_activePlayers[1]);
+            // mainSplitter->addWidget(adjacentPlayers);
+            // mainSplitter->addWidget(m_activePlayers[2]);
+        }
+        else{
+            adjacentPlayers->addWidget(m_activePlayers[1]);
+            adjacentPlayers->addWidget(m_activePlayers[2]);
+            mainSplitter->addWidget(m_activePlayers[0]);
+            mainSplitter->addWidget(adjacentPlayers);
+        }
+
+        adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+
+    }
+    else{
+
+        mainSplitter->setOrientation(Qt::Horizontal);
+
+        auto *adjacentPlayers = new QSplitter(Qt::Vertical);
+        if(arrangement == PlayerLayoutArrangement::Arrangement3H){
+            adjacentPlayers->setOrientation(Qt::Horizontal);
+
+            m_activePlayers[1]->sizePolicy().setHorizontalStretch(1);
+            adjacentPlayers->sizePolicy().setHorizontalStretch(2);
+
+        }
+        if(arrangement == PlayerLayoutArrangement::Arrangement3Right){
+            adjacentPlayers->addWidget(m_activePlayers[0]);
+            adjacentPlayers->addWidget(m_activePlayers[2]);
+            mainSplitter->addWidget(adjacentPlayers);
+            mainSplitter->addWidget(m_activePlayers[1]);
+        }
+        else{
+            adjacentPlayers->addWidget(m_activePlayers[1]);
+            adjacentPlayers->addWidget(m_activePlayers[2]);
+            mainSplitter->addWidget(m_activePlayers[0]);
+            mainSplitter->addWidget(adjacentPlayers);
+        }
+
+        adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+    }
+
     mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
-
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(mainSplitter);
+
 
     return container;
 }
@@ -491,4 +544,33 @@ void PlayerLayoutManager::disableGlobalToolbarButtons()
         }
     }
     emit buttonsDisabled();
+}
+
+void PlayerLayoutManager::arrangePlayerLayout(const PlayerLayoutArrangement& arrangement)
+{
+    switch(arrangement){
+    case PlayerLayoutArrangement::Arrangement1:
+        createLayout(1);
+        break;
+    case PlayerLayoutArrangement::Arrangement2H:
+        createLayout(2, arrangement);
+        break;
+    case PlayerLayoutArrangement::Arrangement2V:
+        createLayout(2, arrangement);
+        break;
+    case PlayerLayoutArrangement::Arrangement3H:
+    case PlayerLayoutArrangement::Arrangement3V:
+    case PlayerLayoutArrangement::Arrangement3Top:
+    case PlayerLayoutArrangement::Arrangement3Bot:
+    case PlayerLayoutArrangement::Arrangement3Left:
+    case PlayerLayoutArrangement::Arrangement3Right:
+        createLayout(3, arrangement);
+        break;
+    case PlayerLayoutArrangement::Arrangement4:
+        createLayout(4);
+        break;
+    case PlayerLayoutArrangement::ArrangementUnknown:
+        break;
+
+    }
 }

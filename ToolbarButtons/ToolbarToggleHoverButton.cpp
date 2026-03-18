@@ -44,7 +44,6 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
     containerBackground->setLayout(layoutToDisplay);
 
     m_widgetToDisplay = container;
-
     
     m_widgetToDisplay->installEventFilter(this);
 
@@ -69,7 +68,7 @@ void ToolbarToggleHoverButton::moveWidget()
     int x = globalPos.x() + (width() / 2) - (m_widgetToDisplay->width() / 2);
     int y = globalPos.y() - m_widgetToDisplay->height();
     if(!m_onTop){
-        y = globalPos.y() + height() + 6;
+        y = globalPos.y() + height();
     }
 
     QRect popupRect(x, y,
@@ -120,7 +119,7 @@ bool ToolbarToggleHoverButton::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_widgetToDisplay) {
         if (event->type() == QEvent::Enter) {
-            m_hideTimer->stop(); 
+            m_hideTimer->stop();
         } else if (event->type() == QEvent::Leave) {
             m_hideTimer->start(); 
         }

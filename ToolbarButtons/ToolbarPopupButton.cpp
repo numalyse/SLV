@@ -6,6 +6,7 @@
 #include <QEvent>
 #include <qapplication.h>
 #include <qboxlayout.h>
+#include <qevent.h>
 #include <qframe.h>
 #include <qscreen.h>
 
@@ -17,8 +18,9 @@ ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QLayout *layoutToDisplay
     layoutToDisplay->setParent(nullptr);
     // m_widgetToDisplay = widgetToDisplay;
     QWidget* container = new QWidget();
-    container->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    container->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowSystemMenuHint);
     container->setAttribute(Qt::WA_TranslucentBackground);
+    container->setAttribute(Qt::WA_ShowWithoutActivating);
 
     QHBoxLayout* containerLayout = new QHBoxLayout(container);
     containerLayout->setContentsMargins(0,0,0,0);

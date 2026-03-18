@@ -4,6 +4,21 @@
 #include "Shot.h"
 #include <QObject.h>
 
+enum class PlayerLayoutArrangement
+{
+    Arrangement1,
+    Arrangement2H,
+    Arrangement2V,
+    Arrangement3H,
+    Arrangement3V,
+    Arrangement3Top,
+    Arrangement3Bot,
+    Arrangement3Left,
+    Arrangement3Right,
+    Arrangement4,
+    ArrangementUnknown
+};
+
 class SignalManager: public QObject
 {
 Q_OBJECT
@@ -30,6 +45,7 @@ signals:
     void mediaSpeedChanged(const QString&);
     void formLineEditPlay();
     void formLineEditPause();
+    void newArrangementRequested(const PlayerLayoutArrangement&);
     void playerWidgetMediaDropped(const QStringList&);
 };
 

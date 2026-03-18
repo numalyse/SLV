@@ -40,7 +40,6 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     // QHBoxLayout* buttonLayout =  new QHBoxLayout();
 
     QVBoxLayout* volumeFrameLayout = new QVBoxLayout();
-    volumeFrameLayout->setContentsMargins(6,6,6,6);
 
     m_volumeSlider = new QSlider(Qt::Vertical);
     m_volumeSlider->setRange(0,100);
@@ -55,7 +54,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     volumeFrameLayout->setAlignment(m_volumeLabel, Qt::AlignHCenter);
 
     m_muteBtn = new ToolbarToggleHoverButton(
-        this, 
+        this,
         volumeFrameLayout,
         false,
         "sound_off_white",
@@ -66,7 +65,6 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_muteBtn->setEnabled(true);
     
     QVBoxLayout* speedFrameLayout = new QVBoxLayout();
-    speedFrameLayout->setContentsMargins(6,6,6,6);
 
     QHBoxLayout* speedInfoLayout = new QHBoxLayout();
     speedFrameLayout->addLayout(speedInfoLayout);
@@ -302,7 +300,7 @@ void SimpleToolbar::enableButtons()
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
-    m_removePlayerBtn->setEnabled(true);
+    // m_removePlayerBtn->setEnabled(true);
     // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
     m_screenshotBtn->setEnabled(true);
@@ -316,7 +314,7 @@ void SimpleToolbar::disableButtons()
     m_langBtn->setEnabled(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
-    m_removePlayerBtn->setEnabled(false);
+    // m_removePlayerBtn->setEnabled(false);
     // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);

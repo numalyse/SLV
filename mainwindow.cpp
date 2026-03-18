@@ -65,6 +65,16 @@ MainWindow::MainWindow(QWidget *parent)
         m_globalPlayerManager->closeNavPanel();
         m_navPanelBtn->setButtonState(false);
     });
+    connect(m_view1, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement1); });
+    connect(m_view2H, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement2H); });
+    connect(m_view2V, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement2V); });
+    connect(m_view3HAlign, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3H); });
+    connect(m_view3VAlign, &ToolbarButton::clicked, &SignalManager::instance(),[](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3V); });
+    connect(m_view3Top, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Top); });
+    connect(m_view3Bot, &ToolbarButton::clicked, &SignalManager::instance(),[](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Bot); });
+    connect(m_view3Left, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Left); });
+    connect(m_view3Right, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Right); });
+    connect(m_view4, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement4); });
 
 }
 
@@ -105,6 +115,10 @@ void MainWindow::createToolBar()
 
     m_toolbarQt->addWidget(spacer);
     m_toolbarQt->addWidget(m_viewGridBtn);
+    // m_toolbarQt->addWidget(m_view1);
+    // m_toolbarQt->addWidget(m_view2);
+    // m_toolbarQt->addWidget(m_view3);
+    // m_toolbarQt->addWidget(m_view4);
     m_toolbarQt->addWidget(m_navPanelBtn);
     m_toolbarQt->setStyleSheet("border: none;");
 
@@ -204,6 +218,6 @@ void MainWindow::createViewGridBtn()
     m_view4 = new ToolbarButton(nullptr, "view_4_white", TextManager::instance().get("tooltip_view_4"));
     viewLayout->addWidget(m_view4);
 
-    m_viewGridBtn = new ToolbarPopupButton(m_toolbarQt, viewLayout, "view_4_white", TextManager::instance().get("tooltip_view_grid"));
+    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", TextManager::instance().get("tooltip_view_grid"), "player_arrangement_white"),  TextManager::instance().get("tooltip_view_grid");
     m_viewGridBtn->setOnTop(false);
 }

@@ -14,7 +14,7 @@ public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
     ~PlayerLayoutManager();
 
-    void createLayout(const int count);
+    void createLayout(const int count, const PlayerLayoutArrangement& arrangement = PlayerLayoutArrangement::ArrangementUnknown);
 
 private:
 
@@ -37,8 +37,8 @@ private:
     void activePlayerUpdate(const int activePlayersNeeded);
 
     QWidget* create1(const QStringList& filePath = QStringList(""));
-    QWidget* create2(const QStringList& filesPaths = QStringList(""));
-    QWidget* create3(const QStringList& filesPaths = QStringList(""));
+    QWidget* create2(const QStringList& filesPaths = QStringList(""), const Qt::Orientation& orientation = Qt::Horizontal);
+    QWidget* create3(const QStringList& filesPaths = QStringList(""), const PlayerLayoutArrangement& arrangement = PlayerLayoutArrangement::ArrangementUnknown);
     QWidget* create4(const QStringList& filesPaths = QStringList(""));
 
     /// @brief Créer une toolbar globale et la connecte aux players
@@ -92,6 +92,7 @@ public slots:
 
     // void enableButtons();
     void disableGlobalToolbarButtons();
+    void arrangePlayerLayout(const PlayerLayoutArrangement&);
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

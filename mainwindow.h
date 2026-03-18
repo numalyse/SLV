@@ -45,7 +45,7 @@ private:
     GlobalPlayerManager* m_globalPlayerManager = nullptr;
     QWidget* m_currentLayout = nullptr;
     ToolbarToggleButton *m_navPanelBtn = nullptr; // Utilisation d'un toggle button pour le bouton de menu
-    ToolbarPopupButton *m_viewGridBtn = nullptr;
+    ToolbarToggleHoverButton *m_viewGridBtn = nullptr;
     ToolbarButton *m_view1 = nullptr;
     ToolbarToggleHoverButton *m_view2 = nullptr;
     ToolbarButton *m_view2H = nullptr;

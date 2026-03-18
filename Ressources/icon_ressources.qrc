@@ -111,5 +111,7 @@
         <file alias="view_3_v_white">icons/view_3_v_white.png</file>
         <file alias="view_4_white">icons/view_4_white.png</file>
         <file alias="zoom_white">icons/zoom_white.png</file>
+        <file alias="player_arrangement">icons/player_arrangement.png</file>
+        <file alias="player_arrangement_white">icons/player_arrangement_white.png</file>
     </qresource>
 </RCC>

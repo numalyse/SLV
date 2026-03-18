@@ -26,6 +26,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::checkPlayersPlayStatusRequested, this, &PlayerLayoutManager::checkPlayersPlayStatus);
         connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
+        connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
         m_players.append(player);
     }
     
@@ -306,6 +307,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableLoopModeRequest, activePlayer, &PlayerWidget::enableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::disableLoopModeRequest, activePlayer, &PlayerWidget::disableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
+    connect(advancedToolbar, &AdvancedToolbar::moveTimeBackwardRequested, activePlayer, &PlayerWidget::moveTimeBackward);
+    connect(advancedToolbar, &AdvancedToolbar::moveTimeForwardRequested, activePlayer, &PlayerWidget::moveTimeForward);
     connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &PlayerLayoutManager::previousMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);

@@ -12,6 +12,9 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 
 
 PlayerWidget::PlayerWidget(QWidget *parent)
@@ -27,6 +30,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     setFocus();
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    setAcceptDrops(true);
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
@@ -71,6 +76,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjected);
+
+    connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -238,6 +245,14 @@ void PlayerWidget::setTime(int64_t time){
     m_mediaWidget->setTime(time);
 }
 
+void PlayerWidget::moveTimeBackward(){
+    m_mediaWidget->moveTimeBackward();
+}
+
+void PlayerWidget::moveTimeForward(){
+    m_mediaWidget->moveTimeForward();
+}
+
 void PlayerWidget::updateFpsRequest(double newFps){
     m_media_fps = newFps;
     emit updateFpsRequested(newFps);
@@ -279,3 +294,64 @@ void PlayerWidget::disableButtons()
 {
     m_toolBar->disableButtons();
 }
+
+void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){
+    if (event->mimeData()->hasUrls()) {
+            event->acceptProposedAction();
+        } else {
+            event->ignore();
+        }
+}
+
+void PlayerWidget::dropEvent(QDropEvent *event)
+{
+    const QMimeData *mimeData = event->mimeData();
+
+    if (mimeData->hasUrls()) {
+        eject();
+
+        QList<QUrl> urlList = mimeData->urls();
+
+        for (const QUrl &url : urlList) {
+            
+            QString filePath = url.toLocalFile();
+            qDebug() << "Fichier droppé :" << filePath;
+
+            emit mediaDropped(QStringList(filePath));
+
+        }
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
+}
+
+void PlayerWidget::keyPressEvent(QKeyEvent *event)
+{
+    // if (event->key() == Qt::Key_Space) {
+    //     togglePlayPause();
+    // } else {
+    //     QWidget::keyPressEvent(event);
+    // }
+
+    if (event->key() == Qt::LeftArrow) {
+        moveTimeBackward();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+
+    if (event->key() == Qt::RightArrow) {
+        moveTimeForward();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+
+    if (event->key() == Qt::Key_C) {
+        takeScreenshot();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+}
+
+
+

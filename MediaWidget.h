@@ -35,6 +35,8 @@ public slots:
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
     void setTime(int64_t);
+    void moveTimeBackward();
+    void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
     void hideMedia();

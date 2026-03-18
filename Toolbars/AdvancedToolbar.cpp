@@ -22,9 +22,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
         "minus_white",
-        TextManager::instance().get("tooltip_expand_toolbar"),
+        TextManager::instance().get("tooltip_minimize_toolbar"),
         "plus_white",
-        TextManager::instance().get("tooltip_minimize_toolbar")
+        TextManager::instance().get("tooltip_expand_toolbar")
     );
 
     m_extensionToolbar = new ExtensionToolbar(this);
@@ -46,6 +46,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
     connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
+
+    connect(m_extensionToolbar, &ExtensionToolbar::moveTimeBackwardRequested, this, &AdvancedToolbar::moveTimeBackwardRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::moveTimeForwardRequested, this, &AdvancedToolbar::moveTimeForwardRequested);
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);

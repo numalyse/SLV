@@ -219,8 +219,8 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
         if(arrangement == PlayerLayoutArrangement::Arrangement3Bot){
             adjacentPlayers->addWidget(m_activePlayers[0]);
             adjacentPlayers->addWidget(m_activePlayers[1]);
-            // mainSplitter->addWidget(adjacentPlayers);
-            // mainSplitter->addWidget(m_activePlayers[2]);
+            mainSplitter->addWidget(adjacentPlayers);
+            mainSplitter->addWidget(m_activePlayers[2]);
         }
         else{
             adjacentPlayers->addWidget(m_activePlayers[1]);
@@ -240,8 +240,8 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
         if(arrangement == PlayerLayoutArrangement::Arrangement3H){
             adjacentPlayers->setOrientation(Qt::Horizontal);
 
-            m_activePlayers[1]->sizePolicy().setHorizontalStretch(1);
-            adjacentPlayers->sizePolicy().setHorizontalStretch(2);
+            // m_activePlayers[1]->sizePolicy().setHorizontalStretch(1);
+            // adjacentPlayers->sizePolicy().setHorizontalStretch(2);
 
         }
         if(arrangement == PlayerLayoutArrangement::Arrangement3Right){

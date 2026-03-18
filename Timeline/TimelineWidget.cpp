@@ -36,7 +36,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     auto fps = ProjectManager::instance().projet()->media->fps();
     auto duration = ProjectManager::instance().projet()->media->duration();
 
-    if(fps == 0.0 || duration == 0){
+    if(/*fps == 0.0 || */duration == 0){
         qDebug() << "Creation timeline : Fps ou durée du film = 0";
         return;
     }

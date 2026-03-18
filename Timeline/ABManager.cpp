@@ -28,6 +28,18 @@ std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 
 }
 
+void ABManager::deleteMarkers()
+{
+    for (auto* marker : m_abMarkersItems)
+    {
+        p_scene->removeItem(marker);
+        delete marker;
+        marker = nullptr;
+    }
+    m_abMarkersItems.clear();
+    emit ABLoopOff();
+}
+
 /// @brief Ajoute un marqueur si 0 ou 1 marqueur présent. Si 1 marqueur déjà présent, garde l'ordre tel que element de 0 de m_abMarkersItems est le "A".
 /// Si 2 marqueurs présents, les supprimes.
 void ABManager::cycleMarkers(int64_t time, int markerHeight){
@@ -35,14 +47,7 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight){
     switch (m_abMarkersItems.size())
     {
     case 2:{
-        for (auto* marker : m_abMarkersItems)
-        {
-            p_scene->removeItem(marker);
-            delete marker;
-            marker = nullptr;
-        }
-        m_abMarkersItems.clear();
-        emit enableSliderRequested();
+        deleteMarkers();
         break;
     }
     case 1 :{
@@ -56,7 +61,7 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight){
 
         newMarker->setX(p_mathManager->timeToPos(time));
         p_scene->addItem(newMarker);
-        emit disableSliderRequested();
+        emit ABLoopOn();
         break;
     }
     case 0 :{

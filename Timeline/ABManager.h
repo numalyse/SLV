@@ -27,12 +27,13 @@ public:
     std::optional<int64_t> getLoopRestartTime(int64_t currentTime);
     int getMarkerCount() { return static_cast<int>(m_abMarkersItems.size());}
 
+    void deleteMarkers();
     void cycleMarkers(int64_t time, int markerHeight);
     void updateMarkersPosition();
 
 signals:
-    void enableSliderRequested();
-    void disableSliderRequested();
+    void ABLoopOff();
+    void ABLoopOn();
 
 private:
     QVector<ABMarkerItem*> m_abMarkersItems;

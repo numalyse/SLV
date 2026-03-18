@@ -22,6 +22,7 @@
 #include <QAction>
 #include <QTimer>
 #include <algorithm> 
+#include "TimelineWidget.h"
 
 
 /// @brief Créer une timeline avec les plan du projet
@@ -54,8 +55,10 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
+    connect(m_abManager, &ABManager::ABLoopOn, this, &TimelineWidget::disableTimeRelatedUI);
+    connect(m_abManager, &ABManager::ABLoopOff, this, &TimelineWidget::enableTimeRelatedUI);
 
-    QHBoxLayout* ButtonLayout = new QHBoxLayout(this);
+    QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
 
     m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
@@ -65,6 +68,16 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_abLoopBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_ab_loop"));
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
     ButtonLayout->addWidget(m_abLoopBtn);
+
+    m_mergeWithPrevShotBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_merge_with_prev_shot"));
+    connect(m_mergeWithPrevShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithPrevShotAction);
+    ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
+    m_mergeWithPrevShotBtn->hide();
+
+    m_mergeWithNextShotBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_merge_with_next_shot"));
+    connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
+    ButtonLayout->addWidget(m_mergeWithNextShotBtn);
+    m_mergeWithNextShotBtn->hide();
 
     ButtonLayout->addStretch(1);
     layout->addLayout(ButtonLayout);
@@ -90,6 +103,8 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectShots, this);
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
+    connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
+    connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
     m_ruler->setPos(0, 0); 
@@ -227,12 +242,23 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 }
 
 
+
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
     QAction *actionSplit = menu.addAction(TextManager::instance().get("timeline_split_shot_at_cursor"));
+    QAction *mergeWithPreviousShot = nullptr;
+    QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
+    QAction *deleteABMarkers = nullptr;
     QAction *actionExtractAB = nullptr;
+
+    if(m_showMergeWithPrevShotBtn){
+        mergeWithPreviousShot = menu.addAction(TextManager::instance().get("timeline_merge_with_previous_shot"));
+    }
+    if(m_showMergeWithNextShotBtn){
+        mergeWithNextShot = menu.addAction(TextManager::instance().get("timeline_merge_with_next_shot"));
+    }
 
     switch (m_abManager->getMarkerCount())
     {
@@ -241,6 +267,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         break;
     case 1:
         actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_1"));
+        deleteABMarkers = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
         break;
     case 2:
         actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
@@ -252,10 +279,16 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 
     if (selectedAction == actionSplit) {
         splitShotAtCursor();
-    }else if (selectedAction == actionAB){
+    } else if (selectedAction == actionAB){
         ABAction();
-    }else if (selectedAction == actionExtractAB){
+    } else if (selectedAction == deleteABMarkers) {
+        m_abManager->deleteMarkers();
+    } else if (selectedAction == actionExtractAB){
         qDebug() << "Extract ab segment";
+    } else if (selectedAction == mergeWithPreviousShot){
+        mergeWithPrevShotAction();
+    } else if(selectedAction == mergeWithNextShot){
+        mergeWithNextShotAction();
     }
 }
 
@@ -288,8 +321,10 @@ void TimelineWidget::updateCursorVisually(int sliderValue) {
 }
 
 void TimelineWidget::goToShot(int idShot){
-    auto posX = m_shotManager->getStartXOf(idShot);
-    if(posX.has_value())  moveCursor( posX.value() ); 
+    auto timeStart = m_shotManager->getStartTimeOf(idShot);
+    if(timeStart.has_value()){
+        emit timelineSetPosition(timeStart.value());
+    }
 }
 
 
@@ -300,8 +335,41 @@ void TimelineWidget::ABAction() {
     m_abManager->cycleMarkers(markerTime, m_sceneHeight);
 }
 
-void TimelineWidget::splitShotAtCursor() {
+void TimelineWidget::splitShotAtCursor()
+{
     int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->splitShotAt(cutTime);
 }
 
+void TimelineWidget::mergeWithPrevShotAction()
+{
+    int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
+    m_shotManager->mergeCurrentWithPrevShot(cursorTime);
+}
+
+void TimelineWidget::mergeWithNextShotAction()
+{
+    int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
+    m_shotManager->mergeCurrentWithNextShot(cursorTime);
+}
+
+
+void TimelineWidget::updateShowMergeWithPreviousShot(bool state)
+{
+    if (state){
+        m_mergeWithPrevShotBtn->show();
+    }else {
+        m_mergeWithPrevShotBtn->hide();
+    } 
+    m_showMergeWithPrevShotBtn = state;
+}
+
+void TimelineWidget::updateShowMergeWithNextShot(bool state)
+{
+    if (state){
+        m_mergeWithNextShotBtn->show();
+    }else {
+        m_mergeWithNextShotBtn->hide();
+    } 
+    m_showMergeWithNextShotBtn = state;
+}

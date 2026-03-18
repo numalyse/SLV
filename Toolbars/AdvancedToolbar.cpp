@@ -230,10 +230,12 @@ void AdvancedToolbar::disableButtons()
 
 void AdvancedToolbar::enableSlider(){
     m_slider->setDisabled(false);
+    m_slider->setToolTip("");
 }
 
 void AdvancedToolbar::disableSlider(){
     m_slider->setDisabled(true);
+    m_slider->setToolTip(TextManager::instance().get("tooltip_slider_disabled"));
 }
 
 void AdvancedToolbar::onSliderPressed() {

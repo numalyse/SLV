@@ -74,3 +74,13 @@ void NavPanel::timelineWidgetUpdateShotDetail(int shotCount, int shotId, Shot * 
 {
     m_shotDetail->updateShotDetail(shotCount, shotId, shot);
 }
+
+void NavPanel::disableShotControlButtons()
+{
+    m_shotDetail->toggleShotControlButtons(false);
+}
+
+void NavPanel::enableShotControlButtons()
+{
+    m_shotDetail->toggleShotControlButtons(true);
+}

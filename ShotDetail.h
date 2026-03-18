@@ -17,6 +17,7 @@ Q_OBJECT
 public:
     explicit ShotDetail(QWidget* parent = nullptr);
     void updateShotDetail(int shotCount, int shotId, Shot *shotData);
+    void toggleShotControlButtons(bool);
 
 signals:
     void goToShotRequested(int id);

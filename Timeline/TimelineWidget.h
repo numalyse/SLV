@@ -35,13 +35,15 @@ public slots:
     void updateCursorPos(int64_t vlcTime);
     void updateCursorVisually(int sliderValue);
     void goToShot(int);
+    void mergeWithPrevShotAction();
+    void mergeWithNextShotAction();
 
 signals:
     void updateShotDetailRequest(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
     void timelineSliderPositionRequested(int64_t);
-    void enableSliderRequested();
-    void disableSliderRequested();
+    void enableTimeRelatedUI();
+    void disableTimeRelatedUI();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -52,6 +54,8 @@ private slots:
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
+    void updateShowMergeWithNextShot(bool);
+    void updateShowMergeWithPreviousShot(bool);
 
 private:
     void applyZoom(double zoomFactor, int mouseX);
@@ -71,6 +75,10 @@ private:
 
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
+    ToolbarButton* m_mergeWithPrevShotBtn = nullptr;
+    bool m_showMergeWithPrevShotBtn = false;
+    ToolbarButton* m_mergeWithNextShotBtn = nullptr;
+    bool m_showMergeWithNextShotBtn = false;
 
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;

@@ -69,15 +69,15 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
     ButtonLayout->addWidget(m_abLoopBtn);
 
-    m_mergeWithPrevShotBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_merge_with_prev_shot"));
+    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", TextManager::instance().get("tooltip_merge_with_prev_shot"));
     connect(m_mergeWithPrevShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithPrevShotAction);
     ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
-    m_mergeWithPrevShotBtn->hide();
+    m_mergeWithPrevShotBtn->setEnabled(false);
 
-    m_mergeWithNextShotBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_merge_with_next_shot"));
+    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", TextManager::instance().get("tooltip_merge_with_next_shot"));
     connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
-    m_mergeWithNextShotBtn->hide();
+    m_mergeWithNextShotBtn->setEnabled(false);
 
     ButtonLayout->addStretch(1);
     layout->addLayout(ButtonLayout);
@@ -356,20 +356,12 @@ void TimelineWidget::mergeWithNextShotAction()
 
 void TimelineWidget::updateShowMergeWithPreviousShot(bool state)
 {
-    if (state){
-        m_mergeWithPrevShotBtn->show();
-    }else {
-        m_mergeWithPrevShotBtn->hide();
-    } 
+    m_mergeWithPrevShotBtn->setEnabled(state);
     m_showMergeWithPrevShotBtn = state;
 }
 
 void TimelineWidget::updateShowMergeWithNextShot(bool state)
 {
-    if (state){
-        m_mergeWithNextShotBtn->show();
-    }else {
-        m_mergeWithNextShotBtn->hide();
-    } 
+    m_mergeWithNextShotBtn->setEnabled(state);
     m_showMergeWithNextShotBtn = state;
 }

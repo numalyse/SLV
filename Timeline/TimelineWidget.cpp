@@ -34,6 +34,9 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     layout->setContentsMargins(0, 0, 0, 0); 
 
     auto fps = ProjectManager::instance().projet()->media->fps();
+    // Certains fichiers n'ont pas d'attribut fps comme les fichiers audio, on met 1 par défaut
+    if(fps == 0)
+        fps = 1;
     auto duration = ProjectManager::instance().projet()->media->duration();
 
     if(fps == 0.0 || duration == 0){

@@ -2,7 +2,7 @@
 #define SHOTITEM_H
 
 #include "Shot.h"
-#include "ItemTypes.h"
+#include "Timeline/ItemTypes.h"
 
 #include <QGraphicsItem>
 #include <QPixmap>

@@ -86,12 +86,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     layout->addWidget(m_toolBar);
 
     connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
-    connect(m_mediaWidget, &MediaWidget::updateSliderValueRequested, this, &PlayerWidget::updateSliderValueRequest);
+    connect(m_mediaWidget, &MediaWidget::vlcTimeChanged, this, &PlayerWidget::vlcTimeChanged);
     connect(m_mediaWidget, &MediaWidget::updateFpsRequested, this, &PlayerWidget::updateFpsRequest);
     connect(m_mediaWidget, &MediaWidget::nameUiUpdateRequested, this, &PlayerWidget::nameUiUpdateRequest);
 
     connect(this, &PlayerWidget::updateSliderRangeRequest, m_toolBar, &SimpleToolbar::updateSliderRange);
-    connect(this, &PlayerWidget::updateSliderValueRequest, m_toolBar, &SimpleToolbar::updateSliderValue);
+    connect(this, &PlayerWidget::vlcTimeChanged, m_toolBar, &SimpleToolbar::updateSliderValue);
     connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);

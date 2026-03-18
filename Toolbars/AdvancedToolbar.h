@@ -29,14 +29,17 @@ public slots:
     void enableSlider();
     void disableSlider();
 
-    void timelineUpdateSliderValue(int64_t currentTime);
-
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;
     ToolbarButton* m_nextMediaBtn = nullptr;
 
     ToolbarToggleButton* m_extensionBtn = nullptr;
     ExtensionToolbar* m_extensionToolbar = nullptr;
+
+protected slots: 
+    virtual void onSliderPressed() override;
+    virtual void onSliderReleased() override;
+    virtual void onSliderMoved(int value) override;
 
 signals:
     void enableRecordRequested();
@@ -47,7 +50,7 @@ signals:
     void moveTimeForwardRequested();
     void previousMediaRequested();
     void nextMediaRequested();
-
+    void toolbarCursorPositionRequested(int);
 
 };
 

@@ -1,7 +1,7 @@
 #ifndef RULERITEM_H
 #define RULERITEM_H
 
-#include "ItemTypes.h"
+#include "Timeline/ItemTypes.h"
 
 #include <QGraphicsItem>
 

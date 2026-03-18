@@ -52,13 +52,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Shot.h
         Project.h
         ProjectManager.h ProjectManager.cpp
-        TimelineWidget.h TimelineWidget.cpp
-        TimelineView.h TimelineView.cpp
-        RulerItem.h RulerItem.cpp
-        CursorItem.h CursorItem.cpp
-        ShotItem.h ShotItem.cpp
-        ABMarkerItem.h ABMarkerItem.cpp
-        ItemTypes.h
+
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp
         PlaylistItem.h PlaylistItem.cpp
@@ -70,6 +64,18 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         FormTextEdit.h FormTextEdit.cpp
         SignalManager.h
 
+        Timeline/TimelineWidget.h Timeline/TimelineWidget.cpp
+        Timeline/TimelineView.h Timeline/TimelineView.cpp
+        Timeline/ABManager.h Timeline/ABManager.cpp
+        Timeline/ShotManager.h Timeline/ShotManager.cpp
+        Timeline/TimelineMath.h Timeline/TimelineMath.cpp
+
+        Timeline/ItemTypes.h
+
+        Timeline/Items/ABMarkerItem.h Timeline/Items/ABMarkerItem.cpp
+        Timeline/Items/RulerItem.h Timeline/Items/RulerItem.cpp
+        Timeline/Items/CursorItem.h Timeline/Items/CursorItem.cpp
+        Timeline/Items/ShotItem.h Timeline/Items/ShotItem.cpp
 
     )
 

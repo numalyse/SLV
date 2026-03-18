@@ -27,6 +27,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::checkPlayersPlayStatusRequested, this, &PlayerLayoutManager::checkPlayersPlayStatus);
         connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
+        connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
         m_players.append(player);
     }
     
@@ -75,10 +76,12 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
 
     QWidget* container = nullptr;
     Media* media = nullptr;
+    PlayerWidget* player = nullptr;
     switch (count){
         case 1: 
             container = create1();
-            media = m_activePlayers[0]->mediaWidget()->media();
+            player = m_activePlayers[0];
+            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2:
@@ -100,7 +103,7 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(media, container, toolbar);
+    emit updateContainerRequest(player, media, container, toolbar);
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -112,10 +115,12 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
 
     QWidget* container = nullptr;
     Media* media = nullptr;
+    PlayerWidget* player = nullptr;
     switch (pathCount){
         case 1: 
             container = create1(filesPaths);
-            media = m_activePlayers[0]->mediaWidget()->media();
+            player = m_activePlayers[0];
+            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2: 
@@ -134,7 +139,7 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(media, container, toolbar);
+    emit updateContainerRequest(player, media, container, toolbar);
 
 }
 
@@ -355,6 +360,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableLoopModeRequest, activePlayer, &PlayerWidget::enableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::disableLoopModeRequest, activePlayer, &PlayerWidget::disableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
+    connect(advancedToolbar, &AdvancedToolbar::moveTimeBackwardRequested, activePlayer, &PlayerWidget::moveTimeBackward);
+    connect(advancedToolbar, &AdvancedToolbar::moveTimeForwardRequested, activePlayer, &PlayerWidget::moveTimeForward);
     connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &PlayerLayoutManager::previousMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);
@@ -367,7 +374,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     });
 
     connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
-    connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
+    connect(activePlayer, &PlayerWidget::vlcTimeChanged, advancedToolbar, &AdvancedToolbar::updateSliderValue);
     connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
 
     connect(activePlayer, &PlayerWidget::playUiUpdateRequested, advancedToolbar, &SimpleToolbar::playUiUpdate);
@@ -427,7 +434,7 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
             player->setTime(currentTime);
 
             // dès que le slider bouge (le chargement est de setTime est fini car vlc a detecté timeChanged), on met en pause 
-            connect(player, &PlayerWidget::updateSliderValueRequest, player, [player](int64_t) {
+            connect(player, &PlayerWidget::vlcTimeChanged, player, [player](int64_t) {
                 player->pause(); 
             }, Qt::SingleShotConnection); 
 

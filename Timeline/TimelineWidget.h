@@ -3,11 +3,16 @@
 
 #include "Shot.h"
 
-#include "RulerItem.h"
-#include "CursorItem.h"
-#include "ShotItem.h"
-#include "TimelineView.h"
-#include "ABMarkerItem.h"
+
+#include "Timeline/TimelineView.h"
+#include "Timeline/TimelineMath.h"
+#include "Timeline/ShotManager.h"
+#include "Timeline/ABManager.h"
+
+#include "Timeline/Items/ABMarkerItem.h"
+#include "Timeline/Items/RulerItem.h"
+#include "Timeline/Items/CursorItem.h"
+#include "Timeline/Items/ShotItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -17,12 +22,7 @@
 #include <QVBoxLayout>
 #include <QVector>
 #include <QPoint>
-
-struct ABLoopData{
-    int64_t aTime;
-    double aXPos;
-    int64_t bTime;
-};
+#include <QTimer>
 
 class TimelineWidget : public QWidget
 {
@@ -33,34 +33,34 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
-    double timeToPosition(int64_t time);
+    void updateCursorVisually(int sliderValue);
     void goToShot(int);
+    void mergeWithPrevShotAction();
+    void mergeWithNextShotAction();
 
 signals:
-    void updateShotDetailRequested(int shotCount, int shotId, Shot*);
+    void updateShotDetailRequest(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
-    void enableSliderRequested();
-    void disableSliderRequested();
+    void timelineSliderPositionRequested(int64_t);
+    void enableTimeRelatedUI();
+    void disableTimeRelatedUI();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void splitCurrentShotItem();
+    void splitShotAtCursor();
+    void ABAction();
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
+    void updateShowMergeWithNextShot(bool);
+    void updateShowMergeWithPreviousShot(bool);
 
 private:
     void applyZoom(double zoomFactor, int mouseX);
-    int64_t timeAtCursor();
-    void updateCurrentShot();
-    void updateShotItems();
+    
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
-
-    void ABAction();
-    std::optional<ABLoopData> getABLoopData();
-    void updateMarkerPos();
 
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
@@ -68,26 +68,30 @@ private:
 
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
-    QVector<ShotItem*> m_shotItems;
-    ShotItem* m_currentShotItem = nullptr;
 
-    QVector<ABMarkerItem*> m_abMarkersItems;
+    TimelineMath* m_mathManager = nullptr;
+    ShotManager* m_shotManager = nullptr;
+    ABManager* m_abManager = nullptr;
 
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
+    ToolbarButton* m_mergeWithPrevShotBtn = nullptr;
+    bool m_showMergeWithPrevShotBtn = false;
+    ToolbarButton* m_mergeWithNextShotBtn = nullptr;
+    bool m_showMergeWithNextShotBtn = false;
 
-    double m_fps{};
-    int64_t m_duration{};
+    QTimer* m_seekTimer = nullptr;
+    int m_seekPendingTime = 50;
+    bool m_isDraggingCursor = false;
+
     int64_t m_vlcTime{};
+
+    double m_minPxBetweenTicks = 100.0;
 
     int m_sceneWidth = 10000;
     int m_sceneHeight = 150;
-    double m_pixelsPerMs {};
 
     int m_rulerHeight = 25;
-    double m_minPxBetweenTicks = 100.0;
-
-
 
 
 };

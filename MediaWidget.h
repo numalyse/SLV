@@ -35,6 +35,8 @@ public slots:
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
     void setTime(int64_t);
+    void moveTimeBackward();
+    void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
     void hideMedia();
@@ -70,7 +72,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 signals:
-    void updateSliderValueRequested(int64_t newTime);
+    void vlcTimeChanged(int64_t newTime);
     void activated(MediaWidget* self);
     void updateSliderRangeRequested(int64_t mediaDuration);
     void updateFpsRequested(double fps);

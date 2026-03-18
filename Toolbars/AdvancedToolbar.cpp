@@ -11,6 +11,7 @@
 #include "AdvancedToolbar.h"
 
 #include "ProjectManager.h"
+#include <TimeFormatter.h>
 
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
@@ -21,9 +22,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
         "minus_white",
-        TextManager::instance().get("tooltip_expand_toolbar"),
+        TextManager::instance().get("tooltip_minimize_toolbar"),
         "plus_white",
-        TextManager::instance().get("tooltip_minimize_toolbar")
+        TextManager::instance().get("tooltip_expand_toolbar")
     );
 
     m_extensionToolbar = new ExtensionToolbar(this);
@@ -45,6 +46,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
     connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
+
+    connect(m_extensionToolbar, &ExtensionToolbar::moveTimeBackwardRequested, this, &AdvancedToolbar::moveTimeBackwardRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::moveTimeForwardRequested, this, &AdvancedToolbar::moveTimeForwardRequested);
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);
@@ -226,8 +230,27 @@ void AdvancedToolbar::disableButtons()
 
 void AdvancedToolbar::enableSlider(){
     m_slider->setDisabled(false);
+    m_slider->setToolTip("");
 }
 
 void AdvancedToolbar::disableSlider(){
     m_slider->setDisabled(true);
+    m_slider->setToolTip(TextManager::instance().get("tooltip_slider_disabled"));
+}
+
+void AdvancedToolbar::onSliderPressed() {
+    SimpleToolbar::onSliderPressed(); 
+}
+
+void AdvancedToolbar::onSliderReleased() {
+    SimpleToolbar::onSliderReleased(); 
+
+    emit toolbarCursorPositionRequested(m_slider->value()); 
+}
+
+void AdvancedToolbar::onSliderMoved(int value) {
+    SimpleToolbar::onSliderMoved(value); 
+
+    emit toolbarCursorPositionRequested(value);
+
 }

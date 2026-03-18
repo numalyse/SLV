@@ -17,6 +17,7 @@ Q_OBJECT
 public:
     explicit ShotDetail(QWidget* parent = nullptr);
     void updateShotDetail(int shotCount, int shotId, Shot *shotData);
+    void toggleShotControlButtons(bool);
 
 signals:
     void goToShotRequested(int id);
@@ -27,6 +28,7 @@ private:
     QVBoxLayout* m_layout = nullptr;
     Shot* m_shotData = nullptr;
     int m_shotId = -1;
+    bool m_buttonDisabled = false;
 
     FormLineEditWidget* m_shotIdForm = nullptr;
     FormLineEditWidget* m_shotTitle = nullptr;

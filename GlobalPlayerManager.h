@@ -5,7 +5,8 @@
 #include "PlayerLayoutManager.h"
 #include "NavPanel.h"
 #include "Media.h"
-#include "TimelineWidget.h"
+#include "Timeline/TimelineWidget.h"
+#include "PlayerWidget.h"
 
 #include <QWidget>
 
@@ -22,6 +23,7 @@ private:
     Toolbar* m_toolbarWidget = nullptr;
     NavPanel* m_navPanel = nullptr;
     TimelineWidget* m_timeline = nullptr;
+    PlayerWidget* m_player = nullptr;
     QVBoxLayout* layout;
 
 public slots:
@@ -34,7 +36,7 @@ public slots:
     void enableSegmentation();
     void disableSegmentation();
 
-    void updateContainer(Media*, QWidget*, Toolbar*);
+    void updateContainer(PlayerWidget*, Media*, QWidget*, Toolbar*);
     void openNavPanel();
     void closeNavPanel();
 

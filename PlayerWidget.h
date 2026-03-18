@@ -39,6 +39,8 @@ public slots:
     void takeScreenshot();
     void setSpeed(const unsigned int &speed);
     void setTime(int64_t time);
+    void moveTimeBackward();
+    void moveTimeForward();
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
@@ -54,7 +56,7 @@ signals:
     void enablePlayerFullscreenRequested(PlayerWidget* self);
     void disablePlayerFullscreenRequested(PlayerWidget* self);
     void updateSliderRangeRequest(int64_t);
-    void updateSliderValueRequest(int64_t);
+    void vlcTimeChanged(int64_t);
     void updateFpsRequested(float);
     void setPlayUIRequested();
     void setPauseUIRequested();
@@ -73,6 +75,13 @@ signals:
 
     void mediaPlayerLoaded();
     void mediaPlayerEjected();
+
+    void mediaDropped(const QStringList&);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 
 private:
     double m_media_fps {};

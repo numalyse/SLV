@@ -99,4 +99,8 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 
 }
 
-
+void ShotDetail::toggleShotControlButtons(bool state)
+{
+    m_toNextShotBtn->setEnabled(state);
+    m_toPrevShotBtn->setEnabled(state);
+}

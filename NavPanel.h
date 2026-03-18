@@ -33,6 +33,8 @@ public slots:
     void displayShotDetail();
     void displayPlaylist();
     void timelineWidgetUpdateShotDetail(int, int, Shot*);
+    void disableShotControlButtons();
+    void enableShotControlButtons();
 
 signals:
     void openMediaFileRequested(const QString &filePath);

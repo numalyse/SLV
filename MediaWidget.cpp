@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QMap>
 #include <QPainter>
+#include <QDebug>
 
 
 MediaWidget::MediaWidget(QWidget *parent)
@@ -201,6 +202,20 @@ void MediaWidget::setTime(int64_t time)
     libvlc_media_player_set_time(m_player, time);
 }
 
+void MediaWidget::moveTimeBackward()
+{
+    int64_t time = -5000;
+    int64_t currentTime = libvlc_media_player_get_time(m_player);
+    setTime(currentTime + time);
+}
+
+void MediaWidget::moveTimeForward()
+{
+    int64_t time = 5000;
+    int64_t currentTime = libvlc_media_player_get_time(m_player);
+    setTime(currentTime + time);
+}
+
 void MediaWidget::enableLoopMode()
 {
     m_loopActivated = true;
@@ -247,7 +262,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {
-        emit mediaWidget->updateSliderValueRequested(event->u.media_player_time_changed.new_time);
+        emit mediaWidget->vlcTimeChanged(event->u.media_player_time_changed.new_time);
     }
     else if(event->type == libvlc_MediaPlayerEndReached){
 

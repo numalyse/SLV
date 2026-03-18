@@ -39,28 +39,6 @@ public:
     void resetSlider();
     void stopSlider();
 
-protected:
-    QSlider* m_slider = nullptr;
-    bool m_draggingSlider = false;
-    double m_media_fps {};
-    QTimer* m_seekTimer = nullptr;
-    QLabel* m_currentTimeLabel = nullptr;
-    QLabel* m_durationLabel = nullptr;
-    QLabel* m_nameLabel = nullptr;
-    bool m_discardVlcUiUpdates = false;
-
-    QSlider* m_volumeSlider = nullptr;
-    QLabel* m_volumeLabel = nullptr;
-    ToolbarToggleHoverButton* m_speedBtn = nullptr;
-    QLabel* m_speedLabel = nullptr;
-    ToolbarToggleButton* m_loopBtn = nullptr;
-    ToolbarButton* m_removePlayerBtn = nullptr;
-    ToolbarButton* m_duplicatePlayerBtn = nullptr;
-    ToolbarPopupButton* m_langBtn = nullptr;
-
-    // ToolbarButton* m_slowDownBtn
-    // ToolbarButton* m_speedUpBtn;
-
 public slots:
     void updateSliderRange(int64_t);
     void updateSliderValue(int64_t);
@@ -82,6 +60,32 @@ public slots:
     void enableButtons();
     void disableButtons();
 
+protected:
+    QSlider* m_slider = nullptr;
+    bool m_draggingSlider = false;
+    double m_media_fps {};
+    QTimer* m_seekTimer = nullptr;
+    int m_seekPendingTime = 50;
+    QLabel* m_currentTimeLabel = nullptr;
+    QLabel* m_durationLabel = nullptr;
+    QLabel* m_nameLabel = nullptr;
+    bool m_discardVlcUiUpdates = false;
+
+    QSlider* m_volumeSlider = nullptr;
+    QLabel* m_volumeLabel = nullptr;
+    ToolbarToggleHoverButton* m_speedBtn = nullptr;
+    QLabel* m_speedLabel = nullptr;
+    ToolbarToggleButton* m_loopBtn = nullptr;
+    ToolbarButton* m_removePlayerBtn = nullptr;
+    ToolbarButton* m_duplicatePlayerBtn = nullptr;
+    ToolbarPopupButton* m_langBtn = nullptr;
+
+
+protected slots: 
+    virtual void onSliderPressed();
+    virtual void onSliderReleased();
+    virtual void onSliderMoved(int value);
+
 signals:
     void setPositionRequested(int64_t);
     void removePlayerRequest();
@@ -93,7 +97,7 @@ signals:
     void disableLoopModeRequest();
     void duplicatePlayerRequested();
     void setCursorPositionRequested(int64_t);
-    void simpleToolbarUpdateCursorPosition(int);
+    
 };
 
 #endif

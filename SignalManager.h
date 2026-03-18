@@ -46,6 +46,7 @@ signals:
     void formLineEditPlay();
     void formLineEditPause();
     void newArrangementRequested(const PlayerLayoutArrangement&);
+    void playerWidgetMediaDropped(const QStringList&);
 };
 
 

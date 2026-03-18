@@ -31,8 +31,8 @@ public:
     void updateMarkersPosition();
 
 signals:
-    void enableSliderRequested();
-    void disableSliderRequested();
+    void ABLoopOff();
+    void ABLoopOn();
 
 private:
     QVector<ABMarkerItem*> m_abMarkersItems;

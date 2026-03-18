@@ -55,8 +55,8 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
-    connect(m_abManager, &ABManager::disableSliderRequested, this, &TimelineWidget::disableSliderRequest);
-    connect(m_abManager, &ABManager::enableSliderRequested, this, &TimelineWidget::enableSliderRequest);
+    connect(m_abManager, &ABManager::ABLoopOn, this, &TimelineWidget::disableTimeRelatedUI);
+    connect(m_abManager, &ABManager::ABLoopOff, this, &TimelineWidget::enableTimeRelatedUI);
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
@@ -306,8 +306,10 @@ void TimelineWidget::updateCursorVisually(int sliderValue) {
 }
 
 void TimelineWidget::goToShot(int idShot){
-    auto posX = m_shotManager->getStartXOf(idShot);
-    if(posX.has_value())  moveCursor( posX.value() ); 
+    auto timeStart = m_shotManager->getStartTimeOf(idShot);
+    if(timeStart.has_value()){
+        emit timelineSetPosition(timeStart.value());
+    }
 }
 
 

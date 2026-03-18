@@ -42,7 +42,7 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight){
             marker = nullptr;
         }
         m_abMarkersItems.clear();
-        emit enableSliderRequested();
+        emit ABLoopOff();
         break;
     }
     case 1 :{
@@ -56,7 +56,7 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight){
 
         newMarker->setX(p_mathManager->timeToPos(time));
         p_scene->addItem(newMarker);
-        emit disableSliderRequested();
+        emit ABLoopOn();
         break;
     }
     case 0 :{

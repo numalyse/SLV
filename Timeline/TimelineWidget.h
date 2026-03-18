@@ -42,8 +42,8 @@ signals:
     void updateShotDetailRequest(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
     void timelineSliderPositionRequested(int64_t);
-    void enableSliderRequest();
-    void disableSliderRequest();
+    void enableTimeRelatedUI();
+    void disableTimeRelatedUI();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;

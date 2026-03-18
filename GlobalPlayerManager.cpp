@@ -191,11 +191,13 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 
     connect(m_timeline, &TimelineWidget::updateShotDetailRequest, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+    connect(m_timeline, &TimelineWidget::disableTimeRelatedUI, m_navPanel, &NavPanel::disableShotControlButtons );
+    connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, m_navPanel, &NavPanel::enableShotControlButtons );
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
 
     connect(m_timeline, &TimelineWidget::timelineSliderPositionRequested, toolbar, &SimpleToolbar::updateSliderValue );
-    connect(m_timeline, &TimelineWidget::disableSliderRequest, toolbar, &AdvancedToolbar::disableSlider );
-    connect(m_timeline, &TimelineWidget::enableSliderRequest, toolbar, &AdvancedToolbar::enableSlider );
+    connect(m_timeline, &TimelineWidget::disableTimeRelatedUI, toolbar, &AdvancedToolbar::disableSlider );
+    connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, toolbar, &AdvancedToolbar::enableSlider );
 
     connect(toolbar, &AdvancedToolbar::toolbarCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorVisually);
 

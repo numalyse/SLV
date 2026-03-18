@@ -27,6 +27,8 @@ public:
 
     std::optional<double> getStartXOf(int idShot);
 
+    std::optional<int64_t> getStartTimeOf(int idShot);
+
 signals:
     void updateShotDetailRequested(int shotCount, int shotId, Shot*);
     void showMergeWithPreviousShotAction(bool);

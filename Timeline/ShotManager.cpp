@@ -177,9 +177,14 @@ void ShotManager::updateShotItemsPosition(){
     p_scene->update();
 }
 
-
 std::optional<double> ShotManager::getStartXOf(int idShot){
     if(idShot < 0 || idShot >= m_shotItems.size() ) return {};
 
     return p_mathManager->timeToPos(m_shotItems[idShot]->shot().start); 
+}
+
+std::optional<int64_t> ShotManager::getStartTimeOf(int idShot){
+    if(idShot < 0 || idShot >= m_shotItems.size() ) return {};
+
+    return m_shotItems[idShot]->shot().start; 
 }

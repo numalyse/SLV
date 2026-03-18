@@ -247,9 +247,18 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 {
     QMenu menu;
     QAction *actionSplit = menu.addAction(TextManager::instance().get("timeline_split_shot_at_cursor"));
+    QAction *mergeWithPreviousShot = nullptr;
+    QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
+    QAction *deleteABMarkers = nullptr;
     QAction *actionExtractAB = nullptr;
-    // ajouter une action pour supprimer le marqueur seul
+
+    if(m_showMergeWithPrevShotBtn){
+        mergeWithPreviousShot = menu.addAction(TextManager::instance().get("timeline_merge_with_previous_shot"));
+    }
+    if(m_showMergeWithNextShotBtn){
+        mergeWithNextShot = menu.addAction(TextManager::instance().get("timeline_merge_with_next_shot"));
+    }
 
     switch (m_abManager->getMarkerCount())
     {
@@ -258,11 +267,11 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         break;
     case 1:
         actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_1"));
-        // ajouter une action pour supprimer le marqueur seul
+        deleteABMarkers = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
         break;
     case 2:
         actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
-        actionExtractAB = menu.addAction(TextManager::instance().get("timeline_ab_extract"));
+        actionExtractAB = menu.addAction(TextManager::instance().get("timeline_ab_extraxt"));
         break;
     }
 
@@ -270,10 +279,16 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 
     if (selectedAction == actionSplit) {
         splitShotAtCursor();
-    }else if (selectedAction == actionAB){
+    } else if (selectedAction == actionAB){
         ABAction();
-    }else if (selectedAction == actionExtractAB){
+    } else if (selectedAction == deleteABMarkers) {
+        m_abManager->deleteMarkers();
+    } else if (selectedAction == actionExtractAB){
         qDebug() << "Extract ab segment";
+    } else if (selectedAction == mergeWithPreviousShot){
+        mergeWithPrevShotAction();
+    } else if(selectedAction == mergeWithNextShot){
+        mergeWithNextShotAction();
     }
 }
 

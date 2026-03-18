@@ -56,6 +56,8 @@
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
     "timeline_ab_action_2": "Supprimer les marqueurs",
     "timeline_ab_extraxt": "Extraire la séquence AB",
+    "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
+    "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
     
     "shot_detail_id_name" : "Numéro du plan",
     "shot_detail_title_name" : "Titre",

@@ -122,6 +122,8 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     item->shot().start = (m_currentShotItem->shot().start > item->shot().start) ? item->shot().start: m_currentShotItem->shot().start ;
     item->shot().end = (m_currentShotItem->shot().end > item->shot().end) ? m_currentShotItem->shot().end : item->shot().end ;
 
+    // TODO : dialog pour choisir quel titre / note garder 
+
     p_scene->removeItem(m_currentShotItem);
     m_shotItems.removeOne(m_currentShotItem);
     m_currentShotItem = nullptr;

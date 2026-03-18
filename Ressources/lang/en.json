@@ -56,6 +56,8 @@
     "timeline_ab_action_1": "Add marker B at cursor",
     "timeline_ab_action_2": "Remove markers",
     "timeline_ab_extraxt": "Extract AB sequence",
+    "timeline_merge_with_previous_shot" : "Merge the current shot with the previous shot", 
+    "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
 
     "shot_detail_id_name" : "Shot numbering",
     "shot_detail_title_name" : "Title",

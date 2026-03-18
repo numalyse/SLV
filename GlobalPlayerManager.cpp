@@ -194,6 +194,9 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
 
     connect(m_timeline, &TimelineWidget::timelineSliderPositionRequested, toolbar, &SimpleToolbar::updateSliderValue );
+    connect(m_timeline, &TimelineWidget::disableSliderRequest, toolbar, &AdvancedToolbar::disableSlider );
+    connect(m_timeline, &TimelineWidget::enableSliderRequest, toolbar, &AdvancedToolbar::enableSlider );
+
     connect(toolbar, &AdvancedToolbar::toolbarCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorVisually);
 
     layout->addWidget(m_timeline);

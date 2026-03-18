@@ -54,6 +54,8 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
+    connect(m_abManager, &ABManager::disableSliderRequested, this, &TimelineWidget::disableSliderRequest);
+    connect(m_abManager, &ABManager::enableSliderRequested, this, &TimelineWidget::enableSliderRequest);
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout(this);
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 

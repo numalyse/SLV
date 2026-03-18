@@ -28,6 +28,7 @@ private:
     QVBoxLayout* m_layout = nullptr;
     Shot* m_shotData = nullptr;
     int m_shotId = -1;
+    bool m_buttonDisabled = false;
 
     FormLineEditWidget* m_shotIdForm = nullptr;
     FormLineEditWidget* m_shotTitle = nullptr;

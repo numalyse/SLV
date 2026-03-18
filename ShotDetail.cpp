@@ -87,13 +87,13 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     m_duration->setText(TimeFormatter::msToHHMMSSFF(duration, fps));
     m_notes->setText(shotData->note);
 
-    m_toNextShotBtn->show();
-    m_toPrevShotBtn->show();
-    if(shotId == 0){
-        m_toPrevShotBtn->hide();
+    m_toNextShotBtn->setEnabled(true);
+    m_toPrevShotBtn->setEnabled(true);
+    if(shotId == 0 || m_buttonDisabled){
+        m_toPrevShotBtn->setEnabled(false);
     }
-    if(shotId == shotCount-1){
-        m_toNextShotBtn->hide();
+    if(shotId == shotCount-1 || m_buttonDisabled){
+        m_toNextShotBtn->setEnabled(false);
     }
 
 
@@ -101,6 +101,7 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 
 void ShotDetail::toggleShotControlButtons(bool state)
 {
+    m_buttonDisabled = !state;
     m_toNextShotBtn->setEnabled(state);
     m_toPrevShotBtn->setEnabled(state);
 }

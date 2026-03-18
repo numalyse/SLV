@@ -247,7 +247,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {
-        emit mediaWidget->updateSliderValueRequested(event->u.media_player_time_changed.new_time);
+        emit mediaWidget->vlcTimeChanged(event->u.media_player_time_changed.new_time);
     }
     else if(event->type == libvlc_MediaPlayerEndReached){
 

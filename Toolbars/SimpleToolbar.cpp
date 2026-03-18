@@ -27,24 +27,11 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_seekTimer = new QTimer(this);
     m_seekTimer->setSingleShot(true);
 
-    connect(m_slider, &QSlider::sliderPressed, this, [this]() {
-        m_draggingSlider = true;
-        m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
-        emit setPositionRequested(m_slider->value());
-        emit simpleToolbarUpdateCursorPosition(m_slider->value());
-    });
+    connect(m_slider, &QSlider::sliderPressed, this, &SimpleToolbar::onSliderPressed);
 
-    connect(this, &SimpleToolbar::simpleToolbarUpdateCursorPosition, &SignalManager::instance(), &SignalManager::simpleToolbarUpdateCursorPosition);
+    connect(m_slider, &QSlider::sliderReleased, this, &SimpleToolbar::onSliderReleased);
 
-    connect(m_slider, &QSlider::sliderReleased, this, [this]() {
-        m_draggingSlider = false;
-    });
-
-    connect(m_slider, &QSlider::sliderMoved, this, [this](){
-        m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
-        emit simpleToolbarUpdateCursorPosition(m_slider->value());
-        m_seekTimer->start(50);
-    });
+    connect(m_slider, &QSlider::sliderMoved, this, &SimpleToolbar::onSliderMoved);
 
     connect(m_seekTimer, &QTimer::timeout, this, [this](){
         emit setPositionRequested(m_slider->value());
@@ -231,8 +218,6 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
     m_slider->setValue(currentTime);
     m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
 
-    emit setCursorPositionRequested(currentTime);
-
 }
 
 void SimpleToolbar::updateFps(double newFps){
@@ -335,4 +320,23 @@ void SimpleToolbar::disableButtons()
     // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
+}
+
+
+void SimpleToolbar::onSliderPressed() {
+    m_draggingSlider = true;
+    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
+}
+
+void SimpleToolbar::onSliderReleased() {
+    m_draggingSlider = false;
+    m_seekTimer->stop(); 
+    emit setPositionRequested(m_slider->value()); 
+}
+
+void SimpleToolbar::onSliderMoved(int value) {
+    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(value, m_media_fps));
+    if (!m_seekTimer->isActive()) {
+        m_seekTimer->start(m_seekPendingTime);
+    }
 }

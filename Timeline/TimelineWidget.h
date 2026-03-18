@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QVector>
 #include <QPoint>
+#include <QTimer>
 
 class TimelineWidget : public QWidget
 {
@@ -32,11 +33,13 @@ public:
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
+    void updateCursorVisually(int sliderValue);
     void goToShot(int);
 
 signals:
     void updateShotDetailRequest(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
+    void timelineSliderPositionRequested(int64_t);
     void enableSliderRequested();
     void disableSliderRequested();
     
@@ -68,6 +71,10 @@ private:
 
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
+
+    QTimer* m_seekTimer = nullptr;
+    int m_seekPendingTime = 50;
+    bool m_isDraggingCursor = false;
 
     int64_t m_vlcTime{};
 

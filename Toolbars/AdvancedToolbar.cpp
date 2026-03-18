@@ -233,17 +233,19 @@ void AdvancedToolbar::disableSlider(){
     m_slider->setDisabled(true);
 }
 
-void AdvancedToolbar::timelineUpdateSliderValue(int64_t currentTime){
-    
-    if( m_draggingSlider || m_discardVlcUiUpdates) return;
+void AdvancedToolbar::onSliderPressed() {
+    SimpleToolbar::onSliderPressed(); 
+}
 
-    Q_ASSERT(currentTime < static_cast<int64_t>(std::numeric_limits<int>::max()));
+void AdvancedToolbar::onSliderReleased() {
+    SimpleToolbar::onSliderReleased(); 
 
-    if (currentTime >= static_cast<int64_t>(std::numeric_limits<int>::max()))
-    {
-        m_slider->setValue(static_cast<int64_t>(std::numeric_limits<int>::max()));
-    }
+    emit toolbarCursorPositionRequested(m_slider->value()); 
+}
 
-    m_slider->setValue(currentTime);
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
+void AdvancedToolbar::onSliderMoved(int value) {
+    SimpleToolbar::onSliderMoved(value); 
+
+    emit toolbarCursorPositionRequested(value);
+
 }

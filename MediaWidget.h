@@ -70,7 +70,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 signals:
-    void updateSliderValueRequested(int64_t newTime);
+    void vlcTimeChanged(int64_t newTime);
     void activated(MediaWidget* self);
     void updateSliderRangeRequested(int64_t mediaDuration);
     void updateFpsRequested(double fps);

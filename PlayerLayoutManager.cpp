@@ -318,7 +318,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     });
 
     connect(activePlayer, &PlayerWidget::updateSliderRangeRequest, advancedToolbar, &AdvancedToolbar::updateSliderRange);
-    connect(activePlayer, &PlayerWidget::updateSliderValueRequest, advancedToolbar, &AdvancedToolbar::updateSliderValue);
+    connect(activePlayer, &PlayerWidget::vlcTimeChanged, advancedToolbar, &AdvancedToolbar::updateSliderValue);
     connect(activePlayer, &PlayerWidget::updateFpsRequested, advancedToolbar, &SimpleToolbar::updateFps);
 
     connect(activePlayer, &PlayerWidget::playUiUpdateRequested, advancedToolbar, &SimpleToolbar::playUiUpdate);
@@ -378,7 +378,7 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
             player->setTime(currentTime);
 
             // dès que le slider bouge (le chargement est de setTime est fini car vlc a detecté timeChanged), on met en pause 
-            connect(player, &PlayerWidget::updateSliderValueRequest, player, [player](int64_t) {
+            connect(player, &PlayerWidget::vlcTimeChanged, player, [player](int64_t) {
                 player->pause(); 
             }, Qt::SingleShotConnection); 
 

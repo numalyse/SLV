@@ -18,6 +18,7 @@ signals:
     void cursorPositionRequested(double);
     void itemLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
+    void isDragging(bool);
     
 protected:
     void wheelEvent(QWheelEvent *event) override;

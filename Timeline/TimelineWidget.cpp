@@ -20,8 +20,9 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QAction>
-
+#include <QTimer>
 #include <algorithm> 
+
 
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots 
@@ -38,6 +39,13 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
         qDebug() << "Creation timeline : Fps ou durée du film = 0";
         return;
     }
+
+    m_seekTimer = new QTimer(this);
+    m_seekTimer->setSingleShot(true);
+
+    connect(m_seekTimer, &QTimer::timeout, this, [this](){
+        emit timelineSetPosition(m_vlcTime);
+    });
 
     m_scene = new QGraphicsScene(this);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
@@ -73,6 +81,9 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
+    connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
+        m_isDraggingCursor = dragState;
+    });
 
     layout->addWidget(m_view);
 
@@ -183,7 +194,13 @@ void TimelineWidget::moveCursor(double newCursorPosX){
 
     m_vlcTime = m_mathManager->posToTimeSnapped(newCursorPosX);
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
-    emit timelineSetPosition(m_vlcTime);
+
+    emit timelineSliderPositionRequested(m_vlcTime); // visual update for slider
+
+    if( ! m_seekTimer->isActive() ){ // limite les appeles à setTime VLC
+        m_seekTimer->start(m_seekPendingTime);
+    }
+
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
@@ -247,6 +264,9 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 /// @brief Reçoit le temps vlc et met à jour la position en conséquence
 /// @param vlcTime 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
+
+    if(m_isDraggingCursor) return;
+
     auto restartTime = m_abManager->getLoopRestartTime(vlcTime);
 
     if(restartTime.has_value()){ // si on a une value, on a dépassé le marqueur B, on revient a A
@@ -259,6 +279,12 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
 
     m_cursor->setX(m_mathManager->timeToPos(m_vlcTime));
     m_shotManager->updateCurrentShot(m_vlcTime);
+}
+
+
+void TimelineWidget::updateCursorVisually(int sliderValue) {
+    m_cursor->setX(m_mathManager->timeToPos(sliderValue));
+    m_shotManager->updateCurrentShot(sliderValue);
 }
 
 void TimelineWidget::goToShot(int idShot){
@@ -278,3 +304,4 @@ void TimelineWidget::splitShotAtCursor() {
     int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->splitShotAt(cutTime);
 }
+

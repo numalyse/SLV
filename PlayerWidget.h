@@ -54,7 +54,7 @@ signals:
     void enablePlayerFullscreenRequested(PlayerWidget* self);
     void disablePlayerFullscreenRequested(PlayerWidget* self);
     void updateSliderRangeRequest(int64_t);
-    void updateSliderValueRequest(int64_t);
+    void vlcTimeChanged(int64_t);
     void updateFpsRequested(float);
     void setPlayUIRequested();
     void setPauseUIRequested();

@@ -34,6 +34,7 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             } 
         } else {
             m_isDragging = true;
+            emit isDragging(true);
             double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
             emit cursorPositionRequested(clickPosition);
         }
@@ -60,6 +61,7 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
 
 void TimelineView::mouseReleaseEvent(QMouseEvent *event)
 {
+    emit isDragging(false);
     m_isDragging = false;
     if (m_isPanning) {
         m_isPanning = false;

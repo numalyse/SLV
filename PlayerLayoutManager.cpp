@@ -320,14 +320,13 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
         connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
-        connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
-        connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerLoaded, globalToolbar, &GlobalToolbar::enableButtons);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerEjected, this, &PlayerLayoutManager::disableGlobalToolbarButtons);
-        connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
-
     }
 
+    connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
+    connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
+    connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
     globalToolbar->playPauseBtn()->setButtonState(newGlobalPlayState());
 

@@ -285,6 +285,11 @@ void PlayerWidget::endRecord()
     m_mediaWidget->endRecord();
 }
 
+void PlayerWidget::rotate()
+{
+    m_mediaWidget->rotate();
+}
+
 void PlayerWidget::enableButtons()
 {
     m_toolBar->enableButtons();

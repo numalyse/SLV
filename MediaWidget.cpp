@@ -257,6 +257,34 @@ void MediaWidget::endRecord()
     int endRecordTime = libvlc_media_player_get_time(m_player);
 }
 
+void MediaWidget::rotate()
+{
+    qDebug() << "bjr test !";
+    if(!m_player || !m_media) return;
+    float pos = libvlc_media_player_get_position(m_player);
+
+    libvlc_media_t* media = libvlc_media_new_path(
+        SLV::VlcInstance::get(),
+        QUrl::fromLocalFile(m_media->filePath())
+            .toString(QUrl::FullyEncoded)
+            .toUtf8()
+            .constData()
+    );
+
+    libvlc_media_add_option(media, ":video-filter=transform");
+    libvlc_media_add_option(media, ":transform-type=90");
+
+    libvlc_media_player_set_media(m_player, media);
+    libvlc_media_player_play(m_player);
+
+    QTimer::singleShot(100, [this, pos]() {
+        libvlc_media_player_set_position(m_player, pos);
+    });
+
+    libvlc_media_release(media);
+
+}
+
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
 /// @param event 
 /// @param userData 

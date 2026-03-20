@@ -362,6 +362,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
     connect(advancedToolbar, &AdvancedToolbar::moveTimeBackwardRequested, activePlayer, &PlayerWidget::moveTimeBackward);
     connect(advancedToolbar, &AdvancedToolbar::moveTimeForwardRequested, activePlayer, &PlayerWidget::moveTimeForward);
+    connect(advancedToolbar, &AdvancedToolbar::rotateRequested, activePlayer, &PlayerWidget::rotate);
     connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &PlayerLayoutManager::previousMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);

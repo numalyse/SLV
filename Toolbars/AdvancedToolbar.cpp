@@ -21,9 +21,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
-        "minus_white",
+        "down_arrow_white",
         TextManager::instance().get("tooltip_minimize_toolbar"),
-        "plus_white",
+        "right_arrow_white",
         TextManager::instance().get("tooltip_expand_toolbar")
     );
 

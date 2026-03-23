@@ -48,7 +48,7 @@ public:
 
     void openProject();
 
-    bool saveProject(bool ejectMedia);
+    void saveProject(bool ejectMedia);
 
     void setTimeline(TimelineWidget* tl) { p_timeline = tl;}
 

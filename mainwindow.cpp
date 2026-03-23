@@ -4,6 +4,7 @@
 #include "ProjectManager.h"
 #include "PlayerWidget.h"
 #include "TextManager.h"
+#include "GenericDialog.h"
 
 #include <qtoolbar.h>
 #include <vlc/vlc.h>
@@ -84,7 +85,7 @@ void MainWindow::createMenuBar()
     auto *fileMenu = menuBar()->addMenu("&Fichier");
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
     auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
-    connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaFile);
+    connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
     connect(openProjectAction, &QAction::triggered, &ProjectManager::instance(), &ProjectManager::openProject);
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
@@ -127,9 +128,38 @@ void MainWindow::createToolBar()
     addToolBar(m_toolbarQt);
 }
 
-void MainWindow::openMediaFile()
+void MainWindow::openMediaAction()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    TextManager& txtManager = TextManager::instance();
+
+    if(projManager.projet()){
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            
+            [this, &projManager]() { 
+                projManager.saveProject(false); 
+                this->selectAndLoadMediaFiles(); 
+            },
+            
+            [this]() { 
+                this->selectAndLoadMediaFiles(); 
+            },
+            
+            []() { return; }
+        );
+    } else {
+        selectAndLoadMediaFiles();
+    }
+
+}
+
+void MainWindow::selectAndLoadMediaFiles()
 {
     QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";
         return;
@@ -138,13 +168,14 @@ void MainWindow::openMediaFile()
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }
+    
     qDebug() << "Fichiers sélectionnés : " << files_paths;
-    for(size_t IFilePath = 0; IFilePath < files_paths.size(); ++IFilePath){
-        qDebug() << files_paths.at(IFilePath);
+    for(const QString& path : files_paths){
+        qDebug() << path;
     }
+    
     ProjectManager::instance().requestProjectCreation(files_paths);
     m_globalPlayerManager->setPlayersFromPaths(files_paths);
-
 }
 
 MainWindow::~MainWindow()
@@ -152,6 +183,8 @@ MainWindow::~MainWindow()
     delete ui;
 
 }
+
+
 
 void MainWindow::enableFullscreenMain()
 {

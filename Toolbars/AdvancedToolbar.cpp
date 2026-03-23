@@ -3,6 +3,8 @@
 #include "TextManager.h"
 #include "ProjectManager.h"
 
+#include "GenericDialog.h"
+
 #include "Toolbars/ExtensionToolbar.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
@@ -264,25 +266,22 @@ void AdvancedToolbar::ejectRequested(){
 
         TextManager& txtManager = TextManager::instance();
 
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Question);
-        msgBox.setWindowTitle(txtManager.get("dialog_save_project_dialog_title"));
-        msgBox.setText(txtManager.get("dialog_save_project_dialog_text"));
-
-        QPushButton *yesBtn = msgBox.addButton(txtManager.get("dialog_btn_yes"), QMessageBox::YesRole);
-        QPushButton *noBtn = msgBox.addButton(txtManager.get("dialog_btn_no"), QMessageBox::NoRole);
-        QPushButton *cancelBtn = msgBox.addButton(txtManager.get("dialog_btn_cancel"), QMessageBox::RejectRole);
-
-        msgBox.exec();
-
-        if (msgBox.clickedButton() == yesBtn) {
-            projManager.saveProject(true);
-        } else if (msgBox.clickedButton() == noBtn) {
-            projManager.deleteProject();
-            emit ejectRequest(); 
-        } else {
-            return;
-        }
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            [&projManager]() { 
+                projManager.saveProject(true); 
+            },
+            [&projManager, this]() { 
+                projManager.deleteProject();
+                emit this->ejectRequest(); 
+            },
+            []() {
+                return; 
+            }
+        );
+        
     }else {
         emit ejectRequest();
     }

@@ -94,7 +94,18 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 /// @brief 
 /// @param ejectMediaAfterSave 
 /// @return 
-bool ProjectManager::saveProject(bool ejectMediaAfterSave){
+void ProjectManager::saveProject(bool ejectMediaAfterSave){
+    if(!m_project){
+        return;
+    }
+
+    if( ! m_askSave){
+        if(ejectMediaAfterSave){
+            deleteProject();
+            emit ejectMedia();
+        }
+        return;
+    }
 
     if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path, on écrit directement dans le json sans copier la vidéo et on return
         writeJson();   
@@ -102,25 +113,25 @@ bool ProjectManager::saveProject(bool ejectMediaAfterSave){
             deleteProject();
             emit ejectMedia();
         }
-        return true;
+        return;
     }
 
     if( m_project->media->filePath().isEmpty() ){
         qDebug() << "Media path du project est vide";
-        return false;
+        return;
     }
 
 
     if ( ! createProjectFolder() ){ // on a cliqué sur annulé on return 
         
-        return false;
+        return;
         
     }else {
 
         QString destMedia = m_project->path + QDir::separator() + m_project->media->fileName() + '.' + m_project->media->fileExtension();
         copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
 
-        return true;
+        return;
     }
 
 }
@@ -487,4 +498,3 @@ void ProjectManager::checkMediaFullyLoaded()
         emit projectInitialized();
     }
 }
-

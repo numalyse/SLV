@@ -29,7 +29,8 @@ public:
     void createViewGridBtn();
 
 public slots:
-    void openMediaFile();
+    void openMediaAction();
+    void selectAndLoadMediaFiles();
     void enableFullscreenMain();
     void disableFullscreenMain();
     void disableNavPanel();

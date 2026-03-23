@@ -124,6 +124,11 @@ QVector<Shot> TimelineWidget::getTimelineData()
     return m_shotManager->shotItemsData();
 }
 
+void TimelineWidget::setTimelineData(QVector<Shot> shots)
+{
+    m_shotManager->setShotItemsData(shots);
+}
+
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event); 

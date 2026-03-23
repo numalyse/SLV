@@ -31,6 +31,7 @@ Q_OBJECT
 public:
     explicit TimelineWidget(QVector<Shot>& projectShots, QWidget* parent = nullptr);
     QVector<Shot> getTimelineData();
+    void setTimelineData(QVector<Shot> shots);
 
 public slots:
     void updateCursorPos(int64_t vlcTime);

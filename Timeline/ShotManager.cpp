@@ -8,21 +8,7 @@
 ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, QVector<Shot> &projectShots, QObject *parent) 
 : QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}
 {
-    int shotHeight {50};
-
-    for ( auto& IShot : projectShots ){
-
-        double xPos =  p_mathManager->timeToPos(IShot.start);
-        double width = p_mathManager->timeToPos(IShot.end - IShot.start);
-        
-        ShotItem* shot = new ShotItem(IShot, width, shotHeight);
-
-        p_scene->addItem(shot);
-        shot->setX(xPos);
-
-        m_shotItems.append(shot);
-
-    }
+    setShotItemsData(projectShots);
 }
 
 
@@ -203,3 +189,29 @@ const QVector<Shot> ShotManager::shotItemsData() const
     
     return data;
 }
+
+void ShotManager::setShotItemsData(const QVector<Shot> &shots)
+{
+
+    int shotHeight {50};
+
+    qDeleteAll(m_shotItems);
+    m_shotItems.clear();
+
+    for ( auto& IShot : shots ){
+
+        double xPos =  p_mathManager->timeToPos(IShot.start);
+        double width = p_mathManager->timeToPos(IShot.end - IShot.start);
+        
+        ShotItem* shot = new ShotItem(IShot, width, shotHeight);
+
+        p_scene->addItem(shot);
+        shot->setX(xPos);
+
+        m_shotItems.push_back(shot);
+
+    }
+
+}
+
+

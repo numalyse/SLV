@@ -51,6 +51,10 @@ QString ProjectManager::getErrorMessage(Error error) const
             return txtManager.get("project_manager_error_media_file_not_found"); 
         case Error::MediaKeyMissing:
             return txtManager.get("project_manager_error_media_key_missing"); 
+        case Error::MismatchFPS:
+            return txtManager.get("project_manager_error_media_mismatch_fps"); 
+        case Error::MismatchDuration:
+            return txtManager.get("project_manager_error_media_mismatch_duration"); 
         case Error::UnexpectedError:
         default:
             return txtManager.get("project_manager_error_unexpected_error");
@@ -352,6 +356,21 @@ std::expected<ProjectSaveData, ProjectManager::Error> ProjectManager::loadProjec
             return std::unexpected(ProjectManager::Error::MediaKeyMissing);
         }
 
+        if(projectData.contains("shots") && projectData["shots"].is_array()){
+            for (const auto& shotJson : projectData["shots"]) {
+                Shot currentShot; 
+                
+                currentShot.title = QString::fromStdString(shotJson.value("title", ""));
+                currentShot.start = shotJson.value("start", 0LL); 
+                currentShot.end = shotJson.value("end", 0LL);
+                currentShot.tagImageTime = shotJson.value("tagImageTime", 0LL);
+                currentShot.note = QString::fromStdString(shotJson.value("note", ""));
+
+                loadedData.shots.append(currentShot);
+            }
+        }else {
+            return std::unexpected(ProjectManager::Error::MediaKeyMissing);
+        }
 
         return loadedData;
 
@@ -366,8 +385,6 @@ std::expected<ProjectSaveData, ProjectManager::Error> ProjectManager::loadProjec
     }
 
 }
-
-
 
 void ProjectManager::openProject()
 {
@@ -391,21 +408,26 @@ void ProjectManager::openProject()
 
     ProjectSaveData projectData = loaded.value();
 
-    if (m_project) {
-        delete m_project;
-    }
-    m_project = new Project();
-    m_project->path = selectedPath;
-    m_project->name = QFileInfo(selectedPath).baseName();
+    Project* project = new Project{
+        projectData.shots, 
+        new Media(projectData.mediaAbsolutePath, this), 
+        QFileInfo(selectedPath).baseName(), 
+        selectedPath
+    };
 
-    m_project->media = new Media(projectData.mediaAbsolutePath, this);
+    if(m_project){
+        delete m_project;
+        m_project = nullptr;
+    }
+
+    m_project = project;
 
     m_isDurationParsed = false;
     m_isFpsParsed = false;
 
-    connect(m_project->media, &Media::durationParsed, this, [this, projectData](int64_t duration) {
+    connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
         
-        if(projectData.duration == duration){
+        if(durationJson == durationFile){
             m_isDurationParsed = true;
             checkMediaFullyLoaded();
         }else {
@@ -415,9 +437,9 @@ void ProjectManager::openProject()
 
     });
 
-    connect(m_project->media, &Media::fpsParsed, this, [this, projectData](double fps) {
+    connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
         
-        if(projectData.fps == fps){
+        if(fpsJson == fpsFile){
             m_isFpsParsed = true;
             checkMediaFullyLoaded();
         }else {
@@ -438,10 +460,7 @@ void ProjectManager::checkMediaFullyLoaded()
         const QStringList paths {m_project->media->filePath()};
 
         emit loadMediaProjectRequested(paths);
-
+        emit projectInitialized();
     }
 }
 
-void setTimelineItemsRequested(){
-
-}

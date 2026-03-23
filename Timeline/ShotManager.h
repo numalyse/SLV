@@ -34,6 +34,7 @@ public:
     const QVector<ShotItem*>& shotItems() const {return m_shotItems;};
 
     const QVector<Shot> shotItemsData() const;
+    void setShotItemsData(const QVector<Shot>& shots);
 
 signals:
     void updateShotDetailRequested(int shotCount, int shotId, Shot*);

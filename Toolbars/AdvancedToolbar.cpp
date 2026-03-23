@@ -1,6 +1,7 @@
 #include "Toolbars/AdvancedToolbar.h"
 
 #include "TextManager.h"
+#include "ProjectManager.h"
 
 #include "Toolbars/ExtensionToolbar.h"
 
@@ -253,4 +254,13 @@ void AdvancedToolbar::onSliderMoved(int value) {
 
     emit toolbarCursorPositionRequested(value);
 
+}
+
+void AdvancedToolbar::ejectRequested(){
+    ProjectManager& projManager = ProjectManager::instance();
+    if(projManager.needSave()){ // TODO : demander si l'utilisateur veut sauvegarder avec "oui" => sauvegarde ; "non" => eject le media ; "annuler" => ne fait rien 
+        projManager.saveProject(true);
+    }else {
+        emit ejectRequest();
+    }
 }

@@ -9,11 +9,35 @@
 
 #include <External/nlohmann/json.hpp>
 
+#include <expected>
+
+struct ProjectSaveData {
+    QString mediaName;
+    QString mediaAbsolutePath;
+    int64_t duration = 0;
+    double fps = 0.0;
+    QVector<Shot> shots;
+};
+
 class ProjectManager : public QObject
 {
 Q_OBJECT
 
 public:
+
+    enum class Error {
+        FolderNotFound,
+        JsonFileNotFound,
+        CannotOpenJsonFile,
+        JsonParsingError,
+        MediaKeyMissing,
+        MediaFileNotFound,
+        UnexpectedError,
+        MismatchDuration,
+        MismatchFPS,
+    };
+    Q_ENUM(Error)
+
 
     static ProjectManager& instance() {
         static ProjectManager _instance;
@@ -22,7 +46,7 @@ public:
 
     void createProject(Media *media);
 
-    void loadProject(const QString& projectPath);
+    void openProject();
 
     bool saveProject(bool ejectMedia);
 
@@ -32,6 +56,9 @@ public:
 
     bool needSave() { return m_askSave;}
 
+signals : 
+    void loadMediaProjectRequested(const QStringList );
+
 private:
     explicit ProjectManager(QObject* parent = nullptr);
     ~ProjectManager();
@@ -39,6 +66,9 @@ private:
     Project* m_project = nullptr;
     TimelineWidget* p_timeline = nullptr;
     bool m_askSave = true; // TODO : true for tests, set to false by default
+    bool m_isDurationParsed = false;
+    bool m_isFpsParsed = false;
+
     FileCopyThread* m_fileCpyThread = nullptr;
 
     void initProjectShot(int64_t mediaDuration);
@@ -47,6 +77,9 @@ private:
     nlohmann::json writeShotsData();
     nlohmann::json writeMediaData();
     bool writeJson();
+    QString getErrorMessage(Error error) const;
+    std::expected<ProjectSaveData, Error> loadProject(const QString& projectPath);
+    void checkMediaFullyLoaded();
 
 signals:
     void projectInitialized();

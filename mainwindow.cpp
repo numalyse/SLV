@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "GlobalPlayerManager.h"
+#include "ProjectManager.h"
 #include "PlayerWidget.h"
 #include "TextManager.h"
 
@@ -82,8 +83,9 @@ void MainWindow::createMenuBar()
 {
     auto *fileMenu = menuBar()->addMenu("&Fichier");
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
+    auto *openProjectAction = fileMenu->addAction("&Ouvrir un project");
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaFile);
-
+    connect(openProjectAction, &QAction::triggered, &ProjectManager::instance(), &ProjectManager::openProject);
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
 

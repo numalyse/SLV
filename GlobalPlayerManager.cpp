@@ -23,6 +23,9 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     mainLayout->addWidget(m_navPanel);
 
     m_layoutManager = new PlayerLayoutManager();
+
+    connect(&ProjectManager::instance(), &ProjectManager::loadMediaProjectRequested, m_layoutManager, &PlayerLayoutManager::createLayoutFromPaths);
+
     connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
 
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenPlayerRequested, this, &GlobalPlayerManager::enableFullscreenPlayer);
@@ -36,12 +39,14 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::disableNavPanelRequested, this, &GlobalPlayerManager::disableNavPanelRequested);
     connect(m_layoutManager, &PlayerLayoutManager::enableNavPanelRequested, this, &GlobalPlayerManager::enableNavPanelRequested);
-
+    
     connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
         { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }
     );
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
+
+
 
     m_layoutManager->createLayout(1);
 }

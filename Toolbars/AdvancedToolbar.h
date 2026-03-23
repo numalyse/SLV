@@ -28,7 +28,8 @@ public slots:
     void disableButtons();
     void enableSlider();
     void disableSlider();
-
+    virtual void ejectRequested() override;
+    
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;
     ToolbarButton* m_nextMediaBtn = nullptr;

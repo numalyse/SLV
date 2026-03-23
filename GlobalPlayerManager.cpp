@@ -83,20 +83,27 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QW
 
     m_player = player;
 
-    if( media ){
-        m_player = player;
-        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
-        ProjectManager::instance().createProject(media);
+    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+
+    if(advancedToolbar){
+
+        connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
 
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+
     }else {
         if(m_timeline){
             m_timeline->deleteLater();
             m_timeline = nullptr;
         }
     }
+
+    if( media ){
+        ProjectManager::instance().createProject(media);
+    }
+    
 }
 
 /// @brief Ouvre la fenêtre à droite de l'écran contenant des infos sur la playlist ou sur le plan sélectionné en fonction du mode
@@ -185,6 +192,8 @@ void GlobalPlayerManager::createTimelineWidget()
     
     m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
     m_timeline->setFixedHeight(150);
+
+    ProjectManager::instance().setTimeline(m_timeline);
 
     connect(m_player, &PlayerWidget::vlcTimeChanged, m_timeline, &TimelineWidget::updateCursorPos);
 

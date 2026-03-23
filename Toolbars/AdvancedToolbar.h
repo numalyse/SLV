@@ -48,6 +48,7 @@ signals:
     void disableSegmentationRequest();
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
+    void rotateRequested();
     void previousMediaRequested();
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);

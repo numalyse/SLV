@@ -43,6 +43,7 @@ public slots:
     void showMedia();
     void startRecord();
     void endRecord();
+    void rotate();
 
 private:
 

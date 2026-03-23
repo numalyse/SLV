@@ -46,6 +46,8 @@ public slots:
     void disableLoopMode();
     void startRecord();
     void endRecord();
+    void rotate();
+
     void enableButtons();
     void disableButtons();
 

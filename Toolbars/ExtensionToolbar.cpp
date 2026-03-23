@@ -54,7 +54,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     );
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
-        if(ProjectManager::instance().projet() != nullptr){
+        if( ProjectManager::instance().projet() ){
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
             emit SignalManager::instance().extensionToolbarDisplayShotDetail();

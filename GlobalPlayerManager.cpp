@@ -43,6 +43,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
         { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }
     );
+    
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
 
@@ -76,6 +77,12 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QW
         m_playersWidget = nullptr;
     }
 
+    if(m_timeline){
+        layout->removeWidget(m_timeline);
+        m_timeline->deleteLater();
+        m_timeline = nullptr;
+    }
+
     // ajout du nouveau playerWidget et toolbar 
     if (newPlayersWidget){
         m_playersWidget = newPlayersWidget;
@@ -91,22 +98,11 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QW
     auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
 
     if(advancedToolbar){
-
         connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
 
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
-
-    }else {
-        if(m_timeline){
-            m_timeline->deleteLater();
-            m_timeline = nullptr;
-        }
-    }
-
-    if( media ){
-        ProjectManager::instance().createProject(media);
     }
     
 }

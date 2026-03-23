@@ -44,7 +44,7 @@ public:
         return _instance;
     };
 
-    void createProject(Media *media);
+    void requestProjectCreation(const QStringList& mediaPaths);
 
     void openProject();
 
@@ -55,6 +55,8 @@ public:
     Project* projet(){ return m_project;}
 
     bool needSave() { return m_askSave;}
+
+    void deleteProject();
 
 signals : 
     void loadMediaProjectRequested(const QStringList );

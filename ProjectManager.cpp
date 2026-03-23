@@ -33,7 +33,9 @@ ProjectManager::~ProjectManager()
     }
 }
 
-
+/// @brief A partir d'une erreur renvoie le message associé
+/// @param error 
+/// @return 
 QString ProjectManager::getErrorMessage(Error error) const
 {
     TextManager& txtManager = TextManager::instance();
@@ -61,46 +63,66 @@ QString ProjectManager::getErrorMessage(Error error) const
     }
 }
 
-
-void ProjectManager::createProject(Media* media) 
-{   
-    if(m_project){
+/// @brief Supprime le projet et envoie un signal pour desactiver l'ui de segmentation 
+void ProjectManager::deleteProject() {
+    //m_askSave = false;
+    if (m_project) {
         delete m_project;
         m_project = nullptr;
+        p_timeline = nullptr;
+        emit projectDeleted();
     }
-    
+}
+
+/// @brief Supprime le projet actuel. Si le nombre de player > 1 return sinon créer un projet
+/// @param mediaPaths 
+void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
+
+    deleteProject();
+
+    if (mediaPaths.size() != 1) {
+        return;
+    }
     m_project = new Project();
-    m_project->media = new Media(media->filePath(), this);
+    m_project->media = new Media(mediaPaths.first(), this);
+    m_askSave = true;// TODO : true for tests, set to false by default
     connect(m_project->media, &Media::durationParsed, this, &ProjectManager::initProjectShot);
     m_project->media->parse();
 }
 
 
-
+/// @brief 
+/// @param ejectMediaAfterSave 
+/// @return 
 bool ProjectManager::saveProject(bool ejectMediaAfterSave){
+
+    if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path, on écrit directement dans le json sans copier la vidéo et on return
+        writeJson();   
+        if(ejectMediaAfterSave){
+            deleteProject();
+            emit ejectMedia();
+        }
+        return true;
+    }
 
     if( m_project->media->filePath().isEmpty() ){
         qDebug() << "Media path du project est vide";
-        if (ejectMediaAfterSave){
-            emit ejectMedia();
-        }
-        
         return false;
     }
 
-    if(m_project->path.isEmpty()){
-        if ( ! createProjectFolder()){
-            if (ejectMediaAfterSave){
-                emit ejectMedia();
-            }
-            return false;
-        }
+
+    if ( ! createProjectFolder() ){ // on a cliqué sur annulé on return 
+        
+        return false;
+        
+    }else {
+
+        QString destMedia = m_project->path + QDir::separator() + m_project->name + QDir::separator()  + m_project->media->fileName() + '.' + m_project->media->fileExtension();
+        copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
+
+        return true;
     }
 
-    QString destMedia = m_project->path + QDir::separator() + m_project->name + QDir::separator()  + m_project->media->fileName() + '.' + m_project->media->fileExtension();
-    copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
-
-    return true;
 }
 
 
@@ -151,7 +173,7 @@ bool ProjectManager::createProjectFolder(){
         }
     }
 
-    m_project->path = fileInfo.absolutePath(); 
+    m_project->path = fileInfo.absolutePath() + QDir::separator() + fileInfo.baseName(); 
     m_project->name = fileInfo.baseName();
     qDebug() << "dossier créé";
     return true;
@@ -193,19 +215,21 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
     connect(m_fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
     connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog](bool success) {
+        
         if (success) {
             // creation json
             writeJson();
+        }else {
+            // TODO : dialogue pour dire que la copie a échoué.
         }
+
         if(ejectMediaAfterSave){
-            delete m_project;
-            m_project = nullptr;
-            p_timeline = nullptr;
-            m_askSave = false;
+            deleteProject();
             emit ejectMedia();
-            emit projectDeleted();
         }
+
         progressDialog->close(); 
+
     });
 
     m_fileCpyThread->start();
@@ -278,12 +302,10 @@ nlohmann::json ProjectManager::writeMediaData(){
 
 bool ProjectManager::writeJson()
 {
-
-
     qDebug() << "Writting Json";
 
-    QString jsonPath = m_project->path + QDir::separator() + m_project->name + QDir::separator() + m_project->name + ".json";
-
+    QString jsonPath = m_project->path + QDir::separator() + m_project->name + ".json";
+    
     std::ofstream projectData(jsonPath.toStdString());
     if ( !projectData.is_open() ) {
         qDebug() << "Impossible d'ouvrir le fichier";
@@ -304,7 +326,9 @@ bool ProjectManager::writeJson()
 }
 
 
-
+/// @brief Parcours le JSON pour récupérer les données du json
+/// @param projectAbsolutePath Path du projet
+/// @return Retourne une structure avec les données du project ou une enum en fonction de l'erreur rencontrées
 std::expected<ProjectSaveData, ProjectManager::Error> ProjectManager::loadProject(const QString &projectAbsolutePath)
 {
     QFileInfo projectInfo(projectAbsolutePath);
@@ -386,6 +410,8 @@ std::expected<ProjectSaveData, ProjectManager::Error> ProjectManager::loadProjec
 
 }
 
+/// @brief Ouvre un dialogue pour choisir l'emplacement du dossier. Parcours le JSON, affiche une erreur dans une message box s'il y en eu, créer projet sinon.
+/// Puis parse le media
 void ProjectManager::openProject()
 {
 
@@ -415,10 +441,7 @@ void ProjectManager::openProject()
         selectedPath
     };
 
-    if(m_project){
-        delete m_project;
-        m_project = nullptr;
-    }
+    deleteProject();
 
     m_project = project;
 
@@ -453,6 +476,7 @@ void ProjectManager::openProject()
 
 }
 
+///@brief Quand les fps et la duréer sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
 void ProjectManager::checkMediaFullyLoaded()
 {
     if(m_isDurationParsed && m_isFpsParsed){

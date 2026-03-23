@@ -83,7 +83,7 @@ void MainWindow::createMenuBar()
 {
     auto *fileMenu = menuBar()->addMenu("&Fichier");
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
-    auto *openProjectAction = fileMenu->addAction("&Ouvrir un project");
+    auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaFile);
     connect(openProjectAction, &QAction::triggered, &ProjectManager::instance(), &ProjectManager::openProject);
 
@@ -142,6 +142,7 @@ void MainWindow::openMediaFile()
     for(size_t IFilePath = 0; IFilePath < files_paths.size(); ++IFilePath){
         qDebug() << files_paths.at(IFilePath);
     }
+    ProjectManager::instance().requestProjectCreation(files_paths);
     m_globalPlayerManager->setPlayersFromPaths(files_paths);
 
 }

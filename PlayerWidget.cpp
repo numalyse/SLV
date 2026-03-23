@@ -152,7 +152,7 @@ void PlayerWidget::play()
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
-        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"); // TODO : utiliser text manager
         if(file_path != ""){
             setMediaFromPath(file_path);
         }
@@ -172,7 +172,7 @@ void PlayerWidget::playFromAdvanced()
         QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
         if(file_path != ""){
             if (setMediaFromPath(file_path)){
-                ProjectManager::instance().createProject(m_mediaWidget->media());
+                ProjectManager::instance().requestProjectCreation({file_path});
             }
         }
         else
@@ -293,8 +293,8 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();
-    //emit disableSegmentation();
     emit mediaPlayerEjected();
+    ProjectManager::instance().deleteProject();
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){

@@ -12,8 +12,10 @@
 #include "AdvancedToolbar.h"
 
 #include "ProjectManager.h"
-#include <TimeFormatter.h>
+#include "TimeFormatter.h"
 
+#include <QMessageBox>
+#include <QPushButton>
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -258,8 +260,29 @@ void AdvancedToolbar::onSliderMoved(int value) {
 
 void AdvancedToolbar::ejectRequested(){
     ProjectManager& projManager = ProjectManager::instance();
-    if(projManager.needSave()){ // TODO : demander si l'utilisateur veut sauvegarder avec "oui" => sauvegarde ; "non" => eject le media ; "annuler" => ne fait rien 
-        projManager.saveProject(true);
+    if(projManager.needSave()){ 
+
+        TextManager& txtManager = TextManager::instance();
+
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowTitle(txtManager.get("dialog_save_project_dialog_title"));
+        msgBox.setText(txtManager.get("dialog_save_project_dialog_text"));
+
+        QPushButton *yesBtn = msgBox.addButton(txtManager.get("dialog_btn_yes"), QMessageBox::YesRole);
+        QPushButton *noBtn = msgBox.addButton(txtManager.get("dialog_btn_no"), QMessageBox::NoRole);
+        QPushButton *cancelBtn = msgBox.addButton(txtManager.get("dialog_btn_cancel"), QMessageBox::RejectRole);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == yesBtn) {
+            projManager.saveProject(true);
+        } else if (msgBox.clickedButton() == noBtn) {
+            projManager.deleteProject();
+            emit ejectRequest(); 
+        } else {
+            return;
+        }
     }else {
         emit ejectRequest();
     }

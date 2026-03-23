@@ -5,6 +5,8 @@
 #include "Timeline/Items/ShotItem.h"
 #include "Timeline/TimelineView.h"
 
+#include "Shot.h"
+
 #include <QObject>
 #include <QGraphicsScene>
 
@@ -28,6 +30,10 @@ public:
     std::optional<double> getStartXOf(int idShot);
 
     std::optional<int64_t> getStartTimeOf(int idShot);
+
+    const QVector<ShotItem*>& shotItems() const {return m_shotItems;};
+
+    const QVector<Shot> shotItemsData() const;
 
 signals:
     void updateShotDetailRequested(int shotCount, int shotId, Shot*);

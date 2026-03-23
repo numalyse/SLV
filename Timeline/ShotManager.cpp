@@ -190,3 +190,16 @@ std::optional<int64_t> ShotManager::getStartTimeOf(int idShot){
 
     return m_shotItems[idShot]->shot().start; 
 }
+
+const QVector<Shot> ShotManager::shotItemsData() const
+{
+
+    QVector<Shot> data; 
+    data.reserve(m_shotItems.size());
+
+    for(auto& shotItem : m_shotItems){
+        data.push_back(shotItem->shot());
+    }
+    
+    return data;
+}

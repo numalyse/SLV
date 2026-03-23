@@ -30,6 +30,7 @@ Q_OBJECT
 
 public:
     explicit TimelineWidget(QVector<Shot>& projectShots, QWidget* parent = nullptr);
+    QVector<Shot> getTimelineData();
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
@@ -37,6 +38,8 @@ public slots:
     void goToShot(int);
     void mergeWithPrevShotAction();
     void mergeWithNextShotAction();
+
+    const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
 signals:
     void updateShotDetailRequest(int shotCount, int shotId, Shot*);

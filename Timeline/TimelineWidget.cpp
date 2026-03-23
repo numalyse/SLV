@@ -119,6 +119,10 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
 }
 
+QVector<Shot> TimelineWidget::getTimelineData()
+{
+    return m_shotManager->shotItemsData();
+}
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {

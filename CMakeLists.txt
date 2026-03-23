@@ -77,6 +77,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Timeline/Items/CursorItem.h Timeline/Items/CursorItem.cpp
         Timeline/Items/ShotItem.h Timeline/Items/ShotItem.cpp
 
+        FileCopyThread.h FileCopyThread.cpp
+
     )
 
 
@@ -137,6 +139,7 @@ target_link_libraries(SLV PRIVATE libvlc.lib libvlccore.lib)
 # -----------------------------
 
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Concurrent)
 # -----------------------------
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Core)

@@ -117,7 +117,7 @@ bool ProjectManager::saveProject(bool ejectMediaAfterSave){
         
     }else {
 
-        QString destMedia = m_project->path + QDir::separator() + m_project->name + QDir::separator()  + m_project->media->fileName() + '.' + m_project->media->fileExtension();
+        QString destMedia = m_project->path + QDir::separator() + m_project->media->fileName() + '.' + m_project->media->fileExtension();
         copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
 
         return true;
@@ -305,7 +305,7 @@ bool ProjectManager::writeJson()
     qDebug() << "Writting Json";
 
     QString jsonPath = m_project->path + QDir::separator() + m_project->name + ".json";
-    
+
     std::ofstream projectData(jsonPath.toStdString());
     if ( !projectData.is_open() ) {
         qDebug() << "Impossible d'ouvrir le fichier";

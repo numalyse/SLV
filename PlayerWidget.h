@@ -48,6 +48,7 @@ public slots:
     void endRecord();
     void enableButtons();
     void disableButtons();
+    void mediaPlayerEjectedHandler();
 
 signals:
     void addPlayerRequest();

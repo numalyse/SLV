@@ -261,16 +261,27 @@ void MediaWidget::rotate()
 {
     qDebug() << "bjr test !";
     if(!m_player || !m_media) return;
+
     float pos = libvlc_media_player_get_position(m_player);
 
+    auto inst = SLV::VlcInstance::get();
+    if (!inst) return;
+    qDebug() << "PATH =" << m_media->filePath();
+    
+    QString filePath = m_media->filePath();
+    if (filePath.isEmpty()) return;
+
     libvlc_media_t* media = libvlc_media_new_path(
-        SLV::VlcInstance::get(),
-        QUrl::fromLocalFile(m_media->filePath())
-            .toString(QUrl::FullyEncoded)
-            .toUtf8()
-            .constData()
+        inst,
+        filePath.toStdString().c_str()
     );
 
+    if (!media) {
+        qDebug() << "media NULL";
+        return;
+    }
+
+    libvlc_media_add_option(media, ":vout=directdraw");
     libvlc_media_add_option(media, ":video-filter=transform");
     libvlc_media_add_option(media, ":transform-type=90");
 
@@ -282,7 +293,6 @@ void MediaWidget::rotate()
     });
 
     libvlc_media_release(media);
-
 }
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.

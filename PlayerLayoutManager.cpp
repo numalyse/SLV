@@ -76,13 +76,11 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
     activePlayerUpdate(count);
 
     QWidget* container = nullptr;
-    Media* media = nullptr;
     PlayerWidget* player = nullptr;
     switch (count){
         case 1: 
             container = create1();
             player = m_activePlayers[0];
-            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2:
@@ -104,7 +102,8 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(player, media, container, toolbar);
+    ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    emit updateContainerRequest(player, container, toolbar);
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -115,13 +114,11 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     activePlayerUpdate(pathCount);
 
     QWidget* container = nullptr;
-    Media* media = nullptr;
     PlayerWidget* player = nullptr;
     switch (pathCount){
         case 1: 
             container = create1(filesPaths);
             player = m_activePlayers[0];
-            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2: 
@@ -140,7 +137,8 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(player, media, container, toolbar);
+    ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    emit updateContainerRequest(player, container, toolbar);
 
 }
 
@@ -453,7 +451,6 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
         playerToRemove->eject();
         m_activePlayers.removeOne(playerToRemove);
         createLayout(m_activePlayers.size());
-        ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
     }
 }
 

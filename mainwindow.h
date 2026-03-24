@@ -28,6 +28,8 @@ public:
     void createToolBar();
     void createViewGridBtn();
 
+
+
 public slots:
     void openMediaAction();
     void openProjectAction();
@@ -38,6 +40,8 @@ public slots:
     void enableNavPanel();
 
 private:
+    void changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement);
+
     Ui::MainWindow *ui;
 
     QSplitter* splitter = nullptr;

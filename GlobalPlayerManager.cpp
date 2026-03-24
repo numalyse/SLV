@@ -62,7 +62,7 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 /// @param videoPlayersCount Nombre de PlayerWidgets dans le container
 /// @param newPlayersWidget Le widget à ajouter au layout
 /// @param newToolbar La GlobalToolbar si videoPlayersCount != 1, AdvancedToolbar sinon
-void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QWidget * newPlayersWidget, Toolbar* newToolbar)
+void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
     if (m_toolbarWidget){

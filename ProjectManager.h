@@ -54,7 +54,10 @@ public:
 
     Project* projet(){ return m_project;}
 
-    bool needSave() { return m_needSave;}
+    bool needSave() {
+        if(!m_project) return false;
+        return m_needSave;
+    }
 
     void deleteProject();
 

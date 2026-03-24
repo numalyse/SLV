@@ -36,7 +36,7 @@ public slots:
     void enableSegmentation();
     void disableSegmentation();
 
-    void updateContainer(PlayerWidget*, Media*, QWidget*, Toolbar*);
+    void updateContainer(PlayerWidget*, QWidget*, Toolbar*);
     void openNavPanel();
     void closeNavPanel();
 

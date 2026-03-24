@@ -67,17 +67,28 @@ MainWindow::MainWindow(QWidget *parent)
         m_globalPlayerManager->closeNavPanel();
         m_navPanelBtn->setButtonState(false);
     });
-    connect(m_view1, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement1); });
-    connect(m_view2H, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement2H); });
-    connect(m_view2V, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement2V); });
-    connect(m_view3HAlign, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3H); });
-    connect(m_view3VAlign, &ToolbarButton::clicked, &SignalManager::instance(),[](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3V); });
-    connect(m_view3Top, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Top); });
-    connect(m_view3Bot, &ToolbarButton::clicked, &SignalManager::instance(),[](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Bot); });
-    connect(m_view3Left, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Left); });
-    connect(m_view3Right, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Right); });
-    connect(m_view4, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement4); });
 
+    std::vector<std::pair<ToolbarButton*, PlayerLayoutArrangement>> layoutButtons = {
+        {m_view1, PlayerLayoutArrangement::Arrangement1},
+        {m_view2H, PlayerLayoutArrangement::Arrangement2H},
+        {m_view2V, PlayerLayoutArrangement::Arrangement2V},
+        {m_view3HAlign, PlayerLayoutArrangement::Arrangement3H},
+        {m_view3VAlign, PlayerLayoutArrangement::Arrangement3V},
+        {m_view3Top, PlayerLayoutArrangement::Arrangement3Top},
+        {m_view3Bot, PlayerLayoutArrangement::Arrangement3Bot},
+        {m_view3Left, PlayerLayoutArrangement::Arrangement3Left},
+        {m_view3Right, PlayerLayoutArrangement::Arrangement3Right},
+        {m_view4, PlayerLayoutArrangement::Arrangement4}
+    };
+
+    for (const auto& pair : layoutButtons) {
+        ToolbarButton* btn = pair.first;
+        PlayerLayoutArrangement arrangement = pair.second;
+        connect(btn, &ToolbarButton::clicked, this, [this, arrangement]() { 
+            changeArrangementWithSaveCheck(arrangement); 
+        });
+    }
+    
 }
 
 void MainWindow::createMenuBar()
@@ -133,7 +144,7 @@ void MainWindow::openProjectAction()
     ProjectManager& projManager = ProjectManager::instance();
     TextManager& txtManager = TextManager::instance();
 
-    if(projManager.projet() && projManager.needSave()){
+    if(projManager.needSave()){
         SLV::showGenericDialog(
             this, 
             txtManager.get("dialog_save_project_dialog_title"),
@@ -181,6 +192,7 @@ void MainWindow::openMediaAction()
 
 }
 
+
 void MainWindow::selectAndLoadMediaFiles()
 {
     QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
@@ -199,7 +211,6 @@ void MainWindow::selectAndLoadMediaFiles()
         qDebug() << path;
     }
     
-    ProjectManager::instance().requestProjectCreation(files_paths);
     m_globalPlayerManager->setPlayersFromPaths(files_paths);
 }
 
@@ -281,4 +292,29 @@ void MainWindow::createViewGridBtn()
 
     m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", TextManager::instance().get("tooltip_view_grid"), "player_arrangement_white"),  TextManager::instance().get("tooltip_view_grid");
     m_viewGridBtn->setOnTop(false);
+}
+
+
+void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    
+    if (projManager.needSave()) { 
+        TextManager& txtManager = TextManager::instance();
+        
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            [&projManager, arrangement]() { 
+                projManager.saveProject(false); 
+                emit SignalManager::instance().newArrangementRequested(arrangement);
+            },
+            [arrangement]() { 
+                emit SignalManager::instance().newArrangementRequested(arrangement);
+            }
+        );
+    } else {
+        emit SignalManager::instance().newArrangementRequested(arrangement);
+    }
 }

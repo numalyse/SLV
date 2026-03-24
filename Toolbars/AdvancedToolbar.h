@@ -52,6 +52,7 @@ signals:
     void previousMediaRequested();
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);
+    void setOverlayModeRequested();
 
 };
 

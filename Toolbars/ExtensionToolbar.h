@@ -17,9 +17,12 @@ Q_OBJECT
 public:
     explicit ExtensionToolbar(QWidget* parent = nullptr);
 
+    void setOverlayMode(int index);
     void setFullscreenUI();
     void setDefaultUI();
     
+    //QComboBox* comboBoxCompoRuleBtn = nullptr;
+
     ToolbarToggleButton* m_zoomBtn = nullptr;
     ToolbarToggleButton* m_hideImgBtn= nullptr;
     ToolbarButton* m_prevFrameBtn= nullptr;
@@ -29,7 +32,9 @@ public:
     ToolbarButton* m_rotateBtn= nullptr;
     ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
-    ToolbarButton* m_compoRuleBtn= nullptr;
+    //ToolbarToggleHoverButton* m_compoRuleBtn = nullptr;
+    ToolbarPopupButton* m_compoRuleBtn = nullptr; 
+    //ToolbarButton* m_compoRuleBtn= nullptr;
     ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarButton* m_verticalInvBtn= nullptr;
     ToolbarButton* m_horizontalInvBtn= nullptr;
@@ -52,6 +57,7 @@ signals:
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
     void rotateRequested();
+    void setOverlayModeRequested();
 };
 
 #endif

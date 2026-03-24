@@ -5,6 +5,10 @@
 #include <QHBoxLayout>
 #include <SignalManager.h>
 #include <qframe.h>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QIcon>
+#include "ExtensionToolbar.h"
 
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
@@ -85,8 +89,44 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         emit SignalManager::instance().displayPlaylist();
     });
 
-    m_compoRuleBtn = new ToolbarButton(this, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
 
+    QHBoxLayout* compoRuleLayout = new QHBoxLayout();
+    QComboBox* compoRuleComboBox = new QComboBox(this);
+    
+    compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_None"));
+    compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_RuleOfThirds"));
+    compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_CenterCross"));
+    compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_Diagonals"));
+    compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_S_Curve"));
+    compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_GoldenRatio"));
+
+    connect(compoRuleComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExtensionToolbar::setOverlayModeRequested);
+
+    compoRuleLayout->addWidget(compoRuleComboBox);
+
+    QCheckBox *compoRuleCheckboxVFlip = new QCheckBox(this);
+    QCheckBox *compoRuleCheckboxHFlip = new QCheckBox(this); 
+    // QCheckBox *compoRuleCheckboxVFlip = new QCheckBox(TextManager::instance().get("compo_rule_VFlip"), this);
+    // QCheckBox *compoRuleCheckboxHFlip = new QCheckBox(TextManager::instance().get("compo_rule_HFlip"), this); 
+
+    compoRuleCheckboxVFlip->setIcon(QIcon(":/icons/invert_v_white"));
+    compoRuleCheckboxHFlip->setIcon(QIcon(":/icons/invert_h_white"));
+
+    compoRuleCheckboxVFlip->setIconSize(QSize(20, 20));
+    compoRuleCheckboxHFlip->setIconSize(QSize(20, 20));
+
+    compoRuleCheckboxHFlip->setToolTip(TextManager::instance().get("tooltip_compo_rule_VFlip"));
+    compoRuleCheckboxVFlip->setToolTip(TextManager::instance().get("tooltip_compo_rule_HFlip"));
+
+    // connect(compoRuleComboBox, stateChanged(), this, &ExtensionToolbar::setOverlayMode);
+    // connect(compoRuleComboBox, stateChanged(), this, &ExtensionToolbar::setOverlayMode);
+    
+    compoRuleLayout->addWidget(compoRuleCheckboxVFlip);
+    compoRuleLayout->addWidget(compoRuleCheckboxHFlip);
+
+    m_compoRuleBtn = new ToolbarPopupButton(this, compoRuleLayout, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
+    //m_compoRuleBtn = new ToolbarButton(this, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
+    
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
     m_verticalInvBtn = new ToolbarButton(this, "invert_v_white", TextManager::instance().get("tooltip_flip_vertical"));
@@ -99,7 +139,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     disableButtons();
     hide();
 }
-
 
 void ExtensionToolbar::setFullscreenUI()
 {    

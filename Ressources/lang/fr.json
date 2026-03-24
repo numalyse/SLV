@@ -66,5 +66,15 @@
     "shot_detail_duration_time_name" : "Durée",
     "shot_detail_note_name" : "Note",
     
-    "shot_detail_id_text" : "Plan n°"
+    "shot_detail_id_text" : "Plan n°",
+
+    "compo_rule_None" : "Aucun",
+    "compo_rule_RuleOfThirds" : "Tiers",
+    "compo_rule_CenterCross" : "Symmetrie",
+    "compo_rule_Diagonals" : "Diagonales",
+    "compo_rule_S_Curve" : "S-Curve",
+    "compo_rule_GoldenRatio" : "Nombre d'or",
+
+    "tooltip_compo_rule_VFlip" : "Retournement vertical",
+    "tooltip_compo_rule_HFlip" : "Retournement horizontal"
 }

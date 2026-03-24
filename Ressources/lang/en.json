@@ -66,5 +66,15 @@
     "shot_detail_duration_time_name" : "Duration",
     "shot_detail_note_name" : "Note",
 
-    "shot_detail_id_text" : "Shot n°"
+    "shot_detail_id_text" : "Shot n°",
+
+    "compo_rule_None" : "None",
+    "compo_rule_RuleOfThirds" : "Thirds",
+    "compo_rule_CenterCross" : "Symmetry",
+    "compo_rule_Diagonals" : "Diagonals",
+    "compo_rule_S_Curve" : "S-Curve",
+    "compo_rule_GoldenRatio" : "Golden Ratio",
+
+    "tooltip_compo_rule_VFlip" : "Vertical flip",
+    "tooltip_compo_rule_HFlip" : "Horizontal flip"
 }

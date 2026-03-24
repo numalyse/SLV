@@ -26,6 +26,7 @@ public:
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
 
+    void changeOverlayMode();
     void widgetSizeMove();
     bool event(QEvent *event);
 

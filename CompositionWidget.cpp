@@ -1,5 +1,6 @@
 #include "CompositionWidget.h"
 #include <QPainter>
+#include <QPainterPath>
 
 CompositionWidget::CompositionWidget(QWidget *parent)
     : QWidget(parent)
@@ -22,6 +23,14 @@ void CompositionWidget::setOverlayMode(OverlayMode mode)
 CompositionWidget::OverlayMode CompositionWidget::overlayMode() const
 {
     return m_mode;
+}
+
+void CompositionWidget::setVerticalFlip(bool vf){
+    vertical_flip = vf; 
+}
+
+void CompositionWidget::setHorizontalFlip(bool hf){
+    horizontal_flip = hf; 
 }
 
 void CompositionWidget::setColor(const QColor &color)
@@ -57,6 +66,12 @@ void CompositionWidget::paintEvent(QPaintEvent *)
     case Diagonals:
         drawDiagonals(p);
         break;
+    case S_Curve:
+        drawS_Curve(p);
+        break;
+    case GoldenRatio:
+        drawGoldenRatio(p);
+        break;        
     default:
         break;
     }
@@ -92,4 +107,87 @@ void CompositionWidget::drawDiagonals(QPainter &p)
 
     p.drawLine(0, 0, w, h);
     p.drawLine(w, 0, 0, h);
+}
+
+void CompositionWidget::drawS_Curve(QPainter &p)
+{
+    int w = width();
+    int h = height();
+
+    QPainterPath path;
+
+    path.moveTo(0, h * 0.2);
+
+    path.cubicTo(
+        w * 0.25, 0,        
+        w * 0.25, h,       
+        w * 0.5, h * 0.5    
+    );
+
+    path.cubicTo(
+        w * 0.75, 0,        
+        w * 0.75, h,        
+        w, h * 0.8          
+    );
+
+    p.setRenderHint(QPainter::Antialiasing, true);
+    p.drawPath(path);
+}
+
+void CompositionWidget::drawGoldenRatio(QPainter &p)
+{
+    int w = width();
+    int h = height();
+    //qDebug() << "w : " << width() << " h : " << height();
+
+    double size = std::min(w, h);
+
+    double x = (w - size) / 2.0;
+    double y = (h - size) / 2.0;
+
+    QRectF rect(x, y, size, size);
+
+    const double phi = (1.0 + std::sqrt(5.0)) / 2.0;
+
+    // 👉 EXACTEMENT 8 arcs
+    for (int i = 0; i < 8; ++i)
+    {
+        // 🔹 angles corrects (sens anti-horaire Qt)
+        int startAngle = 0;
+        switch (i % 4)
+        {
+        case 0: startAngle = 0; break;
+        case 1: startAngle = 90; break;
+        case 2: startAngle = 180; break;
+        case 3: startAngle = 270; break;
+        }
+
+        p.drawArc(rect, startAngle * 16, 90 * 16);
+
+        // 🔹 réduction selon le golden ratio
+        double newSize = rect.width() / phi;
+
+        QRectF next;
+
+        switch (i % 4)
+        {
+        case 0: // coupe droite
+            next = QRectF(rect.left(), rect.top(), newSize, rect.height());
+            break;
+
+        case 1: // coupe bas
+            next = QRectF(rect.left(), rect.top(), rect.width(), newSize);
+            break;
+
+        case 2: // coupe gauche
+            next = QRectF(rect.right() - newSize, rect.top(), newSize, rect.height());
+            break;
+
+        case 3: // coupe haut
+            next = QRectF(rect.left(), rect.bottom() - newSize, rect.width(), newSize);
+            break;
+        }
+
+        rect = next;
+    }
 }

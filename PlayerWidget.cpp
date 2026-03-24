@@ -63,6 +63,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
 
+    //connect(m_toolBar, &Toolbar::setOverlayModeRequested, m_mediaWidget, &CompositionWidget::setOverlayMode);
+
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
     connect(this, &PlayerWidget::muteUiUpdateRequested, m_toolBar, &SimpleToolbar::muteUiUpdate);
@@ -90,7 +92,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->addWidget(m_compositionWidget);
     
     stack->setStackingMode(QStackedLayout::StackAll);
-    //m_compositionWidget->setOverlayMode(CompositionWidget::RuleOfThirds);
+    //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise(); 
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -109,6 +111,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
+
+}
+
+void PlayerWidget::changeOverlayMode(){
 
 }
 

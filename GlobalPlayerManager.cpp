@@ -24,7 +24,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     m_layoutManager = new PlayerLayoutManager();
 
-    connect(&ProjectManager::instance(), &ProjectManager::loadMediaProjectRequested, m_layoutManager, &PlayerLayoutManager::createLayoutFromPaths);
+    connect(&ProjectManager::instance(), &ProjectManager::loadMediaProjectRequested, m_layoutManager, &PlayerLayoutManager::createLayoutFromProject);
 
     connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
 

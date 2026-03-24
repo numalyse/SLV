@@ -91,6 +91,7 @@ public slots:
     void checkPlayersMuteStatus();
 
     void createLayoutFromPaths(const QStringList& filesPaths);
+    void createLayoutFromProject(const QStringList &filesPaths);
 
     // void enableButtons();
     void disableGlobalToolbarButtons();

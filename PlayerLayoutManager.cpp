@@ -142,6 +142,18 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
 
 }
 
+/// @brief Fonction appelé par le project manager quand on charge un projet.
+/// ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath()); aurait reset le projet créer 
+/// @param filesPaths 
+void PlayerLayoutManager::createLayoutFromProject(const QStringList& filesPaths){
+    QWidget* container = create1(filesPaths);
+    PlayerWidget* player = m_activePlayers[0];
+    emit enableNavPanelRequested();
+
+    auto* toolbar = createLayoutToolbar();
+    emit updateContainerRequest(player, container, toolbar);
+}
+
 void PlayerLayoutManager::detachAllPlayers()
 {
     for(auto& IPlayer : m_players){

@@ -2,6 +2,7 @@
 #define PLAYERWIDGET_H
 
 #include "MediaWidget.h"
+#include "CompositionWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 
 #include <QWidget>
@@ -24,6 +25,9 @@ public:
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
+
+    void widgetSizeMove();
+    bool event(QEvent *event);
 
 public slots:
     void play();
@@ -95,6 +99,7 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
+    CompositionWidget* m_compositionWidget = nullptr;
 
 };
 

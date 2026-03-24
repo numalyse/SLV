@@ -2,6 +2,7 @@
 #include "Toolbars/SimpleToolbar.h"
 #include "ProjectManager.h"
 #include "SignalManager.h"
+#include "CompositionWidget.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -15,6 +16,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QStackedLayout>
 
 
 PlayerWidget::PlayerWidget(QWidget *parent)
@@ -23,8 +25,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     //setMinimumSize(640, 360);
     //resize(800, 450);
 
-    setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_DontCreateNativeAncestors);
+    // setAttribute(Qt::WA_NativeWindow);
+    // setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -79,10 +81,22 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
+    QWidget* containerWidget = new QWidget(this);
+    QStackedLayout* stack = new QStackedLayout(containerWidget);
+    stack->setContentsMargins(0,0,0,0);
+    stack->addWidget(m_mediaWidget);
+
+    m_compositionWidget = new CompositionWidget(containerWidget);
+    stack->addWidget(m_compositionWidget);
+    
+    stack->setStackingMode(QStackedLayout::StackAll);
+    //m_compositionWidget->setOverlayMode(CompositionWidget::RuleOfThirds);
+    //m_compositionWidget->raise(); 
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
-    layout->addWidget(m_mediaWidget);
+    layout->addWidget(containerWidget);
     layout->addWidget(m_toolBar);
 
     connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
@@ -96,6 +110,43 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
 
+}
+
+void PlayerWidget::widgetSizeMove()
+{
+    if (m_compositionWidget->width() <= m_mediaWidget->width() && m_compositionWidget->height() <= m_mediaWidget->height())
+    {
+        m_compositionWidget->setWindowOpacity(1); // Show the widget
+        QPoint p = m_mediaWidget->mapToGlobal(m_mediaWidget->pos());
+        int x = p.x() + (m_mediaWidget->width() - m_compositionWidget->width()) / 2;
+        int y = p.y() + (m_mediaWidget->height() - m_compositionWidget->height()) / 2;
+        m_compositionWidget->move(x, y);
+        m_compositionWidget->raise();
+    }
+    else
+    {
+        m_compositionWidget->setWindowOpacity(0); // Hide the widget
+    }
+}
+
+bool PlayerWidget::event(QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+        m_compositionWidget->show();
+        QTimer::singleShot(50, this, SLOT(widgetSizeMove())); 
+        break;
+    case QEvent::WindowActivate:
+    case QEvent::Resize:
+    case QEvent::Move:
+        widgetSizeMove();
+        break;
+    default:
+        break;
+    }
+
+    return QWidget::event(event);
 }
 
 // PlayerWidget::~PlayerWidget()

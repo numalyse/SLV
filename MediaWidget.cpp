@@ -22,15 +22,17 @@ MediaWidget::MediaWidget(QWidget *parent)
     m_blackFrame->setStyleSheet("background: black;");
     m_blackFrame->lower();
     m_mediaSurface = new QWidget(this);
-    m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
-    setAutoFillBackground(true);
+    m_mediaSurface->setAutoFillBackground(false);
+    //m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
+    //m_mediaSurface->hide();
+    //setAutoFillBackground(true);
     QPalette pal = palette();
     pal.setColor(QPalette::Window, Qt::black);
     setPalette(pal);
 
     setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_DontCreateNativeAncestors);
-    setAttribute(Qt::WA_OpaquePaintEvent);
+    //setAttribute(Qt::WA_DontCreateNativeAncestors);
+    //setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 
@@ -40,6 +42,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     createEventManager();
 
     managePlayerSystem();
+
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
     // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 

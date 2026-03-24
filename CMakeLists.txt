@@ -34,6 +34,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlaylistManager.h PlaylistManager.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
 
+        CompositionWidget.h CompositionWidget.cpp
+
         Toolbars/Toolbar.h
         Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp
         Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp

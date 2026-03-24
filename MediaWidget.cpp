@@ -279,6 +279,7 @@ void MediaWidget::endRecord()
 void MediaWidget::rotate()
 {
     if(!m_player || !m_media) return;
+
     float pos = libvlc_media_player_get_position(m_player);
     bool wasPlaying = libvlc_media_player_is_playing(m_player) != 0;
 

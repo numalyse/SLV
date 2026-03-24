@@ -3,6 +3,7 @@
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/GlobalToolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
+#include "ProjectManager.h"
 
 #include <QObject>
 #include <QWidget>
@@ -75,13 +76,11 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
     activePlayerUpdate(count);
 
     QWidget* container = nullptr;
-    Media* media = nullptr;
     PlayerWidget* player = nullptr;
     switch (count){
         case 1: 
             container = create1();
             player = m_activePlayers[0];
-            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2:
@@ -103,7 +102,8 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(player, media, container, toolbar);
+    ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    emit updateContainerRequest(player, container, toolbar);
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -114,13 +114,11 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     activePlayerUpdate(pathCount);
 
     QWidget* container = nullptr;
-    Media* media = nullptr;
     PlayerWidget* player = nullptr;
     switch (pathCount){
         case 1: 
             container = create1(filesPaths);
             player = m_activePlayers[0];
-            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2: 
@@ -139,8 +137,21 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(player, media, container, toolbar);
+    ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    emit updateContainerRequest(player, container, toolbar);
 
+}
+
+/// @brief Fonction appelé par le project manager quand on charge un projet.
+/// ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath()); aurait reset le projet créer 
+/// @param filesPaths 
+void PlayerLayoutManager::createLayoutFromProject(const QStringList& filesPaths){
+    QWidget* container = create1(filesPaths);
+    PlayerWidget* player = m_activePlayers[0];
+    emit enableNavPanelRequested();
+
+    auto* toolbar = createLayoutToolbar();
+    emit updateContainerRequest(player, container, toolbar);
 }
 
 void PlayerLayoutManager::detachAllPlayers()
@@ -573,4 +584,13 @@ void PlayerLayoutManager::arrangePlayerLayout(const PlayerLayoutArrangement& arr
         break;
 
     }
+}
+
+
+QStringList PlayerLayoutManager::getActivePlayersMediaPath(){
+    QStringList mediaPaths;
+    for(auto& IActivePlayer : m_activePlayers){
+        mediaPaths.append(IActivePlayer->getMediaPath());
+    }
+    return mediaPaths;
 }

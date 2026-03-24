@@ -1,6 +1,6 @@
 #include "FormTextEditWidget.h"
 
-FormTextEditWidget::FormTextEditWidget(const QString &name, const QString &text, bool editable, QWidget *parent)
+FormTextEditWidget::FormTextEditWidget(const QString &name, const QString &text, bool editable, QWidget *parent) : QFrame(parent)
 {
     setAutoFillBackground(true);
     setStyleSheet("border: none; background-color: palette(base); padding: 1px; border-radius: 5px;");

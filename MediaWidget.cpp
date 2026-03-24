@@ -12,7 +12,7 @@
 #include <QMap>
 #include <QPainter>
 #include <QDebug>
-
+#include <QThreadPool>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -146,18 +146,29 @@ bool MediaWidget::stop()
     return true;
 }
 
+
+
 /// @brief Release the media player and create a new one from MediaWidget instance
 bool MediaWidget::eject()
 {
     if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
     releaseEventManager();
-    releaseMedia();
-    libvlc_media_player_release(m_player);
-    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
-    createEventManager();
-    managePlayerSystem();
-    emit mediaPlayerEjected();
+
+    QThreadPool::globalInstance()->start([this]() {
+        
+        libvlc_media_player_stop(m_player);
+        libvlc_media_player_release(m_player); 
+        m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+        
+        QMetaObject::invokeMethod(this, [this]() {
+            releaseMedia();
+            createEventManager();
+            managePlayerSystem();
+            emit mediaPlayerEjected();
+        });
+    });
+
     return true;
 }
 
@@ -338,6 +349,8 @@ void MediaWidget::rotate()
 void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 {
     MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);
+    
+    if (!mediaWidget) return;
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {

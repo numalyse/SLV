@@ -28,14 +28,20 @@ public:
     void createToolBar();
     void createViewGridBtn();
 
+
+
 public slots:
-    void openMediaFile();
+    void openMediaAction();
+    void openProjectAction();
+    void selectAndLoadMediaFiles();
     void enableFullscreenMain();
     void disableFullscreenMain();
     void disableNavPanel();
     void enableNavPanel();
 
 private:
+    void changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement);
+
     Ui::MainWindow *ui;
 
     QSplitter* splitter = nullptr;

@@ -119,6 +119,15 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
 }
 
+QVector<Shot> TimelineWidget::getTimelineData()
+{
+    return m_shotManager->shotItemsData();
+}
+
+void TimelineWidget::setTimelineData(QVector<Shot> shots)
+{
+    m_shotManager->setShotItemsData(shots);
+}
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
@@ -342,18 +351,21 @@ void TimelineWidget::splitShotAtCursor()
 {
     int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->splitShotAt(cutTime);
+    emit saveNeeded();
 }
 
 void TimelineWidget::mergeWithPrevShotAction()
 {
     int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->mergeCurrentWithPrevShot(cursorTime);
+    emit saveNeeded();
 }
 
 void TimelineWidget::mergeWithNextShotAction()
 {
     int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->mergeCurrentWithNextShot(cursorTime);
+    emit saveNeeded();
 }
 
 

@@ -53,7 +53,7 @@ private:
 
 
 signals:
-    void updateContainerRequest(PlayerWidget*, Media*, QWidget*, Toolbar*);
+    void updateContainerRequest(PlayerWidget*, QWidget*, Toolbar*);
 
     void enableFullscreenPlayerRequested();
     void disableFullscreenPlayerRequested();
@@ -77,7 +77,9 @@ signals:
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
-    void removePlayer(PlayerWidget* playerToDestroy);
+    QStringList getActivePlayersMediaPath();
+
+    void removePlayer(PlayerWidget *playerToDestroy);
 
     void enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
     void disablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
@@ -89,6 +91,7 @@ public slots:
     void checkPlayersMuteStatus();
 
     void createLayoutFromPaths(const QStringList& filesPaths);
+    void createLayoutFromProject(const QStringList &filesPaths);
 
     // void enableButtons();
     void disableGlobalToolbarButtons();

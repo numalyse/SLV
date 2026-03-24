@@ -1,0 +1,44 @@
+#include "TextManager.h"
+
+#include <QMessageBox>
+#include <QPushButton>
+#include <functional>
+#include <QString>
+
+namespace SLV
+{
+    
+    inline void showGenericDialog(
+        QWidget* parent,
+        const QString& title,
+        const QString& text,
+        std::function<void()> onYes,        
+        std::function<void()> onNo,        
+        std::function<void()> onCancel = nullptr 
+    ) {
+
+
+        TextManager& txtManager = TextManager::instance();
+
+        QMessageBox msgBox(parent);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowTitle(title);
+        msgBox.setText(text);
+
+        QPushButton *yesBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_yes"), QMessageBox::YesRole);
+        QPushButton *noBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_no"), QMessageBox::NoRole);
+        QPushButton *cancelBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_cancel"), QMessageBox::RejectRole);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == yesBtn) {
+            if (onYes) onYes();
+        } else if (msgBox.clickedButton() == noBtn) {
+            if (onNo) onNo();
+        } else {
+            if (onCancel) onCancel();
+        }
+    }
+
+} // namespace SLV
+

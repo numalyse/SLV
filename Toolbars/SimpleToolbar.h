@@ -85,6 +85,7 @@ protected slots:
     virtual void onSliderPressed();
     virtual void onSliderReleased();
     virtual void onSliderMoved(int value);
+    virtual void duplicatePlayerAction();
 
 signals:
     void setPositionRequested(int64_t);

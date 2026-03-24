@@ -12,7 +12,7 @@ struct Shot
     QString note;
     QColor color = QColor(79, 134, 198, 255);
     QImage tagImage;
-    // image ?
+    int64_t tagImageTime;
 };
 
 

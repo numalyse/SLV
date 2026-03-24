@@ -17,7 +17,7 @@ class Media : public QObject
 Q_OBJECT
 
 public:
-    explicit Media(const QString &filePath, QObject *parent = nullptr);
+    explicit Media(const QString &filePath, QObject *parent = nullptr, libvlc_instance_t *vlcInstance = nullptr);
 
     ~Media();
 
@@ -31,15 +31,21 @@ public:
     MediaType type() const { return m_type; }
     int64_t duration() const { return m_duration; }
     double fps() const { return m_fps; }
+    int height() const { return m_height; }
+    int width() const { return m_width; }
+    libvlc_instance_t* vlcInstance() const { return m_vlcInstance; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }
     void setFps(double fps) { m_fps = fps; }
+    void setHeight(int height) { m_height = height; }
+    void setWidth(int width) { m_width = width; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
 
 signals:
     void fpsParsed(double);
+    void resolutionParsed(std::tuple<int, int>);
     void durationParsed(int64_t);
     
 private:
@@ -49,10 +55,13 @@ private:
     MediaType m_type = MediaType::Unknown;
     int64_t m_duration {}; 
     double m_fps {};
+    int m_height = 0;
+    int m_width = 0;
 
     QMap<libvlc_meta_t, QString> m_metaData;
 
     libvlc_event_manager_t* m_parseEventManager = nullptr;
+    libvlc_instance_t* m_vlcInstance = nullptr;
     libvlc_media_t * m_vlcMedia = nullptr;
 
     static void onVlcEvent(const libvlc_event_t *event, void *userData);

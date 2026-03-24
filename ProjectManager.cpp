@@ -27,7 +27,7 @@ void ProjectManager::createProject(Media* media)
     }
     
     m_project = new Project();
-    m_project->media = new Media(media->filePath(), this);
+    m_project->media = new Media(media->filePath(), this, media->vlcInstance());
     connect(m_project->media, &Media::durationParsed, this, &ProjectManager::initProjectShot);
     m_project->media->parse();
 }

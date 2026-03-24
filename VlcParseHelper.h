@@ -59,6 +59,36 @@ namespace VlcParseHelper
 
         return mediaFps;
     }
+
+    /// @brief Helper pour parcourir les streams d'un média et récuperer sa résolution
+    /// @param parsedMedia
+    /// @return std::tuple<int, int> qui correspond respectivement à la hauteur et à la largeur du média, et (-1, -1) si le parsed media est null
+    inline std::tuple<int, int> getResolutionParsedMedia( libvlc_media_t* parsedMedia ){
+
+        if (!parsedMedia) return std::tuple<int, int>(-1, -1);
+
+        libvlc_media_track_t** tracks = nullptr;
+        unsigned int tracksCount = libvlc_media_tracks_get(parsedMedia, &tracks);
+        unsigned int height = 0;
+        unsigned int width = 0;
+
+        for (unsigned int ITrack = 0; ITrack < tracksCount; ++ITrack) {
+
+            if (tracks[ITrack]->i_type == libvlc_track_video) {
+
+                height = tracks[ITrack]->video->i_height;
+                width = tracks[ITrack]->video->i_width;
+
+                break;
+            }
+        }
+
+        if (tracksCount > 0) {
+            libvlc_media_tracks_release(tracks, tracksCount);
+        }
+
+        return std::tuple<int, int>(height, width);
+    }
 } // namespace VlcParseHelper
 
 

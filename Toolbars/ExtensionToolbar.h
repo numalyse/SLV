@@ -51,6 +51,7 @@ signals:
     void disableSegmentationRequested();
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
+    void rotateRequested();
 };
 
 #endif

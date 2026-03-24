@@ -331,14 +331,13 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
         connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
-        connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
-        connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerLoaded, globalToolbar, &GlobalToolbar::enableButtons);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerEjected, this, &PlayerLayoutManager::disableGlobalToolbarButtons);
-        connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
-
     }
 
+    connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
+    connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
+    connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
     globalToolbar->playPauseBtn()->setButtonState(newGlobalPlayState());
 
@@ -373,6 +372,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::setPositionRequested, activePlayer, &PlayerWidget::setTime);
     connect(advancedToolbar, &AdvancedToolbar::moveTimeBackwardRequested, activePlayer, &PlayerWidget::moveTimeBackward);
     connect(advancedToolbar, &AdvancedToolbar::moveTimeForwardRequested, activePlayer, &PlayerWidget::moveTimeForward);
+    connect(advancedToolbar, &AdvancedToolbar::rotateRequested, activePlayer, &PlayerWidget::rotate);
     connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &PlayerLayoutManager::previousMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);

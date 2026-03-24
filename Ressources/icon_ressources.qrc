@@ -115,5 +115,9 @@
         <file alias="player_arrangement_white">icons/player_arrangement_white.png</file>
         <file alias="merge_right_white">icons/merge_right_white.png</file>
         <file alias="merge_left_white">icons/merge_left_white.png</file>
+        <file alias="down_arrow">icons/down_arrow.png</file>
+        <file alias="down_arrow_white">icons/down_arrow_white.png</file>
+        <file alias="right_arrow">icons/right_arrow.png</file>
+        <file alias="right_arrow_white">icons/right_arrow_white.png</file>
     </qresource>
 </RCC>

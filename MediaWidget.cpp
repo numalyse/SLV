@@ -35,7 +35,20 @@ MediaWidget::MediaWidget(QWidget *parent)
 
 
     // ===== VLC ===== //
-    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+
+    const char* const vlc_args[] = {
+        "--quiet",
+        "--aout=directsound",
+        "--no-video-title-show",
+        "--no-input-fast-seek"
+    };
+
+    m_vlcInstance = libvlc_new(4, vlc_args);
+    if (!m_vlcInstance) {
+        qDebug() << "Erreur création VLC";
+        return;
+    }
+    m_player = libvlc_media_player_new(m_vlcInstance);
 
     createEventManager();
 
@@ -204,7 +217,13 @@ void MediaWidget::takeScreenshot()
 {
     if (!m_player) return;
     QString captureDirectory = QDir::homePath() + "/SLV_Content/screenshot.png"; // nommer comme il faut avec le format nom_film_HH_MM_SS_FF.png ou jpg
-    libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), 0, 0);
+
+    // if there is a problem with media resolution here, make sure to recieve Media::resolutionParsed(tuple<int, int>) signal first
+    if(m_rotationIndex % 2 == 0)
+        libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->width(), m_media->height());
+    else
+        // libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->width(), m_media->height());
+        libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->height(), m_media->width());
 }
 
 void MediaWidget::setTime(int64_t time)
@@ -266,6 +285,62 @@ void MediaWidget::endRecord()
 {
     if(!m_player) return;
     int endRecordTime = libvlc_media_player_get_time(m_player);
+}
+
+void MediaWidget::rotate()
+{
+    if(!m_player || !m_media) return;
+
+    float pos = libvlc_media_player_get_position(m_player);
+    bool wasPlaying = libvlc_media_player_is_playing(m_player) != 0;
+
+    releaseEventManager();
+
+    libvlc_media_player_stop(m_player);
+    libvlc_media_player_release(m_player);
+    libvlc_release(m_vlcInstance);
+
+    m_rotationIndex++;
+    if(m_rotationIndex > 3)
+        m_rotationIndex = 0;
+
+    if(m_rotationIndex != 0){
+        const char* const vlc_args[] = {
+            "--quiet",
+            "--aout=directsound",
+            "--no-video-title-show",
+            "--no-input-fast-seek",
+            "--video-filter=transform",
+            m_rotationSteps[m_rotationIndex]
+        };
+
+        m_vlcInstance = libvlc_new(6, vlc_args);
+    }
+    else{
+        const char* const vlc_args[] = {
+            "--quiet",
+            "--aout=directsound",
+            "--no-video-title-show",
+            "--no-input-fast-seek",
+        };
+
+        m_vlcInstance = libvlc_new(4, vlc_args);
+    }
+    m_player = libvlc_media_player_new(m_vlcInstance);
+
+    createEventManager();
+
+    managePlayerSystem();
+    createMedia(m_media->filePath());
+    libvlc_media_player_set_media(m_player, m_media->vlcMedia());
+
+    libvlc_media_player_play(m_player);
+    libvlc_media_player_set_position(m_player, pos);
+
+    // shows a black screen when rotating but playing again shows the media back
+    if(!wasPlaying)
+        pause();
+
 }
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
@@ -406,7 +481,7 @@ void MediaWidget::createEventManager(){
 /// @param filePath 
 void MediaWidget::createMedia(const QString& filePath){
     releaseMedia();
-    m_media = new Media(filePath, this);
+    m_media = new Media(filePath, this, m_vlcInstance);
     emit nameUiUpdateRequested(m_media->fileName());
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 

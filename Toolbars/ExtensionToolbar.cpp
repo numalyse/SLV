@@ -71,6 +71,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(m_backwardBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::moveTimeBackwardRequested);
     connect(m_forwardBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::moveTimeForwardRequested);
 
+    connect(m_rotateBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::rotateRequested);
+
     connect(m_recordBtn, &ToolbarToggleButton::stateActivated, this, &ExtensionToolbar::enableRecordRequested);
     connect(m_recordBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableRecordRequested);
 

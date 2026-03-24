@@ -274,6 +274,8 @@ void MediaWidget::endRecord()
 void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 {
     MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);
+    
+    if (!mediaWidget) return;
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {

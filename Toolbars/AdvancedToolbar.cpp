@@ -260,6 +260,29 @@ void AdvancedToolbar::onSliderMoved(int value) {
 
 }
 
+void AdvancedToolbar::duplicatePlayerAction()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    if(projManager.needSave()){ 
+
+        TextManager& txtManager = TextManager::instance();
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            [&projManager, this]() { 
+                projManager.saveProject(false);
+                emit this->duplicatePlayerRequested();
+            },
+            [&projManager, this]() { 
+                emit this->duplicatePlayerRequested(); 
+            }
+        );
+    }else {
+        emit duplicatePlayerRequested();
+    }
+}
+
 void AdvancedToolbar::ejectRequested(){
     ProjectManager& projManager = ProjectManager::instance();
     if(projManager.needSave()){ 
@@ -273,12 +296,8 @@ void AdvancedToolbar::ejectRequested(){
             [&projManager]() { 
                 projManager.saveProject(true); 
             },
-            [&projManager, this]() { 
-                projManager.deleteProject();
-                emit this->ejectRequest(); 
-            },
-            []() {
-                return; 
+            [&projManager]() { 
+                projManager.discardAndEject();
             }
         );
         

@@ -77,7 +77,9 @@ signals:
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
-    void removePlayer(PlayerWidget* playerToDestroy);
+    QStringList getActivePlayersMediaPath();
+
+    void removePlayer(PlayerWidget *playerToDestroy);
 
     void enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);
     void disablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen);

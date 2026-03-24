@@ -146,9 +146,7 @@ void MainWindow::openMediaAction()
             
             [this]() { 
                 this->selectAndLoadMediaFiles(); 
-            },
-            
-            []() { return; }
+            }
         );
     } else {
         selectAndLoadMediaFiles();

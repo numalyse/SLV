@@ -132,6 +132,14 @@ bool PlayerWidget::setMediaFromPath(const QString& filePath)
     return false;
 }
 
+QString PlayerWidget::getMediaPath()
+{
+    if (mediaWidget() && mediaWidget()->media()) {
+        return mediaWidget()->media()->filePath();
+    }
+    return QString();
+}
+
 void PlayerWidget::enablePlayerFullscreen()
 {
     emit enablePlayerFullscreenRequested(this);
@@ -294,7 +302,6 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();
     emit mediaPlayerEjected();
-    ProjectManager::instance().deleteProject();
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){

@@ -58,6 +58,8 @@ public:
 
     void deleteProject();
 
+    void discardAndEject();
+
 signals : 
     void loadMediaProjectRequested(const QStringList );
 
@@ -73,7 +75,7 @@ private:
 
     FileCopyThread* m_fileCpyThread = nullptr;
 
-    void initProjectShot(int64_t mediaDuration);
+    void initProjectShot();
     bool createProjectFolder();
     bool copyMedia(const QString &sourcePath, const QString &destPath, bool ejectMediaOnEnd);
     nlohmann::json writeShotsData();
@@ -82,7 +84,6 @@ private:
     QString getErrorMessage(Error error) const;
     std::expected<ProjectSaveData, Error> loadProject(const QString& projectPath);
     void checkMediaFullyLoaded();
-
 signals:
     void projectInitialized();
     void projectDeleted();

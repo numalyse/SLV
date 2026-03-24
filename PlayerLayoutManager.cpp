@@ -3,6 +3,7 @@
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/GlobalToolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
+#include "ProjectManager.h"
 
 #include <QObject>
 #include <QWidget>
@@ -452,6 +453,7 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
         playerToRemove->eject();
         m_activePlayers.removeOne(playerToRemove);
         createLayout(m_activePlayers.size());
+        ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
     }
 }
 
@@ -573,4 +575,13 @@ void PlayerLayoutManager::arrangePlayerLayout(const PlayerLayoutArrangement& arr
         break;
 
     }
+}
+
+
+QStringList PlayerLayoutManager::getActivePlayersMediaPath(){
+    QStringList mediaPaths;
+    for(auto& IActivePlayer : m_activePlayers){
+        mediaPaths.append(IActivePlayer->getMediaPath());
+    }
+    return mediaPaths;
 }

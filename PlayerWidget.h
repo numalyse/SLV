@@ -21,6 +21,7 @@ public:
 
     SimpleToolbar* toolbar() {return m_toolBar;};
     MediaWidget* mediaWidget() { return m_mediaWidget; };
+    QString getMediaPath();
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };

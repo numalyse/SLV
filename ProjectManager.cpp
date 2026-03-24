@@ -67,6 +67,9 @@ QString ProjectManager::getErrorMessage(Error error) const
 void ProjectManager::deleteProject() {
     //m_askSave = false;
     if (m_project) {
+        if (m_project->media) {
+            m_project->media->deleteLater(); 
+        }
         delete m_project;
         m_project = nullptr;
         p_timeline = nullptr;
@@ -80,13 +83,25 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 
     deleteProject();
 
-    if (mediaPaths.size() != 1) {
+    if (mediaPaths.size() != 1 || mediaPaths.first().isEmpty()) {
         return;
     }
+
     m_project = new Project();
     m_project->media = new Media(mediaPaths.first(), this);
     m_askSave = true;// TODO : true for tests, set to false by default
-    connect(m_project->media, &Media::durationParsed, this, &ProjectManager::initProjectShot);
+    m_isDurationParsed = false;
+    m_isFpsParsed = false;
+
+    connect(m_project->media, &Media::durationParsed, this, [this]() {
+        m_isDurationParsed = true;
+        this->initProjectShot();
+    });
+
+    connect(m_project->media, &Media::fpsParsed, this, [this]() {
+        m_isFpsParsed = true;
+        this->initProjectShot();
+    });
     m_project->media->parse();
 }
 
@@ -141,14 +156,15 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
 
 /// @brief Créer un plan de la durée de la vidéo quand media a fini de parse pour la durée.
 /// @param mediaDuration 
-void ProjectManager::initProjectShot(int64_t mediaDuration){
+void ProjectManager::initProjectShot(){
 
-    if(!m_project){
-        qDebug() << "project nullptr";
+    if( ! m_isFpsParsed || ! m_isDurationParsed ){
         return;
     }
 
-    Shot shot{"Titre", 0, mediaDuration};
+    Q_ASSERT(m_project);
+
+    Shot shot{"Titre", 0, m_project->media->duration()};
     m_project->shots.append(shot);
     
     for (size_t i = 0; i < m_project->shots.size(); i++) {
@@ -441,6 +457,7 @@ void ProjectManager::openProject()
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
         QMessageBox::critical(nullptr, "Erreur", errorMsg);
+        return;
     }
 
     ProjectSaveData projectData = loaded.value();
@@ -497,4 +514,9 @@ void ProjectManager::checkMediaFullyLoaded()
         emit loadMediaProjectRequested(paths);
         emit projectInitialized();
     }
+}
+
+void ProjectManager::discardAndEject(){
+    deleteProject();
+    emit ejectMedia();
 }

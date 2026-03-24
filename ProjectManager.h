@@ -54,11 +54,14 @@ public:
 
     Project* projet(){ return m_project;}
 
-    bool needSave() { return m_askSave;}
+    bool needSave() { return m_needSave;}
 
     void deleteProject();
 
     void discardAndEject();
+
+public slots:
+    void setSaveNeeded();
 
 signals : 
     void loadMediaProjectRequested(const QStringList );
@@ -69,7 +72,7 @@ private:
 
     Project* m_project = nullptr;
     TimelineWidget* p_timeline = nullptr;
-    bool m_askSave = true; // TODO : true for tests, set to false by default
+    bool m_needSave = false;
     bool m_isDurationParsed = false;
     bool m_isFpsParsed = false;
 
@@ -77,6 +80,7 @@ private:
 
     void initProjectShot();
     bool createProjectFolder();
+    void deleteFolder(const QString &projectFolderPath);
     bool copyMedia(const QString &sourcePath, const QString &destPath, bool ejectMediaOnEnd);
     nlohmann::json writeShotsData();
     nlohmann::json writeMediaData();
@@ -84,6 +88,7 @@ private:
     QString getErrorMessage(Error error) const;
     std::expected<ProjectSaveData, Error> loadProject(const QString& projectPath);
     void checkMediaFullyLoaded();
+
 signals:
     void projectInitialized();
     void projectDeleted();

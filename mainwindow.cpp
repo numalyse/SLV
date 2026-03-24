@@ -86,7 +86,7 @@ void MainWindow::createMenuBar()
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
     auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
-    connect(openProjectAction, &QAction::triggered, &ProjectManager::instance(), &ProjectManager::openProject);
+    connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProjectAction);
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
 
@@ -128,12 +128,39 @@ void MainWindow::createToolBar()
     addToolBar(m_toolbarQt);
 }
 
+void MainWindow::openProjectAction()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    TextManager& txtManager = TextManager::instance();
+
+    if(projManager.projet() && projManager.needSave()){
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            
+            [&projManager]() { 
+                projManager.saveProject(false); 
+                projManager.openProject();
+            },
+            
+            [&projManager]() { 
+                projManager.openProject();
+            }
+        );
+    } else {
+        projManager.openProject();
+    }
+
+}
+
+
 void MainWindow::openMediaAction()
 {
     ProjectManager& projManager = ProjectManager::instance();
     TextManager& txtManager = TextManager::instance();
 
-    if(projManager.projet()){
+    if(projManager.projet() && projManager.needSave()){
         SLV::showGenericDialog(
             this, 
             txtManager.get("dialog_save_project_dialog_title"),

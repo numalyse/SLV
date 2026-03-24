@@ -194,9 +194,13 @@ void GlobalPlayerManager::createTimelineWidget()
     m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
     m_timeline->setFixedHeight(150);
 
-    ProjectManager::instance().setTimeline(m_timeline);
+    ProjectManager& projManager = ProjectManager::instance();
+
+    projManager.setTimeline(m_timeline);
 
     connect(m_player, &PlayerWidget::vlcTimeChanged, m_timeline, &TimelineWidget::updateCursorPos);
+
+    connect(m_timeline, &TimelineWidget::saveNeeded, &projManager, &ProjectManager::setSaveNeeded);
 
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 

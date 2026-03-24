@@ -48,6 +48,7 @@ signals:
     void timelineSliderPositionRequested(int64_t);
     void enableTimeRelatedUI();
     void disableTimeRelatedUI();
+    void saveNeeded();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;

@@ -302,6 +302,6 @@ void AdvancedToolbar::ejectRequested(){
         );
         
     }else {
-        emit ejectRequest();
+        projManager.discardAndEject();
     }
 }

@@ -30,6 +30,7 @@ public:
 
 public slots:
     void openMediaAction();
+    void openProjectAction();
     void selectAndLoadMediaFiles();
     void enableFullscreenMain();
     void disableFullscreenMain();

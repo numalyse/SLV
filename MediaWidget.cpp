@@ -13,6 +13,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QSize>
+#include <QRect>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -93,6 +94,7 @@ MediaWidget::~MediaWidget()
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     }
     
     releaseMedia();
@@ -299,6 +301,21 @@ void MediaWidget::rotate()
     libvlc_media_release(media);
 }
 
+QRect MediaWidget::getMediaDisplayRect() const
+{
+    if (m_mediaSize.isEmpty())
+        return rect();
+
+    QSize widgetSize = size();
+
+    QSize scaled = m_mediaSize.scaled(widgetSize, Qt::KeepAspectRatio);
+
+    int x = (widgetSize.width() - scaled.width()) / 2;
+    int y = (widgetSize.height() - scaled.height()) / 2;
+
+    return QRect(QPoint(x, y), scaled);
+}
+
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
 /// @param event 
 /// @param userData 
@@ -332,15 +349,21 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
     else if (event->type == libvlc_MediaPlayerPlaying)
     {
-        unsigned width = 0;
-        unsigned height = 0;
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
 
-        libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+            unsigned width = 0;
+            unsigned height = 0;
 
-        if (width > 0 && height > 0)
-        {
-            emit mediaWidget->mediaSizeChanged(QSize(width, height));
-        }
+            libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+
+            if (width > 0 && height > 0)
+            {
+                mediaWidget->m_mediaSize = QSize(width, height); // Update size
+                //emit mediaWidget->mediaSizeChanged(mediaWidget->m_mediaSize);
+                qDebug() << "media size OK:" << width << height;
+            }
+
+        }, Qt::QueuedConnection);
     }
 }
 
@@ -362,11 +385,19 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
+
+
 void MediaWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    m_mediaSurface->setGeometry(rect());
+    QRect mediaRect = getMediaDisplayRect();
+    m_mediaSurface->setGeometry(mediaRect);
     m_blackFrame->setGeometry(rect());
+    emit mediaRectChanged(mediaRect);
+    qDebug() << "mediaWidget size:" << this->size();
+    qDebug() << "m_mediaSurface size:" << m_mediaSurface->size();
+    qDebug() << "m_blackFrame size:" << m_blackFrame->size();
+    qDebug() << "Displayed video rect:" << mediaRect;
 }
 
 /// @brief Stops the current media player and load a new media from a path
@@ -424,6 +455,7 @@ void MediaWidget::releaseEventManager(){
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
@@ -436,12 +468,12 @@ void MediaWidget::createEventManager(){
         m_eventManager = libvlc_media_player_event_manager(m_player);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";
     }
 
 }
-
 
 /// @brief Helper pour recréer une classe média et connecter ses signaux
 /// @param filePath 

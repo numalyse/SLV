@@ -110,8 +110,11 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
 
-    connect(m_mediaWidget, &MediaWidget::mediaSizeChanged, this, &PlayerWidget::mediaSizeChanged);
-    connect(this, &PlayerWidget::mediaSizeChanged, m_compositionWidget, &CompositionWidget::onMediaSizeChanged);
+    //connect(m_mediaWidget, &MediaWidget::mediaSizeChanged, this, &PlayerWidget::mediaSizeChanged);
+    //connect(this, &PlayerWidget::mediaSizeChanged, m_compositionWidget, &CompositionWidget::onMediaSizeChanged);
+
+    connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::onMediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
 
 }
 
@@ -312,9 +315,10 @@ void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bo
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
 }
 
-void PlayerWidget::onMediaSizeChanged(const QSize &size)
+void PlayerWidget::onMediaRectChanged(const QRect &rect)
 {
-    m_mediaSize = size;
+    m_mediaRect = rect;
+    //qDebug() << "Rect has changed : " << m_mediaRect;
 }
 
 void PlayerWidget::widgetSizeMove()
@@ -333,32 +337,6 @@ void PlayerWidget::widgetSizeMove()
         m_compositionWidget->setWindowOpacity(0); // Hide
     }
 }
-
-// void PlayerWidget::widgetSizeMove()
-// {
-//     if (m_mediaSize.isEmpty())
-//         return;
-
-//     QSize widgetSize = m_mediaWidget->size();
-
-//     if (m_compositionWidget->width() <= widgetSize.width() &&
-//         m_compositionWidget->height() <= widgetSize.height())
-//     {
-//         m_compositionWidget->setWindowOpacity(1);
-
-//         QPoint p = m_mediaWidget->mapToGlobal(QPoint(0, 0));
-
-//         int x = p.x() + (widgetSize.width() - m_compositionWidget->width()) / 2;
-//         int y = p.y() + (widgetSize.height() - m_compositionWidget->height()) / 2;
-
-//         m_compositionWidget->move(x, y);
-//         m_compositionWidget->raise();
-//     }
-//     else
-//     {
-//         m_compositionWidget->setWindowOpacity(0);
-//     }
-// }
 
 bool PlayerWidget::event(QEvent *event)
 {

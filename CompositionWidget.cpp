@@ -1,5 +1,4 @@
 #include "CompositionWidget.h"
-#include "PlayerWidget.h"
 
 #include <QPainter>
 #include <QPainterPath>
@@ -50,9 +49,9 @@ void CompositionWidget::setLineWidth(int width)
     update();
 }
 
-void CompositionWidget::onMediaSizeChanged(const QSize &size)
+void CompositionWidget::onMediaRectChanged(const QRect &rect)
 {
-    m_mediaSize = size;
+    m_mediaRect = rect;
     update();
 }
 
@@ -90,8 +89,8 @@ void CompositionWidget::paintEvent(QPaintEvent *)
 
 void CompositionWidget::drawRuleOfThirds(QPainter &p)
 {
-    int w = width();
-    int h = height();
+    int w = m_mediaRect.width();
+    int h = m_mediaRect.height();
 
     // vertical
     p.drawLine(w / 3, 0, w / 3, h);
@@ -104,8 +103,8 @@ void CompositionWidget::drawRuleOfThirds(QPainter &p)
 
 void CompositionWidget::drawCenterCross(QPainter &p)
 {
-    int w = width();
-    int h = height();
+    int w = m_mediaRect.width();
+    int h = m_mediaRect.height();
 
     p.drawLine(w / 2, 0, w / 2, h);
     p.drawLine(0, h / 2, w, h / 2);
@@ -113,8 +112,8 @@ void CompositionWidget::drawCenterCross(QPainter &p)
 
 void CompositionWidget::drawDiagonals(QPainter &p)
 {
-    int w = width();
-    int h = height();
+    int w = m_mediaRect.width();
+    int h = m_mediaRect.height();
 
     if (!m_isVFlipped && m_isHFlipped) {
         p.drawLine(w, 0, 0, h);
@@ -133,8 +132,8 @@ void CompositionWidget::drawDiagonals(QPainter &p)
 
 void CompositionWidget::drawS_Curve(QPainter &p)
 {
-    int w = width();
-    int h = height();
+    int w = m_mediaRect.width();
+    int h = m_mediaRect.height();
 
     QPainterPath path;
 
@@ -158,8 +157,8 @@ void CompositionWidget::drawS_Curve(QPainter &p)
 
 void CompositionWidget::drawGoldenRatio(QPainter &p)
 {
-    int w = width();
-    int h = height();
+    int w = m_mediaRect.width();
+    int h = m_mediaRect.height();
     //qDebug() << "w : " << width() << " h : " << height();
 
     double size = std::min(w, h);

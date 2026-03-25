@@ -50,7 +50,7 @@ public slots:
     void endRecord();
     void rotate();
     void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
-    void onMediaSizeChanged(const QSize &size);
+    void onMediaRectChanged(const QRect &rect);
     void widgetSizeMove();
     bool event(QEvent *event);
 
@@ -85,7 +85,7 @@ signals:
     void mediaPlayerEjected();
 
     void mediaDropped(const QStringList&);
-    void mediaSizeChanged(const QSize &size);
+    //void mediaRectChanged(const QRect &rect);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -104,7 +104,7 @@ private:
     MediaWidget* m_mediaWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
     QSize m_mediaSize;
-
+    QRect m_mediaRect;
 };
 
 #endif // PLAYERWIDGET_H

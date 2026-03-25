@@ -23,7 +23,7 @@ public:
     void setLineWidth(int width);
 
 public slots:
-    void onMediaSizeChanged(const QSize &size);
+    void onMediaRectChanged(const QRect &rect);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -36,7 +36,8 @@ private:
 
     void drawGoldenRatio(QPainter &p);
 
-    QSize m_mediaSize;
+    //QSize m_mediaSize;
+    QRect m_mediaRect;
     OverlayMode m_mode = OverlayMode::None;
     bool m_isVFlipped = false;
     bool m_isHFlipped = false;

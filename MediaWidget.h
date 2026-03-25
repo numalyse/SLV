@@ -2,11 +2,13 @@
 #define MEDIAWIDGET_H
 
 #include "Media.h"
+#include "VideoCaptureManager.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <SignalManager.h>
 #include <QFrame>
+#include <QDir>
 
 class MediaWidget : public QWidget
 {
@@ -59,6 +61,7 @@ private:
     QWidget* m_mediaSurface = nullptr;
     QFrame* m_blackFrame = nullptr;
     int m_startRecordTime = -1;
+    VideoCaptureManager m_videoCaptureManager;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     

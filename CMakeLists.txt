@@ -77,6 +77,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Timeline/Items/RulerItem.h Timeline/Items/RulerItem.cpp
         Timeline/Items/CursorItem.h Timeline/Items/CursorItem.cpp
         Timeline/Items/ShotItem.h Timeline/Items/ShotItem.cpp
+        SequenceExtractionHelper.h
+        VideoCaptureManager.h VideoCaptureManager.cpp
 
         FileCopyThread.h FileCopyThread.cpp
 

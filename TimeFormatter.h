@@ -1,3 +1,6 @@
+#ifndef TIMEFORMATTER_H
+#define TIMEFORMATTER_H
+
 #include <cstdint>
 
 #include <QString>
@@ -25,5 +28,21 @@ namespace TimeFormatter
                 .arg(frame, 2, 10, QChar('0'));
     }
 
+    inline QString msToHHMMSSMilMil(int64_t ms){
+        int64_t timeInSeconds = ms / 1000;
+        int64_t h = timeInSeconds / 3600;
+        int64_t m = (timeInSeconds % 3600) / 60;
+        int64_t s = timeInSeconds % 60;
+        int64_t mil = ms % 1000;
+
+        return QString("%1:%2:%3.%4")
+            .arg(h, 2, 10, QChar('0'))
+            .arg(m, 2, 10, QChar('0'))
+            .arg(s, 2, 10, QChar('0'))
+            .arg(mil, 3, 10, QChar('0'));
+    }
+
 
 } // namespace TimeFormatter
+
+#endif // TIMEFORMATTER_H

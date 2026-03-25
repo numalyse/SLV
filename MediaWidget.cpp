@@ -3,6 +3,7 @@
 #include "VlcParseHelper.h"
 #include "VlcInstance.h"
 #include "Media.h"
+#include "SequenceExtractionHelper.h"
 
 #include <QFile>
 #include <QUrl>
@@ -12,6 +13,10 @@
 #include <QMap>
 #include <QPainter>
 #include <QDebug>
+#include <QProcess>
+#include <QFileDialog.h>
+#include <QTextStream>
+
 #include <QThreadPool>
 
 MediaWidget::MediaWidget(QWidget *parent)
@@ -104,6 +109,7 @@ MediaWidget::~MediaWidget()
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
     }
     
+    m_videoCaptureManager.deleteMediaTempDirectory();
     releaseMedia();
 
 }
@@ -222,13 +228,13 @@ void MediaWidget::takeScreenshot()
     if(m_rotationIndex % 2 == 0)
         libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->width(), m_media->height());
     else
-        // libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->width(), m_media->height());
         libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->height(), m_media->width());
 }
 
 void MediaWidget::setTime(int64_t time)
 {
     if(!m_player) return;
+    m_videoCaptureManager.mediaCutAndConcat(libvlc_media_player_get_time(m_player), time);
     libvlc_media_player_set_time(m_player, time);
     emit vlcTimeChanged(time);
 }
@@ -275,17 +281,21 @@ void MediaWidget::showMedia()
 void MediaWidget::startRecord()
 {
     if(!m_player || !m_media) return;
-    m_startRecordTime = libvlc_media_player_get_time(m_player);
-    if(m_media->type() != MediaType::Image){
-        libvlc_media_add_option(m_media->vlcMedia(), (":sout=#duplicate{dst=display,dst=std{access=file,mux=ps,dst=C:/Users/kviguier/Desktop/test.mp4}"));
-        libvlc_media_add_option(m_media->vlcMedia(), ":sout-keep");
-    }
+    m_videoCaptureManager.startMediaRecording(libvlc_media_player_get_time(m_player));
 }
 
 void MediaWidget::endRecord()
 {
     if(!m_player) return;
-    int endRecordTime = libvlc_media_player_get_time(m_player);
+
+    int endTime = libvlc_media_player_get_time(m_player);
+    pause();
+    QString saveRecordPath = QFileDialog::getSaveFileName(this, tr("Save record"), m_media->filePath());
+    saveRecordPath += '.' + m_media->fileExtension();
+    // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
+    m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
+
+    m_startRecordTime = -1;
 }
 
 void MediaWidget::rotate()
@@ -413,9 +423,8 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
 
     QString pathCopy = filePath;
 
-    (filePath);
-
     createMedia(filePath);
+    m_videoCaptureManager.setMediaPath(filePath);
 
     if(!m_media->vlcMedia()) return false;
 

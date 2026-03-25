@@ -230,6 +230,7 @@ void MediaWidget::setTime(int64_t time)
 {
     if(!m_player) return;
     libvlc_media_player_set_time(m_player, time);
+    emit vlcTimeChanged(time);
 }
 
 void MediaWidget::moveTimeBackward()
@@ -237,9 +238,9 @@ void MediaWidget::moveTimeBackward()
     int64_t time = -5000;
     int64_t currentTime = libvlc_media_player_get_time(m_player);
     if(currentTime + time > 5000){
-        emit SignalManager::instance().timelineSetPosition(currentTime + time);
+        setTime(currentTime + time);
     }else{
-        emit SignalManager::instance().timelineSetPosition(0);
+        setTime(0);
     }
 }
 
@@ -247,7 +248,7 @@ void MediaWidget::moveTimeForward()
 {
     int64_t time = 5000;
     int64_t currentTime = libvlc_media_player_get_time(m_player);
-    emit SignalManager::instance().timelineSetPosition(currentTime + time);
+    setTime(currentTime + time);
 }
 
 void MediaWidget::enableLoopMode()

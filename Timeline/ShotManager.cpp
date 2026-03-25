@@ -214,4 +214,45 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
 }
 
+void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
+{
 
+    int shotHeight {50};
+
+    qDeleteAll(m_shotItems);
+    m_shotItems.clear();
+
+    int64_t startShot = 0;
+
+    for(int i=0; i < cuts.size(); ++i ){
+
+        int64_t nextStartShot = p_mathManager->frameToTime(cuts[i]);
+        int64_t endShot = nextStartShot - 1; // la fin du plan = cut - 1 ms
+
+        double xPos =  p_mathManager->timeToPos(startShot);
+        double width = p_mathManager->timeToPos(endShot - startShot);
+        
+        Shot shot{"Titre", startShot, endShot};
+
+        ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+
+        p_scene->addItem(shotItem);
+        shotItem->setX(xPos);
+
+        m_shotItems.push_back(shotItem);
+
+        startShot = nextStartShot;
+    }
+
+    double xPos =  p_mathManager->timeToPos(startShot);
+    double width = p_mathManager->timeToPos(p_mathManager->duration() - startShot);
+    
+    Shot shot{"Titre", startShot, p_mathManager->duration()};
+
+    ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+    
+    p_scene->addItem(shotItem);
+    shotItem->setX(xPos);
+
+    m_shotItems.push_back(shotItem);
+}

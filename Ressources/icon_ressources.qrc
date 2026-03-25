@@ -119,5 +119,7 @@
         <file alias="down_arrow_white">icons/down_arrow_white.png</file>
         <file alias="right_arrow">icons/right_arrow.png</file>
         <file alias="right_arrow_white">icons/right_arrow_white.png</file>
+        <file alias="auto_segmentation_white">icons/auto_segmentation_white.png</file>
+        <file alias="auto_segmentation">icons/auto_segmentation.png</file>
     </qresource>
 </RCC>

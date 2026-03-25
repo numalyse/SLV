@@ -14,6 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package( OpenCV REQUIRED )
 
 set(PROJECT_SOURCES
         main.cpp
@@ -70,6 +71,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Timeline/ABManager.h Timeline/ABManager.cpp
         Timeline/ShotManager.h Timeline/ShotManager.cpp
         Timeline/TimelineMath.h Timeline/TimelineMath.cpp
+        Timeline/SegmentationThread.h Timeline/SegmentationThread.cpp
 
         Timeline/ItemTypes.h
 
@@ -126,6 +128,7 @@ target_link_libraries(SLV PRIVATE
     ${FFMPEG_DIR}/lib/avformat.lib
     ${FFMPEG_DIR}/lib/avutil.lib
     ${FFMPEG_DIR}/lib/swscale.lib
+    ${OpenCV_LIBS}
 )
 # -----------------------------
 
@@ -205,3 +208,27 @@ add_custom_command(TARGET SLV POST_BUILD
     "${CMAKE_SOURCE_DIR}/libvlccore.dll"
     "$<TARGET_FILE_DIR:SLV>"
 )
+
+file(GLOB_RECURSE FFMPEG_DLL_LIST 
+    "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll" 
+    "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"
+)
+
+if(FFMPEG_DLL_LIST)
+    list(GET FFMPEG_DLL_LIST 0 FFMPEG_DLL_PATH)
+    message(STATUS "DLL FFMPEG FOUND : ${FFMPEG_DLL_PATH}")
+
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:SLV>
+            $<TARGET_FILE_DIR:SLV>
+            
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${FFMPEG_DLL_PATH}"
+            "$<TARGET_FILE_DIR:SLV>"
+            
+        COMMAND_EXPAND_LISTS
+    )
+else()
+    message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
+endif()

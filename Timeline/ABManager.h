@@ -26,6 +26,7 @@ public:
     std::optional<ABLoopData> getABLoopData();
     std::optional<int64_t> getLoopRestartTime(int64_t currentTime);
     int getMarkerCount() { return static_cast<int>(m_abMarkersItems.size());}
+    std::optional<int64_t> clampToLoopRange(int64_t time);
 
     void deleteMarkers();
     void cycleMarkers(int64_t time, int markerHeight);

@@ -63,8 +63,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
 
-    //connect(m_toolBar, &Toolbar::setOverlayModeRequested, m_mediaWidget, &CompositionWidget::setOverlayMode);
-
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
     connect(this, &PlayerWidget::muteUiUpdateRequested, m_toolBar, &SimpleToolbar::muteUiUpdate);
@@ -89,9 +87,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->addWidget(m_mediaWidget);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
-    stack->addWidget(m_compositionWidget);
-    
     stack->setStackingMode(QStackedLayout::StackAll);
+    stack->addWidget(m_compositionWidget);
+
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise(); 
 
@@ -112,47 +110,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
 
-}
+    connect(m_mediaWidget, &MediaWidget::mediaSizeChanged, this, &PlayerWidget::mediaSizeChanged);
+    connect(this, &PlayerWidget::mediaSizeChanged, m_compositionWidget, &CompositionWidget::onMediaSizeChanged);
 
-void PlayerWidget::changeOverlayMode(){
-
-}
-
-void PlayerWidget::widgetSizeMove()
-{
-    if (m_compositionWidget->width() <= m_mediaWidget->width() && m_compositionWidget->height() <= m_mediaWidget->height())
-    {
-        m_compositionWidget->setWindowOpacity(1); // Show the widget
-        QPoint p = m_mediaWidget->mapToGlobal(m_mediaWidget->pos());
-        int x = p.x() + (m_mediaWidget->width() - m_compositionWidget->width()) / 2;
-        int y = p.y() + (m_mediaWidget->height() - m_compositionWidget->height()) / 2;
-        m_compositionWidget->move(x, y);
-        m_compositionWidget->raise();
-    }
-    else
-    {
-        m_compositionWidget->setWindowOpacity(0); // Hide the widget
-    }
-}
-
-bool PlayerWidget::event(QEvent *event)
-{
-    switch (event->type())
-    {
-    case QEvent::Show:
-        m_compositionWidget->show();
-        QTimer::singleShot(50, this, SLOT(widgetSizeMove())); 
-        break;
-    case QEvent::WindowActivate:
-    case QEvent::Resize:
-    case QEvent::Move:
-        widgetSizeMove();
-        break;
-    default:
-        break;
-    }
-
-    return QWidget::event(event);
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -345,6 +305,79 @@ void PlayerWidget::endRecord()
 void PlayerWidget::rotate()
 {
     m_mediaWidget->rotate();
+}
+
+void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
+
+    m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
+}
+
+void PlayerWidget::onMediaSizeChanged(const QSize &size)
+{
+    m_mediaSize = size;
+}
+
+void PlayerWidget::widgetSizeMove()
+{
+    if (m_compositionWidget->width() <= m_mediaWidget->width() && m_compositionWidget->height() <= m_mediaWidget->height())
+    {
+        m_compositionWidget->setWindowOpacity(1); // Show
+        QPoint p = m_mediaWidget->mapToGlobal(m_mediaWidget->pos());
+        int x = p.x() + (m_mediaWidget->width() - m_compositionWidget->width()) / 2;
+        int y = p.y() + (m_mediaWidget->height() - m_compositionWidget->height()) / 2;
+        m_compositionWidget->move(x, y);
+        m_compositionWidget->raise();
+    }
+    else
+    {
+        m_compositionWidget->setWindowOpacity(0); // Hide
+    }
+}
+
+// void PlayerWidget::widgetSizeMove()
+// {
+//     if (m_mediaSize.isEmpty())
+//         return;
+
+//     QSize widgetSize = m_mediaWidget->size();
+
+//     if (m_compositionWidget->width() <= widgetSize.width() &&
+//         m_compositionWidget->height() <= widgetSize.height())
+//     {
+//         m_compositionWidget->setWindowOpacity(1);
+
+//         QPoint p = m_mediaWidget->mapToGlobal(QPoint(0, 0));
+
+//         int x = p.x() + (widgetSize.width() - m_compositionWidget->width()) / 2;
+//         int y = p.y() + (widgetSize.height() - m_compositionWidget->height()) / 2;
+
+//         m_compositionWidget->move(x, y);
+//         m_compositionWidget->raise();
+//     }
+//     else
+//     {
+//         m_compositionWidget->setWindowOpacity(0);
+//     }
+// }
+
+bool PlayerWidget::event(QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+        m_compositionWidget->show();
+        QTimer::singleShot(50, this, SLOT(widgetSizeMove())); 
+        break;
+    case QEvent::WindowActivate:
+    case QEvent::Resize:
+    case QEvent::Move:
+        widgetSizeMove();
+        break;
+    default:
+        break;
+    }
+
+    return QWidget::event(event);
 }
 
 void PlayerWidget::enableButtons()

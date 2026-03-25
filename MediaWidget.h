@@ -83,6 +83,7 @@ signals:
     void mediaFinished();
     void volumeChanged(const QString&);
     void speedChanged(const QString&);
+    void mediaSizeChanged(const QSize &size);
 };
 
 #endif // MEDIAWIDGET_H

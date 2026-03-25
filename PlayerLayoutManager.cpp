@@ -369,6 +369,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
     connect(activePlayer, &PlayerWidget::mediaPlayerEjected, advancedToolbar, &AdvancedToolbar::disableButtons);
 
+    connect(advancedToolbar, &AdvancedToolbar::setOverlayModeRequested, activePlayer, &PlayerWidget::setOverlayMode);
+
     connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {
         this->duplicatePlayer(activePlayer);
     });

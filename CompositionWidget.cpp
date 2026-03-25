@@ -1,4 +1,6 @@
 #include "CompositionWidget.h"
+#include "PlayerWidget.h"
+
 #include <QPainter>
 #include <QPainterPath>
 
@@ -11,26 +13,29 @@ CompositionWidget::CompositionWidget(QWidget *parent)
     setAutoFillBackground(false);
     setStyleSheet("background-color: rgba(0,0,0,0)");
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
 }
 
-void CompositionWidget::setOverlayMode(OverlayMode mode)
+void CompositionWidget::setOverlayMode(OverlayMode mode, bool isVFlipped, bool isHFlipped)
 {
     m_mode = mode;
+    m_isVFlipped = isVFlipped; 
+    m_isHFlipped = isHFlipped; 
     update(); // redraw
 }
 
-CompositionWidget::OverlayMode CompositionWidget::overlayMode() const
+enum OverlayMode CompositionWidget::overlayMode() const
 {
     return m_mode;
 }
 
 void CompositionWidget::setVerticalFlip(bool vf){
-    vertical_flip = vf; 
+    m_isVFlipped = vf; 
+    update();
 }
 
 void CompositionWidget::setHorizontalFlip(bool hf){
-    horizontal_flip = hf; 
+    m_isHFlipped = hf; 
+    update();
 }
 
 void CompositionWidget::setColor(const QColor &color)
@@ -45,9 +50,15 @@ void CompositionWidget::setLineWidth(int width)
     update();
 }
 
+void CompositionWidget::onMediaSizeChanged(const QSize &size)
+{
+    m_mediaSize = size;
+    update();
+}
+
 void CompositionWidget::paintEvent(QPaintEvent *)
 {
-    if (m_mode == None)
+    if (m_mode == OverlayMode::None)
         return;
 
     QPainter p(this);
@@ -57,19 +68,19 @@ void CompositionWidget::paintEvent(QPaintEvent *)
     p.setPen(pen);
 
     switch (m_mode) {
-    case RuleOfThirds:
+    case OverlayMode::RuleOfThirds:
         drawRuleOfThirds(p);
         break;
-    case CenterCross:
+    case OverlayMode::CenterCross:
         drawCenterCross(p);
         break;
-    case Diagonals:
+    case OverlayMode::Diagonals:
         drawDiagonals(p);
         break;
-    case S_Curve:
+    case OverlayMode::S_Curve:
         drawS_Curve(p);
         break;
-    case GoldenRatio:
+    case OverlayMode::GoldenRatio:
         drawGoldenRatio(p);
         break;        
     default:
@@ -105,8 +116,19 @@ void CompositionWidget::drawDiagonals(QPainter &p)
     int w = width();
     int h = height();
 
-    p.drawLine(0, 0, w, h);
-    p.drawLine(w, 0, 0, h);
+    if (!m_isVFlipped && m_isHFlipped) {
+        p.drawLine(w, 0, 0, h);
+    }
+    else if (m_isVFlipped && !m_isHFlipped) {
+        p.drawLine(0, h, w, 0);
+    }
+    else if (m_isVFlipped && m_isHFlipped) {
+        p.drawLine(w, h, 0, 0);
+    }
+    else {
+        p.drawLine(0, 0, w, h);
+    }
+    
 }
 
 void CompositionWidget::drawS_Curve(QPainter &p)

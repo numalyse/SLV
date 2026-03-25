@@ -1,28 +1,19 @@
 #ifndef COMPOSITIONWIDGET_H
 #define COMPOSITIONWIDGET_H
 
+#include "OverlayMode.h"
 #include <QWidget>
+#include <QSize>
 
 class CompositionWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    enum OverlayMode {
-        None,
-        RuleOfThirds,
-        CenterCross,
-        Diagonals,
-        S_Curve,
-        GoldenRatio
-    };
-
-    bool vertical_flip = false;
-    bool horizontal_flip = false;
 
     explicit CompositionWidget(QWidget *parent = nullptr);
 
-    void setOverlayMode(OverlayMode mode);
+    void setOverlayMode(OverlayMode mode, bool isVFlipped, bool isHFlipped);
     OverlayMode overlayMode() const;
 
     void setVerticalFlip(bool vf);
@@ -30,6 +21,9 @@ public:
 
     void setColor(const QColor& color);
     void setLineWidth(int width);
+
+public slots:
+    void onMediaSizeChanged(const QSize &size);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -42,8 +36,10 @@ private:
 
     void drawGoldenRatio(QPainter &p);
 
-private:
-    OverlayMode m_mode = None;
+    QSize m_mediaSize;
+    OverlayMode m_mode = OverlayMode::None;
+    bool m_isVFlipped = false;
+    bool m_isHFlipped = false;
     QColor m_color = QColor(255, 255, 255, 120);
     int m_lineWidth = 1;
 };

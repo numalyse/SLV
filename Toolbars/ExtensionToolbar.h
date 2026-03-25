@@ -6,8 +6,11 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
+#include "OverlayMode.h"
 
 #include <QWidget>
+#include <QComboBox>
+#include <QCheckBox>
 
 /// @brief Extension de la Toolbar avancée.
 class ExtensionToolbar : public QWidget
@@ -41,13 +44,20 @@ public:
     // ToolbarButton* m_abloopBtn = nullptr;
     // ToolbarPopupButton* m_multiviewBtn;
 
-
     // playlist btn ?
     // A / B Button voir comment
 
 public slots:
     void enableButtons();
     void disableButtons();
+
+private slots:
+    void updateOverlayMode();
+
+private:
+    QComboBox* m_compoRuleComboBox;
+    QCheckBox* m_compoRuleCheckboxVFlip;
+    QCheckBox* m_compoRuleCheckboxHFlip;
 
 signals:
     void enableRecordRequested();
@@ -57,7 +67,8 @@ signals:
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
     void rotateRequested();
-    void setOverlayModeRequested();
+    void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+
 };
 
 #endif

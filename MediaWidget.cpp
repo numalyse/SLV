@@ -12,7 +12,7 @@
 #include <QMap>
 #include <QPainter>
 #include <QDebug>
-
+#include <QSize>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -49,6 +49,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
     libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
+    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
@@ -328,6 +329,18 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             }
         }, Qt::QueuedConnection);
 
+    }
+    else if (event->type == libvlc_MediaPlayerPlaying)
+    {
+        unsigned width = 0;
+        unsigned height = 0;
+
+        libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+
+        if (width > 0 && height > 0)
+        {
+            emit mediaWidget->mediaSizeChanged(QSize(width, height));
+        }
     }
 }
 

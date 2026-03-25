@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <qmainwindow.h>
 #include <vlc/vlc.h>
+#include <QSize>
 
 class PlayerWidget : public QWidget
 {
@@ -25,10 +26,6 @@ public:
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
-
-    void changeOverlayMode();
-    void widgetSizeMove();
-    bool event(QEvent *event);
 
 public slots:
     void play();
@@ -52,6 +49,10 @@ public slots:
     void startRecord();
     void endRecord();
     void rotate();
+    void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void onMediaSizeChanged(const QSize &size);
+    void widgetSizeMove();
+    bool event(QEvent *event);
 
     void enableButtons();
     void disableButtons();
@@ -84,6 +85,7 @@ signals:
     void mediaPlayerEjected();
 
     void mediaDropped(const QStringList&);
+    void mediaSizeChanged(const QSize &size);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -101,6 +103,7 @@ private:
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
+    QSize m_mediaSize;
 
 };
 

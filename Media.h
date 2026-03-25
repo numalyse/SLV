@@ -41,6 +41,7 @@ public:
 signals:
     void fpsParsed(double);
     void durationParsed(int64_t);
+    void sizeParsed(const QSize &size);
     
 private:
     QString m_name;

@@ -119,6 +119,15 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
 }
 
+QVector<Shot> TimelineWidget::getTimelineData()
+{
+    return m_shotManager->shotItemsData();
+}
+
+void TimelineWidget::setTimelineData(QVector<Shot> shots)
+{
+    m_shotManager->setShotItemsData(shots);
+}
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
@@ -194,28 +203,20 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
 }
 
-/// @brief retourne le temps en ms de la frame le plus proche du curseur
-/// @return 
 
-
-/// @brief déplace le curseur si l'ab loop n'est pas activé, met à jour le temps et et envoie à la toolbar le nouveau temps
+/// @brief déplace le curseur si l'ab loop est active, clamp au min et max, met à jour le temps et et envoie à la toolbar le nouveau temps
 /// @param cursorPosX 
 void TimelineWidget::moveCursor(double newCursorPosX){
-    int64_t newCursorTime = m_mathManager->posToTime(newCursorPosX);
-    auto restartTime = m_abManager->getLoopRestartTime(newCursorTime);
+    int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
 
-    if(restartTime.has_value()){ 
-        m_vlcTime = restartTime.value();
-        m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
-        return;
-    }
+    auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
+    m_vlcTime = clampedTime.value_or(newCursorTime);
 
-    m_vlcTime = m_mathManager->posToTimeSnapped(newCursorPosX);
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
 
-    emit timelineSliderPositionRequested(m_vlcTime); // visual update for slider
+    emit timelineSliderPositionRequested(m_vlcTime);
 
-    if( ! m_seekTimer->isActive() ){ // limite les appeles à setTime VLC
+    if(!m_seekTimer->isActive()){
         m_seekTimer->start(m_seekPendingTime);
     }
 
@@ -342,18 +343,21 @@ void TimelineWidget::splitShotAtCursor()
 {
     int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->splitShotAt(cutTime);
+    emit saveNeeded();
 }
 
 void TimelineWidget::mergeWithPrevShotAction()
 {
     int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->mergeCurrentWithPrevShot(cursorTime);
+    emit saveNeeded();
 }
 
 void TimelineWidget::mergeWithNextShotAction()
 {
     int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->mergeCurrentWithNextShot(cursorTime);
+    emit saveNeeded();
 }
 
 

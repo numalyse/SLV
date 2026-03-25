@@ -75,7 +75,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::enableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
-    connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjected);
+    connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
@@ -132,6 +132,14 @@ bool PlayerWidget::setMediaFromPath(const QString& filePath)
     return false;
 }
 
+QString PlayerWidget::getMediaPath()
+{
+    if (mediaWidget() && mediaWidget()->media()) {
+        return mediaWidget()->media()->filePath();
+    }
+    return QString();
+}
+
 void PlayerWidget::enablePlayerFullscreen()
 {
     emit enablePlayerFullscreenRequested(this);
@@ -152,7 +160,7 @@ void PlayerWidget::play()
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
-        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"); // TODO : utiliser text manager
         if(file_path != ""){
             setMediaFromPath(file_path);
         }
@@ -172,7 +180,7 @@ void PlayerWidget::playFromAdvanced()
         QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
         if(file_path != ""){
             if (setMediaFromPath(file_path)){
-                ProjectManager::instance().createProject(m_mediaWidget->media());
+                ProjectManager::instance().requestProjectCreation({file_path});
             }
         }
         else
@@ -202,15 +210,7 @@ void PlayerWidget::stop()
 
 void PlayerWidget::eject()
 {
-    // TODO : demander à l'utilisateur s'il veut ejecter car cela va supprimer le project
-    if(m_mediaWidget->eject()){
-        m_playing = false;
-        emit ejectUiUpdateRequested();
-        emit checkPlayersPlayStatusRequested();
-        emit SignalManager::instance().displayPlaylist();
-        ProjectManager::instance().deleteProject();
-    }
-
+   m_mediaWidget->eject();
 }
 
 void PlayerWidget::mute()
@@ -298,6 +298,15 @@ void PlayerWidget::enableButtons()
 void PlayerWidget::disableButtons()
 {
     m_toolBar->disableButtons();
+}
+
+void PlayerWidget::mediaPlayerEjectedHandler()
+{
+    m_playing = false;
+    emit ejectUiUpdateRequested();
+    emit checkPlayersPlayStatusRequested();
+    emit SignalManager::instance().displayPlaylist();
+    emit mediaPlayerEjected();
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){

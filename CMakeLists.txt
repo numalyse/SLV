@@ -6,11 +6,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
@@ -79,6 +80,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         SequenceExtractionHelper.h
         VideoCaptureManager.h VideoCaptureManager.cpp
 
+        FileCopyThread.h FileCopyThread.cpp
+
+        External/nlohmann/json.hpp
+
+        GenericDialog.h
+
     )
 
 
@@ -139,6 +146,7 @@ target_link_libraries(SLV PRIVATE libvlc.lib libvlccore.lib)
 # -----------------------------
 
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Concurrent)
 # -----------------------------
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Core)

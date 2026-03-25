@@ -28,7 +28,8 @@ public slots:
     void disableButtons();
     void enableSlider();
     void disableSlider();
-
+    virtual void ejectRequested() override;
+    
 private:
     ToolbarButton* m_prevMediaBtn = nullptr;
     ToolbarButton* m_nextMediaBtn = nullptr;
@@ -40,7 +41,8 @@ protected slots:
     virtual void onSliderPressed() override;
     virtual void onSliderReleased() override;
     virtual void onSliderMoved(int value) override;
-
+    virtual void duplicatePlayerAction() override;
+    
 signals:
     void enableRecordRequested();
     void disableRecordRequested();

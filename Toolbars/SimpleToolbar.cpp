@@ -103,7 +103,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", TextManager::instance().get("tooltip_delete_player"));
     m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", TextManager::instance().get("tooltip_duplicate_player"));
 
-    connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerRequested);
+    connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerAction);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
@@ -337,4 +337,9 @@ void SimpleToolbar::onSliderMoved(int value) {
     if (!m_seekTimer->isActive()) {
         m_seekTimer->start(m_seekPendingTime);
     }
+}
+
+void SimpleToolbar::duplicatePlayerAction()
+{
+    emit duplicatePlayerRequested();
 }

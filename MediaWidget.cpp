@@ -17,6 +17,7 @@
 #include <QFileDialog.h>
 #include <QTextStream>
 
+#include <QThreadPool>
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
@@ -151,18 +152,29 @@ bool MediaWidget::stop()
     return true;
 }
 
+
+
 /// @brief Release the media player and create a new one from MediaWidget instance
 bool MediaWidget::eject()
 {
     if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
     releaseEventManager();
-    releaseMedia();
-    libvlc_media_player_release(m_player);
-    m_player = libvlc_media_player_new(SLV::VlcInstance::get());
-    createEventManager();
-    managePlayerSystem();
-    emit mediaPlayerEjected();
+
+    QThreadPool::globalInstance()->start([this]() {
+        
+        libvlc_media_player_stop(m_player);
+        libvlc_media_player_release(m_player); 
+        m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+        
+        QMetaObject::invokeMethod(this, [this]() {
+            releaseMedia();
+            createEventManager();
+            managePlayerSystem();
+            emit mediaPlayerEjected();
+        });
+    });
+
     return true;
 }
 
@@ -224,6 +236,7 @@ void MediaWidget::setTime(int64_t time)
     if(!m_player) return;
     m_videoCaptureManager.mediaCutAndConcat(libvlc_media_player_get_time(m_player), time);
     libvlc_media_player_set_time(m_player, time);
+    emit vlcTimeChanged(time);
 }
 
 void MediaWidget::moveTimeBackward()
@@ -231,9 +244,9 @@ void MediaWidget::moveTimeBackward()
     int64_t time = -5000;
     int64_t currentTime = libvlc_media_player_get_time(m_player);
     if(currentTime + time > 5000){
-        emit SignalManager::instance().timelineSetPosition(currentTime + time);
+        setTime(currentTime + time);
     }else{
-        emit SignalManager::instance().timelineSetPosition(0);
+        setTime(0);
     }
 }
 
@@ -241,7 +254,7 @@ void MediaWidget::moveTimeForward()
 {
     int64_t time = 5000;
     int64_t currentTime = libvlc_media_player_get_time(m_player);
-    emit SignalManager::instance().timelineSetPosition(currentTime + time);
+    setTime(currentTime + time);
 }
 
 void MediaWidget::enableLoopMode()
@@ -347,6 +360,8 @@ void MediaWidget::rotate()
 void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 {
     MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);
+    
+    if (!mediaWidget) return;
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {

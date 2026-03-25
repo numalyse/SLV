@@ -35,6 +35,7 @@ public:
     int width() const { return m_width; }
     libvlc_instance_t* vlcInstance() const { return m_vlcInstance; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
+    QMap<libvlc_meta_t, QString> metaData() const { return m_metaData; }
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }

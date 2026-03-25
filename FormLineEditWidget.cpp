@@ -1,7 +1,7 @@
 #include "FormLineEditWidget.h"
 
 
-FormLineEditWidget::FormLineEditWidget(const QString &name, const QString &text, bool editable, QWidget *parent)
+FormLineEditWidget::FormLineEditWidget(const QString &name, const QString &text, bool editable, QWidget *parent) : QFrame(parent)
 {
     setAutoFillBackground(true);
     setStyleSheet("border: none; background-color: palette(base); padding: 1px; border-radius: 5px;");

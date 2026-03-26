@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-ThumbnailWorker::ThumbnailWorker(const QString &mediaPath, QObject *parent) : QThread(parent), m_videoPath{mediaPath}
+ThumbnailWorker::ThumbnailWorker(QObject *parent) : QThread(parent)
 {
 }
 
@@ -10,11 +10,11 @@ ThumbnailWorker::~ThumbnailWorker() {
     stop();
 }
 
-void ThumbnailWorker::requestThumbnail(int shotId, int64_t msStart, int64_t lenghtMs)
+void ThumbnailWorker::requestThumbnail(int shotId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize)
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    m_queue.enqueue({shotId, msStart, lenghtMs});
+    m_queue.enqueue({shotId, msStart, lenghtMs, mediaPath, targetSize});
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
 
@@ -27,16 +27,9 @@ void ThumbnailWorker::stop()
 
 void ThumbnailWorker::run()
 {
-    cv::VideoCapture cap(m_videoPath.toStdString(), cv::CAP_FFMPEG);
- 
-    if (!cap.isOpened()) {
-        qCritical() << "Impossible de lire la video pour charger des thumbnails";
-        return;
-    }
-
-    int frameCount = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_COUNT));
-    double fps = cap.get(cv::CAP_PROP_FPS); 
-    qDebug() << "Total frames: " << frameCount << ", FPS: " << fps;
+    cv::VideoCapture cap;
+    QString previousMediaPath = "";
+    double fps {};
 
     while(!m_stop){
         ThumbnailRequest req;
@@ -53,14 +46,26 @@ void ThumbnailWorker::run()
             req = m_queue.dequeue();
         }
 
-
-        int64_t offset = std::round((static_cast<double>(m_frameOffset) * 1000.0) / fps);
-        double msStart = req.msStart;
-        if( req.msStart + req.shotLength > req.msStart + offset){
-            msStart = req.msStart + offset;
+        if (req.videoPath != previousMediaPath){
+            cap.release();
+            cap.open(req.videoPath.toStdString(), cv::CAP_FFMPEG);
+            if (!cap.isOpened()) {
+                qCritical() << "Thumbnail : Impossible de lire la video pour charger des thumbnails";
+                return;
+            }
+            //qDebug() << "Thumbnail : changement de média";
+            previousMediaPath = req.videoPath;
+            fps = cap.get(cv::CAP_PROP_FPS);
         }
 
-        cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(msStart));
+
+        int64_t offset = std::round((static_cast<double>(m_frameOffset) * 1000.0) / fps);
+        double msThumbnail = req.msStart;
+        if( req.msStart + req.shotLength > req.msStart + offset){
+            msThumbnail = req.msStart + offset;
+        }
+
+        cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(msThumbnail));
         
         cv::Mat frame;
         if (cap.read(frame)) {
@@ -68,8 +73,10 @@ void ThumbnailWorker::run()
             int origWidth = frame.cols;
             int origHeight = frame.rows;
 
-            double scaleWidth = static_cast<double>(m_targetSize.width) / origWidth;
-            double scaleHeight = static_cast<double>(m_targetSize.height) / origHeight;
+            cv::Size cvTargetSize(req.targetSize.width(), req.targetSize.height());
+
+            double scaleWidth = static_cast<double>(cvTargetSize.width) / origWidth;
+            double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
 
             double scale = std::min(scaleWidth, scaleHeight);
 
@@ -86,7 +93,10 @@ void ThumbnailWorker::run()
             QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_RGB888);
             QImage finalImg = img.copy(); // utiliser .copy() car les données de resized vont être détruites
 
+            //qDebug() << "Thumbnail : prete pour le plan : " <<req.shotId ;
             emit thumbnailReady(req.shotId, finalImg);
+        }else {
+            qDebug() << "Thumbnail:  Impossible de lire l'image pour le plan : " << req.shotId ;
         }
 
     }

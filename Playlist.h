@@ -5,13 +5,15 @@
 #include <PlaylistItem.h>
 #include <QFileDialog>
 #include <SignalManager.h>
+#include <QImage>
 
 class Playlist : public QWidget
 {
     Q_OBJECT
 public:
     explicit Playlist(QWidget *parent = nullptr);
-
+    void updateThumbnail(int playlistItemId, QImage image);
+    
 private:
     bool m_playlistLooping = false;
     bool m_randomized = false;
@@ -24,6 +26,7 @@ private:
 signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
+    void updateImageRequested(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
 
 public slots:
     void addItemDialog();

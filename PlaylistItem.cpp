@@ -18,7 +18,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // thumbnail
     m_mediaThumbnailLabel = new QLabel();
-    m_mediaThumbnailLabel->setFixedSize(64,36);
+    m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
     m_mediaThumbnailLabel->setText("No preview");
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
@@ -65,6 +65,7 @@ void PlaylistItem::setDurationLabel()
 {
     QString time = TimeFormatter::msToHHMMSSFF(m_mediaData->duration(), 1);
     m_mediaDurationLabel->setText(time);
+    emit updateImageRequested(m_itemIndex, m_mediaData->duration()/2, 0, m_mediaData->filePath(), m_thumbnailSize);
 }
 
 void PlaylistItem::setIndex(int index)
@@ -133,4 +134,11 @@ void PlaylistItem::initStyle()
     m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
     m_deleteBtn->setStyleSheet("background: tomato");
     m_deleteBtn->setMaximumWidth(20);
+}
+
+void PlaylistItem::setThumbnail(QImage image)
+{
+    m_mediaThumbnailLabel->clear();
+    QPixmap pixmap = QPixmap::fromImage(image);
+    m_mediaThumbnailLabel->setPixmap(pixmap);
 }

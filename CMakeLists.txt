@@ -33,7 +33,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlayerWidget.cpp
         PlayerLayoutManager.h PlayerLayoutManager.cpp
         Media.h Media.cpp
-        PlaylistManager.h PlaylistManager.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
 
         Toolbars/Toolbar.h

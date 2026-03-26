@@ -29,6 +29,15 @@ NavPanel::NavPanel(QWidget *parent)
 
     connect(&SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail, this, &NavPanel::displayShotDetail);
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
+
+    m_thumbnailWorker = new ThumbnailWorker(this);
+    connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
+
+    connect(m_playlistWidget, &Playlist::updateImageRequested, this, &NavPanel::updateImageRequest);
+    connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
+
+    m_thumbnailWorker->start();
+
 }
 
 void NavPanel::showPanel()
@@ -83,4 +92,16 @@ void NavPanel::disableShotControlButtons()
 void NavPanel::enableShotControlButtons()
 {
     m_shotDetail->toggleShotControlButtons(true);
+}
+
+void NavPanel::updateImageRequest(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize){
+    m_thumbnailWorker->requestThumbnail(idShot, time, length, mediaPath, targetSize);
+}
+
+void NavPanel::updateThumbnail(int imageId, QImage image){
+    if (imageId == -1){
+        m_shotDetail->updateTagImage(image);
+    }else{
+        m_playlistWidget->updateThumbnail(imageId, image);
+    }
 }

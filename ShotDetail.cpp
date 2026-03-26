@@ -28,6 +28,9 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_endTime = new FormLineEditWidget(textManager.get("shot_detail_end_time_name"), "", false, this);
     m_duration = new FormLineEditWidget(textManager.get("shot_detail_duration_time_name") , "", false, this);
     m_notes = new FormTextEditWidget(textManager.get("shot_detail_note_name") , "", true, this);
+    m_tagImage = new QLabel(this);
+    m_tagImage->setStyleSheet("");
+    m_tagImage->setFixedSize(m_imageSize);
 
     m_notes->setMaximumHeight(250);
 
@@ -67,6 +70,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_layout->addWidget(m_endTime);
     m_layout->addWidget(m_duration);
     m_layout->addWidget(m_notes);
+    m_layout->addWidget(m_tagImage);
     m_layout->addWidget(frameButtonsActions);
     m_layout->addStretch();
 
@@ -76,6 +80,8 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
     m_shotData = shotData;
     m_shotId = shotId;
+
+    m_tagImage->clear();
 
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
@@ -96,7 +102,7 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
         m_toNextShotBtn->setEnabled(false);
     }
 
-
+    emit updateImageRequested(-1, shotData->tagImageTime, 0, ProjectManager::instance().mediaPath(), m_imageSize);
 }
 
 void ShotDetail::toggleShotControlButtons(bool state)
@@ -104,4 +110,11 @@ void ShotDetail::toggleShotControlButtons(bool state)
     m_buttonDisabled = !state;
     m_toNextShotBtn->setEnabled(state);
     m_toPrevShotBtn->setEnabled(state);
+}
+
+void ShotDetail::updateTagImage(QImage image)
+{
+    m_tagImage->clear();
+    QPixmap pixmap = QPixmap::fromImage(image);
+    m_tagImage->setPixmap(pixmap);
 }

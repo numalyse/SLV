@@ -49,6 +49,7 @@ private:
     void mergeCurrentInto(int ShotItemId);
 
     QVector<ShotItem*> m_shotItems;
+    const QString m_mediaPath;
     ShotItem* m_currentShotItem = nullptr;
 
     // pointeurs non onwner, p_ pour les différencier

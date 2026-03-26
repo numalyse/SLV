@@ -19,6 +19,15 @@ Playlist::Playlist(QWidget *parent)
     connect(m_addItemBtn, &QPushButton::clicked, this, &Playlist::addItemDialog);
 }
 
+void Playlist::updateThumbnail(int playlistItemId, QImage image)
+{
+    if(playlistItemId <0 || playlistItemId >= m_items.size()) return;
+
+    auto* item = m_items[playlistItemId];
+    item->setThumbnail(image);
+
+}
+
 void Playlist::addItemDialog()
 {
     QStringList filesPaths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
@@ -39,10 +48,12 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         m_items.append(newItem);
         m_itemsLayout->addWidget(newItem);
 
+        
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
             m_currentMediaIndex = index;
         });
+        connect(newItem, &PlaylistItem::updateImageRequested, this, &Playlist::updateImageRequested);
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
         connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     }

@@ -151,6 +151,15 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
 
 }
 
+QString ProjectManager::mediaPath()
+{
+    if(m_project){
+        if(m_project->media){
+            return m_project->media->filePath();
+        }
+    }
+    return "";
+}
 
 // slots
 
@@ -169,6 +178,7 @@ void ProjectManager::initProjectShot(){
     }
 
     Shot shot{"Titre", 0, m_project->media->duration()};
+    shot.tagImageTime = shot.middle();
     m_project->shots.append(shot);
     
     for (size_t i = 0; i < m_project->shots.size(); i++) {

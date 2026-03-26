@@ -1,3 +1,6 @@
+#ifndef GENERICDIALOG_H
+#define GENERICDIALOG_H
+
 #include "TextManager.h"
 
 #include <QMessageBox>
@@ -13,7 +16,7 @@ namespace SLV
         const QString& title,
         const QString& text,
         std::function<void()> onYes,        
-        std::function<void()> onNo,        
+        std::function<void()> onNo = nullptr,        
         std::function<void()> onCancel = nullptr 
     ) {
 
@@ -26,7 +29,11 @@ namespace SLV
         msgBox.setText(text);
 
         QPushButton *yesBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_yes"), QMessageBox::YesRole);
-        QPushButton *noBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_no"), QMessageBox::NoRole);
+        QPushButton *noBtn = nullptr;
+        if(onNo){
+            noBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_no"), QMessageBox::NoRole);
+        }
+
         QPushButton *cancelBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_cancel"), QMessageBox::RejectRole);
 
         msgBox.exec();
@@ -42,3 +49,4 @@ namespace SLV
 
 } // namespace SLV
 
+#endif

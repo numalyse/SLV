@@ -11,6 +11,18 @@ void TimelineMath::fitToWidth(double width)
     m_pixelsPerMs = width / static_cast<double>(m_duration);
 }
 
+int64_t TimelineMath::frameToTime(int frame)
+{
+    if (frame <= 0) return 0;
+    if (m_fps <= 0.0) return 0; 
+
+    double msPerFrame = 1000.0 / m_fps;
+    double exactTimeMs = frame * msPerFrame;
+    int64_t ms = static_cast<int64_t>( exactTimeMs );
+
+    return std::min(ms, m_duration);
+}
+
 int64_t TimelineMath::posToTime(double pos)
 {
     if(pos <= 0) return 0;

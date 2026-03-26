@@ -121,5 +121,7 @@
         <file alias="fullscreen_off">icons/fullscreen_off.png</file>
         <file alias="fullscreen_off_white">icons/fullscreen_off_white.png</file>
         <file alias="fullscreen_white">icons/fullscreen_white.png</file>
+        <file alias="auto_segmentation_white">icons/auto_segmentation_white.png</file>
+        <file alias="auto_segmentation">icons/auto_segmentation.png</file>
     </qresource>
 </RCC>

@@ -143,13 +143,13 @@ QString PlayerWidget::getMediaPath()
 void PlayerWidget::enablePlayerFullscreen()
 {
     emit enablePlayerFullscreenRequested(this);
-    emit enableFullscreenUiUpdateRequested();
+    m_toolBar->enableFullscreenUiUpdate();
 }
 
 void PlayerWidget::disablePlayerFullscreen()
 {
     emit disablePlayerFullscreenRequested(this);
-    emit disableFullscreenUiUpdateRequested();
+    m_toolBar->disableFullscreenUiUpdate();
 }
 
 // slots 

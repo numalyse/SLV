@@ -336,7 +336,9 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     }
 
     connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
+    connect(globalToolbar, &Toolbar::enableFullscreenRequest, globalToolbar, &GlobalToolbar::enableFullscreenUiUpdate);
     connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
+    connect(globalToolbar, &Toolbar::disableFullscreenRequest, globalToolbar, &GlobalToolbar::disableFullscreenUiUpdate);
     connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
     globalToolbar->playPauseBtn()->setButtonState(newGlobalPlayState());

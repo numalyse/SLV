@@ -301,10 +301,10 @@ void MediaWidget::rotate()
     libvlc_media_release(media);
 }
 
-// QPoint MediaWidget::getMediaPosRect() const
-// {
-//     return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());
-// }
+QPoint MediaWidget::getMediaPosRect() const
+{
+    return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());
+}
 
 QRect MediaWidget::getMediaDisplayRect() const
 {
@@ -390,19 +390,24 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
-
+void MediaWidget::moveEvent(QMoveEvent* event)
+{
+    QWidget::moveEvent(event);
+    QRect mediaRect = getMediaDisplayRect();
+}
 
 void MediaWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     QRect mediaRect = getMediaDisplayRect();
     m_mediaSurface->setGeometry(mediaRect);
-    m_blackFrame->setGeometry(rect());
+    m_blackFrame->setGeometry(mediaRect);
     emit mediaRectChanged(mediaRect);
     qDebug() << "mediaWidget size:" << this->size();
     qDebug() << "m_mediaSurface size:" << m_mediaSurface->size();
     qDebug() << "m_blackFrame size:" << m_blackFrame->size();
     qDebug() << "Displayed video rect:" << mediaRect;
+    qDebug() << "mediasize:" << m_mediaSize;
 }
 
 /// @brief Stops the current media player and load a new media from a path

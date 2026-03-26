@@ -52,6 +52,7 @@ void CompositionWidget::setLineWidth(int width)
 void CompositionWidget::onMediaRectChanged(const QRect &rect)
 {
     m_mediaRect = rect;
+    qDebug() << "position : " << this->pos();
     qDebug() << "CompositionWidget m_mediaRect : " << m_mediaRect;
     update();
 }
@@ -66,6 +67,8 @@ void CompositionWidget::paintEvent(QPaintEvent *)
 
     QPen pen(m_color, m_lineWidth);
     p.setPen(pen);
+
+    p.translate(m_mediaRect.topLeft());
 
     switch (m_mode) {
     case OverlayMode::RuleOfThirds:

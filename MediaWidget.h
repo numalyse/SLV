@@ -45,7 +45,7 @@ public slots:
     void endRecord();
     void rotate();
 
-    //QPoint getMediaPosRect() const;
+    QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
 
 private:
@@ -72,6 +72,7 @@ private:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 

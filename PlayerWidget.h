@@ -76,6 +76,8 @@ signals:
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
     void nameUiUpdateRequest(const QString& );
+    void enableFullscreenUiUpdateRequested();
+    void disableFullscreenUiUpdateRequested();
 
     void mediaPlayerLoaded();
     void mediaPlayerEjected();

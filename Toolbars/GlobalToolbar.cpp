@@ -38,6 +38,16 @@ void GlobalToolbar::setFullscreenUI()
     // Créer un layout quand on est en fullscreen
 }
 
+void GlobalToolbar::enableFullscreenUiUpdate()
+{
+    m_fullscreenBtn->setButtonState(true);
+}
+
+void GlobalToolbar::disableFullscreenUiUpdate()
+{
+    m_fullscreenBtn->setButtonState(false);
+}
+
 void GlobalToolbar::setDefaultUI()
 {
 

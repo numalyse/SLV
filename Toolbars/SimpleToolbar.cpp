@@ -286,6 +286,17 @@ void SimpleToolbar::speedUiUpdate(const QString & newSpeed)
     m_speedLabel->setText("x" + newSpeed);
 }
 
+void SimpleToolbar::enableFullscreenUiUpdate()
+{
+    m_fullscreenBtn->setButtonState(true);
+    m_fullscreenBtn->toggleUpdateIcon();
+}
+
+void SimpleToolbar::disableFullscreenUiUpdate()
+{
+    m_fullscreenBtn->setButtonState(false);
+}
+
 void SimpleToolbar::disableLoopMode()
 {
     emit m_loopBtn->stateDeactivated();

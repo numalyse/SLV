@@ -36,6 +36,8 @@ public:
     const QVector<Shot> shotItemsData() const;
     void setShotItemsData(const QVector<Shot>& shots);
 
+    void createShotItemsFromCuts(const std::vector<int>& cuts);
+
 signals:
     void updateShotDetailRequested(int shotCount, int shotId, Shot*);
     void showMergeWithPreviousShotAction(bool);

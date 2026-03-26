@@ -254,12 +254,12 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
         m_fileCpyThread = nullptr;
     }
 
-    TextManager& txtManger = TextManager::instance();
+    TextManager& txtManager = TextManager::instance();
 
     m_fileCpyThread = new FileCopyThread(sourcePath, destPath, this);
     
-    QProgressDialog* progressDialog = new QProgressDialog(txtManger.get("project_copy_video"), txtManger.get("cancel"), 0, 100, nullptr);
-    progressDialog->setWindowTitle(txtManger.get("project_window_title_copy_video"));
+    QProgressDialog* progressDialog = new QProgressDialog(txtManager.get("project_window_title_copy_video"), txtManager.get("generic_dialog_btn_cancel"), 0, 100, nullptr);
+    progressDialog->setWindowTitle(txtManager.get("project_window_title_copy_video"));
     progressDialog->setWindowModality(Qt::WindowModal); 
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
     progressDialog->show();
@@ -271,13 +271,12 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 
     connect(m_fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
-    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath](bool success) {
+    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath, txtManager](bool success) {
         
         if (success) {
             writeJson();
         }else {
             if ( ! m_fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
-                TextManager& txtManager = TextManager::instance();
                 QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), txtManager.get("project_error_copy_failed"));
             }
             deleteFolder(destPath);

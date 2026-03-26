@@ -113,7 +113,7 @@ void SegmentationThread::run()
             return;
         }
 
-        cv::resize(frame, frameDownscaled, m_reducedSize, 0, 0, cv::INTER_NEAREST);
+        cv::resize(frame, frameDownscaled, m_reducedSize, 0, 0, cv::INTER_AREA);
 
 		cv::cvtColor(frameDownscaled, frameHLS, cv::COLOR_BGR2HLS);
 

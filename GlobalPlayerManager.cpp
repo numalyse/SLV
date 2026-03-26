@@ -7,6 +7,8 @@
 
 #include <qlayout.h>
 
+#include <QDebug>
+
 GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     : QWidget{parent}
 
@@ -190,11 +192,28 @@ void GlobalPlayerManager::createTimelineWidget()
         m_timeline->deleteLater();
         m_timeline = nullptr;
     }
-    
-    m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
-    m_timeline->setFixedHeight(150);
-
     ProjectManager& projManager = ProjectManager::instance();
+    Project* proj = projManager.projet();
+    Media* projMedia = proj->media;
+
+    if( ! projMedia ){
+        qCritical() << "Pas de media dans le projet, impossible de créer une timeline";
+        return;
+    }
+
+    if(projMedia->fps() == 0){
+        projMedia->setFps(1);
+        qDebug() << "FPS == 0, utilisation de FPS = 1";
+    }
+
+    if(projMedia->duration() == 0){
+        qCritical() << "Pas de duréer pour le média, impossible de créer une timeline";
+        return;
+    }
+
+
+    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), projMedia->filePath(), proj->shots, this);
+    m_timeline->setFixedHeight(150);
 
     projManager.setTimeline(m_timeline);
 

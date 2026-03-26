@@ -5,9 +5,13 @@
 
 #include <QtAssert>
 
-ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, QVector<Shot> &projectShots, QObject *parent) 
+ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, const QString& projectMediaPath, QVector<Shot> &projectShots, QObject *parent) 
 : QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}
 {
+    m_thumbnailWorker = new ThumbnailWorker(projectMediaPath, this);
+    connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
+    m_thumbnailWorker->start();
+
     setShotItemsData(projectShots);
 }
 
@@ -80,6 +84,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     auto oldEnd =  m_shotItems[index]->shot().end;
     m_shotItems[index]->shot().end = cutTime - 1; 
+    m_thumbnailWorker->requestThumbnail(index, m_shotItems[index]->shot().start, m_shotItems[index]->shot().end - m_shotItems[index]->shot().start); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
 
     double newWidth1 = p_mathManager->timeToPos( m_shotItems[index]->shot().end - m_shotItems[index]->shot().start );
     m_currentShotItem->setWidth(newWidth1);
@@ -95,6 +100,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     // on insère le plan juste apres le plan cut
     m_shotItems.insert(index + 1, newShotItem);
+    m_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start);
     p_scene->addItem(newShotItem);
 
     updateCurrentShot(cutTime);
@@ -201,14 +207,16 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
     for ( auto& IShot : shots ){
 
         double xPos =  p_mathManager->timeToPos(IShot.start);
-        double width = p_mathManager->timeToPos(IShot.end - IShot.start);
+        int64_t shotLength = (IShot.end - IShot.start);
+        double width = p_mathManager->timeToPos(shotLength);
         
         ShotItem* shot = new ShotItem(IShot, width, shotHeight);
 
         p_scene->addItem(shot);
         shot->setX(xPos);
-
         m_shotItems.push_back(shot);
+
+        m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength);
 
     }
 
@@ -223,14 +231,15 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     m_shotItems.clear();
 
     int64_t startShot = 0;
+    int64_t lengthShot = 0;
 
     for(int i=0; i < cuts.size(); ++i ){
 
         int64_t nextStartShot = p_mathManager->frameToTime(cuts[i]);
         int64_t endShot = nextStartShot - 1; // la fin du plan = cut - 1 ms
-
+        lengthShot = endShot - startShot;
         double xPos =  p_mathManager->timeToPos(startShot);
-        double width = p_mathManager->timeToPos(endShot - startShot);
+        double width = p_mathManager->timeToPos(lengthShot);
         
         Shot shot{"Titre", startShot, endShot};
 
@@ -238,21 +247,34 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
         p_scene->addItem(shotItem);
         shotItem->setX(xPos);
-
         m_shotItems.push_back(shotItem);
+        m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, startShot, lengthShot);
 
         startShot = nextStartShot;
     }
 
+    lengthShot = p_mathManager->duration() - startShot;
+
     double xPos =  p_mathManager->timeToPos(startShot);
-    double width = p_mathManager->timeToPos(p_mathManager->duration() - startShot);
+    double width = p_mathManager->timeToPos(lengthShot);
     
     Shot shot{"Titre", startShot, p_mathManager->duration()};
 
     ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
-    
     p_scene->addItem(shotItem);
     shotItem->setX(xPos);
-
     m_shotItems.push_back(shotItem);
+    m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, startShot, lengthShot);
+
+}
+
+void ShotManager::updateThumbnail(int shotId, QImage image){
+    if(shotId < 0 || shotId >= m_shotItems.size()){
+        qDebug() << "Tentative de mise a jour d'un shot out of range";
+        return;
+    }
+
+    ShotItem* shotItem = m_shotItems.at(shotId);
+    QPixmap pixmap = QPixmap::fromImage(image);
+    shotItem->setThumbnail(pixmap);
 }

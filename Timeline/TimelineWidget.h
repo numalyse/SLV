@@ -30,7 +30,8 @@ class TimelineWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit TimelineWidget(QVector<Shot>& projectShots, QWidget* parent = nullptr);
+
+    explicit TimelineWidget(double fps, int64_t duration, const QString &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
 

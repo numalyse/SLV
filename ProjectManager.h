@@ -54,6 +54,8 @@ public:
 
     Project* projet(){ return m_project;}
 
+    QString mediaPath();
+
     bool needSave() {
         if(!m_project) return false;
         return m_needSave;

@@ -9,10 +9,14 @@ struct Shot
     QString title;
     int64_t start;
     int64_t end;
+    int64_t tagImageTime;
     QString note;
     QColor color = QColor(79, 134, 198, 255);
-    QImage tagImage;
-    int64_t tagImageTime;
+
+    int64_t middle() {
+        return start + (end - start) / 2;
+    }
+    
 };
 
 

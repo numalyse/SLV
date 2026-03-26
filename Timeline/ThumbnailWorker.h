@@ -7,12 +7,15 @@
 #include <QQueue>
 #include <QImage>
 #include <QString>
+#include <QSize>
 #include <opencv2/opencv.hpp>
 
 struct ThumbnailRequest{
     int shotId;
     int64_t msStart;
     int64_t shotLength;
+    QString videoPath;
+    QSize targetSize;
 };
 
 class ThumbnailWorker : public QThread
@@ -20,10 +23,10 @@ class ThumbnailWorker : public QThread
 Q_OBJECT
 
 public:
-    explicit ThumbnailWorker(const QString& mediaPath, QObject* parent = nullptr);
+    explicit ThumbnailWorker(QObject* parent = nullptr);
     ~ThumbnailWorker();
 
-    void requestThumbnail(int shotId, int64_t msStart, int64_t lenghtMs);
+    void requestThumbnail(int shotId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize = {100, 75});
     void stop();
 
 signals:
@@ -33,15 +36,11 @@ protected:
     void run() override;
 
 private:
-    QString m_videoPath;
     QQueue<ThumbnailRequest> m_queue;
     QMutex m_mutex;
     QWaitCondition m_condition;
     bool m_stop = false;
     int m_frameOffset = 100;
-    
-    cv::Size m_targetSize{100, 75};
-
 };
 
 

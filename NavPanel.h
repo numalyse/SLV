@@ -3,10 +3,12 @@
 
 #include "Shot.h"
 #include "ShotDetail.h"
+#include "Timeline/ThumbnailWorker.h"
 
 #include <QWidget>
 #include <QBoxLayout>
 #include <Playlist.h>
+#include <QSize>
 #include <QStackedWidget>
 
 class NavPanel : public QWidget
@@ -21,6 +23,7 @@ private:
     QLayout *m_mainLayout = nullptr;
     Playlist *m_playlistWidget = nullptr;
     ShotDetail *m_shotDetail = nullptr;
+    ThumbnailWorker* m_thumbnailWorker = nullptr;
 
 public slots:
     void showPanel();
@@ -41,6 +44,10 @@ signals:
     void disableToolbarLoopRequested();
     void goToShotRequest(int);
 
+private slots:
+    void updateThumbnail(int shotId, QImage image);
+    void updateImageRequest(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
+    
 };
 
 #endif // NAVPANEL_H

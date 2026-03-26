@@ -6,7 +6,6 @@
         <file alias="sound_on.png">icons/sound_on.png</file>
         <file alias="sound_off.png">icons/sound_off.png</file>
         <file alias="speed_up.png">icons/speed_up.png</file>
-        <file alias="fullscreen.png">icons/fullscreen.png</file>
         <file alias="loop_on.png">icons/loop_on.png</file>
         <file alias="loop_off.png">icons/loop_off.png</file>
         <file alias="eject.png">icons/eject.png</file>
@@ -67,7 +66,6 @@
         <file alias="duplicate_media_white">icons/duplicate_media_white.png</file>
         <file alias="eject_white">icons/eject_white.png</file>
         <file alias="forward_white">icons/forward_white.png</file>
-        <file alias="fullscreen_white">icons/fullscreen_white.png</file>
         <file alias="hide_image_white">icons/hide_image_off_white.png</file>
         <file alias="show_image_white">icons/hide_image_on_white.png</file>
         <file alias="lang_white">icons/lang_white.png</file>
@@ -119,5 +117,9 @@
         <file alias="down_arrow_white">icons/down_arrow_white.png</file>
         <file alias="right_arrow">icons/right_arrow.png</file>
         <file alias="right_arrow_white">icons/right_arrow_white.png</file>
+        <file alias="fullscreen">icons/fullscreen.png</file>
+        <file alias="fullscreen_off">icons/fullscreen_off.png</file>
+        <file alias="fullscreen_off_white">icons/fullscreen_off_white.png</file>
+        <file alias="fullscreen_white">icons/fullscreen_white.png</file>
     </qresource>
 </RCC>

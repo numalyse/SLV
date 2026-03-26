@@ -41,7 +41,8 @@ protected:
     /// @brief Met à jour les icones en fonction de l'état
     void updateIcons(bool checked);
 
-
+public slots:
+    void toggleUpdateIcon();
 
 protected slots:
     /// @brief Appelé lorsque le bouton est cliqué. Met à jour les icônes puis emet le signal stateActivated ou stateDeactivated

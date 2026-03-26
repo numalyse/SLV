@@ -40,6 +40,18 @@ void ToolbarToggleButton::updateIcons(bool checked)
     }
 }
 
+void ToolbarToggleButton::toggleUpdateIcon()
+{
+    if(isChecked()){
+        setIcon(QIcon(m_iconPathOn));
+        setToolTip(m_toolTipTextOn);
+    }
+    else{
+        setIcon(QIcon(m_iconPathOff));
+        setToolTip(m_toolTipTextOff);
+    }
+}
+
 
 void ToolbarToggleButton::onButtonToggled(bool checked)
 {

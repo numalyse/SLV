@@ -30,6 +30,7 @@ void FileCopyThread::run()
 
     emit progress(0);
 
+    int lastPercent = -1;
     while ( !srcFile.atEnd())
     {   
         if(isInterruptionRequested()){
@@ -53,8 +54,11 @@ void FileCopyThread::run()
         copiedSize += written;
 
         if (totalSize > 0) {
-            int percentage = (copiedSize * 100) / totalSize;
-            emit progress(percentage);
+            int currentPercent = (copiedSize * 100) / totalSize;
+            if (currentPercent > lastPercent) {
+                emit progress(currentPercent);
+                lastPercent = currentPercent;
+            }
         }
 
     }

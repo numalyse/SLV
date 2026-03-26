@@ -8,6 +8,7 @@
 #include "Timeline/TimelineMath.h"
 #include "Timeline/ShotManager.h"
 #include "Timeline/ABManager.h"
+#include "Timeline/SegmentationThread.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -61,7 +62,8 @@ private slots:
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
-
+    void autoSegmentation();
+    
 private:
     void applyZoom(double zoomFactor, int mouseX);
     
@@ -78,6 +80,9 @@ private:
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
 
+    SegmentationThread* m_segmentationThread = nullptr;
+
+    ToolbarButton* m_autoSegmentationBtn = nullptr;
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
     ToolbarButton* m_mergeWithPrevShotBtn = nullptr;

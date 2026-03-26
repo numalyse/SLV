@@ -15,7 +15,7 @@ Media::Media(const QString &filePath, QObject *parent, libvlc_instance_t *vlcIns
     QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
 
     if(vlcInstance) m_vlcInstance = vlcInstance;
-    else m_vlcInstance = SLV::VlcInstance::get(); // si on a pas spécifié d'instance on utilise l'instance singleton
+    else m_vlcInstance = SLV::VlcInstance::get();
 
     m_vlcMedia = libvlc_media_new_location(m_vlcInstance, urlBytes.constData());
 

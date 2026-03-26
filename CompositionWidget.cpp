@@ -52,6 +52,7 @@ void CompositionWidget::setLineWidth(int width)
 void CompositionWidget::onMediaRectChanged(const QRect &rect)
 {
     m_mediaRect = rect;
+    qDebug() << "CompositionWidget m_mediaRect : " << m_mediaRect;
     update();
 }
 

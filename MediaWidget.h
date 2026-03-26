@@ -45,6 +45,7 @@ public slots:
     void endRecord();
     void rotate();
 
+    //QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
 
 private:
@@ -85,7 +86,6 @@ signals:
     void mediaFinished();
     void volumeChanged(const QString&);
     void speedChanged(const QString&);
-    //void mediaSizeChanged(const QSize &size);
     void mediaRectChanged(const QRect &rect);
 };
 

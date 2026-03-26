@@ -85,7 +85,7 @@ signals:
     void mediaPlayerEjected();
 
     void mediaDropped(const QStringList&);
-    //void mediaRectChanged(const QRect &rect);
+    void mediaRectChanged(const QRect &rect);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

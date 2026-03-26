@@ -301,6 +301,11 @@ void MediaWidget::rotate()
     libvlc_media_release(media);
 }
 
+// QPoint MediaWidget::getMediaPosRect() const
+// {
+//     return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());
+// }
+
 QRect MediaWidget::getMediaDisplayRect() const
 {
     if (m_mediaSize.isEmpty())
@@ -360,7 +365,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             {
                 mediaWidget->m_mediaSize = QSize(width, height); // Update size
                 //emit mediaWidget->mediaSizeChanged(mediaWidget->m_mediaSize);
-                qDebug() << "media size OK:" << width << height;
+                //qDebug() << "media size OK:" << width << height;
             }
 
         }, Qt::QueuedConnection);

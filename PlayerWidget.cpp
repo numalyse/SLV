@@ -114,7 +114,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     //connect(this, &PlayerWidget::mediaSizeChanged, m_compositionWidget, &CompositionWidget::onMediaSizeChanged);
 
     connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
-    connect(this, &PlayerWidget::onMediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
 
 }
 
@@ -318,7 +318,8 @@ void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bo
 void PlayerWidget::onMediaRectChanged(const QRect &rect)
 {
     m_mediaRect = rect;
-    //qDebug() << "Rect has changed : " << m_mediaRect;
+    emit mediaRectChanged(m_mediaRect);
+    qDebug() << "PlayerWidget m_mediaRect : " << m_mediaRect;
 }
 
 void PlayerWidget::widgetSizeMove()
@@ -326,9 +327,14 @@ void PlayerWidget::widgetSizeMove()
     if (m_compositionWidget->width() <= m_mediaWidget->width() && m_compositionWidget->height() <= m_mediaWidget->height())
     {
         m_compositionWidget->setWindowOpacity(1); // Show
+
         QPoint p = m_mediaWidget->mapToGlobal(m_mediaWidget->pos());
+        
         int x = p.x() + (m_mediaWidget->width() - m_compositionWidget->width()) / 2;
         int y = p.y() + (m_mediaWidget->height() - m_compositionWidget->height()) / 2;
+
+        qDebug() << "x : " << x << " y : " << y;
+
         m_compositionWidget->move(x, y);
         m_compositionWidget->raise();
     }
@@ -337,6 +343,46 @@ void PlayerWidget::widgetSizeMove()
         m_compositionWidget->setWindowOpacity(0); // Hide
     }
 }
+
+// void PlayerWidget::widgetSizeMove()
+// {
+//     if (m_compositionWidget->width() <= m_mediaWidget->getMediaDisplayRect().width() && m_compositionWidget->height() <= m_mediaWidget->getMediaDisplayRect().height())
+//     {
+//         m_compositionWidget->setWindowOpacity(1); // Show
+//         qDebug() << "m_compositionWidget width : " << m_compositionWidget->width();
+//         qDebug() << "m_compositionWidget height : " << m_compositionWidget->height();
+//         qDebug() << "QRect mediaWidget (Display Rect) : " << m_mediaWidget->getMediaDisplayRect();
+
+
+//         //QPoint p = m_mediaWidget->mapToGlobal(m_mediaWidget->pos());
+//         QPoint p = m_mediaWidget->getMediaPosRect();
+//         qDebug() << "QPoint p : " << p;
+        
+//         int x = p.x() + (m_mediaWidget->getMediaDisplayRect().width() - m_compositionWidget->width()) / 2;
+//         int y = p.y() + (m_mediaWidget->getMediaDisplayRect().height() - m_compositionWidget->height()) / 2;
+
+//         qDebug() << "x : " << x << " y : " << y;
+
+//         m_compositionWidget->move(x, y);
+//         m_compositionWidget->raise();
+//     }
+//     else
+//     {
+//         m_compositionWidget->setWindowOpacity(0); // Hide
+//     }
+// }
+
+// void PlayerWidget::widgetSizeMove()
+// {
+//     if (m_compositionWidget->width() <= m_mediaWidget->width() && m_compositionWidget->height() <= m_mediaWidget->height())
+//     {
+//         m_compositionWidget->setWindowOpacity(1); 
+//         m_compositionWidget->setGeometry(m_mediaWidget->getMediaDisplayRect());
+//     }
+//     else{
+//         m_compositionWidget->setWindowOpacity(0);
+//     }
+// }
 
 bool PlayerWidget::event(QEvent *event)
 {

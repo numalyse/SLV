@@ -390,12 +390,6 @@ void MediaWidget::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void MediaWidget::moveEvent(QMoveEvent* event)
-{
-    QWidget::moveEvent(event);
-    QRect mediaRect = getMediaDisplayRect();
-}
-
 void MediaWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

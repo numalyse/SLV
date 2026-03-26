@@ -110,11 +110,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
 
-    //connect(m_mediaWidget, &MediaWidget::mediaSizeChanged, this, &PlayerWidget::mediaSizeChanged);
-    //connect(this, &PlayerWidget::mediaSizeChanged, m_compositionWidget, &CompositionWidget::onMediaSizeChanged);
-
     connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
+    connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
 }
 
@@ -322,26 +320,39 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
     qDebug() << "PlayerWidget m_mediaRect : " << m_mediaRect;
 }
 
-void PlayerWidget::widgetSizeMove()
+// void PlayerWidget::widgetSizeChange()
+// {
+//     int parent_w = m_compositionWidget->parentWidget()->width();
+//     int parent_h = m_compositionWidget->parentWidget()->height();
+
+//     QPoint p = m_compositionWidget->parentWidget()->mapToGlobal(QPoint(0, 0));
+
+//     int x = p.x();
+//     int y = p.y();
+
+//     if(parent_w > m_compositionWidget->width()){
+//         int offset_x = (parent_w - m_compositionWidget->width());
+//         x = x + offset_x;
+//     }
+
+//     if(parent_h > m_compositionWidget->height()){
+//         int offset_y = (parent_h - m_compositionWidget->height());
+//         y = y + offset_y;
+//     }
+//     m_compositionWidget->move(QPoint(x,y));
+// }
+
+void PlayerWidget::widgetSizeChange()
 {
-    int parent_w = m_compositionWidget->parentWidget()->width();
-    int parent_h = m_compositionWidget->parentWidget()->height();
+    if (!m_compositionWidget || !m_mediaWidget)
+        return;
 
-    QPoint p = m_compositionWidget->parentWidget()->mapToGlobal(QPoint(0, 0));
+    QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
 
-    int x = p.x();
-    int y = p.y();
+    int w = m_mediaWidget->width();
+    int h = m_mediaWidget->height();
 
-    if(parent_w > m_compositionWidget->width()){
-        int offset_x = (parent_w - m_compositionWidget->width());
-        x = x + offset_x;
-    }
-
-    if(parent_h > m_compositionWidget->height()){
-        int offset_y = (parent_h - m_compositionWidget->height());
-        y = y + offset_y;
-    }
-    m_compositionWidget->move(QPoint(x,y));
+    m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
 }
 
 bool PlayerWidget::event(QEvent *event)
@@ -350,12 +361,12 @@ bool PlayerWidget::event(QEvent *event)
     {
     case QEvent::Show:
         m_compositionWidget->show();
-        QTimer::singleShot(50, this, SLOT(widgetSizeMove())); 
+        QTimer::singleShot(50, this, SLOT(widgetSizeChange())); 
         break;
     case QEvent::WindowActivate:
     case QEvent::Resize:
     case QEvent::Move:
-        widgetSizeMove();
+        widgetSizeChange();
         break;
     default:
         break;

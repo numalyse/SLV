@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_view3Right, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Right); });
     connect(m_view4, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement4); });
 
+    connect(this, &MainWindow::windowMovedOrResizedRequested, &SignalManager::instance(), [](){ emit SignalManager::instance().windowMovedOrResized(); });
 }
 
 void MainWindow::createMenuBar()
@@ -220,4 +221,16 @@ void MainWindow::createViewGridBtn()
 
     m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", TextManager::instance().get("tooltip_view_grid"), "player_arrangement_white"),  TextManager::instance().get("tooltip_view_grid");
     m_viewGridBtn->setOnTop(false);
+}
+
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    QMainWindow::moveEvent(event);
+    emit windowMovedOrResizedRequested();
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    emit windowMovedOrResizedRequested();
 }

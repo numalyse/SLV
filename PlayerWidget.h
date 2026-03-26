@@ -51,7 +51,7 @@ public slots:
     void rotate();
     void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void onMediaRectChanged(const QRect &rect);
-    void widgetSizeMove();
+    void widgetSizeChange();
     bool event(QEvent *event);
 
     void enableButtons();

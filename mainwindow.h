@@ -34,6 +34,13 @@ public slots:
     void disableFullscreenMain();
     void disableNavPanel();
     void enableNavPanel();
+    
+signals:
+    void windowMovedOrResizedRequested();
+
+protected:
+    void moveEvent(QMoveEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
@@ -60,6 +67,5 @@ private:
     ToolbarButton *m_view4 = nullptr;
     bool wasMaximized = false;
     // QVector<PlayerWidget*> m_players;
-
 };
 #endif // MAINWINDOW_H

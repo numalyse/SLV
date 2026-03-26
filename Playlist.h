@@ -24,14 +24,15 @@ private:
     QVBoxLayout *m_itemsLayout = nullptr;
 
 signals:
-    void openMediaFileRequested(const QString &filPath);
+    void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
     void updateImageRequested(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
 
 public slots:
     void addItemDialog();
     void addItemsFromPaths(const QStringList &filesPaths);
-    void deleteItem(const unsigned int &index);
+    void deleteItem(const unsigned int index);
+    void playMedia(const QString &filePath);
     void playPreviousMedia();
     void playNextMedia();
 };

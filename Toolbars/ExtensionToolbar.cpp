@@ -43,7 +43,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         "record_off_white",
         TextManager::instance().get("tooltip_record_off")
         );
-    
+    m_recordBtn->setIconSize(QSize(30, 30));
+
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
@@ -84,6 +85,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         m_segmBtn->setButtonState(false);
         emit SignalManager::instance().displayPlaylist();
     });
+    connect(&SignalManager::instance(), &SignalManager::recordButtonUiUpdate, this, &ExtensionToolbar::updateRecordButtonUI);
 
     m_compoRuleBtn = new ToolbarButton(this, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
 
@@ -137,6 +139,11 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_compoRuleBtn);
     mainLayout->addStretch();
 
+}
+
+void ExtensionToolbar::updateRecordButtonUI()
+{
+    m_recordBtn->toggleUpdateIcon();
 }
 
 void ExtensionToolbar::enableButtons()

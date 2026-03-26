@@ -56,7 +56,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     initStyle();
     connect(m_mediaData, &Media::durationParsed, this, &PlaylistItem::setDurationLabel);
     connect(m_mediaData, &Media::fpsParsed, this, &PlaylistItem::computeThumbnail);
-    connect(m_deleteBtn, &QPushButton::clicked, this, [this]{ deleteItemRequested(m_itemIndex); });
+    connect(m_deleteBtn, &QPushButton::clicked, this, [this]{ emit deleteItemRequested(m_itemIndex); });
 
     m_mediaData->parse();
 }
@@ -83,13 +83,15 @@ void PlaylistItem::computeThumbnail()
 
 void PlaylistItem::enterEvent(QEnterEvent *event)
 {
-    setStyleSheet("PlaylistItem{border-style: solid; border-color: black; border-radius: 3px; border-width: 2px;}");
+    if(!m_isCurrentMedia)
+        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid palette(button); border-radius: 3px;}");
     // QWidget::enterEvent(event);
 }
 
 void PlaylistItem::leaveEvent(QEvent *event)
 {
-    setStyleSheet("PlaylistItem{border-style: solid; border-color: black; border-radius: 3px; border-width: 1px;}");
+    if(!m_isCurrentMedia)
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
     m_isClicked = false;
     // QWidget::leaveEvent(event);
 }
@@ -102,13 +104,23 @@ void PlaylistItem::mousePressEvent(QMouseEvent *event)
 void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
 {
     if(m_isClicked && rect().contains(event->pos())){
-        playMedia();
         emit updatePlaylistCurrentIndex(m_itemIndex);
+        playMedia();
     }
+}
+
+void PlaylistItem::setCurrentMedia(bool isCurrent)
+{
+    m_isCurrentMedia = isCurrent;
+    if(isCurrent)
+        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid palette(light); border-radius: 3px;}");
+    else
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
 }
 
 void PlaylistItem::playMedia()
 {
+    m_isCurrentMedia = true;
     emit playPlaylistItemRequested(m_mediaData->filePath());
 }
 
@@ -117,7 +129,7 @@ void PlaylistItem::initStyle()
     setFixedHeight(50);
     setAttribute(Qt::WA_StyledBackground, true);
     setContentsMargins(0,0,0,0);
-    setStyleSheet("PlaylistItem{border-style: solid; border-color: black; border-radius: 3px; border-width: 1px;}");
+    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
     m_indexLabel->setMaximumWidth(15);
     m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
     m_deleteBtn->setStyleSheet("background: tomato");

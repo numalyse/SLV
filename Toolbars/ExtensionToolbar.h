@@ -43,6 +43,7 @@ public:
 public slots:
     void enableButtons();
     void disableButtons();
+    void updateRecordButtonUI();
 
 signals:
     void enableRecordRequested();

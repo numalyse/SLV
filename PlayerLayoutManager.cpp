@@ -116,20 +116,20 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     QWidget* container = nullptr;
     PlayerWidget* player = nullptr;
     switch (pathCount){
-        case 1: 
+        case 1:
             container = create1(filesPaths);
             player = m_activePlayers[0];
             emit enableNavPanelRequested();
             break;
-        case 2: 
+        case 2:
             container = create2(filesPaths);
             emit disableNavPanelRequested();
             break;
-        case 3: 
+        case 3:
             container = create3(filesPaths);
             emit disableNavPanelRequested();
             break;
-        case 4: 
+        case 4:
             container = create4(filesPaths);
             emit disableNavPanelRequested();
             break;
@@ -400,6 +400,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::stopUiUpdateRequested, advancedToolbar, &SimpleToolbar::stopUiUpdate);
     connect(&SignalManager::instance(), &SignalManager::mediaVolumeChanged, advancedToolbar, &AdvancedToolbar::volumeUiUpdate);
     connect(&SignalManager::instance(), &SignalManager::mediaSpeedChanged, advancedToolbar, &AdvancedToolbar::speedUiUpdate);
+    connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, activePlayer, &PlayerWidget::eject);
     connect(activePlayer, &PlayerWidget::enableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::enableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);

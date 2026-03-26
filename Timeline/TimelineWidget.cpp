@@ -302,7 +302,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 /// @param vlcTime 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
 
-    if(m_isDraggingCursor) return;
+    if(m_isDraggingCursor || !m_abManager) return;
 
     auto restartTime = m_abManager->getLoopRestartTime(vlcTime);
 

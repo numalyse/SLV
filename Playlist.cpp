@@ -40,12 +40,10 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         m_itemsLayout->addWidget(newItem);
 
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
-        connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::openMediaFileRequested);
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
-            // m_items[m_currentMediaIndex]->setStyleSheet("border-width:1px;");
             m_currentMediaIndex = index;
-            // newItem->setStyleSheet("border-width: 2px;");
         });
+        connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
         connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     }
     if(!filesPaths.empty()){
@@ -54,13 +52,28 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
     emit disableToolbarLoopRequested();
 }
 
-void Playlist::deleteItem(const unsigned int &index)
+void Playlist::deleteItem(const unsigned int index)
 {
+    if(m_currentMediaIndex == index)
+        playPreviousMedia();
     delete m_items[index];
     m_items.remove(index);
+    if(m_items.empty())
+        emit SignalManager::instance().playlistEjectPlayer();
     for(size_t IPlaylistItem = index; IPlaylistItem < m_items.size(); ++IPlaylistItem)
     {
         m_items[IPlaylistItem]->setIndex(IPlaylistItem);
+    }
+}
+
+void Playlist::playMedia(const QString& filePath)
+{
+    emit openMediaFileRequested(filePath);
+    for(size_t IMedia = 0; IMedia < m_items.size(); ++IMedia){
+        if(IMedia != m_currentMediaIndex)
+            m_items[IMedia]->setCurrentMedia(false);
+        else
+            m_items[IMedia]->setCurrentMedia(true);
     }
 }
 

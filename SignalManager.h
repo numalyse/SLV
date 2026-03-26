@@ -36,6 +36,7 @@ signals:
     void mediaWidgetMediaFinished();
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
+    void playlistEjectPlayer();
     void simpleToolbarUpdateCursorPosition(int);
     void timelineSetPosition(int64_t);
     void extendedToolbarHideImageEnabled();

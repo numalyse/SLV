@@ -27,6 +27,7 @@ private:
     QLabel *m_indexLabel = nullptr;
     QPushButton *m_deleteBtn = nullptr;
     bool m_isClicked = false;
+    bool m_isCurrentMedia = false;
 
 protected:
     void enterEvent(QEnterEvent *event) override;
@@ -39,9 +40,10 @@ public slots:
     void computeThumbnail();
     void setIndex(int);
     void playMedia();
+    void setCurrentMedia(bool isCurrent);
 
 signals:
-    void deleteItemRequested(const unsigned int &index);
+    void deleteItemRequested(const unsigned int index);
     void playPlaylistItemRequested(const QString &filePath);
     void updatePlaylistCurrentIndex(unsigned int index);
 };

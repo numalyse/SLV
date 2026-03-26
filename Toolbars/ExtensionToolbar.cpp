@@ -38,11 +38,11 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
-        "record_off_white",
-        TextManager::instance().get("tooltip_record_off"),
         "record_on.png",
-        TextManager::instance().get("tooltip_record_on")
-    );
+        TextManager::instance().get("tooltip_record_on"),
+        "record_off_white",
+        TextManager::instance().get("tooltip_record_off")
+        );
     
     m_segmBtn = new ToolbarToggleButton(
         this, 

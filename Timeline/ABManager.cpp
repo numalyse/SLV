@@ -25,7 +25,16 @@ std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
     }
 
     return {};
+}
 
+std::optional<int64_t> ABManager::clampToLoopRange(int64_t time)
+{
+    if(m_abMarkersItems.size() < 2) return {}; 
+
+    int64_t aTime = m_abMarkersItems[0]->time();
+    int64_t bTime = m_abMarkersItems[1]->time();
+
+    return std::clamp(time, aTime, bTime);
 }
 
 void ABManager::deleteMarkers()

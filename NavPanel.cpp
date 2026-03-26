@@ -33,7 +33,7 @@ NavPanel::NavPanel(QWidget *parent)
     m_thumbnailWorker = new ThumbnailWorker(this);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
 
-    //connect(m_playlistWidget, &Playlist::updateImageRequested, this, &NavPanel::updateImageRequest);
+    connect(m_playlistWidget, &Playlist::updateImageRequested, this, &NavPanel::updateImageRequest);
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
 
     m_thumbnailWorker->start();
@@ -98,10 +98,10 @@ void NavPanel::updateImageRequest(int idShot, int64_t time, int64_t length, cons
     m_thumbnailWorker->requestThumbnail(idShot, time, length, mediaPath, targetSize);
 }
 
-void NavPanel::updateThumbnail(int shotId, QImage image){
-    if (shotId == -1){
+void NavPanel::updateThumbnail(int imageId, QImage image){
+    if (imageId == -1){
         m_shotDetail->updateTagImage(image);
     }else{
-        //m_playlistWidget->updateThumbnail(shotId, image);
+        m_playlistWidget->updateThumbnail(imageId, image);
     }
 }

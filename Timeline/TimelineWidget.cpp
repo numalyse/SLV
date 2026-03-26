@@ -26,6 +26,7 @@
 #include <QProgressDialog>
 
 #include <algorithm> 
+#include "TimelineWidget.h"
 
 
 
@@ -34,21 +35,10 @@
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots 
 /// @param parent 
-TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
+TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& projectMediaPath, QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0); 
-
-    auto fps = ProjectManager::instance().projet()->media->fps();
-    // Certains fichiers n'ont pas d'attribut fps comme les fichiers audio, on met 1 par défaut
-    if(fps == 0)
-        fps = 1;
-    auto duration = ProjectManager::instance().projet()->media->duration();
-
-    if(fps == 0.0 || duration == 0){
-        qDebug() << "Creation timeline : Fps ou durée du film = 0";
-        return;
-    }
 
     m_seekTimer = new QTimer(this);
     m_seekTimer->setSingleShot(true);
@@ -113,7 +103,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     layout->addWidget(m_view);
 
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectShots, this);
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMediaPath, projectShots, this);
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );

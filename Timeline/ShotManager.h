@@ -4,6 +4,7 @@
 #include "Timeline/TimelineMath.h"
 #include "Timeline/Items/ShotItem.h"
 #include "Timeline/TimelineView.h"
+#include "Timeline/ThumbnailWorker.h"
 
 #include "Shot.h"
 
@@ -15,7 +16,8 @@ class ShotManager : public QObject
 Q_OBJECT
 
 public:
-    explicit ShotManager( QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, QVector<Shot>& projectShots,  QObject* parent = nullptr);
+
+    explicit ShotManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, const QString &projectMediaPath, QVector<Shot> &projectShots, QObject *parent);
 
     void updateCurrentShot(int64_t time);
 
@@ -53,6 +55,12 @@ private:
     QGraphicsScene* p_scene = nullptr;
     TimelineView* p_view = nullptr;
     TimelineMath* p_mathManager = nullptr;
+
+    ThumbnailWorker* m_thumbnailWorker = nullptr;
+
+private slots:
+    void updateThumbnail(int shotId, QImage image);
+
 };
 
 

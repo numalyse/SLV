@@ -72,6 +72,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Timeline/ShotManager.h Timeline/ShotManager.cpp
         Timeline/TimelineMath.h Timeline/TimelineMath.cpp
         Timeline/SegmentationThread.h Timeline/SegmentationThread.cpp
+        Timeline/ThumbnailWorker.h Timeline/ThumbnailWorker.cpp
 
         Timeline/ItemTypes.h
 

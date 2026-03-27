@@ -32,8 +32,7 @@ private:
     void drawRuleOfThirds(QPainter& p);
     void drawCenterCross(QPainter& p);
     void drawDiagonals(QPainter& p);
-    void drawS_Curve(QPainter &p);
-
+    void drawL_Shape(QPainter &p);
     void drawGoldenRatio(QPainter &p);
 
     //QSize m_mediaSize;
@@ -42,7 +41,7 @@ private:
     bool m_isVFlipped = false;
     bool m_isHFlipped = false;
     QColor m_color = QColor(255, 255, 255, 120);
-    int m_lineWidth = 1;
+    int m_lineWidth = 2;
 };
 
 #endif // COMPOSITIONWIDGET_H

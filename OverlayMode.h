@@ -6,7 +6,7 @@ enum class OverlayMode {
         RuleOfThirds,
         CenterCross,
         Diagonals,
-        S_Curve,
+        L_Shape,
         GoldenRatio
     };
 

@@ -72,7 +72,7 @@
     "compo_rule_RuleOfThirds" : "Thirds",
     "compo_rule_CenterCross" : "Symmetry",
     "compo_rule_Diagonals" : "Diagonals",
-    "compo_rule_S_Curve" : "S-Curve",
+    "compo_rule_L_Shape" : "L-Shape",
     "compo_rule_GoldenRatio" : "Golden Ratio",
 
     "tooltip_compo_rule_VFlip" : "Vertical flip",

@@ -72,7 +72,7 @@
     "compo_rule_RuleOfThirds" : "Tiers",
     "compo_rule_CenterCross" : "Symmetrie",
     "compo_rule_Diagonals" : "Diagonales",
-    "compo_rule_S_Curve" : "S-Curve",
+    "compo_rule_L_Shape" : "L_Shape",
     "compo_rule_GoldenRatio" : "Nombre d'or",
 
     "tooltip_compo_rule_VFlip" : "Retournement vertical",

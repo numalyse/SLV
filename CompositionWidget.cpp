@@ -80,8 +80,8 @@ void CompositionWidget::paintEvent(QPaintEvent *)
     case OverlayMode::Diagonals:
         drawDiagonals(p);
         break;
-    case OverlayMode::S_Curve:
-        drawS_Curve(p);
+    case OverlayMode::L_Shape:
+        drawL_Shape(p);
         break;
     case OverlayMode::GoldenRatio:
         drawGoldenRatio(p);
@@ -134,85 +134,118 @@ void CompositionWidget::drawDiagonals(QPainter &p)
     
 }
 
-void CompositionWidget::drawS_Curve(QPainter &p)
+void CompositionWidget::drawL_Shape(QPainter &p)
 {
     int w = m_mediaRect.width();
     int h = m_mediaRect.height();
 
-    QPainterPath path;
+    if (!m_isVFlipped && m_isHFlipped) {
+        p.drawLine(3*w/4, h/4, 3*w/4, 3*h/4);
+        p.drawLine(w/4, 3*h/4, 3*w/4, 3*h/4);
+    }
+    else if (m_isVFlipped && !m_isHFlipped) {
+        p.drawLine(w/4, h/4, w/4, 3*h/4);
+        p.drawLine(w/4, h/4, 3*w/4, h/4);
+    }
+    else if (m_isVFlipped && m_isHFlipped) {
+        p.drawLine(3*w/4, h/4, 3*w/4, 3*h/4);
+        p.drawLine(w/4, h/4, 3*w/4, h/4);
+    }
+    else {
+        p.drawLine(w/4, h/4, w/4, 3*h/4);
+        p.drawLine(w/4, 3*h/4, 3*w/4, 3*h/4);
+    }
+}
 
-    path.moveTo(0, h * 0.2);
+void drawArc90(QPainter &painter, QPointF C, QPointF P1, QPointF P2) {
+    double r = QLineF(C, P1).length();
 
-    path.cubicTo(
-        w * 0.25, 0,        
-        w * 0.25, h,       
-        w * 0.5, h * 0.5    
-    );
+    QRectF rect(C.x() - r, C.y() - r, 2*r, 2*r);
 
-    path.cubicTo(
-        w * 0.75, 0,        
-        w * 0.75, h,        
-        w, h * 0.8          
-    );
+    double angleStart = qRadiansToDegrees(qAtan2(-(P1.y() - C.y()), P1.x() - C.x()));
+    if(angleStart < 0) angleStart += 360;
 
-    p.setRenderHint(QPainter::Antialiasing, true);
-    p.drawPath(path);
+    int startAngle = static_cast<int>(angleStart * 16);
+
+    double angleEnd = qRadiansToDegrees(qAtan2(-(P2.y() - C.y()), P2.x() - C.x()));
+    if(angleEnd < 0) angleEnd += 360;
+
+    double diff = angleEnd - angleStart;
+
+    int spanAngle;
+    if(diff > 0 && diff <= 180) {
+        spanAngle = 90 * 16;
+    } else if(diff < 0 && diff >= -180) {
+        spanAngle = -90 * 16;
+    } else if(diff > 180) {
+        spanAngle = -90 * 16;
+    } else {
+        spanAngle = 90 * 16;
+    }
+
+    painter.drawArc(rect, startAngle, spanAngle);
+}
+
+QPointF rotate90(const QPointF &p, const QPointF &c, bool cw) {
+    double dx = p.x() - c.x();
+    double dy = p.y() - c.y();
+
+    if(cw)
+        return QPointF(c.x() + dy, c.y() - dx);
+    else
+        return QPointF(c.x() - dy, c.y() + dx);
+}
+
+QPointF normalize(const QPointF &v) {
+    double len = std::sqrt(v.x()*v.x() + v.y()*v.y());
+    if(len == 0) return QPointF(0,0);
+    return QPointF(v.x()/len, v.y()/len);
+}
+
+void drawNCarresArcs(QPainter &p, int n, int w, int h) {
+    double phi = 0.618;
+    double size = h;
+
+    QPointF C(size, size);
+    QPointF P1(0, size);
+    QPointF P2(size, 0);
+
+    for(int i = 0; i < n; ++i) {
+        drawArc90(p, C, P1, P2);
+
+        qDebug() << "arc n°" << i << " avec :";
+        qDebug() << "C  : " << C;
+        qDebug() << "P1 : " << P1;
+        qDebug() << "P2 : " << P2;
+
+        P1 = P2;
+
+        size *= phi;
+
+        QPointF Cnext = rotate90(C, P2, true);
+        QPointF dir = normalize(Cnext - P2);
+        Cnext = P2 + dir * size;
+
+        QPointF P2next = rotate90(P1, Cnext, true);
+
+        C = Cnext;
+        P2 = P2next;
+
+        if(size < 1) break;
+    }
 }
 
 void CompositionWidget::drawGoldenRatio(QPainter &p)
 {
     int w = m_mediaRect.width();
     int h = m_mediaRect.height();
-    //qDebug() << "w : " << width() << " h : " << height();
 
-    double size = std::min(w, h);
+    qDebug() << "Rectangle de dessin : " << m_mediaRect;
+    qDebug() << "w : " << w;
+    qDebug() << "h : " << h;
 
-    double x = (w - size) / 2.0;
-    double y = (h - size) / 2.0;
+    int n = 5;
+    drawNCarresArcs(p, n, w, h);
 
-    QRectF rect(x, y, size, size);
 
-    const double phi = (1.0 + std::sqrt(5.0)) / 2.0;
-
-    // 👉 EXACTEMENT 8 arcs
-    for (int i = 0; i < 8; ++i)
-    {
-        // 🔹 angles corrects (sens anti-horaire Qt)
-        int startAngle = 0;
-        switch (i % 4)
-        {
-        case 0: startAngle = 0; break;
-        case 1: startAngle = 90; break;
-        case 2: startAngle = 180; break;
-        case 3: startAngle = 270; break;
-        }
-
-        p.drawArc(rect, startAngle * 16, 90 * 16);
-
-        // 🔹 réduction selon le golden ratio
-        double newSize = rect.width() / phi;
-
-        QRectF next;
-
-        switch (i % 4)
-        {
-        case 0: // coupe droite
-            next = QRectF(rect.left(), rect.top(), newSize, rect.height());
-            break;
-
-        case 1: // coupe bas
-            next = QRectF(rect.left(), rect.top(), rect.width(), newSize);
-            break;
-
-        case 2: // coupe gauche
-            next = QRectF(rect.right() - newSize, rect.top(), newSize, rect.height());
-            break;
-
-        case 3: // coupe haut
-            next = QRectF(rect.left(), rect.bottom() - newSize, rect.width(), newSize);
-            break;
-        }
-
-        rect = next;
-    }
 }

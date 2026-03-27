@@ -99,7 +99,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_RuleOfThirds"), QVariant::fromValue(OverlayMode::RuleOfThirds));
     m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_CenterCross"), QVariant::fromValue(OverlayMode::CenterCross));
     m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_Diagonals"), QVariant::fromValue(OverlayMode::Diagonals));
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_S_Curve"), QVariant::fromValue(OverlayMode::S_Curve));
+    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_L_Shape"), QVariant::fromValue(OverlayMode::L_Shape));
     m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_GoldenRatio"), QVariant::fromValue(OverlayMode::GoldenRatio));
 
     connect(m_compoRuleComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExtensionToolbar::updateOverlayMode);

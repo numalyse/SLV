@@ -320,28 +320,6 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
     qDebug() << "PlayerWidget m_mediaRect : " << m_mediaRect;
 }
 
-// void PlayerWidget::widgetSizeChange()
-// {
-//     int parent_w = m_compositionWidget->parentWidget()->width();
-//     int parent_h = m_compositionWidget->parentWidget()->height();
-
-//     QPoint p = m_compositionWidget->parentWidget()->mapToGlobal(QPoint(0, 0));
-
-//     int x = p.x();
-//     int y = p.y();
-
-//     if(parent_w > m_compositionWidget->width()){
-//         int offset_x = (parent_w - m_compositionWidget->width());
-//         x = x + offset_x;
-//     }
-
-//     if(parent_h > m_compositionWidget->height()){
-//         int offset_y = (parent_h - m_compositionWidget->height());
-//         y = y + offset_y;
-//     }
-//     m_compositionWidget->move(QPoint(x,y));
-// }
-
 void PlayerWidget::widgetSizeChange()
 {
     if (!m_compositionWidget || !m_mediaWidget)

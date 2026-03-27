@@ -67,6 +67,7 @@ public:
 
 public slots:
     void setSaveNeeded();
+    void setSaveNotNeeded();
 
 signals : 
     void loadMediaProjectRequested(const QStringList );
@@ -100,6 +101,8 @@ signals:
     void copyDone();
     void copyError();
     void ejectMedia();
+    void enableSaveButton();    
+    void disableSaveButton();
 };
 
 #endif

@@ -65,7 +65,6 @@ QString ProjectManager::getErrorMessage(Error error) const
 
 /// @brief Supprime le projet et son média et envoie un signal pour desactiver l'ui de segmentation 
 void ProjectManager::deleteProject() {
-    m_needSave = false;
     if (m_project) {
         if (m_project->media) {
             m_project->media->deleteLater(); 
@@ -73,6 +72,7 @@ void ProjectManager::deleteProject() {
         delete m_project;
         m_project = nullptr;
         p_timeline = nullptr;
+        setSaveNotNeeded();
         emit projectDeleted();
     }
 }
@@ -89,7 +89,7 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 
     m_project = new Project();
     m_project->media = new Media(mediaPaths.first(), this);
-    m_needSave = false;
+    setSaveNotNeeded();
     m_isDurationParsed = false;
     m_isFpsParsed = false;
 
@@ -125,13 +125,14 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
     if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path,
         // on écrit directement dans le json sans copier la vidéo
         writeJson();   
+        setSaveNotNeeded();
         if(ejectMediaAfterSave){
             discardAndEject();
         }
         return;
     }
 
-    if( m_project->media->filePath().isEmpty() ){
+    if( mediaPath().isEmpty() ){
         qCritical() << "Media path du project est vide";
         if(ejectMediaAfterSave){
             discardAndEject();
@@ -145,7 +146,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
     }else { // copie du média dans le dossier du projet
         QString destMedia = m_project->path + QDir::separator() + m_project->media->fileName() + '.' + m_project->media->fileExtension();
         copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
-
+        setSaveNotNeeded();
         return;
     }
 
@@ -513,7 +514,7 @@ void ProjectManager::openProject()
 
     m_project = project;
 
-    m_needSave = false;
+    setSaveNotNeeded();
     m_isDurationParsed = false;
     m_isFpsParsed = false;
 
@@ -566,4 +567,10 @@ void ProjectManager::discardAndEject(){
 
 void ProjectManager::setSaveNeeded(){
     m_needSave = true;
+    emit enableSaveButton();
+}
+
+void ProjectManager::setSaveNotNeeded(){
+    m_needSave = false;
+    emit disableSaveButton();
 }

@@ -89,15 +89,32 @@ MainWindow::MainWindow(QWidget *parent)
         });
     }
     
+    
 }
 
 void MainWindow::createMenuBar()
 {
+    auto *projManager = &ProjectManager::instance();
     auto *fileMenu = menuBar()->addMenu("&Fichier");
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
     auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
+    auto *saveProjectAction = fileMenu->addAction("&Enregistrer");
+
+    connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){
+        saveProjectAction->setEnabled(true);
+    });
+    connect(projManager, &ProjectManager::disableSaveButton, this, [saveProjectAction](){
+        saveProjectAction->setDisabled(true);
+    });
+    connect(saveProjectAction, &QAction::triggered, this, [projManager]() {
+        projManager->setSaveNeeded();
+        projManager->saveProject(false);
+    });
+
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
     connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProjectAction);
+
+
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
 

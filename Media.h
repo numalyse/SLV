@@ -48,6 +48,7 @@ signals:
     void fpsParsed(double);
     void resolutionParsed(std::tuple<int, int>);
     void durationParsed(int64_t);
+    void sizeParsed(const QSize &size);
     
 private:
     QString m_name;

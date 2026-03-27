@@ -48,8 +48,11 @@ public slots:
     void endRecord();
     void rotate();
 
-private:
+    QPoint getMediaPosRect() const;
+    QRect getMediaDisplayRect() const;
 
+private:
+    QSize m_mediaSize;
 
     bool m_loopActivated = true;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
@@ -89,6 +92,7 @@ signals:
     void mediaFinished();
     void volumeChanged(const QString&);
     void speedChanged(const QString&);
+    void mediaRectChanged(const QRect &rect);
 };
 
 #endif // MEDIAWIDGET_H

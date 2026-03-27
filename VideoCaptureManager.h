@@ -7,7 +7,7 @@
 #include <QDir>
 
 /// @brief Class used to record a media (Video and Audio) in a single MediaWidget. Supports time warps with mediaCutAndConcat method.
-class VideoCaptureManager
+class VideoCaptureManager : QObject
 {
 
 public:

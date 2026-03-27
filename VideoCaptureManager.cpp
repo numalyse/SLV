@@ -66,18 +66,24 @@ void VideoCaptureManager::endMediaRecording(const int endTime, const QString& sa
     if(!m_mediaFile.exists() || m_startRecordTime == -1) return;
 
     QString concatVideoName = m_concatRecordNumber != 0 ? m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix() : savePath;
-    SequenceExtractionHelper::extractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, concatVideoName);
-    m_startRecordTime = -1;
+    QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, concatVideoName);
+    connect(sequenceExtractor, &QProcess::finished, this, [this, concatVideoName, savePath](){
+        m_startRecordTime = -1;
 
-    if(m_concatRecordNumber == 0) return;
+        if(m_concatRecordNumber == 0) return;
 
-    if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
-    {
-        QTextStream stream( m_concatFile );
-        stream << "file '" << concatVideoName.replace("\\", "/")<< "'" << Qt::endl;
-        m_concatFile->close();
-    }
-    m_concatRecordNumber = 0;
-    SequenceExtractionHelper::concatenateSequences(QFileInfo(*m_concatFile).filePath(), savePath);
-    deleteMediaTempDirectory();
+        if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
+        {
+            QTextStream stream( m_concatFile );
+            QString strConcat = concatVideoName;
+            stream << "file '" << strConcat.replace("\\", "/")<< "'" << Qt::endl;
+            m_concatFile->close();
+        }
+        m_concatRecordNumber = 0;
+        QProcess* sequenceConcatenate = SequenceExtractionHelper::concatenateSequences(QFileInfo(*m_concatFile).filePath(), savePath);
+        connect(sequenceConcatenate, &QProcess::finished, this, [this](){
+            deleteMediaTempDirectory();
+        });
+    });
+
 }

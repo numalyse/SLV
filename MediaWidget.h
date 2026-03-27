@@ -2,11 +2,13 @@
 #define MEDIAWIDGET_H
 
 #include "Media.h"
+#include "VideoCaptureManager.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <SignalManager.h>
 #include <QFrame>
+#include <QDir>
 
 class MediaWidget : public QWidget
 {
@@ -19,6 +21,7 @@ public:
     void setActive(bool active);
     bool setMediaFromPath(const QString& filePath);
 
+    libvlc_instance_t *m_vlcInstance = nullptr;
     libvlc_media_player_t *m_player = nullptr;
 
     Media* media(){ return m_media;};
@@ -53,12 +56,15 @@ private:
 
     bool m_loopActivated = true;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
+    unsigned int m_rotationIndex = 0;
+    inline static const char* m_rotationSteps[4] = {"", "--transform-type=90", "--transform-type=180", "--transform-type=270"};
     libvlc_event_manager_t* m_eventManager = nullptr;
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
     QWidget* m_mediaSurface = nullptr;
     QFrame* m_blackFrame = nullptr;
     int m_startRecordTime = -1;
+    VideoCaptureManager m_videoCaptureManager;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
     

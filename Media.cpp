@@ -5,7 +5,7 @@
 #include <qurl.h>
 
 
-Media::Media(const QString &filePath, QObject *parent) : QObject(parent), m_filePath(filePath)
+Media::Media(const QString &filePath, QObject *parent, libvlc_instance_t *vlcInstance) : QObject(parent), m_filePath(filePath)
 {
 
     QFile f(m_filePath);
@@ -14,7 +14,10 @@ Media::Media(const QString &filePath, QObject *parent) : QObject(parent), m_file
     QUrl url = QUrl::fromLocalFile(m_filePath);
     QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
 
-    m_vlcMedia = libvlc_media_new_location(SLV::VlcInstance::get(), urlBytes.constData());
+    if(vlcInstance) m_vlcInstance = vlcInstance;
+    else m_vlcInstance = SLV::VlcInstance::get();
+
+    m_vlcMedia = libvlc_media_new_location(m_vlcInstance, urlBytes.constData());
 
     if (!m_vlcMedia){
         qDebug() << "Erreur lors de l'allocation du média";
@@ -65,13 +68,18 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
 
             if (parsedMedia) {
                 auto fps = VlcParseHelper::getFpsParsedMedia(parsedMedia);
+                std::tuple<int, int> resolution = VlcParseHelper::getResolutionParsedMedia(parsedMedia);
                 auto duration = libvlc_media_get_duration(parsedMedia);
                 
                 media->setDuration(duration);
                 media->setFps(fps);
+                media->setHeight(std::get<0>(resolution));
+                media->setWidth(std::get<1>(resolution));
+
                 media->setMeta(VlcParseHelper::getMetaParsedMedia(parsedMedia));
                 
                 emit media->fpsParsed(fps);
+                emit media->resolutionParsed(resolution);
                 emit media->durationParsed(duration);
             }
         }

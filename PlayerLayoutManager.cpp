@@ -3,6 +3,7 @@
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/GlobalToolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
+#include "ProjectManager.h"
 
 #include <QObject>
 #include <QWidget>
@@ -75,13 +76,11 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
     activePlayerUpdate(count);
 
     QWidget* container = nullptr;
-    Media* media = nullptr;
     PlayerWidget* player = nullptr;
     switch (count){
         case 1: 
             container = create1();
             player = m_activePlayers[0];
-            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
         case 2:
@@ -103,7 +102,8 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(player, media, container, toolbar);
+    ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    emit updateContainerRequest(player, container, toolbar);
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -114,24 +114,22 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     activePlayerUpdate(pathCount);
 
     QWidget* container = nullptr;
-    Media* media = nullptr;
     PlayerWidget* player = nullptr;
     switch (pathCount){
-        case 1: 
+        case 1:
             container = create1(filesPaths);
             player = m_activePlayers[0];
-            media = player->mediaWidget()->media();
             emit enableNavPanelRequested();
             break;
-        case 2: 
+        case 2:
             container = create2(filesPaths);
             emit disableNavPanelRequested();
             break;
-        case 3: 
+        case 3:
             container = create3(filesPaths);
             emit disableNavPanelRequested();
             break;
-        case 4: 
+        case 4:
             container = create4(filesPaths);
             emit disableNavPanelRequested();
             break;
@@ -139,8 +137,21 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
         default: container = nullptr;
     }
     auto* toolbar = createLayoutToolbar();
-    emit updateContainerRequest(player, media, container, toolbar);
+    ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    emit updateContainerRequest(player, container, toolbar);
 
+}
+
+/// @brief Fonction appelé par le project manager quand on charge un projet.
+/// ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath()); aurait reset le projet créer 
+/// @param filesPaths 
+void PlayerLayoutManager::createLayoutFromProject(const QStringList& filesPaths){
+    QWidget* container = create1(filesPaths);
+    PlayerWidget* player = m_activePlayers[0];
+    emit enableNavPanelRequested();
+
+    auto* toolbar = createLayoutToolbar();
+    emit updateContainerRequest(player, container, toolbar);
 }
 
 void PlayerLayoutManager::detachAllPlayers()
@@ -325,7 +336,9 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     }
 
     connect(globalToolbar, &Toolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableGlobalLayoutFullscreen);
+    connect(globalToolbar, &Toolbar::enableFullscreenRequest, globalToolbar, &GlobalToolbar::enableFullscreenUiUpdate);
     connect(globalToolbar, &Toolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableGlobalLayoutFullscreen);
+    connect(globalToolbar, &Toolbar::disableFullscreenRequest, globalToolbar, &GlobalToolbar::disableFullscreenUiUpdate);
     connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
     globalToolbar->playPauseBtn()->setButtonState(newGlobalPlayState());
@@ -354,7 +367,9 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::volumeChanged, activePlayer, &PlayerWidget::setVolume);
     connect(advancedToolbar, &AdvancedToolbar::speedChanged, activePlayer, &PlayerWidget::setSpeed);
     connect(advancedToolbar, &AdvancedToolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableFullscreenGlobalRequested);
+    connect(advancedToolbar, &AdvancedToolbar::enableFullscreenRequest, advancedToolbar, &SimpleToolbar::enableFullscreenUiUpdate);
     connect(advancedToolbar, &AdvancedToolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableFullscreenGlobalRequested);
+    connect(advancedToolbar, &AdvancedToolbar::disableFullscreenRequest, advancedToolbar, &SimpleToolbar::disableFullscreenUiUpdate);
     connect(advancedToolbar, &AdvancedToolbar::screenshotRequest, activePlayer, &PlayerWidget::takeScreenshot);
     connect(advancedToolbar, &AdvancedToolbar::enableLoopModeRequest, activePlayer, &PlayerWidget::enableLoopMode);
     connect(advancedToolbar, &AdvancedToolbar::disableLoopModeRequest, activePlayer, &PlayerWidget::disableLoopMode);
@@ -387,6 +402,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::stopUiUpdateRequested, advancedToolbar, &SimpleToolbar::stopUiUpdate);
     connect(&SignalManager::instance(), &SignalManager::mediaVolumeChanged, advancedToolbar, &AdvancedToolbar::volumeUiUpdate);
     connect(&SignalManager::instance(), &SignalManager::mediaSpeedChanged, advancedToolbar, &AdvancedToolbar::speedUiUpdate);
+    connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, activePlayer, &PlayerWidget::eject);
     connect(activePlayer, &PlayerWidget::enableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::enableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
@@ -575,4 +591,13 @@ void PlayerLayoutManager::arrangePlayerLayout(const PlayerLayoutArrangement& arr
         break;
 
     }
+}
+
+
+QStringList PlayerLayoutManager::getActivePlayersMediaPath(){
+    QStringList mediaPaths;
+    for(auto& IActivePlayer : m_activePlayers){
+        mediaPaths.append(IActivePlayer->getMediaPath());
+    }
+    return mediaPaths;
 }

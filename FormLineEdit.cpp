@@ -1,6 +1,7 @@
 #include "FormLineEdit.h"
 
 #include "SignalManager.h"
+#include "ProjectManager.h"
 
 FormLineEdit::FormLineEdit(const QString &text, bool editable, QWidget *parent) : QLineEdit{parent}
 {
@@ -9,6 +10,7 @@ FormLineEdit::FormLineEdit(const QString &text, bool editable, QWidget *parent) 
     if(editable){
         connect(this, &FormLineEdit::focusIn, &SignalManager::instance(), &SignalManager::formLineEditPause );
         connect(this, &FormLineEdit::focusOut, &SignalManager::instance(), &SignalManager::formLineEditPlay );
+        connect(this, &QLineEdit::textEdited, &ProjectManager::instance(), &ProjectManager::setSaveNeeded );
     }
 }
 

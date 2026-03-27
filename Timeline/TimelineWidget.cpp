@@ -12,6 +12,8 @@
 
 #include "Shot.h"
 
+#include "GenericDialog.h"
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGraphicsView>
@@ -21,28 +23,22 @@
 #include <QMenu>
 #include <QAction>
 #include <QTimer>
+#include <QProgressDialog>
+
 #include <algorithm> 
 #include "TimelineWidget.h"
+
+
+
 
 
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots 
 /// @param parent 
-TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
+TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& projectMediaPath, QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0); 
-
-    auto fps = ProjectManager::instance().projet()->media->fps();
-    // Certains fichiers n'ont pas d'attribut fps comme les fichiers audio, on met 1 par défaut
-    if(fps == 0)
-        fps = 1;
-    auto duration = ProjectManager::instance().projet()->media->duration();
-
-    if(fps == 0.0 || duration == 0){
-        qDebug() << "Creation timeline : Fps ou durée du film = 0";
-        return;
-    }
 
     m_seekTimer = new QTimer(this);
     m_seekTimer->setSingleShot(true);
@@ -63,6 +59,10 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
+
+    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", TextManager::instance().get("tooltip_split_shot"));
+    connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
+    ButtonLayout->addWidget(m_autoSegmentationBtn);
 
     m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitShotAtCursor);
@@ -103,7 +103,7 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
     layout->addWidget(m_view);
 
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectShots, this);
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMediaPath, projectShots, this);
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
@@ -119,6 +119,15 @@ TimelineWidget::TimelineWidget(QVector<Shot>& projectShots, QWidget *parent) : Q
 
 }
 
+QVector<Shot> TimelineWidget::getTimelineData()
+{
+    return m_shotManager->shotItemsData();
+}
+
+void TimelineWidget::setTimelineData(QVector<Shot> shots)
+{
+    m_shotManager->setShotItemsData(shots);
+}
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
@@ -194,28 +203,20 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
 }
 
-/// @brief retourne le temps en ms de la frame le plus proche du curseur
-/// @return 
 
-
-/// @brief déplace le curseur si l'ab loop n'est pas activé, met à jour le temps et et envoie à la toolbar le nouveau temps
+/// @brief déplace le curseur si l'ab loop est active, clamp au min et max, met à jour le temps et et envoie à la toolbar le nouveau temps
 /// @param cursorPosX 
 void TimelineWidget::moveCursor(double newCursorPosX){
-    int64_t newCursorTime = m_mathManager->posToTime(newCursorPosX);
-    auto restartTime = m_abManager->getLoopRestartTime(newCursorTime);
+    int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
 
-    if(restartTime.has_value()){ 
-        m_vlcTime = restartTime.value();
-        m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
-        return;
-    }
+    auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
+    m_vlcTime = clampedTime.value_or(newCursorTime);
 
-    m_vlcTime = m_mathManager->posToTimeSnapped(newCursorPosX);
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
 
-    emit timelineSliderPositionRequested(m_vlcTime); // visual update for slider
+    emit timelineSliderPositionRequested(m_vlcTime);
 
-    if( ! m_seekTimer->isActive() ){ // limite les appeles à setTime VLC
+    if(!m_seekTimer->isActive()){
         m_seekTimer->start(m_seekPendingTime);
     }
 
@@ -301,7 +302,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 /// @param vlcTime 
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
 
-    if(m_isDraggingCursor) return;
+    if(m_isDraggingCursor || !m_abManager) return;
 
     auto restartTime = m_abManager->getLoopRestartTime(vlcTime);
 
@@ -342,18 +343,21 @@ void TimelineWidget::splitShotAtCursor()
 {
     int64_t cutTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->splitShotAt(cutTime);
+    emit saveNeeded();
 }
 
 void TimelineWidget::mergeWithPrevShotAction()
 {
     int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->mergeCurrentWithPrevShot(cursorTime);
+    emit saveNeeded();
 }
 
 void TimelineWidget::mergeWithNextShotAction()
 {
     int64_t cursorTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_shotManager->mergeCurrentWithNextShot(cursorTime);
+    emit saveNeeded();
 }
 
 
@@ -367,4 +371,61 @@ void TimelineWidget::updateShowMergeWithNextShot(bool state)
 {
     m_mergeWithNextShotBtn->setEnabled(state);
     m_showMergeWithNextShotBtn = state;
+}
+
+void TimelineWidget::autoSegmentation(){
+
+    if (m_segmentationThread) { // suppression ancien thread
+        if (m_segmentationThread->isRunning()) {
+            m_segmentationThread->requestInterruption();
+            m_segmentationThread->wait();
+        }
+        m_segmentationThread->deleteLater();
+        m_segmentationThread = nullptr;
+    }
+
+    auto& txtManager = TextManager::instance();
+    const QString& mediaPath = ProjectManager::instance().projet()->media->filePath(); // TODO : gerer ptr null
+
+    m_segmentationThread = new SegmentationThread(mediaPath, this);
+    m_segmentationThread->setPriority(QThread::HighPriority);
+
+    QProgressDialog* progressDialog = new QProgressDialog(txtManager.get("timeline_window_text_auto_segmentation"), txtManager.get("generic_dialog_btn_cancel"), 0, 100, nullptr);
+    progressDialog->setWindowTitle(txtManager.get("timeline_window_title_auto_segmentation"));
+    progressDialog->setWindowModality(Qt::WindowModal); 
+    progressDialog->setAttribute(Qt::WA_DeleteOnClose);
+
+
+    connect(progressDialog, &QProgressDialog::canceled, this, [this](){ 
+        m_segmentationThread->requestInterruption();
+    });
+
+    connect(m_segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
+
+    connect(m_segmentationThread, &SegmentationThread::segmentationFinished, this, [this, progressDialog] (std::vector<int> cuts) {
+        
+        if( ! cuts.empty()){
+            this->m_shotManager->createShotItemsFromCuts(cuts);
+            emit this->saveNeeded();
+        }
+
+        progressDialog->close();
+
+    });
+
+    SLV::showGenericDialog(
+        this, 
+        txtManager.get("dialog_auto_segmentation_title"),
+        txtManager.get("dialog_auto_segmentation_text"),
+    
+        [this, progressDialog, mediaPath]() { 
+            progressDialog->show();
+            m_segmentationThread->start();
+        },
+        nullptr,
+        [ progressDialog ](){
+            progressDialog->close(); 
+        }
+    );
+    
 }

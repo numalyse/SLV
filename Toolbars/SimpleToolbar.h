@@ -55,6 +55,8 @@ public slots:
     void nameUiUpdate(const QString &);
     void volumeUiUpdate(const QString &);
     void speedUiUpdate(const QString &);
+    void enableFullscreenUiUpdate();
+    void disableFullscreenUiUpdate();
     void disableLoopMode();
 
     void enableButtons();
@@ -85,6 +87,7 @@ protected slots:
     virtual void onSliderPressed();
     virtual void onSliderReleased();
     virtual void onSliderMoved(int value);
+    virtual void duplicatePlayerAction();
 
 signals:
     void setPositionRequested(int64_t);

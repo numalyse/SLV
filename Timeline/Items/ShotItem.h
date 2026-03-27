@@ -12,6 +12,8 @@ class ShotItem : public QGraphicsItem
 public:
     explicit ShotItem(Shot shot, double width, double height, double topMargin = 40, QGraphicsItem* parent = nullptr);
 
+    void setThumbnail(const QPixmap &pixmap);
+
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void setWidth(double width);

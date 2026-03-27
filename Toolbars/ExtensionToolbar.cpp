@@ -44,12 +44,13 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
-        "record_off_white",
-        TextManager::instance().get("tooltip_record_off"),
         "record_on.png",
-        TextManager::instance().get("tooltip_record_on")
-    );
-    
+        TextManager::instance().get("tooltip_record_on"),
+        "record_off_white",
+        TextManager::instance().get("tooltip_record_off")
+        );
+    m_recordBtn->setIconSize(QSize(30, 30));
+
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
@@ -60,7 +61,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     );
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
-        if(ProjectManager::instance().projet() != nullptr){
+        if( ProjectManager::instance().projet() ){
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
             emit SignalManager::instance().extensionToolbarDisplayShotDetail();
@@ -90,6 +91,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         m_segmBtn->setButtonState(false);
         emit SignalManager::instance().displayPlaylist();
     });
+    connect(&SignalManager::instance(), &SignalManager::recordButtonUiUpdate, this, &ExtensionToolbar::updateRecordButtonUI);
 
 
     QHBoxLayout* compoRuleLayout = new QHBoxLayout();
@@ -182,6 +184,11 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_compoRuleBtn);
     mainLayout->addStretch();
 
+}
+
+void ExtensionToolbar::updateRecordButtonUI()
+{
+    m_recordBtn->toggleUpdateIcon();
 }
 
 void ExtensionToolbar::enableButtons()

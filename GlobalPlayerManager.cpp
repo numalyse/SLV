@@ -7,6 +7,8 @@
 
 #include <qlayout.h>
 
+#include <QDebug>
+
 GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     : QWidget{parent}
 
@@ -23,6 +25,9 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     mainLayout->addWidget(m_navPanel);
 
     m_layoutManager = new PlayerLayoutManager();
+
+    connect(&ProjectManager::instance(), &ProjectManager::loadMediaProjectRequested, m_layoutManager, &PlayerLayoutManager::createLayoutFromProject);
+
     connect(m_layoutManager, &PlayerLayoutManager::updateContainerRequest, this, &GlobalPlayerManager::updateContainer);
 
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenPlayerRequested, this, &GlobalPlayerManager::enableFullscreenPlayer);
@@ -36,12 +41,15 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::disableNavPanelRequested, this, &GlobalPlayerManager::disableNavPanelRequested);
     connect(m_layoutManager, &PlayerLayoutManager::enableNavPanelRequested, this, &GlobalPlayerManager::enableNavPanelRequested);
-
+    
     connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
         { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }
     );
+    
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
+
+
 
     m_layoutManager->createLayout(1);
 }
@@ -56,7 +64,7 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 /// @param videoPlayersCount Nombre de PlayerWidgets dans le container
 /// @param newPlayersWidget Le widget à ajouter au layout
 /// @param newToolbar La GlobalToolbar si videoPlayersCount != 1, AdvancedToolbar sinon
-void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QWidget * newPlayersWidget, Toolbar* newToolbar)
+void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
     if (m_toolbarWidget){
@@ -71,6 +79,12 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QW
         m_playersWidget = nullptr;
     }
 
+    if(m_timeline){
+        layout->removeWidget(m_timeline);
+        m_timeline->deleteLater();
+        m_timeline = nullptr;
+    }
+
     // ajout du nouveau playerWidget et toolbar 
     if (newPlayersWidget){
         m_playersWidget = newPlayersWidget;
@@ -83,20 +97,16 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, Media* media, QW
 
     m_player = player;
 
-    if( media ){
-        m_player = player;
-        auto *advancedToolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
-        ProjectManager::instance().createProject(media);
+    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+
+    if(advancedToolbar){
+        connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
 
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
-    }else {
-        if(m_timeline){
-            m_timeline->deleteLater();
-            m_timeline = nullptr;
-        }
     }
+    
 }
 
 /// @brief Ouvre la fenêtre à droite de l'écran contenant des infos sur la playlist ou sur le plan sélectionné en fonction du mode
@@ -182,11 +192,34 @@ void GlobalPlayerManager::createTimelineWidget()
         m_timeline->deleteLater();
         m_timeline = nullptr;
     }
-    
-    m_timeline = new TimelineWidget(ProjectManager::instance().projet()->shots, this);
+    ProjectManager& projManager = ProjectManager::instance();
+    Project* proj = projManager.projet();
+    Media* projMedia = proj->media;
+
+    if( ! projMedia ){
+        qCritical() << "Pas de media dans le projet, impossible de créer une timeline";
+        return;
+    }
+
+    if(projMedia->fps() == 0){
+        projMedia->setFps(1);
+        qDebug() << "FPS == 0, utilisation de FPS = 1";
+    }
+
+    if(projMedia->duration() == 0){
+        qCritical() << "Pas de duréer pour le média, impossible de créer une timeline";
+        return;
+    }
+
+
+    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), projMedia->filePath(), proj->shots, this);
     m_timeline->setFixedHeight(150);
 
+    projManager.setTimeline(m_timeline);
+
     connect(m_player, &PlayerWidget::vlcTimeChanged, m_timeline, &TimelineWidget::updateCursorPos);
+
+    connect(m_timeline, &TimelineWidget::saveNeeded, &projManager, &ProjectManager::setSaveNeeded);
 
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 

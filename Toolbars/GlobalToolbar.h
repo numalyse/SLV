@@ -19,6 +19,8 @@ public:
 public slots:
     void enableButtons();
     void disableButtons();
+    void enableFullscreenUiUpdate();
+    void disableFullscreenUiUpdate();
 
 signals:
     void enableMute();

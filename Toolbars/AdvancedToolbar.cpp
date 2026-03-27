@@ -1,6 +1,9 @@
 #include "Toolbars/AdvancedToolbar.h"
 
 #include "TextManager.h"
+#include "ProjectManager.h"
+
+#include "GenericDialog.h"
 
 #include "Toolbars/ExtensionToolbar.h"
 
@@ -11,8 +14,10 @@
 #include "AdvancedToolbar.h"
 
 #include "ProjectManager.h"
-#include <TimeFormatter.h>
+#include "TimeFormatter.h"
 
+#include <QMessageBox>
+#include <QPushButton>
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -37,6 +42,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_extensionBtn->setButtonState(true);
         if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr) emit enableSegmentationRequest();
     });
+    m_extensionBtn->setIconSize(QSize(13, 13));
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
         // cache l'extension et cache le mode segmentation
         m_extensionToolbar->hide();
@@ -258,4 +264,50 @@ void AdvancedToolbar::onSliderMoved(int value) {
 
     emit toolbarCursorPositionRequested(value);
 
+}
+
+void AdvancedToolbar::duplicatePlayerAction()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    if(projManager.needSave()){ 
+
+        TextManager& txtManager = TextManager::instance();
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            [&projManager, this]() { 
+                projManager.saveProject(false);
+                emit this->duplicatePlayerRequested();
+            },
+            [&projManager, this]() { 
+                emit this->duplicatePlayerRequested(); 
+            }
+        );
+    }else {
+        emit duplicatePlayerRequested();
+    }
+}
+
+void AdvancedToolbar::ejectRequested(){
+    ProjectManager& projManager = ProjectManager::instance();
+    if(projManager.needSave()){ 
+
+        TextManager& txtManager = TextManager::instance();
+
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            [&projManager]() { 
+                projManager.saveProject(true); 
+            },
+            [&projManager]() { 
+                projManager.discardAndEject();
+            }
+        );
+        
+    }else {
+        projManager.discardAndEject();
+    }
 }

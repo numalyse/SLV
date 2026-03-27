@@ -23,6 +23,7 @@ public:
 
     SimpleToolbar* toolbar() {return m_toolBar;};
     MediaWidget* mediaWidget() { return m_mediaWidget; };
+    QString getMediaPath();
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
@@ -56,6 +57,7 @@ public slots:
 
     void enableButtons();
     void disableButtons();
+    void mediaPlayerEjectedHandler();
 
 signals:
     void addPlayerRequest();
@@ -80,6 +82,8 @@ signals:
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
     void nameUiUpdateRequest(const QString& );
+    void enableFullscreenUiUpdateRequested();
+    void disableFullscreenUiUpdateRequested();
 
     void mediaPlayerLoaded();
     void mediaPlayerEjected();

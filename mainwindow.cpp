@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "GlobalPlayerManager.h"
+#include "ProjectManager.h"
 #include "PlayerWidget.h"
 #include "TextManager.h"
+#include "GenericDialog.h"
 
 #include <qtoolbar.h>
 #include <vlc/vlc.h>
@@ -65,25 +67,55 @@ MainWindow::MainWindow(QWidget *parent)
         m_globalPlayerManager->closeNavPanel();
         m_navPanelBtn->setButtonState(false);
     });
-    connect(m_view1, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement1); });
-    connect(m_view2H, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement2H); });
-    connect(m_view2V, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement2V); });
-    connect(m_view3HAlign, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3H); });
-    connect(m_view3VAlign, &ToolbarButton::clicked, &SignalManager::instance(),[](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3V); });
-    connect(m_view3Top, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Top); });
-    connect(m_view3Bot, &ToolbarButton::clicked, &SignalManager::instance(),[](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Bot); });
-    connect(m_view3Left, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Left); });
-    connect(m_view3Right, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement3Right); });
-    connect(m_view4, &ToolbarButton::clicked, &SignalManager::instance(), [](){ emit SignalManager::instance().newArrangementRequested(PlayerLayoutArrangement::Arrangement4); });
 
     connect(this, &MainWindow::windowMovedOrResizedRequested, &SignalManager::instance(), [](){ emit SignalManager::instance().windowMovedOrResized(); });
+    std::vector<std::pair<ToolbarButton*, PlayerLayoutArrangement>> layoutButtons = {
+        {m_view1, PlayerLayoutArrangement::Arrangement1},
+        {m_view2H, PlayerLayoutArrangement::Arrangement2H},
+        {m_view2V, PlayerLayoutArrangement::Arrangement2V},
+        {m_view3HAlign, PlayerLayoutArrangement::Arrangement3H},
+        {m_view3VAlign, PlayerLayoutArrangement::Arrangement3V},
+        {m_view3Top, PlayerLayoutArrangement::Arrangement3Top},
+        {m_view3Bot, PlayerLayoutArrangement::Arrangement3Bot},
+        {m_view3Left, PlayerLayoutArrangement::Arrangement3Left},
+        {m_view3Right, PlayerLayoutArrangement::Arrangement3Right},
+        {m_view4, PlayerLayoutArrangement::Arrangement4}
+    };
+
+    for (const auto& pair : layoutButtons) {
+        ToolbarButton* btn = pair.first;
+        PlayerLayoutArrangement arrangement = pair.second;
+        connect(btn, &ToolbarButton::clicked, this, [this, arrangement]() { 
+            changeArrangementWithSaveCheck(arrangement); 
+        });
+    }
+    
+    
 }
 
 void MainWindow::createMenuBar()
 {
+    auto *projManager = &ProjectManager::instance();
     auto *fileMenu = menuBar()->addMenu("&Fichier");
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
-    connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaFile);
+    auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
+    auto *saveProjectAction = fileMenu->addAction("&Enregistrer");
+    saveProjectAction->setDisabled(true);
+
+    connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){
+        saveProjectAction->setEnabled(true);
+    });
+    connect(projManager, &ProjectManager::disableSaveButton, this, [saveProjectAction](){
+        saveProjectAction->setDisabled(true);
+    });
+    connect(saveProjectAction, &QAction::triggered, this, [projManager]() {
+        projManager->setSaveNeeded();
+        projManager->saveProject(false);
+    });
+
+    connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
+    connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProjectAction);
+
 
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
@@ -126,9 +158,64 @@ void MainWindow::createToolBar()
     addToolBar(m_toolbarQt);
 }
 
-void MainWindow::openMediaFile()
+void MainWindow::openProjectAction()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    TextManager& txtManager = TextManager::instance();
+
+    if(projManager.needSave()){
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            
+            [&projManager]() { 
+                projManager.saveProject(false); 
+                projManager.openProject();
+            },
+            
+            [&projManager]() { 
+                projManager.openProject();
+            }
+        );
+    } else {
+        projManager.openProject();
+    }
+
+}
+
+
+void MainWindow::openMediaAction()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    TextManager& txtManager = TextManager::instance();
+
+    if(projManager.projet() && projManager.needSave()){
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            
+            [this, &projManager]() { 
+                projManager.saveProject(false); 
+                this->selectAndLoadMediaFiles(); 
+            },
+            
+            [this]() { 
+                this->selectAndLoadMediaFiles(); 
+            }
+        );
+    } else {
+        selectAndLoadMediaFiles();
+    }
+
+}
+
+
+void MainWindow::selectAndLoadMediaFiles()
 {
     QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";
         return;
@@ -137,12 +224,13 @@ void MainWindow::openMediaFile()
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }
+    
     qDebug() << "Fichiers sélectionnés : " << files_paths;
-    for(size_t IFilePath = 0; IFilePath < files_paths.size(); ++IFilePath){
-        qDebug() << files_paths.at(IFilePath);
+    for(const QString& path : files_paths){
+        qDebug() << path;
     }
+    
     m_globalPlayerManager->setPlayersFromPaths(files_paths);
-
 }
 
 MainWindow::~MainWindow()
@@ -150,6 +238,8 @@ MainWindow::~MainWindow()
     delete ui;
 
 }
+
+
 
 void MainWindow::enableFullscreenMain()
 {
@@ -233,4 +323,27 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     emit windowMovedOrResizedRequested();
+
+void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    
+    if (projManager.needSave()) { 
+        TextManager& txtManager = TextManager::instance();
+        
+        SLV::showGenericDialog(
+            this, 
+            txtManager.get("dialog_save_project_dialog_title"),
+            txtManager.get("dialog_save_project_dialog_text"),
+            [&projManager, arrangement]() { 
+                projManager.saveProject(false); 
+                emit SignalManager::instance().newArrangementRequested(arrangement);
+            },
+            [arrangement]() { 
+                emit SignalManager::instance().newArrangementRequested(arrangement);
+            }
+        );
+    } else {
+        emit SignalManager::instance().newArrangementRequested(arrangement);
+    }
 }

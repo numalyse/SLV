@@ -50,6 +50,7 @@ public:
 public slots:
     void enableButtons();
     void disableButtons();
+    void updateRecordButtonUI();
 
 private slots:
     void updateOverlayMode();

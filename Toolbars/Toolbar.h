@@ -29,13 +29,13 @@ public:
         
         m_stopBtn = new ToolbarButton(this, "stop_white", TextManager::instance().get("tooltip_stop"));
         m_ejectBtn = new ToolbarButton(this, "eject_white", TextManager::instance().get("tooltip_eject"));
-        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_white", TextManager::instance().get("tooltip_fullscreen"), "fullscreen_white", TextManager::instance().get("tooltip_fullscreen"));
+        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white", TextManager::instance().get("tooltip_fullscreen"), "fullscreen_white", TextManager::instance().get("tooltip_fullscreen"));
         m_screenshotBtn = new ToolbarButton(this, "capture_white", TextManager::instance().get("tooltip_capture"));
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
         connect(m_stopBtn, &ToolbarButton::clicked, this, &Toolbar::stopRequest);
-        connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequest);
+        connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequested);
         connect(m_fullscreenBtn,&ToolbarToggleButton::stateActivated, this, &Toolbar::enableFullscreenRequest);
         connect(m_fullscreenBtn,&ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableFullscreenRequest);
         connect(m_screenshotBtn, &ToolbarButton::clicked, this, &Toolbar::screenshotRequest);
@@ -56,6 +56,12 @@ public:
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
     virtual void setDefaultUI() = 0;
+
+public slots:
+    virtual void ejectRequested(){
+        emit ejectRequest();
+    };
+
 
 // Les classes filles pourront modifier ces widgets
 protected: 

@@ -36,6 +36,7 @@ signals:
     void mediaWidgetMediaFinished();
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
+    void playlistEjectPlayer();
     void simpleToolbarUpdateCursorPosition(int);
     void timelineSetPosition(int64_t);
     void extendedToolbarHideImageEnabled();
@@ -48,6 +49,7 @@ signals:
     void newArrangementRequested(const PlayerLayoutArrangement&);
     void playerWidgetMediaDropped(const QStringList&);
     void windowMovedOrResized();
+    void recordButtonUiUpdate();
 };
 
 

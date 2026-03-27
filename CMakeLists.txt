@@ -6,13 +6,15 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package( OpenCV REQUIRED )
 
 set(PROJECT_SOURCES
         main.cpp
@@ -31,7 +33,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         PlayerWidget.cpp
         PlayerLayoutManager.h PlayerLayoutManager.cpp
         Media.h Media.cpp
-        PlaylistManager.h PlaylistManager.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
 
         CompositionWidget.h CompositionWidget.cpp
@@ -71,6 +72,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Timeline/ABManager.h Timeline/ABManager.cpp
         Timeline/ShotManager.h Timeline/ShotManager.cpp
         Timeline/TimelineMath.h Timeline/TimelineMath.cpp
+        Timeline/SegmentationThread.h Timeline/SegmentationThread.cpp
+        Timeline/ThumbnailWorker.h Timeline/ThumbnailWorker.cpp
 
         Timeline/ItemTypes.h
 
@@ -78,6 +81,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Timeline/Items/RulerItem.h Timeline/Items/RulerItem.cpp
         Timeline/Items/CursorItem.h Timeline/Items/CursorItem.cpp
         Timeline/Items/ShotItem.h Timeline/Items/ShotItem.cpp
+        SequenceExtractionHelper.h
+        VideoCaptureManager.h VideoCaptureManager.cpp
+
+        FileCopyThread.h FileCopyThread.cpp
+
+        External/nlohmann/json.hpp
+
+        GenericDialog.h
 
     )
 
@@ -121,6 +132,7 @@ target_link_libraries(SLV PRIVATE
     ${FFMPEG_DIR}/lib/avformat.lib
     ${FFMPEG_DIR}/lib/avutil.lib
     ${FFMPEG_DIR}/lib/swscale.lib
+    ${OpenCV_LIBS}
 )
 # -----------------------------
 
@@ -139,6 +151,7 @@ target_link_libraries(SLV PRIVATE libvlc.lib libvlccore.lib)
 # -----------------------------
 
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Concurrent)
 # -----------------------------
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(SLV PRIVATE Qt${QT_VERSION_MAJOR}::Core)
@@ -199,3 +212,27 @@ add_custom_command(TARGET SLV POST_BUILD
     "${CMAKE_SOURCE_DIR}/libvlccore.dll"
     "$<TARGET_FILE_DIR:SLV>"
 )
+
+file(GLOB_RECURSE FFMPEG_DLL_LIST 
+    "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll" 
+    "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"
+)
+
+if(FFMPEG_DLL_LIST)
+    list(GET FFMPEG_DLL_LIST 0 FFMPEG_DLL_PATH)
+    message(STATUS "DLL FFMPEG FOUND : ${FFMPEG_DLL_PATH}")
+
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:SLV>
+            $<TARGET_FILE_DIR:SLV>
+            
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${FFMPEG_DLL_PATH}"
+            "$<TARGET_FILE_DIR:SLV>"
+            
+        COMMAND_EXPAND_LISTS
+    )
+else()
+    message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
+endif()

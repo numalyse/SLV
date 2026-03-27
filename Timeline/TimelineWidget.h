@@ -8,6 +8,7 @@
 #include "Timeline/TimelineMath.h"
 #include "Timeline/ShotManager.h"
 #include "Timeline/ABManager.h"
+#include "Timeline/SegmentationThread.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -29,7 +30,10 @@ class TimelineWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit TimelineWidget(QVector<Shot>& projectShots, QWidget* parent = nullptr);
+
+    explicit TimelineWidget(double fps, int64_t duration, const QString &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
+    QVector<Shot> getTimelineData();
+    void setTimelineData(QVector<Shot> shots);
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
@@ -38,12 +42,15 @@ public slots:
     void mergeWithPrevShotAction();
     void mergeWithNextShotAction();
 
+    const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
+
 signals:
     void updateShotDetailRequest(int shotCount, int shotId, Shot*);
     void timelineSetPosition(int64_t);
     void timelineSliderPositionRequested(int64_t);
     void enableTimeRelatedUI();
     void disableTimeRelatedUI();
+    void saveNeeded();
     
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -56,7 +63,8 @@ private slots:
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
-
+    void autoSegmentation();
+    
 private:
     void applyZoom(double zoomFactor, int mouseX);
     
@@ -73,6 +81,9 @@ private:
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
 
+    SegmentationThread* m_segmentationThread = nullptr;
+
+    ToolbarButton* m_autoSegmentationBtn = nullptr;
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
     ToolbarButton* m_mergeWithPrevShotBtn = nullptr;

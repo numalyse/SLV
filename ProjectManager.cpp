@@ -65,7 +65,6 @@ QString ProjectManager::getErrorMessage(Error error) const
 
 /// @brief Supprime le projet et son média et envoie un signal pour desactiver l'ui de segmentation 
 void ProjectManager::deleteProject() {
-    m_needSave = false;
     if (m_project) {
         if (m_project->media) {
             m_project->media->deleteLater(); 
@@ -73,6 +72,7 @@ void ProjectManager::deleteProject() {
         delete m_project;
         m_project = nullptr;
         p_timeline = nullptr;
+        setSaveNotNeeded();
         emit projectDeleted();
     }
 }
@@ -89,7 +89,7 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 
     m_project = new Project();
     m_project->media = new Media(mediaPaths.first(), this);
-    m_needSave = false;
+    setSaveNotNeeded();
     m_isDurationParsed = false;
     m_isFpsParsed = false;
 
@@ -125,13 +125,14 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
     if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path,
         // on écrit directement dans le json sans copier la vidéo
         writeJson();   
+        setSaveNotNeeded();
         if(ejectMediaAfterSave){
             discardAndEject();
         }
         return;
     }
 
-    if( m_project->media->filePath().isEmpty() ){
+    if( mediaPath().isEmpty() ){
         qCritical() << "Media path du project est vide";
         if(ejectMediaAfterSave){
             discardAndEject();
@@ -145,7 +146,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
     }else { // copie du média dans le dossier du projet
         QString destMedia = m_project->path + QDir::separator() + m_project->media->fileName() + '.' + m_project->media->fileExtension();
         copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
-
+        setSaveNotNeeded();
         return;
     }
 
@@ -281,12 +282,13 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 
     connect(m_fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
-    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath, txtManager](bool success) {
+    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath](bool success) {
         
         if (success) {
             writeJson();
-        }else {
+        } else {
             if ( ! m_fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
+                auto& txtManager = TextManager::instance(); 
                 QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), txtManager.get("project_error_copy_failed"));
             }
             deleteFolder(destPath);
@@ -369,29 +371,26 @@ nlohmann::json ProjectManager::writeMediaData(){
 
 bool ProjectManager::writeJson()
 {
-    qDebug() << "Writting Json";
-
     QString jsonPath = m_project->path + QDir::separator() + m_project->name + ".json";
 
-    std::ofstream projectData(jsonPath.toStdString());
-    if ( !projectData.is_open() ) {
-        qCritical() << "Impossible d'ouvrir le fichier";
+    QFile projectData(jsonPath);
+    
+    if (!projectData.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qCritical() << "Impossible d'ouvrir le fichier en écriture :" << jsonPath;
         return false;
     }
 
     nlohmann::json j; 
-
     j["media"] = writeMediaData();
-
     j["shots"] = writeShotsData();
 
-    projectData << j.dump(4);
+    std::string jsonString = j.dump(4);
+    projectData.write(jsonString.c_str(), jsonString.size());
 
     projectData.close();
 
     return true;
 }
-
 
 /// @brief Parcours le JSON pour récupérer les données du json
 /// @param projectAbsolutePath Path du projet
@@ -513,32 +512,32 @@ void ProjectManager::openProject()
 
     m_project = project;
 
-    m_needSave = false;
+    setSaveNotNeeded();
     m_isDurationParsed = false;
     m_isFpsParsed = false;
 
     auto& txtManager = TextManager::instance();
 
-    connect(m_project->media, &Media::durationParsed, this, [this, txtManager, durationJson = projectData.duration ](int64_t durationFile) {
+    connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
         
         if(durationJson == durationFile){
             m_isDurationParsed = true;
             checkMediaFullyLoaded();
-        }else {
+        } else {
             QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchDuration);
-            QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), errorMsg);
+            QMessageBox::critical(nullptr, TextManager::instance().get("dialog_error_text"), errorMsg);
         }
 
     });
 
-    connect(m_project->media, &Media::fpsParsed, this, [this, txtManager, fpsJson = projectData.fps](double fpsFile) {
+    connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
         
         if(fpsJson == fpsFile){
             m_isFpsParsed = true;
             checkMediaFullyLoaded();
         }else {
             QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchFPS);
-            QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), errorMsg);
+            QMessageBox::critical(nullptr, TextManager::instance().get("dialog_error_text"), errorMsg);
         }
 
     });
@@ -566,4 +565,10 @@ void ProjectManager::discardAndEject(){
 
 void ProjectManager::setSaveNeeded(){
     m_needSave = true;
+    emit enableSaveButton();
+}
+
+void ProjectManager::setSaveNotNeeded(){
+    m_needSave = false;
+    emit disableSaveButton();
 }

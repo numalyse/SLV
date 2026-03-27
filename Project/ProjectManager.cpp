@@ -4,6 +4,7 @@
 #include "Media.h"
 #include "TextManager.h"
 #include "External/nlohmann/json.hpp"
+#include "Project/ProjectFileHandler.h"
 
 #include <QString>
 #include <QDebug>
@@ -36,32 +37,42 @@ ProjectManager::~ProjectManager()
 /// @brief A partir d'une erreur renvoie le message associé
 /// @param error 
 /// @return 
-QString ProjectManager::getErrorMessage(Error error) const
+QString ProjectManager::getErrorMessage(ProjectFileError error) const
 {
     TextManager& txtManager = TextManager::instance();
-
     switch (error) {
-        case Error::FolderNotFound:
+        case ProjectFileError::FolderNotFound:
             return txtManager.get("project_manager_error_folder_not_found"); 
-        case Error::JsonFileNotFound:
+        case ProjectFileError::JsonFileNotFound:
             return txtManager.get("project_manager_error_json_file_not_found");   
-        case Error::CannotOpenJsonFile:
+        case ProjectFileError::CannotOpenJsonFile:
             return txtManager.get("project_manager_error_cannot_open_json_file");
-        case Error::JsonParsingError:
+        case ProjectFileError::JsonParsingError:
             return txtManager.get("project_manager_error_json_parsing_error");
-        case Error::MediaFileNotFound:
+        case ProjectFileError::MediaFileNotFound:
             return txtManager.get("project_manager_error_media_file_not_found"); 
-        case Error::MediaKeyMissing:
+        case ProjectFileError::MediaKeyMissing:
             return txtManager.get("project_manager_error_media_key_missing"); 
-        case Error::MismatchFPS:
-            return txtManager.get("project_manager_error_media_mismatch_fps"); 
-        case Error::MismatchDuration:
-            return txtManager.get("project_manager_error_media_mismatch_duration"); 
-        case Error::UnexpectedError:
+
+        case ProjectFileError::UnexpectedError:
         default:
             return txtManager.get("project_manager_error_unexpected_error");
     }
 }
+
+QString ProjectManager::getErrorMessage(ProjectManager::Error error) const {
+    TextManager& txtManager = TextManager::instance();
+    switch (error) {
+        case ProjectManager::Error::MismatchFPS:
+            return txtManager.get("project_manager_error_media_mismatch_fps"); 
+        case ProjectManager::Error::MismatchDuration:
+            return txtManager.get("project_manager_error_media_mismatch_duration"); 
+        case ProjectManager::Error::UnexpectedError:
+        default:
+            return txtManager.get("project_manager_error_unexpected_error");
+    }
+}
+
 
 /// @brief Supprime le projet et son média et envoie un signal pour desactiver l'ui de segmentation 
 void ProjectManager::deleteProject() {
@@ -124,7 +135,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
 
     if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path,
         // on écrit directement dans le json sans copier la vidéo
-        writeJson();   
+        ProjectFileHandler::writeJson(m_project, p_timeline);
         setSaveNotNeeded();
         if(ejectMediaAfterSave){
             discardAndEject();
@@ -285,7 +296,7 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
     connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath](bool success) {
         
         if (success) {
-            writeJson();
+            ProjectFileHandler::writeJson(m_project, p_timeline);
         } else {
             if ( ! m_fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
                 auto& txtManager = TextManager::instance(); 
@@ -307,174 +318,7 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
     return true;
 }
 
-nlohmann::json ProjectManager::writeShotsData(){
-    Q_ASSERT( p_timeline );
 
-    auto shots = p_timeline->getTimelineData();
-
-    Q_ASSERT( ! shots.empty() );
-
-    nlohmann::json shotArray = nlohmann::json::array();
-
-    for( int IShot = 0; IShot < shots.size(); ++IShot ){
-
-        nlohmann::json shotObject;
-        
-        shotObject["title"] = shots[IShot].title.toStdString();
-        shotObject["start"] = shots[IShot].start;
-        shotObject["end"] = shots[IShot].end;
-        shotObject["tagImageTime"] = shots[IShot].tagImageTime;
-        shotObject["note"] = shots[IShot].note.toStdString();
-
-        shotArray.push_back(shotObject);
-    }
-
-    return shotArray;
-}
-
-nlohmann::json ProjectManager::writeMediaData(){
-    Q_ASSERT( p_timeline );
-
-    auto shots = p_timeline->getTimelineData();
-
-    Q_ASSERT( ! shots.empty() );
-
-    nlohmann::json mediaData = nlohmann::json::object();
-
-    auto projectMedia = m_project->media;
-
-    mediaData["filePath"] = projectMedia->filePath().toStdString();
-    QString filename = projectMedia->fileName() + "." + projectMedia->fileExtension();
-    mediaData["name"] = filename.toStdString();
-    mediaData["duration"] = projectMedia->duration();
-    mediaData["fps"] = projectMedia->fps();
-    mediaData["type"] = projectMedia->type();
-
-    nlohmann::json metaDataObject = nlohmann::json::object();
-
-    auto meta = projectMedia->metaData();
-
-    QMapIterator<libvlc_meta_t, QString> IMeta(meta);
-    while (IMeta.hasNext()) {
-        IMeta.next();
-
-        int idInt = static_cast<int>(IMeta.key());
-        std::string idString = std::to_string(idInt);
-        
-        metaDataObject[idString] = IMeta.value().toStdString();
-    }
-
-    mediaData["metaData"] = metaDataObject;
-
-    return mediaData;
-}
-
-bool ProjectManager::writeJson()
-{
-    QString jsonPath = m_project->path + QDir::separator() + m_project->name + ".json";
-
-    QFile projectData(jsonPath);
-    
-    if (!projectData.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical() << "Impossible d'ouvrir le fichier en écriture :" << jsonPath;
-        return false;
-    }
-
-    nlohmann::json j; 
-    j["media"] = writeMediaData();
-    j["shots"] = writeShotsData();
-
-    std::string jsonString = j.dump(4);
-    projectData.write(jsonString.c_str(), jsonString.size());
-
-    projectData.close();
-
-    return true;
-}
-
-/// @brief Parcours le JSON pour récupérer les données du json
-/// @param projectAbsolutePath Path du projet
-/// @return Retourne une structure avec les données du project ou une enum en fonction de l'erreur rencontrées
-std::expected<ProjectSaveData, ProjectManager::Error> ProjectManager::loadProject(const QString &projectAbsolutePath)
-{
-    QFileInfo projectInfo(projectAbsolutePath);
-
-    if (!projectInfo.exists() || !projectInfo.isDir()) {
-        qCritical() << "Erreur : Le dossier du projet n'existe pas.";
-        return std::unexpected(ProjectManager::Error::FolderNotFound);
-    }
-
-    QString projectName = projectInfo.baseName(); 
-
-    QString jsonFilePath = projectAbsolutePath + QDir::separator() + projectName + ".json";
-
-    QFileInfo saveFileInfo(jsonFilePath);
-    if (!saveFileInfo.exists() || !saveFileInfo.isFile()) {
-        qCritical() << "Erreur : Fichier de projet introuvable au chemin : " << jsonFilePath;
-        return std::unexpected(ProjectManager::Error::JsonFileNotFound);
-    }
-
-    try {
-        std::ifstream file(jsonFilePath.toLocal8Bit().constData());
-        if (!file.is_open()) {
-            return std::unexpected(ProjectManager::Error::CannotOpenJsonFile);
-        }
-
-        nlohmann::json projectData;
-        file >> projectData; 
-        file.close();
-
-        ProjectSaveData loadedData;
-
-        if (projectData.contains("media")) {
-            auto mediaJson = projectData["media"];
-
-            std::string nameStr = mediaJson.value("name", "");
-            loadedData.mediaName = QString::fromStdString(nameStr);
-            loadedData.duration = mediaJson.value("duration", 0);
-            loadedData.fps = mediaJson.value("fps", 0.0);
-
-            loadedData.mediaAbsolutePath = projectAbsolutePath + QDir::separator() + loadedData.mediaName;
-            QFileInfo mediaInfo(loadedData.mediaAbsolutePath);
-            
-            if (!mediaInfo.exists() || !mediaInfo.isFile()) {
-                qCritical() << "Erreur : Le fichier vidéo n'est pas dans le dossier ";
-                return std::unexpected(ProjectManager::Error::MediaFileNotFound);
-            }
-
-        } else {
-            return std::unexpected(ProjectManager::Error::MediaKeyMissing);
-        }
-
-        if(projectData.contains("shots") && projectData["shots"].is_array()){
-            for (const auto& shotJson : projectData["shots"]) {
-                Shot currentShot; 
-                
-                currentShot.title = QString::fromStdString(shotJson.value("title", ""));
-                currentShot.start = shotJson.value("start", 0LL); 
-                currentShot.end = shotJson.value("end", 0LL);
-                currentShot.tagImageTime = shotJson.value("tagImageTime", 0LL);
-                currentShot.note = QString::fromStdString(shotJson.value("note", ""));
-
-                loadedData.shots.append(currentShot);
-            }
-        }else {
-            return std::unexpected(ProjectManager::Error::MediaKeyMissing);
-        }
-
-        return loadedData;
-
-    } 
-    // Capture les erreurs spécifiques au format JSON 
-    catch (const nlohmann::json::exception& e) {
-        qCritical() << "Erreur de format JSON :" << e.what();
-        return std::unexpected(ProjectManager::Error::JsonParsingError);
-    } 
-    catch (const std::exception& e) {
-        return std::unexpected(ProjectManager::Error::UnexpectedError);
-    }
-
-}
 
 /// @brief Ouvre un dialogue pour choisir l'emplacement du dossier. Parcours le JSON, affiche une erreur dans une message box s'il y en eu, créer projet sinon.
 /// Puis parse le media
@@ -491,7 +335,7 @@ void ProjectManager::openProject()
         return;
     }
 
-    auto loaded = loadProject(selectedPath);
+    auto loaded = ProjectFileHandler::loadProject(selectedPath);
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());

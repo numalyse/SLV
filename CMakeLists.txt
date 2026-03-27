@@ -53,6 +53,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Shot.h
         Project/Project.h
         Project/ProjectManager.h Project/ProjectManager.cpp
+        Project/ProjectFileHandler.h Project/ProjectFileHandler.cpp
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp

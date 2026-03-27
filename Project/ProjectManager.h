@@ -6,18 +6,11 @@
 #include "FileCopyThread.h"
 #include "PlayerWidget.h"
 #include "Timeline/TimelineWidget.h"
+#include "Project/ProjectFileHandler.h"
 
 #include <External/nlohmann/json.hpp>
 
 #include <expected>
-
-struct ProjectSaveData {
-    QString mediaName;
-    QString mediaAbsolutePath;
-    int64_t duration = 0;
-    double fps = 0.0;
-    QVector<Shot> shots;
-};
 
 class ProjectManager : public QObject
 {
@@ -26,18 +19,11 @@ Q_OBJECT
 public:
 
     enum class Error {
-        FolderNotFound,
-        JsonFileNotFound,
-        CannotOpenJsonFile,
-        JsonParsingError,
-        MediaKeyMissing,
-        MediaFileNotFound,
-        UnexpectedError,
         MismatchDuration,
         MismatchFPS,
+        UnexpectedError
     };
     Q_ENUM(Error)
-
 
     static ProjectManager& instance() {
         static ProjectManager _instance;
@@ -88,11 +74,10 @@ private:
     bool createProjectFolder();
     void deleteFolder(const QString &projectFolderPath);
     bool copyMedia(const QString &sourcePath, const QString &destPath, bool ejectMediaOnEnd);
-    nlohmann::json writeShotsData();
-    nlohmann::json writeMediaData();
-    bool writeJson();
-    QString getErrorMessage(Error error) const;
-    std::expected<ProjectSaveData, Error> loadProject(const QString& projectPath);
+
+    QString getErrorMessage(ProjectFileError error) const;
+    QString getErrorMessage(ProjectManager::Error error) const;
+
     void checkMediaFullyLoaded();
 
 signals:

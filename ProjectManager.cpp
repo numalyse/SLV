@@ -282,12 +282,13 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 
     connect(m_fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
-    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath, txtManager](bool success) {
+    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath](bool success) {
         
         if (success) {
             writeJson();
-        }else {
+        } else {
             if ( ! m_fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
+                auto& txtManager = TextManager::instance(); 
                 QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), txtManager.get("project_error_copy_failed"));
             }
             deleteFolder(destPath);

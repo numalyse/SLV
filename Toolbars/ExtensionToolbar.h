@@ -6,8 +6,11 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
+#include "OverlayMode.h"
 
 #include <QWidget>
+#include <QComboBox>
+#include <QCheckBox>
 
 /// @brief Extension de la Toolbar avancée.
 class ExtensionToolbar : public QWidget
@@ -17,9 +20,12 @@ Q_OBJECT
 public:
     explicit ExtensionToolbar(QWidget* parent = nullptr);
 
+    void setOverlayMode(int index);
     void setFullscreenUI();
     void setDefaultUI();
     
+    //QComboBox* comboBoxCompoRuleBtn = nullptr;
+
     ToolbarToggleButton* m_zoomBtn = nullptr;
     ToolbarToggleButton* m_hideImgBtn= nullptr;
     ToolbarButton* m_prevFrameBtn= nullptr;
@@ -29,13 +35,14 @@ public:
     ToolbarButton* m_rotateBtn= nullptr;
     ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
-    ToolbarButton* m_compoRuleBtn= nullptr;
+    //ToolbarToggleHoverButton* m_compoRuleBtn = nullptr;
+    ToolbarPopupButton* m_compoRuleBtn = nullptr; 
+    //ToolbarButton* m_compoRuleBtn= nullptr;
     ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarButton* m_verticalInvBtn= nullptr;
     ToolbarButton* m_horizontalInvBtn= nullptr;
     // ToolbarButton* m_abloopBtn = nullptr;
     // ToolbarPopupButton* m_multiviewBtn;
-
 
     // playlist btn ?
     // A / B Button voir comment
@@ -45,6 +52,14 @@ public slots:
     void disableButtons();
     void updateRecordButtonUI();
 
+private slots:
+    void updateOverlayMode();
+
+private:
+    QComboBox* m_compoRuleComboBox;
+    QCheckBox* m_compoRuleCheckboxVFlip;
+    QCheckBox* m_compoRuleCheckboxHFlip;
+
 signals:
     void enableRecordRequested();
     void disableRecordRequested();
@@ -53,6 +68,8 @@ signals:
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
     void rotateRequested();
+    void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+
 };
 
 #endif

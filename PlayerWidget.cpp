@@ -2,6 +2,7 @@
 #include "Toolbars/SimpleToolbar.h"
 #include "ProjectManager.h"
 #include "SignalManager.h"
+#include "CompositionWidget.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -15,6 +16,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QStackedLayout>
 
 
 PlayerWidget::PlayerWidget(QWidget *parent)
@@ -23,8 +25,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     //setMinimumSize(640, 360);
     //resize(800, 450);
 
-    setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_DontCreateNativeAncestors);
+    // setAttribute(Qt::WA_NativeWindow);
+    // setAttribute(Qt::WA_DontCreateNativeAncestors);
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -79,10 +81,22 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
+    QWidget* containerWidget = new QWidget(this);
+    QStackedLayout* stack = new QStackedLayout(containerWidget);
+    stack->setContentsMargins(0,0,0,0);
+    stack->addWidget(m_mediaWidget);
+
+    m_compositionWidget = new CompositionWidget(containerWidget);
+    stack->setStackingMode(QStackedLayout::StackAll);
+    stack->addWidget(m_compositionWidget);
+
+    //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
+    //m_compositionWidget->raise(); 
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
-    layout->addWidget(m_mediaWidget);
+    layout->addWidget(containerWidget);
     layout->addWidget(m_toolBar);
 
     connect(m_mediaWidget, &MediaWidget::updateSliderRangeRequested, this, &PlayerWidget::updateSliderRangeRequest);
@@ -95,6 +109,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::updateFpsRequested, m_toolBar, &SimpleToolbar::updateFps);
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
+
+    connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
+    connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
 }
 
@@ -292,6 +310,51 @@ void PlayerWidget::endRecord()
 void PlayerWidget::rotate()
 {
     m_mediaWidget->rotate();
+}
+
+void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
+
+    m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
+}
+
+void PlayerWidget::onMediaRectChanged(const QRect &rect)
+{
+    m_mediaRect = rect;
+    emit mediaRectChanged(m_mediaRect);
+    qDebug() << "PlayerWidget m_mediaRect : " << m_mediaRect;
+}
+
+void PlayerWidget::widgetSizeChange()
+{
+    if (!m_compositionWidget || !m_mediaWidget)
+        return;
+
+    QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
+
+    int w = m_mediaWidget->width();
+    int h = m_mediaWidget->height();
+
+    m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+}
+
+bool PlayerWidget::event(QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+        m_compositionWidget->show();
+        QTimer::singleShot(50, this, SLOT(widgetSizeChange())); 
+        break;
+    case QEvent::WindowActivate:
+    case QEvent::Resize:
+    case QEvent::Move:
+        widgetSizeChange();
+        break;
+    default:
+        break;
+    }
+
+    return QWidget::event(event);
 }
 
 void PlayerWidget::enableButtons()

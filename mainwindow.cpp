@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_navPanelBtn->setButtonState(false);
     });
 
+    connect(this, &MainWindow::windowMovedOrResizedRequested, &SignalManager::instance(), [](){ emit SignalManager::instance().windowMovedOrResized(); });
     std::vector<std::pair<ToolbarButton*, PlayerLayoutArrangement>> layoutButtons = {
         {m_view1, PlayerLayoutArrangement::Arrangement1},
         {m_view2H, PlayerLayoutArrangement::Arrangement2H},
@@ -312,6 +313,16 @@ void MainWindow::createViewGridBtn()
     m_viewGridBtn->setOnTop(false);
 }
 
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    QMainWindow::moveEvent(event);
+    emit windowMovedOrResizedRequested();
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    emit windowMovedOrResizedRequested();
 
 void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)
 {

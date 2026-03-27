@@ -60,6 +60,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);
+    
+    connect(m_extensionToolbar, &ExtensionToolbar::setOverlayModeRequested, this, &AdvancedToolbar::setOverlayModeRequested);
+    
     connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, [this](){
         emit AdvancedToolbar::enableSegmentationRequest();
         m_prevMediaBtn->setEnabled(false);

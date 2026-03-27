@@ -2,11 +2,13 @@
 #define PLAYERWIDGET_H
 
 #include "MediaWidget.h"
+#include "CompositionWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 
 #include <QWidget>
 #include <qmainwindow.h>
 #include <vlc/vlc.h>
+#include <QSize>
 
 class PlayerWidget : public QWidget
 {
@@ -48,6 +50,10 @@ public slots:
     void startRecord();
     void endRecord();
     void rotate();
+    void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void onMediaRectChanged(const QRect &rect);
+    void widgetSizeChange();
+    bool event(QEvent *event);
 
     void enableButtons();
     void disableButtons();
@@ -83,6 +89,7 @@ signals:
     void mediaPlayerEjected();
 
     void mediaDropped(const QStringList&);
+    void mediaRectChanged(const QRect &rect);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -99,7 +106,9 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
-
+    CompositionWidget* m_compositionWidget = nullptr;
+    QSize m_mediaSize;
+    QRect m_mediaRect;
 };
 
 #endif // PLAYERWIDGET_H

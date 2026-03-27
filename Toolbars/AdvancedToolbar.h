@@ -7,6 +7,8 @@
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
 
+#include "OverlayMode.h"
+
 #include <QWidget>
 #include <QLabel>
 #include <QSlider>
@@ -54,6 +56,7 @@ signals:
     void previousMediaRequested();
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);
+    void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
 
 };
 

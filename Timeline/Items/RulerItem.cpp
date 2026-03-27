@@ -1,7 +1,6 @@
 #include "RulerItem.h"
 
 #include "TimeFormatter.h"
-#include "ProjectManager.h"
 
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>

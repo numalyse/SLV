@@ -1,7 +1,7 @@
 #include "FormTextEdit.h"
 
 #include "SignalManager.h"
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 
 FormTextEdit::FormTextEdit(const QString &text, bool editable, QWidget *parent) : QTextEdit(parent)
 {

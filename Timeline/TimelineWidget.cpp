@@ -1,8 +1,7 @@
 #include "Timeline/TimelineWidget.h"
 
 #include "TimeFormatter.h"
-#include "ProjectManager.h"
-#include "SignalManager.h"
+#include "Project/ProjectManager.h"
 #include "TextManager.h"
 
 #include "Timeline/Items/RulerItem.h"

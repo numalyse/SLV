@@ -1,6 +1,6 @@
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 
-#include "Project.h"
+#include "Project/Project.h"
 #include "Media.h"
 #include "TextManager.h"
 #include "External/nlohmann/json.hpp"

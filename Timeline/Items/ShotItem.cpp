@@ -1,7 +1,5 @@
 #include "ShotItem.h"
 
-#include "ProjectManager.h"
-
 #include <QPainter>
 
 ShotItem::ShotItem(Shot shot, double width, double height, double topMargin , QGraphicsItem* parent) 

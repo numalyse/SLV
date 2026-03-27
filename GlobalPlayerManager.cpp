@@ -3,7 +3,7 @@
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
 
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 
 #include <qlayout.h>
 

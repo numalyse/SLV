@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "GlobalPlayerManager.h"
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 #include "PlayerWidget.h"
 #include "TextManager.h"
 #include "GenericDialog.h"

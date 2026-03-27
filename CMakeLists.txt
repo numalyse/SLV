@@ -51,8 +51,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         VlcParseHelper.h
         VlcInstance.h
         Shot.h
-        Project.h
-        ProjectManager.h ProjectManager.cpp
+        Project/Project.h
+        Project/ProjectManager.h Project/ProjectManager.cpp
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp

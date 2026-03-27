@@ -1,6 +1,6 @@
 #include "PlayerWidget.h"
 #include "Toolbars/SimpleToolbar.h"
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 #include "SignalManager.h"
 
 #include <QDebug>

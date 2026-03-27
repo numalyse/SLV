@@ -2,7 +2,7 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
-#include "Project.h"
+#include "Project/Project.h"
 #include "FileCopyThread.h"
 #include "PlayerWidget.h"
 #include "Timeline/TimelineWidget.h"

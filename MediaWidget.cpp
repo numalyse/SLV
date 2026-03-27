@@ -163,8 +163,11 @@ bool MediaWidget::eject()
 
     QThreadPool::globalInstance()->start([this]() {
         
-        libvlc_media_player_stop(m_player);
-        libvlc_media_player_release(m_player); 
+        if(m_player){
+            libvlc_media_player_stop(m_player);
+            libvlc_media_player_release(m_player); 
+        }
+
         m_player = libvlc_media_player_new(SLV::VlcInstance::get());
         
         QMetaObject::invokeMethod(this, [this]() {

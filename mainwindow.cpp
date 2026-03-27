@@ -323,6 +323,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     emit windowMovedOrResizedRequested();
+}
 
 void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)
 {

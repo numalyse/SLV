@@ -419,3 +419,56 @@ void ProjectManager::setSaveNotNeeded(){
     m_needSave = false;
     emit disableSaveButton();
 }
+
+void ProjectManager::exportProject(){
+    
+    TextManager& txtManager = TextManager::instance();
+
+    QString extension = '.' + mediaPathExtension();
+
+    if(extension.isEmpty()) return;
+
+    auto format = ProjectExportHandler::selectFormatWindow(extension);
+
+    if ( ! format.has_value() ) return;
+    
+    ExportType selectedFormat = format.value();
+
+    QString selectedPath = QFileDialog::getSaveFileName(
+        nullptr, 
+        txtManager.get("export_file_path_title"), 
+        m_project->path, 
+        txtManager.get("export_file_path_file_format") 
+    );
+
+    if (selectedPath.isEmpty()) {
+        return; 
+    }
+
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, selectedPath, this);
+
+
+    QProgressDialog* progressDialog = new QProgressDialog(txtManager.get("export_running"), txtManager.get("generic_dialog_btn_cancel"), 0, 100, nullptr);
+    progressDialog->show();
+
+
+    connect(exportThread, &ProjectExportThread::progress, progressDialog, &QProgressDialog::setValue);
+    
+    connect(progressDialog, &QProgressDialog::canceled, this, [exportThread](){ 
+        exportThread->requestInterruption();
+    });
+
+    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog](bool success) {
+        if (success) {
+
+        }
+        progressDialog->close(); 
+        progressDialog->deleteLater(); 
+        exportThread->deleteLater(); 
+    });
+
+    exportThread->start();
+
+    qDebug() << "Export";
+    // ProjectExportHandler::exportProject(m_project, p_timeline, ExportType::MP4, selectedPath);
+}

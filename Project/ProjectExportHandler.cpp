@@ -1,6 +1,7 @@
 #include "Project/ProjectExportHandler.h"
 #include "ProjectExportHandler.h"
 #include "TextManager.h"
+#include "TimeFormatter.h"
 
 #include <QDialog>
 #include <QVBoxLayout>
@@ -8,10 +9,55 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <optional>
+#include <functional>
 
 namespace ProjectExportHandler {
     
-    std::optional<ExportType> selectFormatWindow(const QString& originalFormat) {
+
+    void exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<void(int)> progressCallback)
+    {
+        QFile file(dstPath + ".txt");
+
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            return;
+        }
+
+        QTextStream out(&file);
+        out.setEncoding(QStringConverter::Utf8);
+
+        out << "=== Etude cinematographique ===\n\n";
+        out << "Nombre total de plans : " << shots.size() << "\n\n";
+
+        int totalShots = shots.size();
+
+        for (int IShot = 0; IShot < shots.size(); ++IShot) {
+            const Shot &shot = shots[IShot];
+
+            int64_t shotDuration = shot.end - shot.start;
+
+            QString timeStr = TimeFormatter::msToHHMMSSFF(shot.start, fps);
+            QString endStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
+
+            out << "- [Plan " << (IShot + 1) << "] " << shot.title 
+                << " -> Debut : " << timeStr << " / Duree : " << endStr << "\n";
+
+            if (!shot.note.trimmed().isEmpty()) {
+                out << shot.note.trimmed() << "\n"; 
+            }
+
+            out << "\n";
+
+            if (progressCallback && totalShots > 0) {
+                int percent = static_cast<int>(((IShot + 1) * 100.0) / totalShots);
+                progressCallback(percent); 
+            }
+        }
+
+        file.close();
+    }
+
+    std::optional<ExportType> selectFormatWindow(const QString &originalFormat)
+    {
         QDialog dialog;
         auto& txtManager = TextManager::instance();
         dialog.setWindowTitle(txtManager.get("export_format_selection_title")); 
@@ -50,12 +96,6 @@ namespace ProjectExportHandler {
             return static_cast<ExportType>(selectedValue);
         }
 
-        return std::nullopt; 
+        return std::nullopt;
     }
-
-    bool ProjectExportHandler::exportProject(const Project *project, TimelineWidget *timeline, ExportType type, const QString &destinationPath)
-    {
-        return false;
-    }
-
 }

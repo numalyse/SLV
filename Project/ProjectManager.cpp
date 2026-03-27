@@ -421,12 +421,15 @@ void ProjectManager::setSaveNotNeeded(){
 }
 
 void ProjectManager::exportProject(){
-    
+    if ( !p_timeline ) return;
+    if ( !m_project ) return;
+    if ( !m_project->media ) return;
+
     TextManager& txtManager = TextManager::instance();
 
     QString extension = '.' + mediaPathExtension();
 
-    if(extension.isEmpty()) return;
+    if ( extension.isEmpty() ) return;
 
     auto format = ProjectExportHandler::selectFormatWindow(extension);
 
@@ -441,12 +444,13 @@ void ProjectManager::exportProject(){
         txtManager.get("export_file_path_file_format") 
     );
 
-    if (selectedPath.isEmpty()) {
-        return; 
-    }
+    if ( selectedPath.isEmpty() ) return; 
 
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, selectedPath, this);
+    double fps = m_project->media->fps();
+    int64_t duration = m_project->media->duration();
+    QString mediaPath = m_project->media->filePath();
 
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath, this);
 
     QProgressDialog* progressDialog = new QProgressDialog(txtManager.get("export_running"), txtManager.get("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();

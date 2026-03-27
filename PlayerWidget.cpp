@@ -114,6 +114,14 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
+    //connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
+    connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, this, &PlayerWidget::updateAudioTracks);
+    connect(this, &PlayerWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
+    
+    //connect(m_mediaWidget, &MediaWidget::updateSubtitlesTracksRequested, m_toolBar, &SimpleToolbar::updateSubtitlesTracks);
+    connect(m_mediaWidget, &MediaWidget::updateSubtitlesTracksRequested, this, &PlayerWidget::updateSubtitlesTracks);
+    connect(this, &PlayerWidget::updateSubtitlesTracksRequested, m_toolBar, &SimpleToolbar::updateSubtitlesTracks);
+
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -231,6 +239,18 @@ void PlayerWidget::stop()
 void PlayerWidget::eject()
 {
    m_mediaWidget->eject();
+}
+
+void PlayerWidget::updateAudioTracks(const QList<QPair<int, QString>>& list){
+    qDebug() << "RECEIVED emit updateAudioTracksRequested";
+    emit updateAudioTracksRequested(list);
+    qDebug() << "SEND emit updateAudioTracksRequested";
+}
+
+void PlayerWidget::updateSubtitlesTracks(const QList<QPair<int, QString>>& list){
+    qDebug() << "RECEIVED emit updateAudioTracksRequested";
+    emit updateSubtitlesTracksRequested(list);
+    qDebug() << "SEND emit updateSubtitlesTracksRequested";
 }
 
 void PlayerWidget::mute()

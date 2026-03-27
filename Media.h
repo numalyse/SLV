@@ -44,11 +44,16 @@ public:
     void setWidth(int width) { m_width = width; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
 
+    QList<QPair<int, QString>> audioTracks() const { return m_audioTracks; }
+    QList<QPair<int, QString>> subtitlesTracks() const { return m_subtitlesTracks; }
+    void parseTracks(libvlc_media_player_t* player);
+
 signals:
     void fpsParsed(double);
     void resolutionParsed(std::tuple<int, int>);
     void durationParsed(int64_t);
     void sizeParsed(const QSize &size);
+    void tracksParsed();
     
 private:
     QString m_name;
@@ -65,6 +70,9 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     libvlc_instance_t* m_vlcInstance = nullptr;
     libvlc_media_t * m_vlcMedia = nullptr;
+
+    QList<QPair<int, QString>> m_audioTracks;
+    QList<QPair<int, QString>> m_subtitlesTracks;
 
     static void onVlcEvent(const libvlc_event_t *event, void *userData);
 };

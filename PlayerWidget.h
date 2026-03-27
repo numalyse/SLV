@@ -34,6 +34,8 @@ public slots:
     void pause();
     void stop();
     void eject();
+    void updateAudioTracks(const QList<QPair<int, QString>>& tracks);
+    void updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks);
     void enablePlayerFullscreen();
     void disablePlayerFullscreen();
     void mute();
@@ -58,6 +60,10 @@ public slots:
     void enableButtons();
     void disableButtons();
     void mediaPlayerEjectedHandler();
+
+    // void updateAudioTracks();
+    // void updateSubtitlesTracks();
+
 
 signals:
     void addPlayerRequest();
@@ -90,6 +96,9 @@ signals:
 
     void mediaDropped(const QStringList&);
     void mediaRectChanged(const QRect &rect);
+
+    void updateAudioTracksRequested(const QList<QPair<int, QString>>& list);
+    void updateSubtitlesTracksRequested(const QList<QPair<int, QString>>& list);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

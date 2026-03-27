@@ -75,6 +75,8 @@ MediaWidget::MediaWidget(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
 
     libvlc_media_player_play(m_player);
+
+    connect(m_media, &Media::tracksParsed, this, &MediaWidget::updateTracks);
 }
 
 void MediaWidget::paintEvent(QPaintEvent *event) {
@@ -187,6 +189,58 @@ bool MediaWidget::eject()
 
     return true;
 }
+
+void MediaWidget::parseTracks()
+{
+    if (!m_player || !m_media)
+        return;
+
+    m_media->parseTracks(m_player);
+}
+
+void MediaWidget::setAudioTrack(int trackId)
+{
+    if (!m_player) return;
+    libvlc_audio_set_track(m_player, trackId);
+}
+
+void MediaWidget::setSubtitleTrack(int trackId)
+{
+    if (!m_player) return;
+    libvlc_video_set_spu(m_player, trackId);
+}
+
+QList<QPair<int, QString>> MediaWidget::audioTracks() const
+{
+    if (!m_media || !m_player) return {};
+    return m_media->audioTracks();
+}
+
+QList<QPair<int, QString>> MediaWidget::subtitlesTracks() const
+{
+    if (!m_media || !m_player) return {};
+    return m_media->subtitlesTracks();
+}
+
+void MediaWidget::getAudioTracks() 
+{
+    emit updateAudioTracksRequested(audioTracks());
+    qDebug() << "SEND emit updateAudioTracksRequested";
+}
+
+void MediaWidget::getSubtitlesTracks() 
+{
+    emit updateSubtitlesTracksRequested(subtitlesTracks());
+    qDebug() << "SEND emit updateSubtitlesTracksRequested";
+}
+
+void MediaWidget::updateTracks()
+{
+    qDebug() << "[MEDIAWIDGET] RECEIVED emit tracksParsed";
+    getAudioTracks();
+    getSubtitlesTracks();
+}
+
 
 /// @brief Mute the media player
 bool MediaWidget::mute()
@@ -433,6 +487,8 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 //qDebug() << "media size OK:" << width << height;
             }
 
+            mediaWidget->parseTracks();
+
         }, Qt::QueuedConnection);
     }
 }
@@ -553,3 +609,4 @@ void MediaWidget::createMedia(const QString& filePath){
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
     m_media->parse();
 }
+

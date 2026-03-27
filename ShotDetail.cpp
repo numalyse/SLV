@@ -30,7 +30,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_notes = new FormTextEditWidget(textManager.get("shot_detail_note_name") , "", true, this);
     m_tagImage = new QLabel(this);
     m_tagImage->setStyleSheet("");
-    m_tagImage->setFixedSize(m_imageSize);
+
 
     m_notes->setMaximumHeight(250);
 
@@ -71,6 +71,8 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_layout->addWidget(m_duration);
     m_layout->addWidget(m_notes);
     m_layout->addWidget(m_tagImage);
+    m_tagImage->adjustSize();
+    m_tagImage->setAlignment(Qt::AlignCenter);
     m_layout->addWidget(frameButtonsActions);
     m_layout->addStretch();
 

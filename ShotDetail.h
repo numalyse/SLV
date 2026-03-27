@@ -33,7 +33,7 @@ private:
 
     QVBoxLayout* m_layout = nullptr;
     Shot* m_shotData = nullptr;
-    QSize m_imageSize {200, 200};
+    QSize m_imageSize {270, 200};
     int m_shotId = -1;
     bool m_buttonDisabled = false;
 

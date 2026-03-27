@@ -99,6 +99,7 @@ void MainWindow::createMenuBar()
     auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
     auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
     auto *saveProjectAction = fileMenu->addAction("&Enregistrer");
+    saveProjectAction->setDisabled(true);
 
     connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){
         saveProjectAction->setEnabled(true);

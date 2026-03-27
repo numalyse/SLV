@@ -370,29 +370,26 @@ nlohmann::json ProjectManager::writeMediaData(){
 
 bool ProjectManager::writeJson()
 {
-    qDebug() << "Writting Json";
-
     QString jsonPath = m_project->path + QDir::separator() + m_project->name + ".json";
 
-    std::ofstream projectData(jsonPath.toStdString());
-    if ( !projectData.is_open() ) {
-        qCritical() << "Impossible d'ouvrir le fichier";
+    QFile projectData(jsonPath);
+    
+    if (!projectData.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qCritical() << "Impossible d'ouvrir le fichier en écriture :" << jsonPath;
         return false;
     }
 
     nlohmann::json j; 
-
     j["media"] = writeMediaData();
-
     j["shots"] = writeShotsData();
 
-    projectData << j.dump(4);
+    std::string jsonString = j.dump(4);
+    projectData.write(jsonString.c_str(), jsonString.size());
 
     projectData.close();
 
     return true;
 }
-
 
 /// @brief Parcours le JSON pour récupérer les données du json
 /// @param projectAbsolutePath Path du projet

@@ -56,6 +56,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Project/Project.h
         Project/ProjectManager.h Project/ProjectManager.cpp
         Project/ProjectFileHandler.h Project/ProjectFileHandler.cpp
+        Project/ProjectExportHandler.h Project/ProjectExportHandler.cpp
+        Project/ProjectExportThread.h Project/ProjectExportThread.cpp
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp

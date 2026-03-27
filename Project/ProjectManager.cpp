@@ -5,6 +5,8 @@
 #include "TextManager.h"
 #include "External/nlohmann/json.hpp"
 #include "Project/ProjectFileHandler.h"
+#include "Project/ProjectExportThread.h"
+#include "FileCopyThread.h"
 
 #include <QString>
 #include <QDebug>
@@ -173,6 +175,16 @@ QString ProjectManager::mediaPath()
     return "";
 }
 
+QString ProjectManager::mediaPathExtension()
+{
+    if(m_project){
+        if(m_project->media){
+            return m_project->media->fileExtension();
+        }
+    }
+    return "";
+}
+
 // slots
 
 /// @brief Une fois que les fps et la durée on été parsed, Créer un project avec un plan de la longueur de la vidéo
@@ -267,38 +279,28 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
         return false;
     }
 
-    if(m_fileCpyThread){ // suppression ancien thread
-        if (m_fileCpyThread->isRunning()) {
-            m_fileCpyThread->requestInterruption();
-            m_fileCpyThread->wait();
-        }
-        m_fileCpyThread->deleteLater();
-        m_fileCpyThread = nullptr;
-    }
-
     TextManager& txtManager = TextManager::instance();
 
-    m_fileCpyThread = new FileCopyThread(sourcePath, destPath, this);
+    FileCopyThread* fileCpyThread = new FileCopyThread(sourcePath, destPath, this);
     
     QProgressDialog* progressDialog = new QProgressDialog(txtManager.get("project_window_title_copy_video"), txtManager.get("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->setWindowTitle(txtManager.get("project_window_title_copy_video"));
     progressDialog->setWindowModality(Qt::WindowModal); 
-    progressDialog->setAttribute(Qt::WA_DeleteOnClose);
     progressDialog->show();
 
 
-    connect(progressDialog, &QProgressDialog::canceled, this, [this](){ 
-        m_fileCpyThread->requestInterruption();
+    connect(progressDialog, &QProgressDialog::canceled, this, [fileCpyThread](){ 
+        fileCpyThread->requestInterruption();
     });
 
-    connect(m_fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
+    connect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
-    connect(m_fileCpyThread, &FileCopyThread::copyFinished, this, [this, ejectMediaAfterSave, progressDialog, destPath](bool success) {
+    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, destPath](bool success) {
         
         if (success) {
             ProjectFileHandler::writeJson(m_project, p_timeline);
         } else {
-            if ( ! m_fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
+            if ( ! fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
                 auto& txtManager = TextManager::instance(); 
                 QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), txtManager.get("project_error_copy_failed"));
             }
@@ -310,10 +312,11 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
         }
 
         progressDialog->close(); 
-
+        progressDialog->deleteLater(); 
+        fileCpyThread->deleteLater(); 
     });
 
-    m_fileCpyThread->start();
+    fileCpyThread->start();
 
     return true;
 }

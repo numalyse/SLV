@@ -3,10 +3,11 @@
 #define PROJECTMANAGER_H
 
 #include "Project/Project.h"
-#include "FileCopyThread.h"
+
 #include "PlayerWidget.h"
 #include "Timeline/TimelineWidget.h"
 #include "Project/ProjectFileHandler.h"
+#include "Project/ProjectExportHandler.h"
 
 #include <External/nlohmann/json.hpp>
 
@@ -35,12 +36,14 @@ public:
     void openProject();
 
     void saveProject(bool ejectMedia);
+    void exportProject();
 
     void setTimeline(TimelineWidget* tl) { p_timeline = tl;}
 
     Project* projet(){ return m_project;}
 
     QString mediaPath();
+    QString mediaPathExtension();
 
     bool needSave() {
         if(!m_project) return false;
@@ -63,12 +66,11 @@ private:
     ~ProjectManager();
 
     Project* m_project = nullptr;
-    TimelineWidget* p_timeline = nullptr;
     bool m_needSave = false;
     bool m_isDurationParsed = false;
     bool m_isFpsParsed = false;
 
-    FileCopyThread* m_fileCpyThread = nullptr;
+    TimelineWidget* p_timeline = nullptr;
 
     void initProjectShot();
     bool createProjectFolder();

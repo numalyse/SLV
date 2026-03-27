@@ -518,26 +518,26 @@ void ProjectManager::openProject()
 
     auto& txtManager = TextManager::instance();
 
-    connect(m_project->media, &Media::durationParsed, this, [this, txtManager, durationJson = projectData.duration ](int64_t durationFile) {
+    connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
         
         if(durationJson == durationFile){
             m_isDurationParsed = true;
             checkMediaFullyLoaded();
-        }else {
+        } else {
             QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchDuration);
-            QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), errorMsg);
+            QMessageBox::critical(nullptr, TextManager::instance().get("dialog_error_text"), errorMsg);
         }
 
     });
 
-    connect(m_project->media, &Media::fpsParsed, this, [this, txtManager, fpsJson = projectData.fps](double fpsFile) {
+    connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
         
         if(fpsJson == fpsFile){
             m_isFpsParsed = true;
             checkMediaFullyLoaded();
         }else {
             QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchFPS);
-            QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), errorMsg);
+            QMessageBox::critical(nullptr, TextManager::instance().get("dialog_error_text"), errorMsg);
         }
 
     });

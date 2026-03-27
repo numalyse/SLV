@@ -20,7 +20,10 @@ std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
     int64_t aTime = m_abMarkersItems[0]->time();
     int64_t bTime = m_abMarkersItems[1]->time();
 
-    if (currentTime >= bTime || currentTime < aTime) {
+    // marge, apres avoir restart la loop, currentTime peut etre legerement inférieur à aTime, on ajoute une frame de marge pour ne pas restart en boucle
+    int64_t margin = 1000.0 / p_mathManager->fps();
+
+    if (currentTime >= bTime || currentTime < aTime - margin) {
         return aTime; 
     }
 

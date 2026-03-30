@@ -93,6 +93,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         GenericDialog.h
 
+        TSQueue.h
     )
 
 

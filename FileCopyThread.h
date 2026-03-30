@@ -17,7 +17,7 @@ public:
 signals:
     void errorOccured(const QString& errorMsg);
     void progress(int);
-    void copyFinished(bool);
+    void copyFinished(bool success, bool isCancelled = false);
 
 private:
     QString m_src;

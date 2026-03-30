@@ -295,12 +295,12 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 
     connect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
-    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, destPath](bool success) {
+    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, destPath](bool success, bool canceled) {
         
         if (success) {
             ProjectFileHandler::writeJson(m_project, p_timeline);
         } else {
-            if ( ! fileCpyThread->isInterruptionRequested()) { // si c'est pas un fail demandé par l'utilisateur
+            if ( !canceled ) { // si c'est pas un fail demandé par l'utilisateur
                 auto& txtManager = TextManager::instance(); 
                 QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), txtManager.get("project_error_copy_failed"));
             }
@@ -327,10 +327,11 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 /// Puis parse le media
 void ProjectManager::openProject()
 {
+    auto& txtManager = TextManager::instance();
 
     QString selectedPath = QFileDialog::getExistingDirectory(
         nullptr, 
-        tr(TextManager::instance().get("project_manager_open_project_dialog").toStdString().c_str()), 
+        tr(txtManager.get("project_manager_open_project_dialog").toStdString().c_str()), 
         QDir::homePath()
     );
 
@@ -342,7 +343,7 @@ void ProjectManager::openProject()
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
-        QMessageBox::critical(nullptr, TextManager::instance().get("dialog_error_text"), errorMsg);
+        QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), errorMsg);
         return;
     }
 
@@ -363,7 +364,6 @@ void ProjectManager::openProject()
     m_isDurationParsed = false;
     m_isFpsParsed = false;
 
-    auto& txtManager = TextManager::instance();
 
     connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
         

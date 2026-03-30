@@ -1,5 +1,5 @@
 #include "Toolbars/ExtensionToolbar.h"
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 
 #include "TextManager.h"
 #include <QHBoxLayout>

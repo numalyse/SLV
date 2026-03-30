@@ -1,7 +1,7 @@
 #include "Toolbars/AdvancedToolbar.h"
 
 #include "TextManager.h"
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 
 #include "GenericDialog.h"
 
@@ -13,7 +13,6 @@
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 #include "AdvancedToolbar.h"
 
-#include "ProjectManager.h"
 #include "TimeFormatter.h"
 
 #include <QMessageBox>

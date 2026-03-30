@@ -81,8 +81,6 @@ private:
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
 
-    SegmentationThread* m_segmentationThread = nullptr;
-
     ToolbarButton* m_autoSegmentationBtn = nullptr;
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
@@ -90,6 +88,7 @@ private:
     bool m_showMergeWithPrevShotBtn = false;
     ToolbarButton* m_mergeWithNextShotBtn = nullptr;
     bool m_showMergeWithNextShotBtn = false;
+    ToolbarButton* m_exportBtn = nullptr;
 
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;

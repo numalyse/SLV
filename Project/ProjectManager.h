@@ -2,22 +2,16 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
-#include "Project.h"
-#include "FileCopyThread.h"
+#include "Project/Project.h"
+
 #include "PlayerWidget.h"
 #include "Timeline/TimelineWidget.h"
+#include "Project/ProjectFileHandler.h"
+#include "Project/ProjectExportHandler.h"
 
 #include <External/nlohmann/json.hpp>
 
 #include <expected>
-
-struct ProjectSaveData {
-    QString mediaName;
-    QString mediaAbsolutePath;
-    int64_t duration = 0;
-    double fps = 0.0;
-    QVector<Shot> shots;
-};
 
 class ProjectManager : public QObject
 {
@@ -26,18 +20,11 @@ Q_OBJECT
 public:
 
     enum class Error {
-        FolderNotFound,
-        JsonFileNotFound,
-        CannotOpenJsonFile,
-        JsonParsingError,
-        MediaKeyMissing,
-        MediaFileNotFound,
-        UnexpectedError,
         MismatchDuration,
         MismatchFPS,
+        UnexpectedError
     };
     Q_ENUM(Error)
-
 
     static ProjectManager& instance() {
         static ProjectManager _instance;
@@ -49,12 +36,14 @@ public:
     void openProject();
 
     void saveProject(bool ejectMedia);
+    void exportProject();
 
     void setTimeline(TimelineWidget* tl) { p_timeline = tl;}
 
     Project* projet(){ return m_project;}
 
     QString mediaPath();
+    QString mediaPathExtension();
 
     bool needSave() {
         if(!m_project) return false;
@@ -77,22 +66,20 @@ private:
     ~ProjectManager();
 
     Project* m_project = nullptr;
-    TimelineWidget* p_timeline = nullptr;
     bool m_needSave = false;
     bool m_isDurationParsed = false;
     bool m_isFpsParsed = false;
 
-    FileCopyThread* m_fileCpyThread = nullptr;
+    TimelineWidget* p_timeline = nullptr;
 
     void initProjectShot();
     bool createProjectFolder();
     void deleteFolder(const QString &projectFolderPath);
-    bool copyMedia(const QString &sourcePath, const QString &destPath, bool ejectMediaOnEnd);
-    nlohmann::json writeShotsData();
-    nlohmann::json writeMediaData();
-    bool writeJson();
-    QString getErrorMessage(Error error) const;
-    std::expected<ProjectSaveData, Error> loadProject(const QString& projectPath);
+    bool copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave);
+
+    QString getErrorMessage(ProjectFileError error) const;
+    QString getErrorMessage(ProjectManager::Error error) const;
+
     void checkMediaFullyLoaded();
 
 signals:

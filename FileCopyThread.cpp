@@ -15,13 +15,13 @@ void FileCopyThread::run()
 
     if( ! srcFile.open(QIODevice::ReadOnly)){
         emit errorOccured("Impossible d'ouvrir le fichier source");
-        emit copyFinished(false);
+        emit copyFinished(false, false);
         return;
     }
     if( ! dstFile.open(QIODevice::WriteOnly)){
         srcFile.close();
         emit errorOccured("Impossible d'ouvrir le fichier de destination");
-        emit copyFinished(false);
+        emit copyFinished(false, false);
         return;
     }
 
@@ -37,17 +37,18 @@ void FileCopyThread::run()
             srcFile.close();
             dstFile.close();
             QFile::remove(m_dst);
-            emit copyFinished(false);
+            emit copyFinished(false, true);
             return;
         }
 
         QByteArray buffer = srcFile.read(c_chunkSize);
         qint64 written = dstFile.write(buffer);
+
         if (written < 0) {
             srcFile.close();
             dstFile.close();
             QFile::remove(m_dst);
-            emit copyFinished(false);
+            emit copyFinished(false, false);
             return;
         }
 
@@ -65,5 +66,5 @@ void FileCopyThread::run()
     
     srcFile.close();
     dstFile.close();
-    emit copyFinished(true);
+    emit copyFinished(true, false);
 }

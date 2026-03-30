@@ -268,7 +268,7 @@ void ProjectManager::deleteFolder(const QString& projectFolderPath) {
 
 
 
-/// @brief Copie avec un thread dédié un média à l'endroit souhaité.
+/// @brief Copie avec un thread dédié un média à l'endroit souhaité. Une fois terminé, créer le fichier JSON
 /// @param sourcePath Path du média a copier
 /// @param destPath Path de destination du média copié
 /// @param projectPath Path du dossier racine du projet (pour suppression si annulation)

@@ -109,6 +109,7 @@ void SegmentationThread::run()
     while ( cap.read(frame) ) {
         
         if(isInterruptionRequested()){
+			cap.release();
 			emit segmentationFinished({});
             return;
         }

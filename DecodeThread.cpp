@@ -17,6 +17,34 @@ DecodeThread::DecodeThread(
 }
 
 
+void DecodeThread::resizeImage(cv::Mat& src, cv::Mat& dst)
+{
+
+    int origWidth = src.cols;
+    int origHeight = src.rows;
+
+    cv::Size cvTargetSize(m_targetSize.value());
+
+    double scaleWidth = static_cast<double>(cvTargetSize.width) / origWidth;
+    double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
+
+    double scale = std::min(scaleWidth, scaleHeight);
+
+    cv::Size newSize(
+        static_cast<int>(origWidth * scale),
+        static_cast<int>(origHeight * scale)
+    );
+
+    cv::resize(src, dst, newSize, 0, 0, cv::INTER_AREA);
+}
+
+void DecodeThread::convertImage(cv::Mat& src)
+{
+    cv::cvtColor(src, src, m_colorCode.value());
+}
+
+
+
 void DecodeThread::decodeTagImages(){
 
     cv::VideoCapture cap(m_mediaPath.toStdString(), cv::CAP_FFMPEG);
@@ -28,11 +56,30 @@ void DecodeThread::decodeTagImages(){
     }
 
     cv::Mat frame;
+    cv::Mat resized;
 
     for(auto& shot : m_shots){
         cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(shot.tagImageTime));
         cap.read(frame);
-        p_imageQueue->waitPush({frame.clone(), false});
+
+        if (!cap.read(frame) || frame.empty()) {
+            qWarning() << "Impossible de lire la frame au timestamp :" << shot.tagImageTime;
+            continue; 
+        }
+
+        cv::Mat processedFrame = frame;
+
+        if(m_targetSize.has_value()){
+            cv::Mat tempResized;
+            resizeImage(processedFrame, tempResized);
+            processedFrame = tempResized;
+        }
+
+        if(m_colorCode.has_value()){
+            convertImage(processedFrame);
+        }
+
+        p_imageQueue->waitPush({processedFrame.clone(), false});
     }
 
     p_imageQueue->waitPush({{}, true});

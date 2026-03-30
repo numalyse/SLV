@@ -30,6 +30,10 @@ void ProjectExportThread::run()
         break;
     case ExportType::TagImage:
         success = ProjectExportHandler::exportToTagImage(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+        break;
+    case ExportType::PDF:
+        success = ProjectExportHandler::exportToPDF(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+        break;
     default:
         break;
     }

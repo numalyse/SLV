@@ -15,8 +15,18 @@
 #include <QDir>
 #include <QObject>
 #include <QFileInfo>
+#include <QPdfWriter>
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QTextCharFormat>
+#include <QImage>
+#include <QFile>
+#include <QDebug>
+#include <QUrl>
+#include <QPageSize>
 
 #include <memory>
+#include <optional>
 
 namespace ProjectExportHandler {
     
@@ -107,18 +117,16 @@ namespace ProjectExportHandler {
 
             if (progressCallback && totalShots > 0) {
                 int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
-
                 if (!progressCallback(percent)) {
                     folder.removeRecursively();
                     return false;  
                 }
-
             }
             
             QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
             timeString.replace(":", "-");
         
-            QString fileName = dstPath + QDir::separator() + "TagImage" + QString::number(currentShot) + '_' + timeString + ".png";
+            QString fileName = dstPath + QDir::separator() + "TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png";
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
@@ -129,6 +137,119 @@ namespace ProjectExportHandler {
 
         return true;
 
+    }
+
+   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+
+        DecodeThread* decodeThread = new DecodeThread(
+            mediaPath, 
+            imageQueue.get(), 
+            shots, 
+            nullptr, 
+            std::optional<int>(cv::COLOR_BGR2RGB), 
+            std::optional<cv::Size>({400, 400})
+        );
+
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
+
+        QString finalPath = dstPath + ".pdf";
+        QPdfWriter pdfWriter(finalPath);
+        pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+        pdfWriter.setResolution(300); 
+
+        QTextDocument doc;
+        QTextCursor cursor(&doc);
+
+        QTextCharFormat titleFormat;
+        titleFormat.setFontPointSize(24);
+        titleFormat.setFontWeight(QFont::Bold);
+        titleFormat.setForeground(Qt::red);
+
+        QTextCharFormat subtitleFormat;
+        subtitleFormat.setFontPointSize(14);
+        subtitleFormat.setFontWeight(QFont::DemiBold);
+        subtitleFormat.setForeground(Qt::blue);
+
+        QTextCharFormat normalFormat;
+        normalFormat.setFontPointSize(12);
+        normalFormat.setForeground(Qt::black);
+
+        QTextBlockFormat titleAlignment;
+        titleAlignment.setAlignment(Qt::AlignCenter);
+        titleAlignment.setTopMargin(40);
+        titleAlignment.setBottomMargin(20);
+
+        QTextBlockFormat leftAlignment;
+        leftAlignment.setAlignment(Qt::AlignLeft);
+
+        QTextBlockFormat centerAlignment;
+        centerAlignment.setAlignment(Qt::AlignCenter);
+
+        QTextBlockFormat noteAlignment = leftAlignment;
+        noteAlignment.setTopMargin(5);
+
+        QTextBlockFormat imageAlignment = centerAlignment;
+        imageAlignment.setTopMargin(10);
+        imageAlignment.setBottomMargin(15);
+
+        cursor.insertBlock(titleAlignment);
+        cursor.insertText("Étude cinématographique", titleFormat);
+        
+        ImgData imgData{};
+        int totalShots = shots.size();
+        int currentShot = 0;
+
+        while(true) {
+            imageQueue->waitPop(imgData);
+
+            if(imgData.isFinished) break;
+
+            if (progressCallback && totalShots > 0) {
+                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+                if (!progressCallback(percent)) {
+                    decodeThread->requestInterruption();
+                    return false;  
+                }
+            }
+
+            auto& shot = shots[currentShot];
+            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
+            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+
+            QString planHeader = QString("- [Plan %1] %2 -> Début : %3 / Durée : %4")
+                                        .arg(currentShot + 1).arg(shot.title).arg(start).arg(shotDuration);
+            
+            cursor.insertBlock(leftAlignment);
+            cursor.insertText(planHeader, subtitleFormat);
+
+            if (!shot.note.isEmpty()) {
+                cursor.insertBlock(noteAlignment);
+                cursor.insertText(shot.note, normalFormat);
+            }
+            
+            // insertion de l'image, déjà à la bonne taille et au bon format dans video decode
+            if (!imgData.img.empty()) {
+                QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_RGB888);
+                QImage safeImage = tempImage.copy();
+
+                QString imgName = QString("img_%1.png").arg(currentShot + 1);
+                doc.addResource(QTextDocument::ImageResource, QUrl(imgName), safeImage);
+                
+                cursor.insertBlock(imageAlignment);
+
+                QTextImageFormat imgFormat;
+                imgFormat.setName(imgName);
+                cursor.insertImage(imgFormat);
+            }
+
+            ++currentShot;
+        }
+
+        doc.print(&pdfWriter);
+        return true;
     }
 
     std::optional<ExportType> selectFormatWindow(const QString &originalFormat)
@@ -173,4 +294,7 @@ namespace ProjectExportHandler {
 
         return std::nullopt;
     }
+
+
+
 }

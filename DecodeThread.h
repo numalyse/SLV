@@ -29,6 +29,11 @@ public:
     void run() override;
 
 private:
+
+    void resizeImage(cv::Mat &src, cv::Mat &dst);
+    void convertImage(cv::Mat &src);
+
+
     QString m_mediaPath{};
     QVector<Shot> m_shots{};
 

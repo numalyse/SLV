@@ -10,16 +10,17 @@
 #include <QDialogButtonBox>
 #include <optional>
 #include <functional>
+#include <QDir>
 
 namespace ProjectExportHandler {
     
 
-    void exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<void(int)> progressCallback)
+    bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         QFile file(dstPath + ".txt");
 
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            return;
+            return false;
         }
 
         QTextStream out(&file);
@@ -49,11 +50,44 @@ namespace ProjectExportHandler {
 
             if (progressCallback && totalShots > 0) {
                 int percent = static_cast<int>(((IShot + 1) * 100.0) / totalShots);
-                progressCallback(percent); 
+
+                if (!progressCallback(percent)) {
+                    file.close();
+                    file.remove(); 
+                    return false;  
+                }
+
             }
         }
 
         file.close();
+        return true;
+    }
+
+    bool exportToTagImage(const QVector<Shot> &shots, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+        QDir folder(dstPath);
+        if( folder.exists() ) {
+            folder.removeRecursively();
+        }
+
+        QDir().mkdir(dstPath);
+/* 
+        // create decodeThread 
+
+        // create queue
+
+        while(true) {
+            // from here wait pop to get item
+            
+            // write img to folder
+
+        }
+ */
+
+
+        return true;
+
     }
 
     std::optional<ExportType> selectFormatWindow(const QString &originalFormat)

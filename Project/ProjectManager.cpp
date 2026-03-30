@@ -464,7 +464,9 @@ void ProjectManager::exportProject(){
 
     connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog](bool success) {
         if (success) {
-
+            qDebug() << "Export réussi";
+        }else {
+            qDebug() << "Export annulé ou erreur";
         }
         progressDialog->close(); 
         progressDialog->deleteLater(); 

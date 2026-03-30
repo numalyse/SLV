@@ -9,24 +9,30 @@ ProjectExportThread::ProjectExportThread(ExportType type, const QVector<Shot> &s
 void ProjectExportThread::run()
 {
     int lastPercent = -1; 
+    bool success = false;
 
-    auto progressCallback = [this, &lastPercent](int percent) {
+    auto progressCallback = [this, &lastPercent](int percent) -> bool {
+        if (this->isInterruptionRequested()) {
+            return false; 
+        }
+
         if (percent != lastPercent) {
             lastPercent = percent;
             emit progress(percent);
         }
+        return true;
     };
 
     switch (m_type)
     {
     case ExportType::TXT:
-        ProjectExportHandler::exportToTxt(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+        success = ProjectExportHandler::exportToTxt(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
     
     default:
         break;
     }
 
-    emit exportFinished(true);
+    emit exportFinished(success);
     return;
 }

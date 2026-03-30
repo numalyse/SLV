@@ -28,7 +28,8 @@ void ProjectExportThread::run()
     case ExportType::TXT:
         success = ProjectExportHandler::exportToTxt(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
-    
+    case ExportType::TagImage:
+        success = ProjectExportHandler::exportToTagImage(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
     default:
         break;
     }

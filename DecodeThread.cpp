@@ -30,9 +30,9 @@ void DecodeThread::decodeTagImages(){
     cv::Mat frame;
 
     for(auto& shot : m_shots){
-        cap.set(cv::CAP_PROP_POS_MSEC, shot.tagImageTime);
+        cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(shot.tagImageTime));
         cap.read(frame);
-        p_imageQueue->waitPush({frame, false});
+        p_imageQueue->waitPush({frame.clone(), false});
     }
 
     p_imageQueue->waitPush({{}, true});

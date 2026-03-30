@@ -22,8 +22,8 @@ enum class ExportType {
 
 namespace ProjectExportHandler {
 
-    bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<void(int)> progressCallback = nullptr);
-    bool exportToTagImage( const QVector<Shot> &shots, const QString &mediaPath, const QString &dstPath, std::function<void(int)> progressCallback = nullptr);
+    bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
+    bool exportToTagImage( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
 
     std::optional<ExportType> selectFormatWindow(const QString& extension);
 }

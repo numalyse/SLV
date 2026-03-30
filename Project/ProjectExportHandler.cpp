@@ -2,6 +2,8 @@
 #include "ProjectExportHandler.h"
 #include "TextManager.h"
 #include "TimeFormatter.h"
+#include "TSQueue.h"
+#include "DecodeThread.h"
 
 #include <QDialog>
 #include <QVBoxLayout>
@@ -11,6 +13,10 @@
 #include <optional>
 #include <functional>
 #include <QDir>
+#include <QObject>
+#include <QFileInfo>
+
+#include <memory>
 
 namespace ProjectExportHandler {
     
@@ -64,27 +70,62 @@ namespace ProjectExportHandler {
         return true;
     }
 
-    bool exportToTagImage(const QVector<Shot> &shots, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         QDir folder(dstPath);
         if( folder.exists() ) {
             folder.removeRecursively();
         }
 
-        QDir().mkdir(dstPath);
-/* 
-        // create decodeThread 
+        if (!QDir().mkpath(dstPath)) {
+            qDebug() << "Erreur : Impossible de créer le dossier " << dstPath;
+            return false;
+        }
 
-        // create queue
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+
+        DecodeThread* decodeThread = new DecodeThread(mediaPath, imageQueue.get(), shots);
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
+
+        ImgData imgData{};
+
+        int totalShots = shots.size();
+        int currentShot = 0;
+
+        std::vector<int> pngParams;
+        pngParams.push_back(cv::IMWRITE_PNG_COMPRESSION);
+        pngParams.push_back(3);
+
+        QFileInfo mediaFileInfo(mediaPath);
+        QString mediaName = mediaFileInfo.baseName();
 
         while(true) {
-            // from here wait pop to get item
+            imageQueue->waitPop(imgData);
+
+            if(imgData.isFinished) break;
+
+            if (progressCallback && totalShots > 0) {
+                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+
+                if (!progressCallback(percent)) {
+                    folder.removeRecursively();
+                    return false;  
+                }
+
+            }
             
-            // write img to folder
+            QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
+            timeString.replace(":", "-");
+        
+            QString fileName = dstPath + QDir::separator() + "TagImage" + QString::number(currentShot) + '_' + timeString + ".png";
 
+            bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
+            if(!success){
+                qDebug() << "Impossible de sauvegarder la tag image du plan : " << currentShot;
+            }
+            ++currentShot;
         }
- */
-
 
         return true;
 

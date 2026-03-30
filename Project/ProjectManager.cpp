@@ -158,7 +158,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
         return; 
     }else { // copie du média dans le dossier du projet
         QString destMedia = m_project->path + QDir::separator() + m_project->media->fileName() + '.' + m_project->media->fileExtension();
-        copyMedia(m_project->media->filePath(), destMedia, ejectMediaAfterSave);
+        copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave);
         setSaveNotNeeded();
         return;
     }
@@ -267,12 +267,14 @@ void ProjectManager::deleteFolder(const QString& projectFolderPath) {
 }
 
 
+
 /// @brief Copie avec un thread dédié un média à l'endroit souhaité.
 /// @param sourcePath Path du média a copier
 /// @param destPath Path de destination du média copié
+/// @param projectPath Path du dossier racine du projet (pour suppression si annulation)
 /// @param ejectMediaAfterSave Si true, ejecte la vidéo après la copie
 /// @return 
-bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPath, bool ejectMediaAfterSave) { 
+bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave) { 
 
     if (!QFile::exists(sourcePath)) {
         qCritical() << "Erreur : Le fichier source est introuvable." << sourcePath;
@@ -289,22 +291,24 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
     progressDialog->show();
 
 
-    connect(progressDialog, &QProgressDialog::canceled, this, [fileCpyThread](){ 
+    connect(progressDialog, &QProgressDialog::canceled, this, [fileCpyThread, progressDialog](){ 
         fileCpyThread->requestInterruption();
+        disconnect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
     });
 
     connect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
 
-    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, destPath](bool success, bool canceled) {
+    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, projectPath](bool success, bool canceled) {
         
         if (success) {
             ProjectFileHandler::writeJson(m_project, p_timeline);
         } else {
-            if ( !canceled ) { // si c'est pas un fail demandé par l'utilisateur
+            if ( ! canceled ) {
                 auto& txtManager = TextManager::instance(); 
                 QMessageBox::critical(nullptr, txtManager.get("dialog_error_text"), txtManager.get("project_error_copy_failed"));
             }
-            deleteFolder(destPath);
+            deleteFolder(projectPath);
+            setSaveNeeded(); 
         }
 
         if(ejectMediaAfterSave){

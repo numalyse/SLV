@@ -75,7 +75,7 @@ private:
     void initProjectShot();
     bool createProjectFolder();
     void deleteFolder(const QString &projectFolderPath);
-    bool copyMedia(const QString &sourcePath, const QString &destPath, bool ejectMediaOnEnd);
+    bool copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave);
 
     QString getErrorMessage(ProjectFileError error) const;
     QString getErrorMessage(ProjectManager::Error error) const;

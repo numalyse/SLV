@@ -9,15 +9,16 @@
 #include <qdebug.h>
 
 //TODO : à mettre dans une classe pour les signaux/barre de progression si possible
-namespace SequenceExtractionHelper
+class SequenceExtractionHelper : QObject
 {
 
+public:
     /// @brief Extract sequence from a media path
     /// @param filePath : media path
     /// @param startTime : start of the sequence from media in ms
     /// @param endTime : end of the sequence from media in ms
     /// @param savePath : path in which the sequence will be saved
-    inline void extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath){
+    inline static QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath){
         QProcess *ffmpeg = new QProcess();
         QStringList args;
         args << "-ss" << TimeFormatter::msToHHMMSSMilMil(startTime)
@@ -27,9 +28,10 @@ namespace SequenceExtractionHelper
              << savePath;
 
         ffmpeg->start("ffmpeg", args);
+        return ffmpeg;
     }
 
-    inline void concatenateSequences(const QString& enumSequenceFile, const QString& savePath){
+    inline static QProcess* concatenateSequences(const QString& enumSequenceFile, const QString& savePath){
         QProcess *ffmpeg = new QProcess();
         QStringList args;
         args << "-f" << "concat"
@@ -40,8 +42,9 @@ namespace SequenceExtractionHelper
 
         ffmpeg->start("ffmpeg", args);
         QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(), [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
+        return ffmpeg;
     }
 
-} // namespace
+};
 
 #endif // SEQUENCEEXTRACTIONHELPER_H

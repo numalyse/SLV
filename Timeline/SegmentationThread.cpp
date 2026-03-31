@@ -95,7 +95,7 @@ void SegmentationThread::run()
     pythonProcess.setProcessChannelMode(QProcess::MergedChannels);
 
     QStringList arguments;
-    arguments << "segmentation.py" << m_videoPath;
+    arguments << "pyScripts/segmentation.py" << m_videoPath;
     arguments << ("1"); 
 
     pythonProcess.start("py", arguments);

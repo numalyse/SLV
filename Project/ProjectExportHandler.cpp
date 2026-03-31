@@ -332,7 +332,7 @@ namespace ProjectExportHandler {
         pythonProcess.setProcessChannelMode(QProcess::MergedChannels); // Pour lire les prints normaux et les erreurs
         
         // On passe le chemin du JSON en argument unique
-        pythonProcess.start("py", QStringList() << "export_pptx.py" << jsonFile.fileName());
+        pythonProcess.start("py", QStringList() << "pyScripts/export_pptx.py" << jsonFile.fileName());
 
         // Boucle d'attente active pour lire la progression en temps réel
         while (pythonProcess.waitForReadyRead(-1)) {

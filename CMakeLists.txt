@@ -229,7 +229,7 @@ add_custom_command(TARGET SLV POST_BUILD
 add_custom_command(TARGET SLV POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${PYTHON_SCRIPTS_DIR}"
-    "$<TARGET_FILE_DIR:SLV>/scripts"
+    "$<TARGET_FILE_DIR:SLV>/pyScripts"
     COMMENT "Copie des scripts Python vers le dossier de sortie..."
 )
 

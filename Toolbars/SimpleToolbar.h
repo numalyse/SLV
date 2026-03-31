@@ -65,10 +65,13 @@ public slots:
 
     void updateAudioTracks(const QList<QPair<int, QString>>& tracks);
     void updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks);
-    
-    void setAudioTrack(int index);
-    void setSubtitlesTrack(int index);
 
+    void setAudioTrackDefault();
+    void setSubtitlesTrackDefault();
+    void setAudioTrack(int index);
+    //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
+    void setSubtitlesTrack(int index);
+    
 protected:
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;

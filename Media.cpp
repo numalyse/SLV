@@ -54,6 +54,8 @@ void Media::parseTracks(libvlc_media_player_t* player)
 {
     if (!player) return;
 
+    // qDebug() << "[MEDIA] parseTracks instance =" << this;
+
     // Audio
     libvlc_track_description_t *audio = libvlc_audio_get_track_description(player);
     m_audioTracks.clear();
@@ -74,10 +76,14 @@ void Media::parseTracks(libvlc_media_player_t* player)
     // for (auto &t : m_audioTracks)
     //     qDebug() << t.first << ":" << t.second;
 
-    qDebug() << "OK tracks parsed";
+    // qDebug() << "Subtitles tracks:";
+    // for (auto &t : m_subtitlesTracks)
+    //     qDebug() << t.first << ":" << t.second;    
+
+    // qDebug() << "OK tracks parsed";
 
     emit tracksParsed();
-    qDebug() << "[MEDIA] SEND emit tracksParsed";
+    // qDebug() << "[MEDIA] SEND emit tracksParsed";
 
 }
 

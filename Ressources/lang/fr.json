@@ -76,5 +76,10 @@
     "compo_rule_GoldenRatio" : "Nombre d'or",
 
     "tooltip_compo_rule_VFlip" : "Retournement vertical",
-    "tooltip_compo_rule_HFlip" : "Retournement horizontal"
+    "tooltip_compo_rule_HFlip" : "Retournement horizontal",
+
+    "languages" : "Langues",
+    "subtitles" : "Sous-titres",
+    "no_audio" : "Pas de piste audio",
+    "no_subtitles" : "Pas de piste de sous-titres"
 }

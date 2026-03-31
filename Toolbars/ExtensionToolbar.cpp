@@ -93,7 +93,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     });
     connect(&SignalManager::instance(), &SignalManager::recordButtonUiUpdate, this, &ExtensionToolbar::updateRecordButtonUI);
 
-
     QHBoxLayout* compoRuleLayout = new QHBoxLayout();
 
     m_compoRuleComboBox = new QComboBox(this);
@@ -124,8 +123,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     compoRuleLayout->addWidget(m_compoRuleCheckboxHFlip);
 
     m_compoRuleBtn = new ToolbarPopupButton(this, compoRuleLayout, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
-    //m_compoRuleBtn = new ToolbarButton(this, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
-    
+   
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
     m_verticalInvBtn = new ToolbarButton(this, "invert_v_white", TextManager::instance().get("tooltip_flip_vertical"));
@@ -133,7 +131,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
     m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", TextManager::instance().get("tooltip_flip_vertical"));
-
+    
     setDefaultUI();
     disableButtons();
     hide();

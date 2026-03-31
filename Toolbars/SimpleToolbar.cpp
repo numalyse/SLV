@@ -101,6 +101,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     // Languages/Subtitles Popup display
     QVBoxLayout* langLayout = new QVBoxLayout();
+
     // Languages
     QHBoxLayout* audioLangLayout = new QHBoxLayout();
     langLayout->addLayout(audioLangLayout);
@@ -112,6 +113,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     audioLangLayout->addWidget(audioLangLabel);
     audioLangLayout->addWidget(m_audioLangComboBox);
     connect(m_audioLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SimpleToolbar::setAudioTrack);
+    //connect(m_audioLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index){setAudioTrack(index, true);});
 
     // Subtitles
     QHBoxLayout* subLangLayout = new QHBoxLayout();
@@ -385,23 +387,42 @@ void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
     m_audioLangComboBox->clear();
 
     if (tracks.isEmpty()) {
+        //qDebug() << "[SIMPLETOOLBAR] No languages available";
         m_audioLangComboBox->addItem(TextManager::instance().get("no_audio"));
     }
     
     for (const auto& track : tracks) {
+        //qDebug() << "n° " << track.second << " : " << track.first;
         m_audioLangComboBox->addItem(track.second, track.first);
     }
+
 }
 
 void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks){
     m_subLangComboBox->clear();
 
     if (tracks.isEmpty()) {
+        //qDebug() << "[SIMPLETOOLBAR] No subtitles available";
         m_subLangComboBox->addItem(TextManager::instance().get("no_subtitles"));
     }
-    m_subLangComboBox->clear();for (const auto& track : tracks) {
+    
+    for (const auto& track : tracks) {
+        //qDebug() << "n° " << track.second << " : " << track.first;
         m_subLangComboBox->addItem(track.second, track.first);
     }
+
+}
+
+void SimpleToolbar::setAudioTrackDefault(){
+    m_audioLangComboBox->blockSignals(true);
+    m_audioLangComboBox->setCurrentIndex(1);
+    m_audioLangComboBox->blockSignals(false);
+}
+
+void SimpleToolbar::setSubtitlesTrackDefault(){
+    m_subLangComboBox->blockSignals(true);
+    m_subLangComboBox->setCurrentIndex(1);
+    m_subLangComboBox->blockSignals(false);
 }
 
 void SimpleToolbar::setAudioTrack(int index){
@@ -411,7 +432,11 @@ void SimpleToolbar::setAudioTrack(int index){
         return;
 
     int trackNumber = data.toInt();
+
+    qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
+
     emit setAudioTrackRequested(trackNumber);
+    
 }
 
 void SimpleToolbar::setSubtitlesTrack(int index){
@@ -421,7 +446,7 @@ void SimpleToolbar::setSubtitlesTrack(int index){
         return;
 
     int trackNumber = data.toInt();
+    qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
     emit setSubtitlesTrackRequested(trackNumber);
     
 }
-

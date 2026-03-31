@@ -104,8 +104,10 @@ signals:
     void volumeChanged(const QString&);
     void speedChanged(const QString&);
     void mediaRectChanged(const QRect &rect);
-    void updateAudioTracksRequested(QList<QPair<int, QString>>);
-    void updateSubtitlesTracksRequested(QList<QPair<int, QString>>);
+    void updateAudioTracksRequested(const QList<QPair<int, QString>>& tracks);
+    void updateSubtitlesTracksRequested(const QList<QPair<int, QString>>& tracks);
+    void setAudioTrackDefaultRequested();
+    void setSubtitlesTrackDefaultRequested();
 
 };
 

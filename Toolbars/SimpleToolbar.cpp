@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QComboBox>
 #include "SimpleToolbar.h"
 #include <QGraphicsDropShadowEffect>
 
@@ -97,7 +98,35 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         "loop_off_white",
         TextManager::instance().get("tooltip_loop_off")
     );
+
+    // Languages/Subtitles Popup display
     QVBoxLayout* langLayout = new QVBoxLayout();
+
+    // Languages
+    QHBoxLayout* audioLangLayout = new QHBoxLayout();
+    langLayout->addLayout(audioLangLayout);
+    QLabel* audioLangLabel = new QLabel();
+    audioLangLabel->setStyleSheet("border:none;");
+    audioLangLabel->setText(TextManager::instance().get("languages"));
+
+    m_audioLangComboBox = new QComboBox(this);
+    audioLangLayout->addWidget(audioLangLabel);
+    audioLangLayout->addWidget(m_audioLangComboBox);
+    connect(m_audioLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SimpleToolbar::setAudioTrack);
+    //connect(m_audioLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index){setAudioTrack(index, true);});
+
+    // Subtitles
+    QHBoxLayout* subLangLayout = new QHBoxLayout();
+    langLayout->addLayout(subLangLayout);
+    QLabel* subLangLabel = new QLabel();
+    subLangLabel->setStyleSheet("border:none;");
+    subLangLabel->setText(TextManager::instance().get("subtitles"));
+
+    m_subLangComboBox = new QComboBox(this);
+    subLangLayout->addWidget(subLangLabel);
+    subLangLayout->addWidget(m_subLangComboBox);
+    connect(m_subLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SimpleToolbar::setSubtitlesTrack);
+
     m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", TextManager::instance().get("tooltip_lang"));
 
     m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", TextManager::instance().get("tooltip_delete_player"));
@@ -115,7 +144,6 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     setDefaultUI();
     disableButtons();
 }
-
 
 void SimpleToolbar::setFullscreenUI()
 {
@@ -353,4 +381,72 @@ void SimpleToolbar::onSliderMoved(int value) {
 void SimpleToolbar::duplicatePlayerAction()
 {
     emit duplicatePlayerRequested();
+}
+
+void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
+    m_audioLangComboBox->clear();
+
+    if (tracks.isEmpty()) {
+        //qDebug() << "[SIMPLETOOLBAR] No languages available";
+        m_audioLangComboBox->addItem(TextManager::instance().get("no_audio"));
+    }
+    
+    for (const auto& track : tracks) {
+        //qDebug() << "n° " << track.second << " : " << track.first;
+        m_audioLangComboBox->addItem(track.second, track.first);
+    }
+
+}
+
+void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks){
+    m_subLangComboBox->clear();
+
+    if (tracks.isEmpty()) {
+        //qDebug() << "[SIMPLETOOLBAR] No subtitles available";
+        m_subLangComboBox->addItem(TextManager::instance().get("no_subtitles"));
+    }
+    
+    for (const auto& track : tracks) {
+        //qDebug() << "n° " << track.second << " : " << track.first;
+        m_subLangComboBox->addItem(track.second, track.first);
+    }
+
+}
+
+void SimpleToolbar::setAudioTrackDefault(){
+    m_audioLangComboBox->blockSignals(true);
+    m_audioLangComboBox->setCurrentIndex(1);
+    m_audioLangComboBox->blockSignals(false);
+}
+
+void SimpleToolbar::setSubtitlesTrackDefault(){
+    m_subLangComboBox->blockSignals(true);
+    m_subLangComboBox->setCurrentIndex(1);
+    m_subLangComboBox->blockSignals(false);
+}
+
+void SimpleToolbar::setAudioTrack(int index){
+    QVariant data = m_audioLangComboBox->itemData(index);
+
+    if (!data.isValid())
+        return;
+
+    int trackNumber = data.toInt();
+
+    qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
+
+    emit setAudioTrackRequested(trackNumber);
+    
+}
+
+void SimpleToolbar::setSubtitlesTrack(int index){
+    QVariant data = m_subLangComboBox->itemData(index);
+
+    if (!data.isValid())
+        return;
+
+    int trackNumber = data.toInt();
+    qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
+    emit setSubtitlesTrackRequested(trackNumber);
+    
 }

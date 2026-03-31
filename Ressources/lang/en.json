@@ -76,5 +76,10 @@
     "compo_rule_GoldenRatio" : "Golden Ratio",
 
     "tooltip_compo_rule_VFlip" : "Vertical flip",
-    "tooltip_compo_rule_HFlip" : "Horizontal flip"
+    "tooltip_compo_rule_HFlip" : "Horizontal flip",
+
+    "languages" : "Languages",
+    "subtitles" : "Subtitles",
+    "no_audio" : "No audio track",
+    "no_subtitles" : "No subtitle track"
 }

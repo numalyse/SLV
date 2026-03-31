@@ -9,6 +9,7 @@
 #include <SignalManager.h>
 #include <QFrame>
 #include <QDir>
+#include <QComboBox>
 
 class MediaWidget : public QWidget
 {
@@ -27,11 +28,20 @@ public:
     Media* media(){ return m_media;};
     int getCurrentTime(){ return libvlc_media_player_get_time(m_player); }
 
+    QList<QPair<int, QString>> audioTracks() const;
+    QList<QPair<int, QString>> subtitlesTracks() const;
+
+    void getAudioTracks();
+    void getSubtitlesTracks();
+
 public slots:
     bool play();
     bool pause();
     bool stop();
     bool eject();
+    void parseTracks();
+    void setAudioTrack(int trackId);
+    void setSubtitleTrack(int trackId);
     bool mute();
     bool unmute();
     void togglePlayPause();
@@ -52,6 +62,8 @@ public slots:
     QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
 
+    void updateTracks();
+
 private:
     QSize m_mediaSize;
 
@@ -68,7 +80,6 @@ private:
     VideoCaptureManager m_videoCaptureManager;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
-    
 
     void createEventManager();
     void createMedia(const QString& filePath);
@@ -94,6 +105,11 @@ signals:
     void volumeChanged(const QString&);
     void speedChanged(const QString&);
     void mediaRectChanged(const QRect &rect);
+    void updateAudioTracksRequested(const QList<QPair<int, QString>>& tracks);
+    void updateSubtitlesTracksRequested(const QList<QPair<int, QString>>& tracks);
+    void setAudioTrackDefaultRequested();
+    void setSubtitlesTrackDefaultRequested();
+
 };
 
 #endif // MEDIAWIDGET_H

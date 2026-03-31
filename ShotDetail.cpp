@@ -1,8 +1,7 @@
 
 #include "ShotDetail.h"
 #include "TimeFormatter.h"
-#include "ProjectManager.h"
-#include "SignalManager.h"
+#include "Project/ProjectManager.h"
 #include "TextManager.h"
 #include "ToolbarButtons/ToolbarButton.h"
 

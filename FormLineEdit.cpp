@@ -1,7 +1,7 @@
 #include "FormLineEdit.h"
 
 #include "SignalManager.h"
-#include "ProjectManager.h"
+#include "Project/ProjectManager.h"
 
 FormLineEdit::FormLineEdit(const QString &text, bool editable, QWidget *parent) : QLineEdit{parent}
 {

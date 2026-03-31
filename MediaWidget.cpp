@@ -188,6 +188,72 @@ bool MediaWidget::eject()
     return true;
 }
 
+void MediaWidget::parseTracks()
+{
+    if (!m_player || !m_media)
+        return;
+
+    m_media->parseTracks(m_player);
+}
+
+void MediaWidget::setAudioTrack(int trackId)
+{
+    if (!m_player) return;
+    libvlc_audio_set_track(m_player, trackId);
+    qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
+}
+
+void MediaWidget::setSubtitleTrack(int trackId)
+{
+    if (!m_player) return;
+    libvlc_video_set_spu(m_player, trackId);
+    qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
+}
+
+QList<QPair<int, QString>> MediaWidget::audioTracks() const
+{
+    qDebug() << "[MEDIAWIDGET] : audioTracks";
+    qDebug() << "[MEDIAWIDGET] media instance =" << m_media;
+
+    if (!m_media || !m_player) return {};
+
+    const auto tracks = m_media->audioTracks();
+
+    for (int i = 0; i < tracks.size(); ++i) {
+        qDebug() << "[" << i << "]"
+                << "ID:" << tracks[i].first
+                << "Name:" << tracks[i].second;
+    }
+
+    return tracks;
+}
+
+QList<QPair<int, QString>> MediaWidget::subtitlesTracks() const
+{
+    if (!m_media || !m_player) return {};
+    return m_media->subtitlesTracks();
+}
+
+void MediaWidget::getAudioTracks() 
+{
+    emit updateAudioTracksRequested(audioTracks());
+    qDebug() << "[MEDIAWIDGET] SEND emit updateAudioTracksRequested";
+}
+
+void MediaWidget::getSubtitlesTracks() 
+{
+    emit updateSubtitlesTracksRequested(m_media->subtitlesTracks());
+    qDebug() << "[MEDIAWIDGET] SEND emit updateSubtitlesTracksRequested";
+}
+
+void MediaWidget::updateTracks()
+{
+    qDebug() << "[MEDIAWIDGET] RECEIVED emit tracksParsed";
+    getAudioTracks();
+    getSubtitlesTracks();
+}
+
+
 /// @brief Mute the media player
 bool MediaWidget::mute()
 {
@@ -433,6 +499,14 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 //qDebug() << "media size OK:" << width << height;
             }
 
+            if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
+                mediaWidget->parseTracks();
+                if(!mediaWidget->m_media->audioTracks().isEmpty()){
+                    emit mediaWidget->setAudioTrackDefaultRequested();
+                    emit mediaWidget->setSubtitlesTrackDefaultRequested();
+                }
+            }
+            
         }, Qt::QueuedConnection);
     }
 }
@@ -552,4 +626,7 @@ void MediaWidget::createMedia(const QString& filePath){
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
     m_media->parse();
+    connect(m_media, &Media::tracksParsed, this, &MediaWidget::updateTracks);
+    m_media->parseTracks(m_player);
 }
+

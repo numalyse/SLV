@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QWidget>
+#include <QComboBox>
 
 /// @brief Toolbar simple, utilisé pour les lecteurs en mode synchronisé.
 class SimpleToolbar : public Toolbar
@@ -62,6 +63,15 @@ public slots:
     void enableButtons();
     void disableButtons();
 
+    void updateAudioTracks(const QList<QPair<int, QString>>& tracks);
+    void updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks);
+
+    void setAudioTrackDefault();
+    void setSubtitlesTrackDefault();
+    void setAudioTrack(int index);
+    //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
+    void setSubtitlesTrack(int index);
+    
 protected:
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
@@ -80,6 +90,9 @@ protected:
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;
+
+    QComboBox* m_audioLangComboBox = nullptr;
+    QComboBox* m_subLangComboBox = nullptr;
     ToolbarPopupButton* m_langBtn = nullptr;
 
 
@@ -92,6 +105,8 @@ protected slots:
 signals:
     void setPositionRequested(int64_t);
     void removePlayerRequest();
+    void setAudioTrackRequested(int);
+    void setSubtitlesTrackRequested(int);
     void enableMuteRequest();
     void disableMuteRequest();
     void volumeChanged(int);

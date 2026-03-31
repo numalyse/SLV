@@ -17,6 +17,7 @@ public:
     /// @param widgetToDisplay QWidget* à afficher dans la popup lors du clique, Ce QWidget sera détruit par ce bouton
     explicit ToolbarPopupButton(
         QWidget* parent = nullptr,
+        //QWidget* widgetToDisplay = nullptr, 
         QLayout *layoutToDisplay = nullptr,
         const QString& iconName = "", 
         const QString& toolTipText = "ToolTipOn"

@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(SLV VERSION 0.1 LANGUAGES CXX)
 
+if(MSVC)
+    add_compile_options(/MP)
+endif()
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -53,8 +57,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         VlcParseHelper.h
         VlcInstance.h
         Shot.h
-        Project.h
-        ProjectManager.h ProjectManager.cpp
+        Project/Project.h
+        Project/ProjectManager.h Project/ProjectManager.cpp
+        Project/ProjectFileHandler.h Project/ProjectFileHandler.cpp
+        Project/ProjectExportHandler.h Project/ProjectExportHandler.cpp
+        Project/ProjectExportThread.h Project/ProjectExportThread.cpp
 
         MediaWidget.h MediaWidget.cpp
         NavPanel.h NavPanel.cpp
@@ -91,6 +98,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         GenericDialog.h
         GlobalScreenshotHelper.h
         ErrorsHelper.h
+
+        DecodeThread.h DecodeThread.cpp
+        TSQueue.h
 
     )
 
@@ -237,4 +247,18 @@ if(FFMPEG_DLL_LIST)
     )
 else()
     message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
+endif()
+
+
+find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
+
+if(WINDEPLOYQT_EXECUTABLE)
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                --debug
+                --no-compiler-runtime
+                --verbose 1
+                "$<TARGET_FILE:SLV>"
+        COMMENT "Déploiement des dépendances Qt avec windeployqt..."
+    )
 endif()

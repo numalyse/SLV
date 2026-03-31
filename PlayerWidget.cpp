@@ -390,6 +390,12 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();
     emit mediaPlayerEjected();
+
+    // Charger le fichier en attente après eject
+    if (!m_pendingFilePath.isEmpty()) {
+        setMediaFromPath(m_pendingFilePath);
+        m_pendingFilePath.clear();
+    }
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){
@@ -405,18 +411,23 @@ void PlayerWidget::dropEvent(QDropEvent *event)
     const QMimeData *mimeData = event->mimeData();
 
     if (mimeData->hasUrls()) {
-        eject();
-
         QList<QUrl> urlList = mimeData->urls();
+        QStringList filePaths;
 
         for (const QUrl &url : urlList) {
-            
             QString filePath = url.toLocalFile();
             qDebug() << "Fichier droppé :" << filePath;
-
-            emit mediaDropped(QStringList(filePath));
-
+            filePaths.append(filePath);
+            if (filePaths.size() >= 4) break; 
         }
+
+        if (filePaths.size() == 1 && m_mediaWidget->media()) {
+            m_pendingFilePath = filePaths.first();
+            eject();
+        } else {
+            emit mediaDropped(filePaths);
+        }
+
         event->acceptProposedAction();
     } else {
         event->ignore();

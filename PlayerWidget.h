@@ -110,6 +110,7 @@ private:
     CompositionWidget* m_compositionWidget = nullptr;
     QSize m_mediaSize;
     QRect m_mediaRect;
+    QString m_pendingFilePath;
 };
 
 #endif // PLAYERWIDGET_H

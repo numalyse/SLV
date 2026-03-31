@@ -56,7 +56,8 @@ void DecodeThread::decodeTagImages(){
     }
 
     cv::Mat frame;
-    cv::Mat resized;
+    cv::Mat processedFrame;
+    cv::Mat tempResized;
 
     for(auto& shot : m_shots){
         cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(shot.tagImageTime));
@@ -67,10 +68,10 @@ void DecodeThread::decodeTagImages(){
             continue; 
         }
 
-        cv::Mat processedFrame = frame;
+        processedFrame = frame;
 
         if(m_targetSize.has_value()){
-            cv::Mat tempResized;
+
             resizeImage(processedFrame, tempResized);
             processedFrame = tempResized;
         }
@@ -87,36 +88,43 @@ void DecodeThread::decodeTagImages(){
 }
 
 void DecodeThread::decodeMedia(){
-/* 
+
     cv::VideoCapture cap(m_mediaPath.toStdString(), cv::CAP_FFMPEG);
 
-	cv::Mat frame;
+    if (!cap.isOpened()) {
+        qCritical() << "Impossible de lire la video pour segmenter";
+		p_imageQueue->waitPush({{}, true}); // envoie un stop pour que debloquer le thread qui lit
+        return;
+    }
 
-     while ( cap.read(frame) ) {
-        
-        if(isInterruptionRequested()){
-			emit segmentationFinished({});
-            return;
+    cv::Mat frame;
+    cv::Mat processedFrame;
+    cv::Mat tempResized;
+
+    while( cap.read(frame) ){
+
+        if (frame.empty()) {
+            qWarning() << "Impossible de lire la frame ";
+            continue; 
         }
 
-        cv::resize(frame, frameDownscaled, m_reducedSize, 0, 0, cv::INTER_AREA);
+        processedFrame = frame;
 
-		cv::cvtColor(frameDownscaled, frameHLS, cv::COLOR_BGR2HLS);
+        if(m_targetSize.has_value()){
 
-		if( ! prevFrameHLS.empty() ) {
-			frameScores[currFrameNb] = computeFrameScore(prevFrameHLS, frameHLS);
-		}
-
-		std::swap(prevFrameHLS, frameHLS); // prevFrame devient frame et va etre "overwrite" au prochain tour de boucle évite 
-		++currFrameNb;
-		int currentPercent = (currFrameNb * 100) / frameCount;
-
-        if (currentPercent > lastPercent) {
-            emit progress(currentPercent); 
-            lastPercent = currentPercent;
+            resizeImage(processedFrame, tempResized);
+            processedFrame = tempResized;
         }
-    } 
-*/
+
+        if(m_colorCode.has_value()){
+            convertImage(processedFrame);
+        }
+
+        p_imageQueue->waitPush({processedFrame.clone(), false});
+    }
+    
+    p_imageQueue->waitPush({{}, true});
+    return;
 
 }
 

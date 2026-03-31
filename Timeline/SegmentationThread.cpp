@@ -8,6 +8,10 @@
 
 #include <QVector>
 #include <QDebug>
+#include <QProcess>
+#include <QString>
+#include <QJsonDocument>
+#include <QJsonArray>
 
 
 SegmentationThread::SegmentationThread(const QString &mediaPath, QObject *parent) : QThread(parent), m_videoPath{mediaPath}
@@ -87,80 +91,59 @@ std::vector<int> SegmentationThread::detectCuts(const std::vector<float>& scores
 void SegmentationThread::run()
 {
 
-	std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(10));
+	QProcess pythonProcess;
+    pythonProcess.setProcessChannelMode(QProcess::MergedChannels);
 
-	DecodeThread* decodeThread = new DecodeThread(
-		m_videoPath, 
-		imageQueue.get(), 
-		{}, 
-		nullptr, 
-		std::optional<int>(cv::COLOR_BGR2HLS), 
-		std::optional<cv::Size>(m_reducedSize)
-	);
+    QStringList arguments;
+    arguments << "segmentation.py" << m_videoPath;
+    arguments << ("1"); 
 
-	QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
-	decodeThread->start();
+    pythonProcess.start("py", arguments);
 
-    cv::VideoCapture cap(m_videoPath.toStdString(), cv::CAP_FFMPEG); 
-	// ouverture de la vidéo pour récupérer la durée totale et set la taille du vecteur / pour la progression
- 
-    if (!cap.isOpened()) {
-        qCritical() << "Impossible de lire la video pour segmenter";
-		emit segmentationFinished({});
+    if (!pythonProcess.waitForStarted()) {
+        qCritical() << "Impossible de lancer le script Python.";
+        emit segmentationFinished({});
         return;
     }
 
-    int frameCount = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_COUNT));
-    std::vector<float> frameScores(frameCount);
-    frameScores[0] = 0.0;
+    std::vector<int> finalCuts;
 
-	if(frameCount<=0){
-		emit segmentationFinished({});
-		return;
-	}
+    while (pythonProcess.waitForReadyRead(-1)) {
+        while (pythonProcess.canReadLine()) {
+            QString line = QString::fromUtf8(pythonProcess.readLine()).trimmed();
 
-	cap.release();
+            // Gestion de l'interruption utilisateur
+            if (isInterruptionRequested()) {
+                pythonProcess.kill();
+                emit segmentationFinished({});
+                return;
+            }
 
-	cv::Mat prevFrame;
-	ImgData imgData;
-	
-	int currFrameNb = 0;
-
-	int lastPercent = -1;
-    while ( true ) {
-    
-		imageQueue->waitPop(imgData);
-
-		if(isInterruptionRequested()){
-			emit segmentationFinished({});
-			return;
-		}
-
-		if(imgData.isFinished) break;
-
-		int currentPercent = (currFrameNb * 100) / frameCount;
-        if (currentPercent > lastPercent) {
-            emit progress(currentPercent); 
-            lastPercent = currentPercent;
+            if (line.startsWith("PROGRESS:")) {
+                int percent = line.mid(9).toInt();
+                emit progress(percent); 
+            } 
+            else if (line.startsWith("RESULT:")) {
+                // Parsing du JSON reçu
+                QString jsonStr = line.mid(7);
+                QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
+                QJsonArray arr = doc.array();
+                
+                for (const QJsonValue& val : arr) {
+                    finalCuts.push_back(val.toInt());
+                }
+            } 
+            else {
+                qDebug() << "[PYTHON LOG]:" << line;
+            }
         }
-
-		if( ! prevFrame.empty() ) {
-			frameScores[currFrameNb] = computeFrameScore(prevFrame, imgData.img);
-		}
-
-		std::swap(prevFrame, imgData.img); // prevFrame devient frame et va etre "overwrite" au prochain tour de boucle évite 
-		
-		++currFrameNb;
-
     }
 
-    cap.release();
+    pythonProcess.waitForFinished();
 
-    std::vector<int> cuts = detectCuts(frameScores);
+    if (pythonProcess.exitCode() != 0) {
+        qWarning() << "Le script Python s'est terminé avec une erreur.";
+    }
 
-	qDebug() << "Nombre de plan detectés " << cuts.size() << '\n';
-
-    emit segmentationFinished(cuts);
-
-    return;
+    emit segmentationFinished(finalCuts);
 }

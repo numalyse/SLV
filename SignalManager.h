@@ -4,7 +4,7 @@
 #include "Shot.h"
 #include <QObject.h>
 
-enum class PlayerLayoutArrangement
+enum PlayerLayoutArrangement
 {
     Arrangement1,
     Arrangement2H,

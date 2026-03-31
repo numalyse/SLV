@@ -14,7 +14,7 @@ public:
     explicit PlayerLayoutManager(QObject *parent = nullptr);
     ~PlayerLayoutManager();
 
-    void createLayout(const int count, const PlayerLayoutArrangement& arrangement = PlayerLayoutArrangement::ArrangementUnknown);
+    void createLayout(const int count, const PlayerLayoutArrangement& arrangement = ArrangementUnknown);
 
 private:
 
@@ -38,7 +38,7 @@ private:
 
     QWidget* create1(const QStringList& filePath = QStringList(""));
     QWidget* create2(const QStringList& filesPaths = QStringList(""), const Qt::Orientation& orientation = Qt::Horizontal);
-    QWidget* create3(const QStringList& filesPaths = QStringList(""), const PlayerLayoutArrangement& arrangement = PlayerLayoutArrangement::ArrangementUnknown);
+    QWidget* create3(const QStringList& filesPaths = QStringList(""), const PlayerLayoutArrangement& arrangement = ArrangementUnknown);
     QWidget* create4(const QStringList& filesPaths = QStringList(""));
 
     /// @brief Créer une toolbar globale et la connecte aux players
@@ -50,6 +50,8 @@ private:
 
     bool newGlobalMuteState();
     bool newGlobalPlayState();
+
+    PlayerLayoutArrangement m_currentArrangement = ArrangementUnknown;
 
 
 signals:
@@ -78,6 +80,7 @@ public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 
     QStringList getActivePlayersMediaPath();
+    QList<int> getActivePlayersCurrentTimes();
 
     void removePlayer(PlayerWidget *playerToDestroy);
 
@@ -86,6 +89,8 @@ public slots:
 
     void enableGlobalLayoutFullscreen();
     void disableGlobalLayoutFullscreen();
+
+    void takeGlobalScreenshot();
 
     void checkPlayersPlayStatus();
     void checkPlayersMuteStatus();

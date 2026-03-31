@@ -70,16 +70,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::windowMovedOrResizedRequested, &SignalManager::instance(), [](){ emit SignalManager::instance().windowMovedOrResized(); });
     std::vector<std::pair<ToolbarButton*, PlayerLayoutArrangement>> layoutButtons = {
-        {m_view1, PlayerLayoutArrangement::Arrangement1},
-        {m_view2H, PlayerLayoutArrangement::Arrangement2H},
-        {m_view2V, PlayerLayoutArrangement::Arrangement2V},
-        {m_view3HAlign, PlayerLayoutArrangement::Arrangement3H},
-        {m_view3VAlign, PlayerLayoutArrangement::Arrangement3V},
-        {m_view3Top, PlayerLayoutArrangement::Arrangement3Top},
-        {m_view3Bot, PlayerLayoutArrangement::Arrangement3Bot},
-        {m_view3Left, PlayerLayoutArrangement::Arrangement3Left},
-        {m_view3Right, PlayerLayoutArrangement::Arrangement3Right},
-        {m_view4, PlayerLayoutArrangement::Arrangement4}
+        {m_view1, Arrangement1},
+        {m_view2H, Arrangement2H},
+        {m_view2V, Arrangement2V},
+        {m_view3HAlign, Arrangement3H},
+        {m_view3VAlign, Arrangement3V},
+        {m_view3Top, Arrangement3Top},
+        {m_view3Bot, Arrangement3Bot},
+        {m_view3Left, Arrangement3Left},
+        {m_view3Right, Arrangement3Right},
+        {m_view4, Arrangement4}
     };
 
     for (const auto& pair : layoutButtons) {

@@ -384,6 +384,25 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
     connect(activePlayer, &PlayerWidget::mediaPlayerEjected, advancedToolbar, &AdvancedToolbar::disableButtons);
 
+    // Redirection audio/sous-titres vers la toolbar avancée (toolbar simple cachée)
+    //disconnect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, activePlayerToolbar, &SimpleToolbar::updateAudioTracks);
+    //disconnect(activePlayer->mediaWidget(), &MediaWidget::updateSubtitlesTracksRequested, activePlayerToolbar, &SimpleToolbar::updateSubtitlesTracks);
+    connect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, advancedToolbar, &SimpleToolbar::updateAudioTracks);
+    connect(activePlayer->mediaWidget(), &MediaWidget::updateSubtitlesTracksRequested, advancedToolbar, &SimpleToolbar::updateSubtitlesTracks);
+
+    connect(activePlayer->mediaWidget(), &MediaWidget::setAudioTrackDefaultRequested, advancedToolbar, &SimpleToolbar::setAudioTrackDefault);
+    connect(activePlayer->mediaWidget(), &MediaWidget::setSubtitlesTrackDefaultRequested, advancedToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
+
+    // Connecte choix audio/sous-titres au mediawidget
+    connect(advancedToolbar, &SimpleToolbar::setAudioTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setAudioTrack);
+    connect(advancedToolbar, &SimpleToolbar::setSubtitlesTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setSubtitleTrack);
+
+    // Synchro piste actuelle à l'advanced toolbar si le média est déjà chargé
+    if (activePlayer->mediaWidget()->media()) {
+        advancedToolbar->updateAudioTracks(activePlayer->mediaWidget()->audioTracks());
+        advancedToolbar->updateSubtitlesTracks(activePlayer->mediaWidget()->subtitlesTracks());
+    }
+
     connect(advancedToolbar, &AdvancedToolbar::setOverlayModeRequested, activePlayer, &PlayerWidget::setOverlayMode);
 
     connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {

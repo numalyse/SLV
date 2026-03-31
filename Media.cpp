@@ -50,6 +50,43 @@ void Media::parse(){
     }
 }
 
+void Media::parseTracks(libvlc_media_player_t* player)
+{
+    if (!player) return;
+
+    // qDebug() << "[MEDIA] parseTracks instance =" << this;
+
+    // Audio
+    libvlc_track_description_t *audio = libvlc_audio_get_track_description(player);
+    m_audioTracks.clear();
+    for (libvlc_track_description_t *t = audio; t != nullptr; t = t->p_next) {
+        m_audioTracks.append(qMakePair(t->i_id, QString::fromUtf8(t->psz_name)));
+    }
+    libvlc_track_description_list_release(audio);
+
+    // Sous-titres
+    libvlc_track_description_t *subs = libvlc_video_get_spu_description(player);
+    m_subtitlesTracks.clear();
+    for (libvlc_track_description_t *t = subs; t != nullptr; t = t->p_next) {
+        m_subtitlesTracks.append(qMakePair(t->i_id, QString::fromUtf8(t->psz_name)));
+    }
+    libvlc_track_description_list_release(subs);
+
+    // qDebug() << "Audio tracks:";
+    // for (auto &t : m_audioTracks)
+    //     qDebug() << t.first << ":" << t.second;
+
+    // qDebug() << "Subtitles tracks:";
+    // for (auto &t : m_subtitlesTracks)
+    //     qDebug() << t.first << ":" << t.second;    
+
+    // qDebug() << "OK tracks parsed";
+
+    emit tracksParsed();
+    // qDebug() << "[MEDIA] SEND emit tracksParsed";
+
+}
+
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
 /// Ecoute quand la lecture asychrone des métadonnées est terminée et envoie un signal.
 /// @param event 

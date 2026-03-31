@@ -114,6 +114,14 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
+    connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
+    connect(m_mediaWidget, &MediaWidget::updateSubtitlesTracksRequested, m_toolBar, &SimpleToolbar::updateSubtitlesTracks);
+
+    connect(m_mediaWidget, &MediaWidget::setAudioTrackDefaultRequested, m_toolBar, &SimpleToolbar::setAudioTrackDefault);
+    connect(m_mediaWidget, &MediaWidget::setSubtitlesTrackDefaultRequested, m_toolBar, &SimpleToolbar::setSubtitlesTrackDefault);
+    connect(m_toolBar, &SimpleToolbar::setAudioTrackRequested, m_mediaWidget, &MediaWidget::setAudioTrack);
+    connect(m_toolBar, &SimpleToolbar::setSubtitlesTrackRequested, m_mediaWidget, &MediaWidget::setSubtitleTrack);
+
 }
 
 // PlayerWidget::~PlayerWidget()

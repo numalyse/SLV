@@ -223,6 +223,13 @@ add_custom_command(TARGET SLV POST_BUILD
     "$<TARGET_FILE_DIR:SLV>"
 )
 
+# Copier le .py pour le pptx
+add_custom_command(TARGET SLV POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/export_pptx.py"
+    "$<TARGET_FILE_DIR:SLV>/export_pptx.py"
+)
+
 file(GLOB_RECURSE FFMPEG_DLL_LIST 
     "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll" 
     "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"

@@ -298,7 +298,7 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
 void MediaWidget::takeScreenshot()
 {
     if (!m_player) return;
-    QString captureDirectory = QDir::homePath() + "/SLV_Content/screenshot.png"; // nommer comme il faut avec le format nom_film_HH_MM_SS_FF.png ou jpg
+    QString captureDirectory = QDir::homePath() + "/SLV_Content/Captures_Images/"+ m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(libvlc_media_player_get_time(m_player), m_media->fps()) +".png";
 
     // if there is a problem with media resolution here, make sure to recieve Media::resolutionParsed(tuple<int, int>) signal first
     if(m_rotationIndex % 2 == 0)

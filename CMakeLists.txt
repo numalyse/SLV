@@ -96,6 +96,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         External/nlohmann/json.hpp
 
         GenericDialog.h
+        GlobalScreenshotHelper.h
+        ErrorsHelper.h
 
         DecodeThread.h DecodeThread.cpp
         TSQueue.h

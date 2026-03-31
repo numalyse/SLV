@@ -26,6 +26,7 @@ public:
     libvlc_media_player_t *m_player = nullptr;
 
     Media* media(){ return m_media;};
+    int getCurrentTime(){ return libvlc_media_player_get_time(m_player); }
 
     QList<QPair<int, QString>> audioTracks() const;
     QList<QPair<int, QString>> subtitlesTracks() const;

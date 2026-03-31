@@ -166,6 +166,14 @@ QString PlayerWidget::getMediaPath()
     return QString();
 }
 
+int PlayerWidget::getCurrentTime()
+{
+    if(mediaWidget() && mediaWidget()->media()){
+        return mediaWidget()->getCurrentTime();
+    }
+    return -1;
+}
+
 void PlayerWidget::enablePlayerFullscreen()
 {
     emit enablePlayerFullscreenRequested(this);

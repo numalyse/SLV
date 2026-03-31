@@ -1,5 +1,7 @@
 #include "Timeline/SegmentationThread.h"
 
+#include "DecodeThread.h"
+#include "TSQueue.h"
 #include "Shot.h"
 
 #include <opencv2/opencv.hpp>
@@ -81,10 +83,26 @@ std::vector<int> SegmentationThread::detectCuts(const std::vector<float>& scores
 
 }
 
-#include <QFile> 
+
 void SegmentationThread::run()
 {
-    cv::VideoCapture cap(m_videoPath.toStdString(), cv::CAP_FFMPEG);
+
+	std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(10));
+
+	DecodeThread* decodeThread = new DecodeThread(
+		m_videoPath, 
+		imageQueue.get(), 
+		{}, 
+		nullptr, 
+		std::optional<int>(cv::COLOR_BGR2HLS), 
+		std::optional<cv::Size>(m_reducedSize)
+	);
+
+	QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+	decodeThread->start();
+
+    cv::VideoCapture cap(m_videoPath.toStdString(), cv::CAP_FFMPEG); 
+	// ouverture de la vidéo pour récupérer la durée totale et set la taille du vecteur / pour la progression
  
     if (!cap.isOpened()) {
         qCritical() << "Impossible de lire la video pour segmenter";
@@ -93,45 +111,48 @@ void SegmentationThread::run()
     }
 
     int frameCount = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_COUNT));
-    double fps = cap.get(cv::CAP_PROP_FPS); 
-    qDebug() << "Total frames: " << frameCount << ", FPS: " << fps;
-
     std::vector<float> frameScores(frameCount);
     frameScores[0] = 0.0;
 
-	cv::Mat prevFrameHLS;
-	cv::Mat frame;
-	cv::Mat frameDownscaled;
-	cv::Mat frameHLS;
+	if(frameCount<=0){
+		emit segmentationFinished({});
+		return;
+	}
+
+	cap.release();
+
+	cv::Mat prevFrame;
+	ImgData imgData;
+	
 	int currFrameNb = 0;
 
 	int lastPercent = -1;
-    while ( cap.read(frame) ) {
-        
-        if(isInterruptionRequested()){
-			cap.release();
+    while ( true ) {
+    
+		imageQueue->waitPop(imgData);
+
+		if(isInterruptionRequested()){
 			emit segmentationFinished({});
-            return;
-        }
-
-        cv::resize(frame, frameDownscaled, m_reducedSize, 0, 0, cv::INTER_AREA);
-
-		cv::cvtColor(frameDownscaled, frameHLS, cv::COLOR_BGR2HLS);
-
-		if( ! prevFrameHLS.empty() ) {
-			frameScores[currFrameNb] = computeFrameScore(prevFrameHLS, frameHLS);
+			return;
 		}
 
-		std::swap(prevFrameHLS, frameHLS); // prevFrame devient frame et va etre "overwrite" au prochain tour de boucle évite 
-		++currFrameNb;
-		int currentPercent = (currFrameNb * 100) / frameCount;
+		if(imgData.isFinished) break;
 
+		int currentPercent = (currFrameNb * 100) / frameCount;
         if (currentPercent > lastPercent) {
             emit progress(currentPercent); 
             lastPercent = currentPercent;
         }
-    }
 
+		if( ! prevFrame.empty() ) {
+			frameScores[currFrameNb] = computeFrameScore(prevFrame, imgData.img);
+		}
+
+		std::swap(prevFrame, imgData.img); // prevFrame devient frame et va etre "overwrite" au prochain tour de boucle évite 
+		
+		++currFrameNb;
+
+    }
 
     cap.release();
 

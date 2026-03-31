@@ -34,6 +34,9 @@ void ProjectExportThread::run()
     case ExportType::PDF:
         success = ProjectExportHandler::exportToPDF(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
+    case ExportType::PPTX:
+        success = ProjectExportHandler::exportToPPTX(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+        break;
     default:
         break;
     }

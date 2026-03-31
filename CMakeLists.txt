@@ -13,6 +13,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(PYTHON_SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/pyScripts")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
@@ -223,6 +225,14 @@ add_custom_command(TARGET SLV POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${CMAKE_SOURCE_DIR}/libvlccore.dll"
     "$<TARGET_FILE_DIR:SLV>"
+)
+
+# Copier le .py pour le pptx
+add_custom_command(TARGET SLV POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${PYTHON_SCRIPTS_DIR}"
+    "$<TARGET_FILE_DIR:SLV>/pyScripts"
+    COMMENT "Copie des scripts Python vers le dossier de sortie..."
 )
 
 file(GLOB_RECURSE FFMPEG_DLL_LIST 

@@ -24,6 +24,11 @@
 #include <QDebug>
 #include <QUrl>
 #include <QPageSize>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QProcess>
+#include <QTemporaryDir>
 
 #include <memory>
 #include <optional>
@@ -250,6 +255,107 @@ namespace ProjectExportHandler {
 
         doc.print(&pdfWriter);
         return true;
+    }
+
+
+    bool exportToPPTX(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+        // Dossier temp pour le json et les tag images
+        QTemporaryDir tempDir;
+        if (!tempDir.isValid()) return false;
+        QString tempPath = tempDir.path();
+
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(10));
+        DecodeThread* decodeThread = new DecodeThread(
+            mediaPath, imageQueue.get(), shots, nullptr, 
+            std::optional<int>(cv::COLOR_BGR2RGB), std::optional<cv::Size>({800, 800})
+        );
+
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
+
+        ImgData imgData{};
+        int totalShots = shots.size();
+        int currentShot = 0;
+
+        while(true) {
+            imageQueue->waitPop(imgData);
+            if(imgData.isFinished) break;
+
+            if (currentShot < totalShots) {
+                // Sauvegarde de l'image
+                if (!imgData.img.empty()) {
+                    QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_RGB888);
+                    tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currentShot), "PNG");
+                }
+
+                if (progressCallback && totalShots > 0) { 
+                    // On va de 0 à 95% car c'est le plus long 
+                    int percent = static_cast<int>(((currentShot + 1) * 95.0) / totalShots);
+                    if (!progressCallback(percent)) {
+                        decodeThread->requestInterruption();
+                        return false;  
+                    }
+                }
+                currentShot++;
+            }
+        }
+
+        // Preparation json
+        QJsonArray jsonShots;
+        for (int i = 0; i < shots.size(); ++i) {
+            QJsonObject shotObj;
+            shotObj["id"] = i;
+            shotObj["title"] = shots[i].title;
+            shotObj["start"] = shots[i].start;
+            shotObj["duration"] = shots[i].end - shots[i].start; 
+            shotObj["note"] = shots[i].note;
+            shotObj["image"] = QString("image_shot_%1.png").arg(i);
+            jsonShots.append(shotObj);
+        }
+
+        QJsonObject rootData;
+        rootData["fps"] = fps;
+        rootData["duration"] = duration;
+        rootData["dstPath"] = dstPath;
+        rootData["tempDir"] = tempPath;
+        rootData["shots"] = jsonShots;
+
+        QJsonDocument doc(rootData);
+        QFile jsonFile(tempPath + "/export_data.json");
+        if (jsonFile.open(QIODevice::WriteOnly)) {
+            jsonFile.write(doc.toJson());
+            jsonFile.close();
+        }
+
+        QProcess pythonProcess;
+        pythonProcess.setProcessChannelMode(QProcess::MergedChannels); // Pour lire les prints normaux et les erreurs
+        
+        // On passe le chemin du JSON en argument unique
+        pythonProcess.start("py", QStringList() << "pyScripts/export_pptx.py" << jsonFile.fileName());
+
+        // Boucle d'attente active pour lire la progression en temps réel
+        while (pythonProcess.waitForReadyRead(-1)) {
+            while (pythonProcess.canReadLine()) {
+                QString line = QString::fromUtf8(pythonProcess.readLine()).trimmed();
+                
+                if (line.startsWith("PROGRESS:")) {
+                    int pyPercent = line.mid(9).toInt(); // Python envoie de 0 à 100
+                    int totalPercent = 95 + static_cast<int>(pyPercent * 0.05); // Remap de 95 à 100
+                    
+                    if (progressCallback && !progressCallback(totalPercent)) {
+                        pythonProcess.kill();
+                        return false;
+                    }
+                } else {
+                    qDebug() << "[PYTHON]:" << line; 
+                }
+            }
+        }
+
+        pythonProcess.waitForFinished(-1);
+
+        return (pythonProcess.exitCode() == 0);
     }
 
     std::optional<ExportType> selectFormatWindow(const QString &originalFormat)

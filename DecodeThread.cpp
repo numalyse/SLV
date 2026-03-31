@@ -17,7 +17,7 @@ DecodeThread::DecodeThread(
 }
 
 
-void DecodeThread::resizeImage(cv::Mat& src, cv::Mat& dst)
+void DecodeThread::resizeImage(cv::Mat& src, cv::Mat& dst, cv::InterpolationFlags interpolation)
 {
 
     int origWidth = src.cols;
@@ -35,7 +35,7 @@ void DecodeThread::resizeImage(cv::Mat& src, cv::Mat& dst)
         static_cast<int>(origHeight * scale)
     );
 
-    cv::resize(src, dst, newSize, 0, 0, cv::INTER_AREA);
+    cv::resize(src, dst, newSize, 0, 0, interpolation);
 }
 
 void DecodeThread::convertImage(cv::Mat& src)
@@ -72,7 +72,7 @@ void DecodeThread::decodeTagImages(){
 
         if(m_targetSize.has_value()){
 
-            resizeImage(processedFrame, tempResized);
+            resizeImage(processedFrame, tempResized, cv::INTER_AREA);
             processedFrame = tempResized;
         }
 
@@ -111,8 +111,7 @@ void DecodeThread::decodeMedia(){
         processedFrame = frame;
 
         if(m_targetSize.has_value()){
-
-            resizeImage(processedFrame, tempResized);
+            resizeImage(processedFrame, tempResized, cv::INTER_NEAREST);
             processedFrame = tempResized;
         }
 

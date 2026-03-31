@@ -4,6 +4,8 @@
 #include "TSQueue.h"
 #include "Shot.h"
 
+#include <opencv2/imgproc.hpp>
+
 #include <QThread>
 #include <QString>
 #include <QVector>
@@ -30,7 +32,7 @@ public:
 
 private:
 
-    void resizeImage(cv::Mat &src, cv::Mat &dst);
+    void resizeImage(cv::Mat &src, cv::Mat &dst, cv::InterpolationFlags interpolation );
     void convertImage(cv::Mat &src);
 
 

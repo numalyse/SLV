@@ -29,9 +29,150 @@
 #include <QJsonArray>
 #include <QProcess>
 #include <QTemporaryDir>
+#include <QStringList>
 
 #include <memory>
 #include <optional>
+
+namespace  {
+
+    int findShotIndexAtTime(const QVector<Shot>& shots, int64_t timeMs) {
+        for (int IShot = 0; IShot < shots.size(); ++IShot) {
+            if(shots[IShot].start <= timeMs && shots[IShot].end >= timeMs) return IShot;
+        }
+        return -1;
+    }
+
+    QStringList wrapText(const QString& text, int maxChars) {
+        QStringList result;
+        
+        if (text.length() <= maxChars) {
+            result.append(text);
+            return result;
+        }
+
+        // On découpe la phrase en mots en ignorant les espaces multiples
+        QStringList words = text.split(' ', Qt::SkipEmptyParts);
+        QString currentLine;
+
+        for (const QString& word : words) {
+            if (currentLine.isEmpty()) {
+                currentLine = word; // Premier mot de la ligne
+            } else if (currentLine.length() + 1 + word.length() <= maxChars) {
+                currentLine += " " + word; // On ajoute le mot s'il y a de la place
+            } else {
+                result.append(currentLine); // La ligne est pleine, on la sauvegarde
+                currentLine = word;         // On commence une nouvelle ligne
+            }
+        }
+        
+        if (!currentLine.isEmpty()) {
+            result.append(currentLine);
+        }
+
+        return result;
+    }
+
+    QStringList formatText(        
+        const QString& shotTitleTxt,  
+        const QString& timecodeTxt,  
+        const QString& noteTxt,
+        int maxWidth
+    ){
+
+        double fontScale = 0.7;
+        int thicknessText = 1;
+        cv::HersheyFonts font = cv::FONT_HERSHEY_SIMPLEX;
+
+        int baseline=0;
+        cv::Size charSize = cv::getTextSize("A", font, fontScale, thicknessText, &baseline);
+
+        int maxCharsPerLine = (maxWidth + 50) / charSize.width;
+
+        QStringList linesToDraw({shotTitleTxt, "-", timecodeTxt});
+
+        QStringList noteLines = noteTxt.split("\n");
+        for( auto& noteLine : noteLines){
+            linesToDraw.push_back(noteLine.replace("\t", "   "));
+        }
+
+        QStringList wrappedLines{};
+        for ( auto& line : linesToDraw ) {
+            wrappedLines.append(wrapText(line, maxCharsPerLine));
+        }
+
+        return wrappedLines;
+    }
+
+    void writeOnFrame(
+        cv::Mat frame,
+        const QStringList& wrappedLines,
+        int lineSpacing = 24
+    ){
+
+        double fontScale = 0.7;
+        int thicknessOutline = 4;
+        int thicknessText = 1;
+        cv::HersheyFonts font = cv::FONT_HERSHEY_SIMPLEX;
+
+        cv::Point writeStart {50,30};
+        for ( auto& line : wrappedLines){
+            cv::putText(frame, line.toStdString(), writeStart, font, fontScale, {0,0,0}, thicknessOutline, cv::LINE_AA);
+            cv::putText(frame, line.toStdString(), writeStart, font, fontScale, {255,255,255}, thicknessText, cv::LINE_AA);
+            writeStart.y += lineSpacing;
+        }
+
+    }
+
+
+
+    bool mergeVideoAndAudio(const QString& originalMediaPath, const QString& tempVideoPath, const QString& finalFilePath) {
+        QProcess ffmpegProcess;
+        QStringList arguments;
+
+        // Ecraser le fichier de sortie s'il existe déjà
+        arguments << "-y"; 
+
+        // Entrée 0 : La vidéo temporaire sans son 
+        arguments << "-i" << tempVideoPath;
+
+        // Entrée 1 : La vidéo/audio d'origine 
+        arguments << "-i" << originalMediaPath;
+
+        // Commence depuis le début des des vidéos
+        arguments << "-map" << "0:v:0";
+        arguments << "-map" << "1:a:0";
+
+        // On garde le codec video de la video temporaire et le son de l'original
+        arguments << "-c:v" << "copy";
+        arguments << "-c:a" << "copy";
+
+        // Coupe à la fin du plus court
+        arguments << "-shortest";
+
+        arguments << finalFilePath;
+
+        qDebug() << "[export_video] Démarrage du mixage FFmpeg...";
+
+        ffmpegProcess.start("ffmpeg", arguments);
+
+        if (!ffmpegProcess.waitForStarted()) {
+            qCritical() << "Impossible de lancer FFmpeg.";
+            return false;
+        }
+
+        ffmpegProcess.waitForFinished(-1);
+
+        if (ffmpegProcess.exitCode() != 0) {
+            qCritical() << "Erreur lors du mixage FFmpeg :" << ffmpegProcess.readAllStandardError();
+            return false;
+        }
+
+        qDebug() << "[export_video] Écriture faite avec succès : " << finalFilePath;
+        return true;
+    }
+
+}
 
 namespace ProjectExportHelper {
     
@@ -130,7 +271,7 @@ namespace ProjectExportHelper {
             QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
             timeString.replace(":", "-");
         
-            QString fileName = dstPath + QDir::separator() + "TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png";
+            QString fileName = QDir(dstPath).filePath("TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
@@ -290,7 +431,7 @@ namespace ProjectExportHelper {
         if (!tempDir.isValid()) return false;
         QString tempPath = tempDir.path();
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(10));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, imageQueue.get(), shots, nullptr, 
             std::optional<int>(cv::COLOR_BGR2RGB), std::optional<cv::Size>(imgSize)
@@ -380,6 +521,120 @@ namespace ProjectExportHelper {
         pythonProcess.waitForFinished(-1);
 
         return (pythonProcess.exitCode() == 0);
+    }
+
+
+    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+
+        QFileInfo mediaInfo(mediaPath);
+        QString extension = mediaInfo.suffix();
+
+        QTemporaryDir tempDir;
+        if (!tempDir.isValid()) return false;
+        QString tempDirPath = tempDir.path();
+        QString tempVideo = QDir(tempDirPath).filePath("temp_video." + extension);
+        
+        cv::VideoCapture cap(mediaPath.toStdString(), cv::CAP_FFMPEG);
+
+        int currentFrame = 0;
+        int totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+
+        if (!cap.isOpened()) {
+            qCritical() << "Impossible de lire la video pour exporter";
+            return false;
+        }
+
+        int originalFourcc = static_cast<int>(cap.get(cv::CAP_PROP_FOURCC));
+
+        cv::Size originalSize(
+            static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
+            static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT))
+        );
+
+        cv::VideoWriter writer(
+            tempVideo.toLocal8Bit().constData(),
+            originalFourcc,                      
+            fps,                         
+            originalSize 
+        );
+
+        if (!writer.isOpened()) {
+            qDebug() << "Le codec d'origine n'est pas supporté pour l'écriture. Utilisation de mp4v...";
+            
+            // On tente le Plan B : mp4v
+            int fallbackFourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+            writer.open(
+                tempVideo.toLocal8Bit().constData(), 
+                fallbackFourcc, 
+                fps, 
+                originalSize
+            );
+            if(!writer.isOpened()){
+                qDebug() << "Impossible d'écrire";
+                return false;
+            }else qDebug() << "mp4v Ok";
+        }
+
+        int currentShot = -1;
+        int64_t endShotTime = -1;
+
+        int64_t cvTime {-1};
+        cv::Mat frame;
+
+        QStringList wrappedText;
+
+        int percent = 0;
+
+        while ( cap.read(frame) )
+        {
+            cvTime = static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC));
+
+            // récupère le temps et l'id du plan comprenant cvTime, si pas de temps trouvé on passe à la frame suivante
+            if( endShotTime < cvTime ){
+                currentShot = findShotIndexAtTime(shots, cvTime);
+
+                if(currentShot == -1){
+                    qDebug() << "Impossible de trouver un plan qui comprends : " << cvTime;
+                    continue; 
+                }else {
+                    auto& s = shots[currentShot];
+                    endShotTime = s.end;
+                    QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;
+                    QString timecodeTxt = "Debut : " + TimeFormatter::msToHHMMSSFF(s.start, fps) + " / Duree : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
+                    QString noteTxt = s.note;
+                    wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width);
+                }
+
+            }
+
+            writeOnFrame(frame, wrappedText);
+            writer.write(frame);
+
+            if (progressCallback && totalFrames > 0) {
+                int percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
+                if( !progressCallback(percent)){
+                    cap.release();
+                    writer.release();
+                    return false;
+                }
+            }
+            
+            ++currentFrame;
+
+        }
+
+        cap.release();
+        writer.release();
+
+        if( progressCallback && !progressCallback(percent) ){
+            return false;
+        }
+
+        QString finalVideoPath = dstPath + '.' + extension; 
+        mergeVideoAndAudio(mediaPath, tempVideo, finalVideoPath);
+
+        return true;
     }
 
     std::optional<ExportType> selectFormatWindow(const QString &originalFormat)

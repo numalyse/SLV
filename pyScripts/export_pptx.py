@@ -40,6 +40,8 @@ def main():
     shots = data['shots']
     total_shots = len(shots)
 
+    last_percent = -1
+
     try:
         prs = Presentation()
         prs.slide_width = Inches(13.33)
@@ -140,7 +142,9 @@ def main():
                 note_box.height = note_box_height
 
             percent = int(((idx + 1) / total_shots) * 100)
-            print(f"PROGRESS:{percent}", flush=True)
+            if percent != last_percent:
+                print(f"PROGRESS:{percent}", flush=True)
+                last_percent = percent 
 
 
         prs.save(dst_path)

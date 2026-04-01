@@ -91,6 +91,8 @@ std::vector<int> SegmentationThread::detectCuts(const std::vector<float>& scores
 void SegmentationThread::run()
 {
 
+    emit progress(0);
+
 	QProcess pythonProcess;
     pythonProcess.setProcessChannelMode(QProcess::MergedChannels);
 

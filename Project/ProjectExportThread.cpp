@@ -35,7 +35,10 @@ void ProjectExportThread::run()
         success = ProjectExportHandler::exportToPDF(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
     case ExportType::PPTX:
-        success = ProjectExportHandler::exportToPPTX(m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+        success = ProjectExportHandler::exportPython(ExportType::PPTX, m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+        break;
+    case ExportType::DOCX:
+        success = ProjectExportHandler::exportPython(ExportType::DOCX, m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
     default:
         break;

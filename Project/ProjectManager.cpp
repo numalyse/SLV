@@ -156,7 +156,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
     if ( ! createProjectFolder() ){ // on a cliqué sur annulé on return 
         return; 
     }else { // copie du média dans le dossier du projet
-        QString destMedia = m_project->path + QDir::separator() + m_project->media->fileName() + '.' + m_project->media->fileExtension();
+        QString destMedia = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
         copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave);
         setSaveNotNeeded();
         return;
@@ -239,7 +239,7 @@ bool ProjectManager::createProjectFolder(){
         }
     }
 
-    m_project->path = fileInfo.absolutePath() + QDir::separator() + fileInfo.baseName(); 
+    m_project->path = QDir(fileInfo.absolutePath()).filePath(fileInfo.baseName());
     m_project->name = fileInfo.baseName();
     qDebug() << "dossier créé";
     return true;

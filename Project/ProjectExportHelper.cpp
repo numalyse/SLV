@@ -29,15 +29,218 @@
 #include <QJsonArray>
 #include <QProcess>
 #include <QTemporaryDir>
+#include <QStringList>
+#include <QImage>
+#include <QPainter>
+#include <QPainterPath>
+#include <QFont>
+#include <QFontMetrics>
 
 #include <memory>
 #include <optional>
+#include <utility>
+#include <algorithm>
+namespace  {
+
+    int findShotIndexAtTime(const QVector<Shot>& shots, int64_t timeMs) {
+        for (int IShot = 0; IShot < shots.size(); ++IShot) {
+            if(shots[IShot].start <= timeMs && shots[IShot].end >= timeMs) return IShot;
+        }
+        return -1;
+    }
+
+
+
+    std::pair<int, int> computeFontSizeAndSpacing(int width, int height, double ratio = 0.02) {
+        int calculatedSize = static_cast<int>(height * ratio);
+        int fontSize = std::max(12, calculatedSize);
+        
+        int lineSpacing = static_cast<int>(fontSize * 1.5); 
+        
+        return {fontSize, lineSpacing}; 
+    }
+
+    /// @brief Sépare le texte en plusieurs lignes si le texte est trop grand
+    /// @param text 
+    /// @param maxChars 
+    /// @return 
+    QStringList wrapText(const QString& text, int maxChars) {
+        QStringList result;
+        
+        if (text.length() <= maxChars) {
+            result.append(text);
+            return result;
+        }
+
+        // On découpe la phrase en mots en ignorant les espaces multiples
+        QStringList words = text.split(' ', Qt::SkipEmptyParts);
+        QString currentLine;
+
+        for (const QString& word : words) {
+            if (currentLine.isEmpty()) {
+                currentLine = word; // Premier mot de la ligne
+            } else if (currentLine.length() + 1 + word.length() <= maxChars) {
+                currentLine += " " + word; // On ajoute le mot s'il y a de la place
+            } else {
+                result.append(currentLine); // La ligne est pleine, on la sauvegarde
+                currentLine = word;         // On commence une nouvelle ligne
+            }
+        }
+        
+        if (!currentLine.isEmpty()) {
+            result.append(currentLine);
+        }
+
+        return result;
+    }
+
+    /// @brief Calcule le nombre de char max possible sur une ligne puis sépare les lignes de texte si nécessaire
+    /// @param shotTitleTxt 
+    /// @param timecodeTxt 
+    /// @param noteTxt 
+    /// @param maxWidth 
+    /// @param fontSize 
+    /// @return 
+    QStringList formatText(        
+        const QString& shotTitleTxt,  
+        const QString& timecodeTxt,  
+        const QString& noteTxt,
+        int maxWidth,
+        int fontSize
+    ){
+
+        QFont font("Arial");
+        font.setPixelSize(fontSize); 
+        font.setBold(true);
+
+        QFontMetrics fm(font);
+
+        int charWidth = fm.averageCharWidth();
+        if (charWidth == 0) charWidth = 10;
+
+        int maxCharsPerLine = (maxWidth - 100) / charWidth; 
+        if (maxCharsPerLine <= 0) maxCharsPerLine = 10;
+
+        QStringList linesToDraw({shotTitleTxt + " - " + timecodeTxt});
+
+        QStringList noteLines = noteTxt.split("\n");
+        for( auto& noteLine : noteLines){
+            linesToDraw.push_back(noteLine.replace("\t", "   "));
+        }
+
+        QStringList wrappedLines{};
+        for ( auto& line : linesToDraw ) {
+            wrappedLines.append(wrapText(line, maxCharsPerLine));
+        }
+
+        return wrappedLines;
+    }
+
+    /// @brief Utilise une QImage et un QPainter pour écrire. Ecrit directement dans les données de la frame passée en paramètre 
+    /// @param frame 
+    /// @param wrappedLines 
+    /// @param fontSize 
+    /// @param lineSpacing 
+    void writeOnOverlay(
+        QImage& overlay,
+        const QStringList& wrappedLines,
+        int fontSize,
+        int lineSpacing
+    ){
+
+        QPainter painter(&overlay);
+        painter.setRenderHint(QPainter::Antialiasing); 
+
+        QFont font("Arial");
+        font.setPixelSize(fontSize);
+        font.setBold(true);
+        painter.setFont(font);
+
+        int outlineThickness = std::max(2, fontSize / 10); 
+        QPen outlinePen(Qt::black, outlineThickness, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        QBrush textBrush(Qt::white);
+
+        int currentY = overlay.height() * 0.01 + lineSpacing ; 
+        int startX = overlay.width() * 0.02;
+
+        for (const auto& line : wrappedLines) {
+            QPainterPath path;
+            
+            path.addText(startX, currentY, font, line);
+
+            // Contour noir
+            painter.setPen(outlinePen);
+            painter.setBrush(Qt::NoBrush);
+            painter.drawPath(path);
+
+            // Intérieur en blanc
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(textBrush);
+            painter.drawPath(path);
+
+            currentY += lineSpacing;
+        }
+
+        painter.end();
+    }
+
+
+
+    bool mergeVideoAndAudio(const QString& originalMediaPath, const QString& tempVideoPath, const QString& finalFilePath) {
+        QProcess ffmpegProcess;
+        QStringList arguments;
+
+        // Ecraser le fichier de sortie s'il existe déjà
+        arguments << "-y"; 
+
+        // Entrée 0 : La vidéo temporaire sans son 
+        arguments << "-i" << tempVideoPath;
+
+        // Entrée 1 : La vidéo/audio d'origine 
+        arguments << "-i" << originalMediaPath;
+
+        // Commence depuis le début des des vidéos
+        arguments << "-map" << "0:v:0";
+        arguments << "-map" << "1:a:0";
+
+        // On garde le codec video de la video temporaire et le son de l'original
+        arguments << "-c:v" << "copy";
+        arguments << "-c:a" << "copy";
+
+        // Coupe à la fin du plus court ?
+        // arguments << "-shortest";
+
+        arguments << finalFilePath;
+
+        qDebug() << "[export_video] Démarrage du mixage FFmpeg...";
+
+        ffmpegProcess.start("ffmpeg", arguments);
+
+        if (!ffmpegProcess.waitForStarted()) {
+            qCritical() << "Impossible de lancer FFmpeg.";
+            return false;
+        }
+
+        ffmpegProcess.waitForFinished(-1);
+
+        if (ffmpegProcess.exitCode() != 0) {
+            qCritical() << "Erreur lors du mixage FFmpeg :" << ffmpegProcess.readAllStandardError();
+            return false;
+        }
+
+        qDebug() << "[export_video] Écriture faite avec succès : " << finalFilePath;
+        return true;
+    }
+
+}
 
 namespace ProjectExportHelper {
     
 
     bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
+        if(progressCallback) progressCallback(0);
+
         QFile file(dstPath + ".txt");
 
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -86,6 +289,8 @@ namespace ProjectExportHelper {
 
     bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
+        if(progressCallback) progressCallback(0);
+
         QDir folder(dstPath);
         if( folder.exists() ) {
             folder.removeRecursively();
@@ -95,12 +300,6 @@ namespace ProjectExportHelper {
             qDebug() << "Erreur : Impossible de créer le dossier " << dstPath;
             return false;
         }
-
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
-
-        DecodeThread* decodeThread = new DecodeThread(mediaPath, imageQueue.get(), shots);
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
-        decodeThread->start();
 
         ImgData imgData{};
 
@@ -113,6 +312,12 @@ namespace ProjectExportHelper {
 
         QFileInfo mediaFileInfo(mediaPath);
         QString mediaName = mediaFileInfo.baseName();
+
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+
+        DecodeThread* decodeThread = new DecodeThread(mediaPath, imageQueue.get(), shots);
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
 
         while(true) {
             imageQueue->waitPop(imgData);
@@ -130,7 +335,7 @@ namespace ProjectExportHelper {
             QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
             timeString.replace(":", "-");
         
-            QString fileName = dstPath + QDir::separator() + "TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png";
+            QString fileName = QDir(dstPath).filePath("TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
@@ -145,20 +350,8 @@ namespace ProjectExportHelper {
 
    bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
-
-        DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, 
-            imageQueue.get(), 
-            shots, 
-            nullptr, 
-            std::optional<int>(cv::COLOR_BGR2RGB), 
-            std::optional<cv::Size>({400, 400})
-        );
-
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
-        decodeThread->start();
-
+        if(progressCallback) progressCallback(0);
+        
         QString finalPath = dstPath + ".pdf";
         QPdfWriter pdfWriter(finalPath);
         pdfWriter.setPageSize(QPageSize(QPageSize::A4));
@@ -206,6 +399,20 @@ namespace ProjectExportHelper {
         int totalShots = shots.size();
         int currentShot = 0;
 
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+
+        DecodeThread* decodeThread = new DecodeThread(
+            mediaPath, 
+            imageQueue.get(), 
+            shots, 
+            nullptr, 
+            std::optional<int>(), 
+            std::optional<cv::Size>({400, 400})
+        );
+
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
+
         while(true) {
             imageQueue->waitPop(imgData);
 
@@ -236,7 +443,7 @@ namespace ProjectExportHelper {
             
             // insertion de l'image, déjà à la bonne taille et au bon format dans video decode
             if (!imgData.img.empty()) {
-                QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_RGB888);
+                QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
                 QImage safeImage = tempImage.copy();
 
                 QString imgName = QString("img_%1.png").arg(currentShot + 1);
@@ -258,17 +465,13 @@ namespace ProjectExportHelper {
 
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
-    /// @param type 
-    /// @param shots 
-    /// @param fps 
-    /// @param duration 
-    /// @param mediaPath 
-    /// @param dstPath 
-    /// @param progressCallback 
     /// @return 
     bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
+        
+        if(progressCallback) progressCallback(0);
+        
         QString pythonScriptPath;
         cv::Size imgSize;
 
@@ -290,10 +493,10 @@ namespace ProjectExportHelper {
         if (!tempDir.isValid()) return false;
         QString tempPath = tempDir.path();
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(10));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, imageQueue.get(), shots, nullptr, 
-            std::optional<int>(cv::COLOR_BGR2RGB), std::optional<cv::Size>(imgSize)
+            std::optional<int>(), std::optional<cv::Size>(imgSize)
         );
 
         QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
@@ -310,7 +513,7 @@ namespace ProjectExportHelper {
             if (currentShot < totalShots) {
                 // Sauvegarde de l'image
                 if (!imgData.img.empty()) {
-                    QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_RGB888);
+                    QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
                     tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currentShot), "PNG");
                 }
 
@@ -380,6 +583,145 @@ namespace ProjectExportHelper {
         pythonProcess.waitForFinished(-1);
 
         return (pythonProcess.exitCode() == 0);
+    }
+
+
+    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+        if(progressCallback) progressCallback(0);
+
+        QFileInfo mediaInfo(mediaPath);
+        QString extension = mediaInfo.suffix();
+        if (type == ExportType::MP4) extension = "mp4";
+
+        QTemporaryDir tempDir;
+        if (!tempDir.isValid()) return false;
+        QString tempDirPath = tempDir.path();
+        QString tempVideo = QDir(tempDirPath).filePath("temp_video." + extension);
+        
+        cv::VideoCapture cap(mediaPath.toStdString(), cv::CAP_FFMPEG);
+
+        int currentFrame = 0;
+        int totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+
+        if (!cap.isOpened()) {
+            qCritical() << "Impossible de lire la video pour exporter";
+            return false;
+        }
+
+        // On force en mp4 si l'utilisateur veut un export mp4 sinon c'est le même que la source
+        int fourcc = (type == ExportType::MP4) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : static_cast<int>(cap.get(cv::CAP_PROP_FOURCC));
+
+        cv::Size originalSize(
+            static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
+            static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT))
+        );
+
+        cap.release();
+
+        cv::VideoWriter writer(
+            tempVideo.toLocal8Bit().constData(),
+            fourcc,                      
+            fps,                         
+            originalSize 
+        );
+
+        if (!writer.isOpened()) {
+            qDebug() << "Le codec n'est pas supporté pour l'écriture. Utilisation de mp4v...";
+            
+            // On tente mp4v si le codec ne fonctionne pas
+            int fallbackFourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+            writer.open(
+                tempVideo.toLocal8Bit().constData(), 
+                fallbackFourcc, 
+                fps, 
+                originalSize
+            );
+            if(!writer.isOpened()){
+                qDebug() << "Impossible d'écrire";
+                return false;
+            }else qDebug() << "mp4v Ok";
+        }
+
+        int currentShot = -1;
+        int64_t endShotTime = -1;
+
+        ImgData imgData;
+        QStringList wrappedText;
+
+        int percent = 0;
+
+        auto [fontSize, lineSpacing] = computeFontSizeAndSpacing(originalSize.width, originalSize.height, 0.020);
+
+        QImage textOverlay(originalSize.width, originalSize.height, QImage::Format_ARGB32_Premultiplied);
+
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        DecodeThread* decodeThread = new DecodeThread(
+            mediaPath, imageQueue.get(), {}
+        );
+
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
+
+        while ( true )
+        {
+            imageQueue->waitPop(imgData);
+
+            if(imgData.isFinished) break;
+            if(imgData.img.empty()) continue;
+
+            // Si endShotTime < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
+            if( endShotTime < imgData.timeMs || currentShot == -1){
+                 // Récupère le temps et l'id du plan comprenant imgData.timeMs
+                currentShot = findShotIndexAtTime(shots, imgData.timeMs);
+                if(currentShot == -1){ // Si pas de temps trouvé, le text devient vide
+                    qDebug() << "Impossible de trouver un plan qui comprends : " << imgData.timeMs << "garde le textPrecende";
+                    wrappedText.clear();
+                    textOverlay.fill(Qt::transparent); 
+                }else { // Le texte est mis à jour avec les infos du nouveau plan
+                    auto& s = shots[currentShot];
+                    endShotTime = s.end;
+                    QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;
+                    QString timecodeTxt = "Début : " + TimeFormatter::msToHHMMSSFF(s.start, fps) + " / Durée : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
+                    QString noteTxt = s.note;
+                    wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width, fontSize);
+                    textOverlay.fill(Qt::transparent); 
+                    writeOnOverlay(textOverlay, wrappedText, fontSize, lineSpacing); // Mise à jour de l'overlay à chaque fois que le plan change
+                }
+
+            }
+
+            QImage img(imgData.img.data, imgData.img.cols, imgData.img.rows, static_cast<int>(imgData.img.step), QImage::Format_BGR888);
+            QPainter painter(&img);
+            painter.drawImage(0, 0, textOverlay); // Draw l'image transparent avec le texte par dessus l'image (rapide)
+            writer.write(imgData.img);
+
+            if (progressCallback && totalFrames > 0) {
+                int percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
+                if( !progressCallback(percent)){
+                    writer.release();
+                    return false;
+                }
+            }
+            
+            ++currentFrame;
+
+        }
+
+        writer.release();
+
+        if( currentFrame != totalFrames){
+            qWarning() << "La vidéo lue contenait" << currentFrame << "images au lieu des" << totalFrames << "annoncées par opencv. La vidéo a tout de même été exportée.";
+        }
+
+        if( progressCallback && !progressCallback(percent)){
+            return false;
+        }
+
+        QString finalVideoPath = dstPath + '.' + extension; 
+        mergeVideoAndAudio(mediaPath, tempVideo, finalVideoPath);
+
+        return true;
     }
 
     std::optional<ExportType> selectFormatWindow(const QString &originalFormat)

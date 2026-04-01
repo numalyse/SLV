@@ -10,6 +10,7 @@
 struct ImgData
 {
     cv::Mat img;
+    int64_t timeMs;
     bool isFinished;
 };
 

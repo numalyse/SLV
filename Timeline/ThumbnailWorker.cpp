@@ -88,9 +88,7 @@ void ThumbnailWorker::run()
             cv::Mat resized;
             cv::resize(frame, resized, newSize, 0, 0, cv::INTER_AREA);
 
-            cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB);
-
-            QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_RGB888);
+            QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
             QImage finalImg = img.copy(); // utiliser .copy() car les données de resized vont être détruites
 
             //qDebug() << "Thumbnail : prete pour le plan : " <<req.shotId ;

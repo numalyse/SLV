@@ -1,8 +1,12 @@
 #include "Playlist.h"
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 
 Playlist::Playlist(QWidget *parent)
     : QWidget{parent}
 {
+    setAcceptDrops(true);
     m_mainLayout = new QVBoxLayout(this);
     QHBoxLayout *playlistLabelLayout = new QHBoxLayout();
     QLabel *playlistLabel = new QLabel();
@@ -17,6 +21,7 @@ Playlist::Playlist(QWidget *parent)
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &QPushButton::clicked, this, &Playlist::addItemDialog);
+
 }
 
 void Playlist::updateThumbnail(int playlistItemId, QImage image)
@@ -26,6 +31,36 @@ void Playlist::updateThumbnail(int playlistItemId, QImage image)
     auto* item = m_items[playlistItemId];
     item->setThumbnail(image);
 
+}
+
+void Playlist::dragEnterEvent(QDragEnterEvent *event){
+    if (event->mimeData()->hasUrls()) {
+            event->acceptProposedAction();
+        } else {
+            event->ignore();
+        }
+}
+
+void Playlist::dropEvent(QDropEvent *event)
+{
+    const QMimeData *mimeData = event->mimeData();
+
+    if (mimeData->hasUrls()) {
+        QList<QUrl> urlList = mimeData->urls();
+        QStringList filePaths;
+
+        for (const QUrl &url : urlList) {
+            QString filePath = url.toLocalFile();
+            qDebug() << "Fichier droppé :" << filePath;
+            filePaths.append(filePath);
+        }
+
+        addItemsFromPaths(filePaths);
+
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
 }
 
 void Playlist::addItemDialog()

@@ -13,7 +13,11 @@ class Playlist : public QWidget
 public:
     explicit Playlist(QWidget *parent = nullptr);
     void updateThumbnail(int playlistItemId, QImage image);
-    
+
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+
 private:
     bool m_playlistLooping = false;
     bool m_randomized = false;

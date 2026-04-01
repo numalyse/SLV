@@ -8,6 +8,9 @@
 #include <QLayout>
 #include <TimeFormatter.h>
 #include <QImage>
+#include <QDrag>
+#include <QMimeData>
+#include <QApplication>
 
 class PlaylistItem : public QWidget
 {
@@ -31,12 +34,14 @@ private:
     bool m_isClicked = false;
     QSize m_thumbnailSize {64, 36};
     bool m_isCurrentMedia = false;
+    QPoint m_dragStartPosition;
 
 protected:
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 public slots:
     void setDurationLabel();

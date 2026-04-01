@@ -39,6 +39,10 @@ public slots:
     void playMedia(const QString &filePath);
     void playPreviousMedia();
     void playNextMedia();
+
+private slots:
+    void updateItemIndices();
+    void updateLayout();
 };
 
 #endif // PLAYLIST_H

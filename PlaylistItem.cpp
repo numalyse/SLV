@@ -99,6 +99,7 @@ void PlaylistItem::leaveEvent(QEvent *event)
 void PlaylistItem::mousePressEvent(QMouseEvent *event)
 {
     m_isClicked = true; // pas besoin de vérifier si bouton delete cliqué car le bouton bypass l'event de PlaylistItem
+    m_dragStartPosition = event->pos();
 }
 
 void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
@@ -107,6 +108,27 @@ void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
         emit updatePlaylistCurrentIndex(m_itemIndex);
         playMedia();
     }
+}
+
+void PlaylistItem::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!(event->buttons() & Qt::LeftButton))
+        return;
+    if ((event->pos() - m_dragStartPosition).manhattanLength() < QApplication::startDragDistance())
+        return;
+
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData("move-PlaylistItem", QByteArray::number(m_itemIndex));
+    drag->setMimeData(mimeData);
+
+    // Créer une pixmap pour le drag feedback
+    QPixmap pixmap(size());
+    render(&pixmap);
+    drag->setPixmap(pixmap);
+    drag->setHotSpot(event->pos());
+
+    drag->exec(Qt::MoveAction);
 }
 
 void PlaylistItem::setCurrentMedia(bool isCurrent)

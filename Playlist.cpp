@@ -34,18 +34,39 @@ void Playlist::updateThumbnail(int playlistItemId, QImage image)
 }
 
 void Playlist::dragEnterEvent(QDragEnterEvent *event){
-    if (event->mimeData()->hasUrls()) {
-            event->acceptProposedAction();
-        } else {
-            event->ignore();
-        }
+    if (event->mimeData()->hasUrls() || event->mimeData()->hasFormat("move-PlaylistItem")) {
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
 }
 
 void Playlist::dropEvent(QDropEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
 
-    if (mimeData->hasUrls()) {
+    if (mimeData->hasFormat("move-PlaylistItem")) {
+        int draggedIndex = mimeData->data("move-PlaylistItem").toInt();
+
+        int dropIndex = -1;
+        for (int i = 0; i < m_items.size(); ++i) {
+            QRect itemRect = m_items[i]->geometry();
+            if (itemRect.contains(event->pos())) {
+                dropIndex = i;
+                break;
+            }
+        }
+
+        if (dropIndex != -1 && dropIndex != draggedIndex) {
+            PlaylistItem *draggedItem = m_items.takeAt(draggedIndex);
+            m_items.insert(dropIndex, draggedItem);
+
+            updateItemIndices();
+            updateLayout();
+        }
+
+        event->acceptProposedAction();
+    } else if (mimeData->hasUrls()) {
         QList<QUrl> urlList = mimeData->urls();
         QStringList filePaths;
 
@@ -138,5 +159,28 @@ void Playlist::playNextMedia()
     {
         m_currentMediaIndex++;
         m_items[m_currentMediaIndex]->playMedia();
+    }
+}
+
+void Playlist::updateItemIndices()
+{
+    for (int i = 0; i < m_items.size(); ++i) {
+        m_items[i]->setIndex(i);
+    }
+}
+
+void Playlist::updateLayout()
+{
+    // Supprimer tous les widgets du layout
+    while (QLayoutItem *item = m_itemsLayout->takeAt(0)) {
+        if (QWidget *widget = item->widget()) {
+            widget->setParent(nullptr);
+        }
+        delete item;
+    }
+
+    // Réajouter les widgets dans le nouvel ordre
+    for (auto *item : m_items) {
+        m_itemsLayout->addWidget(item);
     }
 }

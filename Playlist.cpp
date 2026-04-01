@@ -2,6 +2,31 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QDir>
+#include <QDirIterator>
+
+namespace {
+QStringList collectValidFilesFromPath(const QString &path)
+{
+    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "wav"};
+    QStringList collected;
+
+    QDir dir(path);
+    if (!dir.exists())
+        return collected;
+
+    QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString filePath = it.next();
+        QString ext = QFileInfo(filePath).suffix().toLower();
+        if (allowedExtensions.contains(ext)) {
+            collected.append(filePath);
+        }
+    }
+
+    return collected;
+}
+}
 
 Playlist::Playlist(QWidget *parent)
     : QWidget{parent}
@@ -72,11 +97,19 @@ void Playlist::dropEvent(QDropEvent *event)
 
         for (const QUrl &url : urlList) {
             QString filePath = url.toLocalFile();
-            qDebug() << "Fichier droppé :" << filePath;
-            filePaths.append(filePath);
+            qDebug() << "Fichier ou dossier droppé :" << filePath;
+
+            QFileInfo info(filePath);
+            if (info.isDir()) {
+                filePaths.append(collectValidFilesFromPath(filePath));
+            } else if (info.isFile()) {
+                filePaths.append(filePath);
+            }
         }
 
-        addItemsFromPaths(filePaths);
+        if (!filePaths.isEmpty()) {
+            addItemsFromPaths(filePaths);
+        }
 
         event->acceptProposedAction();
     } else {
@@ -171,7 +204,6 @@ void Playlist::updateItemIndices()
 
 void Playlist::updateLayout()
 {
-    // Supprimer tous les widgets du layout
     while (QLayoutItem *item = m_itemsLayout->takeAt(0)) {
         if (QWidget *widget = item->widget()) {
             widget->setParent(nullptr);
@@ -179,7 +211,6 @@ void Playlist::updateLayout()
         delete item;
     }
 
-    // Réajouter les widgets dans le nouvel ordre
     for (auto *item : m_items) {
         m_itemsLayout->addWidget(item);
     }

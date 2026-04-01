@@ -44,8 +44,11 @@
     "tooltip_view_3_left" : "1 à gauche, 2 à droite",
     "tooltip_view_3_right" : "2 à gauche, 1 à droite",
     "tooltip_view_4" : "Quatre vues",
+
     "tooltip_nav_panel_close" : "Fermer le panneau latéral",
     "tooltip_nav_panel_open" : "Ouvrir le panneau latéral",
+
+    "no_preview" : "Pas d'image",
 
     "tooltip_to_next_shot" : "Aller au plan suivant",
     "tooltip_to_prev_shot" : "Aller plan précédent",
@@ -81,5 +84,7 @@
     "languages" : "Langues",
     "subtitles" : "Sous-titres",
     "no_audio" : "Pas de piste audio",
-    "no_subtitles" : "Pas de piste de sous-titres"
+    "no_subtitles" : "Pas de piste de sous-titres",
+
+    "open_files" : "Ouvrir des fichiers multimédia"
 }

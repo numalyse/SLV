@@ -1,4 +1,5 @@
 #include "Playlist.h"
+#include "TextManager.h"
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
@@ -119,7 +120,7 @@ void Playlist::dropEvent(QDropEvent *event)
 
 void Playlist::addItemDialog()
 {
-    QStringList filesPaths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    QStringList filesPaths = QFileDialog::getOpenFileNames(this, TextManager::instance().get("open_files"), "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
     if(filesPaths.empty()){
         qDebug() << "PLAYLIST - Pas de fichier sélectionné";
         return;

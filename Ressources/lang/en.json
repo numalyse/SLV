@@ -47,6 +47,8 @@
     "tooltip_nav_panel_close" : "Close side panel",
     "tooltip_nav_panel_open" : "Open side panel",
 
+    "no_preview" : "No preview",
+
     "tooltip_to_next_shot" : "Go to the next shot",
     "tooltip_to_prev_shot" : "Go to the previous shot",
 
@@ -81,5 +83,7 @@
     "languages" : "Languages",
     "subtitles" : "Subtitles",
     "no_audio" : "No audio track",
-    "no_subtitles" : "No subtitle track"
+    "no_subtitles" : "No subtitle track",
+
+    "open_files" : "Open files"
 }

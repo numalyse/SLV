@@ -1,5 +1,5 @@
-#ifndef PROJECTEXPORTHANDLER_H
-#define PROJECTEXPORTHANDLER_H
+#ifndef PROJECTEXPORTHELPER_H
+#define PROJECTEXPORTHELPER_H
 
 #include "Timeline/TimelineWidget.h"
 #include "Project/Project.h"
@@ -20,7 +20,7 @@ enum class ExportType {
     TagImage,
 };
 
-namespace ProjectExportHandler {
+namespace ProjectExportHelper {
 
     bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
     bool exportToTagImage( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);

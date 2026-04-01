@@ -3,8 +3,7 @@
 #include "Project/Project.h"
 #include "Media.h"
 #include "TextManager.h"
-#include "External/nlohmann/json.hpp"
-#include "Project/ProjectFileHandler.h"
+#include "Project/ProjectFileHelper.h"
 #include "Project/ProjectExportThread.h"
 #include "FileCopyThread.h"
 
@@ -137,7 +136,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
 
     if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path,
         // on écrit directement dans le json sans copier la vidéo
-        ProjectFileHandler::writeJson(m_project, p_timeline);
+        ProjectFileHelper::writeJson(m_project, p_timeline);
         setSaveNotNeeded();
         if(ejectMediaAfterSave){
             discardAndEject();
@@ -301,7 +300,7 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
     connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, projectPath](bool success, bool canceled) {
         
         if (success) {
-            ProjectFileHandler::writeJson(m_project, p_timeline);
+            ProjectFileHelper::writeJson(m_project, p_timeline);
         } else {
             if ( ! canceled ) {
                 auto& txtManager = TextManager::instance(); 
@@ -343,7 +342,7 @@ void ProjectManager::openProject()
         return;
     }
 
-    auto loaded = ProjectFileHandler::loadProject(selectedPath);
+    auto loaded = ProjectFileHelper::loadProject(selectedPath);
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
@@ -435,7 +434,7 @@ void ProjectManager::exportProject(){
 
     if ( extension.isEmpty() ) return;
 
-    auto format = ProjectExportHandler::selectFormatWindow(extension);
+    auto format = ProjectExportHelper::selectFormatWindow(extension);
 
     if ( ! format.has_value() ) return;
     
@@ -480,5 +479,5 @@ void ProjectManager::exportProject(){
     exportThread->start();
 
     qDebug() << "Export";
-    // ProjectExportHandler::exportProject(m_project, p_timeline, ExportType::MP4, selectedPath);
+    // ProjectExportHelper::exportProject(m_project, p_timeline, ExportType::MP4, selectedPath);
 }

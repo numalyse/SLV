@@ -61,8 +61,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Shot.h
         Project/Project.h
         Project/ProjectManager.h Project/ProjectManager.cpp
-        Project/ProjectFileHandler.h Project/ProjectFileHandler.cpp
-        Project/ProjectExportHandler.h Project/ProjectExportHandler.cpp
+        Project/ProjectFileHelper.h Project/ProjectFileHelper.cpp
+        Project/ProjectExportHelper.h Project/ProjectExportHelper.cpp
         Project/ProjectExportThread.h Project/ProjectExportThread.cpp
 
         MediaWidget.h MediaWidget.cpp
@@ -94,8 +94,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         VideoCaptureManager.h VideoCaptureManager.cpp
 
         FileCopyThread.h FileCopyThread.cpp
-
-        External/nlohmann/json.hpp
 
         GenericDialog.h
         GlobalScreenshotHelper.h

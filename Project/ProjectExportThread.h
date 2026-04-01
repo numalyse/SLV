@@ -1,7 +1,7 @@
 #ifndef PROJECTEXPORTTHREAD
 #define PROJECTEXPORTTHREAD
 
-#include "Project/ProjectExportHandler.h"
+#include "Project/ProjectExportHelper.h"
 #include "Project/Project.h"
 #include "Shot.h"
 

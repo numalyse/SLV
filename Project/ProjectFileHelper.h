@@ -1,5 +1,5 @@
-#ifndef PROJECTFILEHANDLER_H
-#define PROJECTFILEHANDLER_H
+#ifndef PROJECTFILEHELPER_H
+#define PROJECTFILEHELPER_H
 
 
 #include "Project/Project.h"
@@ -26,7 +26,7 @@ enum class ProjectFileError {
     UnexpectedError
 };
 
-namespace ProjectFileHandler {
+namespace ProjectFileHelper {
     bool writeJson(const Project* project, TimelineWidget* timeline);
     std::expected<ProjectSaveData, ProjectFileError> loadProject(const QString& projectAbsolutePath);
 }

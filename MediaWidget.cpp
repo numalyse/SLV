@@ -621,8 +621,12 @@ void MediaWidget::createEventManager(){
 /// @param filePath 
 void MediaWidget::createMedia(const QString& filePath){
     releaseMedia();
+    emit nameUiUpdateRequested(tr(""));
     m_media = new Media(filePath, this, m_vlcInstance);
-    emit nameUiUpdateRequested(m_media->fileName());
+    QMetaObject::invokeMethod(this, [this]() {
+        if (m_media)
+            emit nameUiUpdateRequested(m_media->fileName());
+    }, Qt::QueuedConnection);
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
     m_media->parse();

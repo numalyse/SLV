@@ -30,6 +30,7 @@ public slots:
     void disableButtons();
     void enableSlider();
     void disableSlider();
+
     virtual void ejectRequested() override;
     
 private:
@@ -44,6 +45,7 @@ protected slots:
     virtual void onSliderReleased() override;
     virtual void onSliderMoved(int value) override;
     virtual void duplicatePlayerAction() override;
+
     
 signals:
     void enableRecordRequested();
@@ -53,6 +55,10 @@ signals:
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
     void rotateRequested();
+    void hFlipUiUpdate();
+    void vFlipUiUpdate();
+    void hFlipRequested();
+    void vFlipRequested();
     void previousMediaRequested();
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);

@@ -385,6 +385,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::moveTimeBackwardRequested, activePlayer, &PlayerWidget::moveTimeBackward);
     connect(advancedToolbar, &AdvancedToolbar::moveTimeForwardRequested, activePlayer, &PlayerWidget::moveTimeForward);
     connect(advancedToolbar, &AdvancedToolbar::rotateRequested, activePlayer, &PlayerWidget::rotate);
+    connect(advancedToolbar, &AdvancedToolbar::hFlipRequested, activePlayer->mediaWidget(), &MediaWidget::hFlip);
+    connect(advancedToolbar, &AdvancedToolbar::vFlipRequested, activePlayer->mediaWidget(), &MediaWidget::vFlip);
     connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &PlayerLayoutManager::previousMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);
@@ -433,6 +435,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::enableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::enableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
+    connect(activePlayer->mediaWidget(), &MediaWidget::hFlipUiUpdateRequested, advancedToolbar, &AdvancedToolbar::hFlipUiUpdate);
+    connect(activePlayer->mediaWidget(), &MediaWidget::vFlipUiUpdateRequested, advancedToolbar, &AdvancedToolbar::vFlipUiUpdate);
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, advancedToolbar, &SimpleToolbar::updateSliderValue);
 

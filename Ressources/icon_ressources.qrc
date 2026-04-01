@@ -123,5 +123,9 @@
         <file alias="fullscreen_white">icons/fullscreen_white.png</file>
         <file alias="auto_segmentation_white">icons/auto_segmentation_white.png</file>
         <file alias="auto_segmentation">icons/auto_segmentation.png</file>
+        <file alias="invert_v_on">icons/horizontal_symmetry_on.png</file>
+        <file alias="invert_v_on_white">icons/horizontal_symmetry_on_white.png</file>
+        <file alias="invert_h_on">icons/vertical_symmetry_on.png</file>
+        <file alias="invert_h_on_white">icons/vertical_symmetry_on_white.png</file>
     </qresource>
 </RCC>

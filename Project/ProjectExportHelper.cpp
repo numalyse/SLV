@@ -1,5 +1,5 @@
-#include "Project/ProjectExportHandler.h"
-#include "ProjectExportHandler.h"
+#include "Project/ProjectExportHelper.h"
+#include "ProjectExportHelper.h"
 #include "TextManager.h"
 #include "TimeFormatter.h"
 #include "TSQueue.h"
@@ -33,7 +33,7 @@
 #include <memory>
 #include <optional>
 
-namespace ProjectExportHandler {
+namespace ProjectExportHelper {
     
 
     bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)

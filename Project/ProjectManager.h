@@ -6,10 +6,8 @@
 
 #include "PlayerWidget.h"
 #include "Timeline/TimelineWidget.h"
-#include "Project/ProjectFileHandler.h"
-#include "Project/ProjectExportHandler.h"
-
-#include <External/nlohmann/json.hpp>
+#include "Project/ProjectFileHelper.h"
+#include "Project/ProjectExportHelper.h"
 
 #include <expected>
 

@@ -346,7 +346,7 @@ namespace ProjectExportHelper {
             imageQueue.get(), 
             shots, 
             nullptr, 
-            std::optional<int>(cv::COLOR_BGR2RGB), 
+            std::optional<int>(), 
             std::optional<cv::Size>({400, 400})
         );
 
@@ -383,7 +383,7 @@ namespace ProjectExportHelper {
             
             // insertion de l'image, déjà à la bonne taille et au bon format dans video decode
             if (!imgData.img.empty()) {
-                QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_RGB888);
+                QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
                 QImage safeImage = tempImage.copy();
 
                 QString imgName = QString("img_%1.png").arg(currentShot + 1);
@@ -443,7 +443,7 @@ namespace ProjectExportHelper {
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, imageQueue.get(), shots, nullptr, 
-            std::optional<int>(cv::COLOR_BGR2RGB), std::optional<cv::Size>(imgSize)
+            std::optional<int>(), std::optional<cv::Size>(imgSize)
         );
 
         QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
@@ -460,7 +460,7 @@ namespace ProjectExportHelper {
             if (currentShot < totalShots) {
                 // Sauvegarde de l'image
                 if (!imgData.img.empty()) {
-                    QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_RGB888);
+                    QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
                     tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currentShot), "PNG");
                 }
 

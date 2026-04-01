@@ -668,14 +668,15 @@ namespace ProjectExportHelper {
             if(imgData.isFinished) break;
             if(imgData.img.empty()) continue;
 
-            // récupère le temps et l'id du plan comprenant imgData.timeMs, si pas de temps trouvé on passe à la frame suivante
+            // si endShotTime < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
             if( endShotTime < imgData.timeMs || currentShot == -1){
+                 // récupère le temps et l'id du plan comprenant imgData.timeMs
                 currentShot = findShotIndexAtTime(shots, imgData.timeMs);
-
-                if(currentShot == -1){
+                if(currentShot == -1){ // si pas de temps trouvé, le text devient vide
                     qDebug() << "Impossible de trouver un plan qui comprends : " << imgData.timeMs << "garde le textPrecende";
                     wrappedText.clear();
-                }else {
+                    textOverlay.fill(Qt::transparent); 
+                }else { // le text est mis à jour avec les infos du nouveau plan
                     auto& s = shots[currentShot];
                     endShotTime = s.end;
                     QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;

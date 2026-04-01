@@ -207,8 +207,8 @@ namespace  {
         arguments << "-c:v" << "copy";
         arguments << "-c:a" << "copy";
 
-        // Coupe à la fin du plus court
-        arguments << "-shortest";
+        // Coupe à la fin du plus court ?
+        // arguments << "-shortest";
 
         arguments << finalFilePath;
 
@@ -592,6 +592,7 @@ namespace ProjectExportHelper {
 
         QFileInfo mediaInfo(mediaPath);
         QString extension = mediaInfo.suffix();
+        if (type == ExportType::MP4) extension = "mp4";
 
         QTemporaryDir tempDir;
         if (!tempDir.isValid()) return false;
@@ -608,7 +609,8 @@ namespace ProjectExportHelper {
             return false;
         }
 
-        int originalFourcc = static_cast<int>(cap.get(cv::CAP_PROP_FOURCC));
+        // On force en mp4 si l'utilisateur veut un export mp4 sinon c'est le même que la source
+        int fourcc = (type == ExportType::MP4) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : static_cast<int>(cap.get(cv::CAP_PROP_FOURCC));
 
         cv::Size originalSize(
             static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
@@ -619,13 +621,13 @@ namespace ProjectExportHelper {
 
         cv::VideoWriter writer(
             tempVideo.toLocal8Bit().constData(),
-            originalFourcc,                      
+            fourcc,                      
             fps,                         
             originalSize 
         );
 
         if (!writer.isOpened()) {
-            qDebug() << "Le codec d'origine n'est pas supporté pour l'écriture. Utilisation de mp4v...";
+            qDebug() << "Le codec n'est pas supporté pour l'écriture. Utilisation de mp4v...";
             
             // On tente mp4v si le codec ne fonctionne pas
             int fallbackFourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
@@ -668,15 +670,15 @@ namespace ProjectExportHelper {
             if(imgData.isFinished) break;
             if(imgData.img.empty()) continue;
 
-            // si endShotTime < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
+            // Si endShotTime < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
             if( endShotTime < imgData.timeMs || currentShot == -1){
-                 // récupère le temps et l'id du plan comprenant imgData.timeMs
+                 // Récupère le temps et l'id du plan comprenant imgData.timeMs
                 currentShot = findShotIndexAtTime(shots, imgData.timeMs);
-                if(currentShot == -1){ // si pas de temps trouvé, le text devient vide
+                if(currentShot == -1){ // Si pas de temps trouvé, le text devient vide
                     qDebug() << "Impossible de trouver un plan qui comprends : " << imgData.timeMs << "garde le textPrecende";
                     wrappedText.clear();
                     textOverlay.fill(Qt::transparent); 
-                }else { // le text est mis à jour avec les infos du nouveau plan
+                }else { // Le texte est mis à jour avec les infos du nouveau plan
                     auto& s = shots[currentShot];
                     endShotTime = s.end;
                     QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;
@@ -684,14 +686,14 @@ namespace ProjectExportHelper {
                     QString noteTxt = s.note;
                     wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width, fontSize);
                     textOverlay.fill(Qt::transparent); 
-                    writeOnOverlay(textOverlay, wrappedText, fontSize, lineSpacing); // mise a jour de l'overlay a chaque fois qu'on change de plan
+                    writeOnOverlay(textOverlay, wrappedText, fontSize, lineSpacing); // Mise à jour de l'overlay à chaque fois que le plan change
                 }
 
             }
 
             QImage img(imgData.img.data, imgData.img.cols, imgData.img.rows, static_cast<int>(imgData.img.step), QImage::Format_BGR888);
             QPainter painter(&img);
-            painter.drawImage(0, 0, textOverlay); // on draw l'image transparent avec le texte par dessus l'image (= rapide)
+            painter.drawImage(0, 0, textOverlay); // Draw l'image transparent avec le texte par dessus l'image (rapide)
             writer.write(imgData.img);
 
             if (progressCallback && totalFrames > 0) {

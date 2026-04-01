@@ -41,7 +41,8 @@ void ProjectExportThread::run()
         success = ProjectExportHelper::exportPython(ExportType::DOCX, m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
     case ExportType::SRC:
-        success = ProjectExportHelper::exportVideo(ExportType::SRC, m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
+    case ExportType::MP4:
+        success = ProjectExportHelper::exportVideo( m_type, m_shots, m_fps, m_duration, m_mediaPath, m_dst, progressCallback);
         break;
     default:
         break;

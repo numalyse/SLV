@@ -414,15 +414,15 @@ void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& trac
 }
 
 void SimpleToolbar::setAudioTrackDefault(){
-    m_audioLangComboBox->blockSignals(true);
+    //m_audioLangComboBox->blockSignals(true);
     m_audioLangComboBox->setCurrentIndex(1);
-    m_audioLangComboBox->blockSignals(false);
+    //m_audioLangComboBox->blockSignals(false);
 }
 
 void SimpleToolbar::setSubtitlesTrackDefault(){
-    m_subLangComboBox->blockSignals(true);
-    m_subLangComboBox->setCurrentIndex(1);
-    m_subLangComboBox->blockSignals(false);
+    //m_subLangComboBox->blockSignals(true);
+    m_subLangComboBox->setCurrentIndex(0);
+    //m_subLangComboBox->blockSignals(false);
 }
 
 void SimpleToolbar::setAudioTrack(int index){

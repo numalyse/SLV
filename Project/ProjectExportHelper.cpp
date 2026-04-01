@@ -30,10 +30,16 @@
 #include <QProcess>
 #include <QTemporaryDir>
 #include <QStringList>
+#include <QImage>
+#include <QPainter>
+#include <QPainterPath>
+#include <QFont>
+#include <QFontMetrics>
 
 #include <memory>
 #include <optional>
-
+#include <utility>
+#include <algorithm>
 namespace  {
 
     int findShotIndexAtTime(const QVector<Shot>& shots, int64_t timeMs) {
@@ -43,6 +49,21 @@ namespace  {
         return -1;
     }
 
+
+
+    std::pair<int, int> computeFontSizeAndSpacing(int width, int height, double ratio = 0.02) {
+        int calculatedSize = static_cast<int>(height * ratio);
+        int fontSize = std::max(12, calculatedSize);
+        
+        int lineSpacing = static_cast<int>(fontSize * 1.5); 
+        
+        return {fontSize, lineSpacing}; 
+    }
+
+    /// @brief Sépare le texte en plusieurs lignes si le texte est trop grand
+    /// @param text 
+    /// @param maxChars 
+    /// @return 
     QStringList wrapText(const QString& text, int maxChars) {
         QStringList result;
         
@@ -73,23 +94,34 @@ namespace  {
         return result;
     }
 
+    /// @brief Calcule le nombre de char max possible sur une ligne puis sépare les lignes de texte si nécessaire
+    /// @param shotTitleTxt 
+    /// @param timecodeTxt 
+    /// @param noteTxt 
+    /// @param maxWidth 
+    /// @param fontSize 
+    /// @return 
     QStringList formatText(        
         const QString& shotTitleTxt,  
         const QString& timecodeTxt,  
         const QString& noteTxt,
-        int maxWidth
+        int maxWidth,
+        int fontSize
     ){
 
-        double fontScale = 0.7;
-        int thicknessText = 1;
-        cv::HersheyFonts font = cv::FONT_HERSHEY_SIMPLEX;
+        QFont font("Arial");
+        font.setPixelSize(fontSize); 
+        font.setBold(true);
 
-        int baseline=0;
-        cv::Size charSize = cv::getTextSize("A", font, fontScale, thicknessText, &baseline);
+        QFontMetrics fm(font);
 
-        int maxCharsPerLine = (maxWidth + 50) / charSize.width;
+        int charWidth = fm.averageCharWidth();
+        if (charWidth == 0) charWidth = 10;
 
-        QStringList linesToDraw({shotTitleTxt, "-", timecodeTxt});
+        int maxCharsPerLine = (maxWidth - 100) / charWidth; 
+        if (maxCharsPerLine <= 0) maxCharsPerLine = 10;
+
+        QStringList linesToDraw({shotTitleTxt + " - " + timecodeTxt});
 
         QStringList noteLines = noteTxt.split("\n");
         for( auto& noteLine : noteLines){
@@ -104,24 +136,52 @@ namespace  {
         return wrappedLines;
     }
 
-    void writeOnFrame(
-        cv::Mat frame,
+    /// @brief Utilise une QImage et un QPainter pour écrire. Ecrit directement dans les données de la frame passée en paramètre 
+    /// @param frame 
+    /// @param wrappedLines 
+    /// @param fontSize 
+    /// @param lineSpacing 
+    void writeOnOverlay(
+        QImage& overlay,
         const QStringList& wrappedLines,
-        int lineSpacing = 24
+        int fontSize,
+        int lineSpacing
     ){
 
-        double fontScale = 0.7;
-        int thicknessOutline = 4;
-        int thicknessText = 1;
-        cv::HersheyFonts font = cv::FONT_HERSHEY_SIMPLEX;
+        QPainter painter(&overlay);
+        painter.setRenderHint(QPainter::Antialiasing); 
 
-        cv::Point writeStart {50,30};
-        for ( auto& line : wrappedLines){
-            cv::putText(frame, line.toStdString(), writeStart, font, fontScale, {0,0,0}, thicknessOutline, cv::LINE_AA);
-            cv::putText(frame, line.toStdString(), writeStart, font, fontScale, {255,255,255}, thicknessText, cv::LINE_AA);
-            writeStart.y += lineSpacing;
+        QFont font("Arial");
+        font.setPixelSize(fontSize);
+        font.setBold(true);
+        painter.setFont(font);
+
+        int outlineThickness = std::max(2, fontSize / 10); 
+        QPen outlinePen(Qt::black, outlineThickness, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        QBrush textBrush(Qt::white);
+
+        int currentY = overlay.height() * 0.01 + lineSpacing ; 
+        int startX = overlay.width() * 0.02;
+
+        for (const auto& line : wrappedLines) {
+            QPainterPath path;
+            
+            path.addText(startX, currentY, font, line);
+
+            // Contour noir
+            painter.setPen(outlinePen);
+            painter.setBrush(Qt::NoBrush);
+            painter.drawPath(path);
+
+            // Intérieur en blanc
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(textBrush);
+            painter.drawPath(path);
+
+            currentY += lineSpacing;
         }
 
+        painter.end();
     }
 
 
@@ -405,13 +465,6 @@ namespace ProjectExportHelper {
 
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
-    /// @param type 
-    /// @param shots 
-    /// @param fps 
-    /// @param duration 
-    /// @param mediaPath 
-    /// @param dstPath 
-    /// @param progressCallback 
     /// @return 
     bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
@@ -574,7 +627,7 @@ namespace ProjectExportHelper {
         if (!writer.isOpened()) {
             qDebug() << "Le codec d'origine n'est pas supporté pour l'écriture. Utilisation de mp4v...";
             
-            // On tente le Plan B : mp4v
+            // On tente mp4v si le codec ne fonctionne pas
             int fallbackFourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
             writer.open(
                 tempVideo.toLocal8Bit().constData(), 
@@ -595,6 +648,10 @@ namespace ProjectExportHelper {
         QStringList wrappedText;
 
         int percent = 0;
+
+        auto [fontSize, lineSpacing] = computeFontSizeAndSpacing(originalSize.width, originalSize.height, 0.020);
+
+        QImage textOverlay(originalSize.width, originalSize.height, QImage::Format_ARGB32_Premultiplied);
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
@@ -622,14 +679,18 @@ namespace ProjectExportHelper {
                     auto& s = shots[currentShot];
                     endShotTime = s.end;
                     QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;
-                    QString timecodeTxt = "Debut : " + TimeFormatter::msToHHMMSSFF(s.start, fps) + " / Duree : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
+                    QString timecodeTxt = "Début : " + TimeFormatter::msToHHMMSSFF(s.start, fps) + " / Durée : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
                     QString noteTxt = s.note;
-                    wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width);
+                    wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width, fontSize);
+                    textOverlay.fill(Qt::transparent); 
+                    writeOnOverlay(textOverlay, wrappedText, fontSize, lineSpacing); // mise a jour de l'overlay a chaque fois qu'on change de plan
                 }
 
             }
 
-            writeOnFrame(imgData.img, wrappedText);
+            QImage img(imgData.img.data, imgData.img.cols, imgData.img.rows, static_cast<int>(imgData.img.step), QImage::Format_BGR888);
+            QPainter painter(&img);
+            painter.drawImage(0, 0, textOverlay); // on draw l'image transparent avec le texte par dessus l'image (= rapide)
             writer.write(imgData.img);
 
             if (progressCallback && totalFrames > 0) {
@@ -647,8 +708,7 @@ namespace ProjectExportHelper {
         writer.release();
 
         if( currentFrame != totalFrames){
-            qCritical() << "La video finale et originale ont des durées différentes";
-            return false;
+            qWarning() << "La vidéo lue contenait" << currentFrame << "images au lieu des" << totalFrames << "annoncées par opencv. La vidéo a tout de même été exportée.";
         }
 
         if( progressCallback && !progressCallback(percent)){

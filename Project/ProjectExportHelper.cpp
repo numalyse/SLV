@@ -179,6 +179,8 @@ namespace ProjectExportHelper {
 
     bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
+        if(progressCallback) progressCallback(0);
+
         QFile file(dstPath + ".txt");
 
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -227,6 +229,8 @@ namespace ProjectExportHelper {
 
     bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
+        if(progressCallback) progressCallback(0);
+
         QDir folder(dstPath);
         if( folder.exists() ) {
             folder.removeRecursively();
@@ -236,12 +240,6 @@ namespace ProjectExportHelper {
             qDebug() << "Erreur : Impossible de créer le dossier " << dstPath;
             return false;
         }
-
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
-
-        DecodeThread* decodeThread = new DecodeThread(mediaPath, imageQueue.get(), shots);
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
-        decodeThread->start();
 
         ImgData imgData{};
 
@@ -254,6 +252,12 @@ namespace ProjectExportHelper {
 
         QFileInfo mediaFileInfo(mediaPath);
         QString mediaName = mediaFileInfo.baseName();
+
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+
+        DecodeThread* decodeThread = new DecodeThread(mediaPath, imageQueue.get(), shots);
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
 
         while(true) {
             imageQueue->waitPop(imgData);
@@ -286,20 +290,8 @@ namespace ProjectExportHelper {
 
    bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
-
-        DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, 
-            imageQueue.get(), 
-            shots, 
-            nullptr, 
-            std::optional<int>(cv::COLOR_BGR2RGB), 
-            std::optional<cv::Size>({400, 400})
-        );
-
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
-        decodeThread->start();
-
+        if(progressCallback) progressCallback(0);
+        
         QString finalPath = dstPath + ".pdf";
         QPdfWriter pdfWriter(finalPath);
         pdfWriter.setPageSize(QPageSize(QPageSize::A4));
@@ -346,6 +338,20 @@ namespace ProjectExportHelper {
         ImgData imgData{};
         int totalShots = shots.size();
         int currentShot = 0;
+
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+
+        DecodeThread* decodeThread = new DecodeThread(
+            mediaPath, 
+            imageQueue.get(), 
+            shots, 
+            nullptr, 
+            std::optional<int>(cv::COLOR_BGR2RGB), 
+            std::optional<cv::Size>({400, 400})
+        );
+
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
 
         while(true) {
             imageQueue->waitPop(imgData);
@@ -410,6 +416,9 @@ namespace ProjectExportHelper {
     bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
+        
+        if(progressCallback) progressCallback(0);
+        
         QString pythonScriptPath;
         cv::Size imgSize;
 
@@ -526,6 +535,7 @@ namespace ProjectExportHelper {
 
     bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
+        if(progressCallback) progressCallback(0);
 
         QFileInfo mediaInfo(mediaPath);
         QString extension = mediaInfo.suffix();
@@ -551,6 +561,8 @@ namespace ProjectExportHelper {
             static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH)),
             static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT))
         );
+
+        cap.release();
 
         cv::VideoWriter writer(
             tempVideo.toLocal8Bit().constData(),
@@ -579,24 +591,33 @@ namespace ProjectExportHelper {
         int currentShot = -1;
         int64_t endShotTime = -1;
 
-        int64_t cvTime {-1};
-        cv::Mat frame;
-
+        ImgData imgData;
         QStringList wrappedText;
 
         int percent = 0;
 
-        while ( cap.read(frame) )
-        {
-            cvTime = static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        DecodeThread* decodeThread = new DecodeThread(
+            mediaPath, imageQueue.get(), {}
+        );
 
-            // récupère le temps et l'id du plan comprenant cvTime, si pas de temps trouvé on passe à la frame suivante
-            if( endShotTime < cvTime ){
-                currentShot = findShotIndexAtTime(shots, cvTime);
+        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+        decodeThread->start();
+
+        while ( true )
+        {
+            imageQueue->waitPop(imgData);
+
+            if(imgData.isFinished) break;
+            if(imgData.img.empty()) continue;
+
+            // récupère le temps et l'id du plan comprenant imgData.timeMs, si pas de temps trouvé on passe à la frame suivante
+            if( endShotTime < imgData.timeMs || currentShot == -1){
+                currentShot = findShotIndexAtTime(shots, imgData.timeMs);
 
                 if(currentShot == -1){
-                    qDebug() << "Impossible de trouver un plan qui comprends : " << cvTime;
-                    continue; 
+                    qDebug() << "Impossible de trouver un plan qui comprends : " << imgData.timeMs << "garde le textPrecende";
+                    wrappedText.clear();
                 }else {
                     auto& s = shots[currentShot];
                     endShotTime = s.end;
@@ -608,13 +629,12 @@ namespace ProjectExportHelper {
 
             }
 
-            writeOnFrame(frame, wrappedText);
-            writer.write(frame);
+            writeOnFrame(imgData.img, wrappedText);
+            writer.write(imgData.img);
 
             if (progressCallback && totalFrames > 0) {
                 int percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
                 if( !progressCallback(percent)){
-                    cap.release();
                     writer.release();
                     return false;
                 }
@@ -624,10 +644,14 @@ namespace ProjectExportHelper {
 
         }
 
-        cap.release();
         writer.release();
 
-        if( progressCallback && !progressCallback(percent) ){
+        if( currentFrame != totalFrames){
+            qCritical() << "La video finale et originale ont des durées différentes";
+            return false;
+        }
+
+        if( progressCallback && !progressCallback(percent)){
             return false;
         }
 

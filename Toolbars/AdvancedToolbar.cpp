@@ -56,6 +56,10 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     connect(m_extensionToolbar, &ExtensionToolbar::moveTimeForwardRequested, this, &AdvancedToolbar::moveTimeForwardRequested);
 
     connect(m_extensionToolbar, &ExtensionToolbar::rotateRequested, this, &AdvancedToolbar::rotateRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::horizontalFlipRequested, this, &AdvancedToolbar::hFlipRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::verticalFlipRequested, this, &AdvancedToolbar::vFlipRequested);
+    connect(this, &AdvancedToolbar::hFlipUiUpdate, m_extensionToolbar, &ExtensionToolbar::updateHFlipButtonUI);
+    connect(this, &AdvancedToolbar::vFlipUiUpdate, m_extensionToolbar, &ExtensionToolbar::updateVFlipButtonUI);
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);

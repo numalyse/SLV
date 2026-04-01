@@ -4,6 +4,7 @@
 #include "VlcInstance.h"
 #include "Media.h"
 #include "SequenceExtractionHelper.h"
+#include "MediaTransformHelper.h"
 
 #include <QFile>
 #include <QUrl>
@@ -45,14 +46,7 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     // ===== VLC ===== //
 
-    const char* const vlc_args[] = {
-        "--quiet",
-        "--aout=directsound",
-        "--no-video-title-show",
-        "--no-input-fast-seek"
-    };
-
-    m_vlcInstance = libvlc_new(4, vlc_args);
+    m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
     if (!m_vlcInstance) {
         qDebug() << "Erreur création VLC";
         return;
@@ -374,7 +368,7 @@ void MediaWidget::endRecord()
     m_startRecordTime = -1;
 }
 
-void MediaWidget::rotate()
+void MediaWidget::transformMedia()
 {
     if(!m_player || !m_media) return;
 
@@ -387,32 +381,9 @@ void MediaWidget::rotate()
     libvlc_media_player_release(m_player);
     libvlc_release(m_vlcInstance);
 
-    m_rotationIndex++;
-    if(m_rotationIndex > 3)
-        m_rotationIndex = 0;
+    m_vlcArgs = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
 
-    if(m_rotationIndex != 0){
-        const char* const vlc_args[] = {
-            "--quiet",
-            "--aout=directsound",
-            "--no-video-title-show",
-            "--no-input-fast-seek",
-            "--video-filter=transform",
-            m_rotationSteps[m_rotationIndex]
-        };
-
-        m_vlcInstance = libvlc_new(6, vlc_args);
-    }
-    else{
-        const char* const vlc_args[] = {
-            "--quiet",
-            "--aout=directsound",
-            "--no-video-title-show",
-            "--no-input-fast-seek",
-        };
-
-        m_vlcInstance = libvlc_new(4, vlc_args);
-    }
+    m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
     m_player = libvlc_media_player_new(m_vlcInstance);
 
     createEventManager();
@@ -427,7 +398,26 @@ void MediaWidget::rotate()
     // shows a black screen when rotating but playing again shows the media back
     if(!wasPlaying)
         pause();
+}
 
+void MediaWidget::rotate()
+{
+    m_rotationIndex = (m_rotationIndex-1) % 4;
+    transformMedia();
+}
+
+void MediaWidget::hFlip()
+{
+    m_hflipped = !m_hflipped;
+    transformMedia();
+    emit hFlipUiUpdateRequested();
+}
+
+void MediaWidget::vFlip()
+{
+    m_vflipped = !m_vflipped;
+    transformMedia();
+    vFlipUiUpdateRequested();
 }
 
 QPoint MediaWidget::getMediaPosRect() const

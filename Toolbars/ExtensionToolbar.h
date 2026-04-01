@@ -39,8 +39,8 @@ public:
     ToolbarPopupButton* m_compoRuleBtn = nullptr; 
     //ToolbarButton* m_compoRuleBtn= nullptr;
     ToolbarPopupButton* m_invBtn = nullptr;
-    ToolbarButton* m_verticalInvBtn= nullptr;
-    ToolbarButton* m_horizontalInvBtn= nullptr;
+    ToolbarToggleButton* m_verticalInvBtn= nullptr;
+    ToolbarToggleButton* m_horizontalInvBtn= nullptr;
     // ToolbarButton* m_abloopBtn = nullptr;
     // ToolbarPopupButton* m_multiviewBtn;
 
@@ -51,9 +51,11 @@ public slots:
     void enableButtons();
     void disableButtons();
     void updateRecordButtonUI();
+    void updateHFlipButtonUI();
+    void updateVFlipButtonUI();
 
 private slots:
-    void updateOverlayMode();
+    void updateOverlayMode(); 
 
 private:
     QComboBox* m_compoRuleComboBox;
@@ -68,6 +70,8 @@ signals:
     void moveTimeBackwardRequested();
     void moveTimeForwardRequested();
     void rotateRequested();
+    void horizontalFlipRequested();
+    void verticalFlipRequested();
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
 
 };

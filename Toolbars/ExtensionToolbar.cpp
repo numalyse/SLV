@@ -83,6 +83,11 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(m_recordBtn, &ToolbarToggleButton::stateActivated, this, &ExtensionToolbar::enableRecordRequested);
     connect(m_recordBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableRecordRequested);
 
+    m_verticalInvBtn = new ToolbarToggleButton(this, false, "invert_v_on_white", TextManager::instance().get("tooltip_flip_vertical"), "invert_v_white", TextManager::instance().get("tooltip_flip_vertical"));
+    m_horizontalInvBtn = new ToolbarToggleButton(this, false, "invert_h_on_white", TextManager::instance().get("tooltip_flip_horizontal"),  "invert_h_white", TextManager::instance().get("tooltip_flip_horizontal"));
+
+    connect(m_horizontalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::horizontalFlipRequested);
+    connect(m_verticalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::verticalFlipRequested);
 
     connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableSegmentationRequested);
 
@@ -126,8 +131,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
    
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
-    m_verticalInvBtn = new ToolbarButton(this, "invert_v_white", TextManager::instance().get("tooltip_flip_vertical"));
-    m_horizontalInvBtn = new ToolbarButton(this, "invert_h_white", TextManager::instance().get("tooltip_flip_horizontal"));
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
     m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", TextManager::instance().get("tooltip_flip_vertical"));
@@ -187,6 +190,16 @@ void ExtensionToolbar::setDefaultUI()
 void ExtensionToolbar::updateRecordButtonUI()
 {
     m_recordBtn->toggleUpdateIcon();
+}
+
+void ExtensionToolbar::updateHFlipButtonUI()
+{
+    m_horizontalInvBtn->toggleUpdateIcon();
+}
+
+void ExtensionToolbar::updateVFlipButtonUI()
+{
+    m_verticalInvBtn->toggleUpdateIcon();
 }
 
 void ExtensionToolbar::enableButtons()

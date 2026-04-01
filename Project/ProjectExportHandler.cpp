@@ -71,7 +71,6 @@ namespace ProjectExportHandler {
 
             if (progressCallback && totalShots > 0) {
                 int percent = static_cast<int>(((IShot + 1) * 100.0) / totalShots);
-
                 if (!progressCallback(percent)) {
                     file.close();
                     file.remove(); 
@@ -258,8 +257,34 @@ namespace ProjectExportHandler {
     }
 
 
-    bool exportToPPTX(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
+    /// @param type 
+    /// @param shots 
+    /// @param fps 
+    /// @param duration 
+    /// @param mediaPath 
+    /// @param dstPath 
+    /// @param progressCallback 
+    /// @return 
+    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
+        if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
+        QString pythonScriptPath;
+        cv::Size imgSize;
+
+        switch (type)
+        {
+        case ExportType::PPTX:
+            pythonScriptPath = "pyScripts/export_pptx.py";
+            imgSize = {800,800};
+            break;
+        case ExportType::DOCX:
+        default:
+            pythonScriptPath = "pyScripts/export_docx.py";
+            imgSize = {400,400};
+            break;
+        }
+
         // Dossier temp pour le json et les tag images
         QTemporaryDir tempDir;
         if (!tempDir.isValid()) return false;
@@ -268,7 +293,7 @@ namespace ProjectExportHandler {
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(10));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, imageQueue.get(), shots, nullptr, 
-            std::optional<int>(cv::COLOR_BGR2RGB), std::optional<cv::Size>({800, 800})
+            std::optional<int>(cv::COLOR_BGR2RGB), std::optional<cv::Size>(imgSize)
         );
 
         QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
@@ -290,8 +315,7 @@ namespace ProjectExportHandler {
                 }
 
                 if (progressCallback && totalShots > 0) { 
-                    // On va de 0 à 95% car c'est le plus long 
-                    int percent = static_cast<int>(((currentShot + 1) * 95.0) / totalShots);
+                    int percent = static_cast<int>(((currentShot + 1) * 95.0) / totalShots); // On va de 0 à 95% car c'est le plus long 
                     if (!progressCallback(percent)) {
                         decodeThread->requestInterruption();
                         return false;  
@@ -330,9 +354,9 @@ namespace ProjectExportHandler {
 
         QProcess pythonProcess;
         pythonProcess.setProcessChannelMode(QProcess::MergedChannels); // Pour lire les prints normaux et les erreurs
-        
-        // On passe le chemin du JSON en argument unique
-        pythonProcess.start("py", QStringList() << "pyScripts/export_pptx.py" << jsonFile.fileName());
+
+        // On passe le chemin du JSON
+        pythonProcess.start("py", QStringList() << pythonScriptPath << jsonFile.fileName());
 
         // Boucle d'attente active pour lire la progression en temps réel
         while (pythonProcess.waitForReadyRead(-1)) {

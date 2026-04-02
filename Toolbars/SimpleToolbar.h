@@ -30,7 +30,8 @@ public:
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
     TimeEdit* currentTimeLE() const { return m_timeEdit; }
-    QLabel* durationLabel() const { return m_durationLabel; }
+    QPushButton* durationBtn() const { return m_durationBtn; }
+    bool showRemainingTime() const { return m_showRemainingTime; }
     QLabel* nameLabel() const { return m_nameLabel; }
 
     ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
@@ -71,17 +72,27 @@ public slots:
     void setSubtitlesTrackDefault();
     void setAudioTrack(int index);
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
-    void setSubtitlesTrack(int index);    
+    void setSubtitlesTrack(int index);
+
+
 
 protected:
+    void createSlider();
+    void createTimeTotBtn();
+    void createTimeEdit();
+
+    void updateDurationText();
+
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
     double m_media_fps {};
+    int64_t m_media_duration {};
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
     TimeEdit* m_timeEdit = nullptr;
     bool m_editingTime = false;
-    QLabel* m_durationLabel = nullptr;
+    QPushButton* m_durationBtn; 
+    bool m_showRemainingTime = false;
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
 

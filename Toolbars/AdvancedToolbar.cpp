@@ -107,9 +107,11 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
         // TODO : set le temps du timecode modifiable
     }
 
-    QLabel* oldDurationLabel = toolbar->durationLabel();
-    if (oldDurationLabel && m_durationLabel) {
-        m_durationLabel->setText(oldDurationLabel->text());
+    QPushButton* oldDurationBtn = toolbar->durationBtn();
+    if (oldDurationBtn && m_durationBtn) {
+        m_durationBtn->setText(oldDurationBtn->text());
+        m_showRemainingTime = toolbar->showRemainingTime();
+
     }
 
     ToolbarToggleButton* oldPlayPause = toolbar->playPauseBtn();
@@ -162,7 +164,7 @@ void AdvancedToolbar::setDefaultUI()
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
     timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
     timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-    timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
+    timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);
 
     mainLayout->addWidget(m_slider);

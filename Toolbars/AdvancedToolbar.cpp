@@ -33,7 +33,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     m_extensionToolbar = new ExtensionToolbar(this);
 
-
+    
     
     connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, [this](){
         // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
@@ -101,9 +101,10 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
         m_slider->setValue(oldSlider->value());
     }
 
-    QLabel* oldTimeLabel = toolbar->currentTimeLabel();
-    if (oldTimeLabel && m_currentTimeLabel) {
-        m_currentTimeLabel->setText(oldTimeLabel->text());
+    TimeEdit* oldTimeLE = toolbar->currentTimeLE();
+    if (oldTimeLE && m_timeEdit) {
+        m_timeEdit->setText(oldTimeLE->text());
+        // TODO : set le temps du timecode modifiable
     }
 
     QLabel* oldDurationLabel = toolbar->durationLabel();
@@ -132,7 +133,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     }
 
     QLabel* oldNameLabel = toolbar->nameLabel();
-    if (oldTimeLabel && m_nameLabel) {
+    if (oldNameLabel && m_nameLabel) {
         m_nameLabel->setText(oldNameLabel->text());
     }
 
@@ -159,7 +160,7 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
+    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
     timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
     timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);

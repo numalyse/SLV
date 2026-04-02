@@ -1,23 +1,34 @@
 #include "NavPanel.h"
 #include <QLabel.h>
 #include "SignalManager.h"
+#include <QScrollArea>
 
 NavPanel::NavPanel(QWidget *parent)
     : QWidget{parent}
 {
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_mainLayout = new QHBoxLayout(this);
     m_mainLayout->setSpacing(0);
-
+    
     m_sideWidget = new QStackedWidget(this);
 
     m_playlistWidget = new Playlist(this);
     m_shotDetail = new ShotDetail(this);
-
     m_sideWidget->addWidget(m_playlistWidget); 
     m_sideWidget->addWidget(m_shotDetail);
-
     m_sideWidget->setCurrentWidget(m_playlistWidget);
-    m_mainLayout->addWidget(m_sideWidget);
+    
+    m_scrollArea = new QScrollArea(this);
+    m_scrollArea->setWidgetResizable(true);
+    m_scrollArea->setFrameShape(QFrame::NoFrame);
+
+    m_scrollArea->setWidget(m_sideWidget);
+    m_mainLayout->addWidget(m_scrollArea);
+
+    m_sideWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+
+    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     m_sideWidget->hide();
     setFixedWidth(0);
@@ -37,7 +48,11 @@ NavPanel::NavPanel(QWidget *parent)
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
 
     m_thumbnailWorker->start();
+    
+}
 
+void NavPanel::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
 }
 
 void NavPanel::showPanel()
@@ -105,3 +120,4 @@ void NavPanel::updateThumbnail(int imageId, QImage image){
         m_playlistWidget->updateThumbnail(imageId, image);
     }
 }
+

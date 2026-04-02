@@ -2,6 +2,7 @@
 #define SIMPLETOOLBAR_H 
 
 #include "Toolbars/Toolbar.h"
+#include "Toolbars/TimeEdit.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -28,8 +29,9 @@ public:
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
-    QLabel* currentTimeLabel() const { return m_currentTimeLabel; }
-    QLabel* durationLabel() const { return m_durationLabel; }
+    TimeEdit* currentTimeLE() const { return m_timeEdit; }
+    QPushButton* durationBtn() const { return m_durationBtn; }
+    bool showRemainingTime() const { return m_showRemainingTime; }
     QLabel* nameLabel() const { return m_nameLabel; }
 
     ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
@@ -71,15 +73,26 @@ public slots:
     void setAudioTrack(int index);
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
     void setSubtitlesTrack(int index);
-    
+
+
+
 protected:
+    void createSlider();
+    void createTimeTotBtn();
+    void createTimeEdit();
+
+    void updateDurationText();
+
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
     double m_media_fps {};
+    int64_t m_media_duration {};
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
-    QLabel* m_currentTimeLabel = nullptr;
-    QLabel* m_durationLabel = nullptr;
+    TimeEdit* m_timeEdit = nullptr;
+    bool m_editingTime = false;
+    QPushButton* m_durationBtn; 
+    bool m_showRemainingTime = false;
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
 

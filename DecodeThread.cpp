@@ -51,7 +51,7 @@ void DecodeThread::decodeTagImages(){
 
     if (!cap.isOpened()) {
         qCritical() << "Impossible de lire la video pour segmenter";
-		p_imageQueue->waitPush({{}, true}); // envoie un stop pour que debloquer le thread qui lit
+		p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
         return;
     }
 
@@ -80,10 +80,10 @@ void DecodeThread::decodeTagImages(){
             convertImage(processedFrame);
         }
 
-        p_imageQueue->waitPush({processedFrame.clone(), false});
+        p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false});
     }
 
-    p_imageQueue->waitPush({{}, true});
+    p_imageQueue->waitPush({{}, -1, true});
     return;
 }
 
@@ -93,7 +93,7 @@ void DecodeThread::decodeMedia(){
 
     if (!cap.isOpened()) {
         qCritical() << "Impossible de lire la video pour segmenter";
-		p_imageQueue->waitPush({{}, true}); // envoie un stop pour que debloquer le thread qui lit
+		p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
         return;
     }
 
@@ -119,10 +119,10 @@ void DecodeThread::decodeMedia(){
             convertImage(processedFrame);
         }
 
-        p_imageQueue->waitPush({processedFrame.clone(), false});
+        p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false});
     }
     
-    p_imageQueue->waitPush({{}, true});
+    p_imageQueue->waitPush({{}, -1, true});
     return;
 
 }

@@ -1,4 +1,5 @@
 #include "Playlist.h"
+#include "TextManager.h"
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
@@ -32,17 +33,25 @@ Playlist::Playlist(QWidget *parent)
     : QWidget{parent}
 {
     setAcceptDrops(true);
-    m_mainLayout = new QVBoxLayout(this);
+    m_mainLayout = new QVBoxLayout();
+    this->setLayout(m_mainLayout);
+
     QHBoxLayout *playlistLabelLayout = new QHBoxLayout();
+    m_mainLayout->addLayout(playlistLabelLayout);
+    
     QLabel *playlistLabel = new QLabel();
     playlistLabel->setTextFormat(Qt::RichText);
     playlistLabel->setText("<b>Playlist</b>");
     playlistLabelLayout->addWidget(playlistLabel); //ajouter les boutons random et loop peut-être
-    m_mainLayout->addLayout(playlistLabelLayout);
+
+
     m_addItemBtn = new QPushButton("+");
+    m_addItemBtn->setFixedSize(24,24);
+    playlistLabelLayout->addWidget(m_addItemBtn);
+
     m_itemsLayout = new QVBoxLayout();
     m_mainLayout->addLayout(m_itemsLayout);
-    m_mainLayout->addWidget(m_addItemBtn);
+    //m_mainLayout->addWidget(m_addItemBtn);
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &QPushButton::clicked, this, &Playlist::addItemDialog);
@@ -56,6 +65,12 @@ void Playlist::updateThumbnail(int playlistItemId, QImage image)
     auto* item = m_items[playlistItemId];
     item->setThumbnail(image);
 
+}
+
+void Playlist::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    qDebug() << "Playlist height : " << this->height();
 }
 
 void Playlist::dragEnterEvent(QDragEnterEvent *event){
@@ -119,7 +134,7 @@ void Playlist::dropEvent(QDropEvent *event)
 
 void Playlist::addItemDialog()
 {
-    QStringList filesPaths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    QStringList filesPaths = QFileDialog::getOpenFileNames(this, TextManager::instance().get("open_files"), "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
     if(filesPaths.empty()){
         qDebug() << "PLAYLIST - Pas de fichier sélectionné";
         return;
@@ -136,7 +151,8 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         newItem->setIndex(m_items.size());
         m_items.append(newItem);
         m_itemsLayout->addWidget(newItem);
-
+        this->adjustSize();
+        this->updateGeometry();
         
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
@@ -213,5 +229,8 @@ void Playlist::updateLayout()
 
     for (auto *item : m_items) {
         m_itemsLayout->addWidget(item);
+        
     }
+
+    this->updateGeometry();
 }

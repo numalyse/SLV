@@ -14,31 +14,15 @@
 #include <QComboBox>
 #include "SimpleToolbar.h"
 #include <QGraphicsDropShadowEffect>
+#include <QPushButton>
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
-    m_currentTimeLabel = new QLabel("00:00:00", this);
-    m_durationLabel = new QLabel("00:00:00", this);
+    createTimeEdit();
     m_nameLabel = new QLabel("", this);
+    createTimeTotBtn();
 
-    m_slider = new QSlider(Qt::Horizontal, this);
-    m_slider->setRange(0,0);
-    m_slider->setValue(0);
-
-    m_seekTimer = new QTimer(this);
-    m_seekTimer->setSingleShot(true);
-
-    connect(m_slider, &QSlider::sliderPressed, this, &SimpleToolbar::onSliderPressed);
-
-    connect(m_slider, &QSlider::sliderReleased, this, &SimpleToolbar::onSliderReleased);
-
-    connect(m_slider, &QSlider::sliderMoved, this, &SimpleToolbar::onSliderMoved);
-
-    connect(m_seekTimer, &QTimer::timeout, this, [this](){
-        emit setPositionRequested(m_slider->value());
-    });
-
-    // QHBoxLayout* buttonLayout =  new QHBoxLayout();
+    createSlider();
 
     QVBoxLayout* volumeFrameLayout = new QVBoxLayout();
 
@@ -166,9 +150,9 @@ void SimpleToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
+    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
     timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-    timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
+    timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);
 
     mainLayout->addWidget(m_slider);
@@ -202,15 +186,15 @@ void SimpleToolbar::setDefaultUI()
 
 void SimpleToolbar::resetSlider()
 {
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(0,1));
-    m_durationLabel->setText(TimeFormatter::msToHHMMSSFF(0,1));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(0,1));
+    m_durationBtn->setText(TimeFormatter::msToHHMMSSFF(0,1));
     m_slider->setRange(0,0);
     m_slider->setValue(0);
 }
 
 void SimpleToolbar::stopSlider()
 {
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(0,m_media_fps));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(0,m_media_fps));
     m_slider->setValue(0);
 }
 
@@ -225,8 +209,8 @@ void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
     }else {
         m_slider->setMaximum(mediaDuration);
     }
-    m_durationLabel->setText(TimeFormatter::msToHHMMSSFF(mediaDuration, m_media_fps));
-
+    m_media_duration = mediaDuration;
+    updateDurationText();
 
 }
 
@@ -242,8 +226,10 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
     }
 
     m_slider->setValue(currentTime);
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
 
+    if( !m_editingTime ) m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
+    if ( m_showRemainingTime ) updateDurationText();
+    
 }
 
 void SimpleToolbar::updateFps(double newFps){
@@ -279,6 +265,8 @@ void SimpleToolbar::ejectUiUpdate()
 {
     m_discardVlcUiUpdates = true;
     m_nameLabel->setText("");
+    m_media_duration = 0;
+    updateDurationText();
     resetSlider();
     pauseUiUpdate();
 }
@@ -362,7 +350,8 @@ void SimpleToolbar::disableButtons()
 
 void SimpleToolbar::onSliderPressed() {
     m_draggingSlider = true;
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
+    updateDurationText();
 }
 
 void SimpleToolbar::onSliderReleased() {
@@ -372,7 +361,8 @@ void SimpleToolbar::onSliderReleased() {
 }
 
 void SimpleToolbar::onSliderMoved(int value) {
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(value, m_media_fps));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(value, m_media_fps));
+    updateDurationText();
     if (!m_seekTimer->isActive()) {
         m_seekTimer->start(m_seekPendingTime);
     }
@@ -449,4 +439,85 @@ void SimpleToolbar::setSubtitlesTrack(int index){
     qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
     emit setSubtitlesTrackRequested(trackNumber);
     
+}
+
+void SimpleToolbar::createTimeEdit(){
+    m_timeEdit = new TimeEdit("00:00:00.00", this);
+    m_timeEdit->setFixedWidth(75);
+    connect(m_timeEdit, &TimeEdit::focusIn, this, [this](){
+        emit pauseRequest();  
+        m_editingTime = true;
+    });
+
+    connect(m_timeEdit, &TimeEdit::focusOut, this, [this](){
+        m_editingTime = false;
+    });
+
+    connect(m_timeEdit, &QLineEdit::textEdited, this, [this](){
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
+    });
+
+    connect(m_timeEdit, &QLineEdit::returnPressed, [this]() {
+        m_timeEdit->clearFocus(); 
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
+    });
+}
+
+void SimpleToolbar::createSlider(){
+    m_slider = new QSlider(Qt::Horizontal, this);
+    m_slider->setRange(0,0);
+    m_slider->setValue(0);
+
+    m_seekTimer = new QTimer(this);
+    m_seekTimer->setSingleShot(true);
+
+    connect(m_slider, &QSlider::sliderPressed, this, &SimpleToolbar::onSliderPressed);
+
+    connect(m_slider, &QSlider::sliderReleased, this, &SimpleToolbar::onSliderReleased);
+
+    connect(m_slider, &QSlider::sliderMoved, this, &SimpleToolbar::onSliderMoved);
+
+    connect(m_seekTimer, &QTimer::timeout, this, [this](){
+        emit setPositionRequested(m_slider->value());
+    });
+}
+
+
+void SimpleToolbar::createTimeTotBtn()
+{
+    auto& txtManager = TextManager::instance();
+
+    m_durationBtn = new QPushButton("00:00:00.00", this);
+    m_durationBtn->setCheckable(true);
+    m_durationBtn->setChecked(false);
+    m_durationBtn->setToolTip(txtManager.get("tooltip_time_total_btn"));
+    m_durationBtn->setFont(m_timeEdit->font());
+    m_durationBtn->setObjectName("durationToggleBtn");
+    
+    m_durationBtn->setFlat(true); 
+
+    connect(m_durationBtn, &QPushButton::toggled, this, [this](bool checked) {
+        m_showRemainingTime = checked;
+        auto& txtManager = TextManager::instance();
+        if (checked) {
+            m_durationBtn->setToolTip(txtManager.get("tooltip_time_remaining_btn"));
+        } else {
+            m_durationBtn->setToolTip(txtManager.get("tooltip_time_total_btn"));
+        }
+        
+        updateDurationText(); 
+    });
+}
+
+void SimpleToolbar::updateDurationText()
+{
+    if (!m_durationBtn) return;
+
+    if (m_showRemainingTime) {
+        int64_t remaining = m_media_duration - m_slider->value();
+        if (remaining < 0) remaining = 0;
+        m_durationBtn->setText("-" + TimeFormatter::msToHHMMSSFF(remaining, m_media_fps));
+    } else {
+        m_durationBtn->setText(TimeFormatter::msToHHMMSSFF(m_media_duration, m_media_fps));
+    }
 }

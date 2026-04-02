@@ -40,6 +40,8 @@ public slots:
     void openNavPanel();
     void closeNavPanel();
 
+    void resizeEvent(QResizeEvent *event);
+
     void setGlobalPlayState(bool);
     void setGlobalMuteState(bool);
 

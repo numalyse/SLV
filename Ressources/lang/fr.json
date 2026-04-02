@@ -86,5 +86,7 @@
     "no_audio" : "Pas de piste audio",
     "no_subtitles" : "Pas de piste de sous-titres",
 
-    "open_files" : "Ouvrir des fichiers multimédia"
+    "open_files" : "Ouvrir des fichiers multimédia",
+
+    "duration" : "Durée"
 }

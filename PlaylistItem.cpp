@@ -1,6 +1,7 @@
 #include "PlaylistItem.h"
 #include "TextManager.h"
 #include <qevent.h>
+#include <QBuffer>
 
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     : QWidget{parent}
@@ -29,6 +30,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     infoLayout->setSpacing(2);
 
     m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
+    m_mediaTitleLabel->setToolTip(m_mediaData->fileName()+"."+m_mediaData->fileExtension());
     //m_mediaTitleLabel->setWordWrap(true);
     m_mediaTitleLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     infoLayout->addWidget(m_mediaTitleLabel);
@@ -43,17 +45,20 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     metaLayout->addWidget(m_mediaTypeIcon);
     metaLayout->addWidget(m_mediaDurationLabel);
-    metaLayout->addStretch();
+    //metaLayout->addStretch();
 
     infoLayout->addLayout(metaLayout);
 
     mainLayout->addLayout(infoLayout);
-    mainLayout->addStretch();
+    //mainLayout->setSpacing(2);
+    mainLayout->addSpacing(10);
+    //mainLayout->addStretch();
 
     // bouton delete
     m_deleteBtn = new QPushButton("✕");
     m_deleteBtn->setFixedSize(24,24);
     mainLayout->addWidget(m_deleteBtn);
+    mainLayout->addSpacing(10);
 
     initStyle();
     connect(m_mediaData, &Media::durationParsed, this, &PlaylistItem::setDurationLabel);
@@ -66,14 +71,16 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 void PlaylistItem::setDurationLabel()
 {
     QString time = TimeFormatter::msToHHMMSSFF(m_mediaData->duration(), 1);
-    m_mediaDurationLabel->setText(time);
+    QString timeChopped = time.left(time.length() - 3);
+    m_mediaDurationLabel->setText(timeChopped);
+    m_mediaDurationLabel->setToolTip(TextManager::instance().get("duration") + " : " + time);
     emit updateImageRequested(m_itemIndex, m_mediaData->duration()/2, 0, m_mediaData->filePath(), m_thumbnailSize);
 }
 
 void PlaylistItem::setIndex(int index)
 {
     m_itemIndex = index;
-    m_indexLabel->setText(QString::number(m_itemIndex));
+    m_indexLabel->setText(QString::number(m_itemIndex+1));
 }
 
 void PlaylistItem::computeThumbnail()
@@ -156,8 +163,17 @@ void PlaylistItem::initStyle()
     setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
     m_indexLabel->setMaximumWidth(15);
     m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
-    m_deleteBtn->setStyleSheet("background: tomato");
+    //m_deleteBtn->setStyleSheet("background: tomato");
     m_deleteBtn->setMaximumWidth(20);
+    m_deleteBtn->setStyleSheet("QPushButton{"
+        "   background-color: rgba(0,0,0,0);"
+        "   border: none;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: tomato;"
+        "   border: 1px solid palette(button);"
+        "   border-radius: 4px;"
+        "}");
 }
 
 void PlaylistItem::setThumbnail(QImage image)

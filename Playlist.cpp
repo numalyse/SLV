@@ -1,4 +1,5 @@
 #include "Playlist.h"
+#include "./ToolbarButtons/ToolbarButton.h"
 #include "TextManager.h"
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -45,8 +46,9 @@ Playlist::Playlist(QWidget *parent)
     playlistLabelLayout->addWidget(playlistLabel); //ajouter les boutons random et loop peut-être
 
 
-    m_addItemBtn = new QPushButton("+");
-    m_addItemBtn->setFixedSize(24,24);
+    //m_addItemBtn = new QPushButton("+");
+    m_addItemBtn = new ToolbarButton(this, "plus_white", "tooltip_add_item_playlist");
+    //m_addItemBtn->setFixedSize(24,24);
     playlistLabelLayout->addWidget(m_addItemBtn);
 
     m_itemsLayout = new QVBoxLayout();
@@ -54,7 +56,7 @@ Playlist::Playlist(QWidget *parent)
     //m_mainLayout->addWidget(m_addItemBtn);
     m_mainLayout->addStretch();
 
-    connect(m_addItemBtn, &QPushButton::clicked, this, &Playlist::addItemDialog);
+    connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
 
 }
 

@@ -85,5 +85,7 @@
     "no_audio" : "No audio track",
     "no_subtitles" : "No subtitle track",
 
-    "open_files" : "Open files"
+    "open_files" : "Open files",
+
+    "duration" : "Duration"
 }

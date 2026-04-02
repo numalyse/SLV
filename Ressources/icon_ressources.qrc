@@ -128,5 +128,6 @@
         <file alias="invert_h_on">icons/vertical_symmetry_on.png</file>
         <file alias="invert_h_on_white">icons/vertical_symmetry_on_white.png</file>
         <file alias="check">icons/check.png</file>
+        <file alias="check_white">icons/check_white.png</file>
     </qresource>
 </RCC>

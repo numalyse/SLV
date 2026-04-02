@@ -214,7 +214,7 @@ void MainWindow::openMediaAction()
 
 void MainWindow::selectAndLoadMediaFiles()
 {
-    QStringList files_paths = QFileDialog::getOpenFileNames(this, "Ouvrir des fichiers multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    QStringList files_paths = QFileDialog::getOpenFileNames(this, TextManager::instance().get("open_files"), "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
     
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";

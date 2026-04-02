@@ -14,6 +14,8 @@ public:
     explicit Playlist(QWidget *parent = nullptr);
     void updateThumbnail(int playlistItemId, QImage image);
 
+    void resizeEvent(QResizeEvent *event);
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;

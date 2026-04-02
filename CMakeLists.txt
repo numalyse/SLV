@@ -56,7 +56,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ToolbarButtons/ToolbarPopupButton.h ToolbarButtons/ToolbarPopupButton.cpp
         ToolbarButtons/ToolbarToggleHoverButton.h ToolbarButtons/ToolbarToggleHoverButton.cpp
 
-        TextManager.h TextManager.cpp
+        PrefManager.h PrefManager.cpp
         TimeFormatter.h
         VlcParseHelper.h
         VlcInstance.h

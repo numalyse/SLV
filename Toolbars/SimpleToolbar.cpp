@@ -1,5 +1,5 @@
 #include "Toolbars/SimpleToolbar.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 #include "TimeFormatter.h"
 #include "SignalManager.h"
 
@@ -43,9 +43,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         volumeFrameLayout,
         false,
         "sound_off_white",
-        TextManager::instance().get("tooltip_sound_on"),
+        PrefManager::instance().getText("tooltip_sound_on"),
         "sound_on_white",
-        TextManager::instance().get("tooltip_sound_off")
+        PrefManager::instance().getText("tooltip_sound_off")
     );
     m_muteBtn->setEnabled(true);
     
@@ -72,15 +72,15 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     speedFrameLayout->addWidget(speedSlider);
 
-    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  TextManager::instance().get("tooltip_speed"), "speed_white", TextManager::instance().get("tooltip_speed"));
+    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  PrefManager::instance().getText("tooltip_speed"), "speed_white", PrefManager::instance().getText("tooltip_speed"));
 
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
         "loop_on.png",
-        TextManager::instance().get("tooltip_loop_on"),
+        PrefManager::instance().getText("tooltip_loop_on"),
         "loop_off_white",
-        TextManager::instance().get("tooltip_loop_off")
+        PrefManager::instance().getText("tooltip_loop_off")
     );
 
     // Languages/Subtitles Popup display
@@ -91,7 +91,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     langLayout->addLayout(audioLangLayout);
     QLabel* audioLangLabel = new QLabel();
     audioLangLabel->setStyleSheet("border:none;");
-    audioLangLabel->setText(TextManager::instance().get("languages"));
+    audioLangLabel->setText(PrefManager::instance().getText("languages"));
 
     m_audioLangComboBox = new QComboBox(this);
     audioLangLayout->addWidget(audioLangLabel);
@@ -104,17 +104,17 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     langLayout->addLayout(subLangLayout);
     QLabel* subLangLabel = new QLabel();
     subLangLabel->setStyleSheet("border:none;");
-    subLangLabel->setText(TextManager::instance().get("subtitles"));
+    subLangLabel->setText(PrefManager::instance().getText("subtitles"));
 
     m_subLangComboBox = new QComboBox(this);
     subLangLayout->addWidget(subLangLabel);
     subLangLayout->addWidget(m_subLangComboBox);
     connect(m_subLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SimpleToolbar::setSubtitlesTrack);
 
-    m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", TextManager::instance().get("tooltip_lang"));
+    m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", PrefManager::instance().getText("tooltip_lang"));
 
-    m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", TextManager::instance().get("tooltip_delete_player"));
-    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", TextManager::instance().get("tooltip_duplicate_player"));
+    m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", PrefManager::instance().getText("tooltip_delete_player"));
+    m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", PrefManager::instance().getText("tooltip_duplicate_player"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerAction);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
@@ -378,7 +378,7 @@ void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
 
     if (tracks.isEmpty()) {
         //qDebug() << "[SIMPLETOOLBAR] No languages available";
-        m_audioLangComboBox->addItem(TextManager::instance().get("no_audio"));
+        m_audioLangComboBox->addItem(PrefManager::instance().getText("no_audio"));
     }
     
     for (const auto& track : tracks) {
@@ -393,7 +393,7 @@ void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& trac
 
     if (tracks.isEmpty()) {
         //qDebug() << "[SIMPLETOOLBAR] No subtitles available";
-        m_subLangComboBox->addItem(TextManager::instance().get("no_subtitles"));
+        m_subLangComboBox->addItem(PrefManager::instance().getText("no_subtitles"));
     }
     
     for (const auto& track : tracks) {
@@ -485,12 +485,12 @@ void SimpleToolbar::createSlider(){
 
 void SimpleToolbar::createTimeTotBtn()
 {
-    auto& txtManager = TextManager::instance();
+    auto& txtManager = PrefManager::instance();
 
     m_durationBtn = new QPushButton("00:00:00.00", this);
     m_durationBtn->setCheckable(true);
     m_durationBtn->setChecked(false);
-    m_durationBtn->setToolTip(txtManager.get("tooltip_time_total_btn"));
+    m_durationBtn->setToolTip(txtManager.getText("tooltip_time_total_btn"));
     m_durationBtn->setFont(m_timeEdit->font());
     m_durationBtn->setObjectName("durationToggleBtn");
     
@@ -498,11 +498,11 @@ void SimpleToolbar::createTimeTotBtn()
 
     connect(m_durationBtn, &QPushButton::toggled, this, [this](bool checked) {
         m_showRemainingTime = checked;
-        auto& txtManager = TextManager::instance();
+        auto& txtManager = PrefManager::instance();
         if (checked) {
-            m_durationBtn->setToolTip(txtManager.get("tooltip_time_remaining_btn"));
+            m_durationBtn->setToolTip(txtManager.getText("tooltip_time_remaining_btn"));
         } else {
-            m_durationBtn->setToolTip(txtManager.get("tooltip_time_total_btn"));
+            m_durationBtn->setToolTip(txtManager.getText("tooltip_time_total_btn"));
         }
         
         updateDurationText(); 

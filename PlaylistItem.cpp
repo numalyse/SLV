@@ -1,5 +1,5 @@
 #include "PlaylistItem.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 #include <qevent.h>
 
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
@@ -20,7 +20,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     // thumbnail
     m_mediaThumbnailLabel = new QLabel();
     m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
-    m_mediaThumbnailLabel->setText(TextManager::instance().get("No preview"));
+    m_mediaThumbnailLabel->setText(PrefManager::instance().getText("No preview"));
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
 

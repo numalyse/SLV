@@ -1,7 +1,7 @@
 #include "Toolbars/ExtensionToolbar.h"
 #include "Project/ProjectManager.h"
 
-#include "TextManager.h"
+#include "PrefManager.h"
 #include <QHBoxLayout>
 #include <SignalManager.h>
 #include <qframe.h>
@@ -19,35 +19,35 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         this, 
         false,
         "zoom_white",
-        TextManager::instance().get("tooltip_zoom_on"),
+        PrefManager::instance().getText("tooltip_zoom_on"),
         "zoom_white",
-        TextManager::instance().get("tooltip_zoom_off")
+        PrefManager::instance().getText("tooltip_zoom_off")
     );
 
     m_hideImgBtn = new ToolbarToggleButton(
         this, 
         false,
         "hide_image_white",
-        TextManager::instance().get("tooltip_hide_image"),
+        PrefManager::instance().getText("tooltip_hide_image"),
         "show_image_white",
-        TextManager::instance().get("tooltip_show_image")
+        PrefManager::instance().getText("tooltip_show_image")
     );
 
-    m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", TextManager::instance().get("tooltip_prev_frame"));
-    m_nextFrameBtn = new ToolbarButton(this, "next_frame_white", TextManager::instance().get("tooltip_next_frame"));
+    m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", PrefManager::instance().getText("tooltip_prev_frame"));
+    m_nextFrameBtn = new ToolbarButton(this, "next_frame_white", PrefManager::instance().getText("tooltip_next_frame"));
     
-    m_backwardBtn = new ToolbarButton(this, "backward_white", TextManager::instance().get("tooltip_backward"));
-    m_forwardBtn = new ToolbarButton(this, "forward_white", TextManager::instance().get("tooltip_forward"));
+    m_backwardBtn = new ToolbarButton(this, "backward_white", PrefManager::instance().getText("tooltip_backward"));
+    m_forwardBtn = new ToolbarButton(this, "forward_white", PrefManager::instance().getText("tooltip_forward"));
     
-    m_rotateBtn = new ToolbarButton(this, "rotate_white", TextManager::instance().get("tooltip_rotate"));
+    m_rotateBtn = new ToolbarButton(this, "rotate_white", PrefManager::instance().getText("tooltip_rotate"));
 
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
         "record_on.png",
-        TextManager::instance().get("tooltip_record_on"),
+        PrefManager::instance().getText("tooltip_record_on"),
         "record_off_white",
-        TextManager::instance().get("tooltip_record_off")
+        PrefManager::instance().getText("tooltip_record_off")
         );
     m_recordBtn->setIconSize(QSize(30, 30));
 
@@ -55,9 +55,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         this, 
         false,
         "timeline_on_white",
-        TextManager::instance().get("tooltip_segmentation_on"),
+        PrefManager::instance().getText("tooltip_segmentation_on"),
         "timeline_off_white",
-        TextManager::instance().get("tooltip_segmentation_off")
+        PrefManager::instance().getText("tooltip_segmentation_off")
     );
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
@@ -83,8 +83,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(m_recordBtn, &ToolbarToggleButton::stateActivated, this, &ExtensionToolbar::enableRecordRequested);
     connect(m_recordBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableRecordRequested);
 
-    m_verticalInvBtn = new ToolbarToggleButton(this, false, "invert_v_on_white", TextManager::instance().get("tooltip_flip_vertical"), "invert_v_white", TextManager::instance().get("tooltip_flip_vertical"));
-    m_horizontalInvBtn = new ToolbarToggleButton(this, false, "invert_h_on_white", TextManager::instance().get("tooltip_flip_horizontal"),  "invert_h_white", TextManager::instance().get("tooltip_flip_horizontal"));
+    m_verticalInvBtn = new ToolbarToggleButton(this, false, "invert_v_on_white", PrefManager::instance().getText("tooltip_flip_vertical"), "invert_v_white", PrefManager::instance().getText("tooltip_flip_vertical"));
+    m_horizontalInvBtn = new ToolbarToggleButton(this, false, "invert_h_on_white", PrefManager::instance().getText("tooltip_flip_horizontal"),  "invert_h_white", PrefManager::instance().getText("tooltip_flip_horizontal"));
 
     connect(m_horizontalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::horizontalFlipRequested);
     connect(m_verticalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::verticalFlipRequested);
@@ -101,12 +101,12 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     QHBoxLayout* compoRuleLayout = new QHBoxLayout();
 
     m_compoRuleComboBox = new QComboBox(this);
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_None"), QVariant::fromValue(OverlayMode::None));
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_RuleOfThirds"), QVariant::fromValue(OverlayMode::RuleOfThirds));
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_CenterCross"), QVariant::fromValue(OverlayMode::CenterCross));
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_Diagonals"), QVariant::fromValue(OverlayMode::Diagonals));
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_L_Shape"), QVariant::fromValue(OverlayMode::L_Shape));
-    m_compoRuleComboBox->addItem(TextManager::instance().get("compo_rule_GoldenRatio"), QVariant::fromValue(OverlayMode::GoldenRatio));
+    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_None"), QVariant::fromValue(OverlayMode::None));
+    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_RuleOfThirds"), QVariant::fromValue(OverlayMode::RuleOfThirds));
+    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_CenterCross"), QVariant::fromValue(OverlayMode::CenterCross));
+    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_Diagonals"), QVariant::fromValue(OverlayMode::Diagonals));
+    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_L_Shape"), QVariant::fromValue(OverlayMode::L_Shape));
+    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_GoldenRatio"), QVariant::fromValue(OverlayMode::GoldenRatio));
 
     connect(m_compoRuleComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExtensionToolbar::updateOverlayMode);
 
@@ -118,8 +118,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_compoRuleCheckboxHFlip->setIcon(QIcon(":/icons/invert_h_white"));
     m_compoRuleCheckboxVFlip->setIconSize(QSize(20, 20));
     m_compoRuleCheckboxHFlip->setIconSize(QSize(20, 20));
-    m_compoRuleCheckboxHFlip->setToolTip(TextManager::instance().get("tooltip_compo_rule_VFlip"));
-    m_compoRuleCheckboxVFlip->setToolTip(TextManager::instance().get("tooltip_compo_rule_HFlip"));
+    m_compoRuleCheckboxHFlip->setToolTip(PrefManager::instance().getText("tooltip_compo_rule_VFlip"));
+    m_compoRuleCheckboxVFlip->setToolTip(PrefManager::instance().getText("tooltip_compo_rule_HFlip"));
 
     connect(m_compoRuleCheckboxVFlip, &QCheckBox::toggled, this, &ExtensionToolbar::updateOverlayMode);
     connect(m_compoRuleCheckboxHFlip, &QCheckBox::toggled, this, &ExtensionToolbar::updateOverlayMode);
@@ -127,13 +127,13 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     compoRuleLayout->addWidget(m_compoRuleCheckboxVFlip);
     compoRuleLayout->addWidget(m_compoRuleCheckboxHFlip);
 
-    m_compoRuleBtn = new ToolbarPopupButton(this, compoRuleLayout, "compo_rule_white", TextManager::instance().get("tooltip_composition"));
+    m_compoRuleBtn = new ToolbarPopupButton(this, compoRuleLayout, "compo_rule_white", PrefManager::instance().getText("tooltip_composition"));
    
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
-    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", TextManager::instance().get("tooltip_flip_vertical"));
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip_vertical"));
     
     setDefaultUI();
     disableButtons();

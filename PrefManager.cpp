@@ -1,4 +1,4 @@
-#include "TextManager.h"
+#include "PrefManager.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -6,7 +6,7 @@
 
 /// @brief Charge le JSON de la langue choisie
 /// @param langCode "fr", "en"
-void TextManager::loadLanguage(const QString& langCode) 
+void PrefManager::loadLanguage(const QString& langCode) 
 {
     QString filePath = ":/lang/" + langCode + ".json";
     QFile file(filePath);
@@ -24,7 +24,7 @@ void TextManager::loadLanguage(const QString& langCode)
 /// @brief Retrouve la valeur associée à la clé
 /// @param key QString
 /// @return QString. Si la valeur associée à la clé est trouvée, retourne la valeur, sinon retourne la clé.
-QString TextManager::get(const QString &key) const
+QString PrefManager::getText(const QString &key) const
 {
     if (m_texts.contains(key)) {
         return m_texts[key].toString();

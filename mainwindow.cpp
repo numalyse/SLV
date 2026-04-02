@@ -3,7 +3,7 @@
 #include "GlobalPlayerManager.h"
 #include "Project/ProjectManager.h"
 #include "PlayerWidget.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 #include "GenericDialog.h"
 
 #include <qtoolbar.h>
@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     // qDebug() << QFile::exists("../icon/numal_logo.ico");
 
     // TODO : stocker la langue que l'utilisateur choisie dans le preference manager ect.
-    TextManager::instance().loadLanguage("fr");
+    PrefManager::instance().loadLanguage("fr");
 
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);
@@ -132,9 +132,9 @@ void MainWindow::createToolBar()
         m_toolbarQt,
         false,
         "nav_panel_menu_open_white",
-        TextManager::instance().get("tooltip_nav_panel_open"),
+        PrefManager::instance().getText("tooltip_nav_panel_open"),
         "nav_panel_menu_closed_white",
-        TextManager::instance().get("tooltip_nav_panel_close")
+        PrefManager::instance().getText("tooltip_nav_panel_close")
     );
     m_navPanelBtn->setFixedSize(30, 30);
     m_navPanelBtn->setIconSize(QSize(20, 20));
@@ -161,13 +161,13 @@ void MainWindow::createToolBar()
 void MainWindow::openProjectAction()
 {
     ProjectManager& projManager = ProjectManager::instance();
-    TextManager& txtManager = TextManager::instance();
+    PrefManager& txtManager = PrefManager::instance();
 
     if(projManager.needSave()){
         SLV::showGenericDialog(
             this, 
-            txtManager.get("dialog_save_project_dialog_title"),
-            txtManager.get("dialog_save_project_dialog_text"),
+            txtManager.getText("dialog_save_project_dialog_title"),
+            txtManager.getText("dialog_save_project_dialog_text"),
             
             [&projManager]() { 
                 projManager.saveProject(false); 
@@ -188,13 +188,13 @@ void MainWindow::openProjectAction()
 void MainWindow::openMediaAction()
 {
     ProjectManager& projManager = ProjectManager::instance();
-    TextManager& txtManager = TextManager::instance();
+    PrefManager& txtManager = PrefManager::instance();
 
     if(projManager.projet() && projManager.needSave()){
         SLV::showGenericDialog(
             this, 
-            txtManager.get("dialog_save_project_dialog_title"),
-            txtManager.get("dialog_save_project_dialog_text"),
+            txtManager.getText("dialog_save_project_dialog_title"),
+            txtManager.getText("dialog_save_project_dialog_text"),
             
             [this, &projManager]() { 
                 projManager.saveProject(false); 
@@ -214,7 +214,7 @@ void MainWindow::openMediaAction()
 
 void MainWindow::selectAndLoadMediaFiles()
 {
-    QStringList files_paths = QFileDialog::getOpenFileNames(this, TextManager::instance().get("open_files"), "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    QStringList files_paths = QFileDialog::getOpenFileNames(this, PrefManager::instance().getText("open_files"), "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
     
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";
@@ -275,41 +275,41 @@ void MainWindow::createViewGridBtn()
 {
     QHBoxLayout *viewLayout = new QHBoxLayout();
 
-    m_view1 = new ToolbarButton(nullptr, "view_1_white", TextManager::instance().get("tooltip_view_1"));
+    m_view1 = new ToolbarButton(nullptr, "view_1_white", PrefManager::instance().getText("tooltip_view_1"));
     viewLayout->addWidget(m_view1);
 
     QHBoxLayout *view2Layout = new QHBoxLayout();
-    m_view2H = new ToolbarButton(nullptr, "view_2_h_white", TextManager::instance().get("tooltip_view_2_h"));
-    m_view2V = new ToolbarButton(nullptr, "view_2_v_white", TextManager::instance().get("tooltip_view_2_v"));
+    m_view2H = new ToolbarButton(nullptr, "view_2_h_white", PrefManager::instance().getText("tooltip_view_2_h"));
+    m_view2V = new ToolbarButton(nullptr, "view_2_v_white", PrefManager::instance().getText("tooltip_view_2_v"));
     view2Layout->addWidget(m_view2H);
     view2Layout->addWidget(m_view2V);
-    m_view2 = new ToolbarToggleHoverButton(nullptr, view2Layout, false, "view_2_h_white", TextManager::instance().get("tooltip_view_2"), "view_2_h_white", TextManager::instance().get("tooltip_view_2"));
+    m_view2 = new ToolbarToggleHoverButton(nullptr, view2Layout, false, "view_2_h_white", PrefManager::instance().getText("tooltip_view_2"), "view_2_h_white", PrefManager::instance().getText("tooltip_view_2"));
     m_view2->setOnTop(false);
     m_view2->setToolTip("");
     viewLayout->addWidget(m_view2);
 
     QGridLayout *view3Layout = new QGridLayout();
-    m_view3HAlign = new ToolbarButton(nullptr, "view_3_h_white", TextManager::instance().get("tooltip_view_3_h"));
-    m_view3VAlign = new ToolbarButton(nullptr, "view_3_v_white", TextManager::instance().get("tooltip_view_3_v"));
-    m_view3Bot = new ToolbarButton(nullptr, "view_3_bot_white", TextManager::instance().get("tooltip_view_3_bot"));
-    m_view3Top = new ToolbarButton(nullptr, "view_3_top_white", TextManager::instance().get("tooltip_view_3_top"));
-    m_view3Left = new ToolbarButton(nullptr, "view_3_left_white", TextManager::instance().get("tooltip_view_3_left"));
-    m_view3Right = new ToolbarButton(nullptr, "view_3_right_white", TextManager::instance().get("tooltip_view_3_right"));
+    m_view3HAlign = new ToolbarButton(nullptr, "view_3_h_white", PrefManager::instance().getText("tooltip_view_3_h"));
+    m_view3VAlign = new ToolbarButton(nullptr, "view_3_v_white", PrefManager::instance().getText("tooltip_view_3_v"));
+    m_view3Bot = new ToolbarButton(nullptr, "view_3_bot_white", PrefManager::instance().getText("tooltip_view_3_bot"));
+    m_view3Top = new ToolbarButton(nullptr, "view_3_top_white", PrefManager::instance().getText("tooltip_view_3_top"));
+    m_view3Left = new ToolbarButton(nullptr, "view_3_left_white", PrefManager::instance().getText("tooltip_view_3_left"));
+    m_view3Right = new ToolbarButton(nullptr, "view_3_right_white", PrefManager::instance().getText("tooltip_view_3_right"));
     view3Layout->addWidget(m_view3HAlign, 0, 0);
     view3Layout->addWidget(m_view3VAlign, 1, 0);
     view3Layout->addWidget(m_view3Bot, 0, 1);
     view3Layout->addWidget(m_view3Top, 1, 1);
     view3Layout->addWidget(m_view3Left, 0, 2);
     view3Layout->addWidget(m_view3Right, 1, 2);
-    m_view3 = new ToolbarToggleHoverButton(nullptr, view3Layout, false, "view_3_bot_white", TextManager::instance().get("tooltip_view_3"), "view_3_bot_white", TextManager::instance().get("tooltip_view_3"));
+    m_view3 = new ToolbarToggleHoverButton(nullptr, view3Layout, false, "view_3_bot_white", PrefManager::instance().getText("tooltip_view_3"), "view_3_bot_white", PrefManager::instance().getText("tooltip_view_3"));
     m_view3->setOnTop(false);
     m_view3->setToolTip("");
     viewLayout->addWidget(m_view3);
 
-    m_view4 = new ToolbarButton(nullptr, "view_4_white", TextManager::instance().get("tooltip_view_4"));
+    m_view4 = new ToolbarButton(nullptr, "view_4_white", PrefManager::instance().getText("tooltip_view_4"));
     viewLayout->addWidget(m_view4);
 
-    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", TextManager::instance().get("tooltip_view_grid"), "player_arrangement_white"),  TextManager::instance().get("tooltip_view_grid");
+    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white"),  PrefManager::instance().getText("tooltip_view_grid");
     m_viewGridBtn->setOnTop(false);
 }
 
@@ -330,12 +330,12 @@ void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangem
     ProjectManager& projManager = ProjectManager::instance();
     
     if (projManager.needSave()) { 
-        TextManager& txtManager = TextManager::instance();
+        PrefManager& txtManager = PrefManager::instance();
         
         SLV::showGenericDialog(
             this, 
-            txtManager.get("dialog_save_project_dialog_title"),
-            txtManager.get("dialog_save_project_dialog_text"),
+            txtManager.getText("dialog_save_project_dialog_title"),
+            txtManager.getText("dialog_save_project_dialog_text"),
             [&projManager, arrangement]() { 
                 projManager.saveProject(false); 
                 emit SignalManager::instance().newArrangementRequested(arrangement);

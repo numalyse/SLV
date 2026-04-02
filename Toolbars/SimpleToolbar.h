@@ -2,6 +2,7 @@
 #define SIMPLETOOLBAR_H 
 
 #include "Toolbars/Toolbar.h"
+#include "Toolbars/TimeEdit.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -28,7 +29,7 @@ public:
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
-    QLabel* currentTimeLabel() const { return m_currentTimeLabel; }
+    TimeEdit* currentTimeLE() const { return m_timeEdit; }
     QLabel* durationLabel() const { return m_durationLabel; }
     QLabel* nameLabel() const { return m_nameLabel; }
 
@@ -70,15 +71,16 @@ public slots:
     void setSubtitlesTrackDefault();
     void setAudioTrack(int index);
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
-    void setSubtitlesTrack(int index);
-    
+    void setSubtitlesTrack(int index);    
+
 protected:
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
     double m_media_fps {};
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
-    QLabel* m_currentTimeLabel = nullptr;
+    TimeEdit* m_timeEdit = nullptr;
+    bool m_editingTime = false;
     QLabel* m_durationLabel = nullptr;
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;

@@ -17,7 +17,25 @@
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
-    m_currentTimeLabel = new QLabel("00:00:00", this);
+    m_timeEdit = new TimeEdit("00:00:00.00", this);
+    connect(m_timeEdit, &TimeEdit::focusIn, this, [this](){
+        emit pauseRequest();  
+        m_editingTime = true;
+    });
+
+    connect(m_timeEdit, &TimeEdit::focusOut, this, [this](){
+        m_editingTime = false;
+    });
+
+    connect(m_timeEdit, &QLineEdit::textEdited, this, [this](){
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.005));
+    });
+
+    connect(m_timeEdit, &QLineEdit::returnPressed, [this]() {
+        m_timeEdit->clearFocus(); 
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.005));
+    });
+
     m_durationLabel = new QLabel("00:00:00", this);
     m_nameLabel = new QLabel("", this);
 
@@ -166,7 +184,7 @@ void SimpleToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_currentTimeLabel, 1, Qt::AlignLeft);
+    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
     timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
     timecodeLayout->addWidget(m_durationLabel, 1, Qt::AlignRight);
     mainLayout->addLayout(timecodeLayout);
@@ -202,7 +220,7 @@ void SimpleToolbar::setDefaultUI()
 
 void SimpleToolbar::resetSlider()
 {
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(0,1));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(0,1));
     m_durationLabel->setText(TimeFormatter::msToHHMMSSFF(0,1));
     m_slider->setRange(0,0);
     m_slider->setValue(0);
@@ -210,7 +228,7 @@ void SimpleToolbar::resetSlider()
 
 void SimpleToolbar::stopSlider()
 {
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(0,m_media_fps));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(0,m_media_fps));
     m_slider->setValue(0);
 }
 
@@ -242,8 +260,7 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
     }
 
     m_slider->setValue(currentTime);
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
-
+    if( !m_editingTime ) m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(currentTime, m_media_fps));
 }
 
 void SimpleToolbar::updateFps(double newFps){
@@ -362,7 +379,7 @@ void SimpleToolbar::disableButtons()
 
 void SimpleToolbar::onSliderPressed() {
     m_draggingSlider = true;
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(m_slider->value(), m_media_fps));
 }
 
 void SimpleToolbar::onSliderReleased() {
@@ -372,7 +389,7 @@ void SimpleToolbar::onSliderReleased() {
 }
 
 void SimpleToolbar::onSliderMoved(int value) {
-    m_currentTimeLabel->setText(TimeFormatter::msToHHMMSSFF(value, m_media_fps));
+    m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(value, m_media_fps));
     if (!m_seekTimer->isActive()) {
         m_seekTimer->start(m_seekPendingTime);
     }

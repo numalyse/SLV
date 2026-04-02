@@ -18,6 +18,7 @@
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
     m_timeEdit = new TimeEdit("00:00:00.00", this);
+    m_timeEdit->setFixedWidth(75);
     connect(m_timeEdit, &TimeEdit::focusIn, this, [this](){
         emit pauseRequest();  
         m_editingTime = true;
@@ -28,12 +29,12 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     });
 
     connect(m_timeEdit, &QLineEdit::textEdited, this, [this](){
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.005));
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
     });
 
     connect(m_timeEdit, &QLineEdit::returnPressed, [this]() {
         m_timeEdit->clearFocus(); 
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.005));
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
     });
 
     m_durationLabel = new QLabel("00:00:00", this);

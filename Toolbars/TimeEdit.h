@@ -3,12 +3,16 @@
 
 #include <QLineEdit>
 
+#include <QAction>
 class TimeEdit : public QLineEdit
 {
 Q_OBJECT
 
 public:
-    explicit TimeEdit( const QString& txt , QWidget* parent = nullptr); 
+    explicit TimeEdit( const QString& txt , QWidget* parent = nullptr);
+
+private:
+    QAction* m_action = nullptr;
 
 protected:
     void focusInEvent(QFocusEvent *e) override;

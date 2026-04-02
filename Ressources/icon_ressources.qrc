@@ -129,5 +129,15 @@
         <file alias="invert_h_on_white">icons/vertical_symmetry_on_white.png</file>
         <file alias="extract_sequence">icons/extract_video.png</file>
         <file alias="extract_sequence_white">icons/extract_video_white.png</file>
+        <file alias="check">icons/check.png</file>
+        <file alias="check_white">icons/check_white.png</file>
+        <file alias="delete">icons/delete.png</file>
+        <file alias="delete_white">icons/delete_white.png</file>
+        <file alias="music_note">icons/music_note.png</file>
+        <file alias="music_note_white">icons/music_note_white.png</file>
+        <file alias="shuffle">icons/shuffle.png</file>
+        <file alias="shuffle_white">icons/shuffle_white.png</file>
+        <file alias="sort">icons/sort.png</file>
+        <file alias="sort_white">icons/sort_white.png</file>
     </qresource>
 </RCC>

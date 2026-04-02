@@ -485,10 +485,12 @@ void SimpleToolbar::createSlider(){
 
 void SimpleToolbar::createTimeTotBtn()
 {
+    auto& txtManager = TextManager::instance();
+
     m_durationBtn = new QPushButton("00:00:00.00", this);
     m_durationBtn->setCheckable(true);
     m_durationBtn->setChecked(false);
-    m_durationBtn->setToolTip("Temps total");
+    m_durationBtn->setToolTip(txtManager.get("tooltip_time_total_btn"));
     m_durationBtn->setFont(m_timeEdit->font());
     m_durationBtn->setObjectName("durationToggleBtn");
     
@@ -496,11 +498,11 @@ void SimpleToolbar::createTimeTotBtn()
 
     connect(m_durationBtn, &QPushButton::toggled, this, [this](bool checked) {
         m_showRemainingTime = checked;
-        
+        auto& txtManager = TextManager::instance();
         if (checked) {
-            m_durationBtn->setToolTip("Temps restant");
+            m_durationBtn->setToolTip(txtManager.get("tooltip_time_remaining_btn"));
         } else {
-            m_durationBtn->setToolTip("Temps total");
+            m_durationBtn->setToolTip(txtManager.get("tooltip_time_total_btn"));
         }
         
         updateDurationText(); 

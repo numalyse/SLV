@@ -88,5 +88,8 @@
 
     "open_files" : "Ouvrir des fichiers multimédia",
 
+    "playlist" : "Liste de lecture",
+    "tooltip_add_item_playlist" : "Ajouter un média",
+    "delete" : "Supprimer",
     "duration" : "Durée"
 }

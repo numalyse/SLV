@@ -87,5 +87,8 @@
 
     "open_files" : "Open files",
 
+    "playlist" : "Playlist",
+    "tooltip_add_item_playlist" : "Add media",
+    "delete" : "Delete",
     "duration" : "Duration"
 }

@@ -12,7 +12,7 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     
     setFixedWidth(75);
 
-    m_action = addAction(QIcon(":/icons/check"), QLineEdit::TrailingPosition);
+    m_action = addAction(QIcon(":/icons/check_white"), QLineEdit::TrailingPosition);
     m_action->setVisible(false);
 
     connect(m_action, &QAction::triggered, this, [this](){

@@ -29,7 +29,8 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     infoLayout->setSpacing(2);
 
     m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
-    m_mediaTitleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    //m_mediaTitleLabel->setWordWrap(true);
+    m_mediaTitleLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     infoLayout->addWidget(m_mediaTitleLabel);
 
     QHBoxLayout *metaLayout = new QHBoxLayout();

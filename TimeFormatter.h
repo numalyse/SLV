@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include <QString>
+#include <QList>
 #include <QDebug>
 
 namespace TimeFormatter
@@ -87,6 +88,23 @@ namespace TimeFormatter
             .arg(m, 2, 10, QChar('0'))
             .arg(s, 2, 10, QChar('0'))
             .arg(mil, 3, 10, QChar('0'));
+    }
+
+    inline QList<int64_t> parsedMsToHHMMSSFF(int64_t ms, double fps){
+        QList<int64_t> res = {0,0,0,0};
+        int64_t timeInSeconds = ms / 1000;
+        int64_t h = timeInSeconds / 3600;
+        int64_t m = (timeInSeconds % 3600) / 60;
+        int64_t s = timeInSeconds % 60;
+
+        double tf = 1000.0 / fps;
+        int frame = static_cast<int>((ms % 1000) / tf);
+
+        res[0] = h;
+        res[1] = m;
+        res[2] = s;
+        res[3] = frame;
+        return res;
     }
 
 

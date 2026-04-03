@@ -62,6 +62,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::setPositionRequested, this, &PlayerWidget::setTime);
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
+    connect(m_toolBar, &SimpleToolbar::extractSequenceRequest, this, &PlayerWidget::openSequenceExtractionDialog);
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -78,6 +79,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
+    connect(m_mediaWidget, &MediaWidget::mediaIsVideoParsed, this, [this](){ m_toolBar->setExtractable(true); });
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
@@ -331,6 +333,14 @@ void PlayerWidget::rotate()
 void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
 
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
+}
+
+void PlayerWidget::openSequenceExtractionDialog()
+{
+    pause();
+    ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
+    connect(sequenceExtractor, &QDialog::finished, this, [](int){ /* afficher une fenêtre ? */ });
+    sequenceExtractor->open();
 }
 
 void PlayerWidget::onMediaRectChanged(const QRect &rect)

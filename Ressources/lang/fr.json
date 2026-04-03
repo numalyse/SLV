@@ -61,6 +61,8 @@
     "timeline_ab_extraxt": "Extraire la séquence AB",
     "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
     "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
+
+    "cancel_action" : "Annuler",
     
     "shot_detail_id_name" : "Numéro du plan",
     "shot_detail_title_name" : "Titre",
@@ -86,6 +88,8 @@
     "no_audio" : "Pas de piste audio",
     "no_subtitles" : "Pas de piste de sous-titres",
 
+    "extract_start_label" : "Début",
+    "extract_end_label" : "Fin",
     "open_files" : "Ouvrir des fichiers multimédia",
 
     "main_window_menu_bar_file": "Fichier",

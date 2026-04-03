@@ -41,7 +41,7 @@ public:
     void createShotItemsFromCuts(const std::vector<int>& cuts);
 
 signals:
-    void updateShotDetailRequested(int shotCount, int shotId, Shot*);
+    void updateShotDetailRequested(int shotCount, int requestId, Shot*);
     void showMergeWithPreviousShotAction(bool);
     void showMergeWithNextShotAction(bool);
 
@@ -60,7 +60,7 @@ private:
     ThumbnailWorker* m_thumbnailWorker = nullptr;
 
 private slots:
-    void updateThumbnail(int shotId, QImage image);
+    void updateThumbnail(int requestId, QImage image);
 
 };
 

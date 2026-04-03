@@ -34,6 +34,8 @@ public:
     /// @param targetSize Target size of the thumnails, will use opencv to resize the frame
     void requestThumbnail(int requestId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize = {100, 75});
     void stop();
+    void clearQueue();
+    void keepNQueue(const int n);
 
 signals:
     void thumbnailReady(int requestId, QImage image);

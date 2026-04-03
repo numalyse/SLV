@@ -1,7 +1,7 @@
 #ifndef GENERICDIALOG_H
 #define GENERICDIALOG_H
 
-#include "TextManager.h"
+#include "PrefManager.h"
 
 #include <QMessageBox>
 #include <QPushButton>
@@ -21,20 +21,20 @@ namespace SLV
     ) {
 
 
-        TextManager& txtManager = TextManager::instance();
+        PrefManager& txtManager = PrefManager::instance();
 
         QMessageBox msgBox(parent);
         msgBox.setIcon(QMessageBox::Question);
         msgBox.setWindowTitle(title);
         msgBox.setText(text);
 
-        QPushButton *yesBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_yes"), QMessageBox::YesRole);
+        QPushButton *yesBtn = msgBox.addButton(txtManager.getText("generic_dialog_btn_yes"), QMessageBox::YesRole);
         QPushButton *noBtn = nullptr;
         if(onNo){
-            noBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_no"), QMessageBox::NoRole);
+            noBtn = msgBox.addButton(txtManager.getText("generic_dialog_btn_no"), QMessageBox::NoRole);
         }
 
-        QPushButton *cancelBtn = msgBox.addButton(txtManager.get("generic_dialog_btn_cancel"), QMessageBox::RejectRole);
+        QPushButton *cancelBtn = msgBox.addButton(txtManager.getText("generic_dialog_btn_cancel"), QMessageBox::RejectRole);
 
         msgBox.exec();
 

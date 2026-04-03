@@ -90,5 +90,15 @@
 
     "extract_start_label" : "Début",
     "extract_end_label" : "Fin",
-    "open_files" : "Ouvrir des fichiers multimédia"
+    "open_files" : "Ouvrir des fichiers multimédia",
+
+    "main_window_menu_bar_file": "Fichier",
+    "main_window_file_open_media_action": "Ouvrir des fichiers multimédia",
+    "main_window_file_open_project_action": "Ouvrir un projet",
+    "main_window_file_save_project_action": "Enregistrer",
+
+    "playlist" : "Liste de lecture",
+    "tooltip_add_item_playlist" : "Ajouter un média",
+    "delete" : "Supprimer",
+    "duration" : "Durée"
 }

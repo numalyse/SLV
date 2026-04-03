@@ -1,5 +1,6 @@
 #include "Playlist.h"
-#include "TextManager.h"
+#include "PrefManager.h"
+#include "./ToolbarButtons/ToolbarButton.h"
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
@@ -38,23 +39,44 @@ Playlist::Playlist(QWidget *parent)
 
     QHBoxLayout *playlistLabelLayout = new QHBoxLayout();
     m_mainLayout->addLayout(playlistLabelLayout);
-    
+
     QLabel *playlistLabel = new QLabel();
-    playlistLabel->setTextFormat(Qt::RichText);
-    playlistLabel->setText("<b>Playlist</b>");
+    QFont font = playlistLabel->font();
+    font.setPointSize(12);
+    font.setBold(true);
+    playlistLabel->setFont(font);
+    //playlistLabel->setTextFormat(Qt::RichText);
+    playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel); //ajouter les boutons random et loop peut-être
 
 
-    m_addItemBtn = new QPushButton("+");
-    m_addItemBtn->setFixedSize(24,24);
+    //m_addItemBtn = new QPushButton("+");
+    //m_addItemBtn = new ToolbarButton(this, "plus_white", "tooltip_add_item_playlist");
+    //m_addItemBtn->setFixedSize(24,24);
+
+    m_addItemBtn = new QPushButton;
+    m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    //m_addItemBtn->setIconSize(QSize(12,12));
+    m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
+    m_addItemBtn->setFixedHeight(50);
+    m_addItemBtn->setStyleSheet("QPushButton{"
+        "   background-color: rgba(0,0,0,0);"
+        "   border: 2px dashed palette(button);"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: palette(button);"
+        "   border: 2px solid palette(button);"
+        "   border-radius: 4px;"
+        "}");
     playlistLabelLayout->addWidget(m_addItemBtn);
 
     m_itemsLayout = new QVBoxLayout();
     m_mainLayout->addLayout(m_itemsLayout);
-    //m_mainLayout->addWidget(m_addItemBtn);
+    m_mainLayout->addWidget(m_addItemBtn);
     m_mainLayout->addStretch();
 
-    connect(m_addItemBtn, &QPushButton::clicked, this, &Playlist::addItemDialog);
+    connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
 
 }
 
@@ -134,7 +156,7 @@ void Playlist::dropEvent(QDropEvent *event)
 
 void Playlist::addItemDialog()
 {
-    QStringList filesPaths = QFileDialog::getOpenFileNames(this, TextManager::instance().get("open_files"), "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    QStringList filesPaths = QFileDialog::getOpenFileNames(this, PrefManager::instance().getText("open_files"), "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
     if(filesPaths.empty()){
         qDebug() << "PLAYLIST - Pas de fichier sélectionné";
         return;

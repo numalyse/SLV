@@ -48,6 +48,7 @@
     "tooltip_nav_panel_open" : "Open side panel",
 
     "no_preview" : "No preview",
+    "preview" : "Preview",
 
     "tooltip_to_next_shot" : "Go to the next shot",
     "tooltip_to_prev_shot" : "Go to the previous shot",
@@ -86,6 +87,9 @@
     "no_subtitles" : "No subtitle track",
 
     "open_files" : "Open files",
+    "file_video" : "Vidéo file",
+    "file_image" : "Image file",
+    "file_audio" : "Audio file",
 
     
     "main_window_menu_bar_file": "File",

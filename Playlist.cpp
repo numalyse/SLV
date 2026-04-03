@@ -82,10 +82,17 @@ Playlist::Playlist(QWidget *parent)
 
 void Playlist::updateThumbnail(int playlistItemId, QImage image)
 {
-    if(playlistItemId <0 || playlistItemId >= m_items.size()) return;
+    if(playlistItemId < 0 || playlistItemId >= m_items.size()) return;
 
-    auto* item = m_items[playlistItemId];
-    item->setThumbnail(image);
+    //auto* item = m_items[playlistItemId];
+    PlaylistItem* item = m_items[playlistItemId];
+    //item->setThumbnail(image);
+    // if (item->getType() == MediaType::Video)
+    //     item->setThumbnail(image);
+    // if (item->getType() == MediaType::Image)
+    //     item->setThumbnail();
+    // if (item->getType() == MediaType::Audio)
+    //     item->setThumbnail(QPixmap(":/icons/hide_image_white"));
 
 }
 
@@ -146,6 +153,8 @@ void Playlist::dropEvent(QDropEvent *event)
 
         if (!filePaths.isEmpty()) {
             addItemsFromPaths(filePaths);
+            // updateItemIndices();
+            // updateLayout();
         }
 
         event->acceptProposedAction();

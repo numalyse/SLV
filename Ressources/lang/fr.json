@@ -48,7 +48,8 @@
     "tooltip_nav_panel_close" : "Fermer le panneau latéral",
     "tooltip_nav_panel_open" : "Ouvrir le panneau latéral",
 
-    "no_preview" : "Pas d'image",
+    "no_preview" : "Pas d'aperçu",
+    "preview" : "Aperçu",
 
     "tooltip_to_next_shot" : "Aller au plan suivant",
     "tooltip_to_prev_shot" : "Aller plan précédent",
@@ -91,6 +92,9 @@
     "extract_start_label" : "Début",
     "extract_end_label" : "Fin",
     "open_files" : "Ouvrir des fichiers multimédia",
+    "file_video" : "Fichier vidéo",
+    "file_image" : "Fichier image",
+    "file_audio" : "Fichier audio",
 
     "main_window_menu_bar_file": "Fichier",
     "main_window_file_open_media_action": "Ouvrir des fichiers multimédia",

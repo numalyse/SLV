@@ -20,14 +20,22 @@ public:
     explicit PlaylistItem(QWidget *parent = nullptr, const QString &mediaFilePath = "");
     void initStyle();
     void setThumbnail(QImage image);
+    void updateTypeIcon();
+    QPixmap generateVideoThumbnail(const QString &videoPath);
+    void updateThumbnail();
+    MediaType getType() const { return m_mediaData->type(); }
+    QSize thumbnailSize() const  {return m_thumbnailSize; }
+    QString setThumbnailTime();
 
 private:
     Media *m_mediaData = nullptr;
     QLabel *m_mediaThumbnailLabel = nullptr;
     QPixmap *m_mediaThumbnailImage = nullptr;
+    QString m_mediaThumbnailTime = "00:00:00";
+    QPixmap *m_mediaTypeIcon = nullptr;
     QLabel *m_mediaDurationLabel = nullptr;
     QLabel *m_mediaTitleLabel = nullptr;
-    QLabel *m_mediaTypeIcon = nullptr; // mettre une pixmap dedans pour l'icône
+    QLabel *m_mediaTypeIconLabel = nullptr;
     unsigned int m_itemIndex = 0;
     QLabel *m_indexLabel = nullptr;
     QPushButton *m_deleteBtn = nullptr;

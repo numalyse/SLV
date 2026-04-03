@@ -116,8 +116,6 @@ void NavPanel::updateImageRequest(int idShot, int64_t time, int64_t length, cons
 void NavPanel::updateThumbnail(int imageId, QImage image){
     if (imageId == -1){
         m_shotDetail->updateTagImage(image);
-    }else{
-        m_playlistWidget->updateThumbnail(imageId, image);
     }
 }
 

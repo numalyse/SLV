@@ -17,7 +17,7 @@ void PrefManager::loadLanguage(const QString& langCode)
         m_texts = doc.object();
         file.close();
     } else {
-        qDebug() << "Impossible de charger le fichier de langue:" << filePath;
+        qDebug() << "[PrefManager] Impossible de charger le fichier de langue:" << filePath;
     }
 }
 
@@ -27,7 +27,7 @@ QString PrefManager::getText(const QString &key) const
     if (m_texts.contains(key)) {
         return m_texts[key].toString();
     }
-    qDebug() << key << " n'est pas dans le fichier json";
+    qDebug() << "[PrefManager] " << key << " n'est pas dans le fichier json";
     return "[" + key + "]";
 }
 
@@ -38,7 +38,7 @@ bool PrefManager::createPreferenceFile(const QString &destFilePath) {
 
     if (!dir.exists()) {
         if (!dir.mkpath(".")) {
-            qCritical() << "Impossible de créer le dossier SLV Contents pour les préférences.";
+            qCritical() << "[PrefManager] Impossible de créer le dossier SLV Contents pour les préférences.";
             return false;
         }
     }
@@ -46,20 +46,25 @@ bool PrefManager::createPreferenceFile(const QString &destFilePath) {
     QString resourcePath = ":/defaultPref.json";
     QFile defaultFile(resourcePath);
 
-    return defaultFile.copy(destFilePath);
+    if (defaultFile.copy(destFilePath)) {
+        QFile::setPermissions(destFilePath, QFile::ReadOwner | QFile::WriteOwner | QFile::ReadUser | QFile::WriteUser);
+        return true;
+    }
+
+    return false;
 }
 
 void PrefManager::loadDefaultPrefs(){
     QString resourcePath = ":/defaultPref.json";
     QFile defaultFile(resourcePath);
 
-    if (defaultFile.open(QIODevice::ReadWrite)) {
+    if (defaultFile.open(QIODevice::ReadOnly)) {
         QByteArray data = defaultFile.readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
         m_defaultPrefs = doc.object();
         defaultFile.close();
     }else {
-        qCritical() << "Impossible d'ouvrir le fichier des préférences par défaut : " << defaultFile.errorString();
+        qCritical() << "[PrefManager] Impossible d'ouvrir le fichier des préférences par défaut : " << defaultFile.errorString();
     }
 
 }
@@ -71,7 +76,7 @@ void PrefManager::loadUserPrefs(){
 
     if ( ! file.exists() ){
         if(!createPreferenceFile(filePath)){
-            qCritical() << "Impossible de copier le fichier des preferences dans SLV contents";
+            qCritical() << "[PrefManager] Impossible de copier le fichier des preferences dans SLV contents";
             return; 
         } 
     }
@@ -82,7 +87,7 @@ void PrefManager::loadUserPrefs(){
         m_userPrefs = doc.object();
         file.close();
     } else {
-        qCritical() << "Impossible d'ouvrir le fichier des préférences : " << file.errorString();
+        qCritical() << "[PrefManager] Impossible d'ouvrir le fichier des préférences : " << file.errorString();
     }
 }
 
@@ -96,10 +101,10 @@ QString PrefManager::getPref(const QString &key) const
 {
     if (m_userPrefs.contains(key)) {
         return m_userPrefs[key].toString();
-    }else if(m_defaultPrefs.contains(key)) { // check si existe dans le fichier par défault
+    }else if(m_defaultPrefs.contains(key)) { // check si existe dans le fichier par défault si pas trouvé dans le fichier user
         return m_userPrefs[key].toString();
     }else {
-        qCritical() << "La clé n'existe pas dans les préférences";
+        qCritical() << "[PrefManager] La clé n'existe pas dans les préférences";
         return "[" + key + "]";
     }
 }

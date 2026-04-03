@@ -19,15 +19,21 @@ template <typename T>
 class TSQueue
 {
 public:
-
+    /// @brief Constructor for a thread safe queue
+    /// @details Initialize the queue with a maximum amout of elements, not based on the size of the elements in the queue.
+    /// @param maxElemCount Max number of elements allowed in the queue
     TSQueue(size_t maxElemCount) : m_maxElemCount{maxElemCount} {};
 
+    /// @brief Pushes if queue size < max size, otherwise waits until space available
     bool waitPush(T item);
+
+    /// @brief Fills item with the front of queue by using std::move then pop 
     bool waitPop(T& item);
     
     size_t size();
     bool empty();
 
+    /// @brief Call stop when needing to wake sleeping threads 
     void stop();
 
 private:

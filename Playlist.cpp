@@ -47,16 +47,28 @@ Playlist::Playlist(QWidget *parent)
     playlistLabel->setFont(font);
     //playlistLabel->setTextFormat(Qt::RichText);
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
-    playlistLabelLayout->addWidget(playlistLabel); //ajouter les boutons random et loop peut-être
+    playlistLabelLayout->addWidget(playlistLabel);
 
+    m_loopItemBtn = new ToolbarToggleButton(this, 
+        false, 
+        "loop_off_white", PrefManager::instance().getText("tooltip_loop_playlist"),
+        "loop_off_white", PrefManager::instance().getText("tooltip_loop_playlist"));
+    m_loopItemBtn->setFixedSize(24,24);
+    connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
+    connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
+    playlistLabelLayout->addWidget(m_loopItemBtn);
 
-    //m_addItemBtn = new QPushButton("+");
-    //m_addItemBtn = new ToolbarButton(this, "plus_white", "tooltip_add_item_playlist");
-    //m_addItemBtn->setFixedSize(24,24);
+    m_shuffleItemBtn = new ToolbarToggleButton(this, 
+        false, 
+        "shuffle_white", PrefManager::instance().getText("tooltip_shuffle_playlist"),
+        "shuffle_white", PrefManager::instance().getText("tooltip_loop_playlist"));
+    m_shuffleItemBtn->setFixedSize(24,24);
+    //connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
+    //connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
+    playlistLabelLayout->addWidget(m_shuffleItemBtn);
 
     m_addItemBtn = new QPushButton;
     m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
-    //m_addItemBtn->setIconSize(QSize(12,12));
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
     m_addItemBtn->setStyleSheet("QPushButton{"
@@ -77,22 +89,6 @@ Playlist::Playlist(QWidget *parent)
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
-
-}
-
-void Playlist::updateThumbnail(int playlistItemId, QImage image)
-{
-    if(playlistItemId < 0 || playlistItemId >= m_items.size()) return;
-
-    //auto* item = m_items[playlistItemId];
-    PlaylistItem* item = m_items[playlistItemId];
-    //item->setThumbnail(image);
-    // if (item->getType() == MediaType::Video)
-    //     item->setThumbnail(image);
-    // if (item->getType() == MediaType::Image)
-    //     item->setThumbnail();
-    // if (item->getType() == MediaType::Audio)
-    //     item->setThumbnail(QPixmap(":/icons/hide_image_white"));
 
 }
 
@@ -264,4 +260,20 @@ void Playlist::updateLayout()
     }
 
     this->updateGeometry();
+}
+
+void Playlist::enableLoop(){
+    m_loopItemBtn->setButtonState(true);
+}
+
+void Playlist::disableLoop(){
+    m_loopItemBtn->setButtonState(false);
+}
+
+void Playlist::enableShuffle(){
+    m_shuffleItemBtn->setButtonState(true);
+}
+
+void Playlist::disableShuffle(){
+    m_shuffleItemBtn->setButtonState(false);
 }

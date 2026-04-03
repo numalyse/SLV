@@ -141,11 +141,6 @@ void PlaylistItem::setIndex(int index)
     m_indexLabel->setText(QString::number(m_itemIndex+1));
 }
 
-void PlaylistItem::computeThumbnail() //il y a un setThumbnail
-{
-    // recupérer frame à 1/15 de la vidéo à partir de duration et fps avec opencv get frame
-}
-
 // --- EVENTS --- //
 
 void PlaylistItem::enterEvent(QEnterEvent *event)
@@ -213,31 +208,25 @@ void PlaylistItem::playMedia()
     emit playPlaylistItemRequested(m_mediaData->filePath());
 }
 
-// void PlaylistItem::setThumbnail(QImage image)
-// {
-//     QPixmap pixmap = QPixmap::fromImage(image);
-//     m_mediaThumbnailLabel->setPixmap(pixmap);
-// }
-
 void PlaylistItem::updateTypeIcon(){
     if (m_mediaData->type() != MediaType::Unknown)
         m_mediaTypeIconLabel->clear();
 
     if (m_mediaData->type() == MediaType::Video){
         m_mediaTypeIcon = new QPixmap(":/icons/video_icon_white");
-        m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_video") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
         
     if (m_mediaData->type() == MediaType::Image){
         m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
-        m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_image") + " (" + m_mediaData->fileExtension().toUpper() + ")");   
     }
         
     if (m_mediaData->type() == MediaType::Audio){
         m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
-        m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_audio") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
 }

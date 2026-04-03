@@ -48,7 +48,8 @@
     "tooltip_nav_panel_close" : "Fermer le panneau latéral",
     "tooltip_nav_panel_open" : "Ouvrir le panneau latéral",
 
-    "no_preview" : "Pas d'image",
+    "no_preview" : "Pas d'aperçu",
+    "preview" : "Aperçu",
 
     "tooltip_to_next_shot" : "Aller au plan suivant",
     "tooltip_to_prev_shot" : "Aller plan précédent",
@@ -87,6 +88,9 @@
     "no_subtitles" : "Pas de piste de sous-titres",
 
     "open_files" : "Ouvrir des fichiers multimédia",
+    "file_video" : "Fichier vidéo",
+    "file_image" : "Fichier image",
+    "file_audio" : "Fichier audio",
 
     "playlist" : "Liste de lecture",
     "tooltip_add_item_playlist" : "Ajouter un média",

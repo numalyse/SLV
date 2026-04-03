@@ -21,14 +21,17 @@ public:
     void initStyle();
     void setThumbnail(QImage image);
     void updateTypeIcon();
+    QPixmap generateVideoThumbnail(const QString &videoPath);
     void updateThumbnail();
     MediaType getType() const { return m_mediaData->type(); }
     QSize thumbnailSize() const  {return m_thumbnailSize; }
+    QString setThumbnailTime();
 
 private:
     Media *m_mediaData = nullptr;
     QLabel *m_mediaThumbnailLabel = nullptr;
     QPixmap *m_mediaThumbnailImage = nullptr;
+    QString m_mediaThumbnailTime = "00:00:00";
     QPixmap *m_mediaTypeIcon = nullptr;
     QLabel *m_mediaDurationLabel = nullptr;
     QLabel *m_mediaTitleLabel = nullptr;

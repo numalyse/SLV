@@ -2,6 +2,7 @@
 #include "TextManager.h"
 #include <qevent.h>
 #include <QBuffer>
+#include <QProcess>
 
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     : QWidget{parent}
@@ -23,7 +24,6 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
     m_mediaThumbnailImage = new QPixmap(":/icons/hide_image_white");
     m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    //m_mediaThumbnailLabel->setText(TextManager::instance().get("no_preview"));
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
 
@@ -33,7 +33,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // titre
     m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
-    m_mediaTitleLabel->setToolTip(m_mediaData->fileName()+"."+m_mediaData->fileExtension());
+    m_mediaTitleLabel->setToolTip(m_mediaData->fileName() + "."+ m_mediaData->fileExtension());
     m_mediaTitleLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     infoLayout->addWidget(m_mediaTitleLabel);
 
@@ -69,8 +69,8 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     connect(m_deleteBtn, &QPushButton::clicked, this, [this]{ emit deleteItemRequested(m_itemIndex); });
 
     m_mediaData->parse();
-    updateThumbnail();
 }
+
 
 void PlaylistItem::initStyle()
 {
@@ -96,11 +96,43 @@ void PlaylistItem::initStyle()
 
 void PlaylistItem::setDurationLabel()
 {
-    QString time = TimeFormatter::msToHHMMSSFF(m_mediaData->duration(), 1);
-    QString timeChopped = time.left(time.length() - 3);
+    qint64 durationMs = m_mediaData->duration();
+    if (durationMs <= 0) {
+        // Par défaut, si rien n'est encore disponible
+        m_mediaDurationLabel->setText("00:00:00");
+        m_mediaDurationLabel->setToolTip(TextManager::instance().get("duration") + " : 00:00:00.00");
+        return;
+    }
+
+    QString time = TimeFormatter::msToHHMMSSFF(durationMs, 1);
+    QString timeChopped = time.left(qMax(0, time.length() - 3));
     m_mediaDurationLabel->setText(timeChopped);
     m_mediaDurationLabel->setToolTip(TextManager::instance().get("duration") + " : " + time);
-    emit updateImageRequested(m_itemIndex, m_mediaData->duration()/2, 0, m_mediaData->filePath(), m_thumbnailSize);
+
+    m_mediaThumbnailTime = setThumbnailTime();
+    updateTypeIcon();
+    updateThumbnail();
+
+    emit updateImageRequested(m_itemIndex, durationMs / 2, 0, m_mediaData->filePath(), m_thumbnailSize);
+}
+
+QString PlaylistItem::setThumbnailTime(){
+    qint64 durationMs = m_mediaData->duration();
+    if (durationMs <= 0) {
+        //qDebug() << "Duration not available yet";
+        return "00:00:00";
+    }
+
+    qint64 halfMs = durationMs / 2;
+    QString time = TimeFormatter::msToHHMMSSFF(halfMs, 1);
+    //qDebug() << "le temps en ms : " << durationMs << " => half : " << halfMs;
+    //qDebug() << "le temps en HMSF half : " << time;
+
+    // Conserve uniquement HH:MM:SS car on veut un format base pour ffmpeg.
+    QString timeCropped = time.left(qMax(0, time.length() - 3));
+    //qDebug() << "le temps cropped : " << timeCropped;
+
+    return timeCropped;
 }
 
 void PlaylistItem::setIndex(int index)
@@ -192,33 +224,62 @@ void PlaylistItem::updateTypeIcon(){
         m_mediaTypeIconLabel->clear();
 
     if (m_mediaData->type() == MediaType::Video){
-        m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
+        m_mediaTypeIcon = new QPixmap(":/icons/video_icon_white");
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_mediaTypeIconLabel->setToolTip(TextManager::instance().get("file_video") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
         
     if (m_mediaData->type() == MediaType::Image){
         m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_mediaTypeIconLabel->setToolTip(TextManager::instance().get("file_image") + " (" + m_mediaData->fileExtension().toUpper() + ")");   
     }
         
     if (m_mediaData->type() == MediaType::Audio){
         m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        m_mediaTypeIconLabel->setToolTip(TextManager::instance().get("file_audio") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
+}
+
+QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
+{
+    QProcess ffmpeg;
+    QStringList args;
+    args << "-ss" << m_mediaThumbnailTime  
+         << "-i" << videoPath
+         << "-frames:v" << "1"
+         << "-f" << "image2pipe" 
+         << "-vcodec" << "png"   
+         << "-";                 
+
+    ffmpeg.start("ffmpeg", args);
+    ffmpeg.waitForFinished(-1);
+
+    QByteArray imageData = ffmpeg.readAllStandardOutput();
+    QPixmap pixmap;
+    pixmap.loadFromData(imageData, "PNG");
+
+    return pixmap;
 }
 
 void PlaylistItem::updateThumbnail()
 {
     qDebug() << "type détecté : " << m_mediaData->type();
-    if (m_mediaData->type() != MediaType::Unknown)
+    if (m_mediaData->type() != MediaType::Unknown){
         m_mediaThumbnailLabel->clear();
+        m_mediaThumbnailLabel->setToolTip(TextManager::instance().get("preview"));
+    } else {
+        m_mediaThumbnailLabel->setToolTip(TextManager::instance().get("no_preview"));
+    }
+        
 
-    //QPixmap pixmap = QPixmap::fromImage(image);
-    //m_mediaThumbnailLabel->setPixmap(pixmap);
-
-    if (m_mediaData->type() == MediaType::Video){
         //QPixmap pixmap = QPixmap::fromImage(image);
         //m_mediaThumbnailLabel->setPixmap(pixmap);
+
+    if (m_mediaData->type() == MediaType::Video){
+        QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
+        m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
         
 

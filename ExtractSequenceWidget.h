@@ -5,7 +5,7 @@
 #include "SequenceExtractionHelper.h"
 #include "TimeEditor.h"
 #include "Timeline/ThumbnailWorker.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 
 #include <QWidget>
 #include <QLabel>

@@ -87,7 +87,7 @@ void ShotDetail::updateShotDetail(int shotCount, int requestId, Shot * shotData)
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text") + QString::number(requestId + 1));
+    m_shotIdForm->setText(PrefManager::instance().getText("shot_detail_id_text") + QString::number(requestId + 1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));

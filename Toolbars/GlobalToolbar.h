@@ -15,6 +15,7 @@ public:
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
+    void disableFullscreenRequested() override;
 
 public slots:
     void enableButtons();
@@ -25,7 +26,8 @@ public slots:
 signals:
     void enableMute();
     void disableMute();
-
+private: 
+    void addShortcuts();
 };
 
 #endif

@@ -94,12 +94,13 @@ void AdvancedToolbar::addShortcuts(){
     QJsonObject atShortcuts = prefManager.getSubCategory("Shortcuts", "AdvancedTB");
 
     m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
-    m_nextMediaBtn->setShortcut(QKeySequence(atShortcuts.value("next_media").toString()));
-    m_prevMediaBtn->setShortcut(QKeySequence(atShortcuts.value("prev_media").toString()));
     m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
     m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
     m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
     m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("capture").toString()));
+
+    m_nextMediaBtn->setShortcut(QKeySequence(atShortcuts.value("next_media").toString()));
+    m_prevMediaBtn->setShortcut(QKeySequence(atShortcuts.value("prev_media").toString()));
     m_loopBtn->setShortcut(QKeySequence(atShortcuts.value("loop").toString())); 
 
     QShortcut* shortcutIncSpeed = new QShortcut(QKeySequence(atShortcuts.value("increase_speed").toString()), this);

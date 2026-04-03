@@ -28,6 +28,8 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
 
     setDefaultUI();
     // disableButtons();
+
+    addShortcuts();
 }
 
 void GlobalToolbar::setFullscreenUI()
@@ -95,4 +97,20 @@ void GlobalToolbar::disableButtons()
     // m_muteBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
+}
+
+void GlobalToolbar::addShortcuts(){
+    auto& prefManager = PrefManager::instance();
+    QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
+    
+    m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
+    m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
+    m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
+    m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
+    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("capture").toString()));
+}
+
+void GlobalToolbar::disableFullscreenRequested(){
+    m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar" , "enter_fullscreen")));
+    emit disableFullscreenRequest();
 }

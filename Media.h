@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QFileInfo>
 
-enum class MediaType{
+enum MediaType{
     Video,
     Image,
     Audio,
@@ -47,6 +47,8 @@ public:
     QList<QPair<int, QString>> audioTracks() const { return m_audioTracks; }
     QList<QPair<int, QString>> subtitlesTracks() const { return m_subtitlesTracks; }
     void parseTracks(libvlc_media_player_t* player);
+
+    MediaType detectTypeFromFile(const QString &path);
 
 signals:
     void fpsParsed(double);

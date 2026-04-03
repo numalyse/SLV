@@ -3,6 +3,9 @@
 #include "VlcParseHelper.h"
 
 #include <qurl.h>
+#include <QDebug>
+#include <QMimeDatabase>
+#include <QMimeType>
 
 
 Media::Media(const QString &filePath, QObject *parent, libvlc_instance_t *vlcInstance) : QObject(parent), m_filePath(filePath)
@@ -26,6 +29,8 @@ Media::Media(const QString &filePath, QObject *parent, libvlc_instance_t *vlcIns
 
     m_fileInfo = new QFileInfo(filePath);
     m_name = m_fileInfo->baseName();
+    setType(detectTypeFromFile(filePath));
+    //qDebug() << m_name << " type détecté : " << m_type;
 }
 
 Media::~Media()
@@ -84,7 +89,23 @@ void Media::parseTracks(libvlc_media_player_t* player)
 
     emit tracksParsed();
     // qDebug() << "[MEDIA] SEND emit tracksParsed";
+}
 
+MediaType Media::detectTypeFromFile(const QString& path)
+{
+    QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(path);
+
+    QString name = type.name();
+
+    if (name.startsWith("video/"))
+        return MediaType::Video;
+    if (name.startsWith("audio/"))
+        return MediaType::Audio;
+    if (name.startsWith("image/"))
+        return MediaType::Image;
+
+    return MediaType::Unknown;
 }
 
 /// @brief Ecoute les évènements vlc, lors du changement du temps envoie un signal.
@@ -114,7 +135,7 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                 media->setWidth(std::get<1>(resolution));
 
                 media->setMeta(VlcParseHelper::getMetaParsedMedia(parsedMedia));
-                
+
                 emit media->fpsParsed(fps);
                 emit media->resolutionParsed(resolution);
                 emit media->durationParsed(duration);

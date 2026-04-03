@@ -1,6 +1,6 @@
 #include "Project/ProjectExportHelper.h"
 #include "ProjectExportHelper.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 #include "TimeFormatter.h"
 #include "TSQueue.h"
 #include "DecodeThread.h"
@@ -727,13 +727,13 @@ namespace ProjectExportHelper {
     std::optional<ExportType> selectFormatWindow(const QString &originalFormat)
     {
         QDialog dialog;
-        auto& txtManager = TextManager::instance();
-        dialog.setWindowTitle(txtManager.get("export_format_selection_title")); 
+        auto& txtManager = PrefManager::instance();
+        dialog.setWindowTitle(txtManager.getText("export_format_selection_title")); 
         dialog.setMinimumWidth(300);
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
 
-        QLabel* label = new QLabel(txtManager.get("export_format_selection_txt"), &dialog);
+        QLabel* label = new QLabel(txtManager.getText("export_format_selection_txt"), &dialog);
         layout->addWidget(label);
 
         QComboBox* comboBox = new QComboBox(&dialog);
@@ -744,14 +744,14 @@ namespace ProjectExportHelper {
         comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
         if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
         comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
-        comboBox->addItem(txtManager.get("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+        comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
         
         layout->addWidget(comboBox);
 
         QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
         
-        buttonBox->button(QDialogButtonBox::Ok)->setText(txtManager.get("generic_dialog_btn_yes"));
-        buttonBox->button(QDialogButtonBox::Cancel)->setText(txtManager.get("generic_dialog_btn_cancel"));
+        buttonBox->button(QDialogButtonBox::Ok)->setText(txtManager.getText("generic_dialog_btn_yes"));
+        buttonBox->button(QDialogButtonBox::Cancel)->setText(txtManager.getText("generic_dialog_btn_cancel"));
         
         layout->addWidget(buttonBox);
 

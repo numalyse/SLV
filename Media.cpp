@@ -128,6 +128,32 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                 auto fps = VlcParseHelper::getFpsParsedMedia(parsedMedia);
                 std::tuple<int, int> resolution = VlcParseHelper::getResolutionParsedMedia(parsedMedia);
                 auto duration = libvlc_media_get_duration(parsedMedia);
+                libvlc_media_track_t **tracks;
+                unsigned int count = libvlc_media_tracks_get(parsedMedia, &tracks);
+                bool hasVideo = false; bool hasAudio = false; bool hasText = false;
+                MediaType type = MediaType::Unknown;
+                for (unsigned int i = 0; i < count; ++i) {
+                    switch (tracks[i]->i_type) {
+                    case libvlc_track_video:
+                        hasVideo = true;
+                        break;
+                    case libvlc_track_audio:
+                        hasAudio = true;
+                        break;
+                    // case libvlc_track_text:
+                    //     hasText = true;
+                    //     break;
+                    // case libvlc_track_unknown:
+                    //     break;
+                    }
+                }
+                if(hasVideo)
+                    type = MediaType::Video;
+                else if(hasAudio)
+                    type = MediaType::Audio;
+                //à voir pour image
+
+                libvlc_media_tracks_release(tracks, count);
                 
                 media->setDuration(duration);
                 media->setFps(fps);
@@ -139,6 +165,7 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                 emit media->fpsParsed(fps);
                 emit media->resolutionParsed(resolution);
                 emit media->durationParsed(duration);
+                emit media->typeParsed(type);
             }
         }
         else  {

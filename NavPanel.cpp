@@ -94,9 +94,9 @@ void NavPanel::displayPlaylist()
     m_sideWidget->setCurrentWidget(m_playlistWidget);
 }
 
-void NavPanel::timelineWidgetUpdateShotDetail(int shotCount, int shotId, Shot * shot)
+void NavPanel::timelineWidgetUpdateShotDetail(int shotCount, int requestId, Shot * shot)
 {
-    m_shotDetail->updateShotDetail(shotCount, shotId, shot);
+    m_shotDetail->updateShotDetail(shotCount, requestId, shot);
 }
 
 void NavPanel::disableShotControlButtons()

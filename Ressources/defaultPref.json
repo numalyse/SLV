@@ -1,0 +1,13 @@
+{
+    "Lang" : {
+        "code" : "en"
+    },
+
+    "Shortcuts" : {
+        "MainWindow" : {
+            "open_media" : "Ctrl + O",
+            "open_project" : "Ctrl + A",
+            "save_project" : "Ctrl + S"
+        }
+    }
+}

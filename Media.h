@@ -56,6 +56,7 @@ signals:
     void durationParsed(int64_t);
     void sizeParsed(const QSize &size);
     void tracksParsed();
+    void typeParsed(const MediaType);
     
 private:
     QString m_name;

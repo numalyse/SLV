@@ -1,5 +1,5 @@
 #include "PlaylistItem.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 #include <qevent.h>
 #include <QBuffer>
 #include <QProcess>

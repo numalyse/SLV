@@ -1,6 +1,6 @@
 #include "Toolbars/AdvancedToolbar.h"
 
-#include "TextManager.h"
+#include "PrefManager.h"
 #include "Project/ProjectManager.h"
 
 #include "GenericDialog.h"
@@ -20,15 +20,15 @@
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
-    m_nextMediaBtn = new ToolbarButton(this, "next_white", TextManager::instance().get("tooltip_next_media"));
-    m_prevMediaBtn = new ToolbarButton(this, "prev_white", TextManager::instance().get("tooltip_prev_media"));
+    m_nextMediaBtn = new ToolbarButton(this, "next_white", PrefManager::instance().getText("tooltip_next_media"));
+    m_prevMediaBtn = new ToolbarButton(this, "prev_white", PrefManager::instance().getText("tooltip_prev_media"));
 
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
         "down_arrow_white",
-        TextManager::instance().get("tooltip_minimize_toolbar"),
+        PrefManager::instance().getText("tooltip_minimize_toolbar"),
         "right_arrow_white",
-        TextManager::instance().get("tooltip_expand_toolbar")
+        PrefManager::instance().getText("tooltip_expand_toolbar")
     );
 
     m_extensionToolbar = new ExtensionToolbar(this);
@@ -176,7 +176,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_langBtn);
     buttonLayout->addSpacing(m_speedBtn->size().width());
     buttonLayout->addSpacing(m_speedBtn->size().width());
-
+    buttonLayout->addSpacing(m_speedBtn->size().width());
 
     buttonLayout->addStretch();
 
@@ -191,7 +191,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addStretch();
 
     buttonLayout->addWidget(m_screenshotBtn);
-
+    buttonLayout->addWidget(m_extractSequenceBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_extensionBtn);
@@ -211,6 +211,8 @@ void AdvancedToolbar::enableButtons()
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
+    if(m_extractable)
+        m_extractSequenceBtn->setEnabled(false);
     // m_removePlayerBtn->setEnabled(true);
     // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
@@ -233,6 +235,7 @@ void AdvancedToolbar::disableButtons()
     m_langBtn->setEnabled(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
+    m_extractSequenceBtn->setEnabled(false);
     // m_removePlayerBtn->setEnabled(false);
     // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
@@ -252,7 +255,7 @@ void AdvancedToolbar::enableSlider(){
 
 void AdvancedToolbar::disableSlider(){
     m_slider->setDisabled(true);
-    m_slider->setToolTip(TextManager::instance().get("tooltip_slider_disabled"));
+    m_slider->setToolTip(PrefManager::instance().getText("tooltip_slider_disabled"));
 }
 
 void AdvancedToolbar::onSliderPressed() {
@@ -277,11 +280,11 @@ void AdvancedToolbar::duplicatePlayerAction()
     ProjectManager& projManager = ProjectManager::instance();
     if(projManager.needSave()){ 
 
-        TextManager& txtManager = TextManager::instance();
+        PrefManager& txtManager = PrefManager::instance();
         SLV::showGenericDialog(
             this, 
-            txtManager.get("dialog_save_project_dialog_title"),
-            txtManager.get("dialog_save_project_dialog_text"),
+            txtManager.getText("dialog_save_project_dialog_title"),
+            txtManager.getText("dialog_save_project_dialog_text"),
             [&projManager, this]() { 
                 projManager.saveProject(false);
                 emit this->duplicatePlayerRequested();
@@ -299,12 +302,12 @@ void AdvancedToolbar::ejectRequested(){
     ProjectManager& projManager = ProjectManager::instance();
     if(projManager.needSave()){ 
 
-        TextManager& txtManager = TextManager::instance();
+        PrefManager& txtManager = PrefManager::instance();
 
         SLV::showGenericDialog(
             this, 
-            txtManager.get("dialog_save_project_dialog_title"),
-            txtManager.get("dialog_save_project_dialog_text"),
+            txtManager.getText("dialog_save_project_dialog_title"),
+            txtManager.getText("dialog_save_project_dialog_text"),
             [&projManager]() { 
                 projManager.saveProject(true); 
             },

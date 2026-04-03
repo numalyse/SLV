@@ -274,13 +274,13 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
 }
 
-void ShotManager::updateThumbnail(int shotId, QImage image){
-    if(shotId < 0 || shotId >= m_shotItems.size()){
+void ShotManager::updateThumbnail(int requestId, QImage image){
+    if(requestId < 0 || requestId >= m_shotItems.size()){
         qDebug() << "Tentative de mise a jour d'un shot out of range";
         return;
     }
 
-    ShotItem* shotItem = m_shotItems.at(shotId);
+    ShotItem* shotItem = m_shotItems.at(requestId);
     QPixmap pixmap = QPixmap::fromImage(image);
     shotItem->setThumbnail(pixmap);
 }

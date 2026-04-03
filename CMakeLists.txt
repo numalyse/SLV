@@ -28,7 +28,7 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
         Ressources/icon_ressources.qrc
-        Ressources/translation_ressources.qrc
+        Ressources/pref_ressources.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -56,7 +56,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ToolbarButtons/ToolbarPopupButton.h ToolbarButtons/ToolbarPopupButton.cpp
         ToolbarButtons/ToolbarToggleHoverButton.h ToolbarButtons/ToolbarToggleHoverButton.cpp
 
-        TextManager.h TextManager.cpp
+        PrefManager.h PrefManager.cpp
         TimeFormatter.h
         VlcParseHelper.h
         VlcInstance.h
@@ -104,6 +104,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         DecodeThread.h DecodeThread.cpp
         TSQueue.h
         MediaTransformHelper.h
+        ExtractSequenceWidget.h ExtractSequenceWidget.cpp
+        TimeEditor.h TimeEditor.cpp
 
     )
 

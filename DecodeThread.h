@@ -28,6 +28,15 @@ public:
     void decodeTagImages();
     void decodeMedia();
 
+    /** 
+    @brief Starts to decode the provided media. 
+    \n
+    \n If shots int the constructor was empty, will decode every frame.
+    \n Otherwise will decode only the tag image of each shot.
+    \n
+    If a target size was specified in the constructor, images will be resized. Same for color code
+    
+    **/
     void run() override;
 
 private:

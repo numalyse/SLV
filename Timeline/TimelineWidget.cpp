@@ -2,7 +2,7 @@
 
 #include "TimeFormatter.h"
 #include "Project/ProjectManager.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 
 #include "Timeline/Items/RulerItem.h"
 #include "Timeline/Items/CursorItem.h"
@@ -59,29 +59,29 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& proj
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
 
-    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", TextManager::instance().get("tooltip_split_shot"));
+    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_split_shot"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
     ButtonLayout->addWidget(m_autoSegmentationBtn);
 
-    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", TextManager::instance().get("tooltip_split_shot"));
+    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", PrefManager::instance().getText("tooltip_split_shot"));
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitShotAtCursor);
     ButtonLayout->addWidget(m_splitShotBtn);
 
-    m_abLoopBtn = new ToolbarButton(this, "abloop_white", TextManager::instance().get("tooltip_ab_loop"));
+    m_abLoopBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_ab_loop"));
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
     ButtonLayout->addWidget(m_abLoopBtn);
 
-    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", TextManager::instance().get("tooltip_merge_with_prev_shot"));
+    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", PrefManager::instance().getText("tooltip_merge_with_prev_shot"));
     connect(m_mergeWithPrevShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithPrevShotAction);
     ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
     m_mergeWithPrevShotBtn->setEnabled(false);
 
-    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", TextManager::instance().get("tooltip_merge_with_next_shot"));
+    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", PrefManager::instance().getText("tooltip_merge_with_next_shot"));
     connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
     m_mergeWithNextShotBtn->setEnabled(false);
 
-    m_exportBtn = new ToolbarButton(this, "auto_segmentation_white", TextManager::instance().get("tooltip_export"));
+    m_exportBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_export"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
@@ -253,7 +253,7 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
-    QAction *actionSplit = menu.addAction(TextManager::instance().get("timeline_split_shot_at_cursor"));
+    QAction *actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -261,24 +261,24 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionExtractAB = nullptr;
 
     if(m_showMergeWithPrevShotBtn){
-        mergeWithPreviousShot = menu.addAction(TextManager::instance().get("timeline_merge_with_previous_shot"));
+        mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
     }
     if(m_showMergeWithNextShotBtn){
-        mergeWithNextShot = menu.addAction(TextManager::instance().get("timeline_merge_with_next_shot"));
+        mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
     }
 
     switch (m_abManager->getMarkerCount())
     {
     case 0:
-        actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_0"));
+        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
         break;
     case 1:
-        actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_1"));
-        deleteABMarkers = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
+        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
+        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
         break;
     case 2:
-        actionAB = menu.addAction(TextManager::instance().get("timeline_ab_action_2"));
-        actionExtractAB = menu.addAction(TextManager::instance().get("timeline_ab_extraxt"));
+        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extraxt"));
         break;
     }
 
@@ -378,7 +378,7 @@ void TimelineWidget::updateShowMergeWithNextShot(bool state)
 
 void TimelineWidget::autoSegmentation(){
 
-    auto& txtManager = TextManager::instance();
+    auto& txtManager = PrefManager::instance();
     const QString& mediaPath = ProjectManager::instance().mediaPath(); 
     if(mediaPath.isEmpty()){
         qDebug() << "Project media path est vide";
@@ -388,8 +388,8 @@ void TimelineWidget::autoSegmentation(){
     SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
     segmentationThread->setPriority(QThread::HighPriority);
 
-    QProgressDialog* progressDialog = new QProgressDialog(txtManager.get("timeline_window_text_auto_segmentation"), txtManager.get("generic_dialog_btn_cancel"), 0, 100, nullptr);
-    progressDialog->setWindowTitle(txtManager.get("timeline_window_title_auto_segmentation"));
+    QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_window_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+    progressDialog->setWindowTitle(txtManager.getText("timeline_window_title_auto_segmentation"));
     progressDialog->setWindowModality(Qt::WindowModal); 
 
     connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){ 
@@ -412,8 +412,8 @@ void TimelineWidget::autoSegmentation(){
 
     SLV::showGenericDialog(
         this, 
-        txtManager.get("dialog_auto_segmentation_title"),
-        txtManager.get("dialog_auto_segmentation_text"),
+        txtManager.getText("dialog_auto_segmentation_title"),
+        txtManager.getText("dialog_auto_segmentation_text"),
     
         [segmentationThread, progressDialog, mediaPath]() { 
             progressDialog->show();

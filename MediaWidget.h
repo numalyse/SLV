@@ -42,6 +42,7 @@ public slots:
     void parseTracks();
     void setAudioTrack(int trackId);
     void setSubtitleTrack(int trackId);
+    void typeParsed(const MediaType type);
     bool mute();
     bool unmute();
     void togglePlayPause();
@@ -123,6 +124,7 @@ signals:
     void setSubtitlesTrackDefaultRequested();
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
+    void mediaIsVideoParsed();
 
 };
 

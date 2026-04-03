@@ -45,7 +45,7 @@ signals:
     void goToShotRequest(int);
 
 private slots:
-    void updateThumbnail(int shotId, QImage image);
+    void updateThumbnail(int requestId, QImage image);
     void updateImageRequest(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
     
 };

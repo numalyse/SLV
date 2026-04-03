@@ -25,6 +25,7 @@ public:
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
+    void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
@@ -36,6 +37,7 @@ public:
     ToolbarToggleHoverButton* speedBtn() const { return m_speedBtn; }
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
+    ToolbarButton* extractSequenceBtn() const {return m_extractSequenceBtn;}
     
     void resetSlider();
     void stopSlider();
@@ -82,6 +84,7 @@ protected:
     QLabel* m_durationLabel = nullptr;
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
+    bool m_extractable = false;
 
     QSlider* m_volumeSlider = nullptr;
     QLabel* m_volumeLabel = nullptr;
@@ -90,6 +93,7 @@ protected:
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;
+    ToolbarButton* m_extractSequenceBtn = nullptr;
 
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;
@@ -115,6 +119,7 @@ signals:
     void disableLoopModeRequest();
     void duplicatePlayerRequested();
     void setCursorPositionRequested(int64_t);
+    void extractSequenceRequest();
     
 };
 

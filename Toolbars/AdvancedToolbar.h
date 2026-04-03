@@ -24,6 +24,7 @@ public:
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
+    void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
 
 public slots:
     void enableButtons();

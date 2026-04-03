@@ -4,6 +4,7 @@
 #include "MediaWidget.h"
 #include "CompositionWidget.h"
 #include "Toolbars/SimpleToolbar.h"
+#include "ExtractSequenceWidget.h"
 
 #include <QWidget>
 #include <qmainwindow.h>
@@ -55,6 +56,7 @@ public slots:
     void onMediaRectChanged(const QRect &rect);
     void widgetSizeChange();
     bool event(QEvent *event);
+    void openSequenceExtractionDialog();
 
     void enableButtons();
     void disableButtons();

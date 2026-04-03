@@ -573,6 +573,12 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
 
 }
 
+void MediaWidget::typeParsed(const MediaType type)
+{
+    if(type == MediaType::Video)
+        emit mediaIsVideoParsed();
+}
+
 /// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
 void MediaWidget::releaseMedia(){
     if(m_media){
@@ -621,6 +627,7 @@ void MediaWidget::createMedia(const QString& filePath){
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
     m_media->parse();
     connect(m_media, &Media::tracksParsed, this, &MediaWidget::updateTracks);
+    connect(m_media, &Media::typeParsed, this, &MediaWidget::typeParsed);
     m_media->parseTracks(m_player);
 }
 

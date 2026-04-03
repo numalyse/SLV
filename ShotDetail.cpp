@@ -77,17 +77,17 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
 }
 
-void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
+void ShotDetail::updateShotDetail(int shotCount, int requestId, Shot * shotData)
 {
     m_shotData = shotData;
-    m_shotId = shotId;
+    m_shotId = requestId;
 
     m_tagImage->clear();
 
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text") + QString::number(shotId + 1));
+    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text") + QString::number(requestId + 1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));
@@ -96,10 +96,10 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 
     m_toNextShotBtn->setEnabled(true);
     m_toPrevShotBtn->setEnabled(true);
-    if(shotId == 0 || m_buttonDisabled){
+    if(requestId == 0 || m_buttonDisabled){
         m_toPrevShotBtn->setEnabled(false);
     }
-    if(shotId == shotCount-1 || m_buttonDisabled){
+    if(requestId == shotCount-1 || m_buttonDisabled){
         m_toNextShotBtn->setEnabled(false);
     }
 

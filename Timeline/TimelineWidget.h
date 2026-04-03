@@ -45,7 +45,7 @@ public slots:
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
 signals:
-    void updateShotDetailRequest(int shotCount, int shotId, Shot*);
+    void updateShotDetailRequest(int shotCount, int requestId, Shot*);
     void timelineSetPosition(int64_t);
     void timelineSliderPositionRequested(int64_t);
     void enableTimeRelatedUI();

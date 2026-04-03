@@ -10,11 +10,11 @@ ThumbnailWorker::~ThumbnailWorker() {
     stop();
 }
 
-void ThumbnailWorker::requestThumbnail(int shotId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize)
+void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize)
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    m_queue.enqueue({shotId, msStart, lenghtMs, mediaPath, targetSize});
+    m_queue.enqueue({requestId, msStart, lenghtMs, mediaPath, targetSize});
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
 
@@ -23,6 +23,20 @@ void ThumbnailWorker::stop()
     m_stop = true;
     m_condition.wakeOne();
     wait();
+}
+
+void ThumbnailWorker::clearQueue()
+{
+    QMutexLocker locker(&m_mutex);
+    m_queue.clear();
+}
+
+void ThumbnailWorker::keepNQueue(const int n)
+{
+    QMutexLocker locker(&m_mutex);
+    while (m_queue.size() > n) {
+        m_queue.dequeue();
+    }
 }
 
 void ThumbnailWorker::run()
@@ -86,17 +100,15 @@ void ThumbnailWorker::run()
             );
 
             cv::Mat resized;
-            cv::resize(frame, resized, newSize, 0, 0, cv::INTER_AREA);
+            cv::resize(frame, resized, newSize, 0, 0, cv::INTER_NEAREST);
 
-            cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB);
-
-            QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_RGB888);
+            QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
             QImage finalImg = img.copy(); // utiliser .copy() car les données de resized vont être détruites
 
-            //qDebug() << "Thumbnail : prete pour le plan : " <<req.shotId ;
-            emit thumbnailReady(req.shotId, finalImg);
+            //qDebug() << "Thumbnail : prete pour le plan : " <<req.requestId ;
+            emit thumbnailReady(req.requestId, finalImg);
         }else {
-            qDebug() << "Thumbnail:  Impossible de lire l'image pour le plan : " << req.shotId ;
+            qDebug() << "Thumbnail:  Impossible de lire l'image pour le plan : " << req.requestId ;
         }
 
     }

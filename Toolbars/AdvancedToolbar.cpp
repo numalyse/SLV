@@ -173,7 +173,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_langBtn);
     buttonLayout->addSpacing(m_speedBtn->size().width());
     buttonLayout->addSpacing(m_speedBtn->size().width());
-
+    buttonLayout->addSpacing(m_speedBtn->size().width());
 
     buttonLayout->addStretch();
 
@@ -188,7 +188,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addStretch();
 
     buttonLayout->addWidget(m_screenshotBtn);
-
+    buttonLayout->addWidget(m_extractSequenceBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);
     buttonLayout->addWidget(m_fullscreenBtn);
     buttonLayout->addWidget(m_extensionBtn);
@@ -208,6 +208,8 @@ void AdvancedToolbar::enableButtons()
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
+    if(m_extractable)
+        m_extractSequenceBtn->setEnabled(false);
     // m_removePlayerBtn->setEnabled(true);
     // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
@@ -230,6 +232,7 @@ void AdvancedToolbar::disableButtons()
     m_langBtn->setEnabled(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
+    m_extractSequenceBtn->setEnabled(false);
     // m_removePlayerBtn->setEnabled(false);
     // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);

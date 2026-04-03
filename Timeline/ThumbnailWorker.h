@@ -11,7 +11,7 @@
 #include <opencv2/opencv.hpp>
 
 struct ThumbnailRequest{
-    int shotId;
+    int requestId;
     int64_t msStart;
     int64_t shotLength;
     QString videoPath;
@@ -26,11 +26,13 @@ public:
     explicit ThumbnailWorker(QObject* parent = nullptr);
     ~ThumbnailWorker();
 
-    void requestThumbnail(int shotId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize = {100, 75});
+    void requestThumbnail(int requestId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize = {100, 75});
     void stop();
+    void clearQueue();
+    void keepNQueue(const int n);
 
 signals:
-    void thumbnailReady(int shotId, QImage image);
+    void thumbnailReady(int requestId, QImage image);
 
 protected:
     void run() override;

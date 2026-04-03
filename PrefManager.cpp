@@ -3,9 +3,9 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QDebug>
+#include <QDir>
 
-/// @brief Charge le JSON de la langue choisie
-/// @param langCode "fr", "en"
+
 void PrefManager::loadLanguage(const QString& langCode) 
 {
     QString filePath = ":/lang/" + langCode + ".json";
@@ -21,9 +21,7 @@ void PrefManager::loadLanguage(const QString& langCode)
     }
 }
 
-/// @brief Retrouve la valeur associée à la clé
-/// @param key QString
-/// @return QString. Si la valeur associée à la clé est trouvée, retourne la valeur, sinon retourne la clé.
+
 QString PrefManager::getText(const QString &key) const
 {
     if (m_texts.contains(key)) {
@@ -31,4 +29,77 @@ QString PrefManager::getText(const QString &key) const
     }
     qDebug() << key << " n'est pas dans le fichier json";
     return "[" + key + "]";
+}
+
+
+bool PrefManager::createPreferenceFile(const QString &destFilePath) {
+    QFileInfo fileInfo(destFilePath);
+    QDir dir = fileInfo.absoluteDir();
+
+    if (!dir.exists()) {
+        if (!dir.mkpath(".")) {
+            qCritical() << "Impossible de créer le dossier SLV Contents pour les préférences.";
+            return false;
+        }
+    }
+
+    QString resourcePath = ":/defaultPref.json";
+    QFile defaultFile(resourcePath);
+
+    return defaultFile.copy(destFilePath);
+}
+
+void PrefManager::loadDefaultPrefs(){
+    QString resourcePath = ":/defaultPref.json";
+    QFile defaultFile(resourcePath);
+
+    if (defaultFile.open(QIODevice::ReadWrite)) {
+        QByteArray data = defaultFile.readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        m_defaultPrefs = doc.object();
+        defaultFile.close();
+    }else {
+        qCritical() << "Impossible d'ouvrir le fichier des préférences par défaut : " << defaultFile.errorString();
+    }
+
+}
+
+void PrefManager::loadUserPrefs(){
+
+    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
+    QFile file(filePath);
+
+    if ( ! file.exists() ){
+        if(!createPreferenceFile(filePath)){
+            qCritical() << "Impossible de copier le fichier des preferences dans SLV contents";
+            return; 
+        } 
+    }
+
+    if (file.open(QIODevice::ReadWrite)) {
+        QByteArray data = file.readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        m_userPrefs = doc.object();
+        file.close();
+    } else {
+        qCritical() << "Impossible d'ouvrir le fichier des préférences : " << file.errorString();
+    }
+}
+
+void PrefManager::loadPrefs()
+{
+    loadDefaultPrefs();
+    loadUserPrefs();
+}
+
+QString PrefManager::getPref(const QString &key) const
+{
+    if (m_userPrefs.contains(key)) {
+        return m_userPrefs[key].toString();
+    }else if(m_defaultPrefs.contains(key)) { // check si existe dans le fichier par défault
+        return m_userPrefs[key].toString();
+    }else {
+        qCritical() << "La clé n'existe pas dans les préférences";
+        return "[" + key + "]";
+    }
 }

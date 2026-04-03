@@ -35,8 +35,14 @@ public slots:
     void disableSlider();
 
     virtual void ejectRequested() override;
+    virtual void disableFullscreenRequested() override;
     
 private:
+    void addShortcuts();
+    void incrementSpeedSlider();
+    void decrementSpeedSlider();
+    void resetSpeedSlider();
+
     ToolbarButton* m_prevMediaBtn = nullptr;
     ToolbarButton* m_nextMediaBtn = nullptr;
 

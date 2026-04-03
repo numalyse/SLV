@@ -36,8 +36,8 @@ public:
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
         connect(m_stopBtn, &ToolbarButton::clicked, this, &Toolbar::stopRequest);
         connect(m_ejectBtn, &ToolbarButton::clicked, this, &Toolbar::ejectRequested);
-        connect(m_fullscreenBtn,&ToolbarToggleButton::stateActivated, this, &Toolbar::enableFullscreenRequest);
-        connect(m_fullscreenBtn,&ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableFullscreenRequest);
+        connect(m_fullscreenBtn,&ToolbarToggleButton::stateActivated, this, &Toolbar::enableFullscreenRequested);
+        connect(m_fullscreenBtn,&ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableFullscreenRequested);
         connect(m_screenshotBtn, &ToolbarButton::clicked, this, &Toolbar::screenshotRequest);
         connect(&SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled, m_playPauseBtn, [this](){ m_playPauseBtn->setButtonState(false); });
         connect(this, &Toolbar::selectFilePlayCanceled, &SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled);
@@ -61,6 +61,18 @@ public slots:
     virtual void ejectRequested(){
         emit ejectRequest();
     };
+
+    void enableFullscreenRequested(){
+        // permet d'ajouter un shortcut a la toolbar pour pouvoir quitter le fullscreen avec le raccourcis meme si la toolbar n'a pas de raccourcis
+        m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "exit_fullscreen")));
+        emit enableFullscreenRequest();
+    }
+
+    virtual void disableFullscreenRequested(){
+        // par défaut on supprime le shortcut, dans advanced / global toolbar on override cette fonction pour le rajouter le bon
+        m_fullscreenBtn->setShortcut(QKeySequence()); 
+        emit disableFullscreenRequest();
+    }
 
 
 // Les classes filles pourront modifier ces widgets

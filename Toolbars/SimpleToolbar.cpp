@@ -64,13 +64,13 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     speedInfoLayout->addStretch();
     speedInfoLayout->addWidget(fastIcon);
 
-    QSlider* speedSlider = new QSlider(Qt::Horizontal);
-    speedSlider->setRange(0,6);
-    speedSlider->setValue(3);
-    speedSlider->setTickPosition(QSlider::TicksAbove);
-    speedSlider->setTickInterval(1);
+    m_speedSlider = new QSlider(Qt::Horizontal);
+    m_speedSlider->setRange(0,6);
+    m_speedSlider->setValue(3);
+    m_speedSlider->setTickPosition(QSlider::TicksAbove);
+    m_speedSlider->setTickInterval(1);
 
-    speedFrameLayout->addWidget(speedSlider);
+    speedFrameLayout->addWidget(m_speedSlider);
 
     m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  PrefManager::instance().getText("tooltip_speed"), "speed_white", PrefManager::instance().getText("tooltip_speed"));
 
@@ -122,7 +122,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateActivated, this, &SimpleToolbar::enableMuteRequest);
     connect(m_muteBtn, &ToolbarToggleHoverButton::stateDeactivated, this, &SimpleToolbar::disableMuteRequest);
     connect(m_volumeSlider, &QSlider::valueChanged, this, &SimpleToolbar::volumeChanged);
-    connect(speedSlider, &QSlider::valueChanged, this, &SimpleToolbar::speedChanged);
+    connect(m_speedSlider, &QSlider::valueChanged, this, &SimpleToolbar::speedChanged);
     connect(m_loopBtn, &ToolbarToggleButton::stateActivated, this, &SimpleToolbar::enableLoopModeRequest);
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);

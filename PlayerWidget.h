@@ -95,7 +95,6 @@ signals:
     void mediaRectChanged(const QRect &rect);
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 

@@ -444,32 +444,5 @@ void PlayerWidget::dropEvent(QDropEvent *event)
     }
 }
 
-void PlayerWidget::keyPressEvent(QKeyEvent *event)
-{
-    // if (event->key() == Qt::Key_Space) {
-    //     togglePlayPause();
-    // } else {
-    //     QWidget::keyPressEvent(event);
-    // }
-
-    if (event->key() == Qt::LeftArrow) {
-        moveTimeBackward();
-    } else {
-        QWidget::keyPressEvent(event);
-    }
-
-    if (event->key() == Qt::RightArrow) {
-        moveTimeForward();
-    } else {
-        QWidget::keyPressEvent(event);
-    }
-
-    if (event->key() == Qt::Key_C) {
-        takeScreenshot();
-    } else {
-        QWidget::keyPressEvent(event);
-    }
-}
-
 
 

@@ -3,6 +3,7 @@
 
 ToolbarButton::ToolbarButton(QWidget *parent, const QString &iconName, const QString &toolTipText) : QPushButton(parent)
 {
+    setFocusPolicy(Qt::NoFocus);
     if(iconName == ""){
         setText("Icon");
     }else {

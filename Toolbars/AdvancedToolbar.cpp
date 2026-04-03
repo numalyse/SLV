@@ -17,6 +17,7 @@
 
 #include <QMessageBox>
 #include <QPushButton>
+#include <QShortcut>
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -83,6 +84,35 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     setDefaultUI();
     disableButtons();
+
+    addShortcuts();
+}
+
+void AdvancedToolbar::addShortcuts(){
+    auto& prefManager = PrefManager::instance();
+    QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
+    QJsonObject atShortcuts = prefManager.getSubCategory("Shortcuts", "AdvancedTB");
+
+    m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
+    m_nextMediaBtn->setShortcut(QKeySequence(atShortcuts.value("next_media").toString()));
+    m_prevMediaBtn->setShortcut(QKeySequence(atShortcuts.value("prev_media").toString()));
+    m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
+    m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
+    m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
+    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("capture").toString()));
+    m_loopBtn->setShortcut(QKeySequence(atShortcuts.value("loop").toString())); 
+
+    QShortcut* shortcutIncSpeed = new QShortcut(QKeySequence(atShortcuts.value("increase_speed").toString()), this);
+    shortcutIncSpeed->setContext(Qt::ApplicationShortcut);
+    connect(shortcutIncSpeed, &QShortcut::activated, this, &AdvancedToolbar::incrementSpeedSlider);
+
+    QShortcut* shortcutDecSpeed = new QShortcut(QKeySequence(atShortcuts.value("decrease_speed").toString()), this);
+    shortcutDecSpeed->setContext(Qt::ApplicationShortcut);
+    connect(shortcutDecSpeed, &QShortcut::activated, this, &AdvancedToolbar::decrementSpeedSlider);
+
+    QShortcut* shortcutResetSpeed = new QShortcut(QKeySequence(atShortcuts.value("base_speed").toString()), this);
+    shortcutResetSpeed->setContext(Qt::ApplicationShortcut);
+    connect(shortcutResetSpeed, &QShortcut::activated, this, &AdvancedToolbar::resetSpeedSlider);
 }
 
 /// @brief Constructeur qui va copier les états des boutons de le toolbar passé en paramète 
@@ -140,7 +170,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     }
 
     // TODO : voir pour copier les états des sliders dans muteBtn et speedBtn
-
+    //addShortcuts();
 }
 
 void AdvancedToolbar::setFullscreenUI()
@@ -319,4 +349,25 @@ void AdvancedToolbar::ejectRequested(){
     }else {
         projManager.discardAndEject();
     }
+}
+
+void AdvancedToolbar::disableFullscreenRequested(){
+    m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar" , "enter_fullscreen")));
+    emit disableFullscreenRequest();
+}
+
+void AdvancedToolbar::incrementSpeedSlider(){
+    if (m_speedSlider->value() < m_speedSlider->maximum()) {
+        m_speedSlider->setValue(m_speedSlider->value() + 1);
+    }
+}
+
+void AdvancedToolbar::decrementSpeedSlider(){
+    if (m_speedSlider->value() > m_speedSlider->minimum()) {
+        m_speedSlider->setValue(m_speedSlider->value() - 1);
+    }
+}
+
+void AdvancedToolbar::resetSpeedSlider(){
+    m_speedSlider->setValue(3);
 }

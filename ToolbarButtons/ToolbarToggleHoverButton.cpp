@@ -15,6 +15,8 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
 {
     Q_ASSERT(layoutToDisplay != nullptr);
 
+    setFocusPolicy(Qt::NoFocus);
+
     m_hideTimer = new QTimer(this);
     m_hideTimer->setSingleShot(true);
     m_hideTimer->setInterval(timerDuration);

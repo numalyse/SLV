@@ -86,5 +86,11 @@
     "no_audio" : "Pas de piste audio",
     "no_subtitles" : "Pas de piste de sous-titres",
 
-    "open_files" : "Ouvrir des fichiers multimédia"
+    "open_files" : "Ouvrir des fichiers multimédia",
+
+    "main_window_menu_bar_file": "Fichier",
+    "main_window_file_open_media_action": "Ouvrir des fichiers multimédia",
+    "main_window_file_open_project_action": "Ouvrir un projet",
+    "main_window_file_save_project_action": "Enregistrer"
+
 }

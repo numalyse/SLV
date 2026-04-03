@@ -91,16 +91,22 @@ MainWindow::MainWindow(QWidget *parent)
         });
     }
     
-    
 }
 
 void MainWindow::createMenuBar()
 {
     auto *projManager = &ProjectManager::instance();
-    auto *fileMenu = menuBar()->addMenu("&Fichier");
-    auto *openMediaAction = fileMenu->addAction("&Ouvrir des fichiers multimédia");
-    auto *openProjectAction = fileMenu->addAction("&Ouvrir un projet");
-    auto *saveProjectAction = fileMenu->addAction("&Enregistrer");
+    auto& prefManager = PrefManager::instance();
+    auto *fileMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_file"));
+
+    auto *openMediaAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_open_media_action"));
+    openMediaAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "open_media")));
+
+    auto *openProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_open_project_action"));
+    openProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "open_project")));
+
+    auto *saveProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_project_action"));
+    saveProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "save_project")));
     saveProjectAction->setDisabled(true);
 
     connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){

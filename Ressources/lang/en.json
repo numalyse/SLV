@@ -85,5 +85,12 @@
     "no_audio" : "No audio track",
     "no_subtitles" : "No subtitle track",
 
-    "open_files" : "Open files"
+    "open_files" : "Open files",
+
+    
+    "main_window_menu_bar_file": "File",
+    "main_window_file_open_media_action": "Open Multimedia files",
+    "main_window_file_open_project_action": "Open a project",
+    "main_window_file_save_project_action": "Save"
+    
 }

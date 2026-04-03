@@ -101,33 +101,87 @@ void PrefManager::loadPrefs()
 
 QString PrefManager::getPref(const QString &category, const QString &key) const
 {
-    if (m_userPrefs.contains(category)) {
-        QJsonObject userCatObj = m_userPrefs.value(category).toObject();
-        if (userCatObj.contains(key)) {
-            return userCatObj.value(key).toString();
-        }
-    }
-    if (m_defaultPrefs.contains(category)) {
-        QJsonObject defaultCatObj = m_defaultPrefs.value(category).toObject();
-        
-        if (defaultCatObj.contains(key)) {
-            return defaultCatObj.value(key).toString();
-        }
+    QJsonObject catObj = getCategory(category);
+
+    if (catObj.contains(key)) {
+        return catObj.value(key).toString();
     }
 
-    qWarning() << "La clé" << key << "dans la catégorie" << category << "n'existe pas.";
+    qWarning() << "[PrefManager] La clé" << key << "dans la catégorie" << category << "n'existe pas.";
     return QString();
 }
 
-QJsonObject PrefManager::getCategory(const QString &category) const
+QString PrefManager::getPref(const QString &category, const QString &subCategory, const QString &key) const
 {
-    if (m_userPrefs.contains(category)) {
-        return m_userPrefs.value(category).toObject();
-    }
-    if (m_defaultPrefs.contains(category)) {
-        m_defaultPrefs.value(category).toObject();
+    QJsonObject subCatObj = getSubCategory(category, subCategory);
+
+    if (subCatObj.contains(key)) {
+        return subCatObj.value(key).toString();
     }
 
-    qWarning() << "La catégorie : "<< category << "n'existe pas";
-    return QJsonObject();
+    qWarning() << "[PrefManager]  La clé" << key << "dans la catégorie" << category << "->" << subCategory << "n'existe pas.";
+    return QString();
+}
+
+
+QJsonObject PrefManager::getCategory(const QString &category) const
+{
+    QJsonObject result; 
+
+    if (m_defaultPrefs.contains(category)) {
+        result = m_defaultPrefs.value(category).toObject();
+    }
+
+    if (m_userPrefs.contains(category)) { // ajoute les pref de l'utilsateur par dessus, si le fichier en contient que quelques uns ca sera pris en compte
+        QJsonObject userCatObj = m_userPrefs.value(category).toObject();
+
+        for (auto it = userCatObj.begin(); it != userCatObj.end(); ++it) {
+            if (result.contains(it.key())) {
+                result.insert(it.key(), it.value());
+            } else {
+                qWarning() << "[PrefManager] Clé inconnue ignorée :" << it.key() << "dans la catégorie" << category;
+            }
+        }
+    }
+
+    if (result.isEmpty()) {
+        qWarning() << "[PrefManager] La catégorie : "<< category << "n'existe pas";
+    }
+
+    return result;
+}
+
+
+QJsonObject PrefManager::getSubCategory(const QString &category, const QString &subCategory) const
+{
+    QJsonObject result; 
+
+    if (m_defaultPrefs.contains(category)) {
+        QJsonObject defaultCatObj = m_defaultPrefs.value(category).toObject();
+        if (defaultCatObj.contains(subCategory)) {
+            result = defaultCatObj.value(subCategory).toObject();
+        }
+    }
+
+    if (m_userPrefs.contains(category)) {
+        QJsonObject userCatObj = m_userPrefs.value(category).toObject();
+
+        if (userCatObj.contains(subCategory)) {
+            QJsonObject userSubCatObj = userCatObj.value(subCategory).toObject();
+            
+            for (auto it = userSubCatObj.begin(); it != userSubCatObj.end(); ++it) {
+                if (result.contains(it.key())) {
+                    result.insert(it.key(), it.value());
+                } else {
+                    qWarning() << "Clé inconnue ignorée :" << it.key() << "dans" << category << "->" << subCategory;
+                }
+            }
+        }
+    }
+
+    if (result.isEmpty()) {
+        qWarning() << "La sous catégorie : "<< category << "->" << subCategory << "n'existe pas (ou est vide)";
+    }
+
+    return result;
 }

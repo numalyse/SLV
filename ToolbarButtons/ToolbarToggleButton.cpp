@@ -11,7 +11,7 @@ ToolbarToggleButton::ToolbarToggleButton(
     const QString &iconNameOff, 
     const QString &toolTipTextOff)  : QPushButton(parent)
 {
-
+    setFocusPolicy(Qt::NoFocus);
     m_iconPathOn = ICONS_PATH + iconNameOn;
     m_toolTipTextOn = toolTipTextOn;
     m_iconPathOff = ICONS_PATH + iconNameOff;

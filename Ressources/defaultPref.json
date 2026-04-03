@@ -8,6 +8,26 @@
             "open_media" : "Ctrl + O",
             "open_project" : "Ctrl + A",
             "save_project" : "Ctrl + S"
+        },
+        "CommonToolbar" : {
+            "play_pause" : "Space",
+            "stop" : "S",
+            "mute" : "M",
+            "enter_fullscreen" : "F",
+            "exit_fullscreen" : "Escape",
+            "capture" : "Shift + S"
+        },
+        "AdvancedTB" : {
+            "increase_speed" : "+",
+            "decrease_speed" : "-",
+            "base_speed" : "=",
+            "next_media" : "N",
+            "prev_media" : "P",
+            "loop" : "L"
+        },
+        "ExtensionTB" : {
+            "prev_frame" : "A",
+            "next_frame" : "E"
         }
     }
 }

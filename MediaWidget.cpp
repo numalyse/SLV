@@ -510,15 +510,6 @@ void MediaWidget::mousePressEvent(QMouseEvent *event)
     QWidget::mousePressEvent(event);
 }
 
-void MediaWidget::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Space) {
-        togglePlayPause();
-    } else {
-        QWidget::keyPressEvent(event);
-    }
-}
-
 void MediaWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

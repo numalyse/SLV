@@ -15,6 +15,8 @@ ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QLayout *layoutToDisplay
 {
     Q_ASSERT(layoutToDisplay != nullptr);
 
+    setFocusPolicy(Qt::NoFocus);
+
     layoutToDisplay->setParent(nullptr);
     // m_widgetToDisplay = widgetToDisplay;
     QWidget* container = new QWidget();

@@ -99,6 +99,7 @@ protected:
     QSlider* m_volumeSlider = nullptr;
     QLabel* m_volumeLabel = nullptr;
     ToolbarToggleHoverButton* m_speedBtn = nullptr;
+    QSlider* m_speedSlider = nullptr;
     QLabel* m_speedLabel = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;

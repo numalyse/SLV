@@ -28,7 +28,7 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
         Ressources/icon_ressources.qrc
-        Ressources/translation_ressources.qrc
+        Ressources/pref_ressources.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

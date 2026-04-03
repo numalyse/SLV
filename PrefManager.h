@@ -28,9 +28,18 @@ public:
     /// @brief Loads the default preference to be used as fallback if key was not found in user pref
     void loadDefaultPrefs();
 
+    /// @brief Load the file in SLV Content if present, if not present creates a new one before loading
     void loadUserPrefs();
 
-    QString getPref(const QString &key) const;
+    /// @brief Gets an entire category 
+    /// @param category 
+    QJsonObject getCategory(const QString &category) const;
+
+    /// @brief Finds the value of the specified key in the specified category
+    /// @param category 
+    /// @param key 
+    /// @return If key was found, returns its value otherwise "[key]"
+    QString getPref(const QString &category, const QString &key) const;
 
 private:
     /// @brief Creates the preference file in SLV Contents

@@ -1,3 +1,9 @@
 {
-    "langCode" : "en"
+    "Lang" : {
+        "code" : "en"
+    },
+
+    "Shortcuts" : {
+        
+    }
 }

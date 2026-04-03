@@ -32,7 +32,8 @@ QString PrefManager::getText(const QString &key) const
 }
 
 
-bool PrefManager::createPreferenceFile(const QString &destFilePath) {
+bool PrefManager::createPreferenceFile(const QString &destFilePath)
+{
     QFileInfo fileInfo(destFilePath);
     QDir dir = fileInfo.absoluteDir();
 
@@ -97,14 +98,36 @@ void PrefManager::loadPrefs()
     loadUserPrefs();
 }
 
-QString PrefManager::getPref(const QString &key) const
+
+QString PrefManager::getPref(const QString &category, const QString &key) const
 {
-    if (m_userPrefs.contains(key)) {
-        return m_userPrefs[key].toString();
-    }else if(m_defaultPrefs.contains(key)) { // check si existe dans le fichier par défault si pas trouvé dans le fichier user
-        return m_userPrefs[key].toString();
-    }else {
-        qCritical() << "[PrefManager] La clé n'existe pas dans les préférences";
-        return "[" + key + "]";
+    if (m_userPrefs.contains(category)) {
+        QJsonObject userCatObj = m_userPrefs.value(category).toObject();
+        if (userCatObj.contains(key)) {
+            return userCatObj.value(key).toString();
+        }
     }
+    if (m_defaultPrefs.contains(category)) {
+        QJsonObject defaultCatObj = m_defaultPrefs.value(category).toObject();
+        
+        if (defaultCatObj.contains(key)) {
+            return defaultCatObj.value(key).toString();
+        }
+    }
+
+    qWarning() << "La clé" << key << "dans la catégorie" << category << "n'existe pas.";
+    return QString();
+}
+
+QJsonObject PrefManager::getCategory(const QString &category) const
+{
+    if (m_userPrefs.contains(category)) {
+        return m_userPrefs.value(category).toObject();
+    }
+    if (m_defaultPrefs.contains(category)) {
+        m_defaultPrefs.value(category).toObject();
+    }
+
+    qWarning() << "La catégorie : "<< category << "n'existe pas";
+    return QJsonObject();
 }

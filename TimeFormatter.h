@@ -5,9 +5,40 @@
 
 #include <QString>
 #include <QList>
+#include <QDebug>
 
 namespace TimeFormatter
 {
+
+    /// @brief Convertie str en int64_t
+    /// @param timeStr 
+    /// @param fps 
+    /// @param frameOffset Si vlc set time nous place sur la frame précédente, on peut ajouter un offset frame pour compenser
+    /// @return 
+    inline int64_t HHMMSSFFToMs(QString timeStr, double fps, double frameOffset = 0.0) {
+        timeStr.replace(' ', '0');
+        timeStr.replace('.', ':');
+        QStringList parts = timeStr.split(':');
+
+        if (parts.size() < 4) {
+            qDebug() << "Conversion impossible, le texte n'est pas au bon format";
+            return 0;
+        }
+
+        if (fps <= 0.0) {
+            qDebug() << "Conversion Warning, les fps étaient invalides, passage à 1 fps";
+            fps = 1.0;
+        }
+
+        int64_t h = parts[0].toLongLong() * 3600000;
+        int64_t m = parts[1].toLongLong() * 60000;
+        int64_t s = parts[2].toLongLong() * 1000;
+
+        double frames = parts[3].toDouble() + frameOffset; 
+        int64_t msFromFrames = static_cast<int64_t>( (frames * 1000.0) / fps);
+
+        return h + m + s + msFromFrames;
+    }
 
     /// @brief Formatte un temps passé en ms en temps HH : MM : SS : FF en fonction du nombre de FPS du média
     /// @param ms 

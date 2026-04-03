@@ -10,6 +10,8 @@
 #include <Playlist.h>
 #include <QSize>
 #include <QStackedWidget>
+#include <QScrollArea>
+#include <QResizeEvent>
 
 class NavPanel : public QWidget
 {
@@ -20,6 +22,7 @@ private:
 
     bool m_isOpen = false;
     QStackedWidget *m_sideWidget = nullptr;
+    QScrollArea *m_scrollArea = nullptr;
     QLayout *m_mainLayout = nullptr;
     Playlist *m_playlistWidget = nullptr;
     ShotDetail *m_shotDetail = nullptr;
@@ -43,6 +46,9 @@ signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
     void goToShotRequest(int);
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void updateThumbnail(int requestId, QImage image);

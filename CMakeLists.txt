@@ -48,6 +48,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp
         Toolbars/SimpleToolbar.h Toolbars/SimpleToolbar.cpp
         Toolbars/ExtensionToolbar.h Toolbars/ExtensionToolbar.cpp
+        Toolbars/TimeEdit.h Toolbars/TimeEdit.cpp
+        Toolbars/TimeValidator.h Toolbars/TimeValidator.cpp
 
         ToolbarButtons/ToolbarButton.h ToolbarButtons/ToolbarButton.cpp
         ToolbarButtons/ToolbarToggleButton.h ToolbarButtons/ToolbarToggleButton.cpp

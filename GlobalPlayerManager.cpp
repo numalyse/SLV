@@ -52,6 +52,8 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
 
     m_layoutManager->createLayout(1);
+    qDebug() << "GlobalPlayerManager height : " << this->height();
+    //m_navPanel->
 }
 
 ///@brief Supprime puis Remplace m_playersWidget par le widget retourné par m_layoutManager->createLayoutFromPaths(filesPaths); 
@@ -120,6 +122,11 @@ void GlobalPlayerManager::closeNavPanel()
     m_navPanel->hidePanel();
 }
 // slots
+
+void GlobalPlayerManager::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+}
 
 /// @brief Met à jour l'état du bouton play pause 
 /// @param state 

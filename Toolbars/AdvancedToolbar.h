@@ -3,6 +3,7 @@
 
 #include "Toolbars/SimpleToolbar.h"
 #include "Toolbars/ExtensionToolbar.h"
+#include "Toolbars/TimeEdit.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -12,6 +13,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QSlider>
+
 
 /// @brief Toolbar Avancé, utilisé pour la lecture classique, peut être étendu pour afficher des contrôles supplémentaires.
 class AdvancedToolbar : public SimpleToolbar

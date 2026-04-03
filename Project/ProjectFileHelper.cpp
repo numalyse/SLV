@@ -63,8 +63,8 @@ namespace ProjectFileHelper {
         }
 
         QString projectName = projectInfo.baseName(); 
-        QString jsonFilePath = projectAbsolutePath + QDir::separator() + projectName + ".json";
-
+        QString jsonFilePath = QDir(projectAbsolutePath).filePath(projectName + ".json");
+        
         QFileInfo saveFileInfo(jsonFilePath);
         if (!saveFileInfo.exists() || !saveFileInfo.isFile()) {
             qCritical() << "Erreur : Fichier de projet introuvable au chemin : " << jsonFilePath;
@@ -101,7 +101,7 @@ namespace ProjectFileHelper {
             loadedData.duration = mediaJson.value("duration").toInt(0);
             loadedData.fps = mediaJson.value("fps").toDouble(0.0);
 
-            loadedData.mediaAbsolutePath = projectAbsolutePath + QDir::separator() + loadedData.mediaName;
+            loadedData.mediaAbsolutePath = QDir(projectAbsolutePath).filePath(loadedData.mediaName);
             QFileInfo mediaInfo(loadedData.mediaAbsolutePath);
             
             if (!mediaInfo.exists() || !mediaInfo.isFile()) {
@@ -138,8 +138,8 @@ namespace ProjectFileHelper {
     bool writeJson(const Project* project, TimelineWidget* timeline) {
         if (!project || !timeline) return false;
 
-        QString jsonPath = project->path + QDir::separator() + project->name + ".json";
-
+        QString jsonPath = QDir(project->path).filePath(project->name + ".json");
+        
         QFile projectDataFile(jsonPath);
         if (!projectDataFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
             qCritical() << "Impossible d'ouvrir le fichier en écriture :" << jsonPath;

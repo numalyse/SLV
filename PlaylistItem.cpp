@@ -1,6 +1,7 @@
 #include "PlaylistItem.h"
 #include "PrefManager.h"
 #include <qevent.h>
+#include <QBuffer>
 
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     : QWidget{parent}
@@ -20,7 +21,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     // thumbnail
     m_mediaThumbnailLabel = new QLabel();
     m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
-    m_mediaThumbnailLabel->setText(PrefManager::instance().getText("No preview"));
+    m_mediaThumbnailLabel->setText(PrefManager::instance().getText("no_preview"));
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
 
@@ -29,31 +30,32 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     infoLayout->setSpacing(2);
 
     m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
-    //m_mediaTitleLabel->setWordWrap(true);
+    m_mediaTitleLabel->setToolTip(m_mediaData->fileName()+"."+m_mediaData->fileExtension());
     m_mediaTitleLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     infoLayout->addWidget(m_mediaTitleLabel);
 
     QHBoxLayout *metaLayout = new QHBoxLayout();
 
     m_mediaTypeIcon = new QLabel();
-    m_mediaThumbnailImage = new QPixmap(":/icon/show_image_white");
+    m_mediaThumbnailImage = new QPixmap(":/icons/show_image_white");
     m_mediaTypeIcon->setPixmap(m_mediaThumbnailImage->scaled(16,16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     m_mediaDurationLabel = new QLabel("00:00:00");
 
     metaLayout->addWidget(m_mediaTypeIcon);
     metaLayout->addWidget(m_mediaDurationLabel);
-    metaLayout->addStretch();
 
     infoLayout->addLayout(metaLayout);
 
     mainLayout->addLayout(infoLayout);
-    mainLayout->addStretch();
+    mainLayout->addSpacing(10);
 
     // bouton delete
     m_deleteBtn = new QPushButton("✕");
-    m_deleteBtn->setFixedSize(24,24);
+    m_deleteBtn->setToolTip(TextManager::instance().get("delete"));
+
     mainLayout->addWidget(m_deleteBtn);
+    mainLayout->addSpacing(10);
 
     initStyle();
     connect(m_mediaData, &Media::durationParsed, this, &PlaylistItem::setDurationLabel);
@@ -63,17 +65,41 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     m_mediaData->parse();
 }
 
+void PlaylistItem::initStyle()
+{
+    setFixedHeight(50);
+    setAttribute(Qt::WA_StyledBackground, true);
+    setContentsMargins(0,0,0,0);
+    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
+    m_indexLabel->setMaximumWidth(15);
+    m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
+
+    m_deleteBtn->setFixedSize(24,24);
+    m_deleteBtn->setMaximumWidth(20);
+    m_deleteBtn->setStyleSheet("QPushButton{"
+        "   background-color: rgba(0,0,0,0);"
+        "   border: none;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: tomato;"
+        "   border: 1px solid palette(button);"
+        "   border-radius: 4px;"
+        "}");
+}
+
 void PlaylistItem::setDurationLabel()
 {
     QString time = TimeFormatter::msToHHMMSSFF(m_mediaData->duration(), 1);
-    m_mediaDurationLabel->setText(time);
+    QString timeChopped = time.left(time.length() - 3);
+    m_mediaDurationLabel->setText(timeChopped);
+    m_mediaDurationLabel->setToolTip(TextManager::instance().get("duration") + " : " + time);
     emit updateImageRequested(m_itemIndex, m_mediaData->duration()/2, 0, m_mediaData->filePath(), m_thumbnailSize);
 }
 
 void PlaylistItem::setIndex(int index)
 {
     m_itemIndex = index;
-    m_indexLabel->setText(QString::number(m_itemIndex));
+    m_indexLabel->setText(QString::number(m_itemIndex+1));
 }
 
 void PlaylistItem::computeThumbnail()
@@ -137,27 +163,15 @@ void PlaylistItem::setCurrentMedia(bool isCurrent)
 {
     m_isCurrentMedia = isCurrent;
     if(isCurrent)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid palette(light); border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid palette(light); border-radius: 4px;}");
     else
-        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 4px;}");
 }
 
 void PlaylistItem::playMedia()
 {
     m_isCurrentMedia = true;
     emit playPlaylistItemRequested(m_mediaData->filePath());
-}
-
-void PlaylistItem::initStyle()
-{
-    setFixedHeight(50);
-    setAttribute(Qt::WA_StyledBackground, true);
-    setContentsMargins(0,0,0,0);
-    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
-    m_indexLabel->setMaximumWidth(15);
-    m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
-    m_deleteBtn->setStyleSheet("background: tomato");
-    m_deleteBtn->setMaximumWidth(20);
 }
 
 void PlaylistItem::setThumbnail(QImage image)

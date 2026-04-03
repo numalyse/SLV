@@ -1,6 +1,6 @@
 #include "Toolbars/GlobalToolbar.h"
 
-#include "TextManager.h"
+#include "PrefManager.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -14,9 +14,9 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
         this,
         false,
         "sound_off_white",
-        TextManager::instance().get("tooltip_sound_on"),
+        PrefManager::instance().getText("tooltip_sound_on"),
         "sound_on_white",
-        TextManager::instance().get("tooltip_sound_off")
+        PrefManager::instance().getText("tooltip_sound_off")
     );
     m_muteBtn->setEnabled(true);
 

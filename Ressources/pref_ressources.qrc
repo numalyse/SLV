@@ -3,4 +3,7 @@
         <file alias="fr.json">lang/fr.json</file>
         <file alias="en.json">lang/en.json</file>
     </qresource>
+    <qresource prefix="/">
+        <file alias="defaultPref.json">defaultPref.json</file>
+    </qresource>
 </RCC>

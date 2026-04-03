@@ -2,7 +2,7 @@
 #include "ShotDetail.h"
 #include "TimeFormatter.h"
 #include "Project/ProjectManager.h"
-#include "TextManager.h"
+#include "PrefManager.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
 #include <QLabel>
@@ -19,14 +19,14 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    TextManager& textManager = TextManager::instance();
+    PrefManager& PrefManager = PrefManager::instance();
 
-    m_shotIdForm = new FormLineEditWidget(textManager.get("shot_detail_id_name") , "", false, this);
-    m_shotTitle = new FormLineEditWidget(textManager.get("shot_detail_title_name") , "", true, this);
-    m_startTime = new FormLineEditWidget(textManager.get("shot_detail_start_time_name") , "", false, this);
-    m_endTime = new FormLineEditWidget(textManager.get("shot_detail_end_time_name"), "", false, this);
-    m_duration = new FormLineEditWidget(textManager.get("shot_detail_duration_time_name") , "", false, this);
-    m_notes = new FormTextEditWidget(textManager.get("shot_detail_note_name") , "", true, this);
+    m_shotIdForm = new FormLineEditWidget(PrefManager.getText("shot_detail_id_name") , "", false, this);
+    m_shotTitle = new FormLineEditWidget(PrefManager.getText("shot_detail_title_name") , "", true, this);
+    m_startTime = new FormLineEditWidget(PrefManager.getText("shot_detail_start_time_name") , "", false, this);
+    m_endTime = new FormLineEditWidget(PrefManager.getText("shot_detail_end_time_name"), "", false, this);
+    m_duration = new FormLineEditWidget(PrefManager.getText("shot_detail_duration_time_name") , "", false, this);
+    m_notes = new FormTextEditWidget(PrefManager.getText("shot_detail_note_name") , "", true, this);
     m_tagImage = new QLabel(this);
     m_tagImage->setStyleSheet("");
 
@@ -87,7 +87,7 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(TextManager::instance().get("shot_detail_id_text") + QString::number(shotId + 1));
+    m_shotIdForm->setText(PrefManager::instance().getText("shot_detail_id_text") + QString::number(shotId + 1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));

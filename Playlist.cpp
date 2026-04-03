@@ -46,7 +46,7 @@ Playlist::Playlist(QWidget *parent)
     font.setBold(true);
     playlistLabel->setFont(font);
     //playlistLabel->setTextFormat(Qt::RichText);
-    playlistLabel->setText("<b>"+TextManager::instance().get("playlist")+"</b>");
+    playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel); //ajouter les boutons random et loop peut-être
 
 
@@ -57,7 +57,7 @@ Playlist::Playlist(QWidget *parent)
     m_addItemBtn = new QPushButton;
     m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
     //m_addItemBtn->setIconSize(QSize(12,12));
-    m_addItemBtn->setToolTip(TextManager::instance().get("tooltip_add_item_playlist"));
+    m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
     m_addItemBtn->setStyleSheet("QPushButton{"
         "   background-color: rgba(0,0,0,0);"

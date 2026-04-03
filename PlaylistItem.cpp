@@ -52,7 +52,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // bouton delete
     m_deleteBtn = new QPushButton("✕");
-    m_deleteBtn->setToolTip(TextManager::instance().get("delete"));
+    m_deleteBtn->setToolTip(PrefManager::instance().getText("delete"));
 
     mainLayout->addWidget(m_deleteBtn);
     mainLayout->addSpacing(10);
@@ -92,7 +92,7 @@ void PlaylistItem::setDurationLabel()
     QString time = TimeFormatter::msToHHMMSSFF(m_mediaData->duration(), 1);
     QString timeChopped = time.left(time.length() - 3);
     m_mediaDurationLabel->setText(timeChopped);
-    m_mediaDurationLabel->setToolTip(TextManager::instance().get("duration") + " : " + time);
+    m_mediaDurationLabel->setToolTip(PrefManager::instance().getText("duration") + " : " + time);
     emit updateImageRequested(m_itemIndex, m_mediaData->duration()/2, 0, m_mediaData->filePath(), m_thumbnailSize);
 }
 

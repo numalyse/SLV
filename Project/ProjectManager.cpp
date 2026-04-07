@@ -229,7 +229,7 @@ bool ProjectManager::createProjectFolder(){
     }
     
     QFileInfo fileInfo(selectedPath);
-    prefManager.setPref("Paths", "lp_project", selectedPath);
+    prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
     QDir dir(fileInfo.absolutePath());
     

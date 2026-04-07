@@ -266,8 +266,8 @@ void PrefManager::syncUserPrefs()
         pathCategory.insert("lp_open_media", defaultPath);
         pathModified = true;
     }
-    if(pathCategory.value("lp_open_export").toString().isEmpty()){
-        pathCategory.insert("lp_open_export", defaultPath);
+    if(pathCategory.value("lp_export").toString().isEmpty()){
+        pathCategory.insert("lp_export", defaultPath);
         pathModified = true;
     }
     if(pathCategory.value("lp_extract_sequence").toString().isEmpty()){

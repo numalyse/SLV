@@ -274,6 +274,10 @@ void PrefManager::syncUserPrefs()
         pathCategory.insert("lp_extract_sequence", defaultPath);
         pathModified = true;
     }
+    if(pathCategory.value("lp_capture").toString().isEmpty()){
+        pathCategory.insert("lp_capture", defaultPath);
+        pathModified = true;
+    }
     
     if(pathModified){
         m_userPrefs.insert("Paths", pathCategory);

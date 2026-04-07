@@ -4,6 +4,7 @@
     },
     "Paths" : {
         "default": "",
+        "lp_capture": "",
         "lp_project": "",
         "lp_open_media": "",
         "lp_export": "",

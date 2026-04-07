@@ -444,14 +444,24 @@ void ProjectManager::exportProject(){
     
     ExportType selectedFormat = format.value();
 
+    // si on est dans un project existant (avec un dossier), on enregistre par défaut dans le dossier du projet
+    // sinon on recupère le path dans les preferences
+    QString dialogDir = (m_project->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export"): m_project->path;
+
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr, 
         prefManager.getText("export_file_path_title"), 
-        m_project->path, 
+        dialogDir, 
         prefManager.getText("export_file_path_file_format") 
     );
 
-    if ( selectedPath.isEmpty() ) return; 
+    if ( selectedPath.isEmpty() ) return;
+    
+    if ( m_project->path.isEmpty()) { // si on a pas de path on met a jour les prefs 
+        QFileInfo fileInfo(selectedPath);
+        prefManager.setPref("Paths", "lp_export", fileInfo.absolutePath());
+    }
+
 
     double fps = m_project->media->fps();
     int64_t duration = m_project->media->duration();

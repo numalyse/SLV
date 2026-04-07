@@ -7,6 +7,7 @@
 #include <SignalManager.h>
 #include <QImage>
 #include "./ToolbarButtons/ToolbarToggleButton.h"
+#include "./ToolbarButtons/ToolbarPopupButton.h"
 
 class Playlist : public QWidget
 {
@@ -28,6 +29,7 @@ private:
     QVector<PlaylistItem*> m_items;
     ToolbarToggleButton *m_loopItemBtn = nullptr;
     ToolbarToggleButton *m_shuffleItemBtn = nullptr;
+    ToolbarPopupButton *m_sortPlaylistBtn = nullptr;
     QPushButton *m_addItemBtn = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
     QVBoxLayout *m_itemsLayout = nullptr;

@@ -6,6 +6,7 @@
 #include <QMimeData>
 #include <QDir>
 #include <QDirIterator>
+#include <QCheckBox>
 
 namespace {
 QStringList collectValidFilesFromPath(const QString &path)
@@ -49,24 +50,63 @@ Playlist::Playlist(QWidget *parent)
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
 
+    // [Bouton] Boucle -> Lorsqu'on atteint la fin de la playlist, celle-ci se rejoue du début
+
+    // TODO : Implémenter la fonction 
+
     m_loopItemBtn = new ToolbarToggleButton(this, 
         false, 
-        "loop_off_white", PrefManager::instance().getText("tooltip_loop_playlist"),
-        "loop_off_white", PrefManager::instance().getText("tooltip_loop_playlist"));
+        "loop_off_white", 
+        PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "loop_off_white", 
+        PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_loopItemBtn->setFixedSize(24,24);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
     playlistLabelLayout->addWidget(m_loopItemBtn);
 
+    // [Bouton] Lecture aléatoire -> Lecture aléatoire de la playlist (1 fois chaque élément)
+
+    // TODO : Implémenter la fonction 
+
     m_shuffleItemBtn = new ToolbarToggleButton(this, 
         false, 
-        "shuffle_white", PrefManager::instance().getText("tooltip_shuffle_playlist"),
-        "shuffle_white", PrefManager::instance().getText("tooltip_loop_playlist"));
+        "shuffle_white", 
+        PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "shuffle_white", 
+        PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_shuffleItemBtn->setFixedSize(24,24);
-    //connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
-    //connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
+    connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
+    connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
     playlistLabelLayout->addWidget(m_shuffleItemBtn);
 
+    // [Bouton] Trier la playlist -> Ordre A-Z, Z-A, récent
+    QVBoxLayout* sortPlaylistLayout = new QVBoxLayout();
+
+    // TODO : 
+    // 1/ Quand une des checkboxes est cochée,
+    // Les autres doivent être désactivées
+
+    // 2/ Quand un élément est ajouté à la playlist OU qu'un élément est déplacé,
+    // Il faut que les checkboxes soient décochées
+
+    // 3/ Il faudrait que le popup soit en bas du bouton, pas en haut (peut-être auto en bas si on met plus de checkboxes)
+    
+    // 4/ Possible de garder en mémoire, l'ordre d'ajout ?
+
+    QCheckBox* sortAZCheckBox = new QCheckBox(PrefManager::instance().getText("sort_AZ_playlist"));
+    QCheckBox* sortZACheckBox = new QCheckBox(PrefManager::instance().getText("sort_ZA_playlist"));
+    sortPlaylistLayout->addWidget(sortAZCheckBox);
+    sortPlaylistLayout->addWidget(sortZACheckBox);
+    
+    m_sortPlaylistBtn = new ToolbarPopupButton(this,
+        sortPlaylistLayout, 
+        "sort_white", 
+        PrefManager::instance().getText("tooltip_sort_playlist"));
+    m_sortPlaylistBtn->setFixedSize(24,24);
+    playlistLabelLayout->addWidget(m_sortPlaylistBtn);    
+
+    // [Bouton] Ajouter un élément à la playlist
     m_addItemBtn = new QPushButton;
     m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));

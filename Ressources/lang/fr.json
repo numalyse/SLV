@@ -32,6 +32,7 @@
     "tooltip_delete_player" : "Supprimer un lecteur",
     "tooltip_duplicate_player" : "Dupliquer un lecteur",
     "tooltip_lang" : "Langues et sous-titres",
+
     "tooltip_grid" : "Changer la disposition",
     "tooltip_view_grid" : "Changer la vue en grille",
     "tooltip_view_1" : "Vue unique",
@@ -101,7 +102,15 @@
     "main_window_file_open_project_action": "Ouvrir un projet",
     "main_window_file_save_project_action": "Enregistrer",
 
-    "playlist" : "Liste de lecture",
+    "(activated)" : "(Activé)",
+    "(deactivated)" : "(Désactivé)",
+
+    "playlist" : "Playlist",
+    "tooltip_loop_playlist" : "Lecture de la playlist en boucle",
+    "tooltip_shuffle_playlist" : "Lecture aléatoire de la playlist",
+    "tooltip_sort_playlist" : "Trier la playlist",
+    "sort_AZ_playlist" : "A → Z",
+    "sort_ZA_playlist" : "Z → A",
     "tooltip_add_item_playlist" : "Ajouter un média",
     "delete" : "Supprimer",
     "duration" : "Durée"

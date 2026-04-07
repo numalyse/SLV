@@ -1,9 +1,9 @@
 #ifndef SHORTCUTTAB_H
 #define SHORTCUTTAB_H
 
-#include <QWidget>
+#include <QScrollArea>
 
-class ShortcutTab : public QWidget
+class ShortcutTab : public QScrollArea
 {
 Q_OBJECT
 

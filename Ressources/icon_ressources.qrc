@@ -141,5 +141,7 @@
         <file alias="sort_white">icons/sort_white.png</file>
         <file alias="video_icon">icons/video_icon.png</file>
         <file alias="video_icon_white">icons/video_icon_white.png</file>
+        <file alias="draw">icons/draw.png</file>
+        <file alias="draw_white">icons/draw_white.png</file>
     </qresource>
 </RCC>

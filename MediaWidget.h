@@ -26,7 +26,7 @@ public:
     libvlc_media_player_t *m_player = nullptr;
 
     Media* media(){ return m_media;};
-    int getCurrentTime(){ return libvlc_media_player_get_time(m_player); }
+    int getCurrentTime(){ return std::max(libvlc_media_player_get_time(m_player), m_vlcTime); }
 
     QList<QPair<int, QString>> audioTracks() const;
     QList<QPair<int, QString>> subtitlesTracks() const;
@@ -61,6 +61,8 @@ public slots:
     void rotate();
     void hFlip();
     void vFlip();
+    void nextFrame();
+    void prevFrame();
 
     QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
@@ -73,6 +75,7 @@ private:
     bool m_loopActivated = true;
     bool m_vflipped = false;
     bool m_hflipped = false;
+    int64_t m_vlcTime;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     unsigned int m_rotationIndex = 0;
     std::vector<const char*> m_vlcArgs ={"--quiet",

@@ -64,6 +64,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);
+
+    connect(m_extensionToolbar, &ExtensionToolbar::prevFrameRequested, this, &AdvancedToolbar::prevFrameRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::nextFrameRequested, this, &AdvancedToolbar::nextFrameRequested);
     
     connect(m_extensionToolbar, &ExtensionToolbar::setOverlayModeRequested, this, &AdvancedToolbar::setOverlayModeRequested);
     

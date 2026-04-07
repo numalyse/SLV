@@ -68,6 +68,8 @@ signals:
     void vFlipUiUpdate();
     void hFlipRequested();
     void vFlipRequested();
+    void prevFrameRequested();
+    void nextFrameRequested();
     void previousMediaRequested();
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);

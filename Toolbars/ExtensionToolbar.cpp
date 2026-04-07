@@ -74,6 +74,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
     connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
+
+    connect(m_prevFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::prevFrameRequested);
+    connect(m_nextFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::nextFrameRequested);
     
     connect(m_backwardBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::moveTimeBackwardRequested);
     connect(m_forwardBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::moveTimeForwardRequested);

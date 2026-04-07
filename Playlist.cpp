@@ -307,7 +307,7 @@ void Playlist::updateLayout()
         delete item;
     }
 
-    for (auto *item : m_items) {
+    for (auto *item : std::as_const(m_items)) {
         m_itemsLayout->addWidget(item);
         
     }

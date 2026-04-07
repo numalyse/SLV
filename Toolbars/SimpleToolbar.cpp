@@ -115,7 +115,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", PrefManager::instance().getText("tooltip_delete_player"));
     m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", PrefManager::instance().getText("tooltip_duplicate_player"));
-    m_extractSequenceBtn = new ToolbarButton(this, "extract_sequence_white", TextManager::instance().getText("tooltip_extract_sequence"));
+    m_extractSequenceBtn = new ToolbarButton(this, "extract_sequence_white", PrefManager::instance().getText("tooltip_extract_sequence"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerAction);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);

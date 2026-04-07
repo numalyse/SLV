@@ -73,6 +73,8 @@ signals:
     void horizontalFlipRequested();
     void verticalFlipRequested();
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void prevFrameRequested();
+    void nextFrameRequested();
 
 };
 

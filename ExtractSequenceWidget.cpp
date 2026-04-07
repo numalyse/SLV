@@ -23,7 +23,7 @@ void ExtractSequenceWidget::createButtons()
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     m_okButton = new QPushButton("OK");
-    m_cancelButton = new QPushButton(TextManager::instance().get("cancel_action"));
+    m_cancelButton = new QPushButton(PrefManager::instance().getText("cancel_action"));
     m_startFrameDisplay = new QLabel();
     m_endFrameDisplay = new QLabel();
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ExtractSequenceWidget::onThumbnailReady);
@@ -40,13 +40,13 @@ void ExtractSequenceWidget::initUiLayout()
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QHBoxLayout *timeSelectionLayout = new QHBoxLayout();
     QVBoxLayout *startTimeSelectionLayout = new QVBoxLayout();
-    QLabel *startLabel = new QLabel(TextManager::instance().get("extract_start_label") + " :");
+    QLabel *startLabel = new QLabel(PrefManager::instance().getText("extract_start_label") + " :");
     startTimeSelectionLayout->addWidget(startLabel);
     startTimeSelectionLayout->addWidget(m_startFrameDisplay);
     startTimeSelectionLayout->addWidget(m_startTimeEditor);
 
     QVBoxLayout *endTimeSelectionLayout = new QVBoxLayout();
-    QLabel *endLabel = new QLabel(TextManager::instance().get("extract_end_label") + " :");
+    QLabel *endLabel = new QLabel(PrefManager::instance().getText("extract_end_label") + " :");
     endTimeSelectionLayout->addWidget(endLabel);
     endTimeSelectionLayout->addWidget(m_endFrameDisplay);
     endTimeSelectionLayout->addWidget(m_endTimeEditor);

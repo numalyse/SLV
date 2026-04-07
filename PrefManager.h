@@ -52,6 +52,7 @@ public:
     /// @brief Writes directly to the json file the value of the key
     /// @return True if successfully written to, false otherwise 
     bool setPref(const QString &category, const QString &key, const QString &value);
+    bool setPref(const QString &category, const QString &subCategory, const QString &key, const QString &value);
 
     /// @brief Write all the data of m_userPrefs in the json file
     /// @return True if successfully written to, false otherwise  

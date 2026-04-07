@@ -204,24 +204,27 @@ bool PrefManager::setPref(const QString& category, const QString& key, const QSt
     categoryObject[key] = value;
     m_userPrefs[category] = categoryObject;
 
-    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
-    QFile file(filePath);
+    return writeUserJson();
+}
 
-    if (!file.exists() && !createPreferenceFile(filePath)) {
-        qCritical() << "[PrefManager] Impossible de créer le fichier de préférences.";
-        return false; 
+bool PrefManager::setPref(const QString& category, const QString& subCategory, const QString& key, const QString& value)
+{
+    QJsonObject categoryObject;
+    if (m_userPrefs.contains(category) && m_userPrefs[category].isObject()) {
+        categoryObject = m_userPrefs[category].toObject();
     }
 
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QJsonDocument newDoc(m_userPrefs);
-        file.write(newDoc.toJson(QJsonDocument::Indented));
-        file.close();
-        
-        return true;
-    } 
-    
-    qDebug() << "[PrefManager] Erreur : Impossible d'écrire dans le fichier" << filePath;
-    return false;
+    QJsonObject subCategoryObject;
+    if (categoryObject.contains(subCategory) && categoryObject[subCategory].isObject()) {
+        subCategoryObject = categoryObject[subCategory].toObject();
+    }
+
+    subCategoryObject[key] = value;
+
+    categoryObject[subCategory] = subCategoryObject; 
+    m_userPrefs[category] = categoryObject;
+
+   return writeUserJson();
 }
 
 bool PrefManager::writeUserJson(){

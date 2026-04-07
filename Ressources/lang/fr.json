@@ -105,6 +105,9 @@
     "(activated)" : "(Activé)",
     "(deactivated)" : "(Désactivé)",
 
+    "activate" : "Activer",
+    "deactivate" : "Désactiver",
+
     "playlist" : "Playlist",
     "tooltip_loop_playlist" : "Lecture de la playlist en boucle",
     "tooltip_shuffle_playlist" : "Lecture aléatoire de la playlist",
@@ -113,5 +116,7 @@
     "sort_ZA_playlist" : "Z → A",
     "tooltip_add_item_playlist" : "Ajouter un média",
     "delete" : "Supprimer",
-    "duration" : "Durée"
+    "duration" : "Durée",
+
+    "tooltip_drawing_mode" : "mode dessin"
 }

@@ -103,7 +103,10 @@
     "main_window_file_save_project_action": "Save",
 
     "(activated)" : "(Activated)",
-    "(deactivated)" : "(Désactivated)",
+    "(deactivated)" : "(Deactivated)",
+
+    "activate" : "Activate",
+    "deactivate" : "Deactivate",
     
     "playlist" : "Playlist",
     "tooltip_loop_playlist" : "Loop mode",
@@ -113,5 +116,7 @@
     "sort_ZA_playlist" : "Z → A",
     "tooltip_add_item_playlist" : "Add media",
     "delete" : "Delete",
-    "duration" : "Duration"
+    "duration" : "Duration",
+
+    "tooltip_drawing_mode" : "drawing mode"
 }

@@ -135,9 +135,26 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     invFrameLayout->addWidget(m_horizontalInvBtn);
     m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip_vertical"));
     
+    m_drawingBtn = new ToolbarToggleButton(
+        this, 
+        false,
+        "auto_segmentation_white",
+        PrefManager::instance().getText("deactivate") + " " + PrefManager::instance().getText("tooltip_drawing_mode"),
+        "auto_segmentation",
+        PrefManager::instance().getText("activate") + " " + PrefManager::instance().getText("tooltip_drawing_mode")
+    );
+
+    connect(m_drawingBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::updateDrawingMode);
+    //connect(m_drawingBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::updateDrawingMode);
+
     setDefaultUI();
     disableButtons();
     hide();
+}
+
+void ExtensionToolbar::updateDrawingMode(){
+    m_drawingBtn->setButtonState(m_drawingBtn->isChecked());
+    emit showDrawingModeRequested(m_drawingBtn->isChecked());
 }
 
 void ExtensionToolbar::updateOverlayMode(){
@@ -183,8 +200,14 @@ void ExtensionToolbar::setDefaultUI()
     // mainLayout->addWidget(m_abloopBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);
+    mainLayout->addWidget(m_drawingBtn);
     mainLayout->addStretch();
 
+}
+
+void ExtensionToolbar::updateDrawingButtonUI()
+{
+    m_drawingBtn->toggleUpdateIcon();
 }
 
 void ExtensionToolbar::updateRecordButtonUI()
@@ -212,6 +235,7 @@ void ExtensionToolbar::enableButtons()
     m_segmBtn->setEnabled(true);
     m_zoomBtn->setEnabled(true);
     m_compoRuleBtn->setEnabled(true);
+    m_drawingBtn->setEnabled(true);
     m_hideImgBtn->setEnabled(true);
     m_horizontalInvBtn->setEnabled(true);
     m_verticalInvBtn->setEnabled(true);
@@ -229,6 +253,7 @@ void ExtensionToolbar::disableButtons()
     m_segmBtn->setEnabled(false);
     m_zoomBtn->setEnabled(false);
     m_compoRuleBtn->setEnabled(false);
+    m_drawingBtn->setEnabled(false);
     m_hideImgBtn->setEnabled(false);
     m_horizontalInvBtn->setEnabled(false);
     m_verticalInvBtn->setEnabled(false);

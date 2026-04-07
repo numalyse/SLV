@@ -24,7 +24,7 @@ ShortcutTab::ShortcutTab(QWidget *parent) : QScrollArea(parent)
         for(auto subCategory = shortCutSubcategory.begin(); subCategory != shortCutSubcategory.end(); ++subCategory){
             QString keyTranslated = prefManager.getText("shortcut_" + subCategory.key());
             
-            FormShortcutEditFrame* formShortcutEditFrame = new FormShortcutEditFrame(keyTranslated, "MainWindow", subCategory.key(), subCategory.value().toString(), this);
+            FormShortcutEditFrame* formShortcutEditFrame = new FormShortcutEditFrame(keyTranslated, category.key() , subCategory.key(), subCategory.value().toString(), this);
             layout->addWidget(formShortcutEditFrame);
         }
 

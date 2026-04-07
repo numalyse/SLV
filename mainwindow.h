@@ -48,6 +48,7 @@ protected:
 
 private:
     void changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement);
+    void openPrefWidget();
 
     Ui::MainWindow *ui;
 

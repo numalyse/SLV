@@ -5,6 +5,7 @@
 #include "PlayerWidget.h"
 #include "PrefManager.h"
 #include "GenericDialog.h"
+#include "Preference/PreferenceDialog.h"
 
 #include <qtoolbar.h>
 #include <vlc/vlc.h>
@@ -123,6 +124,10 @@ void MainWindow::createMenuBar()
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
     connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProjectAction);
 
+    auto *OptionMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_option"));
+
+    auto *openPrefAction = OptionMenu->addAction("&" + prefManager.getText("main_window_option_open_pref"));
+    connect(openPrefAction, &QAction::triggered, this, &MainWindow::openPrefWidget);
 
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
@@ -363,4 +368,11 @@ void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangem
     } else {
         emit SignalManager::instance().newArrangementRequested(arrangement);
     }
+}
+
+void MainWindow::openPrefWidget()
+{
+    qDebug() << "open pref widget";
+    PreferenceDialog* prefDialog = new PreferenceDialog(this);
+    prefDialog->exec();
 }

@@ -336,12 +336,15 @@ void ProjectManager::openProject()
     QString selectedPath = QFileDialog::getExistingDirectory(
         nullptr, 
         tr(prefManager.getText("project_manager_open_project_dialog").toStdString().c_str()), 
-        QDir::homePath()
+        prefManager.getPref("Paths", "lp_project")
     );
 
     if(selectedPath.isEmpty()){
         return;
     }
+
+    QFileInfo fileInfo(selectedPath);
+    prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
     auto loaded = ProjectFileHelper::loadProject(selectedPath);
 

@@ -223,10 +223,20 @@ void PlayerWidget::playFromAdvanced()
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
-        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+
+        auto& prefManager = PrefManager::instance();
+        QString file_path = QFileDialog::getOpenFileName(
+            this, 
+            prefManager.getText("dialog_open_file"), 
+            prefManager.getPref("Paths", "lp_open_media"), 
+            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        ); 
+
         if(file_path != ""){
             if (setMediaFromPath(file_path)){
                 ProjectManager::instance().requestProjectCreation({file_path});
+                QFileInfo fileInfo (file_path);
+                prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
             }
         }
         else

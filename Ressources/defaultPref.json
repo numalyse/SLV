@@ -2,7 +2,14 @@
     "Lang" : {
         "code" : "en"
     },
-
+    "Paths" : {
+        "default": "",
+        "lp_capture": "",
+        "lp_project": "",
+        "lp_open_media": "",
+        "lp_export": "",
+        "lp_extract_sequence": ""
+    },
     "Shortcuts" : {
         "MainWindow" : {
             "open_media" : "Ctrl + O",

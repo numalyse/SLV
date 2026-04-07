@@ -19,7 +19,6 @@ class PlaylistItem : public QWidget
 public:
     explicit PlaylistItem(QWidget *parent = nullptr, const QString &mediaFilePath = "");
     void initStyle();
-    void setThumbnail(QImage image);
     void updateTypeIcon();
     QPixmap generateVideoThumbnail(const QString &videoPath);
     void updateThumbnail();
@@ -53,7 +52,6 @@ protected:
 
 public slots:
     void setDurationLabel();
-    void computeThumbnail();
     void setIndex(int);
     void playMedia();
     void setCurrentMedia(bool isCurrent);

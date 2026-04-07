@@ -32,6 +32,7 @@
     "tooltip_delete_player" : "Delete player",
     "tooltip_duplicate_player" : "Duplicate player",
     "tooltip_lang" : "Langages and subtitles",
+
     "tooltip_grid" : "Change disposal",
     "tooltip_view_grid" : "Change grid view",
     "tooltip_view_1" : "Single view",
@@ -44,6 +45,7 @@
     "tooltip_view_3_left" : "1 left, 2 right",
     "tooltip_view_3_right" : "2 left, 1 right",
     "tooltip_view_4" : "Four views",
+
     "tooltip_nav_panel_close" : "Close side panel",
     "tooltip_nav_panel_open" : "Open side panel",
 
@@ -61,6 +63,8 @@
     "timeline_ab_extraxt": "Extract AB sequence",
     "timeline_merge_with_previous_shot" : "Merge the current shot with the previous shot", 
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
+
+    "cancel_action" : "Cancel",
 
     "shot_detail_id_name" : "Shot numbering",
     "shot_detail_title_name" : "Title",
@@ -86,18 +90,27 @@
     "no_audio" : "No audio track",
     "no_subtitles" : "No subtitle track",
 
+    "extract_start_label" : "Start",
+    "extract_end_label" : "End",
     "open_files" : "Open files",
     "file_video" : "Vidéo file",
     "file_image" : "Image file",
     "file_audio" : "Audio file",
 
-    
     "main_window_menu_bar_file": "File",
     "main_window_file_open_media_action": "Open multimedia files",
     "main_window_file_open_project_action": "Open a project",
     "main_window_file_save_project_action": "Save",
+
+    "(activated)" : "(Activated)",
+    "(deactivated)" : "(Désactivated)",
     
     "playlist" : "Playlist",
+    "tooltip_loop_playlist" : "Loop mode",
+    "tooltip_shuffle_playlist" : "Shuffle mode",
+    "tooltip_sort_playlist" : "Sort playlist",
+    "sort_AZ_playlist" : "A → Z",
+    "sort_ZA_playlist" : "Z → A",
     "tooltip_add_item_playlist" : "Add media",
     "delete" : "Delete",
     "duration" : "Duration"

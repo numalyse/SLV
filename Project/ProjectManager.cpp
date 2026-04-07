@@ -40,37 +40,37 @@ ProjectManager::~ProjectManager()
 /// @return 
 QString ProjectManager::getErrorMessage(ProjectFileError error) const
 {
-    PrefManager& txtManager = PrefManager::instance();
+    PrefManager& prefManager = PrefManager::instance();
     switch (error) {
         case ProjectFileError::FolderNotFound:
-            return txtManager.getText("project_manager_error_folder_not_found"); 
+            return prefManager.getText("project_manager_error_folder_not_found"); 
         case ProjectFileError::JsonFileNotFound:
-            return txtManager.getText("project_manager_error_json_file_not_found");   
+            return prefManager.getText("project_manager_error_json_file_not_found");   
         case ProjectFileError::CannotOpenJsonFile:
-            return txtManager.getText("project_manager_error_cannot_open_json_file");
+            return prefManager.getText("project_manager_error_cannot_open_json_file");
         case ProjectFileError::JsonParsingError:
-            return txtManager.getText("project_manager_error_json_parsing_error");
+            return prefManager.getText("project_manager_error_json_parsing_error");
         case ProjectFileError::MediaFileNotFound:
-            return txtManager.getText("project_manager_error_media_file_not_found"); 
+            return prefManager.getText("project_manager_error_media_file_not_found"); 
         case ProjectFileError::MediaKeyMissing:
-            return txtManager.getText("project_manager_error_media_key_missing"); 
+            return prefManager.getText("project_manager_error_media_key_missing"); 
 
         case ProjectFileError::UnexpectedError:
         default:
-            return txtManager.getText("project_manager_error_unexpected_error");
+            return prefManager.getText("project_manager_error_unexpected_error");
     }
 }
 
 QString ProjectManager::getErrorMessage(ProjectManager::Error error) const {
-    PrefManager& txtManager = PrefManager::instance();
+    PrefManager& prefManager = PrefManager::instance();
     switch (error) {
         case ProjectManager::Error::MismatchFPS:
-            return txtManager.getText("project_manager_error_media_mismatch_fps"); 
+            return prefManager.getText("project_manager_error_media_mismatch_fps"); 
         case ProjectManager::Error::MismatchDuration:
-            return txtManager.getText("project_manager_error_media_mismatch_duration"); 
+            return prefManager.getText("project_manager_error_media_mismatch_duration"); 
         case ProjectManager::Error::UnexpectedError:
         default:
-            return txtManager.getText("project_manager_error_unexpected_error");
+            return prefManager.getText("project_manager_error_unexpected_error");
     }
 }
 
@@ -214,12 +214,12 @@ void ProjectManager::initProjectShot(){
 
 
 bool ProjectManager::createProjectFolder(){
-    PrefManager& txtManager = PrefManager::instance();
-    QString fileType = txtManager.getText("project_manager_create_project_dialog_file_type") + "(*)";
+    PrefManager& prefManager = PrefManager::instance();
+    QString fileType = prefManager.getText("project_manager_create_project_dialog_file_type") + "(*)";
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr, 
-        tr(txtManager.getText("project_manager_create_project_dialog").toStdString().c_str()), 
-        QDir::homePath(),
+        tr(prefManager.getText("project_manager_create_project_dialog").toStdString().c_str()), 
+        prefManager.getPref("Paths", "lp_project"),
         tr(fileType.toStdString().c_str() )
     );
 
@@ -229,6 +229,7 @@ bool ProjectManager::createProjectFolder(){
     }
     
     QFileInfo fileInfo(selectedPath);
+    prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
     QDir dir(fileInfo.absolutePath());
     
@@ -280,12 +281,12 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
         return false;
     }
 
-    PrefManager& txtManager = PrefManager::instance();
+    PrefManager& prefManager = PrefManager::instance();
 
     FileCopyThread* fileCpyThread = new FileCopyThread(sourcePath, destPath, this);
     
-    QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("project_window_title_copy_video"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
-    progressDialog->setWindowTitle(txtManager.getText("project_window_title_copy_video"));
+    QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("project_window_title_copy_video"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+    progressDialog->setWindowTitle(prefManager.getText("project_window_title_copy_video"));
     progressDialog->setWindowModality(Qt::WindowModal); 
     progressDialog->show();
 
@@ -303,8 +304,8 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
             ProjectFileHelper::writeJson(m_project, p_timeline);
         } else {
             if ( ! canceled ) {
-                auto& txtManager = PrefManager::instance(); 
-                QMessageBox::critical(nullptr, txtManager.getText("dialog_error_text"), txtManager.getText("project_error_copy_failed"));
+                auto& prefManager = PrefManager::instance(); 
+                QMessageBox::critical(nullptr, prefManager.getText("dialog_error_text"), prefManager.getText("project_error_copy_failed"));
             }
             deleteFolder(projectPath);
             setSaveNeeded(); 
@@ -330,23 +331,26 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 /// Puis parse le media
 void ProjectManager::openProject()
 {
-    auto& txtManager = PrefManager::instance();
+    auto& prefManager = PrefManager::instance();
 
     QString selectedPath = QFileDialog::getExistingDirectory(
         nullptr, 
-        tr(txtManager.getText("project_manager_open_project_dialog").toStdString().c_str()), 
-        QDir::homePath()
+        tr(prefManager.getText("project_manager_open_project_dialog").toStdString().c_str()), 
+        prefManager.getPref("Paths", "lp_project")
     );
 
     if(selectedPath.isEmpty()){
         return;
     }
 
+    QFileInfo fileInfo(selectedPath);
+    prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
+
     auto loaded = ProjectFileHelper::loadProject(selectedPath);
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
-        QMessageBox::critical(nullptr, txtManager.getText("dialog_error_text"), errorMsg);
+        QMessageBox::critical(nullptr, prefManager.getText("dialog_error_text"), errorMsg);
         return;
     }
 
@@ -428,7 +432,7 @@ void ProjectManager::exportProject(){
     if ( !m_project ) return;
     if ( !m_project->media ) return;
 
-    PrefManager& txtManager = PrefManager::instance();
+    PrefManager& prefManager = PrefManager::instance();
 
     QString extension = '.' + mediaPathExtension();
 
@@ -440,14 +444,24 @@ void ProjectManager::exportProject(){
     
     ExportType selectedFormat = format.value();
 
+    // si on est dans un project existant (avec un dossier), on enregistre par défaut dans le dossier du projet
+    // sinon on recupère le path dans les preferences
+    QString dialogDir = (m_project->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export"): m_project->path;
+
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr, 
-        txtManager.getText("export_file_path_title"), 
-        m_project->path, 
-        txtManager.getText("export_file_path_file_format") 
+        prefManager.getText("export_file_path_title"), 
+        dialogDir, 
+        prefManager.getText("export_file_path_file_format") 
     );
 
-    if ( selectedPath.isEmpty() ) return; 
+    if ( selectedPath.isEmpty() ) return;
+    
+    if ( m_project->path.isEmpty()) { // si on a pas de path on met a jour les prefs 
+        QFileInfo fileInfo(selectedPath);
+        prefManager.setPref("Paths", "lp_export", fileInfo.absolutePath());
+    }
+
 
     double fps = m_project->media->fps();
     int64_t duration = m_project->media->duration();
@@ -455,7 +469,7 @@ void ProjectManager::exportProject(){
 
     ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath, this);
 
-    QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("export_running"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+    QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();
 
 

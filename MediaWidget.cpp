@@ -5,6 +5,7 @@
 #include "Media.h"
 #include "SequenceExtractionHelper.h"
 #include "MediaTransformHelper.h"
+#include "PrefManager.h"
 
 #include <QFile>
 #include <QUrl>
@@ -360,7 +361,21 @@ void MediaWidget::endRecord()
 
     int endTime = libvlc_media_player_get_time(m_player);
     pause();
-    QString saveRecordPath = QFileDialog::getSaveFileName(this, tr("Save record"), m_media->filePath());
+    auto& prefManager = PrefManager::instance();
+    QString saveRecordPath = QFileDialog::getSaveFileName(
+        this, 
+        prefManager.getText("dialog_capture"),
+        prefManager.getPref("Paths", "lp_capture")
+    );
+
+    if (saveRecordPath.isEmpty()){
+        qDebug() << "[MediaWidget] Enregistrement de la capture annulé";
+        return;
+    }
+
+    QFileInfo fileInfo (saveRecordPath);
+    prefManager.setPref("Paths", "lp_capture", fileInfo.absolutePath());
+
     saveRecordPath += '.' + m_media->fileExtension();
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);

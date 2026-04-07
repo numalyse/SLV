@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QDebug>
 #include <QDir>
+#include <QStandardPaths>
 
 
 void PrefManager::loadLanguage(const QString& langCode) 
@@ -96,6 +97,7 @@ void PrefManager::loadPrefs()
 {
     loadDefaultPrefs();
     loadUserPrefs();
+    syncUserPrefs();
 }
 
 
@@ -184,4 +186,129 @@ QJsonObject PrefManager::getSubCategory(const QString &category, const QString &
     }
 
     return result;
+}
+
+
+bool PrefManager::setPref(const QString& category, const QString& key, const QString& value)
+{
+    QJsonObject categoryObject;
+    if (m_userPrefs.contains(category) && m_userPrefs[category].isObject()) {
+        categoryObject = m_userPrefs[category].toObject();
+    }
+
+    categoryObject[key] = value;
+    m_userPrefs[category] = categoryObject;
+
+    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
+    QFile file(filePath);
+
+    if (!file.exists() && !createPreferenceFile(filePath)) {
+        qCritical() << "[PrefManager] Impossible de créer le fichier de préférences.";
+        return false; 
+    }
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonDocument newDoc(m_userPrefs);
+        file.write(newDoc.toJson(QJsonDocument::Indented));
+        file.close();
+        
+        return true;
+    } 
+    
+    qDebug() << "[PrefManager] Erreur : Impossible d'écrire dans le fichier" << filePath;
+    return false;
+}
+
+bool PrefManager::writeUserJson(){
+    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
+    QFile file(filePath);
+
+    if (!file.exists() && !createPreferenceFile(filePath)) {
+        qCritical() << "[PrefManager] Impossible de créer le fichier de préférences.";
+        return false; 
+    }
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonDocument newDoc(m_userPrefs);
+        file.write(newDoc.toJson(QJsonDocument::Indented));
+        file.close();
+        
+        return true;
+    } 
+    
+    qDebug() << "[PrefManager] Erreur : Impossible d'écrire dans le fichier" << filePath;
+    return false;
+
+} 
+
+void PrefManager::syncUserPrefs()
+{
+    bool modified = false;
+
+    // adds any missing keys from default pref to user pref 
+    modified = mergeMissingKeys(m_defaultPrefs, m_userPrefs);
+
+    // checks if user paths are set and sets them if not
+    QJsonObject pathCategory = m_userPrefs.value("Paths").toObject();
+    QString defaultPath = pathCategory.value("default").toString();
+    bool pathModified = false;
+
+    if (defaultPath.isEmpty()){
+        defaultPath = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
+        pathCategory.insert("default", defaultPath);
+        pathModified = true;
+    }
+    if(pathCategory.value("lp_project").toString().isEmpty()){
+        pathCategory.insert("lp_project", defaultPath);
+        pathModified = true;
+    }
+    if(pathCategory.value("lp_open_media").toString().isEmpty()){
+        pathCategory.insert("lp_open_media", defaultPath);
+        pathModified = true;
+    }
+    if(pathCategory.value("lp_export").toString().isEmpty()){
+        pathCategory.insert("lp_export", defaultPath);
+        pathModified = true;
+    }
+    if(pathCategory.value("lp_extract_sequence").toString().isEmpty()){
+        pathCategory.insert("lp_extract_sequence", defaultPath);
+        pathModified = true;
+    }
+    if(pathCategory.value("lp_capture").toString().isEmpty()){
+        pathCategory.insert("lp_capture", defaultPath);
+        pathModified = true;
+    }
+    
+    if(pathModified){
+        m_userPrefs.insert("Paths", pathCategory);
+        modified = true;
+    }
+
+    // if m_userPrefs was modified rewrite the json with all its data
+    if (modified){
+        writeUserJson();
+    } 
+}
+
+bool PrefManager::mergeMissingKeys(const QJsonObject& defaultObj, QJsonObject& userObj)
+{
+    bool modified = false;
+
+    for (auto it = defaultObj.begin(); it != defaultObj.end(); ++it) {
+        const QString& key = it.key();
+
+        if (!userObj.contains(key)) {
+            userObj.insert(key, it.value());
+            modified = true;
+        } 
+        else if (it.value().isObject() && userObj.value(key).isObject()) {
+            QJsonObject subUserObj = userObj.value(key).toObject();
+            if ( mergeMissingKeys(it.value().toObject(), subUserObj) ) {
+                userObj.insert(key, subUserObj);
+                modified = true;
+            }
+        }
+    }
+
+    return modified;
 }

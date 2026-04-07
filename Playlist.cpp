@@ -201,11 +201,24 @@ void Playlist::dropEvent(QDropEvent *event)
 
 void Playlist::addItemDialog()
 {
-    QStringList filesPaths = QFileDialog::getOpenFileNames(this, PrefManager::instance().getText("open_files"), "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+
+    auto& prefManager = PrefManager::instance();
+    QStringList filesPaths = QFileDialog::getOpenFileNames(
+        this, 
+        prefManager.getText("dialog_open_files"), 
+        prefManager.getPref("Paths", "lp_open_media"), 
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+    ); 
+
     if(filesPaths.empty()){
         qDebug() << "PLAYLIST - Pas de fichier sélectionné";
         return;
     }
+
+    QFileInfo fileInfo (filesPaths[0]);
+    prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+
+
     addItemsFromPaths(filesPaths);
 
 }

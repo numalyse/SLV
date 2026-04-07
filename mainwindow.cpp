@@ -221,7 +221,13 @@ void MainWindow::openMediaAction()
 
 void MainWindow::selectAndLoadMediaFiles()
 {
-    QStringList files_paths = QFileDialog::getOpenFileNames(this, PrefManager::instance().getText("open_files"), "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+    auto& prefManager = PrefManager::instance();
+    QStringList files_paths = QFileDialog::getOpenFileNames(
+        this, 
+        prefManager.getText("open_files"), 
+        prefManager.getPref("Paths", "lp_open_media"), 
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+    );
     
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";
@@ -231,6 +237,9 @@ void MainWindow::selectAndLoadMediaFiles()
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }
+
+    QFileInfo fileInfo (files_paths[0]);
+    prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
     
     qDebug() << "Fichiers sélectionnés : " << files_paths;
     for(const QString& path : files_paths){

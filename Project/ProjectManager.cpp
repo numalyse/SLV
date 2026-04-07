@@ -219,7 +219,7 @@ bool ProjectManager::createProjectFolder(){
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr, 
         tr(prefManager.getText("project_manager_create_project_dialog").toStdString().c_str()), 
-        QDir::homePath(),
+        prefManager.getPref("Paths", "lp_project"),
         tr(fileType.toStdString().c_str() )
     );
 
@@ -229,6 +229,7 @@ bool ProjectManager::createProjectFolder(){
     }
     
     QFileInfo fileInfo(selectedPath);
+    prefManager.setPref("Paths", "lp_project", selectedPath);
 
     QDir dir(fileInfo.absolutePath());
     

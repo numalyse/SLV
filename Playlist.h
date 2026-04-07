@@ -6,6 +6,8 @@
 #include <QFileDialog>
 #include <SignalManager.h>
 #include <QImage>
+#include "./ToolbarButtons/ToolbarToggleButton.h"
+#include "./ToolbarButtons/ToolbarPopupButton.h"
 
 class Playlist : public QWidget
 {
@@ -25,6 +27,9 @@ private:
     bool m_randomized = false;
     unsigned int m_currentMediaIndex = 0;
     QVector<PlaylistItem*> m_items;
+    ToolbarToggleButton *m_loopItemBtn = nullptr;
+    ToolbarToggleButton *m_shuffleItemBtn = nullptr;
+    ToolbarPopupButton *m_sortPlaylistBtn = nullptr;
     QPushButton *m_addItemBtn = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
     QVBoxLayout *m_itemsLayout = nullptr;
@@ -41,6 +46,10 @@ public slots:
     void playMedia(const QString &filePath);
     void playPreviousMedia();
     void playNextMedia();
+    void enableLoop();
+    void disableLoop();
+    void enableShuffle();
+    void disableShuffle();
 
 private slots:
     void updateItemIndices();

@@ -139,9 +139,9 @@ void MainWindow::createToolBar()
         m_toolbarQt,
         false,
         "nav_panel_menu_open_white",
-        PrefManager::instance().getText("tooltip_nav_panel_open"),
+        PrefManager::instance().getText("tooltip_nav_panel_close"),
         "nav_panel_menu_closed_white",
-        PrefManager::instance().getText("tooltip_nav_panel_close")
+        PrefManager::instance().getText("tooltip_nav_panel_open")
     );
     m_navPanelBtn->setFixedSize(30, 30);
     m_navPanelBtn->setIconSize(QSize(20, 20));

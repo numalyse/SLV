@@ -44,6 +44,11 @@ public:
     QString getPref(const QString &category, const QString &key) const;
     QString getPref(const QString &category, const QString &subCategory, const QString &key) const;
 
+    /// @brief Traverse :/lang folder an retrieve the base name of each files
+    /// @return list of all file name, ex : "fr", "en" 
+    QStringList getAvailableLangs();
+
+
     /// @brief Writes directly to the json file the value of the key
     /// @return True if successfully written to, false otherwise 
     bool setPref(const QString &category, const QString &key, const QString &value);
@@ -62,7 +67,6 @@ private:
     /// @param userObj The user's JSON object that needs to be updated with missing keys.
     /// @return True if 'userObj' was modified (missing keys were added), false otherwise.
     bool mergeMissingKeys(const QJsonObject& defaultObj, QJsonObject& userObj);
-
 
     /// @brief Checks if the user pref are missing keys from default prefs,
     /// sets the paths if they are empty and writes to the json if m_userPrefs was modified 

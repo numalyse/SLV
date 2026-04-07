@@ -5,11 +5,16 @@
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
+#include <QDirIterator>
 
 
 void PrefManager::loadLanguage(const QString& langCode) 
 {
-    QString filePath = ":/lang/" + langCode + ".json";
+
+    QStringList availableLangs = getAvailableLangs();
+
+    // si le langcode est bien dans les langues supportées, utilisation de celui ci sinon fallback sur en
+    QString filePath = (availableLangs.contains(langCode)) ? ":/lang/" + langCode + ".json" : ":/lang/en.json";
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly)) {
@@ -311,4 +316,17 @@ bool PrefManager::mergeMissingKeys(const QJsonObject& defaultObj, QJsonObject& u
     }
 
     return modified;
+}
+
+QStringList PrefManager::getAvailableLangs(){
+    QStringList langs;
+
+    QDirIterator it(":/lang", QDir::Files, QDirIterator::NoIteratorFlags);
+    while (it.hasNext()) {
+        QFile f(it.next());
+        QFileInfo fileInfo(f);
+        langs.append(fileInfo.baseName());
+    }
+
+    return langs;
 }

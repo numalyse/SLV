@@ -68,3 +68,34 @@ void ToolbarToggleButton::setButtonState(bool state)
     setChecked(state);
     updateIcons(state);
 }
+
+void ToolbarToggleButton::setToggledIconFrame(bool framed)
+{
+    if(framed){
+        setStyleSheet(
+            "ToolbarToggleButton{"
+            "   background-color: rgba(0,0,0,0);"
+            "   border: none;"
+            "   border-radius: 4px;"
+            "}"
+            "ToolbarToggleButton:hover{"
+            "   background-color: palette(button);"
+            "   border: 1px solid palette(button);"
+            "   border-radius: 4px;"
+            "}"
+            "ToolbarToggleButton:checked{"
+            // "   background-color: palette(button);"
+            "   border: 1px solid rgba(240,240,240,1);"
+            "   border-radius: 4px;"
+            "}"
+            "ToolbarToggleButton:checked:hover{"
+            // "   background-color: palette(button);"
+            "   border: 1px solid rgba(240,240,240,1);"
+            "   border-radius: 4px;"
+            "}"
+            "ToolbarToggleButton:disabled{"
+            "   border: none;"
+            "}"
+        );
+    }
+}

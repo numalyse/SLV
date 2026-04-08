@@ -43,6 +43,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr) emit enableSegmentationRequest();
     });
     m_extensionBtn->setIconSize(QSize(13, 13));
+
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
         // cache l'extension et cache le mode segmentation
         m_extensionToolbar->hide();

@@ -36,7 +36,14 @@
         },
         "ExtensionTB" : {
             "prev_frame" : "A",
-            "next_frame" : "E"
+            "next_frame" : "E",
+            "forward" : "Right",
+            "backward" : "Left",
+            "rotate" : "R",
+            "record" : "Shift + R",
+            "h_flip" : "H",
+            "v_flip" : "V",
+            "hide_img" : "I"
         }
     }
 }

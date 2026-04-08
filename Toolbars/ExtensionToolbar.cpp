@@ -2,15 +2,18 @@
 #include "Project/ProjectManager.h"
 
 #include "PrefManager.h"
+#include "ExtensionToolbar.h"
+#include "OverlayMode.h"
+#include "SignalManager.h"
+
 #include <QHBoxLayout>
-#include <SignalManager.h>
 #include <qframe.h>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QIcon>
-#include "ExtensionToolbar.h"
-#include "OverlayMode.h"
 #include <QVariant>
+#include <QShortcut>
+
 
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
@@ -138,9 +141,17 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     invFrameLayout->addWidget(m_horizontalInvBtn);
     m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip_vertical"));
     
+
+
     setDefaultUI();
     disableButtons();
     hide();
+    addShortcuts();
+}
+
+ExtensionToolbar::~ExtensionToolbar()
+{
+    clearShortcuts();
 }
 
 void ExtensionToolbar::updateOverlayMode(){
@@ -205,6 +216,41 @@ void ExtensionToolbar::updateVFlipButtonUI()
     m_verticalInvBtn->toggleUpdateIcon();
 }
 
+
+void ExtensionToolbar::addShortcuts()
+{
+    auto& prefManager = PrefManager::instance();
+    QJsonObject extShortcuts = prefManager.getSubCategory("Shortcuts", "ExtensionTB");
+
+    qDebug() << "[ExtensionToolbar] raccourcis : " << extShortcuts;
+
+
+    auto createGlobalShortcut = [this](const QString& keyString, QPushButton* button, bool autoRepeat = true) {
+        if (keyString.isEmpty()) return; 
+        QWidget* mainWindow = this->window(); // need to add this so shortcuts can be used event if this is hidden
+        QShortcut* shortcut = new QShortcut(QKeySequence(keyString), mainWindow);
+        shortcut->setContext(Qt::ApplicationShortcut); 
+        shortcut->setAutoRepeat(autoRepeat);
+        if (autoRepeat){
+            connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
+        }else {
+            connect(shortcut, &QShortcut::activated, button, &QPushButton::animateClick);
+        }
+        m_globalShortcuts.append(shortcut);
+    };
+
+    createGlobalShortcut(extShortcuts.value("h_flip").toString(), m_horizontalInvBtn, false);
+    createGlobalShortcut(extShortcuts.value("v_flip").toString(), m_verticalInvBtn, false);
+    createGlobalShortcut(extShortcuts.value("record").toString(), m_recordBtn, false);
+    createGlobalShortcut(extShortcuts.value("rotate").toString(), m_rotateBtn, false);
+    createGlobalShortcut(extShortcuts.value("hide_img").toString(), m_hideImgBtn);
+    createGlobalShortcut(extShortcuts.value("next_frame").toString(), m_nextFrameBtn);
+    createGlobalShortcut(extShortcuts.value("prev_frame").toString(), m_prevFrameBtn);
+    createGlobalShortcut(extShortcuts.value("forward").toString(), m_forwardBtn);
+    createGlobalShortcut(extShortcuts.value("backward").toString(), m_backwardBtn);
+
+}
+
 void ExtensionToolbar::enableButtons()
 {
     // m_abloopBtn->setEnabled(true);
@@ -237,4 +283,12 @@ void ExtensionToolbar::disableButtons()
     m_verticalInvBtn->setEnabled(false);
     m_nextFrameBtn->setEnabled(false);
     m_prevFrameBtn->setEnabled(false);
+}
+
+
+void ExtensionToolbar::clearShortcuts(){
+    for (auto& shortcut : m_globalShortcuts){
+        shortcut->deleteLater();
+    }
+    m_globalShortcuts.clear();
 }

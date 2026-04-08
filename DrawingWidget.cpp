@@ -10,21 +10,28 @@
 DrawingWidget::DrawingWidget(QWidget *parent)
     : QWidget(parent)
 {
-    //setAttribute(Qt::WA_TransparentForMouseEvents);
+    setAttribute(Qt::WA_TransparentForMouseEvents, false);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
     setStyleSheet("background-color: rgba(0,0,0,0)");
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    setFocusPolicy(Qt::StrongFocus);
 
-    //initDrawingToolbar();
+    initDrawingSurface();
+    initDrawingToolbar();
+}
+
+void DrawingWidget::initDrawingSurface(){
+    m_drawingSurfaceW = new QWidget(this);
+    m_drawingSurface = new QFrame(m_drawingSurfaceW);
+    m_drawingSurface->setGeometry(0, 0, m_mediaRect.width(), m_mediaRect.height());
+    m_drawingSurface->setStyleSheet("background: transparent;");
+    m_drawingSurfaceW->hide();
 }
 
 void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
-    QFrame* containerBackground = new QFrame(m_drawingToolbar);
-    // m_drawingToolbar->setGeometry(50, m_mediaRect.height()/2, , 200);
+    containerBackground = new QFrame(m_drawingToolbar);
     containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
     m_drawingToolbar->setStyleSheet(
         "QFrame {"
@@ -44,6 +51,8 @@ void DrawingWidget::initDrawingToolbar(){
     "auto_segmentation",
     PrefManager::instance().getText("activate") + " " + PrefManager::instance().getText("tooltip_drawing_mode")
     );
+    
+    m_drawingToolbar->hide();
 }
 
 void DrawingWidget::showDrawingMode(bool isEnabled)
@@ -53,8 +62,13 @@ void DrawingWidget::showDrawingMode(bool isEnabled)
         initDrawingToolbar();
         m_drawingToolbar->show();
         m_drawingToolbar->raise();
+
+        initDrawingSurface();
+        m_drawingSurfaceW->show();
+        m_drawingSurfaceW->raise();
     } else {
         m_drawingToolbar->hide();
+        m_drawingSurfaceW->hide();
     }
 
     update(); // redraw
@@ -75,12 +89,49 @@ void DrawingWidget::setLineWidth(int width)
 void DrawingWidget::onMediaRectChanged(const QRect &rect)
 {
     m_mediaRect = rect;
+    containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
+    m_drawingSurface->setGeometry(rect);
     update();
+}
+
+
+// Gestion des Events
+
+void DrawingWidget::paintEvent(QPaintEvent *)
+{
+    if (!m_isEnabled) return;
+
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    m_pen.setColor(Qt::red);
+    p.setPen(m_pen);
+
+    p.translate(m_mediaRect.topLeft());
+
+    int w = m_mediaRect.width();
+    int h = m_mediaRect.height();
+
+    for (const QPainterPath &path : m_paths)
+    {
+        p.drawPath(path);
+    }
+
+}
+
+void DrawingWidget::enterEvent(QEnterEvent *event)
+{
+    //activateWindow();
+    setFocus(Qt::MouseFocusReason);
+    //raise();
+    QWidget::enterEvent(event);
+    qDebug() << "ici";
 }
 
 void DrawingWidget::mousePressEvent(QMouseEvent *event)
 {
     setFocus();
+    qDebug() << "pressed";
     if (event->button() == Qt::LeftButton && m_isEnabled)
     {
         m_drawing = true;
@@ -112,26 +163,4 @@ void DrawingWidget::mouseReleaseEvent(QMouseEvent *event)
     {
         m_drawing = false;
     }
-}
-
-void DrawingWidget::paintEvent(QPaintEvent *)
-{
-    if (!m_isEnabled) return;
-
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    m_pen.setColor(Qt::red);
-    p.setPen(m_pen);
-
-    p.translate(m_mediaRect.topLeft());
-
-    int w = m_mediaRect.width();
-    int h = m_mediaRect.height();
-
-    for (const QPainterPath &path : m_paths)
-    {
-        p.drawPath(path);
-    }
-
 }

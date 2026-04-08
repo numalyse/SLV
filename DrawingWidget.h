@@ -3,6 +3,7 @@
 
 #include "./ToolbarButtons/ToolbarToggleButton.h"
 #include <QWidget>
+#include <QFrame>
 #include <QSize>
 #include <QPen>
 
@@ -17,19 +18,24 @@ public:
     void setColor(const QColor& color);
     void setLineWidth(int width);
 
+    void enterEvent(QEnterEvent *event);
     void mousePressEvent(QMouseEvent *event);
-
     void mouseMoveEvent(QMouseEvent *event);
-
     void mouseReleaseEvent(QMouseEvent *event);
 
 public slots:
     void onMediaRectChanged(const QRect &rect);
 
 protected:
+    QWidget *m_drawingSurfaceW = nullptr;
+    QFrame * m_drawingSurface = nullptr;
+
     QWidget *m_drawingToolbar = nullptr;
+    QFrame *containerBackground = nullptr;
 
     void paintEvent(QPaintEvent *event) override;
+
+    void initDrawingSurface();
     void initDrawingToolbar();
 
 private:

@@ -85,6 +85,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Preference/BasePreferenceFrame.h Preference/BasePreferenceFrame.cpp
         Preference/FormPathEditFrame.h Preference/FormPathEditFrame.cpp
         Preference/FormShortcutEditFrame.h Preference/FormShortcutEditFrame.cpp
+        Preference/FormComboBoxFrame.h Preference/FormComboBoxFrame.cpp
         SignalManager.h
 
 

@@ -137,6 +137,7 @@
 
     "dialog_preference_tab_interface" : "Interface",
     "dialog_preference_tab_shortcut" : "Raccroucis",
+    "dialog_preference_tab_paths" : "Chemins",
 
     "shortcut_subsection_MainWindow": "Fenêtre principale",
     "shortcut_subsection_CommonToolbar": "Barre d'outils standard",

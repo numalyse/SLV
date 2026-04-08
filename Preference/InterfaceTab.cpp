@@ -2,7 +2,7 @@
 
 #include "PrefManager.h"
 #include "Preference/BasePreferenceFrame.h"
-#include "Preference/FormPathEditFrame.h"
+#include "Preference/FormComboBoxFrame.h"
 
 
 #include <QComboBox>
@@ -16,21 +16,17 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
     QString preferredLang = prefManager.getPref("Interface", "Lang", "code");
     QStringList availableLangs = prefManager.getAvailableLangs();
 
-/*     
     FormComboBoxFrame* langFrame = new FormComboBoxFrame(
         prefManager.getText("interface_lang_code"), 
-        "Lang",      // Sous-catégorie
-        "code",      // Clé
-        availableLangs, 
+        "Lang",
+        "code",    
         preferredLang, 
+        availableLangs, 
         m_container
     ); 
-    
-    // Ajout et connexion automatique
+
     addPreferenceFrame(langFrame);
 
-    layout->addRow( prefManager.getText("interface_lang_code"), FormComboBoxFrame);
+    m_layout->addRow(langFrame);
  
-*/
-
 }

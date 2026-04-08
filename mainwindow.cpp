@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto& prefManager = PrefManager::instance();
     prefManager.loadPrefs();
-    prefManager.loadLanguage(prefManager.getPref("Lang","code"));
+    prefManager.loadLanguage(prefManager.getPref("Interface","Lang","code"));
 
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);

@@ -69,3 +69,24 @@ void ShortcutTab::save(){
         qWarning() << "[ShortcutTab] Echec de la sauvegarde des raccourcis";
     }
 }
+
+void ShortcutTab::discard()
+{
+    m_updatedShortcut = m_baseShortcut;
+
+    for (auto category = m_baseShortcut.begin(); category != m_baseShortcut.end(); ++category) {
+        
+        QJsonObject shortCutSubcategory = category.value().toObject();
+
+        for(auto subCategory = shortCutSubcategory.begin(); subCategory != shortCutSubcategory.end(); ++subCategory){
+            
+            QString internalKey = subCategory.key();
+            QString originalShortcut = subCategory.value().toString(); 
+
+            if (m_shortcutFrames.contains(internalKey)) {
+                m_shortcutFrames[internalKey]->setShortcutUI(originalShortcut);
+            }
+        }
+    }
+
+}

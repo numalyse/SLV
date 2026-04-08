@@ -15,7 +15,8 @@ public:
     explicit ShortcutTab(QWidget* parent = nullptr);
     bool needSave();
     void save();
-    
+    void discard();
+
     ~ShortcutTab() {}
 
 private:

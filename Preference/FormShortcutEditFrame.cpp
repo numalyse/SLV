@@ -21,6 +21,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
     nameLabel->setStyleSheet("font-weight: bold;");
     nameLabel->setText(name);
 
+    m_prevValue = value;
     m_keySequenceEdit = new QKeySequenceEdit(value, this);
     m_keySequenceEdit->setMaximumSequenceLength(1);
     QLineEdit* internalLineEdit = m_keySequenceEdit->findChild<QLineEdit*>();  // récupère le QLineEdit interne généré par Qt
@@ -37,6 +38,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
         auto [conflictSubCategory, conflictKey] = prefManager.checkAvailableShortcut(key, newShortcutString);
 
         if(conflictKey.isEmpty()) {
+            m_prevValue = newShortcutString;
             emit updateJsonObjRequested(subCategory, key, newShortcutString);
         } 
         else {
@@ -47,6 +49,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
                 
                 [this, conflictSubCategory, conflictKey, subCategory, key, newShortcutString]() { // si y'a un conflit, on assigne le raccourcis et on vide l'autre
                     auto& prefManager = PrefManager::instance();
+                    m_prevValue = newShortcutString;
                     emit updateJsonObjRequested(subCategory, key, newShortcutString);
                     emit updateJsonObjRequested(conflictSubCategory, conflictKey, "");
                     emit emptyShortcutUIRequested(conflictKey);
@@ -56,7 +59,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
 
                 [this, subCategory, key](){
                     auto& prefManager = PrefManager::instance();
-                    m_keySequenceEdit->setKeySequence(QKeySequence::fromString(prefManager.getPref("Shortcuts", subCategory, key)));
+                    m_keySequenceEdit->setKeySequence(QKeySequence::fromString(m_prevValue));
                 }
             );
         }
@@ -68,10 +71,19 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
 }
 
 void FormShortcutEditFrame::clearShortcutUI(){
-    QKeySequenceEdit* keyEdit = this->findChild<QKeySequenceEdit*>();
-    if (keyEdit) {
-        keyEdit->blockSignals(true); 
-        keyEdit->clear();     
-        keyEdit->blockSignals(false);
+    if (m_keySequenceEdit) {
+        m_keySequenceEdit->blockSignals(true); 
+        m_prevValue = "";
+        m_keySequenceEdit->clear();     
+        m_keySequenceEdit->blockSignals(false);
+    }
+}
+
+void FormShortcutEditFrame::setShortcutUI(const QString& shortcut){
+    if (m_keySequenceEdit) {
+        m_keySequenceEdit->blockSignals(true); 
+        m_prevValue = shortcut;
+        m_keySequenceEdit->setKeySequence(QKeySequence::fromString(shortcut));
+        m_keySequenceEdit->blockSignals(false);
     }
 }

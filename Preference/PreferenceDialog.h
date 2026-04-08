@@ -19,7 +19,11 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    
+
+private slots:
+    void save();
+    void discard();
+
 private:
     QTabWidget* m_tabWidget = nullptr;
     InterfaceTab* m_interfaceTab = nullptr;

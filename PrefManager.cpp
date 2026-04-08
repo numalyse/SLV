@@ -292,6 +292,10 @@ void PrefManager::syncUserPrefs()
         pathCategory.insert("lp_capture", defaultPath);
         pathModified = true;
     }
+    if(pathCategory.value("screenshot").toString().isEmpty()){
+        pathCategory.insert("screenshot", QDir::homePath() + "/SLV_Content/Captures_Images");
+        pathModified = true;
+    }
     
     if(pathModified){
         m_userPrefs.insert("Paths", pathCategory);

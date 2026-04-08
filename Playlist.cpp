@@ -61,6 +61,7 @@ Playlist::Playlist(QWidget *parent)
         "loop_off_white", 
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_loopItemBtn->setFixedSize(24,24);
+    m_loopItemBtn->setToggledIconFrame(true);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
     playlistLabelLayout->addWidget(m_loopItemBtn);
@@ -76,6 +77,7 @@ Playlist::Playlist(QWidget *parent)
         "shuffle_white", 
         PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_shuffleItemBtn->setFixedSize(24,24);
+    m_shuffleItemBtn->setToggledIconFrame(true);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
     playlistLabelLayout->addWidget(m_shuffleItemBtn);

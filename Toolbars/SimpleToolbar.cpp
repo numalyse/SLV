@@ -77,11 +77,12 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
-        "loop_on.png",
+        "loop_off_white",
         PrefManager::instance().getText("tooltip_loop_on"),
         "loop_off_white",
         PrefManager::instance().getText("tooltip_loop_off")
     );
+    m_loopBtn->setToggledIconFrame(true);
 
     // Languages/Subtitles Popup display
     QVBoxLayout* langLayout = new QVBoxLayout();

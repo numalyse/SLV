@@ -6,10 +6,15 @@
 #include <QFormLayout>
 #include <QMessageBox>
 
-InterfaceTab::InterfaceTab(QWidget *parent) : QWidget(parent)
+InterfaceTab::InterfaceTab(QWidget *parent) : QScrollArea(parent)
 {
     auto& prefManager = PrefManager::instance();
-    QFormLayout* layout = new QFormLayout(this);
+    setWidgetResizable(true); 
+    setFrameShape(QFrame::NoFrame);
+
+    QWidget* container = new QWidget(this);
+    QFormLayout* layout = new QFormLayout(container);
+
 
     m_baseInterface = prefManager.getCategory("Interface");
     m_updatedInterface = m_baseInterface;
@@ -41,7 +46,8 @@ InterfaceTab::InterfaceTab(QWidget *parent) : QWidget(parent)
     });
     
     layout->addWidget(langComboBox);
-
+    
+    setWidget(container);
 }
 
 bool InterfaceTab::needSave()

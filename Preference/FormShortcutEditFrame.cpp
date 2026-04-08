@@ -43,7 +43,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
         } 
         else {
             SLV::showGenericDialog(
-                this, 
+                nullptr, 
                 prefManager.getText("dialog_update_shortcut_conflict_title"),
                 prefManager.getText("dialog_update_shortcut_conflict_text") 
                 + prefManager.getText("shortcut_subsection_" + conflictSubCategory) 

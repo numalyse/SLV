@@ -126,12 +126,14 @@
     "generic_dialog_btn_no" : "Non",
     "generic_dialog_btn_cancel" : "Annuler",
 
-    "dialog_update_shortcut_conflict_title" : "Conflit raccroucis",
-    "dialog_update_shortcut_conflict_text" : "Le raccroucis choisit est déjà utilisé par : ",
-    "dialog_update_shortcut_conflict_text_info" : "Voulez-vous continuer ?",
+    "dialog_update_shortcut_conflict_title" : "Conflit de raccourcis",
+    "dialog_update_shortcut_conflict_text" : "Le raccourci choisi est déjà utilisé par : ",
+    "dialog_update_shortcut_conflict_text_info" : "Voulez-vous l'écraser ?",
 
     "dialog_preference_restart_to_apply_tittle" : "Redémarrage requis",
     "dialog_preference_restart_to_apply_text" : "Un redémarrage de l'application est nécessaire pour prendre en compte les changements.",
+    "dialog_preference_save_tilte" : "Sauvegarde des préférences",
+    "dialog_preference_save_text" : "Voulez-vous sauvegarder vos changements ?",
 
     "dialog_preference_tab_interface" : "Interface",
     "dialog_preference_tab_shortcut" : "Raccroucis",

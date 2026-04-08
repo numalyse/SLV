@@ -344,25 +344,3 @@ QStringList PrefManager::getAvailableLangs(){
     return langs;
 }
 
-std::pair<QString, QString> PrefManager::checkAvailableShortcut(const QString& shortcutKey, const QString& newShortcut){
-
-    if(newShortcut.isEmpty()) return {};
-
-    QJsonObject shortCuts = getCategory("Shortcuts");
-    
-    for (auto category = shortCuts.begin(); category != shortCuts.end(); ++category) {
-
-        QJsonObject shortCutSubcategory = category.value().toObject();
-
-        for(auto subCategory = shortCutSubcategory.begin(); subCategory != shortCutSubcategory.end(); ++subCategory){
-
-            QString subCategoryValue = subCategory.value().toString();
-
-            if( subCategoryValue == newShortcut && subCategory.key() != shortcutKey ){
-                return {category.key(), subCategory.key()};
-            }
-        }
-    }
-
-    return {};
-}

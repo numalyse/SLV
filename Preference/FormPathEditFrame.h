@@ -1,3 +1,6 @@
+#ifndef FORMPATHEDITFRAME_H
+#define FORMPATHEDITFRAME_H
+
 #include "Preference/BasePreferenceFrame.h"
 
 class QLineEdit;
@@ -17,3 +20,5 @@ private:
     QLineEdit* m_pathLineEdit = nullptr;
     QPushButton* m_browseBtn = nullptr;
 };
+
+#endif

@@ -39,7 +39,7 @@ void BasePreferenceTab::save()
     if(prefManager.setCategory(m_categoryName, m_updatedJson)) {
         m_baseJson = m_updatedJson;
     } else {
-        qWarning() << "Echec de la sauvegarde pour l'onglet" << m_categoryName;
+        qWarning() << "[BasePreferenceTab] Echec de la sauvegarde pour l'onglet" << m_categoryName;
     }
 }
 
@@ -57,7 +57,10 @@ void BasePreferenceTab::discard()
         if (m_baseJson.contains(subCat) && m_baseJson[subCat].isObject()) {
             originalValue = m_baseJson[subCat].toObject().value(key).toString();
         } else {
-            originalValue = m_baseJson.value(key).toString();
+            if( m_baseJson.contains(key) ) originalValue = m_baseJson.value(key).toString();
+            else {
+                qDebug() << "[BasePreferenceTab] Pas de préférence de base retrouvé pour la clé : "<< key;
+            }
         }
 
         frame->setUIValue(originalValue);
@@ -71,7 +74,10 @@ void BasePreferenceTab::updateJsonObj(const QString& subCategory, const QString&
         subObject[key] = newValue;
         m_updatedJson[subCategory] = subObject;
     } else {
-        m_updatedJson[key] = newValue;
+        if( m_updatedJson.contains(key) ) m_updatedJson[key] = newValue;
+        else {
+            qDebug() << "[BasePreferenceTab] Pas de clé "<< key << "de base retrouvé pour le json : " << m_updatedJson;
+        }
     }
     
     emit tabChanges();

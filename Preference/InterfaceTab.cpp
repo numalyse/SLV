@@ -30,17 +30,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
     addPreferenceFrame(langFrame);
 
     layout->addRow( prefManager.getText("interface_lang_code"), FormComboBoxFrame);
- */   
-
-    FormPathEditFrame* projectPathFrame = new FormPathEditFrame(
-        "Dossier de sauvegarde",          
-        "Paths",                      
-        "screenshot",           
-        prefManager.getPref("Paths", "screenshot"),
-        true,                           
-        this
-    );
-
-    addPreferenceFrame( projectPathFrame );
+ 
+*/
 
 }

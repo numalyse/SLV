@@ -10,7 +10,7 @@
 #include <QMessageBox>
 
 FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, QWidget *parent)
-    : BasePreferenceFrame(name, subCategory, key, value, parent)
+: BasePreferenceFrame(name, subCategory, key, value, parent)
 {
     m_keySequenceEdit = new QKeySequenceEdit(value, this);
     m_keySequenceEdit->setMaximumSequenceLength(1);

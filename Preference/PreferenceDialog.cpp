@@ -1,6 +1,9 @@
 #include "PreferenceDialog.h"
 
 #include "Preference/BasePreferenceTab.h"
+#include "Preference/InterfaceTab.h"
+#include "Preference/ShortcutTab.h"
+#include "Preference/PathTab.h"
 
 #include "PrefManager.h"
 #include "GenericDialog.h"
@@ -30,6 +33,11 @@ PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
     m_tabWidget->addTab(shortcutTab, prefManager.getText("dialog_preference_tab_shortcut"));
     m_tabs.append(shortcutTab);
     connect(shortcutTab, &BasePreferenceTab::tabChanges, this, &PreferenceDialog::toggleButtons);
+
+    PathTab* pathTab = new PathTab(m_tabWidget);
+    m_tabWidget->addTab(pathTab, prefManager.getText("dialog_preference_tab_paths"));
+    m_tabs.append(pathTab);
+    connect(pathTab, &BasePreferenceTab::tabChanges, this, &PreferenceDialog::toggleButtons);
 
     mainLayout->addWidget(m_tabWidget);
 
@@ -85,7 +93,7 @@ void PreferenceDialog::save(){
     if(!needSave()) return;
 
     for(auto& tab : m_tabs){
-        tab->needSave();
+        tab->save();
     }
     showWarning();
     m_buttonBox->setDisabled(true);

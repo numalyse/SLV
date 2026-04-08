@@ -5,7 +5,7 @@
 #include <QFileDialog>
 
 FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, bool isFolder, QWidget *parent)
-    : BasePreferenceFrame(name, subCategory, key, value, parent) // <--- Appel du constructeur parent
+: BasePreferenceFrame(name, subCategory, key, value, parent)
 {
 
     m_pathLineEdit = new QLineEdit(value, this);

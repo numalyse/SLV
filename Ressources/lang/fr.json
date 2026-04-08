@@ -164,6 +164,8 @@
     "shortcut_prev_frame": "Image précédente",
     "shortcut_next_frame": "Image suivante",
 
+    "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
+
     "interface_lang_code" : "Langue de l'interface : "
 
 }

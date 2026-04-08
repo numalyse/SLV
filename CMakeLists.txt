@@ -81,6 +81,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Preference/BasePreferenceTab.h Preference/BasePreferenceTab.cpp
         Preference/InterfaceTab.h Preference/InterfaceTab.cpp
         Preference/ShortcutTab.h Preference/ShortcutTab.cpp
+        Preference/PathTab.h Preference/PathTab.cpp
         Preference/BasePreferenceFrame.h Preference/BasePreferenceFrame.cpp
         Preference/FormPathEditFrame.h Preference/FormPathEditFrame.cpp
         Preference/FormShortcutEditFrame.h Preference/FormShortcutEditFrame.cpp

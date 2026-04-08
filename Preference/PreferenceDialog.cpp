@@ -39,7 +39,7 @@ PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
 void PreferenceDialog::closeEvent(QCloseEvent *event)
 {
     auto& prefManager = PrefManager::instance();
-    if(m_shortcutTab->needSave()) {
+    if(needSave()) {
         SLV::showGenericDialog(
             nullptr, 
             prefManager.getText("dialog_preference_save_tilte"),
@@ -64,10 +64,30 @@ void PreferenceDialog::closeEvent(QCloseEvent *event)
     }
 }
 
+bool PreferenceDialog::needSave(){
+    return m_shortcutTab->needSave() || m_interfaceTab->needSave();
+}
+
 void PreferenceDialog::save(){
+    if(!needSave()) return;
+
     m_shortcutTab->save();
+    m_interfaceTab->save();
+    showWarning();
 }
 
 void PreferenceDialog::discard(){
     m_shortcutTab->discard();
+    m_interfaceTab->discard();
+}
+
+void PreferenceDialog::showWarning(){
+    auto& prefManager = PrefManager::instance();
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(prefManager.getText("dialog_preference_restart_to_apply_tittle"));
+    msgBox.setText(prefManager.getText("dialog_preference_restart_to_apply_text"));
+    msgBox.setInformativeText(prefManager.getText("dialog_preference_restart_to_apply_text_info"));
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
 }

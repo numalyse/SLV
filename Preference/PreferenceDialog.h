@@ -25,6 +25,9 @@ private slots:
     void discard();
 
 private:
+    bool needSave();
+    void showWarning();
+
     QTabWidget* m_tabWidget = nullptr;
     InterfaceTab* m_interfaceTab = nullptr;
     ShortcutTab* m_shortcutTab = nullptr;

@@ -18,10 +18,10 @@ PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
     m_tabWidget = new QTabWidget(this);
 
     m_interfaceTab = new InterfaceTab(m_tabWidget);
-    m_tabWidget->addTab(m_interfaceTab, prefManager.getText("pref_dialog_tab_interface"));
+    m_tabWidget->addTab(m_interfaceTab, prefManager.getText("dialog_preference_tab_interface"));
 
     m_shortcutTab = new ShortcutTab(m_tabWidget);
-    m_tabWidget->addTab(m_shortcutTab, prefManager.getText("pref_dialog_tab_shortcut"));
+    m_tabWidget->addTab(m_shortcutTab, prefManager.getText("dialog_preference_tab_shortcut"));
 
     mainLayout->addWidget(m_tabWidget);
 
@@ -86,7 +86,6 @@ void PreferenceDialog::showWarning(){
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(prefManager.getText("dialog_preference_restart_to_apply_tittle"));
     msgBox.setText(prefManager.getText("dialog_preference_restart_to_apply_text"));
-    msgBox.setInformativeText(prefManager.getText("dialog_preference_restart_to_apply_text_info"));
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();

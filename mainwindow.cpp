@@ -351,13 +351,14 @@ void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangem
     ProjectManager& projManager = ProjectManager::instance();
     
     if (projManager.needSave()) { 
-        PrefManager& txtManager = PrefManager::instance();
+        PrefManager& prefManager = PrefManager::instance();
         
         SLV::showGenericDialog(
             this, 
-            txtManager.getText("dialog_save_project_dialog_title"),
-            txtManager.getText("dialog_save_project_dialog_text"),
-            [&projManager, arrangement]() { 
+            prefManager.getText("dialog_save_project_dialog_title"),
+            prefManager.getText("dialog_save_project_dialog_text"),
+            [arrangement]() { 
+                ProjectManager& projManager = ProjectManager::instance();
                 projManager.saveProject(false); 
                 emit SignalManager::instance().newArrangementRequested(arrangement);
             },
@@ -372,7 +373,6 @@ void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangem
 
 void MainWindow::openPrefWidget()
 {
-    qDebug() << "open pref widget";
     PreferenceDialog* prefDialog = new PreferenceDialog(this);
     prefDialog->exec();
 }

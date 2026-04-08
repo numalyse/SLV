@@ -10,11 +10,13 @@
 
 namespace SLV
 {
-    
+
+    // 1. La fonction "Maître" (celle qui fait le vrai travail)
     inline void showGenericDialog(
         QWidget* parent,
         const QString& title,
         const QString& text,
+        const QString& textInfo,
         std::function<void()> onYes,        
         std::function<void()> onNo = nullptr,        
         std::function<void()> onCancel = nullptr 
@@ -25,6 +27,10 @@ namespace SLV
         msgBox.setIcon(QMessageBox::Question);
         msgBox.setWindowTitle(title);
         msgBox.setText(text);
+        
+        if (!textInfo.isEmpty()) {
+            msgBox.setInformativeText(textInfo);
+        }
 
         QPushButton *yesBtn = msgBox.addButton(prefManager.getText("generic_dialog_btn_yes"), QMessageBox::YesRole);
         QPushButton *noBtn = nullptr;
@@ -38,12 +44,24 @@ namespace SLV
 
         if (msgBox.clickedButton() == yesBtn) {
             if (onYes) onYes();
-        } else if (msgBox.clickedButton() == noBtn) {
+        } else if (noBtn && msgBox.clickedButton() == noBtn) {
             if (onNo) onNo();
         } else {
             if (onCancel) onCancel();
         }
     }
+
+    inline void showGenericDialog(
+        QWidget* parent,
+        const QString& title,
+        const QString& text,
+        std::function<void()> onYes,        
+        std::function<void()> onNo = nullptr,        
+        std::function<void()> onCancel = nullptr 
+    ) {
+        showGenericDialog(parent, title, text, QString(), onYes, onNo, onCancel);
+    }
+
 
 } // namespace SLV
 

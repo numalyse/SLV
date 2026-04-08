@@ -45,7 +45,12 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
             SLV::showGenericDialog(
                 this, 
                 prefManager.getText("dialog_update_shortcut_conflict_title"),
-                prefManager.getText("dialog_update_shortcut_conflict_text"),
+                prefManager.getText("dialog_update_shortcut_conflict_text") 
+                + prefManager.getText("shortcut_subsection_" + conflictSubCategory) 
+                + ", " + prefManager.getText("shortcut_" + conflictKey)
+                + " : " + newShortcutString,
+
+                prefManager.getText("dialog_update_shortcut_conflict_text_info"),
                 
                 [this, conflictSubCategory, conflictKey, subCategory, key, newShortcutString]() { // si y'a un conflit, on assigne le raccourcis et on vide l'autre
                     auto& prefManager = PrefManager::instance();

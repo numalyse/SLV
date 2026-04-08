@@ -121,6 +121,12 @@
     "tooltip_drawing_mode" : "mode dessin",
     "tooltip_pen_tool" : "Crayon",
     "tooltip_color_tool" : "Choisir une couleur",
+    "red" : "Rouge",
+    "orange" : "Orange",
+    "yellow" : "Jaune",
+    "green" : "Vert",
+    "blue" : "Bleu",
+    "purple" : "Violet",
     "tooltip_eraser_tool" : "Gomme",
     "tooltip_bin_tool" : "Poubelle"
 }

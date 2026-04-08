@@ -9,6 +9,14 @@
 #include <QSize>
 #include <QPainter>
 #include <QPen>
+#include <QPainterPath>
+#include <QColor>
+
+struct DrawingStroke {
+    QPainterPath path;
+    QColor color;
+    int lineWidth;
+};
 
 class DrawingWidget : public QWidget
 {
@@ -45,15 +53,16 @@ protected:
     void initDrawingSurface();
 
     QIcon genIconPreviewColor(QColor color);
+    void updatePen();
     void initDrawingToolbar();
 
 private:
     QRect m_mediaRect;
     bool m_isEnabled = false;
 
-    QVector<QPainterPath> m_paths;
-    QVector<QPainterPath> m_redoPathlist;
-    QVector<QPainterPath> m_undoPathlist;
+    QVector<DrawingStroke> m_paths;
+    QVector<DrawingStroke> m_redoPathlist;
+    QVector<DrawingStroke> m_undoPathlist;
 
     QPoint m_lastPoint;
 
@@ -65,7 +74,7 @@ private:
     ToolbarToggleButton* m_eraserToolBtn = nullptr;
     ToolbarButton* m_binToolBtn = nullptr;
 
-    QVector<QColor> m_palette;
+    QVector<QPair<QString, QColor>> m_palette;
     QColor m_color = QColor(255, 0, 0, 255);
     int m_lineWidth = 2;
     QPen m_pen {QColor(255, 0, 0, 255), 2};

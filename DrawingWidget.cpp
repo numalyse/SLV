@@ -18,12 +18,12 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     m_palette = {
-        QColor{229, 0, 0, 255},     // Rouge
-        QColor{255, 141, 0, 255},   // Orange
-        QColor{255, 238, 0, 255},   // Jaune
-        QColor{0, 129, 33, 255},    // Vert
-        QColor{0, 76, 255, 255},    // Bleu
-        QColor{118, 1, 136, 255}    // Violet
+        {PrefManager::instance().getText("red"), QColor{229, 0, 0, 255}},     // Rouge
+        {PrefManager::instance().getText("orange"), QColor{255, 141, 0, 255}},   // Orange
+        {PrefManager::instance().getText("yellow"), QColor{255, 238, 0, 255}},   // Jaune
+        {PrefManager::instance().getText("green"), QColor{0, 129, 33, 255}},    // Vert
+        {PrefManager::instance().getText("blue"), QColor{0, 76, 255, 255}},    // Bleu
+        {PrefManager::instance().getText("purple"), QColor{118, 1, 136, 255}}    // Violet
     };
 
     initDrawingSurface();
@@ -66,6 +66,11 @@ QIcon DrawingWidget::genIconPreviewColor(QColor color){
     return m_previewColor;
 }
 
+void DrawingWidget::updatePen(){
+    m_pen.setColor(m_color);
+    m_pen.setWidth(m_lineWidth);
+}
+
 void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
     containerBackground = new QFrame(m_drawingToolbar);
@@ -86,18 +91,6 @@ void DrawingWidget::initDrawingToolbar(){
 
     // PALETTE CHOIX COULEUR
     QHBoxLayout* colorLayout = new QHBoxLayout;
-    for (const QColor& color : m_palette) {
-        ToolbarButton* colorBtn = new ToolbarButton(
-            m_drawingToolbar,
-            " ",
-            PrefManager::instance().getText("tooltip")
-        );
-        colorBtn->setIcon(genIconPreviewColor(color));
-        connect(colorBtn, &ToolbarButton::clicked, this, [this, color]() {
-            setColor(color);
-        });
-        colorLayout->addWidget(colorBtn);
-    }
 
     // BOUTON COULEUR
     m_colorToolBtn = new ToolbarToggleHoverButton(
@@ -111,9 +104,22 @@ void DrawingWidget::initDrawingToolbar(){
     );
     connect(m_colorToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::binRequested);
     drawingToolbarLayout->addWidget(m_colorToolBtn);
-
-    
     m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
+
+    for ( const auto& [colorName, color] : m_palette) {
+        ToolbarButton* colorBtn = new ToolbarButton(
+            m_drawingToolbar,
+            " ",
+            colorName
+        );
+        colorBtn->setIcon(genIconPreviewColor(color));
+        connect(colorBtn, &ToolbarButton::clicked, this, [this, color]() {
+            setColor(color);
+            m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
+            updatePen();
+        });
+        colorLayout->addWidget(colorBtn);
+    }
 
 
     // BOUTON CRAYON
@@ -233,17 +239,13 @@ void DrawingWidget::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    m_pen.setColor(Qt::red);
-    p.setPen(m_pen);
-
     p.translate(m_mediaRect.topLeft());
 
-    int w = m_mediaRect.width();
-    int h = m_mediaRect.height();
-
-    for (const QPainterPath &path : m_paths)
+    for (const DrawingStroke &stroke : m_paths)
     {
-        p.drawPath(path);
+        QPen strokePen(stroke.color, stroke.lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        p.setPen(strokePen);
+        p.drawPath(stroke.path);
     }
 
 }
@@ -261,16 +263,16 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 {
     setFocus();
     qDebug() << "pressed";
-    if (event->button() == Qt::LeftButton && m_isEnabled)
+    if (event->button() == Qt::LeftButton && m_isEnabled && m_drawing)
     {
-        //m_drawing = true;
-
         QPoint p = event->pos() - m_mediaRect.topLeft();
 
-        QPainterPath newPath;
-        newPath.moveTo(p);
+        DrawingStroke newStroke;
+        newStroke.path.moveTo(p);
+        newStroke.color = m_color;
+        newStroke.lineWidth = m_lineWidth;
 
-        m_paths.append(newPath);
+        m_paths.append(newStroke);
     }
 }
 
@@ -280,7 +282,7 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
     {
         QPoint p = event->pos() - m_mediaRect.topLeft();
 
-        m_paths.last().lineTo(p);
+        m_paths.last().path.lineTo(p);
 
         update();
     }

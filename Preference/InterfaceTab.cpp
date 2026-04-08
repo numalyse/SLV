@@ -1,83 +1,46 @@
 #include "InterfaceTab.h"
 
 #include "PrefManager.h"
+#include "Preference/BasePreferenceFrame.h"
+#include "Preference/FormPathEditFrame.h"
+
 
 #include <QComboBox>
 #include <QFormLayout>
 #include <QMessageBox>
 
-InterfaceTab::InterfaceTab(QWidget *parent) : QScrollArea(parent)
+InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", parent) 
 {
     auto& prefManager = PrefManager::instance();
-    setWidgetResizable(true); 
-    setFrameShape(QFrame::NoFrame);
-
-    QWidget* container = new QWidget(this);
-    QFormLayout* layout = new QFormLayout(container);
-
-
-    m_baseInterface = prefManager.getCategory("Interface");
-    m_updatedInterface = m_baseInterface;
-
-    QComboBox* langComboBox = new QComboBox(this);
-    QStringList availableLangs = prefManager.getAvailableLangs();
-    for (size_t i = 0; i < availableLangs.size(); i++){
-        langComboBox->addItem(availableLangs[i], i);
-    }
 
     QString preferredLang = prefManager.getPref("Interface", "Lang", "code");
-    int indexCurrLang = availableLangs.indexOf(preferredLang);
-    if (indexCurrLang != -1) langComboBox->setCurrentIndex(indexCurrLang);
+    QStringList availableLangs = prefManager.getAvailableLangs();
 
-    connect(langComboBox, &QComboBox::currentIndexChanged, this , [this, availableLangs](int cbIndex){
-        QJsonObject langObj = m_updatedInterface["Lang"].toObject();
-        langObj["code"] = availableLangs[cbIndex];
-        m_updatedInterface["Lang"] = langObj;
-        emit interfaceChanges();
-    });
-
-    m_discardActions.append([this, langComboBox, availableLangs]() {
-        QString originalLang = m_baseInterface["Lang"].toObject().value("code").toString();
-        int index = availableLangs.indexOf(originalLang);
-        if (index != -1) {
-            langComboBox->blockSignals(true);
-            langComboBox->setCurrentIndex(index);
-            langComboBox->blockSignals(false);
-        }
-    });
+/*     
+    FormComboBoxFrame* langFrame = new FormComboBoxFrame(
+        prefManager.getText("interface_lang_code"), 
+        "Lang",      // Sous-catégorie
+        "code",      // Clé
+        availableLangs, 
+        preferredLang, 
+        m_container
+    ); 
     
-    layout->addRow( prefManager.getText("interface_lang_code"), langComboBox);
+    // Ajout et connexion automatique
+    addPreferenceFrame(langFrame);
 
-    setWidget(container);
-}
+    layout->addRow( prefManager.getText("interface_lang_code"), FormComboBoxFrame);
+ */   
 
-bool InterfaceTab::needSave()
-{
-    qDebug()<< " should save ? " << (m_baseInterface != m_updatedInterface);
-    return m_baseInterface != m_updatedInterface;
-}
+    FormPathEditFrame* projectPathFrame = new FormPathEditFrame(
+        "Dossier de sauvegarde",          
+        "Paths",                      
+        "screenshot",           
+        prefManager.getPref("Paths", "screenshot"),
+        true,                           
+        this
+    );
 
-void InterfaceTab::save()
-{
-    if(!needSave()) return;
-
-    auto& prefManager = PrefManager::instance();
-    if( prefManager.setCategory("Interface", m_updatedInterface)) {
-        m_baseInterface = m_updatedInterface;
-    } else {
-        qWarning() << "[InterfaceTab] Echec de la sauvegarde des raccourcis";
-    }
-}
-
-void InterfaceTab::discard()
-{
-    if(!needSave()) return;
-
-    for (auto& function : m_discardActions)
-    {
-        function();
-    }
-    
-    m_updatedInterface = m_baseInterface;
+    addPreferenceFrame( projectPathFrame );
 
 }

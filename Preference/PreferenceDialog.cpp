@@ -1,5 +1,7 @@
 #include "PreferenceDialog.h"
 
+#include "Preference/BasePreferenceTab.h"
+
 #include "PrefManager.h"
 #include "GenericDialog.h"
 
@@ -19,13 +21,15 @@ PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     m_tabWidget = new QTabWidget(this);
 
-    m_interfaceTab = new InterfaceTab(m_tabWidget);
-    m_tabWidget->addTab(m_interfaceTab, prefManager.getText("dialog_preference_tab_interface"));
-    connect(m_interfaceTab, &InterfaceTab::interfaceChanges, this, &PreferenceDialog::toggleButtons);
+    InterfaceTab* interfaceTab = new InterfaceTab(m_tabWidget);
+    m_tabWidget->addTab(interfaceTab, prefManager.getText("dialog_preference_tab_interface"));
+    m_tabs.append(interfaceTab);
+    connect(interfaceTab, &BasePreferenceTab::tabChanges, this, &PreferenceDialog::toggleButtons);
 
-    m_shortcutTab = new ShortcutTab(m_tabWidget);
-    m_tabWidget->addTab(m_shortcutTab, prefManager.getText("dialog_preference_tab_shortcut"));
-    connect(m_shortcutTab, &ShortcutTab::shortcutChanges, this, &PreferenceDialog::toggleButtons);
+    ShortcutTab* shortcutTab = new ShortcutTab(m_tabWidget);
+    m_tabWidget->addTab(shortcutTab, prefManager.getText("dialog_preference_tab_shortcut"));
+    m_tabs.append(shortcutTab);
+    connect(shortcutTab, &BasePreferenceTab::tabChanges, this, &PreferenceDialog::toggleButtons);
 
     mainLayout->addWidget(m_tabWidget);
 
@@ -71,21 +75,26 @@ void PreferenceDialog::closeEvent(QCloseEvent *event)
 }
 
 bool PreferenceDialog::needSave(){
-    return m_shortcutTab->needSave() || m_interfaceTab->needSave();
+    for(auto& tab : m_tabs){
+        if (tab->needSave()) return true;
+    }
+    return false;
 }
 
 void PreferenceDialog::save(){
     if(!needSave()) return;
 
-    m_shortcutTab->save();
-    m_interfaceTab->save();
+    for(auto& tab : m_tabs){
+        tab->needSave();
+    }
     showWarning();
     m_buttonBox->setDisabled(true);
 }
 
 void PreferenceDialog::discard(){
-    m_shortcutTab->discard();
-    m_interfaceTab->discard();
+    for(auto& tab : m_tabs){
+        tab->discard();
+    }
     m_buttonBox->setDisabled(true);
 }
 

@@ -3,56 +3,40 @@
 #include "PrefManager.h"
 #include "Preference/FormShortcutEditFrame.h"
 
+
 #include <QFormLayout>
 #include <QLabel>
 
-ShortcutTab::ShortcutTab(QWidget *parent) : QScrollArea(parent)
+ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", parent)
 {
     auto& prefManager = PrefManager::instance();
     setWidgetResizable(true); 
     setFrameShape(QFrame::NoFrame);
 
-    QWidget* container = new QWidget(this);
-    QFormLayout* layout = new QFormLayout(container);
-
-
-    m_baseShortcut = prefManager.getCategory("Shortcuts");
-    m_updatedShortcut = m_baseShortcut;
-    
-
-    for (auto category = m_baseShortcut.begin(); category != m_baseShortcut.end(); ++category) {
+    for (auto category = m_baseJson.begin(); category != m_baseJson.end(); ++category) {
         
-        layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" +  category.key()), container));
+        m_layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" +  category.key()), m_container));
         QJsonObject shortCutSubcategory = category.value().toObject();
 
         for(auto subCategory = shortCutSubcategory.begin(); subCategory != shortCutSubcategory.end(); ++subCategory){
             QString internalKey = subCategory.key();
             QString keyTranslated = prefManager.getText("shortcut_" + internalKey);
     
-            FormShortcutEditFrame* formShortcutEditFrame = new FormShortcutEditFrame(keyTranslated, category.key(), internalKey, subCategory.value().toString(), container);
+            FormShortcutEditFrame* formShortcutEditFrame = new FormShortcutEditFrame(
+                keyTranslated, 
+                category.key(), 
+                internalKey, 
+                subCategory.value().toString(), 
+                m_container
+            );
             
-            m_shortcutFrames.insert(internalKey, formShortcutEditFrame);
-            connect(formShortcutEditFrame, &FormShortcutEditFrame::updateJsonObjRequested, this, &ShortcutTab::updateJsonObj);
             connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutUIRequested, this, &ShortcutTab::emptyShortcutUI);
-            layout->addWidget(formShortcutEditFrame);
+            addPreferenceFrame(formShortcutEditFrame);
+
+            m_shortcutFrames.insert(internalKey, formShortcutEditFrame);
         }
 
     }
-
-    setWidget(container);
-
-}
-
-void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, const QString& newShortcutString)
-{
-    QJsonObject subObject = m_updatedShortcut[subCategory].toObject();
-    subObject[key] = newShortcutString;
-    m_updatedShortcut[subCategory] = subObject;
-    emit shortcutChanges();
-}
-
-bool ShortcutTab::needSave(){
-    return m_baseShortcut != m_updatedShortcut;
 }
 
 void ShortcutTab::emptyShortcutUI(const QString& stolenKey)
@@ -60,39 +44,4 @@ void ShortcutTab::emptyShortcutUI(const QString& stolenKey)
     if(m_shortcutFrames.contains(stolenKey)) {
         m_shortcutFrames[stolenKey]->clearShortcutUI();
     }
-}
-
-void ShortcutTab::save(){
-    
-    if(!needSave()) return;
-
-    auto& prefManager = PrefManager::instance();
-    if( prefManager.setCategory("Shortcuts", m_updatedShortcut)) {
-        m_baseShortcut = m_updatedShortcut;
-    } else {
-        qWarning() << "[ShortcutTab] Echec de la sauvegarde des raccourcis";
-    }
-}
-
-void ShortcutTab::discard()
-{
-    if(!needSave()) return;
-
-    m_updatedShortcut = m_baseShortcut;
-
-    for (auto category = m_baseShortcut.begin(); category != m_baseShortcut.end(); ++category) {
-        
-        QJsonObject shortCutSubcategory = category.value().toObject();
-
-        for(auto subCategory = shortCutSubcategory.begin(); subCategory != shortCutSubcategory.end(); ++subCategory){
-            
-            QString internalKey = subCategory.key();
-            QString originalShortcut = subCategory.value().toString(); 
-
-            if (m_shortcutFrames.contains(internalKey)) {
-                m_shortcutFrames[internalKey]->setShortcutUI(originalShortcut);
-            }
-        }
-    }
-
 }

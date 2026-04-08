@@ -10,7 +10,7 @@
 #include <QMessageBox>
 
 FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, QWidget *parent)
-: BasePreferenceFrame(name, subCategory, key, value, parent)
+    : BasePreferenceFrame(name, subCategory, key, value, parent)
 {
     m_keySequenceEdit = new QKeySequenceEdit(value, this);
     m_keySequenceEdit->setMaximumSequenceLength(1);
@@ -25,43 +25,11 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
         if (!m_keySequenceEdit->hasFocus()) return;
         
         QString newShortcutString = m_keySequenceEdit->keySequence().toString();
-        auto& prefManager = PrefManager::instance();
-        auto [conflictSubCategory, conflictKey] = prefManager.checkAvailableShortcut(m_key, newShortcutString);
-
-        if(conflictKey.isEmpty()) {
-            m_prevValue = newShortcutString;
+        
+        if (newShortcutString != m_prevValue) {
             emit updateJsonObjRequested(m_subCategory, m_key, newShortcutString);
         }
-        else {
-            SLV::showGenericDialog(
-                nullptr, 
-                prefManager.getText("dialog_update_shortcut_conflict_title"),
-                prefManager.getText("dialog_update_shortcut_conflict_text") 
-                + prefManager.getText("shortcut_subsection_" + conflictSubCategory) 
-                + ", " + prefManager.getText("shortcut_" + conflictKey)
-                + " : " + newShortcutString,
-
-                prefManager.getText("dialog_update_shortcut_conflict_text_info"),
-                
-                [this, conflictSubCategory, conflictKey, newShortcutString]() { // si y'a un conflit, on assigne le raccourcis et on vide l'autre
-                    auto& prefManager = PrefManager::instance();
-                    m_prevValue = newShortcutString;
-                    emit updateJsonObjRequested(m_subCategory, m_key, newShortcutString);
-                    emit updateJsonObjRequested(conflictSubCategory, conflictKey, "");
-                    emit emptyShortcutUIRequested(conflictKey);
-                },
-
-                nullptr,
-
-                [this](){
-                    auto& prefManager = PrefManager::instance();
-                    m_keySequenceEdit->setKeySequence(QKeySequence::fromString(m_prevValue));
-                }
-            );
-        }
-
     });
-
 }
 
 void FormShortcutEditFrame::clearShortcutUI(){

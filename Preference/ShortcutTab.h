@@ -15,11 +15,17 @@ Q_OBJECT
 public:
     explicit ShortcutTab(QWidget* parent = nullptr);
 
-private:
-    QMap<QString, FormShortcutEditFrame*> m_shortcutFrames; // keeping this easily update on conflict
+protected slots:
+    void updateJsonObj(const QString& subCategory, const QString& key, const QString& newValue) override;
 
 private slots:
     void emptyShortcutUI(const QString& stolenKey);
+
+private:
+    bool hasConflict(const QString& newShortcut, const QString& currentKey, QString& outSubCategory, QString& outKey);
+
+    QMap<QString, FormShortcutEditFrame*> m_shortcutFrames; // keeping this easily update on conflict
+
 };
 
 

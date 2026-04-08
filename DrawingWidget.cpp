@@ -90,7 +90,7 @@ void DrawingWidget::initDrawingToolbar(){
         ToolbarButton* colorBtn = new ToolbarButton(
             m_drawingToolbar,
             " ",
-            PrefManager::instance().getText("tooltip");
+            PrefManager::instance().getText("tooltip")
         );
         colorBtn->setIcon(genIconPreviewColor(color));
         connect(colorBtn, &ToolbarButton::clicked, this, [this, color]() {

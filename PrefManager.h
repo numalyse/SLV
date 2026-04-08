@@ -4,6 +4,8 @@
 #include <QString>
 #include <QJsonObject>
 
+#include <utility>
+
 /// @brief Singleton pour gérer les différentes langues
 class PrefManager {
 
@@ -44,9 +46,22 @@ public:
     QString getPref(const QString &category, const QString &key) const;
     QString getPref(const QString &category, const QString &subCategory, const QString &key) const;
 
+    /// @brief Traverse :/lang folder an retrieve the base name of each files
+    /// @return list of all file name, ex : "fr", "en" 
+    QStringList getAvailableLangs();
+    
+    /// @brief Check if a shortcut can be remapped to the selected shortcut
+    /// @return returns {} if non taken, otherwise returns the key and value that uses this shortcut
+    std::pair<QString, QString> checkAvailableShortcut(const QString& shortcutKey, const QString& newShortcut);
+
     /// @brief Writes directly to the json file the value of the key
     /// @return True if successfully written to, false otherwise 
     bool setPref(const QString &category, const QString &key, const QString &value);
+    bool setPref(const QString &category, const QString &subCategory, const QString &key, const QString &value);
+
+    /// @brief Rewrites the whole category to the user pref json
+    /// @return True if successfully written to, false otherwise  
+    bool setCategory(const QString &category, const QJsonObject &categoryData);
 
     /// @brief Write all the data of m_userPrefs in the json file
     /// @return True if successfully written to, false otherwise  
@@ -62,7 +77,6 @@ private:
     /// @param userObj The user's JSON object that needs to be updated with missing keys.
     /// @return True if 'userObj' was modified (missing keys were added), false otherwise.
     bool mergeMissingKeys(const QJsonObject& defaultObj, QJsonObject& userObj);
-
 
     /// @brief Checks if the user pref are missing keys from default prefs,
     /// sets the paths if they are empty and writes to the json if m_userPrefs was modified 

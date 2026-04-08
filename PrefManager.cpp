@@ -5,11 +5,16 @@
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
+#include <QDirIterator>
 
 
 void PrefManager::loadLanguage(const QString& langCode) 
 {
-    QString filePath = ":/lang/" + langCode + ".json";
+
+    QStringList availableLangs = getAvailableLangs();
+
+    // si le langcode est bien dans les langues supportées, utilisation de celui ci sinon fallback sur en
+    QString filePath = (availableLangs.contains(langCode)) ? ":/lang/" + langCode + ".json" : ":/lang/en.json";
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly)) {
@@ -199,24 +204,33 @@ bool PrefManager::setPref(const QString& category, const QString& key, const QSt
     categoryObject[key] = value;
     m_userPrefs[category] = categoryObject;
 
-    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
-    QFile file(filePath);
+    return writeUserJson();
+}
 
-    if (!file.exists() && !createPreferenceFile(filePath)) {
-        qCritical() << "[PrefManager] Impossible de créer le fichier de préférences.";
-        return false; 
+bool PrefManager::setPref(const QString& category, const QString& subCategory, const QString& key, const QString& value)
+{
+    QJsonObject categoryObject;
+    if (m_userPrefs.contains(category) && m_userPrefs[category].isObject()) {
+        categoryObject = m_userPrefs[category].toObject();
     }
 
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QJsonDocument newDoc(m_userPrefs);
-        file.write(newDoc.toJson(QJsonDocument::Indented));
-        file.close();
-        
-        return true;
-    } 
-    
-    qDebug() << "[PrefManager] Erreur : Impossible d'écrire dans le fichier" << filePath;
-    return false;
+    QJsonObject subCategoryObject;
+    if (categoryObject.contains(subCategory) && categoryObject[subCategory].isObject()) {
+        subCategoryObject = categoryObject[subCategory].toObject();
+    }
+
+    subCategoryObject[key] = value;
+
+    categoryObject[subCategory] = subCategoryObject; 
+    m_userPrefs[category] = categoryObject;
+
+   return writeUserJson();
+}
+
+bool PrefManager::setCategory(const QString &category, const QJsonObject &categoryData)
+{
+    m_userPrefs[category] = categoryData;
+    return writeUserJson();
 }
 
 bool PrefManager::writeUserJson(){
@@ -311,4 +325,40 @@ bool PrefManager::mergeMissingKeys(const QJsonObject& defaultObj, QJsonObject& u
     }
 
     return modified;
+}
+
+QStringList PrefManager::getAvailableLangs(){
+    QStringList langs;
+
+    QDirIterator it(":/lang", QDir::Files, QDirIterator::NoIteratorFlags);
+    while (it.hasNext()) {
+        QFile f(it.next());
+        QFileInfo fileInfo(f);
+        langs.append(fileInfo.baseName());
+    }
+
+    return langs;
+}
+
+std::pair<QString, QString> PrefManager::checkAvailableShortcut(const QString& shortcutKey, const QString& newShortcut){
+
+    if(newShortcut.isEmpty()) return {};
+
+    QJsonObject shortCuts = getCategory("Shortcuts");
+    
+    for (auto category = shortCuts.begin(); category != shortCuts.end(); ++category) {
+
+        QJsonObject shortCutSubcategory = category.value().toObject();
+
+        for(auto subCategory = shortCutSubcategory.begin(); subCategory != shortCutSubcategory.end(); ++subCategory){
+
+            QString subCategoryValue = subCategory.value().toString();
+
+            if( subCategoryValue == newShortcut && subCategory.key() != shortcutKey ){
+                return {category.key(), subCategory.key()};
+            }
+        }
+    }
+
+    return {};
 }

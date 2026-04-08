@@ -5,6 +5,7 @@
 #include "PlayerWidget.h"
 #include "PrefManager.h"
 #include "GenericDialog.h"
+#include "Preference/PreferenceDialog.h"
 
 #include <qtoolbar.h>
 #include <vlc/vlc.h>
@@ -40,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto& prefManager = PrefManager::instance();
     prefManager.loadPrefs();
-    prefManager.loadLanguage(prefManager.getPref("Lang","code"));
+    prefManager.loadLanguage(prefManager.getPref("Interface","Lang","code"));
 
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);
@@ -123,6 +124,10 @@ void MainWindow::createMenuBar()
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
     connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProjectAction);
 
+    auto *OptionMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_option"));
+
+    auto *openPrefAction = OptionMenu->addAction("&" + prefManager.getText("main_window_option_open_pref"));
+    connect(openPrefAction, &QAction::triggered, this, &MainWindow::openPrefWidget);
 
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
@@ -346,13 +351,14 @@ void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangem
     ProjectManager& projManager = ProjectManager::instance();
     
     if (projManager.needSave()) { 
-        PrefManager& txtManager = PrefManager::instance();
+        PrefManager& prefManager = PrefManager::instance();
         
         SLV::showGenericDialog(
             this, 
-            txtManager.getText("dialog_save_project_dialog_title"),
-            txtManager.getText("dialog_save_project_dialog_text"),
-            [&projManager, arrangement]() { 
+            prefManager.getText("dialog_save_project_dialog_title"),
+            prefManager.getText("dialog_save_project_dialog_text"),
+            [arrangement]() { 
+                ProjectManager& projManager = ProjectManager::instance();
                 projManager.saveProject(false); 
                 emit SignalManager::instance().newArrangementRequested(arrangement);
             },
@@ -363,4 +369,10 @@ void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangem
     } else {
         emit SignalManager::instance().newArrangementRequested(arrangement);
     }
+}
+
+void MainWindow::openPrefWidget()
+{
+    PreferenceDialog* prefDialog = new PreferenceDialog(this);
+    prefDialog->exec();
 }

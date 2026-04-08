@@ -4,6 +4,8 @@
 #include <QString>
 #include <QJsonObject>
 
+#include <utility>
+
 /// @brief Singleton pour gérer les différentes langues
 class PrefManager {
 
@@ -47,7 +49,10 @@ public:
     /// @brief Traverse :/lang folder an retrieve the base name of each files
     /// @return list of all file name, ex : "fr", "en" 
     QStringList getAvailableLangs();
-
+    
+    /// @brief Check if a shortcut can be remapped to the selected shortcut
+    /// @return returns {} if non taken, otherwise returns the key and value that uses this shortcut
+    std::pair<QString, QString> checkAvailableShortcut(const QString& shortcutKey, const QString& newShortcut);
 
     /// @brief Writes directly to the json file the value of the key
     /// @return True if successfully written to, false otherwise 

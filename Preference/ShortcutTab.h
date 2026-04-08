@@ -1,8 +1,11 @@
 #ifndef SHORTCUTTAB_H
 #define SHORTCUTTAB_H
 
-#include <QScrollArea>
+#include "Preference/FormShortcutEditFrame.h"
 
+#include <QScrollArea>
+#include <QString>
+#include <QMap>
 class ShortcutTab : public QScrollArea
 {
 Q_OBJECT
@@ -12,8 +15,10 @@ public:
     ~ShortcutTab() {}
 
 private:
+    QMap<QString, FormShortcutEditFrame*> m_shortcutFrames;
     
-
+private slots:
+    void onShortcutStolen(const QString& stolenKey);
 };
 
 

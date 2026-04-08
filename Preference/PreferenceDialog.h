@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QTabWidget>
+#include <QCloseEvent> 
+#include <QMessageBox> 
 
 class PreferenceDialog : public QDialog
 {
@@ -14,6 +16,7 @@ public:
 
 private:
     QTabWidget* m_tabWidget = nullptr;
+    bool m_needSave = false;
 };
 
 #endif

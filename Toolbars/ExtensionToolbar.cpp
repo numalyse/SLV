@@ -229,9 +229,13 @@ void ExtensionToolbar::addShortcuts()
         if (keyString.isEmpty()) return; 
         QWidget* mainWindow = this->window(); // need to add this so shortcuts can be used event if this is hidden
         QShortcut* shortcut = new QShortcut(QKeySequence(keyString), mainWindow);
-        shortcut->setAutoRepeat(autoRepeat);
         shortcut->setContext(Qt::ApplicationShortcut); 
-        connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
+        shortcut->setAutoRepeat(autoRepeat);
+        if (autoRepeat){
+            connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
+        }else {
+            connect(shortcut, &QShortcut::activated, button, &QPushButton::animateClick);
+        }
         m_globalShortcuts.append(shortcut);
     };
 

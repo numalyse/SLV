@@ -1,8 +1,7 @@
 #include "PreferenceDialog.h"
 
 #include "PrefManager.h"
-#include "Preference/InterfaceTab.h"
-#include "Preference/ShortcutTab.h"
+#include "GenericDialog.h"
 
 #include <QFormLayout>
 #include <QComboBox>
@@ -15,13 +14,41 @@ PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
     QFormLayout* prefManagerLayout = new QFormLayout(this);
     m_tabWidget = new QTabWidget(this);
 
-    InterfaceTab* interfaceTab = new InterfaceTab(m_tabWidget);
-    m_tabWidget->addTab(interfaceTab, prefManager.getText("pref_dialog_tab_interface"));
+    m_interfaceTab = new InterfaceTab(m_tabWidget);
+    m_tabWidget->addTab(m_interfaceTab, prefManager.getText("pref_dialog_tab_interface"));
 
 
-    ShortcutTab* shortcutTab = new ShortcutTab(m_tabWidget);
-    m_tabWidget->addTab(shortcutTab, prefManager.getText("pref_dialog_tab_shortcut"));
+    m_shortcutTab = new ShortcutTab(m_tabWidget);
+    m_tabWidget->addTab(m_shortcutTab, prefManager.getText("pref_dialog_tab_shortcut"));
 
     prefManagerLayout->addWidget(m_tabWidget);
     
+}
+
+void PreferenceDialog::closeEvent(QCloseEvent *event)
+{
+    auto& prefManager = PrefManager::instance();
+    if(m_shortcutTab->needSave()) {
+        SLV::showGenericDialog(
+            nullptr, 
+            prefManager.getText("dialog_preference_save_tilte"),
+            prefManager.getText("dialog_preference_save_text"),
+
+            [this, event](){
+                m_shortcutTab->save();
+                event->accept();
+            },
+
+            [event](){
+                event->accept();
+            },
+
+            [event](){
+                event->ignore();
+            }
+
+        );
+    }else {
+        event->accept();
+    }
 }

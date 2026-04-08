@@ -227,6 +227,12 @@ bool PrefManager::setPref(const QString& category, const QString& subCategory, c
    return writeUserJson();
 }
 
+bool PrefManager::setCategory(const QString &category, const QJsonObject &categoryData)
+{
+    m_userPrefs[category] = categoryData;
+    return writeUserJson();
+}
+
 bool PrefManager::writeUserJson(){
     QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
     QFile file(filePath);

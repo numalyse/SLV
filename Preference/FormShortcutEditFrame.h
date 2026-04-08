@@ -16,8 +16,8 @@ public:
     void clearShortcutUI();
 
 signals :
-    void emptyShortcutOf(QString key);
-
+    void updateJsonObjRequested(const QString& subCategory, const QString& key, const QString& newShortcutString);
+    void emptyShortcutUIRequested(const QString& key);
 private:
     QKeySequenceEdit* m_keySequenceEdit = nullptr;
 

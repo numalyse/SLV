@@ -16,9 +16,11 @@ ShortcutTab::ShortcutTab(QWidget *parent) : QScrollArea(parent)
     QFormLayout* layout = new QFormLayout(container);
 
 
-    QJsonObject shortCuts = prefManager.getCategory("Shortcuts");
+    m_baseShortcut = prefManager.getCategory("Shortcuts");
+    m_updatedShortcut = m_baseShortcut;
+    
 
-    for (auto category = shortCuts.begin(); category != shortCuts.end(); ++category) {
+    for (auto category = m_baseShortcut.begin(); category != m_baseShortcut.end(); ++category) {
         
         layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" +  category.key()), container));
         QJsonObject shortCutSubcategory = category.value().toObject();
@@ -29,9 +31,9 @@ ShortcutTab::ShortcutTab(QWidget *parent) : QScrollArea(parent)
     
             FormShortcutEditFrame* formShortcutEditFrame = new FormShortcutEditFrame(keyTranslated, category.key(), internalKey, subCategory.value().toString(), container);
             
-            connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutOf, this, &ShortcutTab::onShortcutStolen);
-            
             m_shortcutFrames.insert(internalKey, formShortcutEditFrame);
+            connect(formShortcutEditFrame, &FormShortcutEditFrame::updateJsonObjRequested, this, &ShortcutTab::updateJsonObj);
+            connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutUIRequested, this, &ShortcutTab::emptyShortcutUI);
             layout->addWidget(formShortcutEditFrame);
         }
 
@@ -41,10 +43,29 @@ ShortcutTab::ShortcutTab(QWidget *parent) : QScrollArea(parent)
 
 }
 
+void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, const QString& newShortcutString)
+{
+    QJsonObject subObject = m_updatedShortcut[subCategory].toObject();
+    subObject[key] = newShortcutString;
+    m_updatedShortcut[subCategory] = subObject;
+}
 
-void ShortcutTab::onShortcutStolen(const QString& stolenKey)
+bool ShortcutTab::needSave(){
+    return m_baseShortcut != m_updatedShortcut;
+}
+
+void ShortcutTab::emptyShortcutUI(const QString& stolenKey)
 {
     if(m_shortcutFrames.contains(stolenKey)) {
         m_shortcutFrames[stolenKey]->clearShortcutUI();
+    }
+}
+
+void ShortcutTab::save(){
+    auto& prefManager = PrefManager::instance();
+    if( prefManager.setCategory("Shortcuts", m_updatedShortcut)) {
+        m_baseShortcut = m_updatedShortcut;
+    } else {
+        qWarning() << "[ShortcutTab] Echec de la sauvegarde des raccourcis";
     }
 }

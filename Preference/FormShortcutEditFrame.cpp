@@ -37,8 +37,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
         auto [conflictSubCategory, conflictKey] = prefManager.checkAvailableShortcut(key, newShortcutString);
 
         if(conflictKey.isEmpty()) {
-
-            prefManager.setPref("Shortcuts", subCategory, key, newShortcutString);
+            emit updateJsonObjRequested(subCategory, key, newShortcutString);
         } 
         else {
             SLV::showGenericDialog(
@@ -48,9 +47,9 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
                 
                 [this, conflictSubCategory, conflictKey, subCategory, key, newShortcutString]() { // si y'a un conflit, on assigne le raccourcis et on vide l'autre
                     auto& prefManager = PrefManager::instance();
-                    prefManager.setPref("Shortcuts", subCategory, key, newShortcutString);
-                    prefManager.setPref("Shortcuts", conflictSubCategory, conflictKey, ""); 
-                    emit emptyShortcutOf(conflictKey);
+                    emit updateJsonObjRequested(subCategory, key, newShortcutString);
+                    emit updateJsonObjRequested(conflictSubCategory, conflictKey, "");
+                    emit emptyShortcutUIRequested(conflictKey);
                 },
 
                 nullptr,
@@ -71,8 +70,8 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
 void FormShortcutEditFrame::clearShortcutUI(){
     QKeySequenceEdit* keyEdit = this->findChild<QKeySequenceEdit*>();
     if (keyEdit) {
-        keyEdit->blockSignals(true); // On bloque pour ne pas relancer le check de conflit
-        keyEdit->clear();            // Vide l'affichage du raccourci
+        keyEdit->blockSignals(true); 
+        keyEdit->clear();     
         keyEdit->blockSignals(false);
     }
 }

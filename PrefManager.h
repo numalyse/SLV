@@ -59,6 +59,10 @@ public:
     bool setPref(const QString &category, const QString &key, const QString &value);
     bool setPref(const QString &category, const QString &subCategory, const QString &key, const QString &value);
 
+    /// @brief Rewrites the whole category to the user pref json
+    /// @return True if successfully written to, false otherwise  
+    bool setCategory(const QString &category, const QJsonObject &categoryData);
+
     /// @brief Write all the data of m_userPrefs in the json file
     /// @return True if successfully written to, false otherwise  
     bool writeUserJson();

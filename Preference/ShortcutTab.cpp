@@ -62,6 +62,9 @@ void ShortcutTab::emptyShortcutUI(const QString& stolenKey)
 }
 
 void ShortcutTab::save(){
+    
+    if(!needSave()) return;
+
     auto& prefManager = PrefManager::instance();
     if( prefManager.setCategory("Shortcuts", m_updatedShortcut)) {
         m_baseShortcut = m_updatedShortcut;
@@ -72,6 +75,8 @@ void ShortcutTab::save(){
 
 void ShortcutTab::discard()
 {
+    if(!needSave()) return;
+
     m_updatedShortcut = m_baseShortcut;
 
     for (auto category = m_baseShortcut.begin(); category != m_baseShortcut.end(); ++category) {

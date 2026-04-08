@@ -17,16 +17,53 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setStyleSheet("background-color: rgba(0,0,0,0)");
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+    m_palette = {
+        QColor{229, 0, 0, 255},     // Rouge
+        QColor{255, 141, 0, 255},   // Orange
+        QColor{255, 238, 0, 255},   // Jaune
+        QColor{0, 129, 33, 255},    // Vert
+        QColor{0, 76, 255, 255},    // Bleu
+        QColor{118, 1, 136, 255}    // Violet
+    };
+
     initDrawingSurface();
     initDrawingToolbar();
 }
 
 void DrawingWidget::initDrawingSurface(){
-    m_drawingSurfaceW = new QWidget(this);
-    m_drawingSurface = new QFrame(m_drawingSurfaceW);
-    m_drawingSurface->setGeometry(0, 0, m_mediaRect.width(), m_mediaRect.height());
-    m_drawingSurface->setStyleSheet("background: transparent;");
-    m_drawingSurfaceW->hide();
+    if (!m_drawingSurface) {
+        m_drawingSurface = new QWidget(this);
+        m_drawingSurface->setGeometry(m_mediaRect);
+        //m_drawingSurface->setStyleSheet("background-color: rgba(255, 255, 255, 0.25);");
+        m_drawingSurface->setStyleSheet("background-color: rgba(255, 255, 255, 0.01);");
+        //m_drawingSurface->setStyleSheet("background: transparent;");
+        m_drawingSurface->hide();
+    }
+
+    if (m_drawingCanvas.size() != m_drawingSurface->size()) {
+        QImage newCanvas(m_drawingSurface->size(), QImage::Format_ARGB32_Premultiplied);
+        newCanvas.fill(Qt::transparent);
+
+        QPainter p(&newCanvas);
+        p.drawImage(0, 0, m_drawingCanvas);
+
+        m_drawingCanvas = newCanvas;
+    }
+}
+
+QIcon DrawingWidget::genIconPreviewColor(QColor color){
+    QPixmap pixmap(30, 30);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    painter.setBrush(color);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(0, 0, 30, 30);
+
+    QIcon m_previewColor(pixmap);
+    return m_previewColor;
 }
 
 void DrawingWidget::initDrawingToolbar(){
@@ -43,35 +80,124 @@ void DrawingWidget::initDrawingToolbar(){
         " border: none;"
         "}");
     
-    m_penModeBtn = new ToolbarToggleButton(
-    this, 
+    
+    QVBoxLayout* drawingToolbarLayout = new QVBoxLayout(containerBackground);
+    //drawingToolbarLayout->addWidget(m_drawingToolbar);
+
+    // PALETTE CHOIX COULEUR
+    QHBoxLayout* colorLayout = new QHBoxLayout;
+    for (const QColor& color : m_palette) {
+        ToolbarButton* colorBtn = new ToolbarButton(
+            m_drawingToolbar,
+            " ",
+            PrefManager::instance().getText("tooltip");
+        );
+        colorBtn->setIcon(genIconPreviewColor(color));
+        connect(colorBtn, &ToolbarButton::clicked, this, [this, color]() {
+            setColor(color);
+        });
+        colorLayout->addWidget(colorBtn);
+    }
+
+    // BOUTON COULEUR
+    m_colorToolBtn = new ToolbarToggleHoverButton(
+    m_drawingToolbar, 
+    colorLayout,
+    false,
+    "",
+    PrefManager::instance().getText("tooltip_color_tool"),
+    "",
+    PrefManager::instance().getText("tooltip_color_tool")
+    );
+    connect(m_colorToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::binRequested);
+    drawingToolbarLayout->addWidget(m_colorToolBtn);
+
+    
+    m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
+
+
+    // BOUTON CRAYON
+    m_pencilToolBtn = new ToolbarToggleButton(
+    m_drawingToolbar, 
     false,
     "auto_segmentation_white",
-    PrefManager::instance().getText("deactivate") + " " + PrefManager::instance().getText("tooltip_drawing_mode"),
+    PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(activated)"),
     "auto_segmentation",
-    PrefManager::instance().getText("activate") + " " + PrefManager::instance().getText("tooltip_drawing_mode")
+    PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
-    
+    connect(m_pencilToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+    drawingToolbarLayout->addWidget(m_pencilToolBtn);
+
+    // BOUTON GOMME
+    m_eraserToolBtn = new ToolbarToggleButton(
+    m_drawingToolbar, 
+    false,
+    "auto_segmentation_white",
+    PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
+    "auto_segmentation",
+    PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
+    );
+    connect(m_eraserToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+    drawingToolbarLayout->addWidget(m_eraserToolBtn);
+
+    // BOUTON SUPPRIMER TOUT
+    m_binToolBtn = new ToolbarButton(
+    m_drawingToolbar,
+    "delete_white",
+    PrefManager::instance().getText("tooltip_bin_tool")
+    );
+    connect(m_binToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::binRequested);
+    drawingToolbarLayout->addWidget(m_binToolBtn);
+
     m_drawingToolbar->hide();
 }
+
+void DrawingWidget::binRequested(){
+    // TO DO : QDialog - Voulez-vous effacer tout le contenu ?
+
+}
+
+void DrawingWidget::updateToolbarButtonsState(){
+    ToolbarToggleButton* senderBtn = qobject_cast<ToolbarToggleButton*>(sender());
+    if (senderBtn == m_pencilToolBtn) {
+        if (m_pencilToolBtn->isChecked()) {
+            m_eraserToolBtn->setChecked(false);
+            m_eraserToolBtn->setButtonState(false);
+            m_drawing = true;
+        } else {
+            m_drawing = false;
+        }
+        m_pencilToolBtn->setButtonState(m_pencilToolBtn->isChecked());
+        
+    } else if (senderBtn == m_eraserToolBtn) {
+        if (m_eraserToolBtn->isChecked()) {
+            m_pencilToolBtn->setChecked(false);
+            m_pencilToolBtn->setButtonState(false);
+        }
+        m_eraserToolBtn->setButtonState(m_eraserToolBtn->isChecked());
+        m_drawing = false;
+    }
+}
+
 
 void DrawingWidget::showDrawingMode(bool isEnabled)
 {
     m_isEnabled = isEnabled;
-    if (m_isEnabled){
-        initDrawingToolbar();
+
+    if (m_isEnabled) {
+        //initDrawingSurface();
+        //initDrawingToolbar();
+        m_drawingSurface->show();
+        m_drawingSurface->raise();
+
         m_drawingToolbar->show();
         m_drawingToolbar->raise();
-
-        initDrawingSurface();
-        m_drawingSurfaceW->show();
-        m_drawingSurfaceW->raise();
     } else {
+        m_drawingSurface->hide();
         m_drawingToolbar->hide();
-        m_drawingSurfaceW->hide();
     }
 
-    update(); // redraw
+    update();
 }
 
 void DrawingWidget::setColor(const QColor &color)
@@ -89,8 +215,11 @@ void DrawingWidget::setLineWidth(int width)
 void DrawingWidget::onMediaRectChanged(const QRect &rect)
 {
     m_mediaRect = rect;
-    containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
-    m_drawingSurface->setGeometry(rect);
+    if(containerBackground)
+        containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
+    if(m_drawingSurface)
+        m_drawingSurface->setGeometry(m_mediaRect);
+    //this->setGeometry(m_mediaRect);
     update();
 }
 
@@ -134,7 +263,7 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
     qDebug() << "pressed";
     if (event->button() == Qt::LeftButton && m_isEnabled)
     {
-        m_drawing = true;
+        //m_drawing = true;
 
         QPoint p = event->pos() - m_mediaRect.topLeft();
 
@@ -159,8 +288,8 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 
 void DrawingWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
-    {
-        m_drawing = false;
-    }
+    // if (event->button() == Qt::LeftButton)
+    // {
+    //     m_drawing = false;
+    // }
 }

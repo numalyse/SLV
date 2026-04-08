@@ -118,5 +118,9 @@
     "delete" : "Supprimer",
     "duration" : "Durée",
 
-    "tooltip_drawing_mode" : "mode dessin"
+    "tooltip_drawing_mode" : "mode dessin",
+    "tooltip_pen_tool" : "Crayon",
+    "tooltip_color_tool" : "Choisir une couleur",
+    "tooltip_eraser_tool" : "Gomme",
+    "tooltip_bin_tool" : "Poubelle"
 }

@@ -118,5 +118,16 @@
     "delete" : "Delete",
     "duration" : "Duration",
 
-    "tooltip_drawing_mode" : "drawing mode"
+    "tooltip_drawing_mode" : "drawing mode",
+    "tooltip_pen_tool" : "Pen",
+    "tooltip_color_tool" : "Choose a color",
+    "red" : "Red",
+    "orange" : "Orange",
+    "yellow" : "Yellow",
+    "green" : "Green",
+    "blue" : "Blue",
+    "purple" : "Purple",
+    "tooltip_eraser_tool" : "Eraser",
+    "tooltip_bin_tool" : "Bin"
+
 }

@@ -25,6 +25,9 @@ public:
 
     ~InterfaceTab() {}
 
+signals : 
+    void interfaceChanges();
+
 private:
     // use of 2 json object to check if needing to save and be able to discard changes
     QJsonObject m_baseInterface;

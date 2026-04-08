@@ -33,6 +33,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : QScrollArea(parent)
         QJsonObject langObj = m_updatedInterface["Lang"].toObject();
         langObj["code"] = availableLangs[cbIndex];
         m_updatedInterface["Lang"] = langObj;
+        emit interfaceChanges();
     });
 
     m_discardActions.append([this, langComboBox, availableLangs]() {
@@ -45,8 +46,8 @@ InterfaceTab::InterfaceTab(QWidget *parent) : QScrollArea(parent)
         }
     });
     
-    layout->addWidget(langComboBox);
-    
+    layout->addRow( prefManager.getText("interface_lang_code"), langComboBox);
+
     setWidget(container);
 }
 

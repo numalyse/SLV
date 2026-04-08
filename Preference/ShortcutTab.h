@@ -26,6 +26,9 @@ public:
 
     ~ShortcutTab() {}
 
+signals :
+    void shortcutChanges();
+
 private:
     QMap<QString, FormShortcutEditFrame*> m_shortcutFrames; // map to easily access and update the value of each shortcuts (based on the key in the json ex : "enter_fullscreen") 
 

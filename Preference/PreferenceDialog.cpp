@@ -13,27 +13,33 @@
 
 PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
+    setMinimumWidth(500);
+
     auto& prefManager = PrefManager::instance();
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     m_tabWidget = new QTabWidget(this);
 
     m_interfaceTab = new InterfaceTab(m_tabWidget);
     m_tabWidget->addTab(m_interfaceTab, prefManager.getText("dialog_preference_tab_interface"));
+    connect(m_interfaceTab, &InterfaceTab::interfaceChanges, this, &PreferenceDialog::toggleButtons);
 
     m_shortcutTab = new ShortcutTab(m_tabWidget);
     m_tabWidget->addTab(m_shortcutTab, prefManager.getText("dialog_preference_tab_shortcut"));
+    connect(m_shortcutTab, &ShortcutTab::shortcutChanges, this, &PreferenceDialog::toggleButtons);
 
     mainLayout->addWidget(m_tabWidget);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel, this);
+    m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel, this);
 
-    buttonBox->button(QDialogButtonBox::Save)->setText(prefManager.getText("generic_btn_save"));
-    buttonBox->button(QDialogButtonBox::Cancel)->setText(prefManager.getText("generic_btn_cancel"));
+    m_buttonBox->button(QDialogButtonBox::Save)->setText(prefManager.getText("generic_btn_save"));
+    m_buttonBox->button(QDialogButtonBox::Cancel)->setText(prefManager.getText("generic_btn_cancel"));
 
-    mainLayout->addWidget(buttonBox);
+    m_buttonBox->setDisabled(true);
 
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &PreferenceDialog::save); 
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &PreferenceDialog::discard); 
+    mainLayout->addWidget(m_buttonBox);
+
+    connect(m_buttonBox, &QDialogButtonBox::accepted, this, &PreferenceDialog::save); 
+    connect(m_buttonBox, &QDialogButtonBox::rejected, this, &PreferenceDialog::discard); 
 }
 
 void PreferenceDialog::closeEvent(QCloseEvent *event)
@@ -74,11 +80,13 @@ void PreferenceDialog::save(){
     m_shortcutTab->save();
     m_interfaceTab->save();
     showWarning();
+    m_buttonBox->setDisabled(true);
 }
 
 void PreferenceDialog::discard(){
     m_shortcutTab->discard();
     m_interfaceTab->discard();
+    m_buttonBox->setDisabled(true);
 }
 
 void PreferenceDialog::showWarning(){
@@ -89,4 +97,12 @@ void PreferenceDialog::showWarning(){
     msgBox.setIcon(QMessageBox::Information);
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
+}
+
+void PreferenceDialog::toggleButtons(){
+    if(!needSave()){
+        m_buttonBox->setDisabled(true);
+    }else {
+        m_buttonBox->setDisabled(false);
+    }
 }

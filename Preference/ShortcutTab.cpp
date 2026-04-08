@@ -48,6 +48,7 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
     QJsonObject subObject = m_updatedShortcut[subCategory].toObject();
     subObject[key] = newShortcutString;
     m_updatedShortcut[subCategory] = subObject;
+    emit shortcutChanges();
 }
 
 bool ShortcutTab::needSave(){

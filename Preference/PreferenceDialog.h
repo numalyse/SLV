@@ -8,6 +8,7 @@
 #include <QTabWidget>
 #include <QCloseEvent> 
 #include <QMessageBox> 
+#include <QDialogButtonBox>
 
 class PreferenceDialog : public QDialog
 {
@@ -23,6 +24,7 @@ protected:
 private slots:
     void save();
     void discard();
+    void toggleButtons();
 
 private:
     bool needSave();
@@ -31,7 +33,7 @@ private:
     QTabWidget* m_tabWidget = nullptr;
     InterfaceTab* m_interfaceTab = nullptr;
     ShortcutTab* m_shortcutTab = nullptr;
-
+    QDialogButtonBox* m_buttonBox = nullptr;
 };
 
 #endif

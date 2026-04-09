@@ -82,32 +82,33 @@ void ThumbnailWorker::run()
         cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(msThumbnail));
         
         cv::Mat frame;
-        if (cap.read(frame)) {
 
-            int origWidth = frame.cols;
-            int origHeight = frame.rows;
-
-            cv::Size cvTargetSize(req.targetSize.width(), req.targetSize.height());
-
-            double scaleWidth = static_cast<double>(cvTargetSize.width) / origWidth;
-            double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
-
-            double scale = std::min(scaleWidth, scaleHeight);
-
-            cv::Size newSize(
-                static_cast<int>(origWidth * scale),
-                static_cast<int>(origHeight * scale)
-            );
-
-            cv::Mat resized;
-            cv::resize(frame, resized, newSize, 0, 0, cv::INTER_NEAREST);
-
-            QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
-
-            emit thumbnailReady(req.requestId, img.copy()); // copy because img does a shallow copy of the cv::mat
-        }else {
-            qDebug() << "Thumbnail:  Impossible de lire l'image pour le plan : " << req.requestId ;
+        if (!cap.read(frame) || frame.empty()) {
+            qWarning() << "[ThumbnailWorker] Impossible de lire la frame au timestamp :" << msThumbnail;
+            continue; 
         }
+
+        int origWidth = frame.cols;
+        int origHeight = frame.rows;
+
+        cv::Size cvTargetSize(req.targetSize.width(), req.targetSize.height());
+
+        double scaleWidth = static_cast<double>(cvTargetSize.width) / origWidth;
+        double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
+
+        double scale = std::min(scaleWidth, scaleHeight);
+
+        cv::Size newSize(
+            static_cast<int>(origWidth * scale),
+            static_cast<int>(origHeight * scale)
+        );
+
+        cv::Mat resized;
+        cv::resize(frame, resized, newSize, 0, 0, cv::INTER_NEAREST);
+
+        QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
+
+        emit thumbnailReady(req.requestId, img.copy()); // copy because img does a shallow copy of the cv::mat
 
     }
 

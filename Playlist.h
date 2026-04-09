@@ -8,6 +8,9 @@
 #include <QImage>
 #include "./ToolbarButtons/ToolbarToggleButton.h"
 #include "./ToolbarButtons/ToolbarPopupButton.h"
+#include <random>
+#include <QRadioButton>
+#include <QButtonGroup>
 
 class Playlist : public QWidget
 {
@@ -24,8 +27,10 @@ protected:
 
 private:
     bool m_playlistLooping = false;
-    bool m_randomized = false;
+    bool m_playlistShuffled = false;
     unsigned int m_currentMediaIndex = 0;
+    QVector<unsigned int> m_itemsShuffleOrder;
+    QVector<unsigned int> m_itemsSortOrder;
     QVector<PlaylistItem*> m_items;
     ToolbarToggleButton *m_loopItemBtn = nullptr;
     ToolbarToggleButton *m_shuffleItemBtn = nullptr;
@@ -33,6 +38,8 @@ private:
     QPushButton *m_addItemBtn = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
     QVBoxLayout *m_itemsLayout = nullptr;
+    QButtonGroup *m_sortButtons;
+    void createSortBtn();
 
 signals:
     void openMediaFileRequested(const QString &filePath);
@@ -43,13 +50,14 @@ public slots:
     void addItemDialog();
     void addItemsFromPaths(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);
-    void playMedia(const QString &filePath);
+    void playMedia(const QString &filePath, const bool isClicked);
     void playPreviousMedia();
     void playNextMedia();
     void enableLoop();
     void disableLoop();
     void enableShuffle();
     void disableShuffle();
+    void sortPlaylist(int id, bool checked);
 
 private slots:
     void updateItemIndices();

@@ -111,6 +111,8 @@
     "tooltip_sort_playlist" : "Sort playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
+    "sort_addition_down_playlist" : "By addition ↓",
+    "sort_addition_up_playlist" : "By addition ↑",
     "tooltip_add_item_playlist" : "Add media",
     "delete" : "Delete",
     "duration" : "Duration"

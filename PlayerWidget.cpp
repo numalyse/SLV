@@ -238,6 +238,7 @@ void PlayerWidget::playFromAdvanced()
                 QFileInfo fileInfo (file_path);
                 prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
             }
+            emit SignalManager::instance().addPlaylistItems(QStringList(file_path));
         }
         else
             emit m_toolBar->selectFilePlayCanceled();

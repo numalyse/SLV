@@ -60,11 +60,8 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
-    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
+    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique,
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
@@ -108,7 +105,7 @@ MediaWidget::~MediaWidget()
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     }
     
     m_videoCaptureManager.deleteMediaTempDirectory();
@@ -624,7 +621,7 @@ void MediaWidget::releaseEventManager(){
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";

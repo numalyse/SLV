@@ -5,6 +5,7 @@
 #include "CompositionWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "ExtractSequenceWidget.h"
+#include "SignalManager.h"
 
 #include <QWidget>
 #include <qmainwindow.h>

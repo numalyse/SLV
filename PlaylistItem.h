@@ -11,6 +11,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QApplication>
+#include <QThreadPool>
 
 class PlaylistItem : public QWidget
 {
@@ -22,6 +23,7 @@ public:
     void updateTypeIcon();
     QPixmap generateVideoThumbnail(const QString &videoPath);
     void updateThumbnail();
+    QString getTitle() const { return m_mediaData->fileName(); };
     MediaType getType() const { return m_mediaData->type(); }
     QSize thumbnailSize() const  {return m_thumbnailSize; }
     QString setThumbnailTime();
@@ -53,12 +55,12 @@ protected:
 public slots:
     void setDurationLabel();
     void setIndex(int);
-    void playMedia();
+    void playMedia(bool isClicked = false);
     void setCurrentMedia(bool isCurrent);
 
 signals:
     void deleteItemRequested(const unsigned int index);
-    void playPlaylistItemRequested(const QString &filePath);
+    void playPlaylistItemRequested(const QString &filePath, const bool isClicked);
     void updatePlaylistCurrentIndex(unsigned int index);
     void updateImageRequested(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
 };

@@ -4,7 +4,6 @@
 #include "Preference/BasePreferenceTab.h"
 
 #include "PrefManager.h"
-#include "Preference/FormPathEditFrame.h"
 
 #include <QWidget>
 #include <QJsonObject>

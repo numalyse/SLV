@@ -1,8 +1,7 @@
 #include "InterfaceTab.h"
 
 #include "PrefManager.h"
-#include "Preference/BasePreferenceFrame.h"
-#include "Preference/FormComboBoxFrame.h"
+#include "Preference/Frames/FormComboBoxFrame.h"
 
 
 #include <QComboBox>

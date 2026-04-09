@@ -1,9 +1,9 @@
 #include "PreferenceDialog.h"
 
 #include "Preference/BasePreferenceTab.h"
-#include "Preference/InterfaceTab.h"
-#include "Preference/ShortcutTab.h"
-#include "Preference/PathTab.h"
+#include "Preference/Tabs/InterfaceTab.h"
+#include "Preference/Tabs/ShortcutTab.h"
+#include "Preference/Tabs/PathTab.h"
 
 #include "PrefManager.h"
 #include "GenericDialog.h"

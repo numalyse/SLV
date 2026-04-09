@@ -1,7 +1,7 @@
 #include "ShortcutTab.h"
 
 #include "PrefManager.h"
-#include "Preference/FormShortcutEditFrame.h"
+#include "Preference/Frames/FormShortcutEditFrame.h"
 #include "GenericDialog.h"
 
 

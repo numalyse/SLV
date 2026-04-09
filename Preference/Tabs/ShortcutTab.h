@@ -1,13 +1,14 @@
 #ifndef SHORTCUTTAB_H
 #define SHORTCUTTAB_H
 
-#include "Preference/FormShortcutEditFrame.h"
 #include "Preference/BasePreferenceTab.h"
+#include "Preference/Frames/FormShortcutEditFrame.h"
 
 #include <QScrollArea>
 #include <QString>
 #include <QMap>
 #include <QJsonObject>
+
 class ShortcutTab : public BasePreferenceTab
 {
 Q_OBJECT

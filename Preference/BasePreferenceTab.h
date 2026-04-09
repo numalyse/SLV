@@ -1,10 +1,11 @@
 #ifndef BASEPREFERENCETAB_H
 #define BASEPREFERENCETAB_H
 
+#include "Preference/BasePreferenceFrame.h"
+
 #include <QScrollArea>
 #include <QJsonObject>
 #include <QList>
-#include "Preference/BasePreferenceFrame.h"
 
 class QFormLayout;
 

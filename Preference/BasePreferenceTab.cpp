@@ -1,5 +1,7 @@
 #include "Preference/BasePreferenceTab.h"
+
 #include "PrefManager.h"
+
 #include <QFormLayout>
 #include <QDebug>
 

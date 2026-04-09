@@ -1,8 +1,6 @@
 #ifndef PREFERENCEDIALOG_H
 #define PREFERENCEDIALOG_H
 
-#include "Preference/InterfaceTab.h"
-#include "Preference/ShortcutTab.h"
 #include "Preference/BasePreferenceTab.h"
 
 #include <QDialog>

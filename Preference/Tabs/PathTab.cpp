@@ -1,5 +1,6 @@
 #include "PathTab.h"
 
+#include "Preference/Frames/FormPathEditFrame.h"
 #include "PrefManager.h"
 
 PathTab::PathTab(QWidget *parent) : BasePreferenceTab("Paths", parent)

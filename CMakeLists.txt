@@ -79,13 +79,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         Preference/PreferenceDialog.h Preference/PreferenceDialog.cpp
         Preference/BasePreferenceTab.h Preference/BasePreferenceTab.cpp
-        Preference/InterfaceTab.h Preference/InterfaceTab.cpp
-        Preference/ShortcutTab.h Preference/ShortcutTab.cpp
-        Preference/PathTab.h Preference/PathTab.cpp
+        Preference/Tabs/InterfaceTab.h Preference/Tabs/InterfaceTab.cpp
+        Preference/Tabs/ShortcutTab.h Preference/Tabs/ShortcutTab.cpp
+        Preference/Tabs/PathTab.h Preference/Tabs/PathTab.cpp
         Preference/BasePreferenceFrame.h Preference/BasePreferenceFrame.cpp
-        Preference/FormPathEditFrame.h Preference/FormPathEditFrame.cpp
-        Preference/FormShortcutEditFrame.h Preference/FormShortcutEditFrame.cpp
-        Preference/FormComboBoxFrame.h Preference/FormComboBoxFrame.cpp
+        Preference/Frames/FormPathEditFrame.h Preference/Frames/FormPathEditFrame.cpp
+        Preference/Frames/FormShortcutEditFrame.h Preference/Frames/FormShortcutEditFrame.cpp
+        Preference/Frames/FormComboBoxFrame.h Preference/Frames/FormComboBoxFrame.cpp
         SignalManager.h
 
 

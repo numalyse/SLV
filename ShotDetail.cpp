@@ -79,7 +79,6 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
 void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
-    emit clearThumbnailQueueRequested(); // since worker only used to display tag image now
 
     m_shotData = shotData;
     m_shotId = shotId;

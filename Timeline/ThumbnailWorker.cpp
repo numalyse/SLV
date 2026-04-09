@@ -104,7 +104,7 @@ void ThumbnailWorker::run()
 
             QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
 
-            emit thumbnailReady(req.requestId, img.copy());
+            emit thumbnailReady(req.requestId, img.copy()); // copy because img does a shallow copy of the cv::mat
         }else {
             qDebug() << "Thumbnail:  Impossible de lire l'image pour le plan : " << req.requestId ;
         }

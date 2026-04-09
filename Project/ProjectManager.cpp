@@ -307,6 +307,8 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
                 auto& prefManager = PrefManager::instance(); 
                 QMessageBox::critical(nullptr, prefManager.getText("dialog_error_text"), prefManager.getText("project_error_copy_failed"));
             }
+            m_project->path = "";
+            m_project->name = "";
             deleteFolder(projectPath);
             setSaveNeeded(); 
         }

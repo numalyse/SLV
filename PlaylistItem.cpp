@@ -168,7 +168,7 @@ void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
 {
     if(m_isClicked && rect().contains(event->pos())){
         emit updatePlaylistCurrentIndex(m_itemIndex);
-        playMedia();
+        playMedia(true);
     }
 }
 
@@ -202,10 +202,10 @@ void PlaylistItem::setCurrentMedia(bool isCurrent)
         setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 4px;}");
 }
 
-void PlaylistItem::playMedia()
+void PlaylistItem::playMedia(bool isClicked)
 {
     m_isCurrentMedia = true;
-    emit playPlaylistItemRequested(m_mediaData->filePath());
+    emit playPlaylistItemRequested(m_mediaData->filePath(), isClicked);
 }
 
 void PlaylistItem::updateTypeIcon(){
@@ -266,20 +266,23 @@ void PlaylistItem::updateThumbnail()
         //QPixmap pixmap = QPixmap::fromImage(image);
         //m_mediaThumbnailLabel->setPixmap(pixmap);
 
-    if (m_mediaData->type() == MediaType::Video){
-        QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
-        m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
-        
+    QThreadPool::globalInstance()->start([this]() {
 
-    if (m_mediaData->type() == MediaType::Image){
-        QPixmap pixmap = QPixmap::fromImage(QImage(m_mediaData->filePath()));
-        m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
+        if (m_mediaData->type() == MediaType::Video){
+            QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
+            m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
 
-    if (m_mediaData->type() == MediaType::Audio){
-        m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
-        m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
+
+        if (m_mediaData->type() == MediaType::Image){
+            QPixmap pixmap = QPixmap::fromImage(QImage(m_mediaData->filePath()));
+            m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+
+        if (m_mediaData->type() == MediaType::Audio){
+            m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+    });
         
 }

@@ -233,7 +233,13 @@ void MainWindow::selectAndLoadMediaFiles()
         qDebug() << "Pas de fichier sélectionné";
         return;
     }
+    if(files_paths.size() == 1)
+        emit SignalManager::instance().addPlaylistItems(files_paths);
     if(files_paths.size() > 4){
+        SLV::showGenericDialog(this, "open_more_than_four_files_title", "open_more_than_four_files_dialog", [files_paths](){
+            emit SignalManager::instance().addPlaylistItems(files_paths);
+        });
+        emit SignalManager::instance().addPlaylistItems(files_paths);
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }

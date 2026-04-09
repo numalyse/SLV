@@ -1,8 +1,7 @@
 #ifndef PREFERENCEDIALOG_H
 #define PREFERENCEDIALOG_H
 
-#include "Preference/InterfaceTab.h"
-#include "Preference/ShortcutTab.h"
+#include "Preference/BasePreferenceTab.h"
 
 #include <QDialog>
 #include <QTabWidget>
@@ -31,8 +30,7 @@ private:
     void showWarning();
 
     QTabWidget* m_tabWidget = nullptr;
-    InterfaceTab* m_interfaceTab = nullptr;
-    ShortcutTab* m_shortcutTab = nullptr;
+    QVector<BasePreferenceTab*> m_tabs;
     QDialogButtonBox* m_buttonBox = nullptr;
 };
 

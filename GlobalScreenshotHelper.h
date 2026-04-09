@@ -3,6 +3,7 @@
 
 #include "TimeFormatter.h"
 #include "PlayerLayoutManager.h"
+#include "PrefManager.h"
 
 #include <QObject.h>
 #include <opencv2/opencv.hpp>
@@ -28,12 +29,13 @@ private:
 
     inline void takeGlobalScreenshot(){
         Q_ASSERT(playersPaths.size() == playersTimes.size());
+        auto& prefManager = PrefManager::instance();
         QList<cv::Mat> screenshots;
         QList<cv::Mat> resizedScreenshots;
         cv::VideoCapture cap;
         int minWidth = 10000000;
         int minHeight = 10000000;
-        QString mergedPath(QDir::homePath() + "/SLV_Content/Captures_Images/");
+        QString mergedPath( prefManager.getPref("Paths", "screenshot") + '/');
         for(size_t IPlayer = 0; IPlayer<playersPaths.size(); ++IPlayer){
             cap.open(playersPaths[IPlayer].toStdString(), cv::CAP_FFMPEG);
             QString p = playersPaths.at(IPlayer);
@@ -58,7 +60,7 @@ private:
             screenshots.append(playerFrame);
             QString path = QFileInfo(playersPaths[IPlayer]).baseName();
             double fps = cap.get(cv::CAP_PROP_FPS);
-            if(!cv::imwrite((QDir::homePath() + "/SLV_Content/Captures_Images/" + path.toUtf8().constData() + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) + ".png").toStdString(), playerFrame)){
+            if(!cv::imwrite(( prefManager.getPref("Paths", "screenshot") + '/' + path.toUtf8().constData() + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) + ".png").toStdString(), playerFrame)){
                 qDebug() << "Erreur dans l'enregistrement de la capture multiple";
                 // QMessageBox messageBox;
                 // messageBox.critical(0,"Error","Erreur dans l'enregistrement de la capture multiple !");

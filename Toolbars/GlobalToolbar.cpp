@@ -107,7 +107,7 @@ void GlobalToolbar::addShortcuts(){
     m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
     m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
     m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
-    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("capture").toString()));
+    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("screenshot").toString()));
 }
 
 void GlobalToolbar::disableFullscreenRequested(){

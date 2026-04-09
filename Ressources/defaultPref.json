@@ -2,9 +2,13 @@
     "Interface" : {
         "Lang" : {
             "code" : "en"
+        },
+        "Export" : {
+            "capture_path" : ""
         }
     },
     "Paths" : {
+        "screenshot": "",
         "default": "",
         "lp_capture": "",
         "lp_project": "",

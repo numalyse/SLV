@@ -137,6 +137,7 @@
 
     "dialog_preference_tab_interface" : "Interface",
     "dialog_preference_tab_shortcut" : "Raccroucis",
+    "dialog_preference_tab_paths" : "Chemins",
 
     "shortcut_subsection_MainWindow": "Fenêtre principale",
     "shortcut_subsection_CommonToolbar": "Barre d'outils standard",
@@ -152,7 +153,7 @@
     "shortcut_mute": "Couper le son",
     "shortcut_enter_fullscreen": "Passer en plein écran",
     "shortcut_exit_fullscreen": "Quitter le plein écran",
-    "shortcut_capture": "Capture d'écran",
+    "shortcut_screenshot": "Capture d'écran",
 
     "shortcut_increase_speed": "Augmenter la vitesse",
     "shortcut_decrease_speed": "Diminuer la vitesse",
@@ -163,6 +164,8 @@
 
     "shortcut_prev_frame": "Image précédente",
     "shortcut_next_frame": "Image suivante",
+
+    "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
 
     "interface_lang_code" : "Langue de l'interface : "
 

@@ -77,17 +77,20 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
 }
 
-void ShotDetail::updateShotDetail(int shotCount, int requestId, Shot * shotData)
+void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
+    emit clearThumbnailQueueRequested(); // since worker only used to display tag image now
+
     m_shotData = shotData;
-    m_shotId = requestId;
+    m_shotId = shotId;
 
     m_tagImage->clear();
+
 
     double fps = ProjectManager::instance().projet()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(PrefManager::instance().getText("shot_detail_id_text") + QString::number(requestId + 1));
+    m_shotIdForm->setText(PrefManager::instance().getText("shot_detail_id_text") + QString::number(shotId + 1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));
@@ -96,14 +99,20 @@ void ShotDetail::updateShotDetail(int shotCount, int requestId, Shot * shotData)
 
     m_toNextShotBtn->setEnabled(true);
     m_toPrevShotBtn->setEnabled(true);
-    if(requestId == 0 || m_buttonDisabled){
+    if(shotId == 0 || m_buttonDisabled){
         m_toPrevShotBtn->setEnabled(false);
     }
-    if(requestId == shotCount-1 || m_buttonDisabled){
+    if(shotId == shotCount-1 || m_buttonDisabled){
         m_toNextShotBtn->setEnabled(false);
     }
 
-    emit updateImageRequested(-1, shotData->tagImageTime, 0, ProjectManager::instance().mediaPath(), m_imageSize);
+    QString mediaPath = ProjectManager::instance().mediaPath();
+    if(mediaPath.isEmpty()){
+        qDebug() << "[ShotDetail] Impossible de récuperer la tag image, le path du média du project est vide";
+    }else {
+        emit updateImageRequested(-1, shotData->tagImageTime, 0, mediaPath, m_imageSize);
+    }
+
 }
 
 void ShotDetail::toggleShotControlButtons(bool state)

@@ -44,7 +44,6 @@ NavPanel::NavPanel(QWidget *parent)
     m_thumbnailWorker = new ThumbnailWorker(this);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
 
-    connect(m_playlistWidget, &Playlist::updateImageRequested, this, &NavPanel::updateImageRequest);
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
 
     m_thumbnailWorker->start();

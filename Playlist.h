@@ -44,7 +44,6 @@ private:
 signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
-    void updateImageRequested(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
 
 public slots:
     void addItemDialog();

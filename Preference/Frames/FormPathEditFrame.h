@@ -3,7 +3,7 @@
 
 #include "Preference/BasePreferenceFrame.h"
 
-class QLineEdit;
+class QLabel;
 class QPushButton;
 
 class FormPathEditFrame : public BasePreferenceFrame 
@@ -17,7 +17,7 @@ public:
     void setUIValue(const QString &path);
 
 private:
-    QLineEdit* m_pathLineEdit = nullptr;
+    QLabel* m_pathLabel = nullptr;
     QPushButton* m_browseBtn = nullptr;
 };
 

@@ -117,7 +117,9 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     item->shot().start = (m_currentShotItem->shot().start > item->shot().start) ? item->shot().start: m_currentShotItem->shot().start ;
     item->shot().end = (m_currentShotItem->shot().end > item->shot().end) ? m_currentShotItem->shot().end : item->shot().end ;
 
-    // TODO : dialog pour choisir quel titre / note garder 
+    item->shot().note += "\n" + m_currentShotItem->shot().note; // add the note of the current shot to the merged shot
+
+    item->shot().tagImageTime = item->shot().middle(); // updates the tagimage to the middle of the merged shot
 
     p_scene->removeItem(m_currentShotItem);
     m_shotItems.removeOne(m_currentShotItem);
@@ -276,7 +278,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
 void ShotManager::updateThumbnail(int requestId, QImage image){
     if(requestId < 0 || requestId >= m_shotItems.size()){
-        qDebug() << "Tentative de mise a jour d'un shot out of range";
+        qDebug() << "[ShotManager] Tentative de mise a jour d'un shot out of range";
         return;
     }
 

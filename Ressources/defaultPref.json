@@ -28,7 +28,7 @@
             "mute" : "M",
             "enter_fullscreen" : "F",
             "exit_fullscreen" : "Escape",
-            "capture" : "Shift + S"
+            "screenshot" : "Shift + S"
         },
         "AdvancedTB" : {
             "increase_speed" : "+",

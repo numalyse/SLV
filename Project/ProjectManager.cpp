@@ -449,12 +449,22 @@ void ProjectManager::exportProject(){
     // sinon on recupère le path dans les preferences
     QString dialogDir = (m_project->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export"): m_project->path;
 
-    QString selectedPath = QFileDialog::getSaveFileName(
-        nullptr, 
-        prefManager.getText("export_file_path_title"), 
-        dialogDir, 
-        prefManager.getText("export_file_path_file_format") 
-    );
+    QString selectedPath;
+    if(selectedFormat == ExportType::TagImage){
+        selectedPath = QFileDialog::getExistingDirectory(
+            nullptr, 
+            prefManager.getText("export_directory_path_title"), // N'oublie pas d'ajouter cette clé dans tes JSON !
+            dialogDir,
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+    }else {
+        selectedPath = QFileDialog::getSaveFileName(
+            nullptr, 
+            prefManager.getText("export_file_path_title"), 
+            dialogDir, 
+            prefManager.getText(SLV::getExportTypeString(selectedFormat)) 
+        );
+    }
 
     if ( selectedPath.isEmpty() ) return;
     

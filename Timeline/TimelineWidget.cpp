@@ -291,7 +291,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if (selectedAction == deleteABMarkers) {
         m_abManager->deleteMarkers();
     } else if (selectedAction == actionExtractAB){
-        qDebug() << "Extract ab segment";
+        m_abManager->extractLoop();
     } else if (selectedAction == mergeWithPreviousShot){
         mergeWithPrevShotAction();
     } else if(selectedAction == mergeWithNextShot){

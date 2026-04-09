@@ -219,7 +219,6 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
             m_currentMediaIndex = index;
         });
-        connect(newItem, &PlaylistItem::updateImageRequested, this, &Playlist::updateImageRequested);
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
     }
     if(wasEmpty && !filesPaths.empty()){

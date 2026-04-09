@@ -77,7 +77,7 @@ void ExtractSequenceWidget::requestEndFrameDisplay()
     m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {720, 480});
 }
 
-void ExtractSequenceWidget::onThumbnailReady(int requestId, QImage image)
+void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)
 {
     QPixmap pixmap = QPixmap::fromImage(image);
     switch(requestId){

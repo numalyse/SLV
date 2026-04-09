@@ -385,46 +385,45 @@ void TimelineWidget::autoSegmentation(){
         return;
     } 
 
-    SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
-    segmentationThread->setPriority(QThread::HighPriority);
-
-    QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_window_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
-    progressDialog->setWindowTitle(txtManager.getText("timeline_window_title_auto_segmentation"));
-    progressDialog->setWindowModality(Qt::WindowModal); 
-
-    connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){ 
-        segmentationThread->requestInterruption();
-    });
-
-    connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
-
-    connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<int> cuts) {
-        
-        if( ! cuts.empty()){
-            this->m_shotManager->createShotItemsFromCuts(cuts);
-            emit this->saveNeeded();
-        }
-        progressDialog->close(); 
-        progressDialog->deleteLater(); 
-        segmentationThread->deleteLater();
-    });
-
-
     SLV::showGenericDialog(
         this, 
         txtManager.getText("dialog_auto_segmentation_title"),
         txtManager.getText("dialog_auto_segmentation_text"),
     
-        [segmentationThread, progressDialog, mediaPath]() { 
+        [this, mediaPath]() { 
+            auto& txtManager = PrefManager::instance();
+            SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
+            segmentationThread->setPriority(QThread::HighPriority);
+
+            QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_window_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+            progressDialog->setWindowTitle(txtManager.getText("timeline_window_title_auto_segmentation"));
+            progressDialog->setWindowModality(Qt::WindowModal); 
+
+            connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){ 
+                segmentationThread->requestInterruption();
+            });
+
+            connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
+
+            connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<int> cuts) {
+                
+                if( ! cuts.empty()){
+                    this->m_shotManager->createShotItemsFromCuts(cuts);
+                    emit this->saveNeeded();
+                }
+                progressDialog->close(); 
+                progressDialog->deleteLater(); 
+            });
+
+            connect(segmentationThread, &QThread::finished, segmentationThread, &QObject::deleteLater);
+
             progressDialog->show();
             segmentationThread->start();
         },
         nullptr,
-        [ segmentationThread, progressDialog ](){
-            progressDialog->close(); 
-            progressDialog->deleteLater();
-            segmentationThread->deleteLater();
-        }
+        nullptr
     );
+
+
     
 }

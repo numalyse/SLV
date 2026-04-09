@@ -111,10 +111,14 @@ void SegmentationThread::run()
     std::vector<int> finalCuts;
 
     while (pythonProcess.waitForReadyRead(-1)) {
+        if (isInterruptionRequested()) {
+            pythonProcess.kill();
+            emit segmentationFinished({});
+            return;
+        }
         while (pythonProcess.canReadLine()) {
             QString line = QString::fromUtf8(pythonProcess.readLine()).trimmed();
 
-            // Gestion de l'interruption utilisateur
             if (isInterruptionRequested()) {
                 pythonProcess.kill();
                 emit segmentationFinished({});
@@ -126,7 +130,6 @@ void SegmentationThread::run()
                 emit progress(percent); 
             } 
             else if (line.startsWith("RESULT:")) {
-                // Parsing du JSON reçu
                 QString jsonStr = line.mid(7);
                 QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
                 QJsonArray arr = doc.array();
@@ -141,6 +144,12 @@ void SegmentationThread::run()
         }
     }
 
+    if (isInterruptionRequested()) {
+        pythonProcess.kill();
+        emit segmentationFinished({});
+        return;
+    }
+    
     pythonProcess.waitForFinished();
 
     if (pythonProcess.exitCode() != 0) {

@@ -317,8 +317,9 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
 
         progressDialog->close(); 
         progressDialog->deleteLater(); 
-        fileCpyThread->deleteLater(); 
     });
+
+    connect(fileCpyThread, &QThread::finished, fileCpyThread, &QObject::deleteLater);
 
     fileCpyThread->start();
 
@@ -487,8 +488,9 @@ void ProjectManager::exportProject(){
         }
         progressDialog->close(); 
         progressDialog->deleteLater(); 
-        exportThread->deleteLater(); 
     });
+
+    connect(exportThread, &QThread::finished, exportThread, &QObject::deleteLater);
 
     exportThread->start();
 

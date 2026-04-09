@@ -44,7 +44,7 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
 {
     QString conflictSubCat, conflictKey;
 
-    if (hasConflict(newValue, key, conflictSubCat, conflictKey)) {
+    if (hasConflict(newValue, key, conflictSubCat, conflictKey)) { // if has conflict shows the dialog to override the value
         auto& prefManager = PrefManager::instance();
         
         SLV::showGenericDialog(
@@ -56,7 +56,7 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
             + " : " + newValue,
             prefManager.getText("dialog_update_shortcut_conflict_text_info"),
             
-            [this, subCategory, key, newValue, conflictSubCat, conflictKey]() { 
+            [this, subCategory, key, newValue, conflictSubCat, conflictKey]() { // chose to override, set the value and empties the other
                 BasePreferenceTab::updateJsonObj(subCategory, key, newValue);
                 BasePreferenceTab::updateJsonObj(conflictSubCat, conflictKey, "");
                 m_shortcutFrames[conflictKey]->setUIValue(""); 
@@ -65,7 +65,7 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
             
             nullptr,
             
-            [this, subCategory, key]() {
+            [this, subCategory, key]() { // on cancel revert the shortcut back to its original value
                 QString prevVal = m_updatedJson[subCategory].toObject()[key].toString();
                 m_shortcutFrames[key]->setUIValue(prevVal);
             }

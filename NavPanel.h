@@ -52,7 +52,7 @@ protected:
 
 private slots:
     void updateThumbnail(int requestId, QImage image);
-    void updateImageRequest(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
+    void updateImageRequest(int requestId, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
     
 };
 

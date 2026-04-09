@@ -103,10 +103,8 @@ void ThumbnailWorker::run()
             cv::resize(frame, resized, newSize, 0, 0, cv::INTER_NEAREST);
 
             QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
-            QImage finalImg = img.copy(); // utiliser .copy() car les données de resized vont être détruites
 
-            //qDebug() << "Thumbnail : prete pour le plan : " <<req.requestId ;
-            emit thumbnailReady(req.requestId, finalImg);
+            emit thumbnailReady(req.requestId, img.copy());
         }else {
             qDebug() << "Thumbnail:  Impossible de lire l'image pour le plan : " << req.requestId ;
         }

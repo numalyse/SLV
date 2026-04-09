@@ -21,12 +21,13 @@ Q_OBJECT
 
 public:
     explicit ShotDetail(QWidget* parent = nullptr);
-    void updateShotDetail(int shotCount, int requestId, Shot *shotData);
+    void updateShotDetail(int shotCount, int shotId, Shot *shotData);
     void toggleShotControlButtons(bool);
     void updateTagImage(QImage);
 signals:
     void goToShotRequested(int id);
-    void updateImageRequested(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
+    void updateImageRequested(int requestId, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
+    void clearThumbnailQueueRequested();
 
 private:
     void infoWidget(const QString &name, const QString &text, bool editable);

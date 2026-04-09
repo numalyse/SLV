@@ -38,7 +38,7 @@ public:
     void keepNQueue(const int n);
 
 signals:
-    void thumbnailReady(int requestId, QImage image);
+    void thumbnailReady(int requestId, const QImage& image);
 
 protected:
     void run() override;

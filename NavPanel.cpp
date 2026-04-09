@@ -45,6 +45,9 @@ NavPanel::NavPanel(QWidget *parent)
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
 
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
+    connect(m_shotDetail, &ShotDetail::clearThumbnailQueueRequested, this, [this](){
+        m_thumbnailWorker->clearQueue(); // prevent having many images inside the queue since m_thumbnailWorker now only used by m_shotDetail
+    });
 
     m_thumbnailWorker->start();
     
@@ -108,8 +111,8 @@ void NavPanel::enableShotControlButtons()
     m_shotDetail->toggleShotControlButtons(true);
 }
 
-void NavPanel::updateImageRequest(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize){
-    m_thumbnailWorker->requestThumbnail(idShot, time, length, mediaPath, targetSize);
+void NavPanel::updateImageRequest(int requestId, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize){
+    m_thumbnailWorker->requestThumbnail(requestId, time, length, mediaPath, targetSize);
 }
 
 void NavPanel::updateThumbnail(int imageId, QImage image){

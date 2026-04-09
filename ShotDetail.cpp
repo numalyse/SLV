@@ -79,7 +79,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
 void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
-
+    emit clearThumbnailQueueRequested();
     m_shotData = shotData;
     m_shotId = shotId;
 

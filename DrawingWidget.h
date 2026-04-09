@@ -52,7 +52,7 @@ protected:
 
     void initDrawingSurface();
 
-    QIcon genIconPreviewColor(QColor color);
+    QIcon genIconPreviewColor(QColor color, int sizePen = 30);
     void updatePen();
     void initDrawingToolbar();
 

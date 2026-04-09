@@ -119,8 +119,8 @@
     "duration" : "Durée",
 
     "tooltip_drawing_mode" : "mode dessin",
-    "tooltip_pen_tool" : "Crayon",
-    "tooltip_color_tool" : "Choisir une couleur",
+    "tooltip_pencil_tool" : "Crayon",
+    "tooltip_color_tool" : "Couleur",
     "red" : "Rouge",
     "orange" : "Orange",
     "yellow" : "Jaune",

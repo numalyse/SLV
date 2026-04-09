@@ -51,7 +51,7 @@ void DrawingWidget::initDrawingSurface(){
     }
 }
 
-QIcon DrawingWidget::genIconPreviewColor(QColor color){
+QIcon DrawingWidget::genIconPreviewColor(QColor color, int sizePen){
     QPixmap pixmap(30, 30);
     pixmap.fill(Qt::transparent);
 
@@ -60,7 +60,7 @@ QIcon DrawingWidget::genIconPreviewColor(QColor color){
 
     painter.setBrush(color);
     painter.setPen(Qt::NoPen);
-    painter.drawEllipse(0, 0, 30, 30);
+    painter.drawEllipse(0, 0, sizePen, sizePen);
 
     QIcon m_previewColor(pixmap);
     return m_previewColor;
@@ -73,8 +73,11 @@ void DrawingWidget::updatePen(){
 
 void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
+    m_drawingToolbar->setContentsMargins(0,0,0,0);
     containerBackground = new QFrame(m_drawingToolbar);
-    containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
+    containerBackground->move(50, m_mediaRect.height()-m_drawingToolbar->height()-50);
+    containerBackground->setContentsMargins(0,0,0,0);
+    //containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
     m_drawingToolbar->setStyleSheet(
         "QFrame {"
         " background-color: palette(base);"
@@ -83,7 +86,8 @@ void DrawingWidget::initDrawingToolbar(){
         "}"
         "QLabel {"
         " border: none;"
-        "}");
+        "}"
+    );
     
     
     QVBoxLayout* drawingToolbarLayout = new QVBoxLayout(containerBackground);
@@ -191,8 +195,6 @@ void DrawingWidget::showDrawingMode(bool isEnabled)
     m_isEnabled = isEnabled;
 
     if (m_isEnabled) {
-        //initDrawingSurface();
-        //initDrawingToolbar();
         m_drawingSurface->show();
         m_drawingSurface->raise();
 

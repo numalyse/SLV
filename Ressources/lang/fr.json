@@ -121,6 +121,8 @@
     "tooltip_drawing_mode" : "mode dessin",
     "tooltip_pencil_tool" : "Crayon",
     "tooltip_color_tool" : "Couleur",
+    "white" : "Blanc",
+    "black" : "Noir",
     "red" : "Rouge",
     "orange" : "Orange",
     "yellow" : "Jaune",
@@ -128,5 +130,7 @@
     "blue" : "Bleu",
     "purple" : "Violet",
     "tooltip_eraser_tool" : "Gomme",
+    "tooltip_erase_stroke" : "Gomme de trait",
+    "tooltip_erase_point" : "Gomme de point",
     "tooltip_bin_tool" : "Poubelle"
 }

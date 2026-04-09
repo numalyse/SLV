@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QFrame>
 #include <QMouseEvent>
+#include <QRadioButton>
 
 DrawingWidget::DrawingWidget(QWidget *parent)
     : QWidget(parent)
@@ -18,12 +19,14 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     m_palette = {
-        {PrefManager::instance().getText("red"), QColor{229, 0, 0, 255}},     // Rouge
-        {PrefManager::instance().getText("orange"), QColor{255, 141, 0, 255}},   // Orange
-        {PrefManager::instance().getText("yellow"), QColor{255, 238, 0, 255}},   // Jaune
+        {PrefManager::instance().getText("white"), QColor{255, 255, 255, 255}}, // Blanc
+        {PrefManager::instance().getText("black"), QColor{0, 0, 0, 255}},       // Noir
+        {PrefManager::instance().getText("red"), QColor{229, 0, 0, 255}},       // Rouge
+        {PrefManager::instance().getText("orange"), QColor{255, 141, 0, 255}},  // Orange
+        {PrefManager::instance().getText("yellow"), QColor{255, 238, 0, 255}},  // Jaune
         {PrefManager::instance().getText("green"), QColor{0, 129, 33, 255}},    // Vert
-        {PrefManager::instance().getText("blue"), QColor{0, 76, 255, 255}},    // Bleu
-        {PrefManager::instance().getText("purple"), QColor{118, 1, 136, 255}}    // Violet
+        {PrefManager::instance().getText("blue"), QColor{0, 76, 255, 255}},     // Bleu
+        {PrefManager::instance().getText("purple"), QColor{118, 1, 136, 255}},  // Violet
     };
 
     initDrawingSurface();
@@ -75,7 +78,7 @@ void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
     m_drawingToolbar->setContentsMargins(0,0,0,0);
     containerBackground = new QFrame(m_drawingToolbar);
-    containerBackground->move(50, m_mediaRect.height()-m_drawingToolbar->height()-50);
+    containerBackground->move(20, m_mediaRect.height()-m_drawingToolbar->height()-20);
     containerBackground->setContentsMargins(0,0,0,0);
     //containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
     m_drawingToolbar->setStyleSheet(
@@ -93,10 +96,8 @@ void DrawingWidget::initDrawingToolbar(){
     QVBoxLayout* drawingToolbarLayout = new QVBoxLayout(containerBackground);
     //drawingToolbarLayout->addWidget(m_drawingToolbar);
 
-    // PALETTE CHOIX COULEUR
-    QHBoxLayout* colorLayout = new QHBoxLayout;
-
     // BOUTON COULEUR
+    QHBoxLayout* colorLayout = new QHBoxLayout;
     m_colorToolBtn = new ToolbarToggleHoverButton(
     m_drawingToolbar, 
     colorLayout,
@@ -110,7 +111,8 @@ void DrawingWidget::initDrawingToolbar(){
     drawingToolbarLayout->addWidget(m_colorToolBtn);
     m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
 
-    for ( const auto& [colorName, color] : m_palette) {
+    // CHOIX PALETTE COULEUR
+    for (const auto& [colorName, color] : m_palette) {
         ToolbarButton* colorBtn = new ToolbarButton(
             m_drawingToolbar,
             " ",
@@ -125,7 +127,6 @@ void DrawingWidget::initDrawingToolbar(){
         colorLayout->addWidget(colorBtn);
     }
 
-
     // BOUTON CRAYON
     m_pencilToolBtn = new ToolbarToggleButton(
     m_drawingToolbar, 
@@ -139,16 +140,41 @@ void DrawingWidget::initDrawingToolbar(){
     drawingToolbarLayout->addWidget(m_pencilToolBtn);
 
     // BOUTON GOMME
-    m_eraserToolBtn = new ToolbarToggleButton(
-    m_drawingToolbar, 
+    QVBoxLayout* eraserLayout = new QVBoxLayout;    
+    m_eraserToolBtn = new ToolbarToggleHoverButton(
+    m_drawingToolbar,
+    eraserLayout, 
     false,
     "auto_segmentation_white",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
     "auto_segmentation",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
-    connect(m_eraserToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+    connect(m_eraserToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
     drawingToolbarLayout->addWidget(m_eraserToolBtn);
+
+    // CHOIX TYPE GOMME
+    m_eraserModeGroup = new QButtonGroup(this);
+    
+    QRadioButton* eraseStrokeBtn = new QRadioButton(PrefManager::instance().getText("tooltip_erase_stroke"));
+    eraserLayout->addWidget(eraseStrokeBtn);
+    m_eraserModeGroup->addButton(eraseStrokeBtn, 0);
+    eraseStrokeBtn->setChecked(true);
+    connect(eraseStrokeBtn, &QRadioButton::toggled, this, [this](bool checked){
+        if (checked) {
+            m_strokeMode = true;
+        }
+    });
+
+    QRadioButton* erasePointBtn = new QRadioButton(PrefManager::instance().getText("tooltip_erase_point"));
+    eraserLayout->addWidget(erasePointBtn);
+    m_eraserModeGroup->addButton(erasePointBtn, 1);
+    connect(erasePointBtn, &QRadioButton::toggled, this, [this](bool checked){
+        if (checked) {
+            m_strokeMode = false;
+        }
+    });
+    
 
     // BOUTON SUPPRIMER TOUT
     m_binToolBtn = new ToolbarButton(
@@ -174,6 +200,7 @@ void DrawingWidget::updateToolbarButtonsState(){
             m_eraserToolBtn->setChecked(false);
             m_eraserToolBtn->setButtonState(false);
             m_drawing = true;
+            m_erasing = false;
         } else {
             m_drawing = false;
         }
@@ -183,9 +210,12 @@ void DrawingWidget::updateToolbarButtonsState(){
         if (m_eraserToolBtn->isChecked()) {
             m_pencilToolBtn->setChecked(false);
             m_pencilToolBtn->setButtonState(false);
+            m_erasing = true;
+            m_drawing = false;
+        } else {
+            m_erasing = false;
         }
         m_eraserToolBtn->setButtonState(m_eraserToolBtn->isChecked());
-        m_drawing = false;
     }
 }
 
@@ -242,7 +272,9 @@ void DrawingWidget::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
 
     p.translate(m_mediaRect.topLeft());
+    p.drawImage(0, 0, m_drawingCanvas);
 
+    // Dessin
     for (const DrawingStroke &stroke : m_paths)
     {
         QPen strokePen(stroke.color, stroke.lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -250,6 +282,16 @@ void DrawingWidget::paintEvent(QPaintEvent *)
         p.drawPath(stroke.path);
     }
 
+    // Gomme
+    if (m_erasing && !m_strokeMode && !m_paths.isEmpty())
+    {
+        p.setCompositionMode(QPainter::CompositionMode_Clear);
+
+        QPen eraser(Qt::transparent, m_lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        p.setPen(eraser);
+
+        p.drawPath(m_paths.last().path);
+    }
 }
 
 void DrawingWidget::enterEvent(QEnterEvent *event)
@@ -265,10 +307,24 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 {
     setFocus();
     qDebug() << "pressed";
-    if (event->button() == Qt::LeftButton && m_isEnabled && m_drawing)
-    {
-        QPoint p = event->pos() - m_mediaRect.topLeft();
 
+    if (event->button() != Qt::LeftButton || !m_isEnabled)
+        return;
+
+    QPoint p = event->pos() - m_mediaRect.topLeft();
+
+    if (m_erasing && !m_strokeMode)
+    {
+        DrawingStroke eraseStroke;
+        eraseStroke.path.moveTo(p);
+        eraseStroke.lineWidth = m_lineWidth;
+
+        m_paths.append(eraseStroke);
+        return;
+    }
+
+    if (m_drawing)
+    {
         DrawingStroke newStroke;
         newStroke.path.moveTo(p);
         newStroke.color = m_color;
@@ -276,16 +332,32 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
         m_paths.append(newStroke);
     }
+
 }
 
 void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    QPoint p = event->pos() - m_mediaRect.topLeft();
+
+    if (m_erasing && m_strokeMode)
+    {
+        const int radius = 10;
+
+        for (int i = m_paths.size() - 1; i >= 0; --i)
+        {
+            if (m_paths[i].path.contains(p))
+            {
+                m_paths.removeAt(i);
+            }
+        }
+
+        update();
+        return;
+    }
+
     if (m_drawing && !m_paths.isEmpty())
     {
-        QPoint p = event->pos() - m_mediaRect.topLeft();
-
         m_paths.last().path.lineTo(p);
-
         update();
     }
 }

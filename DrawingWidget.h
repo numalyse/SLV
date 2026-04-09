@@ -11,6 +11,7 @@
 #include <QPen>
 #include <QPainterPath>
 #include <QColor>
+#include <QButtonGroup>
 
 struct DrawingStroke {
     QPainterPath path;
@@ -33,6 +34,8 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+
+    void redrawCanvas();
 
 public slots:
     void onMediaRectChanged(const QRect &rect);
@@ -65,14 +68,17 @@ private:
     QVector<DrawingStroke> m_undoPathlist;
 
     QPoint m_lastPoint;
+    bool m_hasLastPoint = false;
 
     bool m_drawing = false;
     bool m_erasing = false;
+    bool m_strokeMode = true;
 
     ToolbarToggleButton* m_pencilToolBtn = nullptr;
     ToolbarToggleHoverButton* m_colorToolBtn = nullptr;
     ToolbarToggleButton* m_eraserToolBtn = nullptr;
     ToolbarButton* m_binToolBtn = nullptr;
+    QButtonGroup* m_eraserModeGroup = nullptr;
 
     QVector<QPair<QString, QColor>> m_palette;
     QColor m_color = QColor(255, 0, 0, 255);

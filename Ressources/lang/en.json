@@ -159,7 +159,7 @@
     "duration" : "Duration",
 
     "messagebox_not_a_video" : "this media is not a video",
-    "messagebox_extract_sequence_completed" : "Sequence extracted successfully."
+    "messagebox_extract_sequence_completed" : "Sequence extracted successfully.",
   
     "tooltip_drawing_mode" : "drawing mode",
     "tooltip_pencil_tool" : "Pencil",

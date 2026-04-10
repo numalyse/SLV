@@ -6,9 +6,11 @@
 #include "ShortcutHelper.h"
 
 #include <QWidget>
+#include <QEnterEvent>
 #include <QLayout>
 #include <PrefManager.h>
 #include <SignalManager.h>
+
 
 /// @brief Classe abstraite qui sert de base pour les différentes toolbars.
 class Toolbar : public QWidget
@@ -71,6 +73,8 @@ public:
         show();
         raise();
         QWidget::activateWindow();
+
+        setWindowOpacity(0.01);
 
     };
 
@@ -146,6 +150,14 @@ protected:
         }
         QString keyString = PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "enter_fullscreen");
         m_dynamicFullscreenShortcut = SLV::createGlobalButtonShortcut(this, keyString, m_fullscreenBtn,  false);
+    }
+
+    void enterEvent(QEnterEvent *event) override {
+        setWindowOpacity(1.0); 
+    }
+
+    void leaveEvent(QEvent *event) override {
+        setWindowOpacity(0.01); 
     }
 
 signals:

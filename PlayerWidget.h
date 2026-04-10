@@ -35,6 +35,7 @@ public slots:
     void play();
     void playFromAdvanced();
     void pause();
+    void togglePlayPause(bool isPlaying);
     void stop();
     void eject();
     void enablePlayerFullscreen();
@@ -96,6 +97,7 @@ signals:
     void mediaRectChanged(const QRect &rect);
 
 protected:
+    void mousePressEvent(QMouseEvent *event) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 

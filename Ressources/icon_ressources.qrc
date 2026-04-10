@@ -143,5 +143,15 @@
         <file alias="video_icon_white">icons/video_icon_white.png</file>
         <file alias="draw">icons/draw.png</file>
         <file alias="draw_white">icons/draw_white.png</file>
+        <file alias="eraser">icons/eraser.png</file>
+        <file alias="eraser_white">icons/eraser_white.png</file>
+        <file alias="export">icons/export.png</file>
+        <file alias="export_white">icons/export_white.png</file>
+        <file alias="pencil">icons/pencil.png</file>
+        <file alias="pencil_white">icons/pencil_white.png</file>
+        <file alias="redo">icons/redo.png</file>
+        <file alias="redo_white">icons/redo_white.png</file>
+        <file alias="undo">icons/undo.png</file>
+        <file alias="undo_white">icons/undo_white.png</file>
     </qresource>
 </RCC>

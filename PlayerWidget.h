@@ -8,6 +8,7 @@
 #include "ExtractSequenceWidget.h"
 #include "SignalManager.h"
 
+#include <QMessageBox>
 #include <QWidget>
 #include <qmainwindow.h>
 #include <vlc/vlc.h>

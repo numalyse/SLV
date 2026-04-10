@@ -371,10 +371,28 @@ void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bo
 
 void PlayerWidget::openSequenceExtractionDialog()
 {
+    if(m_mediaWidget->media()->type() != MediaType::Video){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_not_a_video"));
+        msg->setIcon(QMessageBox::Warning);
+        msg->adjustSize();
+        msg->exec();
+        return;
+    }
     pause();
     ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
-    connect(sequenceExtractor, &QDialog::finished, this, [](int){ /* afficher une fenêtre ? */ });
+    connect(sequenceExtractor, &QDialog::finished, this, [this](int res){ if(res == QDialog::Accepted){
+            QMessageBox *msg = new QMessageBox(this);
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
+            msg->setIcon(QMessageBox::Information);
+            msg->adjustSize();
+            msg->exec();
+        }
+    });
     sequenceExtractor->open();
+
 }
 
 void PlayerWidget::onMediaRectChanged(const QRect &rect)

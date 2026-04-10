@@ -158,6 +158,9 @@
     "delete" : "Supprimer",
     "duration" : "Durée",
 
+    "messagebox_not_a_video" : "Ce média n'est pas une vidéo",
+    "messagebox_extract_sequence_completed" : "La séquence a été extraite avec succès.",
+  
     "tooltip_drawing_mode" : "mode dessin",
     "tooltip_pencil_tool" : "Crayon",
     "tooltip_color_tool" : "Couleur",
@@ -236,7 +239,7 @@
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
 
     "interface_lang_code" : "Langue de l'interface : ",
-
+  
     "project_window_title_copy_video": "Création du projet : copie de la vidéo en cours...",
     "project_manager_create_project_dialog": "Créer un projet",
     "project_manager_create_project_dialog_file_type": "Dossier du projet"

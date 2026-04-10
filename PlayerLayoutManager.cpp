@@ -396,7 +396,6 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::extractSequenceRequest, activePlayer, &PlayerWidget::openSequenceExtractionDialog);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
     connect(activePlayer, &PlayerWidget::mediaPlayerEjected, advancedToolbar, &AdvancedToolbar::disableButtons);
-    connect(activePlayer->mediaWidget(), &MediaWidget::mediaIsVideoParsed, advancedToolbar, [advancedToolbar](){ advancedToolbar->setExtractable(true); });
 
     // Redirection audio/sous-titres vers la toolbar avancée (toolbar simple cachée)
     //disconnect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, activePlayerToolbar, &SimpleToolbar::updateAudioTracks);

@@ -3,9 +3,10 @@
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime)
     : QDialog{parent}, m_media(media)
 {
-    m_startTime = 0;
-    m_endTime = 0;
+    m_startTime = startTime;
+    m_endTime = startTime+10000;
     m_thumbnailPendingTime = 50;
+    m_isExec = false;
     int duration = media.duration();
     m_startTimeEditor = new TimeEditor(this, startTime, duration, 0, duration, media.fps());
     m_endTimeEditor = new TimeEditor(this, startTime+10000, duration, startTime, duration, media.fps());
@@ -40,13 +41,22 @@ void ExtractSequenceWidget::initUiLayout()
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QHBoxLayout *timeSelectionLayout = new QHBoxLayout();
     QVBoxLayout *startTimeSelectionLayout = new QVBoxLayout();
-    QLabel *startLabel = new QLabel(PrefManager::instance().getText("extract_start_label") + " :");
+    QLabel *startLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_start_label") + " :<b>");
+
+    m_startFrameDisplay->setScaledContents(true);
+    m_endFrameDisplay->setScaledContents(true);
+    m_startFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_endFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_startFrameDisplay->setPixmap(QPixmap(720, 480));
+    m_endFrameDisplay->setPixmap(QPixmap(720, 480));
+
     startTimeSelectionLayout->addWidget(startLabel);
     startTimeSelectionLayout->addWidget(m_startFrameDisplay);
     startTimeSelectionLayout->addWidget(m_startTimeEditor);
 
     QVBoxLayout *endTimeSelectionLayout = new QVBoxLayout();
-    QLabel *endLabel = new QLabel(PrefManager::instance().getText("extract_end_label") + " :");
+    QLabel *endLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_end_label") + " :<b>");
     endTimeSelectionLayout->addWidget(endLabel);
     endTimeSelectionLayout->addWidget(m_endFrameDisplay);
     endTimeSelectionLayout->addWidget(m_endTimeEditor);
@@ -55,6 +65,7 @@ void ExtractSequenceWidget::initUiLayout()
     timeSelectionLayout->addLayout(endTimeSelectionLayout);
 
     QHBoxLayout *confirmLayout = new QHBoxLayout();
+    confirmLayout->addStretch();
     confirmLayout->addWidget(m_okButton);
     confirmLayout->addWidget(m_cancelButton);
 

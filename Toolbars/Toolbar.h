@@ -61,7 +61,9 @@ public:
         setParent(nullptr);
 
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-        adjustSize();
+        //adjustSize();
+        int targetWidth = width()/3;  
+        resize(targetWidth, sizeHint().height());
         moveOnTopOfParent();
         show();
         raise();

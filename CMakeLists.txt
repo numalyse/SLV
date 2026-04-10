@@ -43,7 +43,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         CompositionWidget.h CompositionWidget.cpp
 
-        Toolbars/Toolbar.h
+        Toolbars/Toolbar.h Toolbars/Toolbar.cpp
         Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp
         Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp
         Toolbars/SimpleToolbar.h Toolbars/SimpleToolbar.cpp
@@ -117,6 +117,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MediaTransformHelper.h
         ExtractSequenceWidget.h ExtractSequenceWidget.cpp
         TimeEditor.h TimeEditor.cpp
+        ShortcutHelper.h
 
     )
 

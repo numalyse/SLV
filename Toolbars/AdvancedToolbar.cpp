@@ -15,6 +15,8 @@
 
 #include "TimeFormatter.h"
 
+#include "ShortcutHelper.h"
+
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
@@ -97,28 +99,32 @@ void AdvancedToolbar::addShortcuts(){
     QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
     QJsonObject atShortcuts = prefManager.getSubCategory("Shortcuts", "AdvancedTB");
 
-    m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
-    m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
-    m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
-    m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
-    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("screenshot").toString()));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("play_pause").toString(), m_playPauseBtn));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("enter_fullscreen").toString(), m_fullscreenBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
 
-    m_nextMediaBtn->setShortcut(QKeySequence(atShortcuts.value("next_media").toString()));
-    m_prevMediaBtn->setShortcut(QKeySequence(atShortcuts.value("prev_media").toString()));
-    m_loopBtn->setShortcut(QKeySequence(atShortcuts.value("loop").toString())); 
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, atShortcuts.value("next_media").toString(), m_nextMediaBtn, false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, atShortcuts.value("prev_media").toString(), m_prevMediaBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, atShortcuts.value("loop").toString(), m_loopBtn));
 
     QShortcut* shortcutIncSpeed = new QShortcut(QKeySequence(atShortcuts.value("increase_speed").toString()), this);
     shortcutIncSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutIncSpeed, &QShortcut::activated, this, &AdvancedToolbar::incrementSpeedSlider);
+    m_advancedShortcuts.append(shortcutIncSpeed);
 
     QShortcut* shortcutDecSpeed = new QShortcut(QKeySequence(atShortcuts.value("decrease_speed").toString()), this);
     shortcutDecSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutDecSpeed, &QShortcut::activated, this, &AdvancedToolbar::decrementSpeedSlider);
+    m_advancedShortcuts.append(shortcutDecSpeed);
 
     QShortcut* shortcutResetSpeed = new QShortcut(QKeySequence(atShortcuts.value("base_speed").toString()), this);
     shortcutResetSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutResetSpeed, &QShortcut::activated, this, &AdvancedToolbar::resetSpeedSlider);
+    m_advancedShortcuts.append(shortcutResetSpeed);
 }
+
 
 /// @brief Constructeur qui va copier les états des boutons de le toolbar passé en paramète 
 /// @param parent 
@@ -176,6 +182,11 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
 
     // TODO : voir pour copier les états des sliders dans muteBtn et speedBtn
     //addShortcuts();
+}
+
+AdvancedToolbar::~AdvancedToolbar()
+{
+    SLV::clearShortcuts(m_advancedShortcuts);
 }
 
 void AdvancedToolbar::setFullscreenUI()

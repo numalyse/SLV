@@ -3,9 +3,11 @@
 #include "PrefManager.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarButton.h"
+#include "ShortcutHelper.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include "GlobalToolbar.h"
 
 
 GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
@@ -30,6 +32,11 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     // disableButtons();
 
     addShortcuts();
+}
+
+GlobalToolbar::~GlobalToolbar()
+{
+    SLV::clearShortcuts(m_globalShortcuts);
 }
 
 void GlobalToolbar::enableFullscreenUiUpdate()
@@ -93,11 +100,11 @@ void GlobalToolbar::addShortcuts(){
     auto& prefManager = PrefManager::instance();
     QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
     
-    m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
-    m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
-    m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
-    m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
-    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("screenshot").toString()));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("play_pause").toString(), m_playPauseBtn));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("enter_fullscreen").toString(), m_fullscreenBtn,  false));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
 }
 
 void GlobalToolbar::disableFullscreenRequested(){

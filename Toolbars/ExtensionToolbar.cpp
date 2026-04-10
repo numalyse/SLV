@@ -5,6 +5,7 @@
 #include "ExtensionToolbar.h"
 #include "OverlayMode.h"
 #include "SignalManager.h"
+#include "ShortcutHelper.h"
 
 #include <QHBoxLayout>
 #include <qframe.h>
@@ -151,7 +152,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
 ExtensionToolbar::~ExtensionToolbar()
 {
-    clearShortcuts();
+    SLV::clearShortcuts(m_extensionShortcuts);
 }
 
 void ExtensionToolbar::updateOverlayMode(){
@@ -222,32 +223,15 @@ void ExtensionToolbar::addShortcuts()
     auto& prefManager = PrefManager::instance();
     QJsonObject extShortcuts = prefManager.getSubCategory("Shortcuts", "ExtensionTB");
 
-    qDebug() << "[ExtensionToolbar] raccourcis : " << extShortcuts;
-
-
-    auto createGlobalShortcut = [this](const QString& keyString, QPushButton* button, bool autoRepeat = true) {
-        if (keyString.isEmpty()) return; 
-        QWidget* mainWindow = this->window(); // need to add this so shortcuts can be used event if this is hidden
-        QShortcut* shortcut = new QShortcut(QKeySequence(keyString), mainWindow);
-        shortcut->setContext(Qt::ApplicationShortcut); 
-        shortcut->setAutoRepeat(autoRepeat);
-        if (autoRepeat){
-            connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
-        }else {
-            connect(shortcut, &QShortcut::activated, button, &QPushButton::animateClick);
-        }
-        m_globalShortcuts.append(shortcut);
-    };
-
-    createGlobalShortcut(extShortcuts.value("h_flip").toString(), m_horizontalInvBtn, false);
-    createGlobalShortcut(extShortcuts.value("v_flip").toString(), m_verticalInvBtn, false);
-    createGlobalShortcut(extShortcuts.value("record").toString(), m_recordBtn, false);
-    createGlobalShortcut(extShortcuts.value("rotate").toString(), m_rotateBtn, false);
-    createGlobalShortcut(extShortcuts.value("hide_img").toString(), m_hideImgBtn);
-    createGlobalShortcut(extShortcuts.value("next_frame").toString(), m_nextFrameBtn);
-    createGlobalShortcut(extShortcuts.value("prev_frame").toString(), m_prevFrameBtn);
-    createGlobalShortcut(extShortcuts.value("forward").toString(), m_forwardBtn);
-    createGlobalShortcut(extShortcuts.value("backward").toString(), m_backwardBtn);
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("h_flip").toString(), m_horizontalInvBtn, false));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("v_flip").toString(), m_verticalInvBtn, false));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("record").toString(), m_recordBtn, false));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("rotate").toString(), m_rotateBtn, false));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("hide_img").toString(), m_hideImgBtn));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("next_frame").toString(), m_nextFrameBtn));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("prev_frame").toString(), m_prevFrameBtn));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("forward").toString(), m_forwardBtn));
+    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("backward").toString(), m_backwardBtn));
 
 }
 
@@ -285,10 +269,3 @@ void ExtensionToolbar::disableButtons()
     m_prevFrameBtn->setEnabled(false);
 }
 
-
-void ExtensionToolbar::clearShortcuts(){
-    for (auto& shortcut : m_globalShortcuts){
-        shortcut->deleteLater();
-    }
-    m_globalShortcuts.clear();
-}

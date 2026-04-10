@@ -13,6 +13,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QSlider>
+#include <QShortcut>
+#include <QVector>
 
 
 /// @brief Toolbar Avancé, utilisé pour la lecture classique, peut être étendu pour afficher des contrôles supplémentaires.
@@ -22,7 +24,9 @@ Q_OBJECT
 
 public:
     explicit AdvancedToolbar(QWidget* parent = nullptr);
-    explicit AdvancedToolbar(QWidget* parent, SimpleToolbar* toolbar);
+    explicit AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar);
+
+    ~AdvancedToolbar();
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
@@ -48,6 +52,8 @@ private:
 
     ToolbarToggleButton* m_extensionBtn = nullptr;
     ExtensionToolbar* m_extensionToolbar = nullptr;
+
+    QVector<QShortcut*> m_advancedShortcuts;
 
 protected slots: 
     virtual void onSliderPressed() override;

@@ -35,6 +35,7 @@ private:
     const Media& m_media;
     int m_startTime;
     int m_endTime;
+    bool m_isExec;
     TimeEditor* m_startTimeEditor;
     TimeEditor* m_endTimeEditor;
     QLabel* m_startFrameDisplay;

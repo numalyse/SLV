@@ -2,12 +2,14 @@
 #define TIMEEDITOR_H
 
 #include "TimeFormatter.h"
+#include "Toolbars/TimeValidator.h"
 
 #include <QWidget>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QSlider.h>
 #include <QLayout>
+#include <QLabel>
 
 class TimeEditor : public QWidget
 {
@@ -31,6 +33,7 @@ public:
 
 public slots:
     void onMinTimeChanged(const int newMin);
+    void onTimeEditsChanged(const int timeEditIndex);
 
 private:
 
@@ -57,6 +60,8 @@ private:
     QLineEdit* m_secondsEdit;
     QLineEdit* m_framesEdit;
     QSlider* m_timeSlider;
+    QVector<QLineEdit*> m_timeEdits;
+    int m_indexTimeEdit;
 
 signals:
     void timeChanged(const int time);

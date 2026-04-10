@@ -332,8 +332,7 @@ void SimpleToolbar::enableButtons()
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
-    if(m_extractable)
-        m_extractSequenceBtn->setEnabled(true);
+    m_extractSequenceBtn->setEnabled(true);
     // m_removePlayerBtn->setEnabled(true);
     // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);

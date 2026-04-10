@@ -169,6 +169,9 @@
 
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
 
-    "interface_lang_code" : "Langue de l'interface : "
+    "interface_lang_code" : "Langue de l'interface : ",
+
+    "messagebox_not_a_video" : "Ce média n'est pas une vidéo",
+    "messagebox_extract_sequence_completed" : "La séquence a été extraite avec succès."
 
 }

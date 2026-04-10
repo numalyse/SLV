@@ -26,7 +26,6 @@ public:
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
-    void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
@@ -97,7 +96,6 @@ protected:
     bool m_showRemainingTime = false;
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
-    bool m_extractable = false;
 
     QSlider* m_volumeSlider = nullptr;
     QLabel* m_volumeLabel = nullptr;

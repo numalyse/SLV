@@ -53,6 +53,8 @@ MediaWidget::MediaWidget(QWidget *parent)
         return;
     }
     m_player = libvlc_media_player_new(m_vlcInstance);
+    libvlc_video_set_mouse_input(m_player, 0);
+    libvlc_video_set_key_input(m_player, 0);
 
     createEventManager();
 
@@ -168,6 +170,8 @@ bool MediaWidget::eject()
         }
 
         m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+        libvlc_video_set_mouse_input(m_player, 0);
+        libvlc_video_set_key_input(m_player, 0);
         
         QMetaObject::invokeMethod(this, [this]() {
             releaseMedia();
@@ -399,6 +403,8 @@ void MediaWidget::transformMedia()
 
     m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
     m_player = libvlc_media_player_new(m_vlcInstance);
+    libvlc_video_set_mouse_input(m_player, 0);
+    libvlc_video_set_key_input(m_player, 0);
 
     createEventManager();
 
@@ -543,7 +549,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
 void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
-    emit activated(this);
+    emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
     QWidget::mousePressEvent(event);
 }
 

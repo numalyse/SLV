@@ -9,6 +9,7 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     setText(txt);
     setInputMask("99:99:99.99");
     setValidator(new TimeValidator(this));
+    setFocusPolicy(Qt::ClickFocus);
     
     setFixedWidth(75);
 

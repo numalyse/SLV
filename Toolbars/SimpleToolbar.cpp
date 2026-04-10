@@ -454,8 +454,7 @@ void SimpleToolbar::setSubtitlesTrack(int index){
 
 void SimpleToolbar::createTimeEdit(){
     m_timeEdit = new TimeEdit("00:00:00.00", this);
-    m_timeEdit->setFocusPolicy(Qt::NoFocus);
-    m_timeEdit->setFixedWidth(75);
+
     connect(m_timeEdit, &TimeEdit::focusIn, this, [this](){
         emit pauseRequest();  
         m_editingTime = true;

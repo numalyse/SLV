@@ -93,6 +93,7 @@ private:
     ToolbarButton* m_binToolBtn = nullptr;
     ToolbarButton* m_undoToolBtn = nullptr;
     ToolbarButton* m_redoToolBtn = nullptr;
+    ToolbarToggleButton* m_minimizeToolbarBtn = nullptr;
     
     QPen m_pen;
 

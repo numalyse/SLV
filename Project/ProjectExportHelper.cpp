@@ -750,7 +750,7 @@ namespace ProjectExportHelper {
 
         QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
         
-        buttonBox->button(QDialogButtonBox::Ok)->setText(txtManager.getText("generic_dialog_btn_yes"));
+        buttonBox->button(QDialogButtonBox::Ok)->setText(txtManager.getText("generic_btn_ok"));
         buttonBox->button(QDialogButtonBox::Cancel)->setText(txtManager.getText("generic_dialog_btn_cancel"));
         
         layout->addWidget(buttonBox);

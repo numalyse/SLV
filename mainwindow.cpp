@@ -117,7 +117,6 @@ void MainWindow::createMenuBar()
         saveProjectAction->setDisabled(true);
     });
     connect(saveProjectAction, &QAction::triggered, this, [projManager]() {
-        projManager->setSaveNeeded();
         projManager->saveProject(false);
     });
 

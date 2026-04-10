@@ -79,17 +79,22 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
+    connect(m_mediaWidget, &MediaWidget::mediaIsVideoParsed, this, [this](){ m_toolBar->setExtractable(true); });
+    connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);
     QStackedLayout* stack = new QStackedLayout(containerWidget);
     stack->setContentsMargins(0,0,0,0);
+    stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_mediaWidget);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
-    stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_compositionWidget);
+
+    m_drawingWidget = new DrawingWidget(containerWidget);
+    stack->addWidget(m_drawingWidget);
 
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise(); 
@@ -113,6 +118,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_drawingWidget, &DrawingWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
     connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
@@ -254,6 +260,12 @@ void PlayerWidget::pause()
 
 }
 
+void PlayerWidget::togglePlayPause(bool isPlaying)
+{
+    if(isPlaying) pause();
+    else play();
+}
+
 void PlayerWidget::stop()
 {
     if(m_mediaWidget->stop()){
@@ -348,6 +360,10 @@ void PlayerWidget::rotate()
     m_mediaWidget->rotate();
 }
 
+void PlayerWidget::showDrawingMode(bool isEnabled){
+    m_drawingWidget->showDrawingMode(isEnabled);
+}
+
 void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
 
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
@@ -388,7 +404,7 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
 
 void PlayerWidget::widgetSizeChange()
 {
-    if (!m_compositionWidget || !m_mediaWidget)
+    if (!m_compositionWidget || !m_drawingWidget || !m_mediaWidget)
         return;
 
     QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
@@ -397,6 +413,7 @@ void PlayerWidget::widgetSizeChange()
     int h = m_mediaWidget->height();
 
     m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+    m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
 }
 
 bool PlayerWidget::event(QEvent *event)
@@ -405,6 +422,7 @@ bool PlayerWidget::event(QEvent *event)
     {
     case QEvent::Show:
         m_compositionWidget->show();
+        m_drawingWidget->show();
         QTimer::singleShot(50, this, SLOT(widgetSizeChange())); 
         break;
     case QEvent::WindowActivate:

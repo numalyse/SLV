@@ -59,7 +59,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& proj
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(0, 0, 0, 0); 
 
-    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_split_shot"));
+    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_segmentation_auto"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
     ButtonLayout->addWidget(m_autoSegmentationBtn);
 
@@ -395,8 +395,8 @@ void TimelineWidget::autoSegmentation(){
             SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
             segmentationThread->setPriority(QThread::HighPriority);
 
-            QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_window_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
-            progressDialog->setWindowTitle(txtManager.getText("timeline_window_title_auto_segmentation"));
+            QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_dialog_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+            progressDialog->setWindowTitle(txtManager.getText("timeline_dialog_title_auto_segmentation"));
             progressDialog->setWindowModality(Qt::WindowModal); 
 
             connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){ 

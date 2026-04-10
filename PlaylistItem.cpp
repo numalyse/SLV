@@ -112,8 +112,6 @@ void PlaylistItem::setDurationLabel()
     m_mediaThumbnailTime = setThumbnailTime();
     updateTypeIcon();
     updateThumbnail();
-
-    emit updateImageRequested(m_itemIndex, durationMs / 2, 0, m_mediaData->filePath(), m_thumbnailSize);
 }
 
 QString PlaylistItem::setThumbnailTime(){

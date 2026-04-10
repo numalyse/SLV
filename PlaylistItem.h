@@ -62,7 +62,6 @@ signals:
     void deleteItemRequested(const unsigned int index);
     void playPlaylistItemRequested(const QString &filePath, const bool isClicked);
     void updatePlaylistCurrentIndex(unsigned int index);
-    void updateImageRequested(int idShot, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
 };
 
 #endif // PLAYLISTITEM_H

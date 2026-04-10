@@ -28,7 +28,7 @@ public:
 public slots:
     void onStartTimeChanged(const int newTime);
     void onEndTimeChanged(const int newTime);
-    void onThumbnailReady(int requestId, QImage image);
+    void onThumbnailReady(int requestId, const QImage& image);
     void confirmExtraction();
 
 private:

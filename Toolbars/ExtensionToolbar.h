@@ -45,6 +45,7 @@ public:
     ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarToggleButton* m_verticalInvBtn= nullptr;
     ToolbarToggleButton* m_horizontalInvBtn= nullptr;
+    ToolbarToggleButton* m_drawingBtn= nullptr;
     // ToolbarButton* m_abloopBtn = nullptr;
     // ToolbarPopupButton* m_multiviewBtn;
 
@@ -57,9 +58,12 @@ public slots:
     void updateRecordButtonUI();
     void updateHFlipButtonUI();
     void updateVFlipButtonUI();
+    void updateDrawingButtonUI();
 
 private slots:
+    void updateDrawingMode();
     void updateOverlayMode(); 
+
 
 private:
     /// @brief Adds global shortcuts (that are child of the mainWindow) to be usable when the widget is hidden
@@ -85,6 +89,7 @@ signals:
     void horizontalFlipRequested();
     void verticalFlipRequested();
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void showDrawingModeRequested(bool isEnabled);
     void prevFrameRequested();
     void nextFrameRequested();
 

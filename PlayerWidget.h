@@ -3,6 +3,7 @@
 
 #include "MediaWidget.h"
 #include "CompositionWidget.h"
+#include "DrawingWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "ExtractSequenceWidget.h"
 #include "SignalManager.h"
@@ -36,6 +37,7 @@ public slots:
     void play();
     void playFromAdvanced();
     void pause();
+    void togglePlayPause(bool isPlaying);
     void stop();
     void eject();
     void enablePlayerFullscreen();
@@ -54,6 +56,7 @@ public slots:
     void startRecord();
     void endRecord();
     void rotate();
+    void showDrawingMode(bool isEnabled);
     void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void onMediaRectChanged(const QRect &rect);
     void widgetSizeChange();
@@ -111,6 +114,7 @@ private:
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
+    DrawingWidget* m_drawingWidget = nullptr;
     QSize m_mediaSize;
     QRect m_mediaRect;
     QString m_pendingFilePath;

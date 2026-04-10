@@ -111,6 +111,7 @@ protected:
 signals:
     void vlcTimeChanged(int64_t newTime);
     void activated(MediaWidget* self);
+    void togglePlayPauseRequested(bool isPlaying);
     void updateSliderRangeRequested(int64_t mediaDuration);
     void updateFpsRequested(double fps);
     void mediaPlayerLoaded();

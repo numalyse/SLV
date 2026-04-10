@@ -5,6 +5,7 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 
 #include <QWidget>
+#include <QLayout>
 #include <PrefManager.h>
 #include <SignalManager.h>
 
@@ -26,6 +27,8 @@ public:
         );
         m_playPauseBtn->setButtonState(false);
         m_playPauseBtn->setEnabled(true);
+
+        m_parent = parent;
         
         m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop"));
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));
@@ -52,10 +55,38 @@ public:
     virtual ~Toolbar() = default;
 
     /// @brief Met à jour le layout pour afficher l'interface en plein écran
-    virtual void setFullscreenUI() = 0;
+    virtual void setFullscreenUI() {
+        m_isFullscreen = true;
+
+        setParent(nullptr);
+
+        setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        adjustSize();
+        moveOnTopOfParent();
+        show();
+        raise();
+        QWidget::activateWindow();
+
+    };
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
-    virtual void setDefaultUI() = 0;
+    virtual void setDefaultUI(){
+        m_isFullscreen = false;
+
+        if (m_parent) {
+            if (m_parent->layout()) m_parent->layout()->addWidget(this); 
+        }
+        show();
+        raise();
+    };
+
+    /// @brief Move toolbar on resize when in fullscreen
+    virtual void updateFullscreenPosition() {};
+
+    void setTBParent(QWidget* parent){
+        m_parent = parent;
+        setParent(parent);
+    }
 
 public slots:
     virtual void ejectRequested(){
@@ -83,6 +114,18 @@ protected:
     ToolbarToggleButton* m_fullscreenBtn = nullptr;
     ToolbarButton* m_screenshotBtn = nullptr;
     ToolbarToggleButton* m_muteBtn = nullptr;
+
+    bool m_isFullscreen = false;
+    QWidget* m_parent = nullptr;
+
+    void moveOnTopOfParent(){
+        if (m_parent && m_isFullscreen) {
+            QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
+            int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
+            int posY = parentGlobalPos.y() + m_parent->height() - this->height() - 20;
+            move(posX, posY);
+        }
+    }
 
 signals:
     void playRequest();

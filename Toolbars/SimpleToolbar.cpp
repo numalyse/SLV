@@ -128,65 +128,63 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
 
-    setDefaultUI();
+    
     disableButtons();
-}
 
-void SimpleToolbar::setFullscreenUI()
-{
-    if (layout() != nullptr) {
-        delete layout();
-    }
+    QTimer* mTimer = new QTimer(this);
+    setMouseTracking(true);
+    mTimer->setInterval(500);
+    mTimer->setSingleShot(true);
 
-    // Créer un layout quand on est en fullscreen
+    connect(mTimer, &QTimer::timeout, this, []() {
+      qDebug("Mouse stopped moving!!!");
+    });
+
+
 }
 
 
 void SimpleToolbar::setDefaultUI()
 {
-    if (layout() != nullptr) {
-        delete layout();
+    Toolbar::setDefaultUI();
+
+    if ( !layout() ) {
+        
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(5,5,5,5);
+        mainLayout->setSpacing(1);
+
+        QHBoxLayout* timecodeLayout = new QHBoxLayout();
+        timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
+        timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
+        timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
+        mainLayout->addLayout(timecodeLayout);
+
+        mainLayout->addWidget(m_slider);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(0,0,0,0);
+        buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addWidget(m_langBtn);
+        buttonLayout->addSpacing(m_langBtn->width());
+        buttonLayout->addSpacing(m_langBtn->width());
+        buttonLayout->addSpacing(m_langBtn->width());
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_speedBtn);
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addWidget(m_loopBtn);
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_extractSequenceBtn);
+        buttonLayout->addWidget(m_duplicatePlayerBtn);
+        buttonLayout->addWidget(m_removePlayerBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+        
+        mainLayout->addLayout(buttonLayout);
     }
-
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(5,5,5,5);
-    mainLayout->setSpacing(1);
-
-    QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
-    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-    timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
-    mainLayout->addLayout(timecodeLayout);
-
-    mainLayout->addWidget(m_slider);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0,0,0,0);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addSpacing(m_langBtn->width());
-    buttonLayout->addSpacing(m_langBtn->width());
-    buttonLayout->addSpacing(m_langBtn->width());
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_stopBtn);
-    //buttonLayout->addWidget(m_slowDownBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    //buttonLayout->addWidget(m_speedUpBtn);
-
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_loopBtn);
-
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_extractSequenceBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_removePlayerBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-    mainLayout->addLayout(buttonLayout);
-
-
 }
 
 void SimpleToolbar::resetSlider()
@@ -381,6 +379,11 @@ void SimpleToolbar::duplicatePlayerAction()
     emit duplicatePlayerRequested();
 }
 
+void SimpleToolbar::updateFullscreenPosition()
+{
+    Toolbar::moveOnTopOfParent();
+}
+
 void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
     m_audioLangComboBox->clear();
 
@@ -451,6 +454,7 @@ void SimpleToolbar::setSubtitlesTrack(int index){
 
 void SimpleToolbar::createTimeEdit(){
     m_timeEdit = new TimeEdit("00:00:00.00", this);
+    m_timeEdit->setFocusPolicy(Qt::NoFocus);
     m_timeEdit->setFixedWidth(75);
     connect(m_timeEdit, &TimeEdit::focusIn, this, [this](){
         emit pauseRequest();  

@@ -178,63 +178,57 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     //addShortcuts();
 }
 
-void AdvancedToolbar::setFullscreenUI()
-{
-    if (layout() != nullptr) {
-        delete layout();
-    }
-    // Créer un layout quand on est en fullscreen
-}
-
 void AdvancedToolbar::setDefaultUI()
 {
-    if (layout() != nullptr) {
-        delete layout();
+    Toolbar::setDefaultUI();
+
+    if ( !layout() ) {
+
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(5,5,5,5);
+        mainLayout->setSpacing(1);
+
+        QHBoxLayout* timecodeLayout = new QHBoxLayout();
+        timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
+        timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
+        timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
+        mainLayout->addLayout(timecodeLayout);
+
+        mainLayout->addWidget(m_slider);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(0,0,0,0);
+        buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addWidget(m_langBtn);
+        buttonLayout->addSpacing(m_speedBtn->size().width());
+        buttonLayout->addSpacing(m_speedBtn->size().width());
+        buttonLayout->addSpacing(m_speedBtn->size().width());
+
+        buttonLayout->addStretch();
+
+        buttonLayout->addWidget(m_speedBtn);
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_prevMediaBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_nextMediaBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addWidget(m_loopBtn);
+
+        buttonLayout->addStretch();
+
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_extractSequenceBtn);
+        buttonLayout->addWidget(m_duplicatePlayerBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+        buttonLayout->addWidget(m_extensionBtn);
+        mainLayout->addLayout(buttonLayout);
+
+        mainLayout->addWidget(m_extensionToolbar);
     }
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(5,5,5,5);
-    mainLayout->setSpacing(1);
-
-    QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
-    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-    timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
-    mainLayout->addLayout(timecodeLayout);
-
-    mainLayout->addWidget(m_slider);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0,0,0,0);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addSpacing(m_speedBtn->size().width());
-    buttonLayout->addSpacing(m_speedBtn->size().width());
-    buttonLayout->addSpacing(m_speedBtn->size().width());
-
-    buttonLayout->addStretch();
-
-    buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_stopBtn);
-    buttonLayout->addWidget(m_prevMediaBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_nextMediaBtn);
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_loopBtn);
-
-    buttonLayout->addStretch();
-
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_extractSequenceBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-    buttonLayout->addWidget(m_extensionBtn);
-    mainLayout->addLayout(buttonLayout);
-
-    mainLayout->addWidget(m_extensionToolbar);
-
 }
+
 
 void AdvancedToolbar::enableButtons()
 {

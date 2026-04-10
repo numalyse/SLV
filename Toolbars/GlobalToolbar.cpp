@@ -32,15 +32,6 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     addShortcuts();
 }
 
-void GlobalToolbar::setFullscreenUI()
-{
-    if (layout() != nullptr) {
-        delete layout();
-    }
-
-    // Créer un layout quand on est en fullscreen
-}
-
 void GlobalToolbar::enableFullscreenUiUpdate()
 {
     m_fullscreenBtn->setButtonState(true);
@@ -53,30 +44,29 @@ void GlobalToolbar::disableFullscreenUiUpdate()
 
 void GlobalToolbar::setDefaultUI()
 {
+    Toolbar::setDefaultUI();
 
-    if (layout() != nullptr) {
-        delete layout();
+    if( !layout() ){
+
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(0,0,0,0);
+        mainLayout->setSpacing(1);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(5,0,5,0);
+        buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addSpacing(m_muteBtn->width());
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+
+        mainLayout->addLayout(buttonLayout);
     }
-
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(1);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(5,0,5,0);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addSpacing(m_muteBtn->width());
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_stopBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-
-    mainLayout->addLayout(buttonLayout);
-
 }
 
 void GlobalToolbar::enableButtons()

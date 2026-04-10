@@ -24,7 +24,7 @@ public:
     explicit AdvancedToolbar(QWidget* parent = nullptr);
     explicit AdvancedToolbar(QWidget* parent, SimpleToolbar* toolbar);
 
-    void setFullscreenUI() override;
+    //void setFullscreenUI() override;
     void setDefaultUI() override;
     void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
 

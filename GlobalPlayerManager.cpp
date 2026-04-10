@@ -33,8 +33,21 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenPlayerRequested, this, &GlobalPlayerManager::enableFullscreenPlayer);
     connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenPlayerRequested, this, &GlobalPlayerManager::disableFullscreenPlayer);
 
-    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenMainRequested);
-    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenMainRequested);
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, [this](){
+        if(m_toolbarWidget){
+            m_toolbarWidget->setFullscreenUI();
+        }
+        enableFullscreenMainRequested();
+    });
+
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, [this](){
+        if(m_toolbarWidget){
+            m_toolbarWidget->setParent(this);
+            m_toolbarWidget->setDefaultUI();
+            layout->addWidget(m_toolbarWidget);
+        }
+        disableFullscreenMainRequested();
+    });
 
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
@@ -95,6 +108,7 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
     if (newToolbar){
         m_toolbarWidget = newToolbar;
         layout->addWidget(m_toolbarWidget);
+        m_toolbarWidget->setTBParent(this); // since toolbar was created in playerlayoutmanager, need to update its internal m_parent 
     }
 
     m_player = player;
@@ -126,6 +140,9 @@ void GlobalPlayerManager::closeNavPanel()
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+    if(m_toolbarWidget){
+        m_toolbarWidget->updateFullscreenPosition();
+    }
 }
 
 /// @brief Met à jour l'état du bouton play pause 

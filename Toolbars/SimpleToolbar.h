@@ -24,7 +24,6 @@ Q_OBJECT
 public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
 
-    void setFullscreenUI() override;
     void setDefaultUI() override;
     void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
 
@@ -76,7 +75,7 @@ public slots:
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
     void setSubtitlesTrack(int index);
 
-
+    virtual void updateFullscreenPosition() override;
 
 protected:
     void createSlider();
@@ -112,7 +111,6 @@ protected:
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;
     ToolbarPopupButton* m_langBtn = nullptr;
-
 
 protected slots: 
     virtual void onSliderPressed();

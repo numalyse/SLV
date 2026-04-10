@@ -509,32 +509,33 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
 }
 
 void PlayerLayoutManager::enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen){
-    for(auto &IPlayer : m_players){
-        if(playerToFullscreen != IPlayer)
-            IPlayer->hide();
+    for(auto &IPlayer : m_activePlayers){
+        if(playerToFullscreen != IPlayer) IPlayer->hide();
+        else IPlayer->toolbar()->setFullscreenUI();
     }
     emit enableFullscreenPlayerRequested();
 }
 
 void PlayerLayoutManager::disablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen){
-    for(auto &IPlayer : m_players){
+    for(auto &IPlayer : m_activePlayers){
         IPlayer->show();
+        IPlayer->toolbar()->setDefaultUI();
     }
     emit disableFullscreenPlayerRequested();
 }
 
 void PlayerLayoutManager::enableGlobalLayoutFullscreen(){
-    for(auto &IPlayer : m_players){
+    for(auto &IPlayer : m_activePlayers){
         IPlayer->show();
-        // TODO : set toolbar fullscreen ui
+        IPlayer->toolbar()->setFullscreenUI();
     }
     emit enableFullscreenGlobalRequested();
 }
 
 void PlayerLayoutManager::disableGlobalLayoutFullscreen(){
-    for(auto &IPlayer : m_players){
+    for(auto &IPlayer : m_activePlayers){
         IPlayer->show();
-        // TODO : set toolbar default ui
+        IPlayer->toolbar()->setDefaultUI();
     }
     emit disableFullscreenGlobalRequested();
 }

@@ -13,7 +13,6 @@ Q_OBJECT
 public:
     explicit GlobalToolbar(QWidget* parent = nullptr);
 
-    void setFullscreenUI() override;
     void setDefaultUI() override;
     void disableFullscreenRequested() override;
 

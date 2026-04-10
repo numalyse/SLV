@@ -37,6 +37,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
+    m_toolBar->setDefaultUI();
 
     connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [this]() {
         emit removePlayerRequest(this);
@@ -399,6 +400,8 @@ bool PlayerWidget::event(QEvent *event)
         break;
     case QEvent::WindowActivate:
     case QEvent::Resize:
+        m_toolBar->updateFullscreenPosition();
+        break;
     case QEvent::Move:
         widgetSizeChange();
         break;
@@ -469,6 +472,4 @@ void PlayerWidget::dropEvent(QDropEvent *event)
         event->ignore();
     }
 }
-
-
 

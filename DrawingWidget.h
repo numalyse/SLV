@@ -30,6 +30,7 @@ public:
 
     void setColor(const QColor &color);
     void setLineWidth(int width);
+    void setOpacity(float opacity);
 
     void enterEvent(QEnterEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -85,10 +86,15 @@ private:
     ToolbarButton* m_redoToolBtn = nullptr;
     
     QPen m_pen;
-    int m_lineWidth = 2;
+    
+    int m_lineWidth = 4;
+    QVector<int> m_lineWidthLevels = {4, 8, 12};
 
+    float m_opacity = 1.0;
+    QVector<float> m_opacityLevels = {0.25, 0.5, 1.0};
+
+    QColor m_color = QColor(255, 255, 255, 255);
     QVector<QPair<QString, QColor>> m_palette;
-    QColor m_color = QColor(255, 0, 0, 255);
 
     QPixmap eraseColor();
     QPixmap m_eraseBrush = eraseColor();

@@ -65,7 +65,10 @@ QIcon DrawingWidget::genIconPreviewColor(QColor color, int sizePen){
 
     painter.setBrush(color);
     painter.setPen(Qt::NoPen);
-    painter.drawEllipse(0, 0, sizePen, sizePen);
+
+    int x = (pixmap.width() - sizePen) / 2;
+    int y = (pixmap.height() - sizePen) / 2;
+    painter.drawEllipse(x, y, sizePen, sizePen);
 
     QIcon m_previewColor(pixmap);
     return m_previewColor;
@@ -109,7 +112,7 @@ void DrawingWidget::initDrawingToolbar(){
     "",
     PrefManager::instance().getText("tooltip_color_tool")
     );
-    connect(m_colorToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::binRequested);
+    //connect(m_colorToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::);
     drawingToolbarLayout->addWidget(m_colorToolBtn);
     m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
 
@@ -123,23 +126,69 @@ void DrawingWidget::initDrawingToolbar(){
         colorBtn->setIcon(genIconPreviewColor(color));
         connect(colorBtn, &ToolbarButton::clicked, this, [this, color]() {
             setColor(color);
-            m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
+            m_colorToolBtn->setIcon(genIconPreviewColor(color));
             updatePen();
         });
         colorLayout->addWidget(colorBtn);
     }
 
     // BOUTON CRAYON
-    m_pencilToolBtn = new ToolbarToggleButton(
+    QHBoxLayout* pencilLayout = new QHBoxLayout;
+    m_pencilToolBtn = new ToolbarToggleHoverButton(
     m_drawingToolbar, 
+    pencilLayout,
     false,
     "auto_segmentation_white",
     PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(activated)"),
     "auto_segmentation",
     PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
-    connect(m_pencilToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+    connect(m_pencilToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
     drawingToolbarLayout->addWidget(m_pencilToolBtn);
+
+    // CHOIX EPAISSEUR
+    for(auto lineWidth : m_lineWidthLevels){
+        ToolbarToggleButton* lineWidthBtn = new ToolbarToggleButton(
+            m_drawingToolbar,
+            false,
+            " ",
+            PrefManager::instance().getText("tooltip_linewidth") + " " + QString::number(lineWidth),
+            " ",
+            PrefManager::instance().getText("tooltip_linewidth") + " " + QString::number(lineWidth)
+        );
+        lineWidthBtn->setIcon(genIconPreviewColor(Qt::white, lineWidth*2));
+        connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, [this, lineWidth]() {
+            setLineWidth(lineWidth);
+            updatePen();
+        });
+        pencilLayout->addWidget(lineWidthBtn);
+    }
+
+    QFrame* lineSeparator = new QFrame();
+    lineSeparator->setFrameShape(QFrame::VLine);
+    pencilLayout->addWidget(lineSeparator);
+
+    // CHOIX OPACITE
+    for(auto opacity : m_opacityLevels){
+        ToolbarToggleButton* opacityBtn = new ToolbarToggleButton(
+            m_drawingToolbar,
+            false,
+            " ",
+            PrefManager::instance().getText("tooltip_opacity") + " " + QString::number(opacity),
+            " ",
+            PrefManager::instance().getText("tooltip_opacity") + " " + QString::number(opacity)
+        );
+        QColor previewColor = Qt::white;
+        previewColor.setAlphaF(opacity);
+        
+        opacityBtn->setIcon(genIconPreviewColor(previewColor));
+        connect(opacityBtn, &ToolbarToggleButton::clicked, this, [this, opacity]() {
+            setOpacity(opacity);
+            setColor(m_color);
+            updatePen();
+        });
+        pencilLayout->addWidget(opacityBtn);
+    }
 
     // BOUTON GOMME
     m_eraserToolBtn = new ToolbarToggleButton(
@@ -252,13 +301,22 @@ QPixmap DrawingWidget::eraseColor(){
 
 void DrawingWidget::setColor(const QColor &color)
 {
-    m_color = color;
+    QColor colorWithOpacity = color;
+    colorWithOpacity.setAlphaF(m_opacity);
+    m_color = colorWithOpacity;
+
     update();
 }
 
 void DrawingWidget::setLineWidth(int width)
 {
     m_lineWidth = width;
+    update();
+}
+
+void DrawingWidget::setOpacity(float opacity)
+{
+    m_opacity = opacity;
     update();
 }
 

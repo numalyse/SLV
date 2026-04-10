@@ -29,6 +29,7 @@ public:
     void showDrawingMode(bool isEnabled);
 
     void setColor(const QColor &color);
+    void updateCurrentLineWidthBtnActive(double lineWidth);
     void setLineWidth(int width);
     void setOpacity(float opacity);
 
@@ -42,7 +43,7 @@ public slots:
     void updateToolbarButtonsState();
 
     
-    void updateCurrentOpcityBtnActive(double opacity);
+    void updateCurrentOpacityBtnActive(double opacity);
 
     void binRequested();
     void undoDrawing();

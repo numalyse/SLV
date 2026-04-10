@@ -144,12 +144,12 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_drawingBtn = new ToolbarToggleButton(
         this, 
         false,
-        "auto_segmentation_white",
+        "draw_white",
         PrefManager::instance().getText("deactivate") + " " + PrefManager::instance().getText("tooltip_drawing_mode"),
-        "auto_segmentation",
+        "draw_white",
         PrefManager::instance().getText("activate") + " " + PrefManager::instance().getText("tooltip_drawing_mode")
     );
-
+    m_drawingBtn->setToggledIconFrame(true);
     connect(m_drawingBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::updateDrawingMode);
 
 

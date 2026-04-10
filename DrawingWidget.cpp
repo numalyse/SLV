@@ -178,15 +178,31 @@ void DrawingWidget::initDrawingToolbar(){
             " ",
             PrefManager::instance().getText("tooltip_linewidth") + " " + QString::number(lineWidth)
         );
+
+        lineWidthBtn->setToggledIconFrame(true);
+        if(lineWidth == m_lineWidth)
+            lineWidthBtn->setChecked(true);
+
         lineWidthBtn->setIcon(genIconPreviewColor(Qt::white, lineWidth*2));
         connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, [this, lineWidth]() {
             setLineWidth(lineWidth);
             updatePen();
+            updateCurrentLineWidthBtnActive(lineWidth);
         });
-        //connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+        connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+
         m_lineWidthBtns.append(lineWidthBtn);
         pencilLayout->addWidget(lineWidthBtn);
     }
+
+    // if (!m_lineWidthBtns.isEmpty()) {
+    //     for (auto* btn : m_lineWidthBtns) {
+    //         if (btn->toolTip().contains(QString::number(m_lineWidth))) {
+    //             btn->setChecked(true);
+    //             break;
+    //         }
+    //     }
+    // }
 
     QFrame* lineSeparator = new QFrame();
     lineSeparator->setFrameShape(QFrame::VLine);
@@ -202,21 +218,31 @@ void DrawingWidget::initDrawingToolbar(){
             " ",
             PrefManager::instance().getText("tooltip_opacity") + " " + QString::number(opacity)
         );
+
+        opacityBtn->setToggledIconFrame(true);
+        if(opacity == m_opacity)
+            opacityBtn->setChecked(true);
+
         QColor previewColor = Qt::white;
         previewColor.setAlphaF(opacity);
 
         opacityBtn->setIcon(genIconPreviewColor(previewColor));
-        opacityBtn->setToggledIconFrame(true);
+
         connect(opacityBtn, &ToolbarToggleButton::clicked, this, [this, opacity]() {
             setOpacity(opacity);
             setColor(m_color);
             updatePen();
-            updateCurrentOpcityBtnActive(opacity);
+            updateCurrentOpacityBtnActive(opacity);
         });
         connect(opacityBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+
         m_opacityBtns.append(opacityBtn);
         pencilLayout->addWidget(opacityBtn);
     }
+
+    // if(!m_opacityBtns.isEmpty()){
+    //     m_opacityBtns.first()->toolTip().contains(QString::number(m_opacity));
+    // }
 
     // BOUTON GOMME
     m_eraserToolBtn = new ToolbarToggleButton(
@@ -328,6 +354,16 @@ void DrawingWidget::setColor(const QColor &color)
     update();
 }
 
+void DrawingWidget::updateCurrentLineWidthBtnActive(double lineWidth){
+    for (ToolbarToggleButton* lineWidthBtn : m_lineWidthBtns) {
+        if (lineWidthBtn->toolTip().contains(QString::number(lineWidth))) {
+            lineWidthBtn->setChecked(true);
+        } else {
+            lineWidthBtn->setChecked(false);
+        }
+    }
+}
+
 void DrawingWidget::setLineWidth(int width)
 {
     m_lineWidth = width;
@@ -335,7 +371,6 @@ void DrawingWidget::setLineWidth(int width)
 }
 
 void DrawingWidget::updateCurrentOpacityBtnActive(double opacity){
-    // On veut utliser setToggledIconFrame(true) sur les boutons opacityBtn et actualiser quel réglage est actif parmi ces boutons en fonction de la valeur d'opacité actuelle
     for (ToolbarToggleButton* opacityBtn : m_opacityBtns) {
         if (opacityBtn->toolTip().contains(QString::number(opacity))) {
             opacityBtn->setChecked(true);

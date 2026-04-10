@@ -134,8 +134,9 @@ void DrawingWidget::initDrawingToolbar(){
     "",
     PrefManager::instance().getText("tooltip_color_tool")
     );
-    drawingToolbarLayout->addWidget(m_colorToolBtn);
+    m_colorToolBtn->setOnRight(true);
     m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
+    drawingToolbarLayout->addWidget(m_colorToolBtn);
 
     // CHOIX PALETTE COULEUR
     for (const auto& [colorName, color] : m_palette) {
@@ -162,9 +163,11 @@ void DrawingWidget::initDrawingToolbar(){
     false,
     "pencil_white",
     PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(activated)"),
-    "pencil",
+    "pencil_white",
     PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
+    m_pencilToolBtn->setOnRight(true);
+    m_pencilToolBtn->setToggledIconFrame(true);
     connect(m_pencilToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
     drawingToolbarLayout->addWidget(m_pencilToolBtn);
 
@@ -194,15 +197,6 @@ void DrawingWidget::initDrawingToolbar(){
         m_lineWidthBtns.append(lineWidthBtn);
         pencilLayout->addWidget(lineWidthBtn);
     }
-
-    // if (!m_lineWidthBtns.isEmpty()) {
-    //     for (auto* btn : m_lineWidthBtns) {
-    //         if (btn->toolTip().contains(QString::number(m_lineWidth))) {
-    //             btn->setChecked(true);
-    //             break;
-    //         }
-    //     }
-    // }
 
     QFrame* lineSeparator = new QFrame();
     lineSeparator->setFrameShape(QFrame::VLine);
@@ -240,19 +234,16 @@ void DrawingWidget::initDrawingToolbar(){
         pencilLayout->addWidget(opacityBtn);
     }
 
-    // if(!m_opacityBtns.isEmpty()){
-    //     m_opacityBtns.first()->toolTip().contains(QString::number(m_opacity));
-    // }
-
     // BOUTON GOMME
     m_eraserToolBtn = new ToolbarToggleButton(
     m_drawingToolbar,
     false,
     "eraser_white",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
-    "eraser",
+    "eraser_white",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
+    m_eraserToolBtn->setToggledIconFrame(true);
     connect(m_eraserToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
     drawingToolbarLayout->addWidget(m_eraserToolBtn);    
 
@@ -287,6 +278,7 @@ void DrawingWidget::initDrawingToolbar(){
 
 }
 
+// Suppression de tous les traits
 void DrawingWidget::binRequested(){
     if (m_paths.isEmpty())
         return;
@@ -297,13 +289,14 @@ void DrawingWidget::binRequested(){
     update();
 }
 
+// Gestion du changement d'état entre crayon et gomme
 void DrawingWidget::updateToolbarButtonsState(){
     ToolbarToggleButton* senderBtn = qobject_cast<ToolbarToggleButton*>(sender());
     //qDebug() << "updateToolbarButtonsState appelé par : " << senderBtn;
     if (senderBtn == m_pencilToolBtn) {
         if (m_pencilToolBtn->isChecked()) {
             m_eraserToolBtn->setChecked(false);
-            m_eraserToolBtn->setButtonState(false);
+            //m_eraserToolBtn->setButtonState(false);
             m_drawing = true;
             m_erasing = false;
         } else {
@@ -314,7 +307,7 @@ void DrawingWidget::updateToolbarButtonsState(){
     } else if (senderBtn == m_eraserToolBtn) {
         if (m_eraserToolBtn->isChecked()) {
             m_pencilToolBtn->setChecked(false);
-            m_pencilToolBtn->setButtonState(false);
+            //m_pencilToolBtn->setButtonState(false);
             m_erasing = true;
             m_drawing = false;
         } else {
@@ -334,6 +327,7 @@ void DrawingWidget::updateToolbarButtonsState(){
     }
 }
 
+// Génération d'une texture pour la gomme
 QPixmap DrawingWidget::eraseColor(){
     QPixmap brush(8, 8);
     brush.fill(Qt::white);
@@ -345,6 +339,7 @@ QPixmap DrawingWidget::eraseColor(){
     return brush;
 }
 
+// Choix couleur du trait
 void DrawingWidget::setColor(const QColor &color)
 {
     QColor colorWithOpacity = color;
@@ -364,6 +359,7 @@ void DrawingWidget::updateCurrentLineWidthBtnActive(double lineWidth){
     }
 }
 
+// Choix épaisseur du trait
 void DrawingWidget::setLineWidth(int width)
 {
     m_lineWidth = width;
@@ -487,16 +483,13 @@ void DrawingWidget::paintEvent(QPaintEvent *)
     
 
     // Gomme
-    //if (m_erasing && !m_currentEraserPath.isEmpty())
     if (m_erasing)
     {
-        //QPen eraser(Qt::white, m_lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
         QPen eraser;
         QBrush eraserBrush(m_eraseBrush);
         eraserBrush.setStyle(Qt::TexturePattern);
         eraser.setBrush(eraserBrush);
         eraser.setWidth(m_eraserLineWidth);
-        //eraser.setColor(QColor(255, 255, 255, 255));
         eraser.setStyle(Qt::SolidLine);
         eraser.setCapStyle(Qt::RoundCap);
         eraser.setJoinStyle(Qt::RoundJoin);
@@ -508,17 +501,15 @@ void DrawingWidget::paintEvent(QPaintEvent *)
 
 void DrawingWidget::enterEvent(QEnterEvent *event)
 {
-    //activateWindow();
     setFocus(Qt::MouseFocusReason);
-    //raise();
     QWidget::enterEvent(event);
-    qDebug() << "ici";
+    //qDebug() << "ici";
 }
 
 void DrawingWidget::mousePressEvent(QMouseEvent *event)
 {
     setFocus();
-    qDebug() << "pressed";
+    //qDebug() << "pressed";
 
     if (event->button() != Qt::LeftButton || !m_isEnabled)
         return;

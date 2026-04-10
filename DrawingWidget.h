@@ -85,7 +85,7 @@ private:
     bool m_drawing = false;
     bool m_erasing = false;
 
-    ToolbarToggleButton* m_pencilToolBtn = nullptr;
+    ToolbarToggleHoverButton* m_pencilToolBtn = nullptr;
     QVector<ToolbarToggleButton*> m_lineWidthBtns;
     QVector<ToolbarToggleButton*> m_opacityBtns;
     ToolbarToggleHoverButton* m_colorToolBtn = nullptr;

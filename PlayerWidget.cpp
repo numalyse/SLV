@@ -79,7 +79,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
-    connect(m_mediaWidget, &MediaWidget::mediaIsVideoParsed, this, [this](){ m_toolBar->setExtractable(true); });
     connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);

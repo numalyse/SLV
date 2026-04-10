@@ -59,6 +59,13 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
 void ToolbarToggleHoverButton::setOnTop(const bool &onTop)
 {
     m_onTop = onTop;
+    m_onRight = false;
+}
+
+void ToolbarToggleHoverButton::setOnRight(const bool &onRight)
+{
+    m_onRight = onRight;
+    m_onTop = false;
 }
 
 void ToolbarToggleHoverButton::moveWidget()
@@ -71,6 +78,11 @@ void ToolbarToggleHoverButton::moveWidget()
     int y = globalPos.y() - m_widgetToDisplay->height();
     if(!m_onTop){
         y = globalPos.y() + height();
+    }
+
+    if(m_onRight){
+        x = globalPos.x() + width() + 10;
+        y = globalPos.y() + (height() / 2) - (m_widgetToDisplay->height() / 2);
     }
 
     QRect popupRect(x, y,

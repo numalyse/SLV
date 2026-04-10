@@ -38,11 +38,6 @@
     "tooltip_extract_sequence": "Extract sequence",
     "tooltip_prev_frame": "Previous frame",
     "tooltip_next_frame": "Next frame",
-    "tooltip_segmentation_auto" : "Auto-segmentation",
-    "tooltip_ab_loop": "Create an A-B loop",
-    "tooltip_merge_with_prev_shot": "Merge with the previous shot",
-    "tooltip_merge_with_next_shot": "Merge with the next shot",
-    "tooltip_export": "Export",
 
     "tooltip_grid" : "Change disposal",
     "tooltip_view_grid" : "Change grid view",
@@ -66,7 +61,14 @@
     "tooltip_to_next_shot" : "Go to the next shot",
     "tooltip_to_prev_shot" : "Go to the previous shot",
 
+    "tooltip_segmentation_auto" : "Auto-segmentation",
+
     "tooltip_split_shot" : "Split the shot",
+    "tooltip_ab_loop": "Create an A-B loop",
+    "tooltip_merge_with_prev_shot": "Merge with the previous shot",
+    "tooltip_merge_with_next_shot": "Merge with the next shot",
+    "tooltip_export": "Export",
+
     "timeline_split_shot_at_cursor" : "Cut at cursor",
     "timeline_ab_action_0": "Add marker A at cursor",
     "timeline_ab_action_1": "Add marker B at cursor",
@@ -74,6 +76,7 @@
     "timeline_ab_extraxt": "Extract AB sequence",
     "timeline_merge_with_previous_shot" : "Merge the current shot with the previous shot", 
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
+
     "export_running": "Exporting...",
     "export_directory_path_title": "Select export folder",
     "export_type_txt": "Text file (*.txt)",
@@ -85,9 +88,11 @@
     "export_type_tagimage": "TagImages (*.png)",
     "export_type_unknown": "All files (*.*)",
     "export_file_path_title": "Save as...",
+
     "export_format_selection_title" : "Export format",
     "export_format_selection_txt" : "Select export format",
     "export_format_selection_txt_tagImage" : "TagImages",
+
     "timeline_dialog_title_auto_segmentation": "Auto segmentation",
     "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",
     "dialog_auto_segmentation_title": "Auto segmentation",
@@ -171,7 +176,7 @@
     "tooltip_erase_point" : "Point eraser",
     "tooltip_bin_tool" : "Bin",
     "tooltip_undo_tool" : "Undo",
-    "tooltip_redo_tool" : "Redo"
+    "tooltip_redo_tool" : "Redo",
 
     "generic_btn_ok": "OK",
     "generic_btn_save": "Save",

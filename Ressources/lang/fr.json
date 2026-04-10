@@ -62,11 +62,13 @@
     "tooltip_to_prev_shot" : "Aller plan précédent",
 
     "tooltip_segmentation_auto" : "Segmenter automatiquement",
+
     "tooltip_split_shot" : "Scinder le plan",
     "tooltip_ab_loop": "Créer une boucle A-B",
     "tooltip_merge_with_prev_shot": "Fusionner avec le plan précédent",
     "tooltip_merge_with_next_shot": "Fusionner avec le plan suivant",
     "tooltip_export": "Exporter",
+
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
@@ -86,7 +88,6 @@
     "export_type_tagimage": "TagImages (*.png)",
     "export_type_unknown": "Tous les fichiers (*.*)",
     "export_file_path_title": "Enregistrer sous...",
-
 
     "export_format_selection_title" : "Format exportation",
     "export_format_selection_txt" : "Sélectionner un format d'éxportation",
@@ -134,6 +135,7 @@
     "main_window_file_open_media_action": "Ouvrir des fichiers multimédia",
     "main_window_file_open_project_action": "Ouvrir un projet",
     "main_window_file_save_project_action": "Enregistrer",
+    "project_manager_open_project_dialog" : "Ouvrir un projet",
 
     "main_window_menu_bar_option" : "Options",
     "main_window_option_open_pref" :  "Préférences",
@@ -174,7 +176,8 @@
     "tooltip_erase_point" : "Gomme de point",
     "tooltip_bin_tool" : "Poubelle",
     "tooltip_undo_tool" : "Annuler",
-    "tooltip_redo_tool" : "Refaire"
+    "tooltip_redo_tool" : "Refaire",
+
     "generic_btn_ok" : "Ok",
     "generic_btn_save" : "Sauvegarder",
     "generic_btn_cancel" : "Annuler",
@@ -233,8 +236,6 @@
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
 
     "interface_lang_code" : "Langue de l'interface : ",
-
-    "project_manager_open_project_dialog" : "Ouvrir un projet",
 
     "project_window_title_copy_video": "Création du projet : copie de la vidéo en cours...",
     "project_manager_create_project_dialog": "Créer un projet",

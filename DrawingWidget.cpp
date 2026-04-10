@@ -105,7 +105,7 @@ void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
     m_drawingToolbar->setContentsMargins(0,0,0,0);
     containerBackground = new QFrame(m_drawingToolbar);
-    containerBackground->move(20, m_mediaRect.height()-m_drawingToolbar->height()-20);
+    //containerBackground->move(20, m_mediaRect.height()-m_drawingToolbar->height()-20);
     containerBackground->setContentsMargins(0,0,0,0);
     //containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
     m_drawingToolbar->setStyleSheet(
@@ -259,7 +259,7 @@ void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar->hide();
 
     // BOUTON ANNULER
-    ToolbarButton* m_undoToolBtn = new ToolbarButton(
+    m_undoToolBtn = new ToolbarButton(
         m_drawingToolbar,
         "undo_white",
         PrefManager::instance().getText("tooltip_undo_tool")
@@ -268,13 +268,36 @@ void DrawingWidget::initDrawingToolbar(){
     drawingToolbarLayout->addWidget(m_undoToolBtn);
 
     // BOUTON RETABLIR
-    ToolbarButton* m_redoToolBtn = new ToolbarButton(
+    m_redoToolBtn = new ToolbarButton(
         m_drawingToolbar,
         "redo_white",
         PrefManager::instance().getText("tooltip_redo_tool")
     );
     connect(m_redoToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::redoDrawing);
     drawingToolbarLayout->addWidget(m_redoToolBtn);
+
+    // BOUTON MINIMISER TOOLBAR
+    m_minimizeToolbarBtn = new ToolbarToggleButton(
+        m_drawingToolbar,
+        false,
+        "plus_white",
+        PrefManager::instance().getText("tooltip_expand_toolbar"),
+        "minus_white",
+        PrefManager::instance().getText("tooltip_minimize_toolbar")
+    );
+    connect(m_minimizeToolbarBtn, &ToolbarToggleButton::clicked, this, [this]() {
+        const bool minimized = m_minimizeToolbarBtn->isChecked();
+        m_minimizeToolbarBtn->setChecked(minimized);
+        m_minimizeToolbarBtn->setButtonState(minimized);
+
+        m_colorToolBtn->setVisible(!minimized);
+        m_eraserToolBtn->setVisible(!minimized);
+        m_binToolBtn->setVisible(!minimized);
+        m_undoToolBtn->setVisible(!minimized);
+        m_redoToolBtn->setVisible(!minimized);
+        emit onMediaRectChanged(m_mediaRect);
+    });
+    drawingToolbarLayout->addWidget(m_minimizeToolbarBtn);
 
 }
 
@@ -455,7 +478,9 @@ void DrawingWidget::onMediaRectChanged(const QRect &rect)
 
     m_mediaRect = rect;
     if(containerBackground)
-        containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
+        //containerBackground->setGeometry(20, m_mediaRect.height()-200-20, 50, 200);
+        containerBackground->adjustSize();
+        containerBackground->move(20, m_mediaRect.height()-containerBackground->height()-20);
     if(m_drawingSurface)
         m_drawingSurface->setGeometry(m_mediaRect);
     update();

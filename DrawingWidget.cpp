@@ -112,7 +112,6 @@ void DrawingWidget::initDrawingToolbar(){
     "",
     PrefManager::instance().getText("tooltip_color_tool")
     );
-    //connect(m_colorToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::);
     drawingToolbarLayout->addWidget(m_colorToolBtn);
     m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
 
@@ -128,7 +127,8 @@ void DrawingWidget::initDrawingToolbar(){
             setColor(color);
             m_colorToolBtn->setIcon(genIconPreviewColor(color));
             updatePen();
-        });
+        });    
+        connect(colorBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
         colorLayout->addWidget(colorBtn);
     }
 
@@ -161,6 +161,7 @@ void DrawingWidget::initDrawingToolbar(){
             setLineWidth(lineWidth);
             updatePen();
         });
+        connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
         pencilLayout->addWidget(lineWidthBtn);
     }
 
@@ -180,13 +181,14 @@ void DrawingWidget::initDrawingToolbar(){
         );
         QColor previewColor = Qt::white;
         previewColor.setAlphaF(opacity);
-        
+
         opacityBtn->setIcon(genIconPreviewColor(previewColor));
         connect(opacityBtn, &ToolbarToggleButton::clicked, this, [this, opacity]() {
             setOpacity(opacity);
             setColor(m_color);
             updatePen();
         });
+        connect(opacityBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
         pencilLayout->addWidget(opacityBtn);
     }
 
@@ -245,6 +247,7 @@ void DrawingWidget::binRequested(){
 
 void DrawingWidget::updateToolbarButtonsState(){
     ToolbarToggleButton* senderBtn = qobject_cast<ToolbarToggleButton*>(sender());
+    //qDebug() << "updateToolbarButtonsState appelé par : " << senderBtn;
     if (senderBtn == m_pencilToolBtn) {
         if (m_pencilToolBtn->isChecked()) {
             m_eraserToolBtn->setChecked(false);
@@ -266,6 +269,16 @@ void DrawingWidget::updateToolbarButtonsState(){
             m_erasing = false;
         }
         m_eraserToolBtn->setButtonState(m_eraserToolBtn->isChecked());
+    } else {
+        // C'est un bouton de réglage (couleur, épaisseur, opacité), on veut que m_drawing soit activé
+        if (!m_drawing) {
+            m_pencilToolBtn->setChecked(true);
+            m_pencilToolBtn->setButtonState(true);
+            m_eraserToolBtn->setChecked(false);
+            m_eraserToolBtn->setButtonState(false);
+            m_drawing = true;
+            m_erasing = false;
+        }
     }
 }
 

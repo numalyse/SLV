@@ -150,7 +150,7 @@ void DrawingWidget::initDrawingToolbar(){
             m_colorToolBtn->setIcon(genIconPreviewColor(color));
             updatePen();
         });    
-        connect(colorBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+        connect(colorBtn, &ToolbarButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
         colorLayout->addWidget(colorBtn);
     }
 
@@ -300,6 +300,9 @@ void DrawingWidget::updateToolbarButtonsState(){
             m_eraserToolBtn->setButtonState(false);
             m_drawing = true;
             m_erasing = false;
+
+            // On veut utliser setToggledIconFrame(true) sur les boutons opacityBtn quel réglage est actif par ces boutons
+
         }
     }
 }

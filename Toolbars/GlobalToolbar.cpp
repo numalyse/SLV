@@ -100,14 +100,15 @@ void GlobalToolbar::addShortcuts(){
     auto& prefManager = PrefManager::instance();
     QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
     
+    addEnterFullscreenShortcut();
+
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("play_pause").toString(), m_playPauseBtn));
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
-    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("enter_fullscreen").toString(), m_fullscreenBtn,  false));
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
 }
 
 void GlobalToolbar::disableFullscreenRequested(){
-    m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar" , "enter_fullscreen")));
+    addEnterFullscreenShortcut();
     emit disableFullscreenRequest();
 }

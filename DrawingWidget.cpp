@@ -160,9 +160,9 @@ void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar, 
     pencilLayout,
     false,
-    "auto_segmentation_white",
+    "pencil_white",
     PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(activated)"),
-    "auto_segmentation",
+    "pencil",
     PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
     connect(m_pencilToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
@@ -218,9 +218,9 @@ void DrawingWidget::initDrawingToolbar(){
     m_eraserToolBtn = new ToolbarToggleButton(
     m_drawingToolbar,
     false,
-    "auto_segmentation_white",
+    "eraser_white",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
-    "auto_segmentation",
+    "eraser",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
     connect(m_eraserToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);

@@ -44,7 +44,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         if(m_toolbarWidget){
             m_toolbarWidget->setParent(this);
             m_toolbarWidget->setDefaultUI();
-            layout->addWidget(m_toolbarWidget);
+            layout->insertWidget(1, m_toolbarWidget);
         }
         disableFullscreenMainRequested();
     });

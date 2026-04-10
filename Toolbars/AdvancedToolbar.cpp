@@ -103,7 +103,6 @@ void AdvancedToolbar::addShortcuts(){
 
     m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("play_pause").toString(), m_playPauseBtn));
     m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
-    //m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("enter_fullscreen").toString(), m_fullscreenBtn,  false));
     m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
     m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
 

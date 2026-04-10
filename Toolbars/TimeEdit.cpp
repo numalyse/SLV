@@ -61,7 +61,7 @@ void TimeEdit::focusOutEvent(QFocusEvent *e)
     
     QPropertyAnimation *animMax = new QPropertyAnimation(this, "maximumWidth");
     animMax->setDuration(150);
-    animMin->setStartValue(width());
+    animMax->setStartValue(width());
     animMax->setEndValue(75);
 
     animMin->start(QAbstractAnimation::DeleteWhenStopped);

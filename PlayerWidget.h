@@ -6,6 +6,7 @@
 #include "DrawingWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "ExtractSequenceWidget.h"
+#include "SignalManager.h"
 
 #include <QWidget>
 #include <qmainwindow.h>
@@ -35,6 +36,7 @@ public slots:
     void play();
     void playFromAdvanced();
     void pause();
+    void togglePlayPause(bool isPlaying);
     void stop();
     void eject();
     void enablePlayerFullscreen();

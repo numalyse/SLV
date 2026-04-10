@@ -43,6 +43,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr) emit enableSegmentationRequest();
     });
     m_extensionBtn->setIconSize(QSize(13, 13));
+
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
         // cache l'extension et cache le mode segmentation
         m_extensionToolbar->hide();
@@ -64,6 +65,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableRecordRequested, this, &AdvancedToolbar::enableRecordRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::disableRecordRequested, this, &AdvancedToolbar::disableRecordRequested);
+
+    connect(m_extensionToolbar, &ExtensionToolbar::prevFrameRequested, this, &AdvancedToolbar::prevFrameRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::nextFrameRequested, this, &AdvancedToolbar::nextFrameRequested);
     
     connect(m_extensionToolbar, &ExtensionToolbar::setOverlayModeRequested, this, &AdvancedToolbar::setOverlayModeRequested);
     
@@ -99,7 +103,7 @@ void AdvancedToolbar::addShortcuts(){
     m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
     m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
     m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
-    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("capture").toString()));
+    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("screenshot").toString()));
 
     m_nextMediaBtn->setShortcut(QKeySequence(atShortcuts.value("next_media").toString()));
     m_prevMediaBtn->setShortcut(QKeySequence(atShortcuts.value("prev_media").toString()));

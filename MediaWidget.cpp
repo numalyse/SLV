@@ -5,6 +5,7 @@
 #include "Media.h"
 #include "SequenceExtractionHelper.h"
 #include "MediaTransformHelper.h"
+#include "PrefManager.h"
 
 #include <QFile>
 #include <QUrl>
@@ -52,6 +53,8 @@ MediaWidget::MediaWidget(QWidget *parent)
         return;
     }
     m_player = libvlc_media_player_new(m_vlcInstance);
+    libvlc_video_set_mouse_input(m_player, 0);
+    libvlc_video_set_key_input(m_player, 0);
 
     createEventManager();
 
@@ -59,11 +62,8 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
-    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique, 
+    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique,
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-    libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
     connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
@@ -107,7 +107,7 @@ MediaWidget::~MediaWidget()
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     }
     
     m_videoCaptureManager.deleteMediaTempDirectory();
@@ -170,6 +170,8 @@ bool MediaWidget::eject()
         }
 
         m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+        libvlc_video_set_mouse_input(m_player, 0);
+        libvlc_video_set_key_input(m_player, 0);
         
         QMetaObject::invokeMethod(this, [this]() {
             releaseMedia();
@@ -292,7 +294,8 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
 void MediaWidget::takeScreenshot()
 {
     if (!m_player) return;
-    QString captureDirectory = QDir::homePath() + "/SLV_Content/Captures_Images/"+ m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(libvlc_media_player_get_time(m_player), m_media->fps()) +".png";
+    auto& prefManager = PrefManager::instance();
+    QString captureDirectory = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
 
     // if there is a problem with media resolution here, make sure to recieve Media::resolutionParsed(tuple<int, int>) signal first
     if(m_rotationIndex % 2 == 0)
@@ -304,15 +307,16 @@ void MediaWidget::takeScreenshot()
 void MediaWidget::setTime(int64_t time)
 {
     if(!m_player) return;
-    m_videoCaptureManager.mediaCutAndConcat(libvlc_media_player_get_time(m_player), time);
+    m_videoCaptureManager.mediaCutAndConcat(getCurrentTime(), time);
     libvlc_media_player_set_time(m_player, time);
+    m_vlcTime = time;
     emit vlcTimeChanged(time);
 }
 
 void MediaWidget::moveTimeBackward()
 {
     int64_t time = -5000;
-    int64_t currentTime = libvlc_media_player_get_time(m_player);
+    int64_t currentTime = getCurrentTime();
     if(currentTime + time > 5000){
         setTime(currentTime + time);
     }else{
@@ -323,7 +327,7 @@ void MediaWidget::moveTimeBackward()
 void MediaWidget::moveTimeForward()
 {
     int64_t time = 5000;
-    int64_t currentTime = libvlc_media_player_get_time(m_player);
+    int64_t currentTime = getCurrentTime();
     setTime(currentTime + time);
 }
 
@@ -351,16 +355,30 @@ void MediaWidget::showMedia()
 void MediaWidget::startRecord()
 {
     if(!m_player || !m_media) return;
-    m_videoCaptureManager.startMediaRecording(libvlc_media_player_get_time(m_player));
+    m_videoCaptureManager.startMediaRecording(getCurrentTime());
 }
 
 void MediaWidget::endRecord()
 {
     if(!m_player) return;
 
-    int endTime = libvlc_media_player_get_time(m_player);
+    int endTime = getCurrentTime();
     pause();
-    QString saveRecordPath = QFileDialog::getSaveFileName(this, tr("Save record"), m_media->filePath());
+    auto& prefManager = PrefManager::instance();
+    QString saveRecordPath = QFileDialog::getSaveFileName(
+        this, 
+        prefManager.getText("dialog_capture"),
+        prefManager.getPref("Paths", "lp_capture")
+    );
+
+    if (saveRecordPath.isEmpty()){
+        qDebug() << "[MediaWidget] Enregistrement de la capture annulé";
+        return;
+    }
+
+    QFileInfo fileInfo (saveRecordPath);
+    prefManager.setPref("Paths", "lp_capture", fileInfo.absolutePath());
+
     saveRecordPath += '.' + m_media->fileExtension();
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
@@ -385,6 +403,8 @@ void MediaWidget::transformMedia()
 
     m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
     m_player = libvlc_media_player_new(m_vlcInstance);
+    libvlc_video_set_mouse_input(m_player, 0);
+    libvlc_video_set_key_input(m_player, 0);
 
     createEventManager();
 
@@ -420,6 +440,28 @@ void MediaWidget::vFlip()
     vFlipUiUpdateRequested();
 }
 
+void MediaWidget::nextFrame()
+{
+    if(!m_player || !m_media) return;
+    pause();
+
+    // libvlc_media_player_next_frame(m_player);
+    const int newTime = getCurrentTime() + int(1000/m_media->fps());
+    setTime(newTime);
+    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+    emit vlcTimeChanged(m_vlcTime);
+
+}
+
+void MediaWidget::prevFrame()
+{
+    if(!m_player || !m_media) return;
+    pause();
+    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+    const int newTime = getCurrentTime() - int(1000/m_media->fps());
+    setTime(newTime);
+}
+
 QPoint MediaWidget::getMediaPosRect() const
 {
     return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());
@@ -451,6 +493,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {
+        mediaWidget->m_vlcTime = event->u.media_player_time_changed.new_time;
         emit mediaWidget->vlcTimeChanged(event->u.media_player_time_changed.new_time);
     }
     else if(event->type == libvlc_MediaPlayerEndReached){
@@ -506,7 +549,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
 void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
-    emit activated(this);
+    emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
     QWidget::mousePressEvent(event);
 }
 
@@ -584,7 +627,7 @@ void MediaWidget::releaseEventManager(){
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";

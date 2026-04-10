@@ -1,5 +1,8 @@
 #include "Timeline/ABManager.h"
 #include "ABManager.h"
+#include "PrefManager.h"
+#include "SequenceExtractionHelper.h"
+#include "Project/ProjectManager.h"
 
 ABManager::ABManager(QGraphicsScene *scene, TimelineMath *mathManager, QObject *parent)
 : QObject(parent), p_scene{scene}, p_mathManager{mathManager}
@@ -96,4 +99,29 @@ void ABManager::updateMarkersPosition(){
         newXPos = marker->time() * p_mathManager->pixelsPerMs();
         marker->setX(newXPos);
     }
+}
+
+void ABManager::extractLoop()
+{
+    if(m_abMarkersItems.size() < 2) return;
+
+    auto& prefManager = PrefManager::instance();
+    auto& projManager = ProjectManager::instance();
+    QFileInfo mediaFileInfo(projManager.mediaPath());
+
+    if( ! mediaFileInfo.exists() ) return;
+
+    // if the project is saved in a folder, use it else use prefmanager export path
+    QString dialogDir = (projManager.projet()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.projet()->path;
+
+    QString selectedPath = QFileDialog::getSaveFileName(
+        nullptr, 
+        prefManager.getText("export_file_path_title"), 
+        dialogDir
+    );
+
+    selectedPath += '.' + mediaFileInfo.suffix();
+
+    SequenceExtractionHelper::extractSequence( mediaFileInfo.filePath() ,m_abMarkersItems[0]->time(), m_abMarkersItems[1]->time(), selectedPath);
+
 }

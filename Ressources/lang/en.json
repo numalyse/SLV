@@ -31,7 +31,18 @@
     "tooltip_loop_on" : "Activate loop",
     "tooltip_delete_player" : "Delete player",
     "tooltip_duplicate_player" : "Duplicate player",
-    "tooltip_lang" : "Langages and subtitles",
+    "tooltip_lang" : "Languages and subtitles",
+    "tooltip_slider_disabled" : "Remove the A/B loop to reactivate",
+
+    "tooltip_time_total_btn": "Show total / remaining time",
+    "tooltip_extract_sequence": "Extract sequence",
+    "tooltip_prev_frame": "Previous frame",
+    "tooltip_next_frame": "Next frame",
+    "tooltip_segmentation_auto" : "Auto-segmentation",
+    "tooltip_ab_loop": "Create an A-B loop",
+    "tooltip_merge_with_prev_shot": "Merge with the previous shot",
+    "tooltip_merge_with_next_shot": "Merge with the next shot",
+    "tooltip_export": "Export",
 
     "tooltip_grid" : "Change disposal",
     "tooltip_view_grid" : "Change grid view",
@@ -63,6 +74,24 @@
     "timeline_ab_extraxt": "Extract AB sequence",
     "timeline_merge_with_previous_shot" : "Merge the current shot with the previous shot", 
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
+    "export_running": "Exporting...",
+    "export_directory_path_title": "Select export folder",
+    "export_type_txt": "Text file (*.txt)",
+    "export_type_pdf": "PDF document (*.pdf)",
+    "export_type_pptx": "PowerPoint presentation (*.pptx)",
+    "export_type_docx": "Word document (*.docx)",
+    "export_type_mp4": "MP4 video (*.mp4)",
+    "export_type_src": "Source file (*.src)",
+    "export_type_tagimage": "TagImages (*.png)",
+    "export_type_unknown": "All files (*.*)",
+    "export_file_path_title": "Save as...",
+    "export_format_selection_title" : "Export format",
+    "export_format_selection_txt" : "Select export format",
+    "export_format_selection_txt_tagImage" : "TagImages",
+    "timeline_dialog_title_auto_segmentation": "Auto segmentation",
+    "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",
+    "dialog_auto_segmentation_title": "Auto segmentation",
+    "dialog_auto_segmentation_text": "Do you want to start automatic segmentation? Once completed, it will overwrite the current segmentation.",
 
     "cancel_action" : "Cancel",
 
@@ -93,7 +122,7 @@
     "extract_start_label" : "Start",
     "extract_end_label" : "End",
     "open_files" : "Open files",
-    "file_video" : "Vidéo file",
+    "file_video" : "Video file",
     "file_image" : "Image file",
     "file_audio" : "Audio file",
 
@@ -101,6 +130,10 @@
     "main_window_file_open_media_action": "Open multimedia files",
     "main_window_file_open_project_action": "Open a project",
     "main_window_file_save_project_action": "Save",
+    "project_manager_open_project_dialog" : "Open a project",
+
+    "main_window_menu_bar_option": "Options",
+    "main_window_option_open_pref": "Preferences",
 
     "(activated)" : "(Activated)",
     "(deactivated)" : "(Deactivated)",
@@ -114,6 +147,8 @@
     "tooltip_sort_playlist" : "Sort playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
+    "sort_addition_down_playlist" : "By addition ↓",
+    "sort_addition_up_playlist" : "By addition ↑",
     "tooltip_add_item_playlist" : "Add media",
     "delete" : "Delete",
     "duration" : "Duration",
@@ -137,4 +172,68 @@
     "tooltip_bin_tool" : "Bin",
     "tooltip_undo_tool" : "Undo",
     "tooltip_redo_tool" : "Redo"
+
+    "generic_btn_ok": "OK",
+    "generic_btn_save": "Save",
+    "generic_btn_cancel": "Cancel",
+
+    "generic_dialog_btn_yes": "Yes",
+    "generic_dialog_btn_no": "No",
+    "generic_dialog_btn_cancel": "Cancel",
+
+    "dialog_update_shortcut_conflict_title": "Shortcut Conflict",
+    "dialog_update_shortcut_conflict_text": "The chosen shortcut is already used by : ",
+    "dialog_update_shortcut_conflict_text_info": "Do you want to overwrite it?",
+
+    "dialog_preference_restart_to_apply_tittle": "Restart Required",
+    "dialog_preference_restart_to_apply_text": "An application restart is required to apply the changes.",
+    "dialog_preference_save_tilte": "Save Preferences",
+    "dialog_preference_save_text": "Do you want to save your changes?",
+
+    "dialog_preference_tab_interface": "Interface",
+    "dialog_preference_tab_shortcut": "Shortcuts",
+    "dialog_preference_tab_paths": "Paths",
+
+    "shortcut_subsection_MainWindow": "Main Window",
+    "shortcut_subsection_CommonToolbar": "Standard Toolbar",
+    "shortcut_subsection_AdvancedTB": "Advanced Toolbar",
+    "shortcut_subsection_ExtensionTB": "Additional Options",
+
+    "shortcut_open_media": "Open Media",
+    "shortcut_open_project": "Open Project",
+    "shortcut_save_project": "Save Project",
+
+    "shortcut_play_pause": "Play / Pause",
+    "shortcut_stop": "Stop",
+    "shortcut_mute": "Mute",
+    "shortcut_enter_fullscreen": "Enter Fullscreen",
+    "shortcut_exit_fullscreen": "Exit Fullscreen",
+    "shortcut_screenshot": "Screenshot",
+
+    "shortcut_increase_speed": "Increase Speed",
+    "shortcut_decrease_speed": "Decrease Speed",
+    "shortcut_base_speed": "Normal Speed",
+    "shortcut_next_media": "Next Media",
+    "shortcut_prev_media": "Previous Media",
+    "shortcut_loop": "Loop",
+
+    "shortcut_backward": "Skip backward X seconds",
+    "shortcut_forward": "Skip forward X seconds",
+    "shortcut_h_flip": "Horizontal Flip",
+    "shortcut_hide_img": "Hide Image",
+    "shortcut_record": "Start/Stop Recording",
+    "shortcut_rotate": "Rotate",
+    "shortcut_v_flip": "Vertical Flip",
+
+    "shortcut_prev_frame": "Previous Frame",
+    "shortcut_next_frame": "Next Frame",
+
+    "paths_screenshot": "Screenshot Save Folder",
+
+    "interface_lang_code": "Interface Language : ",
+
+    "project_window_title_copy_video": "Project creation: copying current video...",
+    "project_manager_create_project_dialog": "Create project",
+    "project_manager_create_project_dialog_file_type": "Project folder"
+
 }

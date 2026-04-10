@@ -24,6 +24,7 @@ public:
     /// @brief Modifie l'état du bouton sans avoir besoin d'utiliser les signaux
     /// @param state 
     void setButtonState(bool state);
+    void setToggledIconFrame(bool framed);
 
     inline static const QString ICONS_PATH = ":/icons/";
 

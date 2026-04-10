@@ -4,6 +4,8 @@
 #include <QString>
 #include <QJsonObject>
 
+#include <utility>
+
 /// @brief Singleton pour gérer les différentes langues
 class PrefManager {
 
@@ -33,28 +35,48 @@ public:
 
     /// @brief Gets an entire subcategory
     /// retrieves the default subcategory then adds user prefs, also checks is user pref key is in default pref. Prevents user adding random keys
-    /// @param category
     QJsonObject getCategory(const QString &category) const;
 
     /// @brief Gets an entire category
     /// retrieves the default category then adds user prefs, also checks is user pref key is in default pref. Prevents user adding random keys
-    /// @param category
-    /// @param subCategory
     QJsonObject getSubCategory(const QString &category, const QString &subCategory) const;
 
     /// @brief Finds the value of the specified key in the specified category
-    /// @param category 
-    /// @param key 
     /// @return If key was found, returns its value otherwise "[key]"
     QString getPref(const QString &category, const QString &key) const;
     QString getPref(const QString &category, const QString &subCategory, const QString &key) const;
 
+    /// @brief Traverse :/lang folder an retrieve the base name of each files
+    /// @return list of all file name, ex : "fr", "en" 
+    QStringList getAvailableLangs();
+
+    /// @brief Writes directly to the json file the value of the key
+    /// @return True if successfully written to, false otherwise 
+    bool setPref(const QString &category, const QString &key, const QString &value);
+    bool setPref(const QString &category, const QString &subCategory, const QString &key, const QString &value);
+
+    /// @brief Rewrites the whole category to the user pref json
+    /// @return True if successfully written to, false otherwise  
+    bool setCategory(const QString &category, const QJsonObject &categoryData);
+
+    /// @brief Write all the data of m_userPrefs in the json file
+    /// @return True if successfully written to, false otherwise  
+    bool writeUserJson();
+
 private:
     /// @brief Creates the preference file in SLV Contents
-    /// @return True if successfully created false otherwise 
+    /// @return True if successfully created, false otherwise 
     bool createPreferenceFile(const QString &filePath);
 
+    /// @brief Recursive function that traverses the JSON object and adds any missing default keys to user keys.
+    /// @param defaultObj The reference JSON object containing the default preferences.
+    /// @param userObj The user's JSON object that needs to be updated with missing keys.
+    /// @return True if 'userObj' was modified (missing keys were added), false otherwise.
+    bool mergeMissingKeys(const QJsonObject& defaultObj, QJsonObject& userObj);
 
+    /// @brief Checks if the user pref are missing keys from default prefs,
+    /// sets the paths if they are empty and writes to the json if m_userPrefs was modified 
+    void syncUserPrefs();
 
     PrefManager() {} ;
 

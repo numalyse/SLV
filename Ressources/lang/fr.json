@@ -32,6 +32,12 @@
     "tooltip_delete_player" : "Supprimer un lecteur",
     "tooltip_duplicate_player" : "Dupliquer un lecteur",
     "tooltip_lang" : "Langues et sous-titres",
+    "tooltip_slider_disabled" : "Supprimer la boucle A/B pour réactiver", 
+
+    "tooltip_time_total_btn": "Afficher le temps total / restant",
+    "tooltip_extract_sequence": "Extraire la séquence",
+    "tooltip_prev_frame": "Image précédente",
+    "tooltip_next_frame": "Image suivante",
 
     "tooltip_grid" : "Changer la disposition",
     "tooltip_view_grid" : "Changer la vue en grille",
@@ -55,7 +61,12 @@
     "tooltip_to_next_shot" : "Aller au plan suivant",
     "tooltip_to_prev_shot" : "Aller plan précédent",
 
+    "tooltip_segmentation_auto" : "Segmenter automatiquement",
     "tooltip_split_shot" : "Scinder le plan",
+    "tooltip_ab_loop": "Créer une boucle A-B",
+    "tooltip_merge_with_prev_shot": "Fusionner avec le plan précédent",
+    "tooltip_merge_with_next_shot": "Fusionner avec le plan suivant",
+    "tooltip_export": "Exporter",
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
@@ -63,6 +74,28 @@
     "timeline_ab_extraxt": "Extraire la séquence AB",
     "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
     "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
+    
+    "export_running": "Exportation en cours...",
+    "export_directory_path_title": "Sélectionner un dossier d'exportation",
+    "export_type_txt": "Fichier texte (*.txt)",
+    "export_type_pdf": "Document PDF (*.pdf)",
+    "export_type_pptx": "Présentation PowerPoint (*.pptx)",
+    "export_type_docx": "Document Word (*.docx)",
+    "export_type_mp4": "Vidéo MP4 (*.mp4)",
+    "export_type_src": "Fichier source (*.src)",
+    "export_type_tagimage": "TagImages (*.png)",
+    "export_type_unknown": "Tous les fichiers (*.*)",
+    "export_file_path_title": "Enregistrer sous...",
+
+
+    "export_format_selection_title" : "Format exportation",
+    "export_format_selection_txt" : "Sélectionner un format d'éxportation",
+    "export_format_selection_txt_tagImage" : "TagImages",
+
+    "timeline_dialog_title_auto_segmentation": "Segmentation automatique",
+    "timeline_dialog_text_auto_segmentation": "Segmentation en cours...",
+    "dialog_auto_segmentation_title": "Segmentation automatique",
+    "dialog_auto_segmentation_text": "Voulez-vous lancer la segmentation automatique ?\n Une fois terminée, elle écrasera la segmentation actuelle.",
 
     "cancel_action" : "Annuler",
     
@@ -102,6 +135,9 @@
     "main_window_file_open_project_action": "Ouvrir un projet",
     "main_window_file_save_project_action": "Enregistrer",
 
+    "main_window_menu_bar_option" : "Options",
+    "main_window_option_open_pref" :  "Préférences",
+
     "(activated)" : "(Activé)",
     "(deactivated)" : "(Désactivé)",
 
@@ -114,6 +150,8 @@
     "tooltip_sort_playlist" : "Trier la playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
+    "sort_addition_down_playlist" : "Par ajout ↓",
+    "sort_addition_up_playlist" : "Par ajout ↑",
     "tooltip_add_item_playlist" : "Ajouter un média",
     "delete" : "Supprimer",
     "duration" : "Durée",
@@ -137,5 +175,69 @@
     "tooltip_bin_tool" : "Poubelle",
     "tooltip_undo_tool" : "Annuler",
     "tooltip_redo_tool" : "Refaire"
+    "generic_btn_ok" : "Ok",
+    "generic_btn_save" : "Sauvegarder",
+    "generic_btn_cancel" : "Annuler",
+
+    "generic_dialog_btn_yes" : "Oui",
+    "generic_dialog_btn_no" : "Non",
+    "generic_dialog_btn_cancel" : "Annuler",
+
+    "dialog_update_shortcut_conflict_title" : "Conflit de raccourcis",
+    "dialog_update_shortcut_conflict_text" : "Le raccourci choisi est déjà utilisé par : ",
+    "dialog_update_shortcut_conflict_text_info" : "Voulez-vous l'écraser ?",
+
+    "dialog_preference_restart_to_apply_tittle" : "Redémarrage requis",
+    "dialog_preference_restart_to_apply_text" : "Un redémarrage de l'application est nécessaire pour prendre en compte les changements.",
+    "dialog_preference_save_tilte" : "Sauvegarde des préférences",
+    "dialog_preference_save_text" : "Voulez-vous sauvegarder vos changements ?",
+
+    "dialog_preference_tab_interface" : "Interface",
+    "dialog_preference_tab_shortcut" : "Raccourcis",
+    "dialog_preference_tab_paths" : "Chemins",
+
+    "shortcut_subsection_MainWindow": "Fenêtre principale",
+    "shortcut_subsection_CommonToolbar": "Barre d'outils standard",
+    "shortcut_subsection_AdvancedTB": "Barre d'outils avancée",
+    "shortcut_subsection_ExtensionTB": "Options supplémentaires",
+
+    "shortcut_open_media": "Ouvrir un média",
+    "shortcut_open_project": "Ouvrir un projet",
+    "shortcut_save_project": "Enregistrer le projet",
+
+    "shortcut_play_pause": "Lecture / Pause",
+    "shortcut_stop": "Arrêter",
+    "shortcut_mute": "Couper le son",
+    "shortcut_enter_fullscreen": "Passer en plein écran",
+    "shortcut_exit_fullscreen": "Quitter le plein écran",
+    "shortcut_screenshot": "Capture d'écran",
+
+    "shortcut_increase_speed": "Augmenter la vitesse",
+    "shortcut_decrease_speed": "Diminuer la vitesse",
+    "shortcut_base_speed": "Vitesse normale",
+    "shortcut_next_media": "Média suivant",
+    "shortcut_prev_media": "Média précédent",
+    "shortcut_loop": "Lire en boucle",
+
+    "shortcut_backward": "Reculer de X secondes",
+    "shortcut_forward": "Avancer de X secondes",
+    "shortcut_h_flip": "Miroir horizontal",
+    "shortcut_hide_img": "Masquer l'image",
+    "shortcut_record": "Démarrer/Arrêter l'enregistrement",
+    "shortcut_rotate": "Faire pivoter",
+    "shortcut_v_flip": "Miroir vertical",
+
+    "shortcut_prev_frame": "Image précédente",
+    "shortcut_next_frame": "Image suivante",
+
+    "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
+
+    "interface_lang_code" : "Langue de l'interface : ",
+
+    "project_manager_open_project_dialog" : "Ouvrir un projet",
+
+    "project_window_title_copy_video": "Création du projet : copie de la vidéo en cours...",
+    "project_manager_create_project_dialog": "Créer un projet",
+    "project_manager_create_project_dialog_file_type": "Dossier du projet"
 
 }

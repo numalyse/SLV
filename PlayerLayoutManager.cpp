@@ -387,6 +387,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::rotateRequested, activePlayer, &PlayerWidget::rotate);
     connect(advancedToolbar, &AdvancedToolbar::hFlipRequested, activePlayer->mediaWidget(), &MediaWidget::hFlip);
     connect(advancedToolbar, &AdvancedToolbar::vFlipRequested, activePlayer->mediaWidget(), &MediaWidget::vFlip);
+    connect(advancedToolbar, &AdvancedToolbar::prevFrameRequested, activePlayer->mediaWidget(), &MediaWidget::prevFrame);
+    connect(advancedToolbar, &AdvancedToolbar::nextFrameRequested, activePlayer->mediaWidget(), &MediaWidget::nextFrame);
     connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &PlayerLayoutManager::previousMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &PlayerLayoutManager::nextMediaRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);

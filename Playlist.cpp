@@ -50,10 +50,6 @@ Playlist::Playlist(QWidget *parent)
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
 
-    // [Bouton] Boucle -> Lorsqu'on atteint la fin de la playlist, celle-ci se rejoue du début
-
-    // TODO : Implémenter la fonction 
-
     m_loopItemBtn = new ToolbarToggleButton(this, 
         false, 
         "loop_off_white", 
@@ -61,13 +57,10 @@ Playlist::Playlist(QWidget *parent)
         "loop_off_white", 
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_loopItemBtn->setFixedSize(24,24);
+    m_loopItemBtn->setToggledIconFrame(true);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
     playlistLabelLayout->addWidget(m_loopItemBtn);
-
-    // [Bouton] Lecture aléatoire -> Lecture aléatoire de la playlist (1 fois chaque élément)
-
-    // TODO : Implémenter la fonction 
 
     m_shuffleItemBtn = new ToolbarToggleButton(this, 
         false, 
@@ -76,35 +69,13 @@ Playlist::Playlist(QWidget *parent)
         "shuffle_white", 
         PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_shuffleItemBtn->setFixedSize(24,24);
+    m_shuffleItemBtn->setToggledIconFrame(true);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
     playlistLabelLayout->addWidget(m_shuffleItemBtn);
 
-    // [Bouton] Trier la playlist -> Ordre A-Z, Z-A, récent
-    QVBoxLayout* sortPlaylistLayout = new QVBoxLayout();
-
-    // TODO : 
-    // 1/ Quand une des checkboxes est cochée,
-    // Les autres doivent être désactivées
-
-    // 2/ Quand un élément est ajouté à la playlist OU qu'un élément est déplacé,
-    // Il faut que les checkboxes soient décochées
-
-    // 3/ Il faudrait que le popup soit en bas du bouton, pas en haut (peut-être auto en bas si on met plus de checkboxes)
-    
-    // 4/ Possible de garder en mémoire, l'ordre d'ajout ?
-
-    QCheckBox* sortAZCheckBox = new QCheckBox(PrefManager::instance().getText("sort_AZ_playlist"));
-    QCheckBox* sortZACheckBox = new QCheckBox(PrefManager::instance().getText("sort_ZA_playlist"));
-    sortPlaylistLayout->addWidget(sortAZCheckBox);
-    sortPlaylistLayout->addWidget(sortZACheckBox);
-    
-    m_sortPlaylistBtn = new ToolbarPopupButton(this,
-        sortPlaylistLayout, 
-        "sort_white", 
-        PrefManager::instance().getText("tooltip_sort_playlist"));
-    m_sortPlaylistBtn->setFixedSize(24,24);
-    playlistLabelLayout->addWidget(m_sortPlaylistBtn);    
+    createSortBtn();
+    playlistLabelLayout->addWidget(m_sortPlaylistBtn);
 
     // [Bouton] Ajouter un élément à la playlist
     m_addItemBtn = new QPushButton;
@@ -129,6 +100,8 @@ Playlist::Playlist(QWidget *parent)
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
+    connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
+    connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsFromPaths);
 
 }
 
@@ -163,9 +136,14 @@ void Playlist::dropEvent(QDropEvent *event)
         }
 
         if (dropIndex != -1 && dropIndex != draggedIndex) {
-            PlaylistItem *draggedItem = m_items.takeAt(draggedIndex);
-            m_items.insert(dropIndex, draggedItem);
-
+            // PlaylistItem *draggedItem = m_items.takeAt(draggedIndex);
+            // m_items.insert(dropIndex, draggedItem);
+            if(m_sortButtons->checkedButton()){
+                m_sortButtons->setExclusive(false);
+                m_sortButtons->checkedButton()->setChecked(false);
+            }
+            if(m_currentMediaIndex == draggedIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(dropIndex);
+            m_itemsSortOrder.swapItemsAt(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
             updateItemIndices();
             updateLayout();
         }
@@ -201,11 +179,24 @@ void Playlist::dropEvent(QDropEvent *event)
 
 void Playlist::addItemDialog()
 {
-    QStringList filesPaths = QFileDialog::getOpenFileNames(this, PrefManager::instance().getText("open_files"), "/", "Fichiers multimédia (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+
+    auto& prefManager = PrefManager::instance();
+    QStringList filesPaths = QFileDialog::getOpenFileNames(
+        this, 
+        prefManager.getText("dialog_open_files"), 
+        prefManager.getPref("Paths", "lp_open_media"), 
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+    ); 
+
     if(filesPaths.empty()){
         qDebug() << "PLAYLIST - Pas de fichier sélectionné";
         return;
     }
+
+    QFileInfo fileInfo (filesPaths[0]);
+    prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+
+
     addItemsFromPaths(filesPaths);
 
 }
@@ -213,11 +204,14 @@ void Playlist::addItemDialog()
 void Playlist::addItemsFromPaths(const QStringList &filesPaths)
 {
     qDebug() << "PLAYLIST - Fichiers sélectionnés : " << filesPaths;
+    const bool wasEmpty = m_items.empty();
     for(size_t IFilePath = 0; IFilePath < filesPaths.size(); ++IFilePath){
         PlaylistItem *newItem = new PlaylistItem(nullptr, filesPaths.at(IFilePath));
         newItem->setIndex(m_items.size());
         m_items.append(newItem);
         m_itemsLayout->addWidget(newItem);
+        m_itemsShuffleOrder.append(m_items.size()-1);
+        m_itemsSortOrder.append(m_items.size()-1);
         this->adjustSize();
         this->updateGeometry();
         
@@ -225,38 +219,56 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
             m_currentMediaIndex = index;
         });
-        connect(newItem, &PlaylistItem::updateImageRequested, this, &Playlist::updateImageRequested);
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
-        connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     }
-    if(!filesPaths.empty()){
-        m_items[0]->playMedia();
+    if(wasEmpty && !filesPaths.empty()){
+        m_items[m_itemsSortOrder[0]]->playMedia();
+    }
+    if(!filesPaths.empty() && m_sortButtons->checkedButton())
+        sortPlaylist(m_sortButtons->checkedId(), true);
+    if(m_playlistShuffled){
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_itemsShuffleOrder.begin(), m_itemsShuffleOrder.end(), g);
+        if(!m_itemsShuffleOrder.empty())
+            m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
+        m_currentMediaIndex = 0;
     }
     emit disableToolbarLoopRequested();
 }
 
 void Playlist::deleteItem(const unsigned int index)
 {
-    if(m_currentMediaIndex == index)
+    if(m_currentMediaIndex == index){
         playPreviousMedia();
-    delete m_items[index];
-    m_items.remove(index);
+        if(m_currentMediaIndex == 0)
+                playNextMedia();
+    }
+    if(m_currentMediaIndex >= index)
+        m_currentMediaIndex--;
+    m_items[m_itemsSortOrder[index]]->deleteLater();
+    m_items.remove(m_itemsSortOrder.indexOf(index));
+    m_itemsShuffleOrder.removeAll(index);
+    m_itemsSortOrder.removeAll(index);
     if(m_items.empty())
         emit SignalManager::instance().playlistEjectPlayer();
     for(size_t IPlaylistItem = index; IPlaylistItem < m_items.size(); ++IPlaylistItem)
     {
-        m_items[IPlaylistItem]->setIndex(IPlaylistItem);
+        if(m_itemsSortOrder[IPlaylistItem] > index) m_itemsSortOrder[IPlaylistItem]--;
+        if(m_itemsShuffleOrder[IPlaylistItem] > index) m_itemsShuffleOrder[IPlaylistItem]--;
+        m_items[m_itemsSortOrder[IPlaylistItem]]->setIndex(IPlaylistItem);
     }
 }
 
-void Playlist::playMedia(const QString& filePath)
+void Playlist::playMedia(const QString& filePath, const bool isClicked)
 {
     emit openMediaFileRequested(filePath);
     for(size_t IMedia = 0; IMedia < m_items.size(); ++IMedia){
-        if(IMedia != m_currentMediaIndex)
-            m_items[IMedia]->setCurrentMedia(false);
+        unsigned int index = m_playlistShuffled && !isClicked ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
+        if(IMedia != index)
+            m_items[m_itemsSortOrder[IMedia]]->setCurrentMedia(false);
         else
-            m_items[IMedia]->setCurrentMedia(true);
+            m_items[m_itemsSortOrder[IMedia]]->setCurrentMedia(true);
     }
 }
 
@@ -265,7 +277,8 @@ void Playlist::playPreviousMedia()
     if(m_currentMediaIndex > 0)
     {
         m_currentMediaIndex--;
-        m_items[m_currentMediaIndex]->playMedia();
+        unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
+        m_items[m_itemsSortOrder[index]]->playMedia();
     }
 }
 
@@ -274,14 +287,20 @@ void Playlist::playNextMedia()
     if(m_currentMediaIndex < m_items.size()-1)
     {
         m_currentMediaIndex++;
-        m_items[m_currentMediaIndex]->playMedia();
+        unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
+        m_items[m_itemsSortOrder[index]]->playMedia();
+    }
+    else if(m_playlistLooping){
+        m_currentMediaIndex = 0;
+        unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
+        m_items[m_itemsSortOrder[index]]->playMedia();
     }
 }
 
 void Playlist::updateItemIndices()
 {
     for (int i = 0; i < m_items.size(); ++i) {
-        m_items[i]->setIndex(i);
+        m_items[m_itemsSortOrder[i]]->setIndex(i);
     }
 }
 
@@ -294,9 +313,13 @@ void Playlist::updateLayout()
         delete item;
     }
 
-    for (auto *item : m_items) {
-        m_itemsLayout->addWidget(item);
+    // for (auto *item : std::as_const(m_items)) {
+    //     m_itemsLayout->addWidget(item);
         
+    // }
+
+    for(size_t IItem = 0; IItem < m_items.size(); ++IItem){
+        m_itemsLayout->addWidget(m_items[m_itemsSortOrder[IItem]]);
     }
 
     this->updateGeometry();
@@ -304,16 +327,96 @@ void Playlist::updateLayout()
 
 void Playlist::enableLoop(){
     m_loopItemBtn->setButtonState(true);
+    m_playlistLooping = true;
 }
 
 void Playlist::disableLoop(){
     m_loopItemBtn->setButtonState(false);
+    m_playlistLooping = false;
 }
 
 void Playlist::enableShuffle(){
     m_shuffleItemBtn->setButtonState(true);
+    m_playlistShuffled = true;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(m_itemsShuffleOrder.begin(), m_itemsShuffleOrder.end(), g);
+    if(!m_itemsShuffleOrder.empty())
+        m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
+    m_currentMediaIndex = 0;
 }
 
 void Playlist::disableShuffle(){
     m_shuffleItemBtn->setButtonState(false);
+    m_playlistShuffled = false;
+    for(unsigned int IOrder = 0; IOrder < m_items.size(); IOrder++){
+        m_itemsShuffleOrder[IOrder] = IOrder;
+    }
+}
+
+void Playlist::createSortBtn()
+{
+    // [Bouton] Trier la playlist -> Ordre A-Z, Z-A, récent
+    QVBoxLayout* sortPlaylistLayout = new QVBoxLayout();
+
+    m_sortButtons = new QButtonGroup();
+
+    QRadioButton* sortAdditionDownRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_addition_down_playlist"));
+    QRadioButton* sortAdditionUpRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_addition_up_playlist"));
+    QRadioButton* sortAZRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_AZ_playlist"));
+    QRadioButton* sortZARadioBtn = new QRadioButton(PrefManager::instance().getText("sort_ZA_playlist"));
+
+    sortAdditionDownRadioBtn->setChecked(true);
+
+    m_sortButtons->addButton(sortAdditionDownRadioBtn, 0);
+    m_sortButtons->addButton(sortAdditionUpRadioBtn, 1);
+    m_sortButtons->addButton(sortAZRadioBtn, 2);
+    m_sortButtons->addButton(sortZARadioBtn, 3);
+    sortPlaylistLayout->addWidget(sortAdditionDownRadioBtn);
+    sortPlaylistLayout->addWidget(sortAdditionUpRadioBtn);
+    sortPlaylistLayout->addWidget(sortAZRadioBtn);
+    sortPlaylistLayout->addWidget(sortZARadioBtn);
+
+    connect(m_sortButtons, &QButtonGroup::idToggled, this, &Playlist::sortPlaylist);
+
+    m_sortPlaylistBtn = new ToolbarPopupButton(this,
+                                               sortPlaylistLayout,
+                                               "sort_white",
+                                               PrefManager::instance().getText("tooltip_sort_playlist"));
+    m_sortButtons->setParent(m_sortPlaylistBtn);
+    m_sortPlaylistBtn->setFixedSize(24,24);
+    m_sortPlaylistBtn->setOnTop(false);
+}
+
+void Playlist::sortPlaylist(int id, bool checked)
+{
+    if(checked){
+        m_sortButtons->setExclusive(true);
+        switch(id){
+        case 0:
+            std::sort(m_itemsSortOrder.begin(), m_itemsSortOrder.end());
+            break;
+        case 1:
+            std::sort(m_itemsSortOrder.begin(), m_itemsSortOrder.end(), std::greater<unsigned int>());
+            break;
+        case 2:
+            std::sort(m_itemsSortOrder.begin(), m_itemsSortOrder.end(), [this](unsigned int a, unsigned int b){
+                return m_items[a]->getTitle() < m_items[b]->getTitle();
+            });
+            break;
+        case 3:
+            std::sort(m_itemsSortOrder.begin(), m_itemsSortOrder.end(), [this](unsigned int a, unsigned int b){
+                return m_items[a]->getTitle() > m_items[b]->getTitle();
+            });
+            break;
+        }
+
+        if(m_currentMediaIndex < m_items.size())
+            m_currentMediaIndex = m_itemsSortOrder[m_currentMediaIndex];
+        for(size_t IItem = 0 ; IItem < m_items.size(); ++IItem){
+            m_itemsShuffleOrder[IItem] = m_itemsShuffleOrder[m_itemsSortOrder[IItem]];
+        }
+        updateItemIndices();
+        updateLayout();
+    }
 }

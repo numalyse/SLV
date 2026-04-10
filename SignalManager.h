@@ -50,6 +50,7 @@ signals:
     void playerWidgetMediaDropped(const QStringList&);
     void windowMovedOrResized();
     void recordButtonUiUpdate();
+    void addPlaylistItems(const QStringList&);
 };
 
 

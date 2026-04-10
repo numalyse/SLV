@@ -32,6 +32,8 @@ public:
     void cycleMarkers(int64_t time, int markerHeight);
     void updateMarkersPosition();
 
+    void extractLoop();
+
 signals:
     void ABLoopOff();
     void ABLoopOn();

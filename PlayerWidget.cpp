@@ -80,6 +80,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
     connect(m_mediaWidget, &MediaWidget::mediaIsVideoParsed, this, [this](){ m_toolBar->setExtractable(true); });
+    connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
@@ -202,9 +203,17 @@ void PlayerWidget::play()
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
-        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"); // TODO : utiliser text manager
+        auto& prefManager = PrefManager::instance();
+        QString file_path = QFileDialog::getOpenFileName(
+            this, 
+            prefManager.getText("dialog_open_file"), 
+            prefManager.getPref("Paths", "lp_open_media"), 
+            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        ); 
         if(file_path != ""){
             setMediaFromPath(file_path);
+            QFileInfo fileInfo (file_path);
+            prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
         }
         else
             emit m_toolBar->selectFilePlayCanceled();
@@ -219,11 +228,22 @@ void PlayerWidget::playFromAdvanced()
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
-        QString file_path = QFileDialog::getOpenFileName(this, "Ouvrir un fichier multimédia", "/", "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)");
+
+        auto& prefManager = PrefManager::instance();
+        QString file_path = QFileDialog::getOpenFileName(
+            this, 
+            prefManager.getText("dialog_open_file"), 
+            prefManager.getPref("Paths", "lp_open_media"), 
+            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        ); 
+
         if(file_path != ""){
             if (setMediaFromPath(file_path)){
                 ProjectManager::instance().requestProjectCreation({file_path});
+                QFileInfo fileInfo (file_path);
+                prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
             }
+            emit SignalManager::instance().addPlaylistItems(QStringList(file_path));
         }
         else
             emit m_toolBar->selectFilePlayCanceled();
@@ -238,6 +258,12 @@ void PlayerWidget::pause()
         emit checkPlayersPlayStatusRequested();
     }
 
+}
+
+void PlayerWidget::togglePlayPause(bool isPlaying)
+{
+    if(isPlaying) pause();
+    else play();
 }
 
 void PlayerWidget::stop()

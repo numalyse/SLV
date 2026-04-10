@@ -1,8 +1,21 @@
 {
-    "Lang" : {
-        "code" : "en"
+    "Interface" : {
+        "Lang" : {
+            "code" : "en"
+        },
+        "Export" : {
+            "capture_path" : ""
+        }
     },
-
+    "Paths" : {
+        "screenshot": "",
+        "default": "",
+        "lp_capture": "",
+        "lp_project": "",
+        "lp_open_media": "",
+        "lp_export": "",
+        "lp_extract_sequence": ""
+    },
     "Shortcuts" : {
         "MainWindow" : {
             "open_media" : "Ctrl + O",
@@ -15,7 +28,7 @@
             "mute" : "M",
             "enter_fullscreen" : "F",
             "exit_fullscreen" : "Escape",
-            "capture" : "Shift + S"
+            "screenshot" : "Shift + S"
         },
         "AdvancedTB" : {
             "increase_speed" : "+",
@@ -27,7 +40,14 @@
         },
         "ExtensionTB" : {
             "prev_frame" : "A",
-            "next_frame" : "E"
+            "next_frame" : "E",
+            "forward" : "Right",
+            "backward" : "Left",
+            "rotate" : "R",
+            "record" : "Shift + R",
+            "h_flip" : "H",
+            "v_flip" : "V",
+            "hide_img" : "I"
         }
     }
 }

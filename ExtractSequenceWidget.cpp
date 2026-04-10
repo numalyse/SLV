@@ -77,7 +77,7 @@ void ExtractSequenceWidget::requestEndFrameDisplay()
     m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {720, 480});
 }
 
-void ExtractSequenceWidget::onThumbnailReady(int requestId, QImage image)
+void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)
 {
     QPixmap pixmap = QPixmap::fromImage(image);
     switch(requestId){
@@ -106,9 +106,12 @@ void ExtractSequenceWidget::onEndTimeChanged(const int newTime)
 
 void ExtractSequenceWidget::confirmExtraction()
 {
-    QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"));
+    auto& prefManager = PrefManager::instance();
+    QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), prefManager.getPref("Paths", "lp_extract_sequence"));
     if(saveSequencePath != ""){
         QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath + '.' + m_media.fileExtension());
         connect(sequenceExtractor, &QProcess::finished, this, &QDialog::accept);
+        QFileInfo fileInfo (saveSequencePath);
+        prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());
     }
 }

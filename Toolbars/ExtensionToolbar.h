@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QVector>
 
 /// @brief Extension de la Toolbar avancée.
 class ExtensionToolbar : public QWidget
@@ -19,6 +20,9 @@ Q_OBJECT
 
 public:
     explicit ExtensionToolbar(QWidget* parent = nullptr);
+
+    /// @brief destructor that deletes the global shortcuts since they are declarer as child of main window
+    ~ExtensionToolbar();
 
     void setOverlayMode(int index);
     void setFullscreenUI();
@@ -62,9 +66,17 @@ private slots:
 
 
 private:
+    /// @brief Adds global shortcuts (that are child of the mainWindow) to be usable when the widget is hidden
+    void addShortcuts();
+
+    /// @brief Delete via delete later all of the global shortcuts
+    void clearShortcuts();
+
     QComboBox* m_compoRuleComboBox;
     QCheckBox* m_compoRuleCheckboxVFlip;
     QCheckBox* m_compoRuleCheckboxHFlip;
+
+    QVector<QShortcut*> m_globalShortcuts;
 
 signals:
     void enableRecordRequested();
@@ -78,6 +90,9 @@ signals:
     void verticalFlipRequested();
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void showDrawingModeRequested(bool isEnabled);
+    void prevFrameRequested();
+    void nextFrameRequested();
+
 };
 
 #endif

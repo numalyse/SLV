@@ -178,9 +178,20 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     //addShortcuts();
 }
 
+void AdvancedToolbar::setFullscreenUI()
+{
+    Toolbar::setFullscreenUI();
+    if(m_extensionToolbar && m_extensionToolbar->getSegmBtn()->isChecked()){
+        m_extensionToolbar->getSegmBtn()->click();
+    }
+    m_extensionToolbar->getSegmBtn()->setDisabled(true);
+}
+
 void AdvancedToolbar::setDefaultUI()
 {
     Toolbar::setDefaultUI();
+    
+    m_extensionToolbar->getSegmBtn()->setDisabled(false);
 
     if ( !layout() ) {
 

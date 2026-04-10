@@ -549,7 +549,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
 void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
-    emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+    // emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player)); diabled for now
     QWidget::mousePressEvent(event);
 }
 

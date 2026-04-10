@@ -27,6 +27,8 @@ public:
     void setOverlayMode(int index);
     void setFullscreenUI();
     void setDefaultUI();
+
+    ToolbarToggleButton* getSegmBtn() { return m_segmBtn; };
     
     //QComboBox* comboBoxCompoRuleBtn = nullptr;
 

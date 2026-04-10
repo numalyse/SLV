@@ -3,6 +3,7 @@
 #include "PrefManager.h"
 #include <QPainter>
 #include <QPainterPath>
+#include <QTransform>
 #include <QHBoxLayout>
 #include <QFrame>
 #include <QMouseEvent>
@@ -364,18 +365,51 @@ void DrawingWidget::redoDrawing()
     }
 }
 
-
 // Gestion taille et position du widget
+
+void DrawingWidget::scaleStrokeList(QVector<DrawingStroke> &strokes, double scaleX, double scaleY)
+{
+    if (strokes.isEmpty() || qFuzzyCompare(scaleX, double(1.0)) && qFuzzyCompare(scaleY, double(1.0)))
+        return;
+
+    QTransform transform;
+    transform.scale(scaleX, scaleY);
+
+    double widthFactor = (scaleX + scaleY) / 2.0;
+    for (DrawingStroke &stroke : strokes) {
+        stroke.path = transform.map(stroke.path);
+        stroke.lineWidth = qMax(1, qRound(stroke.lineWidth * widthFactor));
+    }
+}
+
+void DrawingWidget::scaleCurrentEraserPath(double scaleX, double scaleY)
+{
+    if (m_currentEraserPath.isEmpty() || (qFuzzyCompare(scaleX, double(1.0)) && qFuzzyCompare(scaleY, double(1.0))))
+        return;
+
+    QTransform transform;
+    transform.scale(scaleX, scaleY);
+    m_currentEraserPath = transform.map(m_currentEraserPath);
+}
 
 void DrawingWidget::onMediaRectChanged(const QRect &rect)
 {
+    if (m_mediaRect.width() > 0 && m_mediaRect.height() > 0 && m_mediaRect.size() != rect.size()) {
+        double scaleX = double(rect.width()) / double(m_mediaRect.width());
+        double scaleY = double(rect.height()) / double(m_mediaRect.height());
+
+        scaleStrokeList(m_paths, scaleX, scaleY);
+        scaleStrokeList(m_undoPathlist, scaleX, scaleY);
+        scaleStrokeList(m_redoPathlist, scaleX, scaleY);
+        scaleStrokeList(m_lastClearedPaths, scaleX, scaleY);
+        scaleCurrentEraserPath(scaleX, scaleY);
+    }
+
     m_mediaRect = rect;
     if(containerBackground)
         containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
-        //containerBackground->move(20, m_mediaRect.height()-m_drawingToolbar->height()-20);
     if(m_drawingSurface)
         m_drawingSurface->setGeometry(m_mediaRect);
-    //this->setGeometry(m_mediaRect);
     update();
 }
 

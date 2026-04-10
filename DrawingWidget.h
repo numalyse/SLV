@@ -63,6 +63,9 @@ protected:
 
     QPainterPath m_currentEraserPath;
 
+    void scaleStrokeList(QVector<DrawingStroke> &strokes, double scaleX, double scaleY);
+    void scaleCurrentEraserPath(double scaleX, double scaleY);
+
 private:
     QRect m_mediaRect;
     bool m_isEnabled = false;
@@ -86,12 +89,12 @@ private:
     ToolbarButton* m_redoToolBtn = nullptr;
     
     QPen m_pen;
-    
+
     int m_lineWidth = 4;
     QVector<int> m_lineWidthLevels = {4, 8, 12};
 
-    float m_opacity = 1.0;
-    QVector<float> m_opacityLevels = {0.25, 0.5, 1.0};
+    double m_opacity = 1.0;
+    QVector<double> m_opacityLevels = {0.25, 0.5, 1.0};
 
     QColor m_color = QColor(255, 255, 255, 255);
     QVector<QPair<QString, QColor>> m_palette;

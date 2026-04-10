@@ -45,7 +45,7 @@ void DrawingWidget::initDrawingSurface(){
 
     if (m_drawingCanvas.size() != m_drawingSurface->size()) {
         QImage newCanvas(m_drawingSurface->size(), QImage::Format_ARGB32_Premultiplied);
-        newCanvas.fill(Qt::transparent);
+        newCanvas.fill(Qt::red);
 
         QPainter p(&newCanvas);
         p.drawImage(0, 0, m_drawingCanvas);
@@ -140,41 +140,16 @@ void DrawingWidget::initDrawingToolbar(){
     drawingToolbarLayout->addWidget(m_pencilToolBtn);
 
     // BOUTON GOMME
-    QVBoxLayout* eraserLayout = new QVBoxLayout;    
-    m_eraserToolBtn = new ToolbarToggleHoverButton(
+    m_eraserToolBtn = new ToolbarToggleButton(
     m_drawingToolbar,
-    eraserLayout, 
     false,
     "auto_segmentation_white",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
     "auto_segmentation",
     PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
-    connect(m_eraserToolBtn, &ToolbarToggleHoverButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
-    drawingToolbarLayout->addWidget(m_eraserToolBtn);
-
-    // CHOIX TYPE GOMME
-    m_eraserModeGroup = new QButtonGroup(this);
-    
-    QRadioButton* eraseStrokeBtn = new QRadioButton(PrefManager::instance().getText("tooltip_erase_stroke"));
-    eraserLayout->addWidget(eraseStrokeBtn);
-    m_eraserModeGroup->addButton(eraseStrokeBtn, 0);
-    eraseStrokeBtn->setChecked(true);
-    connect(eraseStrokeBtn, &QRadioButton::toggled, this, [this](bool checked){
-        if (checked) {
-            m_strokeMode = true;
-        }
-    });
-
-    QRadioButton* erasePointBtn = new QRadioButton(PrefManager::instance().getText("tooltip_erase_point"));
-    eraserLayout->addWidget(erasePointBtn);
-    m_eraserModeGroup->addButton(erasePointBtn, 1);
-    connect(erasePointBtn, &QRadioButton::toggled, this, [this](bool checked){
-        if (checked) {
-            m_strokeMode = false;
-        }
-    });
-    
+    connect(m_eraserToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+    drawingToolbarLayout->addWidget(m_eraserToolBtn);    
 
     // BOUTON SUPPRIMER TOUT
     m_binToolBtn = new ToolbarButton(
@@ -238,6 +213,17 @@ void DrawingWidget::showDrawingMode(bool isEnabled)
     update();
 }
 
+QPixmap DrawingWidget::eraseColor(){
+    QPixmap brush(8, 8);
+    brush.fill(Qt::white);
+    
+    QPainter p(&brush);
+    p.fillRect(0, 0, 4, 4, Qt::gray);
+    p.fillRect(4, 4, 4, 4, Qt::gray);
+    p.end();
+    return brush;
+}
+
 void DrawingWidget::setColor(const QColor &color)
 {
     m_color = color;
@@ -255,6 +241,7 @@ void DrawingWidget::onMediaRectChanged(const QRect &rect)
     m_mediaRect = rect;
     if(containerBackground)
         containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
+        //containerBackground->move(20, m_mediaRect.height()-m_drawingToolbar->height()-20);
     if(m_drawingSurface)
         m_drawingSurface->setGeometry(m_mediaRect);
     //this->setGeometry(m_mediaRect);
@@ -272,7 +259,6 @@ void DrawingWidget::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
 
     p.translate(m_mediaRect.topLeft());
-    p.drawImage(0, 0, m_drawingCanvas);
 
     // Dessin
     for (const DrawingStroke &stroke : m_paths)
@@ -281,16 +267,25 @@ void DrawingWidget::paintEvent(QPaintEvent *)
         p.setPen(strokePen);
         p.drawPath(stroke.path);
     }
+    
 
     // Gomme
-    if (m_erasing && !m_strokeMode && !m_paths.isEmpty())
+    //if (m_erasing && !m_currentEraserPath.isEmpty())
+    if (m_erasing)
     {
-        p.setCompositionMode(QPainter::CompositionMode_Clear);
+        //QPen eraser(Qt::white, m_lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        QPen eraser;
+        QBrush eraserBrush(m_eraseBrush);
+        eraserBrush.setStyle(Qt::TexturePattern);
+        eraser.setBrush(eraserBrush);
+        eraser.setWidth(m_eraserLineWidth);
+        //eraser.setColor(QColor(255, 255, 255, 255));
+        eraser.setStyle(Qt::SolidLine);
+        eraser.setCapStyle(Qt::RoundCap);
+        eraser.setJoinStyle(Qt::RoundJoin);
 
-        QPen eraser(Qt::transparent, m_lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
         p.setPen(eraser);
-
-        p.drawPath(m_paths.last().path);
+        p.drawPath(m_currentEraserPath);
     }
 }
 
@@ -313,13 +308,12 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
     QPoint p = event->pos() - m_mediaRect.topLeft();
 
-    if (m_erasing && !m_strokeMode)
+    if (m_erasing)
     {
-        DrawingStroke eraseStroke;
-        eraseStroke.path.moveTo(p);
-        eraseStroke.lineWidth = m_lineWidth;
+        m_currentEraserPath = QPainterPath();
+        m_currentEraserPath.moveTo(p);
 
-        m_paths.append(eraseStroke);
+        update();
         return;
     }
 
@@ -339,13 +333,28 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint p = event->pos() - m_mediaRect.topLeft();
 
-    if (m_erasing && m_strokeMode)
+    if (m_erasing)
     {
-        const int radius = 10;
+        m_currentEraserPath.lineTo(p);
+
+        QPainterPathStroker eraserStroker;
+        eraserStroker.setWidth(m_eraserLineWidth);
+        eraserStroker.setCapStyle(Qt::RoundCap);
+        eraserStroker.setJoinStyle(Qt::RoundJoin);
+        QPainterPath eraserStroke = eraserStroker.createStroke(m_currentEraserPath);
 
         for (int i = m_paths.size() - 1; i >= 0; --i)
         {
-            if (m_paths[i].path.contains(p))
+            QPainterPathStroker pathStroker;
+            pathStroker.setWidth(m_paths[i].lineWidth);
+            pathStroker.setCapStyle(Qt::RoundCap);
+            pathStroker.setJoinStyle(Qt::RoundJoin);
+            QPainterPath pathStroke = pathStroker.createStroke(m_paths[i].path);
+
+            if (!eraserStroke.boundingRect().intersects(pathStroke.boundingRect()))
+                continue;
+
+            if (eraserStroke.intersects(pathStroke))
             {
                 m_paths.removeAt(i);
             }
@@ -364,8 +373,9 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 
 void DrawingWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    // if (event->button() == Qt::LeftButton)
-    // {
-    //     m_drawing = false;
-    // }
+    if (m_erasing)
+    {
+        m_currentEraserPath = QPainterPath(); 
+        update();
+    }
 }

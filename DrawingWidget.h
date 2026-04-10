@@ -27,7 +27,8 @@ public:
     explicit DrawingWidget(QWidget *parent = nullptr);
 
     void showDrawingMode(bool isEnabled);
-    void setColor(const QColor& color);
+
+    void setColor(const QColor &color);
     void setLineWidth(int width);
 
     void enterEvent(QEnterEvent *event);
@@ -59,6 +60,8 @@ protected:
     void updatePen();
     void initDrawingToolbar();
 
+    QPainterPath m_currentEraserPath;
+
 private:
     QRect m_mediaRect;
     bool m_isEnabled = false;
@@ -72,21 +75,22 @@ private:
 
     bool m_drawing = false;
     bool m_erasing = false;
-    bool m_strokeMode = true;
 
     ToolbarToggleButton* m_pencilToolBtn = nullptr;
     ToolbarToggleHoverButton* m_colorToolBtn = nullptr;
     ToolbarToggleButton* m_eraserToolBtn = nullptr;
     ToolbarButton* m_binToolBtn = nullptr;
-    QButtonGroup* m_eraserModeGroup = nullptr;
 
     QVector<QPair<QString, QColor>> m_palette;
     QColor m_color = QColor(255, 0, 0, 255);
+
+    QPixmap eraseColor();
+    QPixmap m_eraseBrush = eraseColor();
+    int m_eraserLineWidth = 4;
+
     int m_lineWidth = 2;
     QPen m_pen {QColor(255, 0, 0, 255), 2};
 
-
-    
 };
 
 #endif // DRAWINGWIDGET_H

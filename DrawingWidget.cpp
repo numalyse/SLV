@@ -36,6 +36,27 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     initDrawingToolbar();
 }
 
+void DrawingWidget::showDrawingMode(bool isEnabled)
+{
+    m_isEnabled = isEnabled;
+
+    if (m_isEnabled) {
+        m_drawingSurface->show();
+        m_drawingSurface->raise();
+
+        m_drawingToolbar->show();
+        m_drawingToolbar->raise();
+
+        if (!m_pencilToolBtn->isChecked())
+            emit m_pencilToolBtn->click();
+    } else {
+        m_drawingSurface->hide();
+        m_drawingToolbar->hide();
+    }
+
+    update();
+}
+
 void DrawingWidget::initDrawingSurface(){
     if (!m_drawingSurface) {
         m_drawingSurface = new QWidget(this);
@@ -281,25 +302,6 @@ void DrawingWidget::updateToolbarButtonsState(){
             m_erasing = false;
         }
     }
-}
-
-
-void DrawingWidget::showDrawingMode(bool isEnabled)
-{
-    m_isEnabled = isEnabled;
-
-    if (m_isEnabled) {
-        m_drawingSurface->show();
-        m_drawingSurface->raise();
-
-        m_drawingToolbar->show();
-        m_drawingToolbar->raise();
-    } else {
-        m_drawingSurface->hide();
-        m_drawingToolbar->hide();
-    }
-
-    update();
 }
 
 QPixmap DrawingWidget::eraseColor(){

@@ -145,7 +145,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     );
 
     connect(m_drawingBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::updateDrawingMode);
-    //connect(m_drawingBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::updateDrawingMode);
 
     setDefaultUI();
     disableButtons();

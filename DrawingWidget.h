@@ -36,13 +36,13 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    void redrawCanvas();
-
 public slots:
     void onMediaRectChanged(const QRect &rect);
     void updateToolbarButtonsState();
 
     void binRequested();
+    void undoDrawing();
+    void redoDrawing();
 
 protected:
     QWidget *m_drawingSurface = nullptr;
@@ -69,6 +69,7 @@ private:
     QVector<DrawingStroke> m_paths;
     QVector<DrawingStroke> m_redoPathlist;
     QVector<DrawingStroke> m_undoPathlist;
+    QVector<DrawingStroke> m_lastClearedPaths;
 
     QPoint m_lastPoint;
     bool m_hasLastPoint = false;
@@ -80,6 +81,11 @@ private:
     ToolbarToggleHoverButton* m_colorToolBtn = nullptr;
     ToolbarToggleButton* m_eraserToolBtn = nullptr;
     ToolbarButton* m_binToolBtn = nullptr;
+    ToolbarButton* m_undoToolBtn = nullptr;
+    ToolbarButton* m_redoToolBtn = nullptr;
+    
+    QPen m_pen;
+    int m_lineWidth = 2;
 
     QVector<QPair<QString, QColor>> m_palette;
     QColor m_color = QColor(255, 0, 0, 255);
@@ -87,9 +93,6 @@ private:
     QPixmap eraseColor();
     QPixmap m_eraseBrush = eraseColor();
     int m_eraserLineWidth = 4;
-
-    int m_lineWidth = 2;
-    QPen m_pen {QColor(255, 0, 0, 255), 2};
 
 };
 

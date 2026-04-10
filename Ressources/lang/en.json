@@ -132,5 +132,7 @@
     "tooltip_eraser_tool" : "Eraser",
     "tooltip_erase_stroke" : "Stroke eraser",
     "tooltip_erase_point" : "Point eraser",
-    "tooltip_bin_tool" : "Bin"
+    "tooltip_bin_tool" : "Bin",
+    "tooltip_undo_tool" : "Undo",
+    "tooltip_redo_tool" : "Redo"
 }

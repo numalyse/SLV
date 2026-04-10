@@ -18,6 +18,8 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setStyleSheet("background-color: rgba(0,0,0,0)");
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+    m_pen = QPen(m_color, m_lineWidth);
+
     m_palette = {
         {PrefManager::instance().getText("white"), QColor{255, 255, 255, 255}}, // Blanc
         {PrefManager::instance().getText("black"), QColor{0, 0, 0, 255}},       // Noir
@@ -161,11 +163,35 @@ void DrawingWidget::initDrawingToolbar(){
     drawingToolbarLayout->addWidget(m_binToolBtn);
 
     m_drawingToolbar->hide();
+
+    // BOUTON ANNULER
+    ToolbarButton* m_undoToolBtn = new ToolbarButton(
+        m_drawingToolbar,
+        "undo_white",
+        PrefManager::instance().getText("tooltip_undo_tool")
+    );
+    connect(m_undoToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::undoDrawing);
+    drawingToolbarLayout->addWidget(m_undoToolBtn);
+
+    // BOUTON RETABLIR
+    ToolbarButton* m_redoToolBtn = new ToolbarButton(
+        m_drawingToolbar,
+        "redo_white",
+        PrefManager::instance().getText("tooltip_redo_tool")
+    );
+    connect(m_redoToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::redoDrawing);
+    drawingToolbarLayout->addWidget(m_redoToolBtn);
+
 }
 
 void DrawingWidget::binRequested(){
-    // TO DO : QDialog - Voulez-vous effacer tout le contenu ?
+    if (m_paths.isEmpty())
+        return;
 
+    m_lastClearedPaths = m_paths;
+    m_paths.clear();
+    m_redoPathlist.clear();
+    update();
 }
 
 void DrawingWidget::updateToolbarButtonsState(){
@@ -235,6 +261,40 @@ void DrawingWidget::setLineWidth(int width)
     m_lineWidth = width;
     update();
 }
+
+// Gestion de l'historique des dessins
+
+void DrawingWidget::undoDrawing()
+{
+    if (!m_lastClearedPaths.isEmpty()) {
+        m_paths = m_lastClearedPaths;
+        m_lastClearedPaths.clear();
+        update();
+        return;
+    }
+
+    if (!m_undoPathlist.isEmpty()) {
+        m_paths.append(m_undoPathlist.takeLast());
+        update();
+        return;
+    }
+
+    if (!m_paths.isEmpty()) {
+        m_redoPathlist.append(m_paths.takeLast());
+        update();
+    }
+}
+
+void DrawingWidget::redoDrawing()
+{
+    if (!m_redoPathlist.isEmpty()) {
+        m_paths.append(m_redoPathlist.takeLast());
+        update();
+    }
+}
+
+
+// Gestion taille et position du widget
 
 void DrawingWidget::onMediaRectChanged(const QRect &rect)
 {
@@ -310,6 +370,7 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
     if (m_erasing)
     {
+        m_lastClearedPaths.clear();
         m_currentEraserPath = QPainterPath();
         m_currentEraserPath.moveTo(p);
 
@@ -319,6 +380,7 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
     if (m_drawing)
     {
+        m_lastClearedPaths.clear();
         DrawingStroke newStroke;
         newStroke.path.moveTo(p);
         newStroke.color = m_color;
@@ -356,7 +418,8 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 
             if (eraserStroke.intersects(pathStroke))
             {
-                m_paths.removeAt(i);
+                m_undoPathlist.append(m_paths.takeAt(i));
+                //m_paths.removeAt(i);
             }
         }
 

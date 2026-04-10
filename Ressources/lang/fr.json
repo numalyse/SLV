@@ -132,5 +132,8 @@
     "tooltip_eraser_tool" : "Gomme",
     "tooltip_erase_stroke" : "Gomme de trait",
     "tooltip_erase_point" : "Gomme de point",
-    "tooltip_bin_tool" : "Poubelle"
+    "tooltip_bin_tool" : "Poubelle",
+    "tooltip_undo_tool" : "Annuler",
+    "tooltip_redo_tool" : "Refaire"
+
 }

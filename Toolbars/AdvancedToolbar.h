@@ -74,6 +74,7 @@ signals:
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void showDrawingModeRequested(bool isEnabled);
 
 };
 

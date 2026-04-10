@@ -42,6 +42,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         GlobalPlayerManager.h GlobalPlayerManager.cpp
 
         CompositionWidget.h CompositionWidget.cpp
+        DrawingWidget.h DrawingWidget.cpp
 
         Toolbars/Toolbar.h
         Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp

@@ -136,7 +136,10 @@
     "main_window_option_open_pref": "Preferences",
 
     "(activated)" : "(Activated)",
-    "(deactivated)" : "(Désactivated)",
+    "(deactivated)" : "(Deactivated)",
+
+    "activate" : "Activate",
+    "deactivate" : "Deactivate",
     
     "playlist" : "Playlist",
     "tooltip_loop_playlist" : "Loop mode",
@@ -150,6 +153,25 @@
     "delete" : "Delete",
     "duration" : "Duration",
 
+    "tooltip_drawing_mode" : "drawing mode",
+    "tooltip_pencil_tool" : "Pencil",
+    "tooltip_color_tool" : "Color",
+    "white" : "White",
+    "black" : "Black",
+    "red" : "Red",
+    "orange" : "Orange",
+    "yellow" : "Yellow",
+    "green" : "Green",
+    "blue" : "Blue",
+    "purple" : "Purple",
+    "tooltip_linewidth" : "Line width",
+    "tooltip_opacity" : "Opacity",
+    "tooltip_eraser_tool" : "Eraser",
+    "tooltip_erase_stroke" : "Stroke eraser",
+    "tooltip_erase_point" : "Point eraser",
+    "tooltip_bin_tool" : "Bin",
+    "tooltip_undo_tool" : "Undo",
+    "tooltip_redo_tool" : "Redo"
 
     "generic_btn_ok": "OK",
     "generic_btn_save": "Save",

@@ -183,7 +183,8 @@ void DrawingWidget::initDrawingToolbar(){
             setLineWidth(lineWidth);
             updatePen();
         });
-        connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+        //connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+        m_lineWidthBtns.append(lineWidthBtn);
         pencilLayout->addWidget(lineWidthBtn);
     }
 
@@ -205,12 +206,15 @@ void DrawingWidget::initDrawingToolbar(){
         previewColor.setAlphaF(opacity);
 
         opacityBtn->setIcon(genIconPreviewColor(previewColor));
+        opacityBtn->setToggledIconFrame(true);
         connect(opacityBtn, &ToolbarToggleButton::clicked, this, [this, opacity]() {
             setOpacity(opacity);
             setColor(m_color);
             updatePen();
+            updateCurrentOpcityBtnActive(opacity);
         });
         connect(opacityBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
+        m_opacityBtns.append(opacityBtn);
         pencilLayout->addWidget(opacityBtn);
     }
 
@@ -299,10 +303,7 @@ void DrawingWidget::updateToolbarButtonsState(){
             m_eraserToolBtn->setChecked(false);
             m_eraserToolBtn->setButtonState(false);
             m_drawing = true;
-            m_erasing = false;
-
-            // On veut utliser setToggledIconFrame(true) sur les boutons opacityBtn quel réglage est actif par ces boutons
-
+            m_erasing = false;        
         }
     }
 }
@@ -331,6 +332,17 @@ void DrawingWidget::setLineWidth(int width)
 {
     m_lineWidth = width;
     update();
+}
+
+void DrawingWidget::updateCurrentOpacityBtnActive(double opacity){
+    // On veut utliser setToggledIconFrame(true) sur les boutons opacityBtn et actualiser quel réglage est actif parmi ces boutons en fonction de la valeur d'opacité actuelle
+    for (ToolbarToggleButton* opacityBtn : m_opacityBtns) {
+        if (opacityBtn->toolTip().contains(QString::number(opacity))) {
+            opacityBtn->setChecked(true);
+        } else {
+            opacityBtn->setChecked(false);
+        }
+    }
 }
 
 void DrawingWidget::setOpacity(float opacity)

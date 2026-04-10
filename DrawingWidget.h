@@ -41,6 +41,9 @@ public slots:
     void onMediaRectChanged(const QRect &rect);
     void updateToolbarButtonsState();
 
+    
+    void updateCurrentOpcityBtnActive(double opacity);
+
     void binRequested();
     void undoDrawing();
     void redoDrawing();
@@ -82,6 +85,8 @@ private:
     bool m_erasing = false;
 
     ToolbarToggleButton* m_pencilToolBtn = nullptr;
+    QVector<ToolbarToggleButton*> m_lineWidthBtns;
+    QVector<ToolbarToggleButton*> m_opacityBtns;
     ToolbarToggleHoverButton* m_colorToolBtn = nullptr;
     ToolbarToggleButton* m_eraserToolBtn = nullptr;
     ToolbarButton* m_binToolBtn = nullptr;

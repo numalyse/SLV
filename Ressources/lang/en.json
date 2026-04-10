@@ -129,6 +129,8 @@
     "green" : "Green",
     "blue" : "Blue",
     "purple" : "Purple",
+    "tooltip_linewidth" : "Line width",
+    "tooltip_opacity" : "Opacity",
     "tooltip_eraser_tool" : "Eraser",
     "tooltip_erase_stroke" : "Stroke eraser",
     "tooltip_erase_point" : "Point eraser",

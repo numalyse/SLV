@@ -129,6 +129,8 @@
     "green" : "Vert",
     "blue" : "Bleu",
     "purple" : "Violet",
+    "tooltip_linewidth" : "Épaisseur du trait",
+    "tooltip_opacity" : "Opacité",
     "tooltip_eraser_tool" : "Gomme",
     "tooltip_erase_stroke" : "Gomme de trait",
     "tooltip_erase_point" : "Gomme de point",

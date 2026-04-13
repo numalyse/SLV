@@ -301,17 +301,6 @@ void DrawingWidget::initDrawingToolbar(){
 
 }
 
-// Suppression de tous les traits
-void DrawingWidget::binRequested(){
-    if (m_paths.isEmpty())
-        return;
-
-    m_lastClearedPaths = m_paths;
-    m_paths.clear();
-    m_redoPathlist.clear();
-    update();
-}
-
 // Gestion du changement d'état entre crayon et gomme
 void DrawingWidget::updateToolbarButtonsState(){
     ToolbarToggleButton* senderBtn = qobject_cast<ToolbarToggleButton*>(sender());
@@ -405,34 +394,51 @@ void DrawingWidget::setOpacity(float opacity)
     update();
 }
 
+// Suppression de tous les traits
+void DrawingWidget::binRequested(){
+    if (m_paths.isEmpty())
+        return;
+
+    m_historyPathlist.append(m_paths);
+    m_historyIndex++;
+    m_paths.clear();
+    update();
+}
+
 // Gestion de l'historique des dessins
+
+void DrawingWidget::updatePathsFromHistory(){
+    if(m_historyIndex >= 0 && m_historyIndex < m_historyPathlist.size()){
+        m_paths = m_historyPathlist[m_historyIndex];
+    } else {
+        m_paths.clear();
+    }
+}
 
 void DrawingWidget::undoDrawing()
 {
-    if (!m_lastClearedPaths.isEmpty()) {
-        m_paths = m_lastClearedPaths;
-        m_lastClearedPaths.clear();
+    if(m_historyIndex > 0){
+        m_historyIndex--;
+        updatePathsFromHistory();
         update();
-        return;
-    }
 
-    if (!m_undoPathlist.isEmpty()) {
-        m_paths.append(m_undoPathlist.takeLast());
-        update();
-        return;
-    }
-
-    if (!m_paths.isEmpty()) {
-        m_redoPathlist.append(m_paths.takeLast());
-        update();
+        m_redoToolBtn->setEnabled(true);
+        if(m_historyIndex == 0){
+            m_undoToolBtn->setEnabled(false);
+        }
     }
 }
 
 void DrawingWidget::redoDrawing()
 {
-    if (!m_redoPathlist.isEmpty()) {
-        m_paths.append(m_redoPathlist.takeLast());
+    if(m_historyIndex + 1 < m_historyPathlist.size()){
+        m_historyIndex++;
+        updatePathsFromHistory();
         update();
+
+        if(m_historyIndex + 1 >= m_historyPathlist.size()){
+            m_redoToolBtn->setEnabled(false);
+        }
     }
 }
 
@@ -470,9 +476,9 @@ void DrawingWidget::onMediaRectChanged(const QRect &rect)
         double scaleY = double(rect.height()) / double(m_mediaRect.height());
 
         scaleStrokeList(m_paths, scaleX, scaleY);
-        scaleStrokeList(m_undoPathlist, scaleX, scaleY);
-        scaleStrokeList(m_redoPathlist, scaleX, scaleY);
-        scaleStrokeList(m_lastClearedPaths, scaleX, scaleY);
+        //scaleStrokeList(m_undoPathlist, scaleX, scaleY);
+        //scaleStrokeList(m_redoPathlist, scaleX, scaleY);
+        //scaleStrokeList(m_binPathlist, scaleX, scaleY);
         scaleCurrentEraserPath(scaleX, scaleY);
     }
 
@@ -544,7 +550,6 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
     if (m_erasing)
     {
-        m_lastClearedPaths.clear();
         m_currentEraserPath = QPainterPath();
         m_currentEraserPath.moveTo(p);
 
@@ -554,17 +559,24 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
     if (m_drawing)
     {
-        m_lastClearedPaths.clear();
         DrawingStroke newStroke;
         newStroke.path.moveTo(p);
         newStroke.color = m_color;
         newStroke.lineWidth = m_lineWidth;
 
+        // Ajoute le nouveau trait à m_paths
         m_paths.append(newStroke);
-        if(!m_redoPathlist.isEmpty())
-            m_redoPathlist.clear();
-        if(!m_lastClearedPaths.isEmpty())
-            m_lastClearedPaths.clear();
+
+        while(m_historyPathlist.size() > m_historyIndex + 1){
+            m_historyPathlist.removeLast();
+        }
+
+        m_historyPathlist.append(m_paths);
+        m_historyIndex++;
+
+        m_binToolBtn->setEnabled(true);
+        m_undoToolBtn->setEnabled(true);
+        m_redoToolBtn->setEnabled(false);
     }
 
 }
@@ -596,8 +608,19 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 
             if (eraserStroke.intersects(pathStroke))
             {
-                m_undoPathlist.append(m_paths.takeAt(i));
-                //m_paths.removeAt(i);
+                m_paths.removeAt(i);
+
+                while(m_historyPathlist.size() > m_historyIndex + 1){
+                    m_historyPathlist.removeLast();
+                }
+
+                m_historyPathlist.append(m_paths);
+                m_historyIndex++;
+
+                m_binToolBtn->setEnabled(!m_paths.isEmpty());
+                m_undoToolBtn->setEnabled(!m_paths.isEmpty());
+                m_redoToolBtn->setEnabled(false);
+
             }
         }
 

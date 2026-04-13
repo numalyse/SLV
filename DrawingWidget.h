@@ -46,6 +46,7 @@ public slots:
     void updateCurrentOpacityBtnActive(double opacity);
 
     void binRequested();
+    void updatePathsFromHistory();
     void undoDrawing();
     void redoDrawing();
 
@@ -74,10 +75,10 @@ private:
     QRect m_mediaRect;
     bool m_isEnabled = false;
 
-    QVector<DrawingStroke> m_paths;
-    QVector<DrawingStroke> m_redoPathlist;
-    QVector<DrawingStroke> m_undoPathlist;
-    QVector<DrawingStroke> m_lastClearedPaths;
+    QVector<DrawingStroke> m_paths; // Stocke tous les traits dessinés
+    QVector<QVector<DrawingStroke>> m_historyPathlist; // Stocke les différentes étapes de l'historique des traits dessinés
+    int m_historyIndex = -1;
+
 
     QPoint m_lastPoint;
     bool m_hasLastPoint = false;

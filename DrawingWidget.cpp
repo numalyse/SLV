@@ -16,7 +16,6 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
-    setStyleSheet("background-color: rgba(0,0,0,0)");
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     m_pen = QPen(m_color, m_lineWidth);
@@ -61,9 +60,9 @@ void DrawingWidget::initDrawingSurface(){
     if (!m_drawingSurface) {
         m_drawingSurface = new QWidget(this);
         m_drawingSurface->setGeometry(m_mediaRect);
-        //m_drawingSurface->setStyleSheet("background-color: rgba(255, 255, 255, 0.25);");
-        m_drawingSurface->setStyleSheet("background-color: rgba(255, 255, 255, 0.01);");
-        //m_drawingSurface->setStyleSheet("background: transparent;");
+        m_drawingSurface->setAttribute(Qt::WA_TranslucentBackground);
+        m_drawingSurface->setAttribute(Qt::WA_NoSystemBackground);
+        m_drawingSurface->setAttribute(Qt::WA_OpaquePaintEvent, false);
         m_drawingSurface->hide();
     }
 
@@ -105,9 +104,7 @@ void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
     m_drawingToolbar->setContentsMargins(0,0,0,0);
     containerBackground = new QFrame(m_drawingToolbar);
-    //containerBackground->move(20, m_mediaRect.height()-m_drawingToolbar->height()-20);
     containerBackground->setContentsMargins(0,0,0,0);
-    //containerBackground->setGeometry(50, m_mediaRect.height()-200-50, 50, 200);
     m_drawingToolbar->setStyleSheet(
         "QFrame {"
         " background-color: palette(base);"
@@ -126,13 +123,13 @@ void DrawingWidget::initDrawingToolbar(){
     // BOUTON COULEUR
     QHBoxLayout* colorLayout = new QHBoxLayout;
     m_colorToolBtn = new ToolbarToggleHoverButton(
-    m_drawingToolbar, 
-    colorLayout,
-    false,
-    "",
-    PrefManager::instance().getText("tooltip_color_tool"),
-    "",
-    PrefManager::instance().getText("tooltip_color_tool")
+        m_drawingToolbar, 
+        colorLayout,
+        false,
+        "",
+        PrefManager::instance().getText("tooltip_color_tool"),
+        "",
+        PrefManager::instance().getText("tooltip_color_tool")
     );
     m_colorToolBtn->setOnRight(true);
     m_colorToolBtn->setIcon(genIconPreviewColor(m_color));
@@ -158,13 +155,13 @@ void DrawingWidget::initDrawingToolbar(){
     // BOUTON CRAYON
     QHBoxLayout* pencilLayout = new QHBoxLayout;
     m_pencilToolBtn = new ToolbarToggleHoverButton(
-    m_drawingToolbar, 
-    pencilLayout,
-    false,
-    "pencil_white",
-    PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(activated)"),
-    "pencil_white",
-    PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(deactivated)")
+        m_drawingToolbar, 
+        pencilLayout,
+        false,
+        "pencil_white",
+        PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(activated)"),
+        "pencil_white",
+        PrefManager::instance().getText("tooltip_pencil_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
     m_pencilToolBtn->setOnRight(true);
     m_pencilToolBtn->setToggledIconFrame(true);
@@ -236,12 +233,12 @@ void DrawingWidget::initDrawingToolbar(){
 
     // BOUTON GOMME
     m_eraserToolBtn = new ToolbarToggleButton(
-    m_drawingToolbar,
-    false,
-    "eraser_white",
-    PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
-    "eraser_white",
-    PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
+        m_drawingToolbar,
+        false,
+        "eraser_white",
+        PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(activated)"),
+        "eraser_white",
+        PrefManager::instance().getText("tooltip_eraser_tool") + " " + PrefManager::instance().getText("(deactivated)")
     );
     m_eraserToolBtn->setToggledIconFrame(true);
     connect(m_eraserToolBtn, &ToolbarToggleButton::clicked, this, &DrawingWidget::updateToolbarButtonsState);
@@ -249,10 +246,11 @@ void DrawingWidget::initDrawingToolbar(){
 
     // BOUTON SUPPRIMER TOUT
     m_binToolBtn = new ToolbarButton(
-    m_drawingToolbar,
-    "delete_white",
-    PrefManager::instance().getText("tooltip_bin_tool")
+        m_drawingToolbar,
+        "delete_white",
+        PrefManager::instance().getText("tooltip_bin_tool")
     );
+    m_binToolBtn->setEnabled(false);
     connect(m_binToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::binRequested);
     drawingToolbarLayout->addWidget(m_binToolBtn);
 
@@ -264,6 +262,7 @@ void DrawingWidget::initDrawingToolbar(){
         "undo_white",
         PrefManager::instance().getText("tooltip_undo_tool")
     );
+    m_undoToolBtn->setEnabled(false);
     connect(m_undoToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::undoDrawing);
     drawingToolbarLayout->addWidget(m_undoToolBtn);
 
@@ -273,6 +272,7 @@ void DrawingWidget::initDrawingToolbar(){
         "redo_white",
         PrefManager::instance().getText("tooltip_redo_tool")
     );
+    m_redoToolBtn->setEnabled(false);
     connect(m_redoToolBtn, &ToolbarButton::clicked, this, &DrawingWidget::redoDrawing);
     drawingToolbarLayout->addWidget(m_redoToolBtn);
 
@@ -497,6 +497,7 @@ void DrawingWidget::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
 
     p.translate(m_mediaRect.topLeft());
+    p.fillRect(rect(), QColor(0,0,0,1));
 
     // Dessin
     for (const DrawingStroke &stroke : m_paths)
@@ -560,6 +561,10 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
         newStroke.lineWidth = m_lineWidth;
 
         m_paths.append(newStroke);
+        if(!m_redoPathlist.isEmpty())
+            m_redoPathlist.clear();
+        if(!m_lastClearedPaths.isEmpty())
+            m_lastClearedPaths.clear();
     }
 
 }

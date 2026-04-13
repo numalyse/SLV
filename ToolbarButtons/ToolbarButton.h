@@ -17,6 +17,9 @@ public:
 
     inline static const QString ICONS_PATH = ":/icons/";
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 };
 
 #endif

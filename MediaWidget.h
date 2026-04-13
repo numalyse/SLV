@@ -78,6 +78,8 @@ private:
     int64_t m_vlcTime;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     unsigned int m_rotationIndex = 0;
+    int m_currentAudioTrack = 1;
+    int m_currentSubtitlesTrack = 0;
     std::vector<const char*> m_vlcArgs ={"--quiet",
         "--aout=directsound",
         "--no-video-title-show",
@@ -123,8 +125,8 @@ signals:
     void mediaRectChanged(const QRect &rect);
     void updateAudioTracksRequested(const QList<QPair<int, QString>>& tracks);
     void updateSubtitlesTracksRequested(const QList<QPair<int, QString>>& tracks);
-    void setAudioTrackDefaultRequested();
-    void setSubtitlesTrackDefaultRequested();
+    void setAudioTrackRequested(int trackId);
+    void setSubtitlesTrackRequested(int trackId);
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
     void mediaIsVideoParsed();

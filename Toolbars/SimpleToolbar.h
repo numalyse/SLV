@@ -69,8 +69,8 @@ public slots:
     void updateAudioTracks(const QList<QPair<int, QString>>& tracks);
     void updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks);
 
-    void setAudioTrackDefault();
-    void setSubtitlesTrackDefault();
+    void setAudioTrackDefault(const int trackId);
+    void setSubtitlesTrackDefault(const int trackId);
     void setAudioTrack(int index);
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
     void setSubtitlesTrack(int index);

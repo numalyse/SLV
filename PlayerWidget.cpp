@@ -80,7 +80,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
     connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
-
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);
@@ -123,8 +122,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
     connect(m_mediaWidget, &MediaWidget::updateSubtitlesTracksRequested, m_toolBar, &SimpleToolbar::updateSubtitlesTracks);
 
-    connect(m_mediaWidget, &MediaWidget::setAudioTrackDefaultRequested, m_toolBar, &SimpleToolbar::setAudioTrackDefault);
-    connect(m_mediaWidget, &MediaWidget::setSubtitlesTrackDefaultRequested, m_toolBar, &SimpleToolbar::setSubtitlesTrackDefault);
+    connect(m_mediaWidget, &MediaWidget::setAudioTrackRequested, m_toolBar, &SimpleToolbar::setAudioTrackDefault);
+    connect(m_mediaWidget, &MediaWidget::setSubtitlesTrackRequested, m_toolBar, &SimpleToolbar::setSubtitlesTrackDefault);
     connect(m_toolBar, &SimpleToolbar::setAudioTrackRequested, m_mediaWidget, &MediaWidget::setAudioTrack);
     connect(m_toolBar, &SimpleToolbar::setSubtitlesTrackRequested, m_mediaWidget, &MediaWidget::setSubtitleTrack);
 

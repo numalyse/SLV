@@ -161,6 +161,10 @@ bool MediaWidget::eject()
     if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
     releaseEventManager();
+    m_hflipped = false;
+    m_vflipped = false;
+    m_rotationIndex = 0;
+    m_vlcArgs = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
 
     QThreadPool::globalInstance()->start([this]() {
         
@@ -195,6 +199,7 @@ void MediaWidget::parseTracks()
 void MediaWidget::setAudioTrack(int trackId)
 {
     if (!m_player) return;
+    m_currentAudioTrack = trackId;
     libvlc_audio_set_track(m_player, trackId);
     qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
 }
@@ -202,6 +207,7 @@ void MediaWidget::setAudioTrack(int trackId)
 void MediaWidget::setSubtitleTrack(int trackId)
 {
     if (!m_player) return;
+    m_currentSubtitlesTrack = trackId;
     libvlc_video_set_spu(m_player, trackId);
     qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
 }
@@ -415,6 +421,9 @@ void MediaWidget::transformMedia()
     libvlc_media_player_play(m_player);
     libvlc_media_player_set_position(m_player, pos);
 
+    setAudioTrack(m_currentAudioTrack);
+    setSubtitleTrack(m_currentSubtitlesTrack);
+
     // shows a black screen when rotating but playing again shows the media back
     if(!wasPlaying)
         pause();
@@ -535,8 +544,8 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
                 mediaWidget->parseTracks();
                 if(!mediaWidget->m_media->audioTracks().isEmpty()){
-                    emit mediaWidget->setAudioTrackDefaultRequested();
-                    emit mediaWidget->setSubtitlesTrackDefaultRequested();
+                    emit mediaWidget->setAudioTrackRequested(mediaWidget->m_currentAudioTrack);
+                    emit mediaWidget->setSubtitlesTrackRequested(mediaWidget->m_currentSubtitlesTrack);
                 }
             }
             

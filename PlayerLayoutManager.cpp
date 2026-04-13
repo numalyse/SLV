@@ -270,7 +270,7 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
             adjacentPlayers->addWidget(m_activePlayers[2]);
             mainSplitter->addWidget(m_activePlayers[0]);
             mainSplitter->addWidget(adjacentPlayers);
-            m_currentArrangement = Arrangement3Left;
+            // m_currentArrangement = Arrangement3Left;
         }
 
         adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
@@ -403,8 +403,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, advancedToolbar, &SimpleToolbar::updateAudioTracks);
     connect(activePlayer->mediaWidget(), &MediaWidget::updateSubtitlesTracksRequested, advancedToolbar, &SimpleToolbar::updateSubtitlesTracks);
 
-    connect(activePlayer->mediaWidget(), &MediaWidget::setAudioTrackDefaultRequested, advancedToolbar, &SimpleToolbar::setAudioTrackDefault);
-    connect(activePlayer->mediaWidget(), &MediaWidget::setSubtitlesTrackDefaultRequested, advancedToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
+    connect(activePlayer->mediaWidget(), &MediaWidget::setAudioTrackRequested, advancedToolbar, &SimpleToolbar::setAudioTrackDefault);
+    connect(activePlayer->mediaWidget(), &MediaWidget::setSubtitlesTrackRequested, advancedToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
 
     // Connecte choix audio/sous-titres au mediawidget
     connect(advancedToolbar, &SimpleToolbar::setAudioTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setAudioTrack);

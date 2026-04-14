@@ -489,9 +489,9 @@ void DrawingWidget::onMediaRectChanged(const QRect &rect)
         double scaleY = double(rect.height()) / double(m_mediaRect.height());
 
         scaleStrokeList(m_paths, scaleX, scaleY);
-        //scaleStrokeList(m_undoPathlist, scaleX, scaleY);
-        //scaleStrokeList(m_redoPathlist, scaleX, scaleY);
-        //scaleStrokeList(m_binPathlist, scaleX, scaleY);
+        for(QVector<DrawingStroke> &pathlist : m_historyPathlist){
+            scaleStrokeList(pathlist, scaleX, scaleY);
+        }
         scaleCurrentEraserPath(scaleX, scaleY);
     }
 

@@ -71,13 +71,15 @@ protected:
     void scaleStrokeList(QVector<DrawingStroke> &strokes, double scaleX, double scaleY);
     void scaleCurrentEraserPath(double scaleX, double scaleY);
 
+    void updateHistoryButtons();
+
 private:
     QRect m_mediaRect;
     bool m_isEnabled = false;
 
     QVector<DrawingStroke> m_paths; // Stocke tous les traits dessinés
     QVector<QVector<DrawingStroke>> m_historyPathlist; // Stocke les différentes étapes de l'historique des traits dessinés
-    int m_historyIndex = -1;
+    int m_currentHistoryIndex = -1;
 
 
     QPoint m_lastPoint;
@@ -85,6 +87,7 @@ private:
 
     bool m_drawing = false;
     bool m_erasing = false;
+    bool m_pathsHasChanged = false;
 
     ToolbarToggleHoverButton* m_pencilToolBtn = nullptr;
     QVector<ToolbarToggleButton*> m_lineWidthBtns;

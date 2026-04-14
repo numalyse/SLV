@@ -33,6 +33,10 @@ DrawingWidget::DrawingWidget(QWidget *parent)
 
     initDrawingSurface();
     initDrawingToolbar();
+
+    qDebug() << "[INIT]";
+    qDebug() << "Pathlist size : " << m_historyPathlist.size();
+    qDebug() << "History Index : " << m_currentHistoryIndex;
 }
 
 void DrawingWidget::showDrawingMode(bool isEnabled)
@@ -399,46 +403,55 @@ void DrawingWidget::binRequested(){
     if (m_paths.isEmpty())
         return;
 
+    while(m_historyPathlist.size() > m_currentHistoryIndex + 1){
+        m_historyPathlist.removeLast();
+    }
+
     m_historyPathlist.append(m_paths);
-    m_historyIndex++;
+    m_currentHistoryIndex++;
     m_paths.clear();
+    updateHistoryButtons();
     update();
 }
 
 // Gestion de l'historique des dessins
 
 void DrawingWidget::updatePathsFromHistory(){
-    if(m_historyIndex >= 0 && m_historyIndex < m_historyPathlist.size()){
-        m_paths = m_historyPathlist[m_historyIndex];
+    if(m_currentHistoryIndex >= 0 && m_currentHistoryIndex < m_historyPathlist.size()){
+        m_paths = m_historyPathlist[m_currentHistoryIndex];
     } else {
+        // dans le cas où on annule tout
         m_paths.clear();
     }
 }
 
+void DrawingWidget::updateHistoryButtons()
+{
+    // S'il y a au moins un trait, on peut activer le binToolBtn
+    m_binToolBtn->setEnabled(!m_paths.isEmpty());
+    // S'il l'index supérieur à 0
+    m_undoToolBtn->setEnabled(m_currentHistoryIndex >= 0);
+    // Si l'index est strictement inférieur à la taille de la liste
+    m_redoToolBtn->setEnabled(m_currentHistoryIndex < m_historyPathlist.size() - 1);
+}
+
 void DrawingWidget::undoDrawing()
 {
-    if(m_historyIndex > 0){
-        m_historyIndex--;
+    if(m_currentHistoryIndex >= 0){
+        m_currentHistoryIndex--;
         updatePathsFromHistory();
+        updateHistoryButtons();
         update();
-
-        m_redoToolBtn->setEnabled(true);
-        if(m_historyIndex == 0){
-            m_undoToolBtn->setEnabled(false);
-        }
-    }
+    } 
 }
 
 void DrawingWidget::redoDrawing()
 {
-    if(m_historyIndex + 1 < m_historyPathlist.size()){
-        m_historyIndex++;
+    if(m_currentHistoryIndex < m_historyPathlist.size() - 1){
+        m_currentHistoryIndex++;
         updatePathsFromHistory();
+        updateHistoryButtons();
         update();
-
-        if(m_historyIndex + 1 >= m_historyPathlist.size()){
-            m_redoToolBtn->setEnabled(false);
-        }
     }
 }
 
@@ -550,6 +563,7 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
     if (m_erasing)
     {
+        m_pathsHasChanged = false;
         m_currentEraserPath = QPainterPath();
         m_currentEraserPath.moveTo(p);
 
@@ -566,17 +580,8 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
         // Ajoute le nouveau trait à m_paths
         m_paths.append(newStroke);
-
-        while(m_historyPathlist.size() > m_historyIndex + 1){
-            m_historyPathlist.removeLast();
-        }
-
-        m_historyPathlist.append(m_paths);
-        m_historyIndex++;
-
-        m_binToolBtn->setEnabled(true);
-        m_undoToolBtn->setEnabled(true);
-        m_redoToolBtn->setEnabled(false);
+        
+        updateHistoryButtons();
     }
 
 }
@@ -609,18 +614,7 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
             if (eraserStroke.intersects(pathStroke))
             {
                 m_paths.removeAt(i);
-
-                while(m_historyPathlist.size() > m_historyIndex + 1){
-                    m_historyPathlist.removeLast();
-                }
-
-                m_historyPathlist.append(m_paths);
-                m_historyIndex++;
-
-                m_binToolBtn->setEnabled(!m_paths.isEmpty());
-                m_undoToolBtn->setEnabled(!m_paths.isEmpty());
-                m_redoToolBtn->setEnabled(false);
-
+                m_pathsHasChanged = true;
             }
         }
 
@@ -631,6 +625,7 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
     if (m_drawing && !m_paths.isEmpty())
     {
         m_paths.last().path.lineTo(p);
+
         update();
     }
 }
@@ -639,7 +634,39 @@ void DrawingWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_erasing)
     {
-        m_currentEraserPath = QPainterPath(); 
+        m_currentEraserPath = QPainterPath();
+
+        if (m_pathsHasChanged)
+        {
+            // Vérifie si l'index actuel correspond à la dernière maj de l'histoirique, sinon supprime
+            while (m_currentHistoryIndex < m_historyPathlist.size() - 1)
+            {
+                m_historyPathlist.removeLast();
+            }
+            // Ajoute m_paths à l'historique
+            m_historyPathlist.append(m_paths);
+            m_currentHistoryIndex++;
+            updateHistoryButtons();
+        }
         update();
     }
+
+    if (m_drawing)
+    {
+        // Vérifie si l'index actuel correspond à la dernière maj de l'histoirique, sinon supprime
+        while(m_currentHistoryIndex < m_historyPathlist.size() - 1){
+            m_historyPathlist.removeLast();
+
+        }
+        // Ajoute m_paths à l'historique
+        m_historyPathlist.append(m_paths);
+        m_currentHistoryIndex++;
+        
+        updateHistoryButtons();
+        update();
+    }
+
+    qDebug() << "Pathlist size : " << m_historyPathlist.size();
+    qDebug() << "History Index : " << m_currentHistoryIndex;
+
 }

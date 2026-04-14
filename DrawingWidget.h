@@ -46,6 +46,7 @@ public slots:
     void updateCurrentOpacityBtnActive(double opacity);
 
     void binRequested();
+    void updatePathsFromHistory();
     void undoDrawing();
     void redoDrawing();
 
@@ -70,20 +71,23 @@ protected:
     void scaleStrokeList(QVector<DrawingStroke> &strokes, double scaleX, double scaleY);
     void scaleCurrentEraserPath(double scaleX, double scaleY);
 
+    void updateHistoryButtons();
+
 private:
     QRect m_mediaRect;
     bool m_isEnabled = false;
 
-    QVector<DrawingStroke> m_paths;
-    QVector<DrawingStroke> m_redoPathlist;
-    QVector<DrawingStroke> m_undoPathlist;
-    QVector<DrawingStroke> m_lastClearedPaths;
+    QVector<DrawingStroke> m_paths; // Stocke tous les traits dessinés
+    QVector<QVector<DrawingStroke>> m_historyPathlist; // Stocke les différentes étapes de l'historique des traits dessinés
+    int m_currentHistoryIndex = -1;
+
 
     QPoint m_lastPoint;
     bool m_hasLastPoint = false;
 
     bool m_drawing = false;
     bool m_erasing = false;
+    bool m_pathsHasChanged = false;
 
     ToolbarToggleHoverButton* m_pencilToolBtn = nullptr;
     QVector<ToolbarToggleButton*> m_lineWidthBtns;

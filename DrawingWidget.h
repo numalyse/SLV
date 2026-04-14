@@ -80,15 +80,15 @@ private:
     QVector<DrawingStroke> m_paths; // Stocke tous les traits dessinés
     QVector<QVector<DrawingStroke>> m_historyPathlist; // Stocke les différentes étapes de l'historique des traits dessinés
     int m_currentHistoryIndex = -1;
-
+    bool m_pathsHasChanged = false; // Met à jour m_paths 
 
     QPoint m_lastPoint;
     bool m_hasLastPoint = false;
 
     bool m_drawing = false;
     bool m_erasing = false;
-    bool m_pathsHasChanged = false;
 
+    // Toolbar de dessin
     ToolbarToggleHoverButton* m_pencilToolBtn = nullptr;
     QVector<ToolbarToggleButton*> m_lineWidthBtns;
     QVector<ToolbarToggleButton*> m_opacityBtns;
@@ -99,6 +99,7 @@ private:
     ToolbarButton* m_redoToolBtn = nullptr;
     ToolbarToggleButton* m_minimizeToolbarBtn = nullptr;
     
+    // Paramètre de dessin
     QPen m_pen;
 
     int m_lineWidth = 4;

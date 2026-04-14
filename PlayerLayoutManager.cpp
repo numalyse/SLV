@@ -419,6 +419,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::setOverlayModeRequested, activePlayer, &PlayerWidget::setOverlayMode);
     
     connect(advancedToolbar, &AdvancedToolbar::showDrawingModeRequested, activePlayer, &PlayerWidget::showDrawingMode);
+    connect(advancedToolbar, &AdvancedToolbar::showDrawingModeRequested, activePlayer, &PlayerWidget::pause);
 
     connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {
         this->duplicatePlayer(activePlayer);

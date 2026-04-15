@@ -39,8 +39,8 @@ signals:
     void playlistEjectPlayer();
     void simpleToolbarUpdateCursorPosition(int);
     void timelineSetPosition(int64_t);
-    void extendedToolbarHideImageEnabled();
-    void extendedToolbarHideImageDisabled();
+    //void extendedToolbarHideImageEnabled();
+    //void extendedToolbarHideImageDisabled();
     void playerWidgetSelectFileCanceled();
     void mediaVolumeChanged(const QString&);
     void mediaSpeedChanged(const QString&);

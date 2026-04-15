@@ -55,8 +55,6 @@ public slots:
     void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
-    void hideMedia();
-    void showMedia();
     void startRecord();
     void endRecord();
     void rotate();
@@ -67,8 +65,6 @@ public slots:
 
     QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
-
-    void setBlackFrameMode(bool isShown, double opacity);
 
     void updateTracks();
 
@@ -93,10 +89,6 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
     QWidget* m_mediaSurface = nullptr;
-
-    QFrame* m_blackFrame = nullptr;
-    double m_opacityBlackFrame = 1.0;
-
 
     int m_startRecordTime = -1;
     VideoCaptureManager m_videoCaptureManager;

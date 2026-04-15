@@ -63,7 +63,7 @@ public slots:
     void updateDrawingButtonUI();
 
 private slots:
-    void updateBlackFrameMode(bool sliderUpdated, double opacity);
+    void updateBlackOpacityMode(bool sliderUpdated, double opacity);
     void updateDrawingMode();
     void updateOverlayMode(); 
 
@@ -95,7 +95,7 @@ signals:
     void rotateRequested();
     void horizontalFlipRequested();
     void verticalFlipRequested();
-    void showBlackFrameModeRequested(bool isEnabled, double opacity);
+    void showBlackOpacityModeRequested(bool isEnabled, double opacity);
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void showDrawingModeRequested(bool isEnabled);
     void prevFrameRequested();

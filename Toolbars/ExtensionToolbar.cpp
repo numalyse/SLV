@@ -47,19 +47,19 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         blackFrameLayout,
         false,
         "hide_image_white",
-        PrefManager::instance().getText("tooltip_hide_image"),
+        PrefManager::instance().getText("tooltip_show_image"),
         "show_image_white",
-        PrefManager::instance().getText("tooltip_show_image")
+        PrefManager::instance().getText("tooltip_hide_image")
     );
     connect(m_blackFrameSlider, &QSlider::valueChanged, this, [this](int newValue){
         double opacity = newValue / 100.0;
         m_blackFrameLabel->setText(QString::number(newValue) + "%");
         qDebug() << "QSlider new opacity : " << opacity;
-        updateBlackFrameMode(true, opacity);
+        updateBlackOpacityMode(true, opacity);
     });
     connect(m_hideImgBtn, &ToolbarToggleHoverButton::clicked, this, [this](){
         double opacity = m_blackFrameSlider->value() / 100.0;
-        updateBlackFrameMode(false, opacity);
+        updateBlackOpacityMode(false, opacity);
     });
 
     m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", PrefManager::instance().getText("tooltip_prev_frame"));
@@ -100,9 +100,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this] { // quand le projet est détruit, on force le button segmentation en false   
             m_segmBtn->setButtonState(false); 
     });
-
-    //connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
-    //connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
 
     connect(m_prevFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::prevFrameRequested);
     connect(m_nextFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::nextFrameRequested);
@@ -191,13 +188,17 @@ ExtensionToolbar::~ExtensionToolbar()
 }
 
 // BLACKFRAME
-void ExtensionToolbar::updateBlackFrameMode(bool sliderUpdated, double opacity){
+void ExtensionToolbar::updateBlackOpacityMode(bool sliderUpdated, double opacity){
     if(sliderUpdated){
-        m_hideImgBtn->setButtonState(true);  
+        if(opacity == 0){
+            m_hideImgBtn->setButtonState(false);  
+        } else {
+            m_hideImgBtn->setButtonState(true);  
+        }
     } else {
         m_hideImgBtn->setButtonState(m_hideImgBtn->isChecked());        
     }
-    emit showBlackFrameModeRequested(m_hideImgBtn->isChecked(), opacity);
+    emit showBlackOpacityModeRequested(m_hideImgBtn->isChecked(), opacity);
 }
 
 // DRAWING MODE

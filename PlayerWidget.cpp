@@ -3,6 +3,7 @@
 #include "Project/ProjectManager.h"
 #include "SignalManager.h"
 #include "CompositionWidget.h"
+#include "BlackOpacityWidget.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -94,6 +95,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     m_drawingWidget = new DrawingWidget(containerWidget);
     stack->addWidget(m_drawingWidget);
 
+    m_blackOpacityWidget = new BlackOpacityWidget(containerWidget);
+    stack->addWidget(m_blackOpacityWidget);
+
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise(); 
 
@@ -115,6 +119,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
 
     connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_blackOpacityWidget, &BlackOpacityWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_drawingWidget, &DrawingWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
@@ -358,6 +363,10 @@ void PlayerWidget::rotate()
     m_mediaWidget->rotate();
 }
 
+void PlayerWidget::setBlackOpacityMode(bool isShown, double opacity){
+    m_blackOpacityWidget->setBlackOpacityMode(isShown, opacity);
+}
+
 void PlayerWidget::showDrawingMode(bool isEnabled){
     m_drawingWidget->showDrawingMode(isEnabled);
 }
@@ -402,7 +411,7 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
 
 void PlayerWidget::widgetSizeChange()
 {
-    if (!m_compositionWidget || !m_drawingWidget || !m_mediaWidget)
+    if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget)
         return;
 
     QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
@@ -410,6 +419,7 @@ void PlayerWidget::widgetSizeChange()
     int w = m_mediaWidget->width();
     int h = m_mediaWidget->height();
 
+    m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
 }
@@ -419,6 +429,7 @@ bool PlayerWidget::event(QEvent *event)
     switch (event->type())
     {
     case QEvent::Show:
+        m_blackOpacityWidget->show();
         m_compositionWidget->show();
         m_drawingWidget->show();
         QTimer::singleShot(50, this, SLOT(widgetSizeChange())); 

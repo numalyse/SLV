@@ -2,6 +2,7 @@
 #define PLAYERWIDGET_H
 
 #include "MediaWidget.h"
+#include "BlackOpacityWidget.h"
 #include "CompositionWidget.h"
 #include "DrawingWidget.h"
 #include "Toolbars/SimpleToolbar.h"
@@ -56,6 +57,7 @@ public slots:
     void startRecord();
     void endRecord();
     void rotate();
+    void setBlackOpacityMode(bool isShown, double opacity);
     void showDrawingMode(bool isEnabled);
     void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void onMediaRectChanged(const QRect &rect);
@@ -113,6 +115,7 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
+    BlackOpacityWidget* m_blackOpacityWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
     DrawingWidget* m_drawingWidget = nullptr;
     QSize m_mediaSize;

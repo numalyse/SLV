@@ -26,12 +26,6 @@
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
-
-    m_blackFrame = new QFrame(this);
-    m_blackFrame->setAttribute(Qt::WA_TranslucentBackground);
-    //m_blackFrame->setStyleSheet("background: black;");
-    m_blackFrame->setStyleSheet("background-color: rgba(0, 0, 255, 128);");
-    //m_blackFrame->lower();
     m_mediaSurface = new QWidget(this);
     m_mediaSurface->setAutoFillBackground(false);
     //m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
@@ -67,15 +61,13 @@ MediaWidget::MediaWidget(QWidget *parent)
     // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique,
     // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
     connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
-    //connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
-    //connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
 
     libvlc_media_player_play(m_player);
 }
 
 void MediaWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
-    painter.fillRect(rect(), Qt::red);
+    painter.fillRect(rect(), Qt::black);
 }
 
 
@@ -349,39 +341,6 @@ void MediaWidget::disableLoopMode()
     m_loopActivated = false;
 }
 
-void MediaWidget::setBlackFrameMode(bool isShown, double opacity){
-    if(isShown){
-        //qDebug() << "MEDIA - opacity received : " << opacity;
-        m_opacityBlackFrame = std::clamp(opacity, 0.0, 1.0);
-        //qDebug() << "MEDIA - opacity clamped : " << m_opacityBlackFrame;
-        int alpha = static_cast<int>(m_opacityBlackFrame * 255.0);
-        //qDebug() << "MEDIA - new alpha : " << alpha;
-        m_blackFrame->setStyleSheet(
-            QString("background-color: rgba(0, 0, 0, %1);").arg(alpha)
-            //QString("background-color: rgba(0, 0, 255, 128);")
-        );
-        m_blackFrame->raise();
-    } else {
-        m_blackFrame->lower();
-    }
-}
-
-void MediaWidget::hideMedia() // Modifie l'opacité, cache le media
-{
-    qDebug() << "hide Media";
-    m_opacityBlackFrame = std::clamp(m_opacityBlackFrame, 0.0, 1.0);
-    int alpha = static_cast<int>(m_opacityBlackFrame * 255.0);
-    m_blackFrame->setStyleSheet(
-        QString("background-color: rgba(0, 0, 0, %4);").arg(alpha)
-    );
-    m_blackFrame->raise();
-}
-
-void MediaWidget::showMedia() // Montre le media
-{
-    m_blackFrame->lower();
-}
-
 void MediaWidget::startRecord()
 {
     if(!m_player || !m_media) return;
@@ -591,11 +550,9 @@ void MediaWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
     QRect mediaRect = getMediaDisplayRect();
     m_mediaSurface->setGeometry(mediaRect);
-    m_blackFrame->setGeometry(mediaRect);
     emit mediaRectChanged(mediaRect);
     qDebug() << "mediaWidget size:" << this->size();
     qDebug() << "m_mediaSurface size:" << m_mediaSurface->size();
-    qDebug() << "m_blackFrame size:" << m_blackFrame->size();
     qDebug() << "Displayed video rect:" << mediaRect;
     qDebug() << "mediasize:" << m_mediaSize;
 }

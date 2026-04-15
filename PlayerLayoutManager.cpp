@@ -416,7 +416,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
         advancedToolbar->updateSubtitlesTracks(activePlayer->mediaWidget()->subtitlesTracks());
     }
 
-    connect(advancedToolbar, &AdvancedToolbar::showBlackFrameModeRequested, activePlayer->mediaWidget(), &MediaWidget::setBlackFrameMode);
+    connect(advancedToolbar, &AdvancedToolbar::showBlackOpacityModeRequested, activePlayer, &PlayerWidget::setBlackOpacityMode);
 
     connect(advancedToolbar, &AdvancedToolbar::setOverlayModeRequested, activePlayer, &PlayerWidget::setOverlayMode);
     

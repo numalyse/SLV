@@ -216,7 +216,7 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         this->updateGeometry();
         
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
-        connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
+        connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [this](unsigned int index){
             m_currentMediaIndex = index;
         });
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);

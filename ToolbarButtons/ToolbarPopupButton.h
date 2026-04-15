@@ -23,6 +23,16 @@ public:
         const QString& toolTipText = "ToolTipOn"
     );
 
+    /// @brief Créer un bouton qui affiche une popup lors du clique. Si le bouton de la souris est activé pendant que la popup est affichée, la popup est cachée.
+    /// @param widgetToDisplay QWidget* à afficher dans la popup lors du clique, Ce QWidget sera détruit par ce bouton
+    explicit ToolbarPopupButton(
+        QWidget* parent = nullptr,
+        //QWidget* widgetToDisplay = nullptr,
+        QWidget *widgetToDisplay = nullptr,
+        const QString& iconName = "",
+        const QString& toolTipText = "ToolTipOn"
+        );
+
     ~ToolbarPopupButton() { 
         delete m_widgetToDisplay; 
         m_widgetToDisplay = nullptr;

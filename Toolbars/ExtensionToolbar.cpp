@@ -89,6 +89,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         PrefManager::instance().getText("tooltip_segmentation_off")
     );
 
+    m_adjustmentWidget = new AdjustmentsWidget(this);
+    m_adjustmentsBtn = new ToolbarPopupButton(this, m_adjustmentWidget, "adjustments_white", PrefManager::instance().getText("tooltip_adjust"));
+
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
         if( ProjectManager::instance().projet() ){
             m_segmBtn->setButtonState(true);
@@ -126,6 +129,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         emit SignalManager::instance().displayPlaylist();
     });
     connect(&SignalManager::instance(), &SignalManager::recordButtonUiUpdate, this, &ExtensionToolbar::updateRecordButtonUI);
+    connect(m_adjustmentWidget, &AdjustmentsWidget::adjustmentChangeRequested, this, &ExtensionToolbar::adjustmentChangeRequested);
+    connect(m_adjustmentWidget, &AdjustmentsWidget::resetAdjustmentsRequested, this, &ExtensionToolbar::resetAdjustmentsRequested);
 
     QHBoxLayout* compoRuleLayout = new QHBoxLayout();
 
@@ -239,6 +244,7 @@ void ExtensionToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_zoomBtn);
     mainLayout->addWidget(m_hideImgBtn);
+    mainLayout->addWidget(m_adjustmentsBtn);
     
     mainLayout->addWidget(m_backwardBtn);
     mainLayout->addWidget(m_prevFrameBtn);
@@ -249,9 +255,9 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->addWidget(m_recordBtn);
     mainLayout->addWidget(m_invBtn);
     // mainLayout->addWidget(m_abloopBtn);
-    mainLayout->addWidget(m_segmBtn);
     mainLayout->addWidget(m_compoRuleBtn);
     mainLayout->addWidget(m_drawingBtn);
+    mainLayout->addWidget(m_segmBtn);
     mainLayout->addStretch();
 
 }

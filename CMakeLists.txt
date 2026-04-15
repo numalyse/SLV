@@ -119,6 +119,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MediaTransformHelper.h
         ExtractSequenceWidget.h ExtractSequenceWidget.cpp
         TimeEditor.h TimeEditor.cpp
+        AdjustmentsWidget.h AdjustmentsWidget.cpp
 
     )
 

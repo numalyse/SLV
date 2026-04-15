@@ -7,11 +7,13 @@
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 #include "OverlayMode.h"
+#include "AdjustmentsWidget.h"
 
 #include <QWidget>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QVector>
+#include <vlc/vlc.h>
 #include <QSlider>
 #include <QLabel>
 
@@ -29,6 +31,7 @@ public:
     void setOverlayMode(int index);
     void setFullscreenUI();
     void setDefaultUI();
+    void initAdjustmentLayout();
     
     //QComboBox* comboBoxCompoRuleBtn = nullptr;
 
@@ -41,15 +44,13 @@ public:
     ToolbarButton* m_rotateBtn= nullptr;
     ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
-    //ToolbarToggleHoverButton* m_compoRuleBtn = nullptr;
-    ToolbarPopupButton* m_compoRuleBtn = nullptr; 
-    //ToolbarButton* m_compoRuleBtn= nullptr;
+    ToolbarPopupButton* m_compoRuleBtn = nullptr;
     ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarToggleButton* m_verticalInvBtn= nullptr;
     ToolbarToggleButton* m_horizontalInvBtn= nullptr;
-    ToolbarToggleButton* m_drawingBtn= nullptr;
-    // ToolbarButton* m_abloopBtn = nullptr;
-    // ToolbarPopupButton* m_multiviewBtn;
+    ToolbarToggleButton* m_drawingBtn = nullptr;
+    ToolbarPopupButton* m_adjustmentsBtn = nullptr;
+    AdjustmentsWidget* m_adjustmentWidget = nullptr;
 
     // playlist btn ?
     // A / B Button voir comment
@@ -100,6 +101,8 @@ signals:
     void showDrawingModeRequested(bool isEnabled);
     void prevFrameRequested();
     void nextFrameRequested();
+    void adjustmentChangeRequested(const libvlc_video_adjust_option_t, const float);
+    void resetAdjustmentsRequested();
 
 };
 

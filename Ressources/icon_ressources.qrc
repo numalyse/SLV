@@ -153,5 +153,17 @@
         <file alias="redo_white">icons/redo_white.png</file>
         <file alias="undo">icons/undo.png</file>
         <file alias="undo_white">icons/undo_white.png</file>
+        <file alias="adjustments">icons/adjustments.png</file>
+        <file alias="adjustments_white">icons/adjustments_white.png</file>
+        <file alias="brightness">icons/brightness.png</file>
+        <file alias="brightness_white">icons/brightness_white.png</file>
+        <file alias="contrast">icons/contrast.png</file>
+        <file alias="contrast_white">icons/contrast_white.png</file>
+        <file alias="hue">icons/hue.png</file>
+        <file alias="hue_white">icons/hue_white.png</file>
+        <file alias="saturation">icons/saturation.png</file>
+        <file alias="saturation_white">icons/saturation_white.png</file>
+        <file alias="reset_adjustments">icons/reset_adjustments.png</file>
+        <file alias="reset_adjustments_white">icons/reset_adjustments_white.png</file>
     </qresource>
 </RCC>

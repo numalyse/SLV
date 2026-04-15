@@ -14,6 +14,8 @@
 #include <QCheckBox>
 #include <QVector>
 #include <vlc/vlc.h>
+#include <QSlider>
+#include <QLabel>
 
 /// @brief Extension de la Toolbar avancée.
 class ExtensionToolbar : public QWidget
@@ -62,9 +64,14 @@ public slots:
     void updateDrawingButtonUI();
 
 private slots:
+    void updateBlackOpacityMode(bool sliderUpdated, double opacity);
     void updateDrawingMode();
     void updateOverlayMode(); 
 
+protected:
+
+    QSlider* m_blackFrameSlider = nullptr;
+    QLabel* m_blackFrameLabel = nullptr;
 
 private:
     /// @brief Adds global shortcuts (that are child of the mainWindow) to be usable when the widget is hidden
@@ -89,6 +96,7 @@ signals:
     void rotateRequested();
     void horizontalFlipRequested();
     void verticalFlipRequested();
+    void showBlackOpacityModeRequested(bool isEnabled, double opacity);
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void showDrawingModeRequested(bool isEnabled);
     void prevFrameRequested();

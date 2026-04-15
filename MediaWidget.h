@@ -10,6 +10,7 @@
 #include <QFrame>
 #include <QDir>
 #include <QComboBox>
+#include <QLabel>
 
 class MediaWidget : public QWidget
 {
@@ -54,8 +55,6 @@ public slots:
     void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
-    void hideMedia();
-    void showMedia();
     void startRecord();
     void endRecord();
     void rotate();
@@ -92,7 +91,7 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
     QWidget* m_mediaSurface = nullptr;
-    QFrame* m_blackFrame = nullptr;
+
     int m_startRecordTime = -1;
     VideoCaptureManager m_videoCaptureManager;
 

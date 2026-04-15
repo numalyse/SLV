@@ -69,6 +69,8 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     connect(m_extensionToolbar, &ExtensionToolbar::prevFrameRequested, this, &AdvancedToolbar::prevFrameRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::nextFrameRequested, this, &AdvancedToolbar::nextFrameRequested);
     
+    connect(m_extensionToolbar, &ExtensionToolbar::showBlackOpacityModeRequested, this, &AdvancedToolbar::showBlackOpacityModeRequested);
+
     connect(m_extensionToolbar, &ExtensionToolbar::setOverlayModeRequested, this, &AdvancedToolbar::setOverlayModeRequested);
     
     connect(m_extensionToolbar, &ExtensionToolbar::showDrawingModeRequested, this, &AdvancedToolbar::showDrawingModeRequested);

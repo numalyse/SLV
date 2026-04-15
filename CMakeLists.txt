@@ -41,6 +41,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Media.h Media.cpp
         GlobalPlayerManager.h GlobalPlayerManager.cpp
 
+        BlackOpacityWidget.h BlackOpacityWidget.cpp
         CompositionWidget.h CompositionWidget.cpp
         DrawingWidget.h DrawingWidget.cpp
 

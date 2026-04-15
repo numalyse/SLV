@@ -27,14 +27,40 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         PrefManager::instance().getText("tooltip_zoom_off")
     );
 
-    m_hideImgBtn = new ToolbarToggleButton(
+    // BOUTON CACHER MEDIA + OPACITE CHOISIE
+    QVBoxLayout* blackFrameLayout = new QVBoxLayout();
+
+    m_blackFrameSlider = new QSlider(Qt::Vertical);
+    m_blackFrameSlider->setRange(0,100);
+    m_blackFrameSlider->setValue(100);
+    m_blackFrameSlider->adjustSize();
+
+    m_blackFrameLabel = new QLabel("100%");
+    blackFrameLayout->addWidget(m_blackFrameLabel);
+    blackFrameLayout->addWidget(m_blackFrameSlider);
+    
+    blackFrameLayout->setAlignment(m_blackFrameLabel, Qt::AlignHCenter);
+    blackFrameLayout->setAlignment(m_blackFrameSlider, Qt::AlignHCenter);
+
+    m_hideImgBtn = new ToolbarToggleHoverButton(
         this, 
+        blackFrameLayout,
         false,
         "hide_image_white",
-        PrefManager::instance().getText("tooltip_hide_image"),
+        PrefManager::instance().getText("tooltip_show_image"),
         "show_image_white",
-        PrefManager::instance().getText("tooltip_show_image")
+        PrefManager::instance().getText("tooltip_hide_image")
     );
+    connect(m_blackFrameSlider, &QSlider::valueChanged, this, [this](int newValue){
+        double opacity = newValue / 100.0;
+        m_blackFrameLabel->setText(QString::number(newValue) + "%");
+        qDebug() << "QSlider new opacity : " << opacity;
+        updateBlackOpacityMode(true, opacity);
+    });
+    connect(m_hideImgBtn, &ToolbarToggleHoverButton::clicked, this, [this](){
+        double opacity = m_blackFrameSlider->value() / 100.0;
+        updateBlackOpacityMode(false, opacity);
+    });
 
     m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", PrefManager::instance().getText("tooltip_prev_frame"));
     m_nextFrameBtn = new ToolbarButton(this, "next_frame_white", PrefManager::instance().getText("tooltip_next_frame"));
@@ -74,9 +100,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this] { // quand le projet est détruit, on force le button segmentation en false   
             m_segmBtn->setButtonState(false); 
     });
-
-    connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
-    connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
 
     connect(m_prevFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::prevFrameRequested);
     connect(m_nextFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::nextFrameRequested);
@@ -164,11 +187,27 @@ ExtensionToolbar::~ExtensionToolbar()
     clearShortcuts();
 }
 
+// BLACKFRAME
+void ExtensionToolbar::updateBlackOpacityMode(bool sliderUpdated, double opacity){
+    if(sliderUpdated){
+        if(opacity == 0){
+            m_hideImgBtn->setButtonState(false);  
+        } else {
+            m_hideImgBtn->setButtonState(true);  
+        }
+    } else {
+        m_hideImgBtn->setButtonState(m_hideImgBtn->isChecked());        
+    }
+    emit showBlackOpacityModeRequested(m_hideImgBtn->isChecked(), opacity);
+}
+
+// DRAWING MODE
 void ExtensionToolbar::updateDrawingMode(){
     m_drawingBtn->setButtonState(m_drawingBtn->isChecked());
     emit showDrawingModeRequested(m_drawingBtn->isChecked());
 }
 
+// OVERLAY MODE
 void ExtensionToolbar::updateOverlayMode(){
     auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex());
     emit setOverlayModeRequested(

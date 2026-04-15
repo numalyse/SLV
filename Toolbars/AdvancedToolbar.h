@@ -26,6 +26,7 @@ public:
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
+    ExtensionToolbar* getExtendedToolbar(){ return m_extensionToolbar; }
 
 public slots:
     void enableButtons();

@@ -10,11 +10,11 @@ ThumbnailWorker::~ThumbnailWorker() {
     stop();
 }
 
-void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize)
+void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize)
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    m_queue.enqueue({requestId, msStart, lenghtMs, mediaPath, targetSize});
+    m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize});
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
 

@@ -3,6 +3,7 @@
 
 #include "Shot.h"
 #include <QObject.h>
+#include <vlc/vlc.h>
 
 enum PlayerLayoutArrangement
 {
@@ -51,6 +52,7 @@ signals:
     void windowMovedOrResized();
     void recordButtonUiUpdate();
     void addPlaylistItems(const QStringList&);
+    void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
 };
 
 

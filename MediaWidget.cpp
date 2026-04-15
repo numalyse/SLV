@@ -471,6 +471,24 @@ void MediaWidget::prevFrame()
     setTime(newTime);
 }
 
+void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value)
+{
+    if(!m_player || !m_media) return;
+    libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
+    libvlc_video_set_adjust_float(m_player, adjustOption, value);
+    qDebug() << "BRIGHTNESS : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
+    qDebug() << "CONTRAST : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast);
+    qDebug() << "SATURATION : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation);
+    qDebug() << "HUE : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue);
+    qDebug() << "GAMMA : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma);
+}
+
+void MediaWidget::resetAdjustments()
+{
+    if(!m_player || !m_media) return;
+    libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0);
+}
+
 QPoint MediaWidget::getMediaPosRect() const
 {
     return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());
@@ -599,7 +617,7 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
         QByteArray urlBytes =
             url.toString(QUrl::FullyEncoded).toUtf8();
 
-        libvlc_media_t *vlcMedia = m_media->vlcMedia();
+        libvlc_media_t *vlcMedia = libvlc_media_new_location(m_vlcInstance, urlBytes.constData());
 
         if (!vlcMedia)
             return;

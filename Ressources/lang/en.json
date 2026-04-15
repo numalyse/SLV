@@ -242,6 +242,16 @@
 
     "project_window_title_copy_video": "Project creation: copying current video...",
     "project_manager_create_project_dialog": "Create project",
-    "project_manager_create_project_dialog_file_type": "Project folder"
+    "project_manager_create_project_dialog_file_type": "Project folder",
+
+    "confirm" : "Confirm",
+
+    "brightness" : "Brightness",
+    "contrast" : "Contrast",
+    "saturation" : "Saturation",
+    "hue" : "Hue",
+    "gamma" : "Gamma",
+
+    "reset" : "Reset"
 
 }

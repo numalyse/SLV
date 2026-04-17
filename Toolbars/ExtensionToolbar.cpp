@@ -7,7 +7,7 @@
 #include "SignalManager.h"
 
 #include <QHBoxLayout>
-#include <qframe.h>
+#include <QFrame>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QIcon>

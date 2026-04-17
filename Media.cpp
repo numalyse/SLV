@@ -2,7 +2,7 @@
 #include "VlcInstance.h"
 #include "VlcParseHelper.h"
 
-#include <qurl.h>
+#include <QUrl>
 #include <QDebug>
 #include <QMimeDatabase>
 #include <QMimeType>
@@ -10,24 +10,35 @@
 
 Media::Media(const QString &filePath, QObject *parent, libvlc_instance_t *vlcInstance) : QObject(parent), m_filePath(filePath)
 {
+    // Créer m_fileInfo en premier pour éviter les null-ptr dereferences
+    m_fileInfo = new QFileInfo(filePath);
 
     QFile f(m_filePath);
-    qDebug() << "Fichier existe ?" << f.exists();
+    qDebug() << "[Media::constructor] Vérification du fichier" << filePath << "- Existe?" << f.exists();
 
     QUrl url = QUrl::fromLocalFile(m_filePath);
     QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
+    qDebug() << "[Media::constructor] URL convertie:" << url.toString();
 
     if(vlcInstance) m_vlcInstance = vlcInstance;
     else m_vlcInstance = SLV::VlcInstance::get();
 
+    if (!m_vlcInstance) {
+        qDebug() << "[Media::constructor] Erreur : instance VLC non disponible";
+        return;
+    }
+    
+    qDebug() << "[Media::constructor] VLC instance obtenue, création du média";
+
     m_vlcMedia = libvlc_media_new_location(m_vlcInstance, urlBytes.constData());
 
     if (!m_vlcMedia){
-        qDebug() << "Erreur lors de l'allocation du média";
+        qDebug() << "[Media::constructor] Erreur lors de l'allocation du média VLC";
         return;
     }
 
-    m_fileInfo = new QFileInfo(filePath);
+    qDebug() << "[Media::constructor] Média VLC créé avec succès";
+
     m_name = m_fileInfo->baseName();
     setType(detectTypeFromFile(filePath));
     //qDebug() << m_name << " type détecté : " << m_type;

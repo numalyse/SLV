@@ -5,12 +5,12 @@
 #include "PlayerLayoutManager.h"
 #include "PrefManager.h"
 
-#include <QObject.h>
+#include <QObject>
 #include <opencv2/opencv.hpp>
-#include <qdebug.h>
-#include <qfileinfo.h>
+#include <QDebug>
+#include <QFileInfo>
 #include <QThread>
-#include <qmessagebox.h>
+#include <QMessageBox>
 
 class GlobalScreenshotHelper : public QThread
 {

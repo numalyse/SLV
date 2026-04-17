@@ -7,7 +7,7 @@
 #include "GenericDialog.h"
 #include "Preference/PreferenceDialog.h"
 
-#include <qtoolbar.h>
+#include <QToolBar>
 #include <vlc/vlc.h>
 
 #include <QTimer>

@@ -4,11 +4,11 @@
 #include <QWidget>
 #include <QTimer>
 #include <QEvent>
-#include <qapplication.h>
-#include <qboxlayout.h>
-#include <qevent.h>
-#include <qframe.h>
-#include <qscreen.h>
+#include <QApplication>
+#include <QBoxLayout>
+#include <QEvent>
+#include <QFrame>
+#include <QScreen>
 
 
 ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QLayout *layoutToDisplay, const QString &iconName, const QString &toolTipText) : ToolbarButton(parent, iconName, toolTipText)

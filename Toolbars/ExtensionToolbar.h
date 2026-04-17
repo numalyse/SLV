@@ -13,6 +13,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QVector>
+#include <QShortcut>
 #include <vlc/vlc.h>
 #include <QSlider>
 #include <QLabel>

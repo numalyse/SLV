@@ -5,8 +5,8 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 
 #include <QWidget>
-#include <PrefManager.h>
-#include <SignalManager.h>
+#include "PrefManager.h"
+#include "SignalManager.h"
 
 /// @brief Classe abstraite qui sert de base pour les différentes toolbars.
 class Toolbar : public QWidget

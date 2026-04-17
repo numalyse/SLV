@@ -11,7 +11,7 @@
 
 #include <QMessageBox>
 #include <QWidget>
-#include <qmainwindow.h>
+#include <QMainWindow>
 #include <vlc/vlc.h>
 #include <QSize>
 

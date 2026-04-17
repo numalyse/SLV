@@ -30,4 +30,4 @@ private:
 
 };
 
-#endif BLACKOPACITYWIDGET_H
+#endif // BLACKOPACITYWIDGET_H

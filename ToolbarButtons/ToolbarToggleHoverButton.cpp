@@ -4,10 +4,10 @@
 #include <QWidget>
 #include <QTimer>
 #include <QEvent>
-#include <qapplication.h>
-#include <qframe.h>
-#include <qlayout.h>
-#include <qscreen.h>
+#include <QApplication>
+#include <QFrame>
+#include <QBoxLayout>
+#include <QScreen>
 
 
 ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *layoutToDisplay, bool state, const QString &iconNameOn, const QString &toolTipTextOn, const QString &iconNameOff, const QString &toolTipTextOff, int timerDuration)

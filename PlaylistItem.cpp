@@ -1,6 +1,8 @@
 #include "PlaylistItem.h"
 #include "PrefManager.h"
-#include <qevent.h>
+#include <QEvent>
+#include <QMouseEvent>
+#include <QApplication>
 #include <QBuffer>
 #include <QProcess>
 

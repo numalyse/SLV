@@ -2,9 +2,9 @@
 #define PLAYLIST_H
 
 #include <QWidget>
-#include <PlaylistItem.h>
+#include "PlaylistItem.h"
 #include <QFileDialog>
-#include <SignalManager.h>
+#include "SignalManager.h"
 #include <QImage>
 #include "./ToolbarButtons/ToolbarToggleButton.h"
 #include "./ToolbarButtons/ToolbarPopupButton.h"

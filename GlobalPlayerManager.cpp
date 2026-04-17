@@ -5,7 +5,7 @@
 
 #include "Project/ProjectManager.h"
 
-#include <qlayout.h>
+#include <QLayout>
 
 #include <QDebug>
 

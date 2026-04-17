@@ -33,10 +33,10 @@ public:
     void setLineWidth(int width);
     void setOpacity(float opacity);
 
-    void enterEvent(QEnterEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void enterEvent(QEnterEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 public slots:
     void onMediaRectChanged(const QRect &rect);

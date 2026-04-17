@@ -3,7 +3,7 @@
 #include "Timeline/ItemTypes.h"
 
 #include <QDebug>
-#include <QScrollbar>
+#include <QScrollBar>
 
 TimelineView::TimelineView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent)
 {

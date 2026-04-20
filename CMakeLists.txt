@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(SLV VERSION 0.1 LANGUAGES CXX)
 
+if(MSVC)
+    add_compile_options(/MP)
+endif()
+
 # =========================================================
 # Options générales
 # =========================================================
@@ -26,7 +30,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Concurrent Core)
 find_package(OpenCV REQUIRED)
 
 # =========================================================
-# Source files
+# Sources de base
 # =========================================================
 set(PROJECT_SOURCES
     main.cpp
@@ -87,40 +91,60 @@ set(PROJECT_SOURCES
     Timeline/ShotManager.h Timeline/ShotManager.cpp
 )
 
-# Add any .cpp files that were not explicitly listed above (helps when files
-# were added/renamed without updating this list). This keeps the CMake file
-# robust during development on multiple platforms.
-## Explicit additional sources (avoid automated globs to keep AUTOMOC stable)
+# =========================================================
+# Fichiers additionnels (fusion des 2 versions)
+# =========================================================
 set(ADDITIONAL_SOURCES
-    AdjustmentsWidget.cpp
-    DecodeThread.cpp
-    FileCopyThread.cpp
-    VideoCaptureManager.cpp
-    ExtractSequenceWidget.cpp
+    # UI / widgets
+    FormLineEditWidget.cpp FormLineEditWidget.h
+    FormTextEditWidget.cpp FormTextEditWidget.h
+    FormLineEdit.cpp FormLineEdit.h
+    FormTextEdit.cpp FormTextEdit.h
 
-    Timeline/SegmentationThread.cpp
-    Timeline/ThumbnailWorker.cpp
-    Timeline/TimelineMath.cpp
-    Timeline/Items/CursorItem.cpp
-    Timeline/Items/ABMarkerItem.cpp
-    Timeline/Items/ShotItem.cpp
-    Timeline/Items/RulerItem.cpp
+    GenericDialog.h
+    GlobalScreenshotHelper.h
+    ErrorsHelper.h
+    ExtractSequenceWidget.cpp ExtractSequenceWidget.h
+    AdjustmentsWidget.cpp AdjustmentsWidget.h
+    TimeEditor.cpp TimeEditor.h
 
-    Preference/Tabs/InterfaceTab.cpp
-    Preference/Tabs/PathTab.cpp
-    Preference/Tabs/ShortcutTab.cpp
-    Preference/Frames/FormShortcutEditFrame.cpp
-    Preference/Frames/FormComboBoxFrame.cpp
-    Preference/Frames/FormPathEditFrame.cpp
+    # Media / backend
+    DecodeThread.cpp DecodeThread.h
+    FileCopyThread.cpp FileCopyThread.h
+    VideoCaptureManager.cpp VideoCaptureManager.h
+    TSQueue.h
+    MediaTransformHelper.h
+    SequenceExtractionHelper.h
 
-    FormLineEditWidget.cpp
-    FormTextEditWidget.cpp
-    FormLineEdit.cpp
-    FormTextEdit.cpp
-    TimeEditor.cpp
-    Preference/BasePreferenceFrame.cpp
+    # Timeline complet
+    Timeline/TimelineMath.cpp Timeline/TimelineMath.h
+    Timeline/SegmentationThread.cpp Timeline/SegmentationThread.h
+    Timeline/ThumbnailWorker.cpp Timeline/ThumbnailWorker.h
+    Timeline/ItemTypes.h
+
+    Timeline/Items/ABMarkerItem.cpp Timeline/Items/ABMarkerItem.h
+    Timeline/Items/CursorItem.cpp Timeline/Items/CursorItem.h
+    Timeline/Items/RulerItem.cpp Timeline/Items/RulerItem.h
+    Timeline/Items/ShotItem.cpp Timeline/Items/ShotItem.h
+
+    # Preferences complètes
+    Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h
+    Preference/Tabs/ShortcutTab.cpp  Preference/Tabs/ShortcutTab.h
+    Preference/Tabs/PathTab.cpp      Preference/Tabs/PathTab.h
+
+    Preference/Frames/FormPathEditFrame.cpp Preference/Frames/FormPathEditFrame.h
+    Preference/Frames/FormShortcutEditFrame.cpp Preference/Frames/FormShortcutEditFrame.h
+    Preference/Frames/FormComboBoxFrame.cpp Preference/Frames/FormComboBoxFrame.h
+
+    Preference/BasePreferenceFrame.cpp Preference/BasePreferenceFrame.h
+
+    # Project extras si manquants
+    SequenceExtractionHelper.h
 )
 
+# =========================================================
+# Fusion sans doublons
+# =========================================================
 foreach(_src IN LISTS ADDITIONAL_SOURCES)
     list(FIND PROJECT_SOURCES "${_src}" _found)
     if(_found EQUAL -1)
@@ -129,7 +153,7 @@ foreach(_src IN LISTS ADDITIONAL_SOURCES)
 endforeach()
 
 # =========================================================
-# Executable
+# Exécutable Qt
 # =========================================================
 if(QT_VERSION_MAJOR GREATER_EQUAL 6)
     qt_add_executable(SLV MANUAL_FINALIZATION ${PROJECT_SOURCES})
@@ -142,8 +166,14 @@ endif()
 # =========================================================
 target_include_directories(SLV PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${OpenCV_INCLUDE_DIRS}
 )
+
+# =========================================================
+# OpenCV (optionnel mais conservé)
+# =========================================================
+if(OpenCV_INCLUDE_DIRS)
+    target_include_directories(SLV PRIVATE ${OpenCV_INCLUDE_DIRS})
+endif()
 
 # =========================================================
 # Qt linking
@@ -174,15 +204,11 @@ if(WIN32)
         "${FFMPEG_DIR}/include"
     )
 
-    target_link_directories(SLV PRIVATE
-        "${FFMPEG_DIR}/lib"
-    )
-
     target_link_libraries(SLV PRIVATE
-        avcodec
-        avformat
-        avutil
-        swscale
+        "${FFMPEG_DIR}/lib/avcodec.lib"
+        "${FFMPEG_DIR}/lib/avformat.lib"
+        "${FFMPEG_DIR}/lib/avutil.lib"
+        "${FFMPEG_DIR}/lib/swscale.lib"
     )
 
 elseif(APPLE)
@@ -233,9 +259,10 @@ endif()
 set(VLC_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vlc-sdk")
 
 if(WIN32)
-
+# Includes
     target_include_directories(SLV PRIVATE "${VLC_SDK_PATH}/include")
     
+# Librairies
     target_link_directories(SLV PRIVATE "${VLC_SDK_PATH}/lib")
 
     target_link_libraries(SLV PRIVATE
@@ -298,17 +325,29 @@ if(WIN32)
         "$<TARGET_FILE_DIR:SLV>/plugins"
     )
 
+
+# Copier libvlc.dll
     add_custom_command(TARGET SLV POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/libvlc.dll"
         "$<TARGET_FILE_DIR:SLV>"
     )
 
+    
+# Copier libvlccore.dll
     add_custom_command(TARGET SLV POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/libvlccore.dll"
         "$<TARGET_FILE_DIR:SLV>"
     )
+
+    # Copier le .py pour le pptx
+add_custom_command(TARGET SLV POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${PYTHON_SCRIPTS_DIR}"
+    "$<TARGET_FILE_DIR:SLV>/pyScripts"
+    COMMENT "Copie des scripts Python vers le dossier de sortie..."
+)
 
     # FFmpeg/OpenCV dll detection (Windows only)
     file(GLOB_RECURSE FFMPEG_DLL_LIST
@@ -318,6 +357,7 @@ if(WIN32)
 
     if(FFMPEG_DLL_LIST)
         list(GET FFMPEG_DLL_LIST 0 FFMPEG_DLL_PATH)
+    message(STATUS "DLL FFMPEG FOUND : ${FFMPEG_DLL_PATH}")
 
         add_custom_command(TARGET SLV POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -330,19 +370,32 @@ if(WIN32)
 
             COMMAND_EXPAND_LISTS
         )
+else()
+    message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
     endif()
 
-    find_program(WINDEPLOYQT_EXECUTABLE windeployqt)
+
+find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
 
     if(WINDEPLOYQT_EXECUTABLE)
         add_custom_command(TARGET SLV POST_BUILD
             COMMAND "${WINDEPLOYQT_EXECUTABLE}"
                 --debug
                 --no-compiler-runtime
+                --verbose 1
                 "$<TARGET_FILE:SLV>"
+            COMMENT "Déploiement des dépendances Qt avec windeployqt..."
         )
     endif()
 
+endif()
+
+set_target_properties(SLV PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
+)
+
+if(WIN32)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 # =========================================================

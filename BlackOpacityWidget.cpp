@@ -8,6 +8,8 @@ BlackOpacityWidget::BlackOpacityWidget(QWidget *parent)
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
+    setWindowFlag(Qt::NoDropShadowWindowHint);
+
 
     initSurface();
 }

@@ -17,6 +17,7 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
+    setWindowFlag(Qt::NoDropShadowWindowHint);
 
     m_pen = QPen(m_color, m_lineWidth);
 

@@ -332,7 +332,6 @@ if(WIN32)
         "${CMAKE_SOURCE_DIR}/libvlc.dll"
         "$<TARGET_FILE_DIR:SLV>"
     )
-
     
 # Copier libvlccore.dll
     add_custom_command(TARGET SLV POST_BUILD
@@ -349,13 +348,68 @@ add_custom_command(TARGET SLV POST_BUILD
     COMMENT "Copie des scripts Python vers le dossier de sortie..."
 )
 
-    # FFmpeg/OpenCV dll detection (Windows only)
-    file(GLOB_RECURSE FFMPEG_DLL_LIST
-        "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll"
-        "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"
+# FFmpeg/OpenCV dll detection (Windows only)
+file(GLOB_RECURSE FFMPEG_DLL_LIST
+    "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll"
+    "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"
+)
+
+# =========================================================
+# macOS-only (bundle / dylib / resources)
+# =========================================================
+if(APPLE)
+
+    # -----------------------------------------------------
+    # Copy runtime resources into .app bundle
+    # -----------------------------------------------------
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:SLV>/../Resources/bin"
     )
 
-    if(FFMPEG_DLL_LIST)
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/bin"
+        "$<TARGET_FILE_DIR:SLV>/../Resources/bin"
+    )
+
+    # -----------------------------------------------------
+    # VLC plugins (mac version = dylib/plugins)
+    # -----------------------------------------------------
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/vlc-sdk/plugins"
+        "$<TARGET_FILE_DIR:SLV>/../Resources/plugins"
+    )
+
+    # -----------------------------------------------------
+    # VLC dynamic libraries (mac: .dylib au lieu de .dll)
+    # -----------------------------------------------------
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/libvlc.dylib"
+        "$<TARGET_FILE_DIR:SLV>"
+    )
+
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/libvlccore.dylib"
+        "$<TARGET_FILE_DIR:SLV>"
+    )
+
+    # -----------------------------------------------------
+    # Python scripts
+    # -----------------------------------------------------
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PYTHON_SCRIPTS_DIR}"
+        "$<TARGET_FILE_DIR:SLV>/../Resources/pyScripts"
+        COMMENT "Copy Python scripts into macOS app bundle..."
+    )
+
+endif()
+
+if(FFMPEG_DLL_LIST)
         list(GET FFMPEG_DLL_LIST 0 FFMPEG_DLL_PATH)
     message(STATUS "DLL FFMPEG FOUND : ${FFMPEG_DLL_PATH}")
 
@@ -372,21 +426,21 @@ add_custom_command(TARGET SLV POST_BUILD
         )
 else()
     message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
-    endif()
+endif()
 
 
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
 
-    if(WINDEPLOYQT_EXECUTABLE)
-        add_custom_command(TARGET SLV POST_BUILD
-            COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                --debug
-                --no-compiler-runtime
-                --verbose 1
-                "$<TARGET_FILE:SLV>"
-            COMMENT "Déploiement des dépendances Qt avec windeployqt..."
-        )
-    endif()
+if(WINDEPLOYQT_EXECUTABLE)
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+            --debug
+            --no-compiler-runtime
+            --verbose 1
+            "$<TARGET_FILE:SLV>"
+        COMMENT "Déploiement des dépendances Qt avec windeployqt..."
+    )
+endif()
 
 endif()
 

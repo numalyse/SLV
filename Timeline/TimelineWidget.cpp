@@ -393,7 +393,6 @@ void TimelineWidget::autoSegmentation(){
         [this, mediaPath]() { 
             auto& txtManager = PrefManager::instance();
             SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
-            segmentationThread->setPriority(QThread::HighPriority);
 
             QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_dialog_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
             progressDialog->setWindowTitle(txtManager.getText("timeline_dialog_title_auto_segmentation"));
@@ -419,6 +418,7 @@ void TimelineWidget::autoSegmentation(){
 
             progressDialog->show();
             segmentationThread->start();
+            segmentationThread->setPriority(QThread::HighPriority);
         },
         nullptr,
         nullptr

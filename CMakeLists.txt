@@ -234,6 +234,8 @@ set(VLC_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vlc-sdk")
 
 if(WIN32)
 
+    target_include_directories(SLV PRIVATE "${VLC_SDK_PATH}/include")
+    
     target_link_directories(SLV PRIVATE "${VLC_SDK_PATH}/lib")
 
     target_link_libraries(SLV PRIVATE

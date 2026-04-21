@@ -341,6 +341,20 @@ void MediaWidget::disableLoopMode()
     m_loopActivated = false;
 }
 
+void MediaWidget::enableZoomMode()
+{
+    m_zoomActivated = true;
+    if(!m_player || !m_media) return;
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+}
+
+void MediaWidget::disableZoomMode()
+{
+    m_zoomActivated = false;
+    if(!m_player || !m_media) return;
+    libvlc_video_set_crop_geometry(m_player, QString("%1x%2+%3+%4").arg(m_media->width()).arg(m_media->height()).arg(0).arg(0).toUtf8().constData());
+}
+
 void MediaWidget::startRecord()
 {
     if(!m_player || !m_media) return;
@@ -559,8 +573,39 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
 void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
-    emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
-    QWidget::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton) {
+
+        if (event->modifiers() & Qt::ControlModifier) {
+            if(!m_player || !m_media || !m_zoomActivated) return;
+            setCursor(Qt::ClosedHandCursor);
+            m_isPanning = true;
+            m_lastPanPos = event->pos();
+        }
+        else{
+            emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+        }
+
+        QWidget::mousePressEvent(event);
+
+    }
+}
+
+void MediaWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(!m_player || !m_media || !m_zoomActivated) return;
+    setCursor(Qt::ArrowCursor);
+    m_isPanning = false;
+}
+
+void MediaWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if(!m_player || !m_media || !m_zoomActivated) return;
+    if(m_isPanning){
+        QPoint deltaPos = event->pos() - m_lastPanPos;
+        m_zoomHelper.move(deltaPos);
+        m_lastPanPos = event->pos();
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+    }
 }
 
 void MediaWidget::resizeEvent(QResizeEvent *event)
@@ -573,6 +618,20 @@ void MediaWidget::resizeEvent(QResizeEvent *event)
     qDebug() << "m_mediaSurface size:" << m_mediaSurface->size();
     qDebug() << "Displayed video rect:" << mediaRect;
     qDebug() << "mediasize:" << m_mediaSize;
+}
+
+void MediaWidget::wheelEvent(QWheelEvent *event)
+{
+    if(!m_player || !m_media || !m_zoomActivated) return;
+
+    int delta = event->angleDelta().y();
+
+    QPointF cursorPosNormalized = QPointF(event->position().x() / geometry().width(), event->position().y() / geometry().height());
+
+    if (delta < 0)
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(0.1, cursorPosNormalized).toUtf8().constData());
+    else
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(-0.1, cursorPosNormalized).toUtf8().constData());
 }
 
 /// @brief Stops the current media player and load a new media from a path
@@ -665,11 +724,14 @@ void MediaWidget::createMedia(const QString& filePath){
         if (m_media)
             emit nameUiUpdateRequested(m_media->fileName());
     }, Qt::QueuedConnection);
-    connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
-    connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
-    m_media->parse();
+    connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested);
+    connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested);
+    connect(m_media, &Media::resolutionParsed, this, [this](){ m_zoomHelper = ZoomHelper(m_media->width(), m_media->height()); });
     connect(m_media, &Media::tracksParsed, this, &MediaWidget::updateTracks);
     connect(m_media, &Media::typeParsed, this, &MediaWidget::typeParsed);
+    m_media->parse();
+
+
     m_media->parseTracks(m_player);
 }
 

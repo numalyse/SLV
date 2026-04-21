@@ -3,6 +3,7 @@
 
 #include "Media.h"
 #include "VideoCaptureManager.h"
+#include "ZoomHelper.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
@@ -55,6 +56,8 @@ public slots:
     void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
+    void enableZoomMode();
+    void disableZoomMode();
     void startRecord();
     void endRecord();
     void rotate();
@@ -74,6 +77,7 @@ private:
     QSize m_mediaSize;
 
     bool m_loopActivated = true;
+    bool m_zoomActivated = false;
     bool m_vflipped = false;
     bool m_hflipped = false;
     int64_t m_vlcTime;
@@ -94,6 +98,9 @@ private:
 
     int m_startRecordTime = -1;
     VideoCaptureManager m_videoCaptureManager;
+    ZoomHelper m_zoomHelper;
+    QPoint m_lastPanPos;
+    bool m_isPanning = false;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
 
@@ -108,8 +115,11 @@ private:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 signals:
     void vlcTimeChanged(int64_t newTime);

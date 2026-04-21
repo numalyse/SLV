@@ -44,6 +44,7 @@ public slots:
 
     void setGlobalPlayState(bool);
     void setGlobalMuteState(bool);
+    void setGlobalZoomState(bool);
 
 private slots:
     void createTimelineWidget();

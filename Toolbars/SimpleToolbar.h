@@ -56,6 +56,8 @@ public slots:
     void stopUiUpdate();
     void enableLoopUiUpdate();
     void disableLoopUiUpdate();
+    void enableZoomUiUpdate();
+    void disableZoomUiUpdate();
     void nameUiUpdate(const QString &);
     void volumeUiUpdate(const QString &);
     void speedUiUpdate(const QString &);

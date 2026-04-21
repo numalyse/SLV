@@ -18,15 +18,6 @@
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
 
-    m_zoomBtn = new ToolbarToggleButton(
-        this, 
-        false,
-        "zoom_white",
-        PrefManager::instance().getText("tooltip_zoom_on"),
-        "zoom_white",
-        PrefManager::instance().getText("tooltip_zoom_off")
-    );
-
     // BOUTON CACHER MEDIA + OPACITE CHOISIE
     QVBoxLayout* blackFrameLayout = new QVBoxLayout();
 
@@ -242,7 +233,6 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
     mainLayout->addStretch();
 
-    mainLayout->addWidget(m_zoomBtn);
     mainLayout->addWidget(m_hideImgBtn);
     mainLayout->addWidget(m_adjustmentsBtn);
     
@@ -325,7 +315,6 @@ void ExtensionToolbar::enableButtons()
     m_recordBtn->setEnabled(true);
     m_rotateBtn->setEnabled(true);
     m_segmBtn->setEnabled(true);
-    m_zoomBtn->setEnabled(true);
     m_compoRuleBtn->setEnabled(true);
     m_drawingBtn->setEnabled(true);
     m_hideImgBtn->setEnabled(true);
@@ -343,7 +332,6 @@ void ExtensionToolbar::disableButtons()
     m_recordBtn->setEnabled(false);
     m_rotateBtn->setEnabled(false);
     m_segmBtn->setEnabled(false);
-    m_zoomBtn->setEnabled(false);
     m_compoRuleBtn->setEnabled(false);
     m_drawingBtn->setEnabled(false);
     m_hideImgBtn->setEnabled(false);

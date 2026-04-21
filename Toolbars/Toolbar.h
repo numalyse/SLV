@@ -31,6 +31,15 @@ public:
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));
         m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white", PrefManager::instance().getText("tooltip_fullscreen"), "fullscreen_white", PrefManager::instance().getText("tooltip_fullscreen"));
         m_screenshotBtn = new ToolbarButton(this, "capture_white", PrefManager::instance().getText("tooltip_capture"));
+        m_zoomBtn = new ToolbarToggleButton(
+            this,
+            false,
+            "zoom_white",
+            PrefManager::instance().getText("tooltip_zoom_on"),
+            "zoom_white",
+            PrefManager::instance().getText("tooltip_zoom_off")
+        );
+        m_zoomBtn->setToggledIconFrame(true);
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
@@ -41,6 +50,8 @@ public:
         connect(m_screenshotBtn, &ToolbarButton::clicked, this, &Toolbar::screenshotRequest);
         connect(&SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled, m_playPauseBtn, [this](){ m_playPauseBtn->setButtonState(false); });
         connect(this, &Toolbar::selectFilePlayCanceled, &SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled);
+        connect(m_zoomBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::enableZoomMode);
+        connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableZoomMode);
     }
 
     ToolbarToggleButton* playPauseBtn() const { return m_playPauseBtn; }
@@ -48,6 +59,7 @@ public:
     ToolbarButton* ejectBtn() const { return m_ejectBtn; }
     ToolbarToggleButton* fullscreenBtn() const { return m_fullscreenBtn; }
     ToolbarToggleButton* muteBtn() { return m_muteBtn; };
+    ToolbarToggleButton* zoomBtn() { return m_zoomBtn; };
 
     virtual ~Toolbar() = default;
 
@@ -83,6 +95,7 @@ protected:
     ToolbarToggleButton* m_fullscreenBtn = nullptr;
     ToolbarButton* m_screenshotBtn = nullptr;
     ToolbarToggleButton* m_muteBtn = nullptr;
+    ToolbarToggleButton* m_zoomBtn = nullptr;
 
 signals:
     void playRequest();
@@ -94,6 +107,8 @@ signals:
     void enableMuteRequest();
     void screenshotRequest();
     void selectFilePlayCanceled();
+    void enableZoomMode();
+    void disableZoomMode();
 };
 
 #endif // TOOLBAR_H

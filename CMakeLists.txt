@@ -120,6 +120,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ExtractSequenceWidget.h ExtractSequenceWidget.cpp
         TimeEditor.h TimeEditor.cpp
         AdjustmentsWidget.h AdjustmentsWidget.cpp
+        ZoomHelper.h
 
     )
 

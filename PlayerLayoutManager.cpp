@@ -29,6 +29,8 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::checkPlayersPlayStatusRequested, this, &PlayerLayoutManager::checkPlayersPlayStatus);
         connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
+        connect(player, &PlayerWidget::enableZoomUiUpdateRequested, this, &PlayerLayoutManager::checkPlayersZoomStatus);
+        connect(player, &PlayerWidget::disableZoomUiUpdateRequested, this, &PlayerLayoutManager::checkPlayersZoomStatus);
         connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
         m_players.append(player);
     }
@@ -337,6 +339,8 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
         connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
+        connect(globalToolbar, &GlobalToolbar::enableZoomMode, IActivePlayer, &PlayerWidget::enableZoomMode);
+        connect(globalToolbar, &GlobalToolbar::disableZoomMode, IActivePlayer, &PlayerWidget::disableZoomMode);
         // connect(globalToolbar, &GlobalToolbar::screenshotRequest, IActivePlayer, &PlayerWidget::takeScreenshot);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerLoaded, globalToolbar, &GlobalToolbar::enableButtons);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerEjected, this, &PlayerLayoutManager::disableGlobalToolbarButtons);
@@ -394,6 +398,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);
     connect(advancedToolbar, &AdvancedToolbar::disableRecordRequested, activePlayer, &PlayerWidget::endRecord);
     connect(advancedToolbar, &AdvancedToolbar::extractSequenceRequest, activePlayer, &PlayerWidget::openSequenceExtractionDialog);
+    connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
+    connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
@@ -592,6 +598,26 @@ void PlayerLayoutManager::checkPlayersMuteStatus(){
     if( m_activePlayers.size() == 1 ) return;
 
     emit setGlobalMuteStateRequested(newGlobalMuteState());
+}
+
+/// @brief Vérifie combien de players sont zoomés
+/// puis retourne un bool correspondant au nouvel état du bouton zoom de la toolbar globale
+bool PlayerLayoutManager::newGlobalZoomState()
+{
+    int activePlayerCount = static_cast<int>(m_activePlayers.size());
+
+    for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
+        if ( !m_activePlayers[Iplayer]->zoomed() ) return false;
+    }
+
+    return true;
+}
+
+/// @brief Envoie le nouvel état du bouton zoom à la toolbar globale
+void PlayerLayoutManager::checkPlayersZoomStatus(){
+    if( m_activePlayers.size() == 1 ) return;
+
+    emit setGlobalZoomStateRequested(newGlobalZoomState());
 }
 
 void PlayerLayoutManager::disableGlobalToolbarButtons()

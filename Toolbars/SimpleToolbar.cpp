@@ -168,6 +168,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addSpacing(m_langBtn->width());
     buttonLayout->addSpacing(m_langBtn->width());
     buttonLayout->addSpacing(m_langBtn->width());
+    buttonLayout->addSpacing(m_langBtn->width());
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_speedBtn);
     buttonLayout->addWidget(m_stopBtn);
@@ -179,6 +180,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_loopBtn);
 
     buttonLayout->addStretch();
+    buttonLayout->addWidget(m_zoomBtn);
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_extractSequenceBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);
@@ -290,6 +292,16 @@ void SimpleToolbar::enableLoopUiUpdate()
 void SimpleToolbar::disableLoopUiUpdate()
 {
     m_loopBtn->setButtonState(false);
+}
+
+void SimpleToolbar::enableZoomUiUpdate()
+{
+    m_zoomBtn->setButtonState(true);
+}
+
+void SimpleToolbar::disableZoomUiUpdate()
+{
+    m_zoomBtn->setButtonState(false);
 }
 
 void SimpleToolbar::nameUiUpdate(const QString & mediaName)

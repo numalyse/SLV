@@ -140,6 +140,8 @@ set(ADDITIONAL_SOURCES
 
     # Project extras si manquants
     SequenceExtractionHelper.h
+    ZoomHelper.h
+
 )
 
 # =========================================================

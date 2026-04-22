@@ -214,10 +214,17 @@ if(WIN32)
 elseif(APPLE)
 
     # =====================================================
-    # macOS (Homebrew)
+    # macOS (Homebrew - Apple Silicon vs Intel)
     # =====================================================
-    set(FFMPEG_INCLUDE_DIR /opt/homebrew/include)
-    set(FFMPEG_LIB_DIR /opt/homebrew/lib)
+
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+        set(HOMEBREW_PREFIX /opt/homebrew)
+    else()
+        set(HOMEBREW_PREFIX /usr/local)
+    endif()
+
+    set(FFMPEG_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
+    set(FFMPEG_LIB_DIR ${HOMEBREW_PREFIX}/lib)
 
     target_include_directories(SLV PRIVATE
         ${FFMPEG_INCLUDE_DIR}
@@ -259,6 +266,11 @@ endif()
 set(VLC_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/vlc-sdk")
 
 if(WIN32)
+
+    # =====================================================
+    # Windows
+    # =====================================================
+
 # Includes
     target_include_directories(SLV PRIVATE "${VLC_SDK_PATH}/include")
     
@@ -272,7 +284,18 @@ if(WIN32)
 
 elseif(APPLE)
 
+    # =====================================================
+    # macOS (VLC - Apple Silicon vs Intel)
+    # =====================================================
+
     set(VLC_APP "/Applications/VLC.app")
+
+    # Détection architecture Homebrew
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+        set(HOMEBREW_PREFIX /opt/homebrew)
+    else()
+        set(HOMEBREW_PREFIX /usr/local)
+    endif()
 
     target_include_directories(SLV PRIVATE
         "${VLC_APP}/Contents/MacOS/include"
@@ -281,16 +304,16 @@ elseif(APPLE)
 
     find_library(VLC_LIB vlc HINTS
         "${VLC_APP}/Contents/MacOS/lib"
-        /opt/homebrew/lib
+        "${HOMEBREW_PREFIX}/lib"
     )
 
     find_library(VLCCORE_LIB vlccore HINTS
         "${VLC_APP}/Contents/MacOS/lib"
-        /opt/homebrew/lib
+        "${HOMEBREW_PREFIX}/lib"
     )
 
     if(NOT VLC_LIB OR NOT VLCCORE_LIB)
-        message(FATAL_ERROR "VLC libs not found on macOS")
+        message(FATAL_ERROR "VLC libs not found on macOS (arm64/intel)")
     endif()
 
     target_link_libraries(SLV PRIVATE
@@ -299,6 +322,10 @@ elseif(APPLE)
     )
 
 else()
+
+    # =====================================================
+    # Linux
+    # =====================================================
 
     target_link_libraries(SLV PRIVATE
         vlc

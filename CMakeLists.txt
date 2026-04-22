@@ -460,14 +460,15 @@ endif()
 
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
 
-if(WINDEPLOYQT_EXECUTABLE)
+if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
     add_custom_command(TARGET SLV POST_BUILD
         COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-            --debug
+            $<$<CONFIG:Debug>:--debug>
+            $<$<CONFIG:Release>:--release>
             --no-compiler-runtime
             --verbose 1
             "$<TARGET_FILE:SLV>"
-        COMMENT "Déploiement des dépendances Qt avec windeployqt..."
+        COMMENT "Déploiement des dépendances Qt avec windeployqt... (Debug/Release automatique)"
     )
 endif()
 

@@ -2,9 +2,9 @@
 #define PLAYLIST_H
 
 #include <QWidget>
-#include <PlaylistItem.h>
+#include "PlaylistItem.h"
 #include <QFileDialog>
-#include <SignalManager.h>
+#include "SignalManager.h"
 #include <QImage>
 #include "./ToolbarButtons/ToolbarToggleButton.h"
 #include "./ToolbarButtons/ToolbarPopupButton.h"
@@ -19,7 +19,7 @@ public:
     explicit Playlist(QWidget *parent = nullptr);
     void updateThumbnail(int playlistItemId, QImage image);
 
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

@@ -1,7 +1,6 @@
 #include "MediaWidget.h"
 
 #include "VlcParseHelper.h"
-#include "VlcInstance.h"
 #include "Media.h"
 #include "SequenceExtractionHelper.h"
 #include "MediaTransformHelper.h"
@@ -18,49 +17,88 @@
 #include <QSize>
 #include <QRect>
 #include <QProcess>
-#include <QFileDialog.h>
+#include <QFileDialog>
 #include <QTextStream>
 
 #include <QThreadPool>
+
+
+// Fonction helper pour appliquer les transformations VLC correctes au média
+void applyTransformOptions(libvlc_media_t* vlcMedia, unsigned int rotation, bool hflip, bool vflip) {
+    auto transformArgs = getArgsFromTransform(rotation, hflip, vflip);
+
+    // Si size > 4, il y a une transformation à appliquer
+    if (transformArgs.size() > 4) {
+        // Activer le filtre transform
+        libvlc_media_add_option(vlcMedia, "--video-filter=transform");
+        qDebug() << "[applyTransformOptions] Filtre transform activé";
+
+        // Si size > 5, il y a une option spécifique de transformation
+        if (transformArgs.size() > 5) {
+            const char* transformOption = transformArgs.back();
+            libvlc_media_add_option(vlcMedia, transformOption);
+            qDebug() << "[applyTransformOptions] Option de transformation appliquée:" << transformOption;
+        }
+    } else {
+        qDebug() << "[applyTransformOptions] Aucune transformation à appliquer";
+    }
+}
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
     m_mediaSurface = new QWidget(this);
     m_mediaSurface->setAutoFillBackground(false);
-    //m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
-    //m_mediaSurface->hide();
-    //setAutoFillBackground(true);
+    m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
+
     QPalette pal = palette();
     pal.setColor(QPalette::Window, Qt::black);
     setPalette(pal);
 
     setAttribute(Qt::WA_NativeWindow);
-    //setAttribute(Qt::WA_DontCreateNativeAncestors);
-    //setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+#ifdef Q_OS_MAC
+    setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
+#endif
 
-    // ===== VLC ===== //
+    const char* const vlc_args[] = {
+        "--quiet",
+        "--no-video-title-show",
+        "--no-input-fast-seek"
+    };
 
-    m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
+    int argc = sizeof(vlc_args) / sizeof(vlc_args[0]);
+
+#ifdef Q_OS_WIN
+    const char* const vlc_args_win[] = {
+        "--quiet",
+        "--no-video-title-show",
+        "--no-input-fast-seek",
+        "--aout=directsound"
+    };
+    m_vlcInstance = libvlc_new(4, vlc_args_win);
+#else
+    m_vlcInstance = libvlc_new(argc, vlc_args);
+#endif
+
     if (!m_vlcInstance) {
-        qDebug() << "Erreur création VLC";
+        qCritical() << "Erreur création VLC";
         return;
     }
+
     m_player = libvlc_media_player_new(m_vlcInstance);
     libvlc_video_set_mouse_input(m_player, 0);
     libvlc_video_set_key_input(m_player, 0);
 
     createEventManager();
-
     managePlayerSystem();
 
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
-    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique,
-    // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
-    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
+    connect(this, &MediaWidget::mediaFinished,
+            &SignalManager::instance(),
+            &SignalManager::mediaWidgetMediaFinished);
 
     libvlc_media_player_play(m_player);
 }
@@ -69,8 +107,6 @@ void MediaWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.fillRect(rect(), Qt::black);
 }
-
-
 
 /// @brief Sets the media player in the application window instead of a new window
 void MediaWidget::managePlayerSystem()
@@ -88,44 +124,46 @@ void MediaWidget::managePlayerSystem()
         m_player,
         m_mediaSurface->winId());
 #endif
-
 }
 
 /// @brief Destructeur qui détache les event managers vlc
 MediaWidget::~MediaWidget()
 {
-
-    // if (m_vlc) {
-    //     libvlc_release(m_vlc);
-    // }
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     }
-    
+
     m_videoCaptureManager.deleteMediaTempDirectory();
     releaseMedia();
 
+    if (m_player) {
+        libvlc_media_player_stop(m_player);
+        libvlc_media_player_release(m_player);
+    }
+
+    if (m_vlcInstance) {
+        libvlc_release(m_vlcInstance);
+    }
 }
 
 bool MediaWidget::play()
 {
     if (!m_player || !m_media) return false;
-    if (libvlc_media_player_play(m_player) == -1) return false;
-    return true;
+    return libvlc_media_player_play(m_player) != -1;
 }
 
 bool MediaWidget::pause()
 {
-    if (!m_player || !m_media)  return false;
+    if (!m_player || !m_media) return false;
     libvlc_media_player_set_pause(m_player, 1);
     return true;
 }
 
 void MediaWidget::togglePlayPause()
 {
-    if (!m_player || !m_media ) return;
+    if (!m_player || !m_media) return;
 
     if (libvlc_media_player_is_playing(m_player)) {
         libvlc_media_player_pause(m_player);
@@ -139,7 +177,7 @@ void MediaWidget::togglePlayPause()
 /// @brief Set the media player position to 0 and pause
 bool MediaWidget::stop()
 {
-    if (!m_player || !m_media ) return false;
+    if (!m_player || !m_media) return false;
 
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
@@ -155,22 +193,22 @@ bool MediaWidget::eject()
     if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
     releaseEventManager();
+
     m_hflipped = false;
     m_vflipped = false;
     m_rotationIndex = 0;
-    m_vlcArgs = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
 
     QThreadPool::globalInstance()->start([this]() {
-        
+
         if(m_player){
             libvlc_media_player_stop(m_player);
-            libvlc_media_player_release(m_player); 
+            libvlc_media_player_release(m_player);
         }
 
-        m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+        m_player = libvlc_media_player_new(m_vlcInstance);
         libvlc_video_set_mouse_input(m_player, 0);
         libvlc_video_set_key_input(m_player, 0);
-        
+
         QMetaObject::invokeMethod(this, [this]() {
             releaseMedia();
             createEventManager();
@@ -394,17 +432,24 @@ void MediaWidget::transformMedia()
     if(!m_player || !m_media) return;
 
     float pos = libvlc_media_player_get_position(m_player);
-    bool wasPlaying = libvlc_media_player_is_playing(m_player) != 0;
+    bool wasPlaying = libvlc_media_player_is_playing(m_player);
 
     releaseEventManager();
 
     libvlc_media_player_stop(m_player);
     libvlc_media_player_release(m_player);
-    libvlc_release(m_vlcInstance);
 
-    m_vlcArgs = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
+    if (m_vlcInstance) {
+        libvlc_release(m_vlcInstance);
+    }
 
-    m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
+#ifdef Q_OS_MAC
+    setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
+#endif
+
+    auto args = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
+
+    m_vlcInstance = libvlc_new(args.size(), args.data());
     m_player = libvlc_media_player_new(m_vlcInstance);
     libvlc_video_set_mouse_input(m_player, 0);
     libvlc_video_set_key_input(m_player, 0);
@@ -734,4 +779,3 @@ void MediaWidget::createMedia(const QString& filePath){
 
     m_media->parseTracks(m_player);
 }
-

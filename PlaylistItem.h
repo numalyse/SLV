@@ -2,11 +2,11 @@
 #define PLAYLISTITEM_H
 
 #include <QWidget>
-#include <Media.h>
+#include "Media.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QLayout>
-#include <TimeFormatter.h>
+#include "TimeFormatter.h"
 #include <QImage>
 #include <QDrag>
 #include <QMimeData>

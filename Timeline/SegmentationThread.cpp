@@ -100,7 +100,13 @@ void SegmentationThread::run()
     arguments << "pyScripts/segmentation.py" << m_videoPath;
     arguments << ("1"); 
 
+#ifdef Q_OS_WIN //WINDOWS
     pythonProcess.start("py", arguments);
+#elif defined(Q_OS_MAC) //MACOS
+    pythonProcess.start("python3", arguments);  
+#else //LINUX 
+    pythonProcess.start("python3", arguments);
+#endif
 
     if (!pythonProcess.waitForStarted()) {
         qCritical() << "Impossible de lancer le script Python.";

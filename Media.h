@@ -25,10 +25,14 @@ public:
 
     QString fileName() const { return m_name; }
     QString filePath() const { return m_filePath; }
-    QString fileExtension() const { return m_fileInfo->suffix(); }
-    qint64 fileSize() const { return m_fileInfo->size(); }
-    bool exists() const { return m_fileInfo->exists(); }
+    QString fileExtension() const { return m_fileInfo ? m_fileInfo->suffix() : QString(); }
+    qint64 fileSize() const { return m_fileInfo ? m_fileInfo->size() : 0; }
+    bool exists() const { return m_fileInfo ? m_fileInfo->exists() : false; }
     MediaType type() const { return m_type; }
+    int64_t duration() const { return m_vlcMedia ? m_duration : 0; }
+    double fps() const { return m_vlcMedia ? m_fps : 0.0; }
+    int height() const { return m_vlcMedia ? m_height : 0; }
+    int width() const { return m_vlcMedia ? m_width : 0; }
     int64_t duration() const { return m_duration; }
     double fps() const { return m_fps; }
     int height() const { return m_height; }

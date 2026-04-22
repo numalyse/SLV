@@ -33,10 +33,6 @@ public:
     double fps() const { return m_vlcMedia ? m_fps : 0.0; }
     int height() const { return m_vlcMedia ? m_height : 0; }
     int width() const { return m_vlcMedia ? m_width : 0; }
-    int64_t duration() const { return m_duration; }
-    double fps() const { return m_fps; }
-    int height() const { return m_height; }
-    int width() const { return m_width; }
     QString sar() const { return m_sar; }
     libvlc_instance_t* vlcInstance() const { return m_vlcInstance; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }

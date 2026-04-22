@@ -36,7 +36,6 @@ public:
     
     //QComboBox* comboBoxCompoRuleBtn = nullptr;
 
-    ToolbarToggleButton* m_zoomBtn = nullptr;
     ToolbarToggleButton* m_hideImgBtn= nullptr;
     ToolbarButton* m_prevFrameBtn= nullptr;
     ToolbarButton* m_nextFrameBtn= nullptr;

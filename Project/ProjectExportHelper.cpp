@@ -292,9 +292,6 @@ namespace ProjectExportHelper {
         if(progressCallback) progressCallback(0);
 
         QDir folder(dstPath);
-        if( folder.exists() ) {
-            folder.removeRecursively();
-        }
 
         if (!QDir().mkpath(dstPath)) {
             qDebug() << "Erreur : Impossible de créer le dossier " << dstPath;
@@ -327,13 +324,14 @@ namespace ProjectExportHelper {
             if (progressCallback && totalShots > 0) {
                 int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
                 if (!progressCallback(percent)) {
-                    folder.removeRecursively();
+                    // folder.removeRecursively();
                     return false;  
                 }
             }
             
             QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
             timeString.replace(":", "-");
+            timeString.replace(".", "-");
         
             QString fileName = QDir(dstPath).filePath("TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png");
 

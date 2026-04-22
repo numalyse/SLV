@@ -33,6 +33,11 @@ public:
     double fps() const { return m_vlcMedia ? m_fps : 0.0; }
     int height() const { return m_vlcMedia ? m_height : 0; }
     int width() const { return m_vlcMedia ? m_width : 0; }
+    int64_t duration() const { return m_duration; }
+    double fps() const { return m_fps; }
+    int height() const { return m_height; }
+    int width() const { return m_width; }
+    QString sar() const { return m_sar; }
     libvlc_instance_t* vlcInstance() const { return m_vlcInstance; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
     QMap<libvlc_meta_t, QString> metaData() const { return m_metaData; }
@@ -43,6 +48,7 @@ public:
     void setHeight(int height) { m_height = height; }
     void setWidth(int width) { m_width = width; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
+    void setSAR(const QString& sar) { m_sar = sar; }
 
     QList<QPair<int, QString>> audioTracks() const { return m_audioTracks; }
     QList<QPair<int, QString>> subtitlesTracks() const { return m_subtitlesTracks; }
@@ -67,6 +73,7 @@ private:
     double m_fps {};
     int m_height = 0;
     int m_width = 0;
+    QString m_sar = "1:1";
 
     QMap<libvlc_meta_t, QString> m_metaData;
 

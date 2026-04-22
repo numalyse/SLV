@@ -7,8 +7,10 @@
     "tooltip_fullscreen": "Fullscreen",
     "tooltip_next_media" : "Next media",
     "tooltip_prev_media" : "Previous media",
-    "tooltip_zoom_on" : "Activate zoom",
-    "tooltip_zoom_off" : "Deactivate zoom",
+    "tooltip_zoom_on" : "Activate zoom mode\nWheel : Zoom \nCtrl + Left Click : Pan",
+    "tooltip_zoom_off" : "Deactivate zoom \nWheel : Zoom \nCtrl + Left Click : Pan",
+    "tooltip_zoom_on_apple" : "Activate zoom mode\nWheel : Zoom \nCmd + Left Click : Pan",
+    "tooltip_zoom_off_apple" : "Deactivate zoom \nWheel : Zoom \nCmd + Left Click : Pan",
     "tooltip_hide_image" : "Hide image",
     "tooltip_show_image" : "Show image",
     "tooltip_backward" : "Backward",
@@ -17,8 +19,8 @@
     "tooltip_capture" : "Screenshot",
     "tooltip_record_off" : "Start recording",
     "tooltip_record_on" : "Stop recording",
-    "tooltip_segmentation_on" : "Show timeline",
-    "tooltip_segmentation_off" : "Hide timeline",
+    "tooltip_segmentation_on" : "Show detailed timeline",
+    "tooltip_segmentation_off" : "Hide detailed timeline",
     "tooltip_composition" : "Composition tool",
     "tooltip_flip_vertical" : "Flip vertically",
     "tooltip_flip_horizontal" : "Flip horizontally",
@@ -152,16 +154,16 @@
     "tooltip_sort_playlist" : "Sort playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
-    "sort_addition_down_playlist" : "By addition ↓",
-    "sort_addition_up_playlist" : "By addition ↑",
+    "sort_addition_down_playlist" : "By ascending addition ↓",
+    "sort_addition_up_playlist" : "By descending addition ↑",
     "tooltip_add_item_playlist" : "Add media",
     "delete" : "Delete",
     "duration" : "Duration",
 
-    "messagebox_not_a_video" : "this media is not a video",
-    "messagebox_extract_sequence_completed" : "Sequence extracted successfully.",
+    "messagebox_not_a_video" : "This media is not a video",
+    "messagebox_extract_sequence_completed" : "Sequence successfully extracted.",
   
-    "tooltip_drawing_mode" : "drawing mode",
+    "tooltip_drawing_mode" : "Drawing Mode",
     "tooltip_pencil_tool" : "Pencil",
     "tooltip_color_tool" : "Color",
     "white" : "White",
@@ -181,7 +183,7 @@
     "tooltip_undo_tool" : "Undo",
     "tooltip_redo_tool" : "Redo",
 
-    "generic_btn_ok": "OK",
+    "generic_btn_ok": "Ok",
     "generic_btn_save": "Save",
     "generic_btn_cancel": "Cancel",
 
@@ -204,7 +206,7 @@
 
     "shortcut_subsection_MainWindow": "Main Window",
     "shortcut_subsection_CommonToolbar": "Standard Toolbar",
-    "shortcut_subsection_AdvancedTB": "Advanced Toolbar",
+    "shortcut_subsection_AdvancedTB": "Expanded Toolbar",
     "shortcut_subsection_ExtensionTB": "Additional Options",
 
     "shortcut_open_media": "Open Media",
@@ -240,7 +242,7 @@
 
     "interface_lang_code": "Interface Language : ",
 
-    "project_window_title_copy_video": "Project creation: copying current video...",
+    "project_window_title_copy_video": "Project creation : Copying current video...",
     "project_manager_create_project_dialog": "Create project",
     "project_manager_create_project_dialog_file_type": "Project folder",
 

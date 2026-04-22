@@ -216,6 +216,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addSpacing(m_speedBtn->size().width());
     buttonLayout->addSpacing(m_speedBtn->size().width());
     buttonLayout->addSpacing(m_speedBtn->size().width());
+    buttonLayout->addSpacing(m_speedBtn->size().width());
 
     buttonLayout->addStretch();
 
@@ -229,6 +230,7 @@ void AdvancedToolbar::setDefaultUI()
 
     buttonLayout->addStretch();
 
+    buttonLayout->addWidget(m_zoomBtn);
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_extractSequenceBtn);
     buttonLayout->addWidget(m_duplicatePlayerBtn);

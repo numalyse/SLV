@@ -33,6 +33,7 @@ public:
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
+    bool zoomed() { return m_toolBar->zoomBtn()->isChecked(); }
 
 public slots:
     void play();
@@ -54,6 +55,8 @@ public slots:
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
+    void enableZoomMode();
+    void disableZoomMode();
     void startRecord();
     void endRecord();
     void rotate();
@@ -91,6 +94,8 @@ signals:
     void unmuteUiUpdateRequested();
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
+    void enableZoomUiUpdateRequested();
+    void disableZoomUiUpdateRequested();
     void nameUiUpdateRequest(const QString& );
     void enableFullscreenUiUpdateRequested();
     void disableFullscreenUiUpdateRequested();

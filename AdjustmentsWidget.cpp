@@ -83,28 +83,28 @@ void AdjustmentsWidget::initUiLayout()
 
     QLabel* brightnessLabel = new QLabel();
     brightnessLabel->setPixmap(QPixmap(":/icons/brightness_white").scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    brightnessLabel->setToolTip(PrefManager::instance().getText("tooltip_brightness"));
+    brightnessLabel->setToolTip(PrefManager::instance().getText("brightness"));
     slidersLayout->addWidget(brightnessLabel, 0, 0, Qt::AlignLeft);
     slidersLayout->addWidget(m_brightnessAdjustment, 0, 1);
     slidersLayout->addWidget(m_brightnessValueLabel, 0, 2, Qt::AlignRight);
 
     QLabel* contrastLabel = new QLabel();
     contrastLabel->setPixmap(QPixmap(":/icons/contrast_white").scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    contrastLabel->setToolTip(PrefManager::instance().getText("tooltip_contrast"));
+    contrastLabel->setToolTip(PrefManager::instance().getText("contrast"));
     slidersLayout->addWidget(contrastLabel, 1, 0, Qt::AlignLeft);
     slidersLayout->addWidget(m_contrastAdjustment, 1, 1);
     slidersLayout->addWidget(m_contrastValueLabel, 1, 2, Qt::AlignRight);
 
     QLabel* saturationLabel = new QLabel();
     saturationLabel->setPixmap(QPixmap(":/icons/saturation_white").scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    saturationLabel->setToolTip(PrefManager::instance().getText("tooltip_saturation"));
+    saturationLabel->setToolTip(PrefManager::instance().getText("saturation"));
     slidersLayout->addWidget(saturationLabel, 2, 0, Qt::AlignLeft);
     slidersLayout->addWidget(m_saturationAdjustment, 2, 1);
     slidersLayout->addWidget(m_saturationValueLabel, 2, 2, Qt::AlignRight);
 
     QLabel* hueLabel = new QLabel();
     hueLabel->setPixmap(QPixmap(":/icons/hue_white").scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    hueLabel->setToolTip(PrefManager::instance().getText("tooltip_hue"));
+    hueLabel->setToolTip(PrefManager::instance().getText("hue"));
     slidersLayout->addWidget(hueLabel, 3, 0, Qt::AlignLeft);
     slidersLayout->addWidget(m_hueAdjustment, 3, 1);
     slidersLayout->addWidget(m_hueValueLabel, 3, 2, Qt::AlignRight);

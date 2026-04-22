@@ -38,6 +38,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
+    connect(m_layoutManager, &PlayerLayoutManager::setGlobalZoomStateRequested, this, &GlobalPlayerManager::setGlobalZoomState);
 
     connect(m_layoutManager, &PlayerLayoutManager::disableNavPanelRequested, this, &GlobalPlayerManager::disableNavPanelRequested);
     connect(m_layoutManager, &PlayerLayoutManager::enableNavPanelRequested, this, &GlobalPlayerManager::enableNavPanelRequested);
@@ -143,6 +144,15 @@ void GlobalPlayerManager::setGlobalMuteState(bool state)
 {
     if(m_toolbarWidget){
         m_toolbarWidget->muteBtn()->setButtonState(state);
+    }
+}
+
+/// @brief Met à jour l'état du bouton zoom
+/// @param state
+void GlobalPlayerManager::setGlobalZoomState(bool state)
+{
+    if(m_toolbarWidget){
+        m_toolbarWidget->zoomBtn()->setButtonState(state);
     }
 }
 

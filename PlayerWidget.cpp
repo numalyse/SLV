@@ -64,6 +64,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
     connect(m_toolBar, &SimpleToolbar::extractSequenceRequest, this, &PlayerWidget::openSequenceExtractionDialog);
+    connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
+    connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -344,6 +346,20 @@ void PlayerWidget::disableLoopMode()
 {
     m_mediaWidget->disableLoopMode();
     emit disableLoopUiUpdateRequested();
+}
+
+void PlayerWidget::enableZoomMode()
+{
+    m_mediaWidget->enableZoomMode();
+    m_toolBar->zoomBtn()->setButtonState(true);
+    emit enableZoomUiUpdateRequested();
+}
+
+void PlayerWidget::disableZoomMode()
+{
+    m_mediaWidget->disableZoomMode();
+    m_toolBar->zoomBtn()->setButtonState(false);
+    emit disableZoomUiUpdateRequested();
 }
 
 void PlayerWidget::startRecord()

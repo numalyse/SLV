@@ -96,6 +96,20 @@ void SegmentationThread::run()
 	QProcess pythonProcess;
     pythonProcess.setProcessChannelMode(QProcess::MergedChannels);
 
+    // Ensure Python has a valid locale when the app is launched from environments
+    // that don't provide locale variables (common on macOS when launched from Finder).
+    // Without LANG/LC_* set Python can fail with "nl_langinfo(CODESET) failed".
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if (env.value("LANG").isEmpty()) {
+        env.insert("LANG", "en_US.UTF-8");
+    }
+    if (env.value("LC_ALL").isEmpty()) {
+        env.insert("LC_ALL", "en_US.UTF-8");
+    }
+    // Force UTF-8 for Python I/O to avoid encoding issues
+    env.insert("PYTHONIOENCODING", "utf-8");
+    pythonProcess.setProcessEnvironment(env);
+
     QStringList arguments;
     arguments << "pyScripts/segmentation.py" << m_videoPath;
     arguments << ("1"); 

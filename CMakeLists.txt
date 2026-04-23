@@ -341,47 +341,118 @@ endif()
 # =========================================================
 if(WIN32)
 
-    # copy runtime DLLs
+    # =====================================================
+    # DIST folder (portable app)
+    # =====================================================
+    set(DEPLOY_DIR "${CMAKE_BINARY_DIR}/dist")
+
+    # =====================================================
+    # FFmpeg detection
+    # =====================================================
+    file(GLOB_RECURSE FFMPEG_DLL_LIST
+        "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll"
+        "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"
+    )
+
+    # =====================================================
+    # OpenCV world DLL detection
+    # =====================================================
+    file(GLOB OPENCV_WORLD_DLL
+        "${OpenCV_DIR}/x64/*/bin/opencv_world*.dll"
+        "${OpenCV_DIR}/bin/opencv_world*.dll"
+    )
+
+    # =====================================================
+    # POST BUILD (DEBUG + RELEASE + DIST)
+    # =====================================================
     add_custom_command(TARGET SLV POST_BUILD
+
+        # -------------------------------------------------
+        # - Copy runtime bin folder (build dir)
+        # -------------------------------------------------
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/bin"
         "$<TARGET_FILE_DIR:SLV>/bin"
-    )
 
-    add_custom_command(TARGET SLV POST_BUILD
+        # -------------------------------------------------
+        # - VLC plugins (build dir)
+        # -------------------------------------------------
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/vlc-sdk/plugins"
         "$<TARGET_FILE_DIR:SLV>/plugins"
-    )
 
-
-# Copier libvlc.dll
-    add_custom_command(TARGET SLV POST_BUILD
+        # -------------------------------------------------
+        # - VLC DLLs (build dir)
+        # -------------------------------------------------
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/libvlc.dll"
         "$<TARGET_FILE_DIR:SLV>"
-    )
-    
-# Copier libvlccore.dll
-    add_custom_command(TARGET SLV POST_BUILD
+
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/libvlccore.dll"
         "$<TARGET_FILE_DIR:SLV>"
+
+        # -------------------------------------------------
+        # - Python scripts (build dir)
+        # -------------------------------------------------
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PYTHON_SCRIPTS_DIR}"
+        "$<TARGET_FILE_DIR:SLV>/pyScripts"
+
+        # =================================================
+        # - ALSO COPY TO DIST (portable version)
+        # =================================================
+
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${DEPLOY_DIR}"
+
+        # exe
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "$<TARGET_FILE:SLV>"
+        "${DEPLOY_DIR}/"
+
+        # bin
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/bin"
+        "${DEPLOY_DIR}/bin"
+
+        # VLC plugins
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/vlc-sdk/plugins"
+        "${DEPLOY_DIR}/plugins"
+
+        # VLC DLLs
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/libvlc.dll"
+        "${DEPLOY_DIR}/"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/libvlccore.dll"
+        "${DEPLOY_DIR}/"
+
+        # Python scripts
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PYTHON_SCRIPTS_DIR}"
+        "${DEPLOY_DIR}/pyScripts"
+
+        # FFmpeg/OpenCV
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${FFMPEG_DLL_LIST}
+        "${DEPLOY_DIR}"
+
+        # OpenCV world DLL (build dir)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${OPENCV_WORLD_DLL}
+            "$<TARGET_FILE_DIR:SLV>"
+
+        # OpenCV world DLL (dist)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${OPENCV_WORLD_DLL}
+            "${DEPLOY_DIR}"
+
+        COMMENT "📦 Copy vers build + dist (Debug/Release + portable)"
     )
 
-    # Copier le .py pour le pptx
-add_custom_command(TARGET SLV POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${PYTHON_SCRIPTS_DIR}"
-    "$<TARGET_FILE_DIR:SLV>/pyScripts"
-    COMMENT "Copie des scripts Python vers le dossier de sortie..."
-)
-
-# FFmpeg/OpenCV dll detection (Windows only)
-file(GLOB_RECURSE FFMPEG_DLL_LIST
-    "${OpenCV_DIR}/x64/*/bin/opencv_videoio_ffmpeg*.dll"
-    "${OpenCV_DIR}/bin/opencv_videoio_ffmpeg*.dll"
-)
+endif()
 
 # =========================================================
 # macOS-only (bundle / dylib / resources)
@@ -457,20 +528,38 @@ else()
     message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
 endif()
 
-
+# =========================
+# QT DEPLOY TOOL
+# =========================
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
 
+# =========================
+# DIST FOLDER (PORTABLE APP)
+# =========================
+set(DEPLOY_DIR "${CMAKE_BINARY_DIR}/dist")
+
+# =========================
+# POST BUILD PACKAGING
+# =========================
 if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
+
     add_custom_command(TARGET SLV POST_BUILD
+
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${DEPLOY_DIR}"
+
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "$<TARGET_FILE:SLV>"
+            "${DEPLOY_DIR}/"
+
         COMMAND "${WINDEPLOYQT_EXECUTABLE}"
             $<$<CONFIG:Debug>:--debug>
             $<$<CONFIG:Release>:--release>
             --no-compiler-runtime
-            --verbose 1
+            --dir "${DEPLOY_DIR}"
             "$<TARGET_FILE:SLV>"
-        COMMENT "Déploiement des dépendances Qt avec windeployqt... (Debug/Release automatique)"
+
+        COMMENT "📦 Génération du package portable Qt dans /dist"
     )
-endif()
 
 endif()
 

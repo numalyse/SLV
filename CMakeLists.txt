@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
 
     Ressources/icon_ressources.qrc
     Ressources/pref_ressources.qrc
+    Ressources/logo_ressources.qrc
 
     PlayerWidget.h PlayerWidget.cpp
     PlayerLayoutManager.h PlayerLayoutManager.cpp
@@ -162,6 +163,14 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
 else()
     add_executable(SLV ${PROJECT_SOURCES})
 endif()
+
+# =========================================================
+# NOM DE L'APP Exécutable Qt
+# =========================================================
+
+set_target_properties(SLV PROPERTIES
+    OUTPUT_NAME "Numalyse Player (alpha version)"
+)
 
 # =========================================================
 # Includes
@@ -590,6 +599,25 @@ install(TARGETS SLV
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+# =========================
+# WINDOWS LOGO
+# =========================
+if(WIN32)
+    target_sources(SLV PRIVATE appicon.rc)
+endif()
+
+# =========================
+# MACOS LOGO
+# =========================
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE numalyse_logo_white.icns)
+
+    set_source_files_properties(Resosurces/logo/numalyse_logo_white.icns PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources")
+
+    target_sources(SLV PRIVATE Ressources/logo/numalyse_logo_white.icns)
+endif()
 
 # =========================================================
 # Qt finalization

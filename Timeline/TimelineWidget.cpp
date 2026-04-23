@@ -37,7 +37,8 @@
 TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& projectMediaPath, QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0); 
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(1);
 
     m_seekTimer = new QTimer(this);
     m_seekTimer->setSingleShot(true);
@@ -57,7 +58,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& proj
     connect(m_abManager, &ABManager::ABLoopOff, this, &TimelineWidget::enableTimeRelatedUI);
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
-    ButtonLayout->setContentsMargins(0, 0, 0, 0); 
+    ButtonLayout->setContentsMargins(5, 0, 0, 0);
 
     m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_segmentation_auto"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
@@ -107,6 +108,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& proj
     layout->addWidget(m_view);
 
     m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMediaPath, projectShots, this);
+    computeMediaAmplitudes(projectMediaPath);
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
@@ -197,6 +199,8 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
 
     m_abManager->updateMarkersPosition();
+
+    m_audioVisualizer->setWidth(m_sceneWidth);
 
     updateCursorPos(m_vlcTime);
 
@@ -423,7 +427,63 @@ void TimelineWidget::autoSegmentation(){
         nullptr,
         nullptr
     );
-
-
     
+}
+
+void TimelineWidget::computeMediaAmplitudes(const QString &mediaPath)
+{
+    QProcess *proc = new QProcess(this);
+
+    QStringList args = {
+        "-loglevel", "quiet",
+        "-i", mediaPath,
+        "-f", "s16le",
+        "-ac", "1",
+        "-ar", "44100",
+        "pipe:1"
+    };
+
+    m_audioBuffer.clear();
+    m_amplitudeList.clear();
+
+    connect(proc, &QProcess::readyReadStandardOutput, this, [this, proc]() {
+
+        m_audioBuffer.append(proc->readAllStandardOutput());
+
+        const int frameSamples = 1024;
+        const int frameBytes = frameSamples * sizeof(int16_t);
+
+        while (m_audioBuffer.size() >= frameBytes) {
+
+            const int16_t *samples =
+                reinterpret_cast<const int16_t*>(m_audioBuffer.constData());
+
+            double sum = 0.0;
+
+            for (int i = 0; i < frameSamples; ++i) {
+                sum += std::abs((double)samples[i]);
+            }
+
+            double amplitude = (sum / frameSamples) / 32768.0;
+
+            m_amplitudeList.append(amplitude);
+
+            m_audioBuffer.remove(0, frameBytes);
+        }
+    });
+
+    connect(proc, &QProcess::readyReadStandardError, this, [proc]() {
+        proc->readAllStandardError();
+    });
+
+    connect(proc, &QProcess::finished, this, [this](){ initAudioVisualizer(); });
+
+    proc->start("ffmpeg", args);
+}
+
+void TimelineWidget::initAudioVisualizer()
+{
+    m_audioVisualizer = new AudioVisualizerItem(m_amplitudeList, m_sceneWidth);
+    m_audioVisualizer->setPos(0, 0);
+    m_scene->addItem(m_audioVisualizer);
 }

@@ -20,6 +20,7 @@
 #include <QProcess>
 #include <QFileDialog.h>
 #include <QTextStream>
+#include <QFontDatabase>
 
 #include <QThreadPool>
 

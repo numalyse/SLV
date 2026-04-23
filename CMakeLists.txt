@@ -121,6 +121,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         TimeEditor.h TimeEditor.cpp
         AdjustmentsWidget.h AdjustmentsWidget.cpp
         ZoomHelper.h
+        Timeline/Items/AudioShotItem.h Timeline/Items/AudioShotItem.cpp
+        Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
 
     )
 

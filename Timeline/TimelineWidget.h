@@ -14,6 +14,7 @@
 #include "Timeline/Items/RulerItem.h"
 #include "Timeline/Items/CursorItem.h"
 #include "Timeline/Items/ShotItem.h"
+#include "Timeline/Items/AudioVisualizerItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -41,6 +42,8 @@ public slots:
     void goToShot(int);
     void mergeWithPrevShotAction();
     void mergeWithNextShotAction();
+    void computeMediaAmplitudes(const QString& mediaPath);
+    void initAudioVisualizer();
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
@@ -76,6 +79,7 @@ private:
 
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
+    AudioVisualizerItem* m_audioVisualizer = nullptr;
 
     TimelineMath* m_mathManager = nullptr;
     ShotManager* m_shotManager = nullptr;
@@ -103,6 +107,8 @@ private:
 
     int m_rulerHeight = 25;
 
+    QByteArray m_audioBuffer;
+    QVector<double> m_amplitudeList;
 
 };
 

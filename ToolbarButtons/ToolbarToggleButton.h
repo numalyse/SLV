@@ -28,6 +28,10 @@ public:
 
     inline static const QString ICONS_PATH = ":/icons/";
 
+protected:
+    QIcon updateIconColor(QString iconName);
+
+
 signals:
     void stateActivated();  // Emis quand le bouton est "On"
     void stateDeactivated(); // Emis quand le bouton est "Off"

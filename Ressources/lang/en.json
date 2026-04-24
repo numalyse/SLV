@@ -141,6 +141,10 @@
 
     "main_window_menu_bar_option": "Options",
     "main_window_option_open_pref": "Preferences",
+    
+    "main_window_menu_bar_help" : "Help",
+    "main_window_option_open_helper" : "Help",
+    "main_window_option_open_about" : "About",
 
     "(activated)" : "(Activated)",
     "(deactivated)" : "(Deactivated)",

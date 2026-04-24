@@ -81,7 +81,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& proj
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
     m_mergeWithNextShotBtn->setEnabled(false);
 
-    m_exportBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_export"));
+    m_exportBtn = new ToolbarButton(this, "export_white", PrefManager::instance().getText("tooltip_export"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 

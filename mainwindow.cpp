@@ -4,6 +4,8 @@
 #include "Project/ProjectManager.h"
 #include "PlayerWidget.h"
 #include "PrefManager.h"
+#include "HelperWidget.h"
+#include "AboutWidget.h"
 #include "GenericDialog.h"
 #include "Preference/PreferenceDialog.h"
 
@@ -129,6 +131,13 @@ void MainWindow::createMenuBar()
     auto *openPrefAction = OptionMenu->addAction("&" + prefManager.getText("main_window_option_open_pref"));
     connect(openPrefAction, &QAction::triggered, this, &MainWindow::openPrefWidget);
 
+    auto *HelpMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_help"));
+
+    auto *openHelperAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
+    connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);    
+
+    auto *openAboutAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_about"));
+    connect(openAboutAction, &QAction::triggered, this, &MainWindow::openAboutWidget);
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
 
@@ -381,4 +390,16 @@ void MainWindow::openPrefWidget()
 {
     PreferenceDialog* prefDialog = new PreferenceDialog(this);
     prefDialog->exec();
+}
+
+void MainWindow::openHelperWidget()
+{
+    HelperWidget* helpDialog = new HelperWidget(this);
+    helpDialog->exec();
+}
+
+void MainWindow::openAboutWidget()
+{
+    AboutWidget* aboutDialog = new AboutWidget(this);
+    aboutDialog->exec();
 }

@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QCheckBox>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 namespace {
 QStringList collectValidFilesFromPath(const QString &path)
@@ -79,7 +81,11 @@ Playlist::Playlist(QWidget *parent)
 
     // [Bouton] Ajouter un élément à la playlist
     m_addItemBtn = new QPushButton;
-    m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    } else {
+        m_addItemBtn->setIcon(QIcon(":/icons/plus"));
+    }
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
     m_addItemBtn->setStyleSheet("QPushButton{"

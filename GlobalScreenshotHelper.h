@@ -28,6 +28,7 @@ public:
 private:
 
     inline void takeGlobalScreenshot(){
+        qDebug() << "Global Screenshot";
         Q_ASSERT(playersPaths.size() == playersTimes.size());
         auto& prefManager = PrefManager::instance();
         QList<cv::Mat> screenshots;
@@ -35,10 +36,13 @@ private:
         cv::VideoCapture cap;
         int minWidth = 10000000;
         int minHeight = 10000000;
-        QString mergedPath( prefManager.getPref("Paths", "screenshot") + '/');
+        QString mergedPath(prefManager.getPref("Paths", "screenshot") + '/');
+
         for(size_t IPlayer = 0; IPlayer<playersPaths.size(); ++IPlayer){
+            cap.release();
             cap.open(playersPaths[IPlayer].toStdString(), cv::CAP_FFMPEG);
             QString p = playersPaths.at(IPlayer);
+
             if (!cap.isOpened()) {
                 qDebug() << "Impossible d'ouvrir le média";
                 // QMessageBox messageBox;
@@ -55,22 +59,32 @@ private:
                 // messageBox.critical(0,"Error","Erreur dans le chargement du screenshot de " + playersPaths[IPlayer]);
                 // messageBox.exec();
                 return;
-
             }
             screenshots.append(playerFrame);
+
             QString path = QFileInfo(playersPaths[IPlayer]).baseName();
             double fps = cap.get(cv::CAP_PROP_FPS);
-            if(!cv::imwrite(( prefManager.getPref("Paths", "screenshot") + '/' + path.toUtf8().constData() + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) + ".png").toStdString(), playerFrame)){
+            QByteArray pathBytes = path.toUtf8();
+
+            QString fullOutputPath = prefManager.getPref("Paths", "screenshot")
+                                    + '/'
+                                    + pathBytes.constData()
+                                    + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps)
+                                    + ".png";
+
+            if(!cv::imwrite(fullOutputPath.toStdString(), playerFrame)){
                 qDebug() << "Erreur dans l'enregistrement de la capture multiple";
                 // QMessageBox messageBox;
                 // messageBox.critical(0,"Error","Erreur dans l'enregistrement de la capture multiple !");
                 // messageBox.exec();
             }
-            mergedPath += path.left(std::min(5, int(path.size()))) + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) + (IPlayer != playersPaths.size()-1 ? "_" : "");
+            mergedPath += path.left(std::min(5, int(path.size()))) 
+                        + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) 
+                        + (IPlayer != playersPaths.size()-1 ? "_" : "");
+                        
             minWidth = std::min(minWidth, playerFrame.cols);
             minHeight = std::min(minHeight, playerFrame.rows);
         }
-
 
         for(size_t IPlayer = 0; IPlayer < screenshots.size(); ++IPlayer){
             int origWidth = screenshots[IPlayer].cols;
@@ -166,6 +180,7 @@ private:
         }
 
         mergedPath += ".png";
+        qDebug() << "final mergedPath : " << mergedPath;
         cv::imwrite(mergedPath.toUtf8().constData(), mergedScreenshot);
     }
 

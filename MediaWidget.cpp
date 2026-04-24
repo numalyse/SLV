@@ -71,11 +71,19 @@ MediaWidget::MediaWidget(QWidget *parent)
     int argc = sizeof(vlc_args) / sizeof(vlc_args[0]);
 
 #ifdef Q_OS_WIN
+    QByteArray pluginPath = QCoreApplication::applicationDirPath()
+        .append("/plugins")
+        .toLocal8Bit();
+
+    std::string pluginArg = "--plugin-path=" + std::string(pluginPath.constData());
+
     const char* const vlc_args_win[] = {
         "--quiet",
         "--no-video-title-show",
         "--no-input-fast-seek",
-        "--aout=directsound"
+        "--aout=directsound",
+        pluginArg.c_str(),
+        "--verbose=2"
     };
     m_vlcInstance = libvlc_new(4, vlc_args_win);
 #else
@@ -332,14 +340,20 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
 void MediaWidget::takeScreenshot()
 {
     if (!m_player) return;
+    
     auto& prefManager = PrefManager::instance();
-    QString captureDirectory = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
+
+    QByteArray capturePathBytes = capturePath.toUtf8();
+
+    int w = m_media->width();
+    int h = m_media->height();
 
     // if there is a problem with media resolution here, make sure to recieve Media::resolutionParsed(tuple<int, int>) signal first
     if(m_rotationIndex % 2 == 0)
-        libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->width(), m_media->height());
+        libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), w, h);
     else
-        libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->height(), m_media->width());
+        libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), h, w);
 }
 
 void MediaWidget::setTime(int64_t time)

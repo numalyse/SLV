@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <cstdlib>
 #include <cstdio>
+#include <QCoreApplication>
 
 namespace SLV
 {
@@ -41,11 +42,19 @@ private:
         fflush(stderr);
         
 #ifdef Q_OS_WIN
+    QByteArray pluginPath = QCoreApplication::applicationDirPath()
+        .append("/plugins")
+        .toLocal8Bit();
+
+    std::string pluginArg = "--plugin-path=" + std::string(pluginPath.constData());
+
         const char* const vlc_args[] = {
             "--quiet",
             "--aout=directsound",
             "--no-video-title-show",
-            "--no-input-fast-seek"
+            "--no-input-fast-seek",
+            pluginArg.c_str(),
+            "--verbose=2"
         };
         fprintf(stderr, "[VlcInstance::constructor] Configuration Windows détectée\n");
 #elif defined(Q_OS_MAC)

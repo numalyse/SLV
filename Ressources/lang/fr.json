@@ -241,6 +241,10 @@
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
 
     "interface_lang_code" : "Langue de l'interface : ",
+
+    "dialog_open_files" : "Ouvrir des fichiers multimédia",
+    "dialog_open_file" : "Ouvrir un fichier",
+    "dialog_open_project" : "Ouvrir un projet",
   
     "project_window_title_copy_video": "Création du projet : copie de la vidéo en cours...",
     "project_manager_create_project_dialog": "Créer un projet",

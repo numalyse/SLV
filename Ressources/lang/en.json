@@ -242,6 +242,10 @@
 
     "interface_lang_code": "Interface Language : ",
 
+    "dialog_open_files": "Open multimedia files",
+    "dialog_open_file": "Open a file",
+    "dialog_open_project": "Open a project",
+
     "project_window_title_copy_video": "Project creation : Copying current video...",
     "project_manager_create_project_dialog": "Create project",
     "project_manager_create_project_dialog_file_type": "Project folder",

@@ -7,3 +7,4 @@ vlc-sdk/
 .qtcreator/CMakeLists.txt.user
 /.qtcreator
 .DS_Store
+installer/Output/

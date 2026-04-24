@@ -31,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     //this->setCentralWidget(ui->centralwidget);
 
     // ===== Info ===== //
-    setWindowTitle("SLV (Windows) (dev version)");
+    setWindowTitle("Numalyse Player (alpha version)");
+    setWindowIcon(QIcon(":/logo/numalyse_logo_white"));
     // setWindowIcon(QIcon("../icon/numalyse_logo.ico"));
     // QString path = "../icon/numalyse_logo.ico";
     // QFile f(path);

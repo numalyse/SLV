@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/logo">
+        <file alias="numalyse_logo">logo/numalyse_logo.png</file>
+        <file alias="numalyse_logo_white">logo/numalyse_logo_white.png</file>
+    </qresource>
+</RCC>

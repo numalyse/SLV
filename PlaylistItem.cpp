@@ -307,7 +307,11 @@ void PlaylistItem::updateThumbnail()
         }
 
         if (m_mediaData->type() == MediaType::Audio){
-            m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+                m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            } else {
+                m_mediaThumbnailImage = new QPixmap(":/icons/music_note");
+            }
             m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     });

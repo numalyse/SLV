@@ -102,6 +102,7 @@ void ToolbarToggleButton::setButtonState(bool state)
 void ToolbarToggleButton::setToggledIconFrame(bool framed)
 {
     if(framed){
+        QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "rgba(240,240,240,1);" : "rgba(0,0,0,1);";
         setStyleSheet(
             "ToolbarToggleButton{"
             "   background-color: rgba(0,0,0,0);"
@@ -115,12 +116,12 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
             "}"
             "ToolbarToggleButton:checked{"
             // "   background-color: palette(button);"
-            "   border: 1px solid rgba(240,240,240,1);"
+            "   border: 1px solid " + color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:checked:hover{"
             // "   background-color: palette(button);"
-            "   border: 1px solid rgba(240,240,240,1);"
+            "   border: 1px solid" + color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:disabled{"

@@ -1,7 +1,7 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarToggleButton.h"
-
-
+#include <QStyleHints>
+#include <QGuiApplication>
 
 ToolbarToggleButton::ToolbarToggleButton(
     QWidget *parent, 
@@ -28,14 +28,42 @@ ToolbarToggleButton::ToolbarToggleButton(
     connect(this, &QPushButton::clicked, this, &ToolbarToggleButton::onButtonToggled);
 }
 
+QIcon ToolbarToggleButton::updateIconColor(QString iconName){
+    QPixmap pix(iconName);
+
+    QImage img = pix.toImage();
+
+    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark)
+    {
+        for (int y = 0; y < img.height(); ++y)
+        {
+            for (int x = 0; x < img.width(); ++x)
+            {
+                QColor c = img.pixelColor(x, y);
+
+                if (c.alpha() > 0)
+                {
+                    c.setRgb(0, 0, 0);
+                    c.setAlpha(255);
+                    img.setPixelColor(x, y, c);
+                }
+            }
+        }
+    }
+
+    return QIcon(QPixmap::fromImage(img));
+}
+
 
 void ToolbarToggleButton::updateIcons(bool checked)
 {
     if (checked) {
-        setIcon(QIcon(m_iconPathOn));
+        //setIcon(QIcon(m_iconPathOn));
+        setIcon(updateIconColor(m_iconPathOn));
         setToolTip(m_toolTipTextOn);
     } else {
-        setIcon(QIcon(m_iconPathOff));
+        //setIcon(QIcon(m_iconPathOff));
+        setIcon(updateIconColor(m_iconPathOff));
         setToolTip(m_toolTipTextOff);
     }
 }
@@ -43,11 +71,13 @@ void ToolbarToggleButton::updateIcons(bool checked)
 void ToolbarToggleButton::toggleUpdateIcon()
 {
     if(isChecked()){
-        setIcon(QIcon(m_iconPathOn));
+        //setIcon(QIcon(m_iconPathOn));
+        setIcon(updateIconColor(m_iconPathOn));
         setToolTip(m_toolTipTextOn);
     }
     else{
-        setIcon(QIcon(m_iconPathOff));
+        //setIcon(QIcon(m_iconPathOff));
+        setIcon(updateIconColor(m_iconPathOff));
         setToolTip(m_toolTipTextOff);
     }
 }

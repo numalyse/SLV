@@ -238,9 +238,9 @@ void MainWindow::selectAndLoadMediaFiles()
     auto& prefManager = PrefManager::instance();
     QStringList files_paths = QFileDialog::getOpenFileNames(
         this, 
-        prefManager.getText("open_files"), 
-        prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        prefManager.getText("open_files"),
+        prefManager.getPref("Paths", "lp_open_media"),
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.jpeg *.wav *.mp3)"
     );
     
     if(files_paths.empty()){

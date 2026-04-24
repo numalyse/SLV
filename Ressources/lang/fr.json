@@ -262,6 +262,19 @@
     "hue" : "Teinte",
     "gamma" : "Gamma",
 
-    "reset" : "Réinitialiser"
+    "reset" : "Réinitialiser",
+    "close" : "Fermer",
+
+    "about_dialog_title" : "À propos",
+    "about_dialog_project" : "Application développée dans le cadre du projet ANR Numalyse",
+    "about_dialog_qt" : "Développé avec Qt© 2026 - tous droits réservés",
+    "about_dialog_version" : "V1.0-alpha 24 avril 2026",
+
+    "help_dialog_title" : "Aide",
+    "help_dialog_wip" : "En cours de développement.",
+    "help_dialog_report" : "Pour signaler un problem, veuillez nous contacter aux adresses suivantes :",
+
+    "messagebox_screenshot_with_adjustment" : "Le média actuel possède des ajustements. Voulez-vous enregistrer une capture d'écran sans les ajustements ?",
+    "screenshot_without_adjustment_button" : "Capture sans enregistrement"
 
 }

@@ -159,9 +159,9 @@ endforeach()
 # Exécutable Qt
 # =========================================================
 if(QT_VERSION_MAJOR GREATER_EQUAL 6)
-    qt_add_executable(SLV MANUAL_FINALIZATION ${PROJECT_SOURCES})
+    qt_add_executable(SLV WIN32 MANUAL_FINALIZATION ${PROJECT_SOURCES})
 else()
-    add_executable(SLV ${PROJECT_SOURCES})
+    add_executable(SLV WIN32 ${PROJECT_SOURCES})
 endif()
 
 # =========================================================
@@ -169,7 +169,7 @@ endif()
 # =========================================================
 
 set_target_properties(SLV PROPERTIES
-    OUTPUT_NAME "Numalyse Player (alpha version)"
+    OUTPUT_NAME "NumalysePlayer"
 )
 
 # =========================================================

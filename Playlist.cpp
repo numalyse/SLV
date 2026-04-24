@@ -88,14 +88,15 @@ Playlist::Playlist(QWidget *parent)
     }
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     m_addItemBtn->setStyleSheet("QPushButton{"
         "   background-color: rgba(0,0,0,0);"
-        "   border: 2px dashed palette(button);"
+        "   border: 2px dashed" + color +
         "   border-radius: 4px;"
         "}"
         "QPushButton:hover{"
         "   background-color: palette(button);"
-        "   border: 2px solid palette(button);"
+        "   border: 2px solid " + color +
         "   border-radius: 4px;"
         "}");
     playlistLabelLayout->addWidget(m_addItemBtn);

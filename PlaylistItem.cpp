@@ -5,6 +5,8 @@
 #include <QApplication>
 #include <QBuffer>
 #include <QProcess>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     : QWidget{parent}
@@ -24,7 +26,11 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     // thumbnail
     m_mediaThumbnailLabel = new QLabel();
     m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
-    m_mediaThumbnailImage = new QPixmap(":/icons/hide_image_white");
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_mediaThumbnailImage = new QPixmap(":/icons/hide_image_white");
+    } else {
+        m_mediaThumbnailImage = new QPixmap(":/icons/hide_image");
+    }
     m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
@@ -43,7 +49,11 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // icone
     m_mediaTypeIconLabel = new QLabel();
-    m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+    } else {
+        m_mediaTypeIcon = new QPixmap(":/icons/show_image");
+    }
     m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16,16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     // durée
@@ -59,7 +69,11 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // bouton delete
     m_deleteBtn = new QPushButton;
-    m_deleteBtn->setIcon(QIcon(":/icons/delete_white"));
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_deleteBtn->setIcon(QIcon(":/icons/delete_white"));
+    } else {
+        m_deleteBtn->setIcon(QIcon(":/icons/delete"));
+    }
     m_deleteBtn->setToolTip(PrefManager::instance().getText("delete"));
 
     mainLayout->addWidget(m_deleteBtn);
@@ -72,6 +86,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     m_mediaData->parse();
 }
+
 
 
 void PlaylistItem::initStyle()
@@ -213,19 +228,31 @@ void PlaylistItem::updateTypeIcon(){
         m_mediaTypeIconLabel->clear();
 
     if (m_mediaData->type() == MediaType::Video){
-        m_mediaTypeIcon = new QPixmap(":/icons/video_icon_white");
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            m_mediaTypeIcon = new QPixmap(":/icons/video_icon_white");
+        } else {
+            m_mediaTypeIcon = new QPixmap(":/icons/video_icon");
+        }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_video") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
         
     if (m_mediaData->type() == MediaType::Image){
-        m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+        } else {
+            m_mediaTypeIcon = new QPixmap(":/icons/show_image");
+        }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_image") + " (" + m_mediaData->fileExtension().toUpper() + ")");   
     }
         
     if (m_mediaData->type() == MediaType::Audio){
-        m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
+        } else {
+            m_mediaTypeIcon = new QPixmap(":/icons/music_note");
+        }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_audio") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }

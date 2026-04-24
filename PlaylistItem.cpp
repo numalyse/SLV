@@ -118,7 +118,7 @@ void PlaylistItem::setDurationLabel()
         // Par défaut, si rien n'est encore disponible
         m_mediaDurationLabel->setText("00:00:00");
         m_mediaDurationLabel->setToolTip(PrefManager::instance().getText("duration") + " : 00:00:00.00");
-        return;
+        if(m_mediaData->type() != Image) return;
     }
 
     QString time = TimeFormatter::msToHHMMSSFF(durationMs, 1);
@@ -276,6 +276,9 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
     QPixmap pixmap;
     pixmap.loadFromData(imageData, "PNG");
 
+    if(m_mediaData->fileExtension() == "jpg" || m_mediaData->fileExtension() == "jpeg")
+        pixmap.fromImage(QImage(m_mediaData->filePath()));
+
     return pixmap;
 }
 
@@ -295,6 +298,8 @@ void PlaylistItem::updateThumbnail()
 
     QThreadPool::globalInstance()->start([this]() {
 
+        qDebug() << "Media type : " << m_mediaData->type();
+
         if (m_mediaData->type() == MediaType::Video){
             QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -302,6 +307,7 @@ void PlaylistItem::updateThumbnail()
 
 
         if (m_mediaData->type() == MediaType::Image){
+
             QPixmap pixmap = QPixmap::fromImage(QImage(m_mediaData->filePath()));
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }

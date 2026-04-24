@@ -19,7 +19,8 @@
 #include <QProcess>
 #include <QFileDialog>
 #include <QTextStream>
-
+#include <QMessageBox>
+#include <QPushButton>
 #include <QThreadPool>
 
 
@@ -340,6 +341,31 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
 void MediaWidget::takeScreenshot()
 {
     if (!m_player) return;
+
+    bool cancelScreenShot = false;
+    bool isMediaAdjusted = libvlc_video_get_adjust_int(m_player, libvlc_adjust_Enable) == 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness) != 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast) != 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation) != 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue) != 0 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma) != 1;
+
+    if(isMediaAdjusted){
+        QMessageBox *msg = new QMessageBox(this);
+        QPushButton *cancelBtn = new QPushButton(PrefManager::instance().getText("cancel_action"));
+        msg->addButton(cancelBtn, QMessageBox::RejectRole);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_screenshot_with_adjustment"));
+        msg->setIcon(QMessageBox::Information);
+        QPushButton *screenshotWithoutAdjustments = new QPushButton(PrefManager::instance().getText("screenshot_without_adjustment_button"));
+        msg->addButton(screenshotWithoutAdjustments, QMessageBox::AcceptRole);
+        msg->adjustSize();
+
+        connect(msg, &QMessageBox::accepted, this, [this, &cancelScreenShot](){ libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0); cancelScreenShot = false;});
+        connect(msg, &QMessageBox::rejected, this, [this, &cancelScreenShot](){ cancelScreenShot = true; });
+
+        msg->exec();
+        if(cancelScreenShot) return;
+    }
     
     auto& prefManager = PrefManager::instance();
     QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
@@ -354,6 +380,9 @@ void MediaWidget::takeScreenshot()
         libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), w, h);
     else
         libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), h, w);
+
+    if(isMediaAdjusted)
+         libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
 }
 
 void MediaWidget::setTime(int64_t time)
@@ -641,7 +670,7 @@ void MediaWidget::mousePressEvent(QMouseEvent *event)
             m_lastPanPos = event->pos();
         }
         else{
-            emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+            // emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
         }
 
         QWidget::mousePressEvent(event);

@@ -11,7 +11,7 @@
 namespace {
 QStringList collectValidFilesFromPath(const QString &path)
 {
-    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "wav"};
+    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "jpg", "wav", "mp3"};
     QStringList collected;
 
     QDir dir(path);
@@ -185,7 +185,7 @@ void Playlist::addItemDialog()
         this, 
         prefManager.getText("dialog_open_files"), 
         prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
     ); 
 
     if(filesPaths.empty()){

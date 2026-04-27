@@ -23,8 +23,8 @@ struct Shot
 struct AudioShot : Shot
 {
     AudioShot() {
-        color = QColor(108, 73, 184, 255);
-        borderColor = QColor(64, 39, 117, 255);
+        color = QColor(66, 52, 94, 255);
+        borderColor = QColor(42, 21, 84, 255);
     }
 };
 

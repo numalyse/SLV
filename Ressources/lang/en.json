@@ -252,6 +252,8 @@
     "hue" : "Hue",
     "gamma" : "Gamma",
 
-    "reset" : "Reset"
+    "reset" : "Reset",
+
+    "timeline_extract_selected_shot" : "Extract shot"
 
 }

@@ -252,6 +252,8 @@
     "hue" : "Teinte",
     "gamma" : "Gamma",
 
-    "reset" : "Réinitialiser"
+    "reset" : "Réinitialiser",
+
+    "timeline_extract_selected_shot" : "Extraire le plan"
 
 }

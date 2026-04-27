@@ -405,15 +405,7 @@ void PlayerWidget::openSequenceExtractionDialog()
     }
     pause();
     ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
-    connect(sequenceExtractor, &QDialog::finished, this, [this](int res){ if(res == QDialog::Accepted){
-            QMessageBox *msg = new QMessageBox(this);
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
-            msg->setIcon(QMessageBox::Information);
-            msg->adjustSize();
-            msg->exec();
-        }
-    });
+
     sequenceExtractor->open();
 
 }

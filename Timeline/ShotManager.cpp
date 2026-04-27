@@ -231,7 +231,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
-    m_shotItems.clear();
+    m_audioShotItems.clear();
 
     for ( auto& IShot : shots ){
 
@@ -241,7 +241,9 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
         ShotItem* shot = new ShotItem(IShot, width, shotHeight);
         AudioShot audioShot{};
-        qDebug() << "AudioShot color : " << audioShot.color;
+        audioShot.start = IShot.start;
+        audioShot.end = IShot.end;
+        audioShot.title = IShot.title;
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
 
         p_scene->addItem(shot);

@@ -12,6 +12,7 @@
 #include "Shot.h"
 
 #include "GenericDialog.h"
+#include "ExtractSequenceWidget.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -34,8 +35,10 @@
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots 
 /// @param parent 
-TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& projectMediaPath, QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
+TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia, QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
 {
+    m_media = &projectMedia;
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(1);
@@ -107,8 +110,8 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, const QString& proj
 
     layout->addWidget(m_view);
 
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMediaPath, projectShots, this);
-    computeMediaAmplitudes(projectMediaPath);
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMedia.filePath(), projectShots, this);
+    computeMediaAmplitudes(projectMedia.filePath());
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
@@ -258,6 +261,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 {
     QMenu menu;
     QAction *actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
+    QAction *actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -300,6 +304,9 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         mergeWithPrevShotAction();
     } else if(selectedAction == mergeWithNextShot){
         mergeWithNextShotAction();
+    } else if(selectedAction == actionExtractShot){
+        ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_media, this, item->shot().start, item->shot().end);
+        sequenceExtractor->open();
     }
 }
 

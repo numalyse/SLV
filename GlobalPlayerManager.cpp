@@ -229,7 +229,7 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), projMedia->filePath(), proj->shots, this);
+    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), *projMedia, proj->shots, this);
     m_timeline->setFixedHeight(160);
 
     projManager.setTimeline(m_timeline);

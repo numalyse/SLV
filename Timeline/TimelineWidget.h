@@ -2,7 +2,7 @@
 #define TIMELINE_H
 
 #include "Shot.h"
-
+#include "Media.h"
 
 #include "Timeline/TimelineView.h"
 #include "Timeline/TimelineMath.h"
@@ -32,7 +32,7 @@ Q_OBJECT
 
 public:
 
-    explicit TimelineWidget(double fps, int64_t duration, const QString &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
+    explicit TimelineWidget(double fps, int64_t duration, Media &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
 
@@ -73,6 +73,7 @@ private:
     
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
+    Media* m_media = nullptr;
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;

@@ -13,7 +13,7 @@ private:
     double m_width;
     double m_height;
     double m_topMargin;
-    const QColor m_color{QColor(64, 39, 117, 255)};
+    const QColor m_color{QColor(108, 73, 184, 255)};
     double m_sizeCoeff{300};
     double m_columnWidth;
     double m_minAmplitude;

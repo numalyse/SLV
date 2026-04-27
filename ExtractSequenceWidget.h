@@ -18,7 +18,7 @@ class ExtractSequenceWidget : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int timeStart = 0);
+    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int startTime = 0, int endTime = -1);
 
     void createButtons();
     void initUiLayout();

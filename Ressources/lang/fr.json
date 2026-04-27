@@ -263,6 +263,8 @@
     "gamma" : "Gamma",
 
     "reset" : "Réinitialiser",
+
+    "timeline_extract_selected_shot" : "Extraire le plan",
     "close" : "Fermer",
 
     "about_dialog_title" : "À propos",

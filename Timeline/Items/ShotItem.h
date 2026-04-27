@@ -10,7 +10,7 @@
 class ShotItem : public QGraphicsItem
 {
 public:
-    explicit ShotItem(Shot shot, double width, double height, double topMargin = 40, QGraphicsItem* parent = nullptr);
+    explicit ShotItem(Shot shot, double width, double height, double topMargin = 30, QGraphicsItem* parent = nullptr);
 
     void setThumbnail(const QPixmap &pixmap);
 

@@ -45,7 +45,7 @@ private:
     int m_seconds;
     int m_frames;
     double m_fps;
-    const int milPerFrame;
+    int milPerFrame;
 
     QPushButton* m_hoursPlus;
     QPushButton* m_hoursMinus;

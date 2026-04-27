@@ -1,15 +1,17 @@
 #include "ExtractSequenceWidget.h"
+#include <QMessageBox>
 
-ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime)
+ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
     : QDialog{parent}, m_media(media)
 {
     m_startTime = startTime;
-    m_endTime = startTime+10000;
+    if(endTime < 0) m_endTime = startTime+10000;
+    else m_endTime = endTime;
     m_thumbnailPendingTime = 50;
     m_isExec = false;
     int duration = media.duration();
     m_startTimeEditor = new TimeEditor(this, startTime, duration, 0, duration, media.fps());
-    m_endTimeEditor = new TimeEditor(this, startTime+10000, duration, startTime, duration, media.fps());
+    m_endTimeEditor = new TimeEditor(this, m_endTime, duration, startTime, duration, media.fps());
     m_thumbnailStartTimer = new QTimer(this);
     m_thumbnailStartTimer->setSingleShot(true);
     connect(m_thumbnailStartTimer, &QTimer::timeout, this, [this](){ requestStartFrameDisplay(); });
@@ -18,6 +20,15 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
     connect(m_thumbnailEndTimer, &QTimer::timeout, this, [this](){ requestEndFrameDisplay(); });
     createButtons();
     initUiLayout();
+    connect(this, &QDialog::finished, this, [this, parent](int res){ if(res == QDialog::Accepted){
+            QMessageBox *msg = new QMessageBox(parent);
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
+            msg->setIcon(QMessageBox::Information);
+            msg->adjustSize();
+            msg->exec();
+        }
+    });
 }
 
 void ExtractSequenceWidget::createButtons()

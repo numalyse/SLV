@@ -85,6 +85,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     auto oldEnd =  m_shotItems[index]->shot().end;
     m_shotItems[index]->shot().end = cutTime - 1; 
     m_shotItems[index]->shot().tagImageTime = m_shotItems[index]->shot().middle();
+    m_audioShotItems[index]->shot().end = cutTime - 1;
 
     m_thumbnailWorker->requestThumbnail(index, m_shotItems[index]->shot().start, m_shotItems[index]->shot().end - m_shotItems[index]->shot().start, m_mediaPath); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
 
@@ -96,15 +97,25 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     double pos2 = p_mathManager->timeToPos(newShotData.start);
     double width2 = p_mathManager->timeToPos(newShotData.end) - pos2;
-    int startShotHeight = 50;
+    int startShotHeight = 40;
 
     ShotItem* newShotItem = new ShotItem(newShotData, width2, startShotHeight);
     newShotItem->setPos(pos2, m_currentShotItem->y());
 
+    AudioShot newAudioShotData = AudioShot{};
+    newAudioShotData.title = "Title";
+    newAudioShotData.start = cutTime;
+    newAudioShotData.end = oldEnd;
+
+    AudioShotItem* newAudioShotItem = new AudioShotItem(newAudioShotData, width2);
+    newAudioShotItem->setPos(pos2, m_currentShotItem->y());
+
     // on insère le plan juste apres le plan cut
     m_shotItems.insert(index + 1, newShotItem);
+    m_audioShotItems.insert(index + 1, newAudioShotItem);
     m_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, m_mediaPath);
     p_scene->addItem(newShotItem);
+    p_scene->addItem(newAudioShotItem);
 
     updateCurrentShot(cutTime);
 }
@@ -121,8 +132,16 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
 
     item->shot().tagImageTime = item->shot().middle(); // updates the tagimage to the middle of the merged shot
 
+    AudioShotItem* audioItem = m_audioShotItems[ShotItemId];
+    audioItem->shot().start = item->shot().start;
+    audioItem->shot().end = item->shot().end;
+    audioItem->shot().note = item->shot().note;
+
     p_scene->removeItem(m_currentShotItem);
+    ShotItem* currentAudioShotItem = m_audioShotItems[m_shotItems.indexOf(m_currentShotItem)];
+    p_scene->removeItem(currentAudioShotItem);
     m_shotItems.removeOne(m_currentShotItem);
+    m_audioShotItems.removeOne(currentAudioShotItem);
     m_currentShotItem = nullptr;
     
     updateShotItemsPosition();
@@ -166,9 +185,12 @@ void ShotManager::updateShotItemsPosition(){
 
         newXPos = shotItem->shot().start * p_mathManager->pixelsPerMs();
         shotItem->setX(newXPos);
+        AudioShotItem* audioShotItem = m_audioShotItems[m_shotItems.indexOf(shotItem)];
+        audioShotItem->setX(newXPos);
 
         newWidth = (shotItem->shot().end - shotItem->shot().start) * p_mathManager->pixelsPerMs();
         shotItem->setWidth(newWidth);
+        audioShotItem->setWidth(newWidth);
     }
 
     p_view->setUpdatesEnabled(true);
@@ -204,22 +226,32 @@ const QVector<Shot> ShotManager::shotItemsData() const
 void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 {
 
-    int shotHeight {50};
+    int shotHeight {40};
 
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
+    qDeleteAll(m_audioShotItems);
+    m_audioShotItems.clear();
 
     for ( auto& IShot : shots ){
-        
+
         double xPos =  p_mathManager->timeToPos(IShot.start);
         int64_t shotLength = (IShot.end - IShot.start);
         double width = p_mathManager->timeToPos(shotLength);
-        
+
         ShotItem* shot = new ShotItem(IShot, width, shotHeight);
+        AudioShot audioShot{};
+        audioShot.start = IShot.start;
+        audioShot.end = IShot.end;
+        audioShot.title = IShot.title;
+        AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
 
         p_scene->addItem(shot);
+        p_scene->addItem(audioShotItem);
         shot->setX(xPos);
+        audioShotItem->setX(xPos);
         m_shotItems.push_back(shot);
+        m_audioShotItems.push_back(audioShotItem);
 
         m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, m_mediaPath);
 
@@ -230,10 +262,12 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 {
 
-    int shotHeight {50};
+    int shotHeight {40};
 
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
+    qDeleteAll(m_audioShotItems);
+    m_audioShotItems.clear();
 
     int64_t startShot = 0;
     int64_t lengthShot = 0;
@@ -250,11 +284,18 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         Shot shot{"Titre", startShot, endShot};
         shot.tagImageTime = shot.middle();
 
+        AudioShot audioShot{};
+        audioShot.title = "Titre"; audioShot.start = startShot; audioShot.end = endShot;
+
         ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+        AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
 
         p_scene->addItem(shotItem);
+        p_scene->addItem(audioShotItem);
         shotItem->setX(xPos);
+        audioShotItem->setX(xPos);
         m_shotItems.push_back(shotItem);
+        m_audioShotItems.push_back(audioShotItem);
         m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, startShot, lengthShot, m_mediaPath);
 
         startShot = nextStartShot;
@@ -267,11 +308,17 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     
     Shot shot{"Titre", startShot, p_mathManager->duration()};
     shot.tagImageTime = shot.middle();
+    AudioShot audioShot{};
+    audioShot.title = "Title"; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
     ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+    AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
     p_scene->addItem(shotItem);
+    p_scene->addItem(audioShotItem);
     shotItem->setX(xPos);
+    audioShotItem->setX(xPos);
     m_shotItems.push_back(shotItem);
+    m_audioShotItems.push_back(audioShotItem);
     m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, startShot, lengthShot, m_mediaPath);
 
 }

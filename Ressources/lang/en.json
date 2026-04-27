@@ -263,6 +263,8 @@
     "gamma" : "Gamma",
 
     "reset" : "Reset",
+
+    "timeline_extract_selected_shot" : "Extract shot",
     "close" : "Close",
 
     "about_dialog_title" : "About",

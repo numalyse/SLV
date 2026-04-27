@@ -141,7 +141,6 @@ signals:
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
     void mediaIsVideoParsed();
-    void addAmplitudeRequested(const double amplitude);
 
 };
 

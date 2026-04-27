@@ -200,7 +200,7 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
 
     m_abManager->updateMarkersPosition();
 
-    m_audioVisualizer->setWidth(m_sceneWidth);
+    if(m_audioVisualizer) m_audioVisualizer->setWidth(m_sceneWidth);
 
     updateCursorPos(m_vlcTime);
 

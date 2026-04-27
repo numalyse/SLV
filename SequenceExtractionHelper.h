@@ -6,7 +6,7 @@
 #include <QString>
 #include <QStringList>
 #include <QProcess>
-#include <qdebug.h>
+#include <QDebug>
 
 //TODO : à mettre dans une classe pour les signaux/barre de progression si possible
 class SequenceExtractionHelper : QObject

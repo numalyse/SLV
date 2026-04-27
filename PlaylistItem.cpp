@@ -1,8 +1,12 @@
 #include "PlaylistItem.h"
 #include "PrefManager.h"
-#include <qevent.h>
+#include <QEvent>
+#include <QMouseEvent>
+#include <QApplication>
 #include <QBuffer>
 #include <QProcess>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     : QWidget{parent}
@@ -22,7 +26,11 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     // thumbnail
     m_mediaThumbnailLabel = new QLabel();
     m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
-    m_mediaThumbnailImage = new QPixmap(":/icons/hide_image_white");
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_mediaThumbnailImage = new QPixmap(":/icons/hide_image_white");
+    } else {
+        m_mediaThumbnailImage = new QPixmap(":/icons/hide_image");
+    }
     m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(m_mediaThumbnailLabel);
@@ -41,7 +49,11 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // icone
     m_mediaTypeIconLabel = new QLabel();
-    m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+    } else {
+        m_mediaTypeIcon = new QPixmap(":/icons/show_image");
+    }
     m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16,16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     // durée
@@ -57,7 +69,11 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // bouton delete
     m_deleteBtn = new QPushButton;
-    m_deleteBtn->setIcon(QIcon(":/icons/delete_white"));
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_deleteBtn->setIcon(QIcon(":/icons/delete_white"));
+    } else {
+        m_deleteBtn->setIcon(QIcon(":/icons/delete"));
+    }
     m_deleteBtn->setToolTip(PrefManager::instance().getText("delete"));
 
     mainLayout->addWidget(m_deleteBtn);
@@ -72,12 +88,14 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 }
 
 
+
 void PlaylistItem::initStyle()
 {
     setFixedHeight(50);
     setAttribute(Qt::WA_StyledBackground, true);
     setContentsMargins(0,0,0,0);
-    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid" + color + " border-radius: 3px;}");
     m_indexLabel->setMaximumWidth(15);
     m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
 
@@ -101,7 +119,7 @@ void PlaylistItem::setDurationLabel()
         // Par défaut, si rien n'est encore disponible
         m_mediaDurationLabel->setText("00:00:00");
         m_mediaDurationLabel->setToolTip(PrefManager::instance().getText("duration") + " : 00:00:00.00");
-        return;
+        if(m_mediaData->type() != Image) return;
     }
 
     QString time = TimeFormatter::msToHHMMSSFF(durationMs, 1);
@@ -143,15 +161,17 @@ void PlaylistItem::setIndex(int index)
 
 void PlaylistItem::enterEvent(QEnterEvent *event)
 {
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(!m_isCurrentMedia)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid palette(button); border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid " + color + " border-radius: 3px;}");
     // QWidget::enterEvent(event);
 }
 
 void PlaylistItem::leaveEvent(QEvent *event)
 {
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(!m_isCurrentMedia)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid" + color + " border-radius: 3px;}");
     m_isClicked = false;
     // QWidget::leaveEvent(event);
 }
@@ -194,10 +214,11 @@ void PlaylistItem::mouseMoveEvent(QMouseEvent *event)
 void PlaylistItem::setCurrentMedia(bool isCurrent)
 {
     m_isCurrentMedia = isCurrent;
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(isCurrent)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid palette(light); border-radius: 4px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid " + color +  " border-radius: 4px;}");
     else
-        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid palette(button); border-radius: 4px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 4px;}");
 }
 
 void PlaylistItem::playMedia(bool isClicked)
@@ -211,19 +232,31 @@ void PlaylistItem::updateTypeIcon(){
         m_mediaTypeIconLabel->clear();
 
     if (m_mediaData->type() == MediaType::Video){
-        m_mediaTypeIcon = new QPixmap(":/icons/video_icon_white");
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            m_mediaTypeIcon = new QPixmap(":/icons/video_icon_white");
+        } else {
+            m_mediaTypeIcon = new QPixmap(":/icons/video_icon");
+        }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_video") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
         
     if (m_mediaData->type() == MediaType::Image){
-        m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+        } else {
+            m_mediaTypeIcon = new QPixmap(":/icons/show_image");
+        }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_image") + " (" + m_mediaData->fileExtension().toUpper() + ")");   
     }
         
     if (m_mediaData->type() == MediaType::Audio){
-        m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            m_mediaTypeIcon = new QPixmap(":/icons/music_note_white");
+        } else {
+            m_mediaTypeIcon = new QPixmap(":/icons/music_note");
+        }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_audio") + " (" + m_mediaData->fileExtension().toUpper() + ")");
     }
@@ -247,6 +280,9 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
     QPixmap pixmap;
     pixmap.loadFromData(imageData, "PNG");
 
+    if(m_mediaData->fileExtension() == "jpg" || m_mediaData->fileExtension() == "jpeg")
+        pixmap.fromImage(QImage(m_mediaData->filePath()));
+
     return pixmap;
 }
 
@@ -266,6 +302,8 @@ void PlaylistItem::updateThumbnail()
 
     QThreadPool::globalInstance()->start([this]() {
 
+        qDebug() << "Media type : " << m_mediaData->type();
+
         if (m_mediaData->type() == MediaType::Video){
             QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -273,12 +311,17 @@ void PlaylistItem::updateThumbnail()
 
 
         if (m_mediaData->type() == MediaType::Image){
+
             QPixmap pixmap = QPixmap::fromImage(QImage(m_mediaData->filePath()));
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
 
         if (m_mediaData->type() == MediaType::Audio){
-            m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+                m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            } else {
+                m_mediaThumbnailImage = new QPixmap(":/icons/music_note");
+            }
             m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     });

@@ -2,7 +2,7 @@
 #define SIGNALMANAGER_H
 
 #include "Shot.h"
-#include <QObject.h>
+#include <QObject>
 #include <vlc/vlc.h>
 
 enum PlayerLayoutArrangement

@@ -11,7 +11,7 @@
 
 #include <QMessageBox>
 #include <QWidget>
-#include <qmainwindow.h>
+#include <QMainWindow>
 #include <vlc/vlc.h>
 #include <QSize>
 
@@ -65,7 +65,7 @@ public slots:
     void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void onMediaRectChanged(const QRect &rect);
     void widgetSizeChange();
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
     void openSequenceExtractionDialog();
 
     void enableButtons();

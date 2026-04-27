@@ -4,8 +4,8 @@
 #include "Timeline/ThumbnailWorker.h"
 
 #include <QWidget>
-#include <QSlider.h>
-#include <QPushButton.h>
+#include <QSlider>
+#include <QPushButton>
 #include <QLabel>
 #include <vlc/vlc.h>
 

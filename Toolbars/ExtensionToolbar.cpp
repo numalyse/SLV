@@ -7,7 +7,7 @@
 #include "SignalManager.h"
 
 #include <QHBoxLayout>
-#include <qframe.h>
+#include <QFrame>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QIcon>
@@ -85,9 +85,12 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
         if( ProjectManager::instance().projet() ){
+            qDebug() << "oui projet";
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
             emit SignalManager::instance().extensionToolbarDisplayShotDetail();
+        } else {
+            qDebug() << "non projet";
         }
     });
 

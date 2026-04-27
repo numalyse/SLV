@@ -7,7 +7,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QLineEdit>
-#include <QSlider.h>
+#include <QSlider>
 #include <QLayout>
 #include <QLabel>
 

@@ -7,11 +7,13 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QCheckBox>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 namespace {
 QStringList collectValidFilesFromPath(const QString &path)
 {
-    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "wav"};
+    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "jpg", "wav", "mp3"};
     QStringList collected;
 
     QDir dir(path);
@@ -79,17 +81,22 @@ Playlist::Playlist(QWidget *parent)
 
     // [Bouton] Ajouter un élément à la playlist
     m_addItemBtn = new QPushButton;
-    m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    } else {
+        m_addItemBtn->setIcon(QIcon(":/icons/plus"));
+    }
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     m_addItemBtn->setStyleSheet("QPushButton{"
         "   background-color: rgba(0,0,0,0);"
-        "   border: 2px dashed palette(button);"
+        "   border: 2px dashed" + color +
         "   border-radius: 4px;"
         "}"
         "QPushButton:hover{"
         "   background-color: palette(button);"
-        "   border: 2px solid palette(button);"
+        "   border: 2px solid " + color +
         "   border-radius: 4px;"
         "}");
     playlistLabelLayout->addWidget(m_addItemBtn);
@@ -185,7 +192,7 @@ void Playlist::addItemDialog()
         this, 
         prefManager.getText("dialog_open_files"), 
         prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
     ); 
 
     if(filesPaths.empty()){

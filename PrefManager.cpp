@@ -13,7 +13,7 @@ void PrefManager::loadLanguage(const QString& langCode)
 
     QStringList availableLangs = getAvailableLangs();
 
-    // si le langcode est bien dans les langues supportées, utilisation de celui ci sinon fallback sur en
+    // si le langcode est bien dans les langues supportées, utilisation de celui-ci sinon fallback sur en
     QString filePath = (availableLangs.contains(langCode)) ? ":/lang/" + langCode + ".json" : ":/lang/en.json";
     QFile file(filePath);
 

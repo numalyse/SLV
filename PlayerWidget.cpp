@@ -211,9 +211,9 @@ void PlayerWidget::play()
         auto& prefManager = PrefManager::instance();
         QString file_path = QFileDialog::getOpenFileName(
             this, 
-            prefManager.getText("dialog_open_file"), 
-            prefManager.getPref("Paths", "lp_open_media"), 
-            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+            prefManager.getText("dialog_open_file"),
+            prefManager.getPref("Paths", "lp_open_media"),
+            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
         ); 
         if(file_path != ""){
             setMediaFromPath(file_path);
@@ -239,7 +239,7 @@ void PlayerWidget::playFromAdvanced()
             this, 
             prefManager.getText("dialog_open_file"), 
             prefManager.getPref("Paths", "lp_open_media"), 
-            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
         ); 
 
         if(file_path != ""){

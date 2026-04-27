@@ -4,10 +4,12 @@
 #include "Project/ProjectManager.h"
 #include "PlayerWidget.h"
 #include "PrefManager.h"
+#include "HelperWidget.h"
+#include "AboutWidget.h"
 #include "GenericDialog.h"
 #include "Preference/PreferenceDialog.h"
 
-#include <qtoolbar.h>
+#include <QToolBar>
 #include <vlc/vlc.h>
 
 #include <QTimer>
@@ -31,7 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     //this->setCentralWidget(ui->centralwidget);
 
     // ===== Info ===== //
-    setWindowTitle("SLV (Windows) (dev version)");
+    setWindowTitle("Numalyse Player (alpha version)");
+    setWindowIcon(QIcon(":/logo/numalyse_logo_white"));
     // setWindowIcon(QIcon("../icon/numalyse_logo.ico"));
     // QString path = "../icon/numalyse_logo.ico";
     // QFile f(path);
@@ -128,6 +131,13 @@ void MainWindow::createMenuBar()
     auto *openPrefAction = OptionMenu->addAction("&" + prefManager.getText("main_window_option_open_pref"));
     connect(openPrefAction, &QAction::triggered, this, &MainWindow::openPrefWidget);
 
+    auto *HelpMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_help"));
+
+    auto *openHelperAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
+    connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);    
+
+    auto *openAboutAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_about"));
+    connect(openAboutAction, &QAction::triggered, this, &MainWindow::openAboutWidget);
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
 
@@ -228,9 +238,9 @@ void MainWindow::selectAndLoadMediaFiles()
     auto& prefManager = PrefManager::instance();
     QStringList files_paths = QFileDialog::getOpenFileNames(
         this, 
-        prefManager.getText("open_files"), 
-        prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        prefManager.getText("open_files"),
+        prefManager.getPref("Paths", "lp_open_media"),
+        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.jpeg *.wav *.mp3)"
     );
     
     if(files_paths.empty()){
@@ -380,4 +390,16 @@ void MainWindow::openPrefWidget()
 {
     PreferenceDialog* prefDialog = new PreferenceDialog(this);
     prefDialog->exec();
+}
+
+void MainWindow::openHelperWidget()
+{
+    HelperWidget* helpDialog = new HelperWidget(this);
+    helpDialog->exec();
+}
+
+void MainWindow::openAboutWidget()
+{
+    AboutWidget* aboutDialog = new AboutWidget(this);
+    aboutDialog->exec();
 }

@@ -11,7 +11,9 @@ CompositionWidget::CompositionWidget(QWidget *parent)
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
     setStyleSheet("background-color: rgba(0,0,0,0)");
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
+    setWindowFlag(Qt::NoDropShadowWindowHint);
+
 }
 
 void CompositionWidget::setOverlayMode(OverlayMode mode, bool isVFlipped, bool isHFlipped)

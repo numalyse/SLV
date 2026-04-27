@@ -3,11 +3,11 @@
 
 #include "Media.h"
 #include "VideoCaptureManager.h"
+#include "SignalManager.h"
 #include "ZoomHelper.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
-#include <SignalManager.h>
 #include <QFrame>
 #include <QDir>
 #include <QComboBox>
@@ -138,6 +138,7 @@ signals:
     void updateSubtitlesTracksRequested(const QList<QPair<int, QString>>& tracks);
     void setAudioTrackRequested(int trackId);
     void setSubtitlesTrackRequested(int trackId);
+    void rotateUiUpdateRequested();
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
     void mediaIsVideoParsed();

@@ -164,7 +164,8 @@ endforeach()
 # Exécutable Qt
 # =========================================================
 if(QT_VERSION_MAJOR GREATER_EQUAL 6)
-    qt_add_executable(SLV WIN32 MANUAL_FINALIZATION ${PROJECT_SOURCES})
+    qt_add_executable(SLV WIN32 MANUAL_FINALIZATION ${PROJECT_SOURCES}
+        MediaInfoDialog.h MediaInfoDialog.cpp)
 else()
     add_executable(SLV WIN32 ${PROJECT_SOURCES})
 endif()

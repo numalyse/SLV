@@ -214,7 +214,7 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->setSpacing(1);
     buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addSpacing(m_speedBtn->size().width());
+    buttonLayout->addWidget(m_mediaInfoBtn);
     buttonLayout->addSpacing(m_speedBtn->size().width());
     buttonLayout->addSpacing(m_speedBtn->size().width());
     buttonLayout->addSpacing(m_speedBtn->size().width());
@@ -263,6 +263,7 @@ void AdvancedToolbar::enableButtons()
     m_screenshotBtn->setEnabled(true);
     m_prevMediaBtn->setEnabled(true);
     m_nextMediaBtn->setEnabled(true);
+    m_mediaInfoBtn->setEnabled(true);
     m_extensionToolbar->enableButtons();
 }
 
@@ -286,6 +287,7 @@ void AdvancedToolbar::disableButtons()
     m_screenshotBtn->setEnabled(false);
     m_prevMediaBtn->setEnabled(false);
     m_nextMediaBtn->setEnabled(false);
+    m_mediaInfoBtn->setEnabled(false);
     m_extensionToolbar->disableButtons();
 }
 

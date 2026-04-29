@@ -67,6 +67,7 @@ public slots:
     void prevFrame();
     void adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value);
     void resetAdjustments();
+    void openMediaInfoDialog();
 
     QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;

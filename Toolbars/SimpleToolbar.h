@@ -112,6 +112,7 @@ protected:
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;
     ToolbarPopupButton* m_langBtn = nullptr;
+    ToolbarButton* m_mediaInfoBtn = nullptr;
 
 
 protected slots: 
@@ -134,6 +135,7 @@ signals:
     void duplicatePlayerRequested();
     void setCursorPositionRequested(int64_t);
     void extractSequenceRequest();
+    void mediaInformationRequest();
     
 };
 

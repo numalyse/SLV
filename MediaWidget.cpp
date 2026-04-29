@@ -5,6 +5,7 @@
 #include "SequenceExtractionHelper.h"
 #include "MediaTransformHelper.h"
 #include "PrefManager.h"
+#include "MediaInfoDialog.h"
 
 #include <QFile>
 #include <QUrl>
@@ -572,6 +573,14 @@ void MediaWidget::resetAdjustments()
 {
     if(!m_player || !m_media) return;
     libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0);
+}
+
+void MediaWidget::openMediaInfoDialog()
+{
+    if(!m_player || !m_media) return;
+
+    MediaInfoDialog infoDialog(*m_media);
+    // infoDialog.exec();
 }
 
 QPoint MediaWidget::getMediaPosRect() const

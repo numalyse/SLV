@@ -117,6 +117,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", PrefManager::instance().getText("tooltip_delete_player"));
     m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", PrefManager::instance().getText("tooltip_duplicate_player"));
     m_extractSequenceBtn = new ToolbarButton(this, "extract_sequence_white", PrefManager::instance().getText("tooltip_extract_sequence"));
+    m_mediaInfoBtn = new ToolbarButton(this, "media_info_white", PrefManager::instance().getText("tooltip_media_information"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerAction);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
@@ -127,6 +128,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_loopBtn, &ToolbarToggleButton::stateActivated, this, &SimpleToolbar::enableLoopModeRequest);
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
+    connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
 
     setDefaultUI();
     disableButtons();
@@ -165,7 +167,7 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->setSpacing(1);
     buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addSpacing(m_langBtn->width());
+    buttonLayout->addWidget(m_mediaInfoBtn);
     buttonLayout->addSpacing(m_langBtn->width());
     buttonLayout->addSpacing(m_langBtn->width());
     buttonLayout->addSpacing(m_langBtn->width());
@@ -340,30 +342,26 @@ void SimpleToolbar::enableButtons()
     m_playPauseBtn->setEnabled(true);
     m_stopBtn->setEnabled(true);
     m_ejectBtn->setEnabled(true);
-    // m_muteBtn->setEnabled(true);
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
     m_extractSequenceBtn->setEnabled(true);
-    // m_removePlayerBtn->setEnabled(true);
-    // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
     m_screenshotBtn->setEnabled(true);
+    m_mediaInfoBtn->setEnabled(true);
 }
 
 void SimpleToolbar::disableButtons()
 {
     m_stopBtn->setEnabled(false);
     m_ejectBtn->setEnabled(false);
-    // m_muteBtn->setEnabled(false);
     m_langBtn->setEnabled(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
     m_extractSequenceBtn->setEnabled(false);
-    // m_removePlayerBtn->setEnabled(false);
-    // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
+    m_mediaInfoBtn->setEnabled(false);
 }
 
 

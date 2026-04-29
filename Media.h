@@ -12,6 +12,19 @@ enum MediaType{
     Unknown
 };
 
+struct MediaTrackInfo{
+    libvlc_track_type_t _type;
+    unsigned int _codec; // video + audio
+    unsigned int _bitrate; // video + audio
+    char* _description;
+    char* _language; // audio + subtitles
+    int _sarNum; // video
+    int _sarDen; // video
+    unsigned int _channels; // audio
+    unsigned int _rate; // audio (= taux d'échantillonnage)
+    char* _encoding; // subtitle
+};
+
 class Media : public QObject
 {
 Q_OBJECT
@@ -33,10 +46,10 @@ public:
     double fps() const { return m_vlcMedia ? m_fps : 0.0; }
     int height() const { return m_vlcMedia ? m_height : 0; }
     int width() const { return m_vlcMedia ? m_width : 0; }
-    QString sar() const { return m_sar; }
     libvlc_instance_t* vlcInstance() const { return m_vlcInstance; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
     QMap<libvlc_meta_t, QString> metaData() const { return m_metaData; }
+    QVector<MediaTrackInfo> tracks() const { return m_tracks; }
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }
@@ -44,13 +57,14 @@ public:
     void setHeight(int height) { m_height = height; }
     void setWidth(int width) { m_width = width; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
-    void setSAR(const QString& sar) { m_sar = sar; }
+    void addTrack(const MediaTrackInfo trackInfo) { m_tracks.push_back(trackInfo); }
 
     QList<QPair<int, QString>> audioTracks() const { return m_audioTracks; }
     QList<QPair<int, QString>> subtitlesTracks() const { return m_subtitlesTracks; }
     void parseTracks(libvlc_media_player_t* player);
 
     MediaType detectTypeFromFile(const QString &path);
+    QString metaToString(const libvlc_meta_t) const;
 
 signals:
     void fpsParsed(double);
@@ -69,9 +83,9 @@ private:
     double m_fps {};
     int m_height = 0;
     int m_width = 0;
-    QString m_sar = "1:1";
 
     QMap<libvlc_meta_t, QString> m_metaData;
+    QVector<MediaTrackInfo> m_tracks;
 
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     libvlc_instance_t* m_vlcInstance = nullptr;

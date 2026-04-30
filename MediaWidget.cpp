@@ -562,11 +562,6 @@ void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, c
     if(!m_player || !m_media) return;
     libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
     libvlc_video_set_adjust_float(m_player, adjustOption, value);
-    qDebug() << "BRIGHTNESS : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
-    qDebug() << "CONTRAST : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast);
-    qDebug() << "SATURATION : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation);
-    qDebug() << "HUE : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue);
-    qDebug() << "GAMMA : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma);
 }
 
 void MediaWidget::resetAdjustments()

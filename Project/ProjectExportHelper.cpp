@@ -333,7 +333,7 @@ namespace ProjectExportHelper {
             timeString.replace(":", "-");
             timeString.replace(".", "-");
         
-            QString fileName = QDir(dstPath).filePath("TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png");
+            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currentShot+1) + '_' + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){

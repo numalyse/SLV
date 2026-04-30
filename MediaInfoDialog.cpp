@@ -37,7 +37,7 @@ MediaInfoDialog::MediaInfoDialog(const Media& media)
             if(track._type == previousType) typeCount++;
             else{
                 previousType = track._type;
-                typeCount = 0;
+                typeCount = 1;
             }
             QString countStr = typeCount > 1 ? " " + QString::number(typeCount) : "";
             switch(track._type){

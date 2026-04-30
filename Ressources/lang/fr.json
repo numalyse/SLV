@@ -275,7 +275,7 @@
 
     "help_dialog_title" : "Aide",
     "help_dialog_wip" : "En cours de développement.",
-    "help_dialog_report" : "Pour signaler un problem, veuillez nous contacter aux adresses suivantes :",
+    "help_dialog_report" : "Pour signaler un problème, veuillez nous contacter aux adresses suivantes :",
 
     "messagebox_screenshot_with_adjustment" : "Le média actuel possède des ajustements. Voulez-vous enregistrer une capture d'écran sans les ajustements ?",
     "screenshot_without_adjustment_button" : "Capture sans enregistrement",

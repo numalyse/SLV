@@ -25,6 +25,7 @@
 #include <QVector>
 #include <QPoint>
 #include <QTimer>
+#include <QProcess>
 
 class TimelineWidget : public QWidget
 {
@@ -33,6 +34,7 @@ Q_OBJECT
 public:
 
     explicit TimelineWidget(double fps, int64_t duration, Media &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
+    ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
 
@@ -108,6 +110,7 @@ private:
 
     int m_rulerHeight = 25;
 
+    QProcess *m_audioComputeProcess = nullptr;
     QByteArray m_audioBuffer;
     QVector<double> m_amplitudeList;
 

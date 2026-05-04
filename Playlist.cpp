@@ -91,7 +91,7 @@ Playlist::Playlist(QWidget *parent)
     QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     m_addItemBtn->setStyleSheet("QPushButton{"
         "   background-color: rgba(0,0,0,0);"
-        "   border: 2px dashed" + color +
+        "   border: 2px dashed " + color +
         "   border-radius: 4px;"
         "}"
         "QPushButton:hover{"

@@ -88,13 +88,13 @@
     "export_type_docx": "Word document (*.docx)",
     "export_type_mp4": "MP4 video (*.mp4)",
     "export_type_src": "Source file (*.src)",
-    "export_type_tagimage": "TagImages (*.png)",
+    "export_type_tagimage": "Tag frames (*.png)",
     "export_type_unknown": "All files (*.*)",
     "export_file_path_title": "Save as...",
 
     "export_format_selection_title" : "Export format",
     "export_format_selection_txt" : "Select export format",
-    "export_format_selection_txt_tagImage" : "TagImages",
+    "export_format_selection_txt_tagImage" : "Tag frames",
 
     "timeline_dialog_title_auto_segmentation": "Auto segmentation",
     "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",

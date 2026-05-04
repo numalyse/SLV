@@ -8,3 +8,4 @@ vlc-sdk/
 /.qtcreator
 .DS_Store
 installer/Output/
+python_embedded/

@@ -33,9 +33,7 @@ find_package(OpenCV REQUIRED)
 # Python (embedded ou portable runtime)
 # =========================================================
 
-find_package(Python3 REQUIRED COMPONENTS Development.Embed)
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
 
 # =========================================================
 # Sources de base
@@ -228,9 +226,9 @@ endif()
 # =========================================================
 # Python3
 # =========================================================
-target_include_directories(SLV PRIVATE ${Python3_INCLUDE_DIRS})
+# target_include_directories(SLV PRIVATE ${Python3_INCLUDE_DIRS})
 target_link_libraries(SLV PRIVATE Python3::Python)
-target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
+#target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
 
 # =========================================================
 # Qt linking

@@ -269,6 +269,7 @@ void PlayerWidget::pause()
 void PlayerWidget::togglePlayPause(bool isPlaying)
 {
     if(isPlaying) pause();
+    else if(!m_toolBar->isVisible()) playFromAdvanced();
     else play();
 }
 

@@ -30,6 +30,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Concurrent Core)
 find_package(OpenCV REQUIRED)
 
 # =========================================================
+# Python (embedded ou portable runtime)
+# =========================================================
+
+find_package(Python3 REQUIRED COMPONENTS Development.Embed)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+
+# =========================================================
 # Sources de base
 # =========================================================
 set(PROJECT_SOURCES
@@ -159,12 +167,36 @@ foreach(_src IN LISTS ADDITIONAL_SOURCES)
 endforeach()
 
 # =========================================================
-# Exécutable Qt
+# Exécutable Qt multiplateforme
 # =========================================================
+
 if(QT_VERSION_MAJOR GREATER_EQUAL 6)
-    qt_add_executable(SLV WIN32 MANUAL_FINALIZATION ${PROJECT_SOURCES})
+
+    qt_add_executable(SLV
+        MANUAL_FINALIZATION
+        ${PROJECT_SOURCES}
+    )
+
 else()
-    add_executable(SLV WIN32 ${PROJECT_SOURCES})
+
+    add_executable(SLV ${PROJECT_SOURCES})
+
+endif()
+
+# =========================================================
+# Configuration par plateforme
+# =========================================================
+
+# Windows → pas de console
+if(WIN32)
+    set_target_properties(SLV PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
+# macOS → bundle .app
+if(APPLE)
+    set_target_properties(SLV PROPERTIES
+        MACOSX_BUNDLE TRUE
+    )
 endif()
 
 # =========================================================
@@ -188,6 +220,13 @@ target_include_directories(SLV PRIVATE
 if(OpenCV_INCLUDE_DIRS)
     target_include_directories(SLV PRIVATE ${OpenCV_INCLUDE_DIRS})
 endif()
+
+# =========================================================
+# Python3
+# =========================================================
+target_include_directories(SLV PRIVATE ${Python3_INCLUDE_DIRS})
+target_link_libraries(SLV PRIVATE Python3::Python)
+target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
 
 # =========================================================
 # Qt linking
@@ -410,6 +449,15 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PYTHON_SCRIPTS_DIR}"
         "$<TARGET_FILE_DIR:SLV>/pyScripts"
+
+        # =========================================================
+        # PYTHON RUNTIME EMBEDDED
+        # =========================================================
+
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/python_embedded"
+        "$<TARGET_FILE_DIR:SLV>/python"
+        
 
         # =================================================
         # - ALSO COPY TO DIST (portable version)

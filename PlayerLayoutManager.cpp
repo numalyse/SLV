@@ -398,6 +398,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);
     connect(advancedToolbar, &AdvancedToolbar::disableRecordRequested, activePlayer, &PlayerWidget::endRecord);
     connect(advancedToolbar, &AdvancedToolbar::extractSequenceRequest, activePlayer, &PlayerWidget::openSequenceExtractionDialog);
+    connect(advancedToolbar, &AdvancedToolbar::mediaInformationRequest, activePlayer->mediaWidget(), &MediaWidget::openMediaInfoDialog);
     connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);

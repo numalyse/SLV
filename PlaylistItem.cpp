@@ -95,7 +95,7 @@ void PlaylistItem::initStyle()
     setAttribute(Qt::WA_StyledBackground, true);
     setContentsMargins(0,0,0,0);
     QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
-    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid" + color + " border-radius: 3px;}");
+    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 4px;}");
     m_indexLabel->setMaximumWidth(15);
     m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
 
@@ -171,7 +171,7 @@ void PlaylistItem::leaveEvent(QEvent *event)
 {
     QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(!m_isCurrentMedia)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid" + color + " border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 3px;}");
     m_isClicked = false;
     // QWidget::leaveEvent(event);
 }
@@ -216,7 +216,7 @@ void PlaylistItem::setCurrentMedia(bool isCurrent)
     m_isCurrentMedia = isCurrent;
     QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(isCurrent)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid " + color +  " border-radius: 4px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 3px solid " + color +  " border-radius: 4px; background-color: palette(button);}");
     else
         setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 4px;}");
 }
@@ -317,7 +317,11 @@ void PlaylistItem::updateThumbnail()
         }
 
         if (m_mediaData->type() == MediaType::Audio){
-            m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+                m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
+            } else {
+                m_mediaThumbnailImage = new QPixmap(":/icons/music_note");
+            }
             m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     });

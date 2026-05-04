@@ -229,8 +229,8 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), projMedia->filePath(), proj->shots, this);
-    m_timeline->setFixedHeight(150);
+    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), *projMedia, proj->shots, this);
+    m_timeline->setFixedHeight(160);
 
     projManager.setTimeline(m_timeline);
 
@@ -250,6 +250,7 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, toolbar, &AdvancedToolbar::enableSlider );
 
     connect(toolbar, &AdvancedToolbar::toolbarCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorVisually);
+    layout->setSpacing(1);
 
     layout->addWidget(m_timeline);
     m_timeline->hide();

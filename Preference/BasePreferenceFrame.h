@@ -18,8 +18,8 @@ public:
     QString getSubCategory() const { return m_subCategory; }
     QString getKey() const { return m_key; }
 
-    /// @brief Each child class needs to define how to update the value 
-    /// @param value 
+    /// @brief Each child class needs to define how to update the value
+    /// @param value
     virtual void setUIValue(const QString& value) = 0;
 
 signals:
@@ -36,8 +36,11 @@ protected:
     /// @brief Use this if needing to set the right side of the row to a widget 
     void setRightWidget(QWidget* rightWidget);
 
-    /// @brief  Use this if needing to set the right side of to a layout with multiple widgets 
-    void setRightLayout(QLayout* rightLayout); 
+    /// @brief Use this if needing to set the right side of to a layout with multiple widgets
+    void setRightLayout(QLayout* rightLayout);
+
+    /// @brief Sets the right widget in parameter with a label role
+    void setRightWidgetLabel(QWidget* rightWidget);
 };
 
 #endif // BASEPREFERENCEFRAME_H

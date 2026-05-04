@@ -34,6 +34,7 @@
     "tooltip_delete_player" : "Supprimer un lecteur",
     "tooltip_duplicate_player" : "Dupliquer un lecteur",
     "tooltip_lang" : "Langues et sous-titres",
+    "tooltip_media_information" : "Afficher les informations du média",
     "tooltip_slider_disabled" : "Supprimer la boucle A/B pour réactiver", 
 
     "tooltip_time_total_btn": "Afficher le temps total / restant",
@@ -87,13 +88,13 @@
     "export_type_docx": "Document Word (*.docx)",
     "export_type_mp4": "Vidéo MP4 (*.mp4)",
     "export_type_src": "Fichier source (*.src)",
-    "export_type_tagimage": "TagImages (*.png)",
+    "export_type_tagimage": "Images repères (*.png)",
     "export_type_unknown": "Tous les fichiers (*.*)",
     "export_file_path_title": "Enregistrer sous...",
 
     "export_format_selection_title" : "Format d'exportation",
     "export_format_selection_txt" : "Sélectionner un format d'exportation",
-    "export_format_selection_txt_tagImage" : "TagImages",
+    "export_format_selection_txt_tagImage" : "Images repères",
 
     "timeline_dialog_title_auto_segmentation": "Segmentation automatique",
     "timeline_dialog_text_auto_segmentation": "Segmentation en cours...",
@@ -263,6 +264,8 @@
     "gamma" : "Gamma",
 
     "reset" : "Réinitialiser",
+
+    "timeline_extract_selected_shot" : "Extraire le plan",
     "close" : "Fermer",
 
     "about_dialog_title" : "À propos",
@@ -272,9 +275,63 @@
 
     "help_dialog_title" : "Aide",
     "help_dialog_wip" : "En cours de développement.",
-    "help_dialog_report" : "Pour signaler un problem, veuillez nous contacter aux adresses suivantes :",
+    "help_dialog_report" : "Pour signaler un problème, veuillez nous contacter aux adresses suivantes :",
 
     "messagebox_screenshot_with_adjustment" : "Le média actuel possède des ajustements. Voulez-vous enregistrer une capture d'écran sans les ajustements ?",
-    "screenshot_without_adjustment_button" : "Capture sans enregistrement"
+    "screenshot_without_adjustment_button" : "Capture sans enregistrement",
+
+    "media_info_dialog_title" : "Informations du média",
+    "media_info_title" : "Titre",
+    "media_info_path" : "Chemin",
+    "media_info_format" : "Format",
+    "media_info_type" : "Type",
+    "media_info_duration" : "Durée",
+    "media_info_section_general" : "Général",
+    "media_info_section_audio" : "Piste audio",
+    "media_info_section_video" : "Piste vidéo",
+    "media_info_section_subtitle" : "Piste de sous-titres",
+    "media_info_section_metadata" : "Métadonnées",
+
+    "media_track_info_description" : "Description",
+    "media_track_info_language" : "Langue",
+    "media_track_info_codec" : "Codec",
+    "media_track_info_channels" : "Nombre de canaux",
+    "media_track_info_rate" : "Taux d'échantillonnage",
+    "media_track_info_dimensions" : "Dimensions de l'image",
+    "media_track_info_sar" : "Rapport d'aspect de pixel",
+    "media_track_info_fps" : "Fréquence d'images",
+    "media_track_info_encoding" : "Encondage",
+
+    "media_type_video" : "Vidéo",
+    "media_type_image" : "Image",
+    "media_type_audio" : "Audio",
+    "media_type_unknown" : "Inconnu",
+
+    "media_meta_title" : "Titre original",
+    "media_meta_artist" : "Artiste",
+    "media_meta_genre" : "Genre",
+    "media_meta_copyright" : "Copyright",
+    "media_meta_album" : "Album",
+    "media_meta_track_number" : "Numéro de piste",
+    "media_meta_description" : "Description",
+    "media_meta_rating" : "Note",
+    "media_meta_date" : "Date",
+    "media_meta_setting" : "Décor",
+    "media_meta_url" : "URL",
+    "media_meta_language" : "Langue",
+    "media_meta_now_playing" : "En train de jouer",
+    "media_meta_publisher" : "Éditeur",
+    "media_meta_encoded_by" : "Encodé par",
+    "media_meta_artwork_url" : "URL de l'œuvre",
+    "media_meta_track_id" : "ID de la piste",
+    "media_meta_track_total" : "Total de pistes",
+    "media_meta_director" : "Directeur",
+    "media_meta_season" : "Saison",
+    "media_meta_episode" : "Épisode",
+    "media_meta_show_name" : "Nom du programme",
+    "media_meta_actors" : "Acteurs",
+    "media_meta_album_artist" : "Artiste de l'album",
+    "media_meta_disc_number" : "Numéro de disque",
+    "media_meta_disc_total" : "Total de disques"
 
 }

@@ -34,6 +34,7 @@
     "tooltip_delete_player" : "Delete player",
     "tooltip_duplicate_player" : "Duplicate player",
     "tooltip_lang" : "Languages and subtitles",
+    "tooltip_media_information" : "Show media informations",
     "tooltip_slider_disabled" : "Remove the A/B loop to reactivate",
 
     "tooltip_time_total_btn": "Show total / remaining time",
@@ -87,13 +88,13 @@
     "export_type_docx": "Word document (*.docx)",
     "export_type_mp4": "MP4 video (*.mp4)",
     "export_type_src": "Source file (*.src)",
-    "export_type_tagimage": "TagImages (*.png)",
+    "export_type_tagimage": "Tag frames (*.png)",
     "export_type_unknown": "All files (*.*)",
     "export_file_path_title": "Save as...",
 
     "export_format_selection_title" : "Export format",
     "export_format_selection_txt" : "Select export format",
-    "export_format_selection_txt_tagImage" : "TagImages",
+    "export_format_selection_txt_tagImage" : "Tag frames",
 
     "timeline_dialog_title_auto_segmentation": "Auto segmentation",
     "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",
@@ -263,6 +264,8 @@
     "gamma" : "Gamma",
 
     "reset" : "Reset",
+
+    "timeline_extract_selected_shot" : "Extract shot",
     "close" : "Close",
 
     "about_dialog_title" : "About",
@@ -275,7 +278,61 @@
     "help_dialog_report" : "To report any problem, please contact us:",
 
     "messagebox_screenshot_with_adjustment" : "The current media has adjustments. Do you want to take a screenshot without the adjustments ?",
-    "screenshot_without_adjustment_button" : "Screenshot without adjustment"
+    "screenshot_without_adjustment_button" : "Screenshot without adjustment",
+
+    "media_info_dialog_title" : "Media informations",
+    "media_info_title" : "Title",
+    "media_info_path" : "Path",
+    "media_info_format" : "Format",
+    "media_info_type" : "Type",
+    "media_info_duration" : "Duration",
+    "media_info_section_general" : "General",
+    "media_info_section_audio" : "Audio track",
+    "media_info_section_video" : "Video track",
+    "media_info_section_subtitle" : "Subtitle track",
+    "media_info_section_metadata" : "Metadata",
+
+    "media_track_info_description" : "Description",
+    "media_track_info_language" : "Language",
+    "media_track_info_codec" : "Codec",
+    "media_track_info_channels" : "Number of channels",
+    "media_track_info_rate" : "Rate",
+    "media_track_info_dimensions" : "Image dimensions",
+    "media_track_info_sar" : "Pixel aspect ratio",
+    "media_track_info_fps" : "Frame rate",
+    "media_track_info_encoding" : "Enconding",
+
+    "media_type_video" : "Video",
+    "media_type_image" : "Image",
+    "media_type_audio" : "Audio",
+    "media_type_unknown" : "Unknown",
+
+    "media_meta_title" : "Original title",
+    "media_meta_artist" : "Artist",
+    "media_meta_genre" : "Genre",
+    "media_meta_copyright" : "Copyright",
+    "media_meta_album" : "Album",
+    "media_meta_track_number" : "Track number",
+    "media_meta_description" : "Description",
+    "media_meta_rating" : "Rating",
+    "media_meta_date" : "Date",
+    "media_meta_setting" : "Setting",
+    "media_meta_url" : "URL",
+    "media_meta_language" : "Language",
+    "media_meta_now_playing" : "Now playing",
+    "media_meta_publisher" : "Publisher",
+    "media_meta_encoded_by" : "Encoded by",
+    "media_meta_artwork_url" : "Artwork URL",
+    "media_meta_track_id" : "Track ID",
+    "media_meta_track_total" : "Track total",
+    "media_meta_director" : "Director",
+    "media_meta_season" : "Season",
+    "media_meta_episode" : "Episode",
+    "media_meta_show_name" : "Show name",
+    "media_meta_actors" : "Actors",
+    "media_meta_album_artist" : "Album artist",
+    "media_meta_disc_number" : "Disc number",
+    "media_meta_dic_total" : "Disc total"
 
 
 }

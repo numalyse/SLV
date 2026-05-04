@@ -138,6 +138,8 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/CursorItem.cpp Timeline/Items/CursorItem.h
     Timeline/Items/RulerItem.cpp Timeline/Items/RulerItem.h
     Timeline/Items/ShotItem.cpp Timeline/Items/ShotItem.h
+    Timeline/Items/AudioShotItem.h Timeline/Items/AudioShotItem.cpp
+    Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h
@@ -153,6 +155,8 @@ set(ADDITIONAL_SOURCES
     # Project extras si manquants
     SequenceExtractionHelper.h
     ZoomHelper.h
+    
+    MediaInfoDialog.h MediaInfoDialog.cpp
 
 )
 

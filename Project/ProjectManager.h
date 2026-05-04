@@ -67,6 +67,7 @@ private:
     bool m_needSave = false;
     bool m_isDurationParsed = false;
     bool m_isFpsParsed = false;
+    bool m_projectInitialized = false;
 
     TimelineWidget* p_timeline = nullptr;
 

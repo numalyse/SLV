@@ -104,6 +104,7 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
     setSaveNotNeeded();
     m_isDurationParsed = false;
     m_isFpsParsed = false;
+    m_projectInitialized = false;
 
     connect(m_project->media, &Media::durationParsed, this, [this]() {
         m_isDurationParsed = true;
@@ -189,9 +190,10 @@ QString ProjectManager::mediaPathExtension()
 /// @brief Une fois que les fps et la durée on été parsed, Créer un project avec un plan de la longueur de la vidéo
 void ProjectManager::initProjectShot(){
 
-    if( ! m_isFpsParsed || ! m_isDurationParsed ){
+    if( ! m_isFpsParsed || ! m_isDurationParsed || m_projectInitialized ){
         return;
     }
+    m_projectInitialized = true;
 
     Q_ASSERT(m_project);
 
@@ -210,6 +212,7 @@ void ProjectManager::initProjectShot(){
 
     qDebug() << "project initialisé";
     emit projectInitialized();
+
 }
 
 
@@ -403,7 +406,7 @@ void ProjectManager::openProject()
 
 }
 
-///@brief Quand les fps et la duréer sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
+///@brief Quand les fps et la durée sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
 void ProjectManager::checkMediaFullyLoaded()
 {
     if(m_isDurationParsed && m_isFpsParsed){

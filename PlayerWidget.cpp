@@ -64,6 +64,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
     connect(m_toolBar, &SimpleToolbar::extractSequenceRequest, this, &PlayerWidget::openSequenceExtractionDialog);
+    connect(m_toolBar, &SimpleToolbar::mediaInformationRequest, m_mediaWidget, &MediaWidget::openMediaInfoDialog);
     connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
     connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
 
@@ -268,6 +269,7 @@ void PlayerWidget::pause()
 void PlayerWidget::togglePlayPause(bool isPlaying)
 {
     if(isPlaying) pause();
+    else if(!m_toolBar->isVisible()) playFromAdvanced();
     else play();
 }
 
@@ -405,15 +407,7 @@ void PlayerWidget::openSequenceExtractionDialog()
     }
     pause();
     ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
-    connect(sequenceExtractor, &QDialog::finished, this, [this](int res){ if(res == QDialog::Accepted){
-            QMessageBox *msg = new QMessageBox(this);
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
-            msg->setIcon(QMessageBox::Information);
-            msg->adjustSize();
-            msg->exec();
-        }
-    });
+
     sequenceExtractor->open();
 
 }

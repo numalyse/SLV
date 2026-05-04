@@ -5,6 +5,7 @@
 #include "SequenceExtractionHelper.h"
 #include "MediaTransformHelper.h"
 #include "PrefManager.h"
+#include "MediaInfoDialog.h"
 
 #include <QFile>
 #include <QUrl>
@@ -561,17 +562,20 @@ void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, c
     if(!m_player || !m_media) return;
     libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
     libvlc_video_set_adjust_float(m_player, adjustOption, value);
-    qDebug() << "BRIGHTNESS : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
-    qDebug() << "CONTRAST : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast);
-    qDebug() << "SATURATION : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation);
-    qDebug() << "HUE : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue);
-    qDebug() << "GAMMA : " << libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma);
 }
 
 void MediaWidget::resetAdjustments()
 {
     if(!m_player || !m_media) return;
     libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0);
+}
+
+void MediaWidget::openMediaInfoDialog()
+{
+    if(!m_player || !m_media) return;
+
+    MediaInfoDialog infoDialog(*m_media);
+    // infoDialog.exec();
 }
 
 QPoint MediaWidget::getMediaPosRect() const
@@ -680,9 +684,14 @@ void MediaWidget::mousePressEvent(QMouseEvent *event)
 
 void MediaWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(!m_player || !m_media || !m_zoomActivated) return;
-    setCursor(Qt::ArrowCursor);
-    m_isPanning = false;
+    if(!m_zoomActivated /*&& (m_lastPanPos - event->pos()).manhattanLength() < 5*/){
+        emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+    }
+    if(!m_player || !m_media) return;
+    else if(m_zoomActivated){
+        setCursor(Qt::ArrowCursor);
+        m_isPanning = false;
+    }
 }
 
 void MediaWidget::mouseMoveEvent(QMouseEvent *event)
@@ -702,10 +711,6 @@ void MediaWidget::resizeEvent(QResizeEvent *event)
     QRect mediaRect = getMediaDisplayRect();
     m_mediaSurface->setGeometry(mediaRect);
     emit mediaRectChanged(mediaRect);
-    qDebug() << "mediaWidget size:" << this->size();
-    qDebug() << "m_mediaSurface size:" << m_mediaSurface->size();
-    qDebug() << "Displayed video rect:" << mediaRect;
-    qDebug() << "mediasize:" << m_mediaSize;
 }
 
 void MediaWidget::wheelEvent(QWheelEvent *event)

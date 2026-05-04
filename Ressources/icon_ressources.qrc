@@ -165,5 +165,7 @@
         <file alias="saturation_white">icons/saturation_white.png</file>
         <file alias="reset_adjustments">icons/reset_adjustments.png</file>
         <file alias="reset_adjustments_white">icons/reset_adjustments_white.png</file>
+        <file alias="media_info">icons/media_info.png</file>
+        <file alias="media_info_white">icons/media_info_white.png</file>
     </qresource>
 </RCC>

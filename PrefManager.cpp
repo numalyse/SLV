@@ -338,6 +338,7 @@ QStringList PrefManager::getAvailableLangs(){
     while (it.hasNext()) {
         QFile f(it.next());
         QFileInfo fileInfo(f);
+        //qDebug() << "LANG : " << fileInfo.baseName();
         langs.append(fileInfo.baseName());
     }
 

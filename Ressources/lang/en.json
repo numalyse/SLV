@@ -1,4 +1,10 @@
 {
+    "en" : "English",
+    "fr" : "Français",
+    "es" : "Español",
+    "it" : "Italiano",
+    "de" : "Deutsch",
+    "pt" : "Português",
     "tooltip_play": "Play",
     "tooltip_pause": "Pause",
     "tooltip_stop" : "Stop",
@@ -36,6 +42,7 @@
     "tooltip_lang" : "Languages and subtitles",
     "tooltip_media_information" : "Show media informations",
     "tooltip_slider_disabled" : "Remove the A/B loop to reactivate",
+    "tooltip_adjust" : "Adjust video colorimetry",
 
     "tooltip_time_total_btn": "Show total / remaining time",
     "tooltip_extract_sequence": "Extract sequence",
@@ -76,7 +83,7 @@
     "timeline_ab_action_0": "Add marker A at cursor",
     "timeline_ab_action_1": "Add marker B at cursor",
     "timeline_ab_action_2": "Remove markers",
-    "timeline_ab_extraxt": "Extract AB sequence",
+    "timeline_ab_extract": "Extract AB sequence",
     "timeline_merge_with_previous_shot" : "Merge the current shot with the previous shot", 
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
 
@@ -332,7 +339,5 @@
     "media_meta_actors" : "Actors",
     "media_meta_album_artist" : "Album artist",
     "media_meta_disc_number" : "Disc number",
-    "media_meta_dic_total" : "Disc total"
-
-
+    "media_meta_disc_total" : "Disc total"
 }

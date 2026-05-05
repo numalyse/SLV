@@ -297,7 +297,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         break;
     case 2:
         actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extraxt"));
+        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
         break;
     }
 

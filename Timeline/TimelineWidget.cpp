@@ -127,6 +127,17 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
 
 }
 
+TimelineWidget::~TimelineWidget()
+{
+    if (m_audioComputeProcess) {
+        m_audioComputeProcess->kill();
+        m_audioComputeProcess->waitForFinished();
+
+        m_audioComputeProcess->deleteLater();
+        m_audioComputeProcess = nullptr;
+    }
+}
+
 QVector<Shot> TimelineWidget::getTimelineData()
 {
     return m_shotManager->shotItemsData();
@@ -439,7 +450,7 @@ void TimelineWidget::autoSegmentation(){
 
 void TimelineWidget::computeMediaAmplitudes(const QString &mediaPath)
 {
-    QProcess *proc = new QProcess(this);
+    m_audioComputeProcess = new QProcess(this);
 
     QStringList args = {
         "-loglevel", "quiet",
@@ -453,9 +464,9 @@ void TimelineWidget::computeMediaAmplitudes(const QString &mediaPath)
     m_audioBuffer.clear();
     m_amplitudeList.clear();
 
-    connect(proc, &QProcess::readyReadStandardOutput, this, [this, proc]() {
+    connect(m_audioComputeProcess, &QProcess::readyReadStandardOutput, this, [this]() {
 
-        m_audioBuffer.append(proc->readAllStandardOutput());
+        m_audioBuffer.append(m_audioComputeProcess->readAllStandardOutput());
 
         const int frameSamples = 1024;
         const int frameBytes = frameSamples * sizeof(int16_t);
@@ -479,13 +490,15 @@ void TimelineWidget::computeMediaAmplitudes(const QString &mediaPath)
         }
     });
 
-    connect(proc, &QProcess::readyReadStandardError, this, [proc]() {
-        proc->readAllStandardError();
+    connect(m_audioComputeProcess, &QProcess::readyReadStandardError, this, [this]() {
+        m_audioComputeProcess->readAllStandardError();
     });
 
-    connect(proc, &QProcess::finished, this, [this](){ initAudioVisualizer(); });
+    connect(m_audioComputeProcess, &QProcess::finished, this, [this](){
+        initAudioVisualizer();
+    });
 
-    proc->start("ffmpeg", args);
+    m_audioComputeProcess->start("ffmpeg", args);
 }
 
 void TimelineWidget::initAudioVisualizer()

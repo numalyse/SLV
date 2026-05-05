@@ -143,6 +143,7 @@ signals:
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
     void mediaIsVideoParsed();
+    void zoomValueUpdated(const QString&);
 
 };
 

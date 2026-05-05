@@ -53,10 +53,10 @@ Playlist::Playlist(QWidget *parent)
     playlistLabelLayout->addWidget(playlistLabel);
 
     m_loopItemBtn = new ToolbarToggleButton(this, 
-        false, 
-        "loop_off_white", 
+        false,
+        "playlist_loop_white",
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(activated)"),
-        "loop_off_white", 
+        "playlist_loop_white",
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_loopItemBtn->setFixedSize(24,24);
     m_loopItemBtn->setToggledIconFrame(true);

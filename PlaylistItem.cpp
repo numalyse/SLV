@@ -41,7 +41,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
     // titre
     m_mediaTitleLabel = new QLabel(m_mediaData->fileName());
-    m_mediaTitleLabel->setToolTip(m_mediaData->fileName() + "."+ m_mediaData->fileExtension());
+    m_mediaTitleLabel->setToolTip(m_mediaData->fileName() + "."+ m_mediaData->fileExtension() + "\n" + m_mediaData->filePath());
     m_mediaTitleLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     infoLayout->addWidget(m_mediaTitleLabel);
 

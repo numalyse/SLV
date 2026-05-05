@@ -249,9 +249,9 @@ void Playlist::deleteItem(const unsigned int index)
     if(m_currentMediaIndex == index){
         playPreviousMedia();
         if(m_currentMediaIndex == 0)
-                playNextMedia();
+            playNextMedia();
     }
-    if(m_currentMediaIndex >= index)
+    if(m_currentMediaIndex >= index && m_currentMediaIndex > 0)
         m_currentMediaIndex--;
     m_items[m_itemsSortOrder[index]]->deleteLater();
     m_items.remove(m_itemsSortOrder.indexOf(index));

@@ -143,6 +143,16 @@ public:
         return getZoomArg();
     }
 
+    double getZoomPercent() const {
+        double initialWidth = maxWidth;
+        double currentWidth = fx1 - fx2;
+
+        if (currentWidth <= 0.0)
+            return 100.0;
+
+        return (initialWidth / currentWidth) * 100.0;
+    }
+
 };
 
 #endif // ZOOMHELPER_y1

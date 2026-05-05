@@ -215,9 +215,10 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_mediaInfoBtn);
-    buttonLayout->addSpacing(m_speedBtn->size().width());
-    buttonLayout->addSpacing(m_speedBtn->size().width());
-    buttonLayout->addSpacing(m_speedBtn->size().width());
+    buttonLayout->addSpacing(m_speedBtn->width()+1);
+    buttonLayout->addSpacing(m_speedBtn->width()+1);
+    buttonLayout->addSpacing(m_speedBtn->width()+1);
+    buttonLayout->addSpacing(m_zoomIndicator->width()+4);
 
     buttonLayout->addStretch();
 
@@ -231,6 +232,7 @@ void AdvancedToolbar::setDefaultUI()
 
     buttonLayout->addStretch();
 
+    buttonLayout->addWidget(m_zoomIndicator);
     buttonLayout->addWidget(m_zoomBtn);
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_extractSequenceBtn);

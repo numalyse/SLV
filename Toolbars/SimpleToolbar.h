@@ -77,6 +77,8 @@ public slots:
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
     void setSubtitlesTrack(int index);
 
+    void setZoomIndicatorText(const QString&);
+
 
 
 protected:
@@ -108,6 +110,7 @@ protected:
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;
     ToolbarButton* m_extractSequenceBtn = nullptr;
+    QLabel* m_zoomIndicator = nullptr;
 
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;

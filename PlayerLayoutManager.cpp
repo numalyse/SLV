@@ -454,6 +454,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
     connect(activePlayer->mediaWidget(), &MediaWidget::hFlipUiUpdateRequested, advancedToolbar, &AdvancedToolbar::hFlipUiUpdate);
     connect(activePlayer->mediaWidget(), &MediaWidget::vFlipUiUpdateRequested, advancedToolbar, &AdvancedToolbar::vFlipUiUpdate);
+    connect(activePlayer->mediaWidget(), &MediaWidget::zoomValueUpdated, advancedToolbar, &AdvancedToolbar::setZoomIndicatorText);
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, advancedToolbar, &SimpleToolbar::updateSliderValue);
 

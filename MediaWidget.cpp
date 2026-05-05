@@ -426,6 +426,7 @@ void MediaWidget::disableLoopMode()
 void MediaWidget::enableZoomMode()
 {
     m_zoomActivated = true;
+    emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
     if(!m_player || !m_media) return;
         libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
 }
@@ -725,6 +726,8 @@ void MediaWidget::wheelEvent(QWheelEvent *event)
         libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(0.1, cursorPosNormalized).toUtf8().constData());
     else
         libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(-0.1, cursorPosNormalized).toUtf8().constData());
+
+    emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
 }
 
 /// @brief Stops the current media player and load a new media from a path

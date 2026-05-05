@@ -167,5 +167,7 @@
         <file alias="reset_adjustments_white">icons/reset_adjustments_white.png</file>
         <file alias="media_info">icons/media_info.png</file>
         <file alias="media_info_white">icons/media_info_white.png</file>
+        <file alias="playlist_loop">icons/playlist_loop.png</file>
+        <file alias="playlist_loop_white">icons/playlist_loop_white.png</file>
     </qresource>
 </RCC>

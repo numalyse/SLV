@@ -72,17 +72,25 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     speedFrameLayout->addWidget(m_speedSlider);
 
-    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  PrefManager::instance().getText("tooltip_speed"), "speed_white", PrefManager::instance().getText("tooltip_speed"));
+    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "slow_white",  PrefManager::instance().getText("tooltip_speed"), "slow_white", PrefManager::instance().getText("tooltip_speed"));
 
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
         "loop_off_white",
-        PrefManager::instance().getText("tooltip_loop_on"),
+        PrefManager::instance().getText("tooltip_loop_off"),
         "loop_off_white",
-        PrefManager::instance().getText("tooltip_loop_off")
+        PrefManager::instance().getText("tooltip_loop_on")
     );
     m_loopBtn->setToggledIconFrame(true);
+
+    m_zoomIndicator = new QLabel(this);
+    m_zoomIndicator->setText("");
+    // m_zoomIndicator->hide();
+    m_zoomIndicator->setContentsMargins(0,0,3,0);
+    m_zoomIndicator->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    QFontMetrics fm(m_zoomIndicator->font());
+    m_zoomIndicator->setFixedWidth(fm.horizontalAdvance("-88888%"));
 
     // Languages/Subtitles Popup display
     QVBoxLayout* langLayout = new QVBoxLayout();
@@ -129,6 +137,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
     connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
+    connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, m_zoomIndicator, [this]{ m_zoomIndicator->setText(""); });
 
     setDefaultUI();
     disableButtons();
@@ -168,20 +177,22 @@ void SimpleToolbar::setDefaultUI()
     buttonLayout->addWidget(m_muteBtn);
     buttonLayout->addWidget(m_langBtn);
     buttonLayout->addWidget(m_mediaInfoBtn);
-    buttonLayout->addSpacing(m_langBtn->width());
-    buttonLayout->addSpacing(m_langBtn->width());
-    buttonLayout->addSpacing(m_langBtn->width());
+    buttonLayout->addSpacing(m_langBtn->width()+1);
+    buttonLayout->addSpacing(m_langBtn->width()+1);
+    buttonLayout->addSpacing(m_langBtn->width()+1);
+    buttonLayout->addSpacing(m_zoomIndicator->width()+4);
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_speedBtn);
     buttonLayout->addWidget(m_stopBtn);
-    //buttonLayout->addWidget(m_slowDownBtn);
+    // buttonLayout->addWidget(m_slowDownBtn);
     buttonLayout->addWidget(m_playPauseBtn);
-    //buttonLayout->addWidget(m_speedUpBtn);
+    // buttonLayout->addWidget(m_speedUpBtn);
 
     buttonLayout->addWidget(m_ejectBtn);
     buttonLayout->addWidget(m_loopBtn);
 
     buttonLayout->addStretch();
+    buttonLayout->addWidget(m_zoomIndicator);
     buttonLayout->addWidget(m_zoomBtn);
     buttonLayout->addWidget(m_screenshotBtn);
     buttonLayout->addWidget(m_extractSequenceBtn);
@@ -462,6 +473,11 @@ void SimpleToolbar::setSubtitlesTrack(int index){
     qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
     emit setSubtitlesTrackRequested(trackNumber);
     
+}
+
+void SimpleToolbar::setZoomIndicatorText(const QString& value)
+{
+    if(m_zoomBtn->isChecked()) m_zoomIndicator->setText(value);
 }
 
 void SimpleToolbar::createTimeEdit(){

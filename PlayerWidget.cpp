@@ -84,6 +84,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
     connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
+    connect(m_mediaWidget, &MediaWidget::zoomValueUpdated, m_toolBar, &SimpleToolbar::setZoomIndicatorText);
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);

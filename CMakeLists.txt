@@ -33,7 +33,7 @@ find_package(OpenCV REQUIRED)
 # Python (embedded ou portable runtime)
 # =========================================================
 
-# find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
 
 # =========================================================
 # Sources de base
@@ -227,8 +227,8 @@ endif()
 # Python3
 # =========================================================
 # target_include_directories(SLV PRIVATE ${Python3_INCLUDE_DIRS})
-# target_link_libraries(SLV PRIVATE Python3::Python)
-#target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
+# target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
+target_link_libraries(SLV PRIVATE Python3::Python)
 
 # =========================================================
 # Qt linking
@@ -495,6 +495,11 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PYTHON_SCRIPTS_DIR}"
         "${DEPLOY_DIR}/pyScripts"
+
+        # Python embedded
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/python_embedded"
+        "${DEPLOY_DIR}/python"
 
         # FFmpeg/OpenCV
         COMMAND ${CMAKE_COMMAND} -E copy_if_different

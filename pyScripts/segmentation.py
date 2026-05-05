@@ -10,7 +10,7 @@ def segment_video(video_path, use_color=True):
 
     video = open_video(video_path)
     
-    total_frames = video.duration.get_frames()
+    total_frames = video.duration.frame_num
     if total_frames <= 0:
         total_frames = 1 
 
@@ -21,7 +21,8 @@ def segment_video(video_path, use_color=True):
     else:
         scene_manager.add_detector(HashDetector())
 
-    def progress_callback(frame_img, frame_num):
+    def progress_callback(frame_img, frame_timecode):
+        frame_num = frame_timecode.frame_num
         percent = int((frame_num / total_frames) * 100)
         percent = min(percent, 100)
         print(f"PROGRESS:{percent}", flush=True)
@@ -29,7 +30,11 @@ def segment_video(video_path, use_color=True):
     scene_manager.detect_scenes(video, callback=progress_callback)
     scene_list = scene_manager.get_scene_list()
 
-    cuts = [scene[0].get_frames() for scene in scene_list if scene[0].get_frames() > 0]
+    cuts = [
+        scene[0].frame_num
+        for scene in scene_list
+        if scene[0].frame_num > 0
+    ]
 
     print(f"RESULT:{json.dumps(cuts)}", flush=True)
 

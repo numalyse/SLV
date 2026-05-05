@@ -540,11 +540,13 @@ void MediaWidget::nextFrame()
 {
     if(!m_player || !m_media) return;
     pause();
-
-    // libvlc_media_player_next_frame(m_player);
-    const int newTime = getCurrentTime() + int(1000/m_media->fps());
-    setTime(newTime);
     qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+    libvlc_media_player_next_frame(m_player);
+    const int mspf = int(1000.0/m_media->fps());
+    // const int newTime = getCurrentTime() + int(1000/m_media->fps());
+    // setTime(newTime);
+    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+    m_vlcTime += mspf;
     emit vlcTimeChanged(m_vlcTime);
 
 }
@@ -553,8 +555,9 @@ void MediaWidget::prevFrame()
 {
     if(!m_player || !m_media) return;
     pause();
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
-    const int newTime = getCurrentTime() - int(1000/m_media->fps());
+    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime << "," << int(1000.0/m_media->fps());
+    const int mspf = int(1000.0/m_media->fps());
+    const int newTime = m_vlcTime - mspf;
     setTime(newTime);
 }
 

@@ -286,7 +286,8 @@ void PlayerWidget::stop()
 
 void PlayerWidget::eject()
 {
-   m_mediaWidget->eject();
+    m_mediaWidget->eject();
+    // disconnect(this, nullptr, nullptr, nullptr);
 }
 
 void PlayerWidget::mute()

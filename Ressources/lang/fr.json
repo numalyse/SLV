@@ -1,4 +1,10 @@
 {
+    "en" : "English",
+    "fr" : "Français",
+    "es" : "Español",
+    "it" : "Italiano",
+    "de" : "Deutsch",
+    "pt" : "Português",
     "tooltip_play" : "Lecture",
     "tooltip_pause" : "Pause",
     "tooltip_stop" : "Stop",
@@ -35,7 +41,8 @@
     "tooltip_duplicate_player" : "Dupliquer un lecteur",
     "tooltip_lang" : "Langues et sous-titres",
     "tooltip_media_information" : "Afficher les informations du média",
-    "tooltip_slider_disabled" : "Supprimer la boucle A/B pour réactiver", 
+    "tooltip_slider_disabled" : "Supprimer la boucle A/B pour réactiver",
+    "tooltip_adjust" : "Ajuster la colorimétrie de la vidéo",
 
     "tooltip_time_total_btn": "Afficher le temps total / restant",
     "tooltip_extract_sequence": "Extraire la séquence",
@@ -76,7 +83,7 @@
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
     "timeline_ab_action_2": "Supprimer les marqueurs",
-    "timeline_ab_extraxt": "Extraire la séquence AB",
+    "timeline_ab_extract": "Extraire la séquence AB",
     "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
     "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
     
@@ -333,5 +340,4 @@
     "media_meta_album_artist" : "Artiste de l'album",
     "media_meta_disc_number" : "Numéro de disque",
     "media_meta_disc_total" : "Total de disques"
-
 }

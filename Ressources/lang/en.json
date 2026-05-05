@@ -276,9 +276,10 @@
     "close" : "Close",
 
     "about_dialog_title" : "About",
-    "about_dialog_project" : "Application developped within the framework of the ANR Numalyse project",
-    "about_dialog_qt" : "Developped with Qt© 2026 - all rights reserved",
-    "about_dialog_version" : "V1.0-alpha April 24 2026",
+    "about_dialog_project" : "Application developped within the framework of the ANR Numalyse project\n© 2026 - Free software (GPL)",
+    "about_dialog_qt" : "Developped with Qt",
+    "about_dialog_version" : "Version",
+    "about_dialog_last_update" : "Last update : ",
 
     "help_dialog_title" : "Help",
     "help_dialog_wip" : "Work in progress.",

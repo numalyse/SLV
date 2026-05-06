@@ -172,6 +172,7 @@
     "delete" : "Supprimer",
     "delete_all" : "Tout supprimer",
     "delete_all_items_playlist" : "Supprimer Playlist",
+    "tooltip_delete_all_items_playlist" : "Supprimer tous les éléments de la playlist",
     "delete_all_items" : "Voulez-vous supprimer tous les éléments de la playlist ?",
     "delete_all_items_confirm" : "Cette action est irréversible.",
     "duration" : "Durée",

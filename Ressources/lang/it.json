@@ -170,6 +170,11 @@
     "sort_addition_up_playlist" : "Per aggiunta decrescente ↑",
     "tooltip_add_item_playlist" : "Aggiungi media",
     "delete" : "Elimina",
+    "delete_all" : "Elimina tutto",
+    "delete_all_items_playlist" : "Elimina playlist",
+    "tooltip_delete_all_items_playlist" : "Elimina tutti gli elementi della playlist",
+    "delete_all_items" : "Vuoi eliminare tutti gli elementi della playlist?",
+    "delete_all_items_confirm" : "Questa azione è irreversibile.",
     "duration" : "Durata",
 
     "messagebox_not_a_video" : "Questo media non è un video",

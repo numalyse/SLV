@@ -97,7 +97,7 @@ Playlist::Playlist(QWidget *parent)
         "   border: 1px solid palette(button);"
         "   border-radius: 4px;"
         "}");
-    m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_delete_all_item_playlist"));
+    m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_delete_all_items_playlist"));
     playlistLabelLayout->addWidget(m_deleteAllBtn);
 
     // [Bouton] Ajouter un élément à la playlist

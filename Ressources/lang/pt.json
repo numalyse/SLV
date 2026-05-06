@@ -170,6 +170,11 @@
     "sort_addition_up_playlist" : "Por adição decrescente ↑",
     "tooltip_add_item_playlist" : "Adicionar média",
     "delete" : "Eliminar",
+    "delete_all" : "Eliminar tudo",
+    "delete_all_items_playlist" : "Eliminar lista de reprodução",
+    "tooltip_delete_all_items_playlist" : "Eliminar todos os elementos da lista de reprodução",
+    "delete_all_items" : "Deseja eliminar todos os elementos da lista de reprodução?",
+    "delete_all_items_confirm" : "Esta ação é irreversível.",
     "duration" : "Duração",
 
     "messagebox_not_a_video" : "Este média não é um vídeo",

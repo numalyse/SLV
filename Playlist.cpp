@@ -273,11 +273,10 @@ void Playlist::deleteAllItemsDialog()
     auto& prefManager = PrefManager::instance();
     QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
 
-
     QDialog dialog;
     dialog.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     dialog.setAttribute(Qt::WA_TranslucentBackground);
-    dialog.setFixedSize(500,200);
+    dialog.setFixedSize(500,220);
     dialog.setObjectName("dialogWindow");
     dialog.setStyleSheet(
         "#dialogWindow {"
@@ -326,23 +325,47 @@ void Playlist::deleteAllItemsDialog()
     layout.addWidget(textLabel);
 
     QHBoxLayout* btnLayout = new QHBoxLayout;
-    QPushButton* yesBtn = new QPushButton(prefManager.getText("delete_all"));
+    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("delete_all"));
     QPushButton* cancelBtn = new QPushButton(prefManager.getText("generic_dialog_btn_cancel"));
 
-    QFont btnFont = yesBtn->font();
+    QFont btnFont = deleteAllBtn->font();
     btnFont.setPointSize(10);
     btnFont.setBold(true);
 
-    yesBtn->setFont(btnFont);
+    deleteAllBtn->setFont(btnFont);
     cancelBtn->setFont(btnFont);
 
-    yesBtn->setFixedSize(200,40);
+    deleteAllBtn->setFixedSize(200,40);
     cancelBtn->setFixedSize(200,40);
 
-    connect(yesBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+    deleteAllBtn->setStyleSheet("QPushButton{"
+        "   background-color: tomato;"
+        "   border: 1px solid tomato;"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: salmon;"
+        "   border: 2px solid salmon;"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    cancelBtn->setStyleSheet("QPushButton{"
+        "   background-color: palette(Window);"
+        "   border: 1px solid palette(Button);"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: palette(Button);"
+        "   border: 2px solid palette(Button);"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    connect(deleteAllBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
     connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
 
-    btnLayout->addWidget(yesBtn);
+    btnLayout->addWidget(deleteAllBtn);
     btnLayout->setSpacing(20);
     btnLayout->addWidget(cancelBtn);
     layout.addLayout(btnLayout);

@@ -171,6 +171,11 @@
     "sort_addition_up_playlist" : "Nach Hinzufügung absteigend ↑",
     "tooltip_add_item_playlist" : "Medium hinzufügen",
     "delete" : "Löschen",
+    "delete_all" : "Alle löschen",
+    "delete_all_items_playlist" : "Playlist löschen",
+    "tooltip_delete_all_items_playlist" : "Alle Elemente der Playlist löschen",
+    "delete_all_items" : "Möchten Sie alle Elemente der Playlist löschen?",
+    "delete_all_items_confirm" : "Diese Aktion ist unwiderruflich.",
     "duration" : "Dauer",
 
     "messagebox_not_a_video" : "Dieses Medium ist kein Video",

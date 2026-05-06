@@ -37,6 +37,7 @@ private:
     ToolbarToggleButton *m_shuffleItemBtn = nullptr;
     ToolbarPopupButton *m_sortPlaylistBtn = nullptr;
     QPushButton *m_addItemBtn = nullptr;
+    QPushButton *m_deleteAllBtn = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
     QVBoxLayout *m_itemsLayout = nullptr;
     QButtonGroup *m_sortButtons;
@@ -48,8 +49,10 @@ signals:
 
 public slots:
     void addItemDialog();
+    void deleteAllItemsDialog();
     void addItemsFromPaths(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);
+    void deleteAllItems();
     void playMedia(const QString &filePath, const bool isClicked);
     void playPreviousMedia();
     void playNextMedia();

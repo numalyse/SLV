@@ -45,10 +45,10 @@ Playlist::Playlist(QWidget *parent)
     m_mainLayout->addLayout(playlistLabelLayout);
 
     QLabel *playlistLabel = new QLabel();
-    QFont font = playlistLabel->font();
-    font.setPointSize(12);
-    font.setBold(true);
-    playlistLabel->setFont(font);
+    QFont playlistFont = playlistLabel->font();
+    playlistFont.setPointSize(12);
+    playlistFont.setBold(true);
+    playlistLabel->setFont(playlistFont);
     //playlistLabel->setTextFormat(Qt::RichText);
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
@@ -80,6 +80,27 @@ Playlist::Playlist(QWidget *parent)
     createSortBtn();
     playlistLabelLayout->addWidget(m_sortPlaylistBtn);
 
+    // [Bouton] Supprimer tous les éléments
+    m_deleteAllBtn = new QPushButton;
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_deleteAllBtn->setIcon(QIcon(":/icons/delete_white"));
+    } else {
+        m_deleteAllBtn->setIcon(QIcon(":/icons/delete"));
+    }
+    m_deleteAllBtn->setFixedSize(24,24);
+    m_deleteAllBtn->setMaximumWidth(24);
+    m_deleteAllBtn->setStyleSheet("QPushButton{"
+        "   background-color: rgba(0,0,0,0);"
+        "   border: none;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: tomato;"
+        "   border: 1px solid palette(button);"
+        "   border-radius: 4px;"
+        "}");
+    m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_delete_all_items_playlist"));
+    playlistLabelLayout->addWidget(m_deleteAllBtn);
+
     // [Bouton] Ajouter un élément à la playlist
     m_addItemBtn = new QPushButton;
     if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
@@ -102,12 +123,14 @@ Playlist::Playlist(QWidget *parent)
         "}");
     playlistLabelLayout->addWidget(m_addItemBtn);
 
+    // LAYOUT ITEMS
     m_itemsLayout = new QVBoxLayout();
     m_mainLayout->addLayout(m_itemsLayout);
     m_mainLayout->addWidget(m_addItemBtn);
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
+    connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsFromPaths);
 
@@ -252,6 +275,121 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         m_currentMediaIndex = 0;
     }
     emit disableToolbarLoopRequested();
+}
+
+void Playlist::deleteAllItemsDialog()
+{
+
+    auto& prefManager = PrefManager::instance();
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+
+    QDialog dialog;
+    dialog.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    dialog.setAttribute(Qt::WA_TranslucentBackground);
+    dialog.setFixedSize(500,220);
+    dialog.setObjectName("dialogWindow");
+    dialog.setStyleSheet(
+        "#dialogWindow {"
+            "background-color: transparent;"
+        "}"
+    );    
+
+    QVBoxLayout outerLayout(&dialog);
+    outerLayout.setContentsMargins(0,0,0,0);
+
+    QWidget* container = new QWidget;
+    container->setObjectName("dialogContainer");
+
+    container->setStyleSheet(
+        "#dialogContainer {"
+            "background-color: palette(Window);"
+            "border: 2px solid " + color + ";"
+            "border-radius: 20px;"
+        "}"
+    );
+
+    outerLayout.addWidget(container);
+
+    QVBoxLayout layout(container);
+    layout.setContentsMargins(20,20,20,20);
+
+    QLabel* titleLabel = new QLabel;
+    titleLabel->setAlignment(Qt::AlignCenter);
+    titleLabel->setText(prefManager.getText("delete_all_items_playlist"));
+    
+    QFont titleFont = titleLabel->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    titleLabel->setFont(titleFont);
+    layout.addWidget(titleLabel);
+
+    QLabel* textLabel = new QLabel;
+    QFont textFont = textLabel->font();
+    textFont.setPointSize(10);
+    textLabel->setFont(textFont);
+    textLabel->setAlignment(Qt::AlignCenter);
+    textLabel->setTextFormat(Qt::RichText);
+    textLabel->setText(
+                        prefManager.getText("delete_all_items") + "<br>" +
+                        "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i>");
+    layout.addWidget(textLabel);
+
+    QHBoxLayout* btnLayout = new QHBoxLayout;
+    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("delete_all"));
+    QPushButton* cancelBtn = new QPushButton(prefManager.getText("generic_dialog_btn_cancel"));
+
+    QFont btnFont = deleteAllBtn->font();
+    btnFont.setPointSize(10);
+    btnFont.setBold(true);
+
+    deleteAllBtn->setFont(btnFont);
+    cancelBtn->setFont(btnFont);
+
+    deleteAllBtn->setFixedSize(200,40);
+    cancelBtn->setFixedSize(200,40);
+
+    deleteAllBtn->setStyleSheet("QPushButton{"
+        "   background-color: tomato;"
+        "   border: 1px solid tomato;"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: salmon;"
+        "   border: 2px solid salmon;"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    cancelBtn->setStyleSheet("QPushButton{"
+        "   background-color: palette(Window);"
+        "   border: 1px solid palette(Button);"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: palette(Button);"
+        "   border: 2px solid palette(Button);"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    connect(deleteAllBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+    connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+    btnLayout->addWidget(deleteAllBtn);
+    btnLayout->setSpacing(20);
+    btnLayout->addWidget(cancelBtn);
+    layout.addLayout(btnLayout);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        deleteAllItems();
+    }
+}
+
+void Playlist::deleteAllItems()
+{
+    while(!m_items.isEmpty()){
+        deleteItem(static_cast<unsigned int>(m_items.size() - 1));
+    }
 }
 
 void Playlist::deleteItem(const unsigned int index)

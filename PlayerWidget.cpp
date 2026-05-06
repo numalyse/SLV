@@ -4,6 +4,7 @@
 #include "SignalManager.h"
 #include "CompositionWidget.h"
 #include "BlackOpacityWidget.h"
+#include "FileFormatManager.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -215,7 +216,7 @@ void PlayerWidget::play()
             this, 
             prefManager.getText("dialog_open_file"),
             prefManager.getPref("Paths", "lp_open_media"),
-            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
+            FileFormatManager::instance().getOpenFileDialogFilters()
         ); 
         if(file_path != ""){
             setMediaFromPath(file_path);
@@ -240,8 +241,8 @@ void PlayerWidget::playFromAdvanced()
         QString file_path = QFileDialog::getOpenFileName(
             this, 
             prefManager.getText("dialog_open_file"), 
-            prefManager.getPref("Paths", "lp_open_media"), 
-            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
+            prefManager.getPref("Paths", "lp_open_media"),
+            FileFormatManager::instance().getOpenFileDialogFilters()
         ); 
 
         if(file_path != ""){
@@ -501,14 +502,19 @@ void PlayerWidget::dropEvent(QDropEvent *event)
 
         for (const QUrl &url : urlList) {
             QString filePath = url.toLocalFile();
+            QFileInfo info(filePath);
             qDebug() << "Fichier droppé :" << filePath;
-            filePaths.append(filePath);
+            if(FileFormatManager::instance().isFormatAccepted(info.completeSuffix())) filePaths.append(filePath);
             if (filePaths.size() >= 4) break; 
         }
 
-        if (filePaths.size() == 1 && m_mediaWidget->media()) {
-            m_pendingFilePath = filePaths.first();
-            eject();
+        if (filePaths.size() == 1) {
+            if(m_mediaWidget->media()){
+                m_pendingFilePath = filePaths.first();
+                eject();
+            }
+            else
+                setMediaFromPath(filePaths.first());
         } else {
             emit mediaDropped(filePaths);
         }

@@ -137,9 +137,10 @@
     "extract_start_label" : "Start",
     "extract_end_label" : "Ende",
     "open_files" : "Mediendateien öffnen",
-    "file_video" : "Videodatei",
-    "file_image" : "Bilddatei",
-    "file_audio" : "Audiodatei",
+    "file_video" : "Videodateien",
+    "file_image" : "Bilddateien",
+    "file_audio" : "Audiodateien",
+    "file_multimedia" : "Mediendateien",
 
     "main_window_menu_bar_file": "Datei",
     "main_window_file_open_media_action": "Mediendateien öffnen",

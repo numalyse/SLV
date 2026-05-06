@@ -1,0 +1,34 @@
+{
+        "containers_video": [
+                "mp4", "m4v", "mkv", "avi", "mov", "wmv", "flv", "webm",
+                "mpeg", "mpg", "ts", "m2ts", "mts", "vob", "3gp", "3g2",
+                "rm", "rmvb", "asf", "ogv", "divx", "f4v", "mxf"
+        ],
+
+        "containers_audio": [
+                "mp3", "aac", "m4a", "ogg", "wav", "flac", "wma",
+                "opus", "aiff", "ape", "alac", "amr", "ac3", "dts"
+        ],
+
+        "codecs_video": [
+                "mpeg1", "mpeg2", "mpeg4", "h264", "h265", "hevc",
+                "vp8", "vp9", "av1", "wmv", "theora", "dv"
+        ],
+
+        "codecs_audio": [
+                "mp3", "aac", "heaac", "ac3", "eac3", "dts",
+                "flac", "vorbis", "opus", "pcm", "alac"
+        ],
+
+        "subtitles": [
+                "srt", "ass", "ssa", "sub", "idx", "vtt", "pgs"
+        ],
+
+        "images": [
+                "jpg", "jpeg", "png", "bmp", "gif", "tiff", "webp"
+        ],
+
+        "streaming": [
+                "http", "https", "ftp", "rtsp", "rtp", "mms", "hls", "dash"
+        ]
+}

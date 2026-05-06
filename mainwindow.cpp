@@ -8,6 +8,7 @@
 #include "AboutWidget.h"
 #include "GenericDialog.h"
 #include "Preference/PreferenceDialog.h"
+#include "FileFormatManager.h"
 
 #include <QToolBar>
 #include <vlc/vlc.h>
@@ -240,7 +241,7 @@ void MainWindow::selectAndLoadMediaFiles()
         this, 
         prefManager.getText("open_files"),
         prefManager.getPref("Paths", "lp_open_media"),
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.jpeg *.wav *.mp3)"
+        FileFormatManager::instance().getOpenFileDialogFilters()
     );
     
     if(files_paths.empty()){

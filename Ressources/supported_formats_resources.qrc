@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="formats">supported_formats.json</file>
+    </qresource>
+</RCC>

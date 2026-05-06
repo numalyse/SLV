@@ -1,6 +1,8 @@
 #include "Playlist.h"
 #include "PrefManager.h"
 #include "./ToolbarButtons/ToolbarButton.h"
+#include "FileFormatManager.h"
+
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
@@ -13,7 +15,6 @@
 namespace {
 QStringList collectValidFilesFromPath(const QString &path)
 {
-    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "jpg", "wav", "mp3"};
     QStringList collected;
 
     QDir dir(path);
@@ -23,8 +24,8 @@ QStringList collectValidFilesFromPath(const QString &path)
     QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString filePath = it.next();
-        QString ext = QFileInfo(filePath).suffix().toLower();
-        if (allowedExtensions.contains(ext)) {
+        QString ext = QFileInfo(filePath).completeSuffix().toLower();
+        if (FileFormatManager::instance().isFormatAccepted(ext)) {
             collected.append(filePath);
         }
     }
@@ -118,7 +119,30 @@ void Playlist::resizeEvent(QResizeEvent *event)
     qDebug() << "Playlist height : " << this->height();
 }
 
+QStringList Playlist::dataHasValidUrls(const QMimeData *mimeData) const{
+    QList<QUrl> urlList = mimeData->urls();
+    QStringList filePaths;
+
+    for (const QUrl &url : urlList) {
+        QString filePath = url.toLocalFile();
+
+        QFileInfo info(filePath);
+        if (info.isDir()) {
+            filePaths.append(collectValidFilesFromPath(filePath));
+        } else if (info.isFile() && FileFormatManager::instance().isFormatAccepted(info.completeSuffix())) {
+            filePaths.append(filePath);
+        }
+    }
+    return filePaths;
+}
+
 void Playlist::dragEnterEvent(QDragEnterEvent *event){
+    if (!event->mimeData()->hasFormat("move-PlaylistItem") && event->mimeData()->hasUrls()) {
+        QStringList filePaths = dataHasValidUrls(event->mimeData());
+        if(filePaths.empty())
+            event->ignore();
+    }
+
     if (event->mimeData()->hasUrls() || event->mimeData()->hasFormat("move-PlaylistItem")) {
         event->acceptProposedAction();
     } else {
@@ -157,21 +181,7 @@ void Playlist::dropEvent(QDropEvent *event)
 
         event->acceptProposedAction();
     } else if (mimeData->hasUrls()) {
-        QList<QUrl> urlList = mimeData->urls();
-        QStringList filePaths;
-
-        for (const QUrl &url : urlList) {
-            QString filePath = url.toLocalFile();
-            qDebug() << "Fichier ou dossier droppé :" << filePath;
-
-            QFileInfo info(filePath);
-            if (info.isDir()) {
-                filePaths.append(collectValidFilesFromPath(filePath));
-            } else if (info.isFile()) {
-                filePaths.append(filePath);
-            }
-        }
-
+        QStringList filePaths = dataHasValidUrls(event->mimeData());
         if (!filePaths.isEmpty()) {
             addItemsFromPaths(filePaths);
             // updateItemIndices();
@@ -191,8 +201,8 @@ void Playlist::addItemDialog()
     QStringList filesPaths = QFileDialog::getOpenFileNames(
         this, 
         prefManager.getText("dialog_open_files"), 
-        prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.jpg *.wav *.mp3)"
+        prefManager.getPref("Paths", "lp_open_media"),
+        FileFormatManager::instance().getOpenFileDialogFilters()
     ); 
 
     if(filesPaths.empty()){

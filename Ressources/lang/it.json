@@ -140,6 +140,7 @@
     "file_video" : "File video",
     "file_image" : "File immagine",
     "file_audio" : "File audio",
+    "file_multimedia" : "File multimediali",
 
     "main_window_menu_bar_file": "File",
     "main_window_file_open_media_action": "Apri file multimediali",

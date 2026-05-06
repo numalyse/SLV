@@ -18,6 +18,7 @@ class Playlist : public QWidget
 public:
     explicit Playlist(QWidget *parent = nullptr);
     void updateThumbnail(int playlistItemId, QImage image);
+    QStringList dataHasValidUrls(const QMimeData *mimedata) const;
 
     void resizeEvent(QResizeEvent *event) override;
 

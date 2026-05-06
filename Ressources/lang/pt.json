@@ -140,6 +140,7 @@
     "file_video" : "Ficheiro de vídeo",
     "file_image" : "Ficheiro de imagem",
     "file_audio" : "Ficheiro de áudio",
+    "file_multimedia" : "Ficheiro de multimédia",
 
     "main_window_menu_bar_file": "Ficheiro",
     "main_window_file_open_media_action": "Abrir ficheiros multimédia",

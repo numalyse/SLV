@@ -504,7 +504,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
             QString filePath = url.toLocalFile();
             QFileInfo info(filePath);
             qDebug() << "Fichier droppé :" << filePath;
-            if(FileFormatManager::instance().isFormatAccepted(info.completeSuffix())) filePaths.append(filePath);
+            if(FileFormatManager::instance().isFormatAccepted(info.suffix())) filePaths.append(filePath);
             if (filePaths.size() >= 4) break; 
         }
 
@@ -513,8 +513,14 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 m_pendingFilePath = filePaths.first();
                 eject();
             }
-            else
-                setMediaFromPath(filePaths.first());
+            else{
+                if (!m_toolBar->isVisible() && setMediaFromPath(filePaths.first())){
+                    ProjectManager::instance().requestProjectCreation({filePaths.first()});
+                    QFileInfo fileInfo (filePaths.first());
+                    PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+                }
+                emit SignalManager::instance().addPlaylistItems(QStringList(filePaths.first()));
+            }
         } else {
             emit mediaDropped(filePaths);
         }

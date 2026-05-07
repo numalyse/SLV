@@ -24,7 +24,7 @@ QStringList collectValidFilesFromPath(const QString &path)
     QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString filePath = it.next();
-        QString ext = QFileInfo(filePath).completeSuffix().toLower();
+        QString ext = QFileInfo(filePath).suffix().toLower();
         if (FileFormatManager::instance().isFormatAccepted(ext)) {
             collected.append(filePath);
         }
@@ -152,7 +152,7 @@ QStringList Playlist::dataHasValidUrls(const QMimeData *mimeData) const{
         QFileInfo info(filePath);
         if (info.isDir()) {
             filePaths.append(collectValidFilesFromPath(filePath));
-        } else if (info.isFile() && FileFormatManager::instance().isFormatAccepted(info.completeSuffix())) {
+        } else if (info.isFile() && FileFormatManager::instance().isFormatAccepted(info.suffix())) {
             filePaths.append(filePath);
         }
     }

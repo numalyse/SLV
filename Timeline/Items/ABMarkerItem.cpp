@@ -1,16 +1,18 @@
 #include "Timeline/Items/ABMarkerItem.h"
 
 #include <QPainter>
+#include <QCursor>
 
 ABMarkerItem::ABMarkerItem(int height, int64_t vlcTime, QGraphicsItem *parent) 
 : QGraphicsItem(parent), m_height{height}, m_vlcTime{vlcTime}
 {
-    setZValue(4);
+    setZValue(10);
+    setAcceptHoverEvents(true);
 }
 
 QRectF ABMarkerItem::boundingRect() const
 {
-    return QRectF(-3, 0, 6, m_height);
+    return QRectF(-4.5, 0, 10, m_height);
 }
 
 void ABMarkerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -27,3 +29,12 @@ void ABMarkerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QW
     p->drawPolygon(s_points, 5);
 }
 
+void ABMarkerItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    setCursor(Qt::PointingHandCursor);
+}
+
+void ABMarkerItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    unsetCursor();
+}

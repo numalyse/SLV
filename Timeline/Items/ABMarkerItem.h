@@ -15,6 +15,11 @@ public:
 
     int type() const override { return SLV::TypeABMarkerItem; }
     int64_t time(){return m_vlcTime;};
+    void setTime(const int64_t time){ m_vlcTime = time; }
+
+protected:
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
 private:
     int64_t m_vlcTime;

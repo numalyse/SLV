@@ -30,6 +30,7 @@ public:
 
     void deleteMarkers();
     void cycleMarkers(int64_t time, int markerHeight);
+    void changeMarkerTime(ABMarkerItem* marker, const int64_t time);
     void updateMarkersPosition();
 
     void extractLoop();

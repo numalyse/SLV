@@ -32,6 +32,7 @@ public:
     void requestProjectCreation(const QStringList& mediaPaths);
 
     void openProject();
+    void openProjectFromPath(const QString&);
 
     void saveProject(bool ejectMedia);
     void exportProject();

@@ -345,14 +345,22 @@ void ProjectManager::openProject()
         prefManager.getPref("Paths", "lp_project")
     );
 
-    if(selectedPath.isEmpty()){
+    openProjectFromPath(selectedPath);
+
+}
+
+void ProjectManager::openProjectFromPath(const QString& path)
+{
+    auto& prefManager = PrefManager::instance();
+
+    if(path.isEmpty()){
         return;
     }
 
-    QFileInfo fileInfo(selectedPath);
+    QFileInfo fileInfo(path);
     prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
-    auto loaded = ProjectFileHelper::loadProject(selectedPath);
+    auto loaded = ProjectFileHelper::loadProject(path);
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
@@ -363,10 +371,10 @@ void ProjectManager::openProject()
     ProjectSaveData projectData = loaded.value();
 
     Project* project = new Project{
-        projectData.shots, 
-        new Media(projectData.mediaAbsolutePath, this), 
-        QFileInfo(selectedPath).baseName(), 
-        selectedPath
+        projectData.shots,
+        new Media(projectData.mediaAbsolutePath, this),
+        QFileInfo(path).baseName(),
+        path
     };
 
     deleteProject();
@@ -379,7 +387,7 @@ void ProjectManager::openProject()
 
 
     connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
-        
+
         if(durationJson == durationFile){
             m_isDurationParsed = true;
             checkMediaFullyLoaded();
@@ -391,7 +399,7 @@ void ProjectManager::openProject()
     });
 
     connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
-        
+
         if(fpsJson == fpsFile){
             m_isFpsParsed = true;
             checkMediaFullyLoaded();
@@ -401,9 +409,8 @@ void ProjectManager::openProject()
         }
 
     });
-    
-    m_project->media->parse();
 
+    m_project->media->parse();
 }
 
 ///@brief Quand les fps et la durée sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline

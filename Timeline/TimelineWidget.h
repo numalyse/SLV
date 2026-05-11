@@ -33,7 +33,7 @@ Q_OBJECT
 
 public:
 
-    explicit TimelineWidget(double fps, int64_t duration, Media &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
+explicit TimelineWidget(double fps, int64_t duration, Media &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
@@ -56,7 +56,7 @@ signals:
     void enableTimeRelatedUI();
     void disableTimeRelatedUI();
     void saveNeeded();
-    
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
@@ -68,12 +68,13 @@ private slots:
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
+    void updateTimelineGeometry();
     void autoSegmentation();
     void dragABMarker(QGraphicsItem*, const int);
-    
+
 private:
     void applyZoom(double zoomFactor, int mouseX);
-    
+
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
     Media* m_media = nullptr;

@@ -37,8 +37,12 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     });
 
     connect(m_paste, &QAction::triggered, this, [this](){
-        setText(QGuiApplication::clipboard()->text());
-        emit returnPressed();
+        QString pastedText = QGuiApplication::clipboard()->text();
+        QRegularExpression re("^\\d{2}:\\d{2}:\\d{2}\\.\\d{2}$");
+        if(re.match(pastedText).hasMatch()){
+            setText(pastedText);
+            emit returnPressed();
+        }
     });
 
 }

@@ -169,5 +169,9 @@
         <file alias="media_info_white">icons/media_info_white.png</file>
         <file alias="playlist_loop">icons/playlist_loop.png</file>
         <file alias="playlist_loop_white">icons/playlist_loop_white.png</file>
+        <file alias="copy">icons/copy.png</file>
+        <file alias="copy_white">icons/copy_white.png</file>
+        <file alias="paste">icons/paste.png</file>
+        <file alias="paste_white">icons/paste_white.png</file>
     </qresource>
 </RCC>

@@ -1,8 +1,11 @@
 #include "Toolbars/TimeEdit.h"
 #include "TimeEdit.h"
 #include "TimeValidator.h"
+#include "PrefManager.h"
 
 #include <QPropertyAnimation>
+#include <QGuiApplication>
+#include <QClipboard>
 
 TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
 {
@@ -12,10 +15,29 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     
     setFixedWidth(75);
 
+    m_paste = addAction(QIcon(":/icons/paste_white"), QLineEdit::TrailingPosition);
+    m_paste->setVisible(false);
+    m_paste->setToolTip(PrefManager::instance().getText("paste"));
+
+    m_copy = addAction(QIcon(":/icons/copy_white"), QLineEdit::TrailingPosition);
+    m_copy->setVisible(false);
+    m_copy->setToolTip(PrefManager::instance().getText("copy"));
+
     m_action = addAction(QIcon(":/icons/check_white"), QLineEdit::TrailingPosition);
     m_action->setVisible(false);
+    m_action->setToolTip(PrefManager::instance().getText("confirm"));
 
     connect(m_action, &QAction::triggered, this, [this](){
+        emit returnPressed();
+    });
+
+    connect(m_copy, &QAction::triggered, this, [this](){
+        QGuiApplication::clipboard()->setText(text());
+        emit returnPressed();
+    });
+
+    connect(m_paste, &QAction::triggered, this, [this](){
+        setText(QGuiApplication::clipboard()->text());
         emit returnPressed();
     });
 
@@ -29,16 +51,18 @@ void TimeEdit::focusInEvent(QFocusEvent *e)
     QPropertyAnimation *animMin = new QPropertyAnimation(this, "minimumWidth");
     animMin->setDuration(150);
     animMin->setStartValue(width());
-    animMin->setEndValue(100);
+    animMin->setEndValue(150);
     
     QPropertyAnimation *animMax = new QPropertyAnimation(this, "maximumWidth");
     animMax->setDuration(150);
     animMax->setStartValue(width());
-    animMax->setEndValue(100);
+    animMax->setEndValue(150);
 
     connect(animMax, &QPropertyAnimation::finished, this, [this](){
         if (this->hasFocus()) {
             m_action->setVisible(true);
+            m_copy->setVisible(true);
+            m_paste->setVisible(true);
         }
     });
 
@@ -52,6 +76,8 @@ void TimeEdit::focusOutEvent(QFocusEvent *e)
     emit focusOut();
 
     m_action->setVisible(false);
+    m_copy->setVisible(false);
+    m_paste->setVisible(false);
 
     QPropertyAnimation *animMin = new QPropertyAnimation(this, "minimumWidth");
     animMin->setDuration(150);

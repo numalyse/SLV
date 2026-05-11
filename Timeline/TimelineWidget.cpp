@@ -107,6 +107,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
         m_isDraggingCursor = dragState;
     });
+    connect(m_view, &TimelineView::abMarkerDragged, this, &TimelineWidget::dragABMarker);
 
     layout->addWidget(m_view);
 
@@ -226,18 +227,19 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
 
 
 /// @brief déplace le curseur si l'ab loop est active, clamp au min et max, met à jour le temps et et envoie à la toolbar le nouveau temps
-/// @param cursorPosX 
+/// @param cursorPosX
 void TimelineWidget::moveCursor(double newCursorPosX){
     int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
 
     auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
+    bool timeClamped = clampedTime.has_value() && clampedTime != m_vlcTime;
     m_vlcTime = clampedTime.value_or(newCursorTime);
 
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
 
     emit timelineSliderPositionRequested(m_vlcTime);
 
-    if(!m_seekTimer->isActive()){
+    if(!m_seekTimer->isActive() && !timeClamped){
         m_seekTimer->start(m_seekPendingTime);
     }
 
@@ -506,4 +508,11 @@ void TimelineWidget::initAudioVisualizer()
     m_audioVisualizer = new AudioVisualizerItem(m_amplitudeList, m_sceneWidth);
     m_audioVisualizer->setPos(0, 0);
     m_scene->addItem(m_audioVisualizer);
+}
+
+void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
+{
+    int64_t newTime = m_mathManager->posToTimeSnapped(pos);
+    ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
+    m_abManager->changeMarkerTime(abm, newTime);
 }

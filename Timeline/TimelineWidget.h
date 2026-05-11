@@ -69,6 +69,7 @@ private slots:
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
     void autoSegmentation();
+    void dragABMarker(QGraphicsItem*, const int);
     
 private:
     void applyZoom(double zoomFactor, int mouseX);

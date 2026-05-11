@@ -104,7 +104,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->addWidget(m_blackOpacityWidget);
 
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
-    //m_compositionWidget->raise(); 
+    //m_compositionWidget->raise();
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -201,7 +201,7 @@ void PlayerWidget::disablePlayerFullscreen()
     m_toolBar->disableFullscreenUiUpdate();
 }
 
-// slots 
+// slots
 
 /// @brief Play la video, si pas de media dans le player : créer un QFileDialog pour choisir un fichier à charger.
 void PlayerWidget::play()
@@ -213,11 +213,11 @@ void PlayerWidget::play()
     }else {
         auto& prefManager = PrefManager::instance();
         QString file_path = QFileDialog::getOpenFileName(
-            this, 
+            this,
             prefManager.getText("dialog_open_file"),
             prefManager.getPref("Paths", "lp_open_media"),
             FileFormatManager::instance().getOpenFileDialogFilters()
-        ); 
+        );
         if(file_path != ""){
             setMediaFromPath(file_path);
             QFileInfo fileInfo (file_path);
@@ -239,11 +239,11 @@ void PlayerWidget::playFromAdvanced()
 
         auto& prefManager = PrefManager::instance();
         QString file_path = QFileDialog::getOpenFileName(
-            this, 
-            prefManager.getText("dialog_open_file"), 
+            this,
+            prefManager.getText("dialog_open_file"),
             prefManager.getPref("Paths", "lp_open_media"),
             FileFormatManager::instance().getOpenFileDialogFilters()
-        ); 
+        );
 
         if(file_path != ""){
             if (setMediaFromPath(file_path)){
@@ -445,7 +445,7 @@ bool PlayerWidget::event(QEvent *event)
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
         m_drawingWidget->show();
-        QTimer::singleShot(50, this, SLOT(widgetSizeChange())); 
+        QTimer::singleShot(50, this, SLOT(widgetSizeChange()));
         break;
     case QEvent::WindowActivate:
     case QEvent::Resize:
@@ -505,10 +505,16 @@ void PlayerWidget::dropEvent(QDropEvent *event)
             QFileInfo info(filePath);
             qDebug() << "Fichier droppé :" << filePath;
             if(FileFormatManager::instance().isFormatAccepted(info.suffix())) filePaths.append(filePath);
-            if (filePaths.size() >= 4) break; 
+            else if(info.isDir()){
+                ProjectManager::instance().openProjectFromPath(filePath);
+                event->acceptProposedAction();
+                return;
+            }
+            if (filePaths.size() >= 4) break;
         }
 
         if (filePaths.size() == 1) {
+
             if(m_mediaWidget->media()){
                 m_pendingFilePath = filePaths.first();
                 eject();

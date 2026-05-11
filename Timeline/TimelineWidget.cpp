@@ -25,7 +25,7 @@
 #include <QTimer>
 #include <QProgressDialog>
 
-#include <algorithm> 
+#include <algorithm>
 #include "TimelineWidget.h"
 
 
@@ -33,9 +33,9 @@
 
 
 /// @brief Créer une timeline avec les plan du projet
-/// @param projectShots 
-/// @param parent 
-TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia, QVector<Shot>& projectShots, QWidget *parent) : QWidget(parent)
+/// @param projectShots
+/// @param parent
+TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
     m_media = &projectMedia;
 
@@ -94,12 +94,12 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
 
     m_view = new TimelineView(m_scene, this);
     m_view->setRenderHint(QPainter::Antialiasing);
-    m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop); 
+    m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_view->setFrameShape(QFrame::NoFrame);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
-    
+
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
@@ -119,13 +119,24 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
-    m_ruler->setPos(0, 0); 
+    m_ruler->setPos(0, 0);
     m_scene->addItem(m_ruler);
 
     m_cursor = new CursorItem(m_sceneHeight);
     m_cursor->setPos(200, 0);
     m_scene->addItem(m_cursor);
 
+    if(timelineWidth != 0){
+
+        double minPixelsPerMs =
+        double(timelineWidth) /
+        duration;
+
+        m_mathManager->setPixelsPerMs(minPixelsPerMs);
+
+        updateTimelineGeometry();
+
+    }
 }
 
 TimelineWidget::~TimelineWidget()
@@ -151,7 +162,7 @@ void TimelineWidget::setTimelineData(QVector<Shot> shots)
 
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
-    QWidget::resizeEvent(event); 
+    QWidget::resizeEvent(event);
 
     int viewportHeight = m_view->viewport()->height();
     int viewportWidth = m_view->viewport()->width();
@@ -167,11 +178,11 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
         if(m_ruler){
             m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
         }
-        
+
         m_abManager->updateMarkersPosition();
 
         m_shotManager->updateShotItemsPosition();
-        
+
         if(m_cursor){
             updateCursorPos(m_vlcTime);
         }
@@ -180,24 +191,24 @@ void TimelineWidget::resizeEvent(QResizeEvent *event)
 
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
-/// @param zoomFactor 
-/// @param mouseX 
+/// @param zoomFactor
+/// @param mouseX
 void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
     double currentTimeUnderMouse = (m_view->horizontalScrollBar()->value() + mouseX) / m_mathManager->pixelsPerMs();
     double newPixelsPerMs = m_mathManager->pixelsPerMs() * zoomFactor;
 
-    double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport 
+    double minWidth = m_view->viewport()->width(); // on va limiter le dézom pour qu'au minimum la scene fait la talle du viewport
     double maxWidth = std::numeric_limits<int>::max() - 1000000.0; // en cas de vidéo très très longue le zoom peut causer des problèmes, -1 000 000 pour de la marge au cas ou
-    
+
     double fps = m_mathManager->fps();
     auto duration  = m_mathManager->duration();
     if (fps > 0) {
         double frameMs = 1000.0 / fps;
         double totalFrames = static_cast<double>(duration) / frameMs;
-        
-        maxWidth = std::min( maxWidth, (totalFrames * m_minPxBetweenTicks)); 
+
+        maxWidth = std::min( maxWidth, (totalFrames * m_minPxBetweenTicks));
         // la scene fera au maximum : nb de frames * l'espacement entre les ticks
-        
+
         // si vidéo courte, le taille du view port peut être supérieur à maxWidth
         if (maxWidth < minWidth) maxWidth = minWidth;
     }
@@ -208,21 +219,34 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
 
     m_mathManager->setPixelsPerMs(std::clamp(newPixelsPerMs, minRatio, maxRatio));
 
+    updateTimelineGeometry();
+
+    double newPixelPos = currentTimeUnderMouse * m_mathManager->pixelsPerMs();
+    m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
+}
+
+void TimelineWidget::updateTimelineGeometry()
+{
+    auto duration = m_mathManager->duration();
+
     m_sceneWidth = duration * m_mathManager->pixelsPerMs();
+
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
-    m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
+    m_ruler->setSize(
+        m_sceneWidth,
+        m_rulerHeight,
+        m_mathManager->pixelsPerMs()
+        );
 
     m_abManager->updateMarkersPosition();
 
-    if(m_audioVisualizer) m_audioVisualizer->setWidth(m_sceneWidth);
+    if (m_audioVisualizer)
+        m_audioVisualizer->setWidth(m_sceneWidth);
 
     updateCursorPos(m_vlcTime);
 
     m_shotManager->updateShotItemsPosition();
-
-    double newPixelPos = currentTimeUnderMouse * m_mathManager->pixelsPerMs();
-    m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
 }
 
 
@@ -247,11 +271,11 @@ void TimelineWidget::moveCursor(double newCursorPosX){
 }
 
 /// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
-/// @param item 
+/// @param item
 void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {
     switch( item->type() ) {
-        case SLV::TypeShotItem: 
+        case SLV::TypeShotItem:
             ShotItem* shotItem = static_cast<ShotItem*>(item);
             moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
             break;
@@ -261,7 +285,7 @@ void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 {
     switch( item->type() ) {
-        case SLV::TypeShotItem: 
+        case SLV::TypeShotItem:
             ShotItem* shotItem = static_cast<ShotItem*>(item);
             showContextMenuForShot(globalPos, shotItem);
             break;
@@ -323,10 +347,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     }
 }
 
-// public slots 
+// public slots
 
 /// @brief Reçoit le temps vlc et met à jour la position en conséquence
-/// @param vlcTime 
+/// @param vlcTime
 void TimelineWidget::updateCursorPos(int64_t vlcTime){
 
     if(m_isDraggingCursor || !m_abManager) return;
@@ -359,7 +383,7 @@ void TimelineWidget::goToShot(int idShot){
 }
 
 
-// private slots 
+// private slots
 
 void TimelineWidget::ABAction() {
     int64_t markerTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
@@ -403,39 +427,39 @@ void TimelineWidget::updateShowMergeWithNextShot(bool state)
 void TimelineWidget::autoSegmentation(){
 
     auto& txtManager = PrefManager::instance();
-    const QString& mediaPath = ProjectManager::instance().mediaPath(); 
+    const QString& mediaPath = ProjectManager::instance().mediaPath();
     if(mediaPath.isEmpty()){
         qDebug() << "Project media path est vide";
         return;
-    } 
+    }
 
     SLV::showGenericDialog(
-        this, 
+        this,
         txtManager.getText("dialog_auto_segmentation_title"),
         txtManager.getText("dialog_auto_segmentation_text"),
-    
-        [this, mediaPath]() { 
+
+        [this, mediaPath]() {
             auto& txtManager = PrefManager::instance();
             SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
 
             QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_dialog_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
             progressDialog->setWindowTitle(txtManager.getText("timeline_dialog_title_auto_segmentation"));
-            progressDialog->setWindowModality(Qt::WindowModal); 
+            progressDialog->setWindowModality(Qt::WindowModal);
 
-            connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){ 
+            connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){
                 segmentationThread->requestInterruption();
             });
 
             connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
 
             connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<int> cuts) {
-                
+
                 if( ! cuts.empty()){
                     this->m_shotManager->createShotItemsFromCuts(cuts);
                     emit this->saveNeeded();
                 }
-                progressDialog->close(); 
-                progressDialog->deleteLater(); 
+                progressDialog->close();
+                progressDialog->deleteLater();
             });
 
             connect(segmentationThread, &QThread::finished, segmentationThread, &QObject::deleteLater);
@@ -447,7 +471,7 @@ void TimelineWidget::autoSegmentation(){
         nullptr,
         nullptr
     );
-    
+
 }
 
 void TimelineWidget::computeMediaAmplitudes(const QString &mediaPath)

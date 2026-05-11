@@ -13,6 +13,8 @@ public:
 
 private:
     QAction* m_action = nullptr;
+    QAction* m_copy = nullptr;
+    QAction* m_paste = nullptr;
 
 protected:
     void focusInEvent(QFocusEvent *e) override;

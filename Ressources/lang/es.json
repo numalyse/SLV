@@ -347,5 +347,8 @@
     "media_meta_actors" : "Actores",
     "media_meta_album_artist" : "Artista del álbum",
     "media_meta_disc_number" : "Número de disco",
-    "media_meta_disc_total" : "Total de discos"
+    "media_meta_disc_total" : "Total de discos",
+
+    "copy" : "Copiar",
+    "paste" : "Pegar"
 }

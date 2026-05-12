@@ -45,6 +45,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     });
 
     connect(m_toolBar, &SimpleToolbar::duplicatePlayerRequested, this, [this](){
+        resetLayerWidgets();
         emit duplicatePlayerRequest(this);
     });
 
@@ -287,6 +288,7 @@ void PlayerWidget::stop()
 
 void PlayerWidget::eject()
 {
+    resetLayerWidgets();
     m_mediaWidget->eject();
     // disconnect(this, nullptr, nullptr, nullptr);
 }
@@ -482,6 +484,13 @@ void PlayerWidget::mediaPlayerEjectedHandler()
         setMediaFromPath(m_pendingFilePath);
         m_pendingFilePath.clear();
     }
+}
+
+void PlayerWidget::resetLayerWidgets()
+{
+    m_compositionWidget->setOverlayMode(OverlayMode::None, false, false);
+    m_drawingWidget->showDrawingMode(false);
+    m_blackOpacityWidget->setBlackOpacityMode(false, 0);
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){

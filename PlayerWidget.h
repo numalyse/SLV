@@ -72,6 +72,9 @@ public slots:
     void disableButtons();
     void mediaPlayerEjectedHandler();
 
+    /// @brief Reset compositionWidget, drawingWidget and blackOpacityWidget
+    void resetLayerWidgets();
+
 signals:
     void addPlayerRequest();
     void removePlayerRequest(PlayerWidget* toBeRemoved);

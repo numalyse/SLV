@@ -123,7 +123,7 @@ void SegmentationThread::run()
     pythonExe = appDir + "/python/bin/python3";
 #endif
 
-    QString scriptPath = appDir + "/python/pyScripts/segmentation.py";
+    QString scriptPath = appDir + "/pyScripts/segmentation.py";
 #if defined(Q_OS_MAC)
     if (!QFile::exists(scriptPath)) {
         // Try inside app bundle Resources (macOS) as a fallback

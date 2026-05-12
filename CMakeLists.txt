@@ -34,8 +34,9 @@ find_package(OpenCV REQUIRED)
 # =========================================================
 # Python (embedded ou portable runtime)
 # =========================================================
-
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
+if(WIN32)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
+endif()
 
 # =========================================================
 # Sources de base
@@ -101,6 +102,9 @@ set(PROJECT_SOURCES
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp
+
+    Ressources/supported_formats_resources.qrc
+    FileFormatManager.h FileFormatManager.cpp
 )
 
 # =========================================================
@@ -179,8 +183,7 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
     qt_add_executable(SLV
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        Ressources/supported_formats_resources.qrc
-        FileFormatManager.h FileFormatManager.cpp
+
 
     )
 
@@ -201,18 +204,22 @@ endif()
 
 # macOS → bundle .app
 if(APPLE)
-    set_target_properties(SLV PROPERTIES
-        MACOSX_BUNDLE TRUE
-    )
+    set_target_properties(SLV PROPERTIES MACOSX_BUNDLE TRUE)
 endif()
 
 # =========================================================
 # NOM DE L'APP Exécutable Qt
 # =========================================================
-
+if(WIN32)
 set_target_properties(SLV PROPERTIES
     OUTPUT_NAME "NumalysePlayer"
 )
+elseif(APPLE)
+set_target_properties(SLV PROPERTIES
+    OUTPUT_NAME "NumalysePlayer"
+    MACOSX_BUNDLE_BUNDLE_NAME "NumalysePlayer"
+)
+endif()
 
 # =========================================================
 # Includes
@@ -233,7 +240,9 @@ endif()
 # =========================================================
 # target_include_directories(SLV PRIVATE ${Python3_INCLUDE_DIRS})
 # target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
-target_link_libraries(SLV PRIVATE Python3::Python)
+if(WIN32)
+    target_link_libraries(SLV PRIVATE Python3::Python)
+endif()
 
 # =========================================================
 # Qt linking
@@ -524,6 +533,25 @@ if(WIN32)
         COMMENT "📦 Copy vers build + dist (Debug/Release + portable)"
     )
 
+    if(FFMPEG_DLL_LIST)
+            list(GET FFMPEG_DLL_LIST 0 FFMPEG_DLL_PATH)
+        message(STATUS "DLL FFMPEG FOUND : ${FFMPEG_DLL_PATH}")
+
+            add_custom_command(TARGET SLV POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_RUNTIME_DLLS:SLV>
+                $<TARGET_FILE_DIR:SLV>
+
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${FFMPEG_DLL_PATH}"
+                "$<TARGET_FILE_DIR:SLV>"
+
+                COMMAND_EXPAND_LISTS
+            )
+    else()
+        message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${FFMPEG_DLL_PATH}.")
+    endif()
+
 endif()
 
 # =========================================================
@@ -531,74 +559,34 @@ endif()
 # =========================================================
 if(APPLE)
 
-    # -----------------------------------------------------
-    # Copy runtime resources into .app bundle
-    # -----------------------------------------------------
-    add_custom_command(TARGET SLV POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-        "$<TARGET_FILE_DIR:SLV>/../Resources/bin"
-    )
+    # Base paths (bundle safe)
+    set(MAC_RESOURCES_DIR "$<TARGET_BUNDLE_CONTENT_DIR:SLV>/Resources")
 
-    add_custom_command(TARGET SLV POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/bin"
-        "$<TARGET_FILE_DIR:SLV>/../Resources/bin"
-    )
-
-    # -----------------------------------------------------
-    # VLC plugins (mac version = dylib/plugins)
-    # -----------------------------------------------------
-    add_custom_command(TARGET SLV POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/vlc-sdk/plugins"
-        "$<TARGET_FILE_DIR:SLV>/../Resources/plugins"
-    )
-
-    # -----------------------------------------------------
-    # VLC dynamic libraries (mac: .dylib au lieu de .dll)
-    # -----------------------------------------------------
-    add_custom_command(TARGET SLV POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/libvlc.dylib"
-        "$<TARGET_FILE_DIR:SLV>"
-    )
-
-    add_custom_command(TARGET SLV POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/libvlccore.dylib"
-        "$<TARGET_FILE_DIR:SLV>"
-    )
-
-    # -----------------------------------------------------
-    # Python scripts
-    # -----------------------------------------------------
-    add_custom_command(TARGET SLV POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PYTHON_SCRIPTS_DIR}"
-        "$<TARGET_FILE_DIR:SLV>/../Resources/pyScripts"
-        COMMENT "Copy Python scripts into macOS app bundle..."
-    )
-
-endif()
-
-if(FFMPEG_DLL_LIST)
-        list(GET FFMPEG_DLL_LIST 0 FFMPEG_DLL_PATH)
-    message(STATUS "DLL FFMPEG FOUND : ${FFMPEG_DLL_PATH}")
-
+    # Copy embedded Python runtime into the app bundle if present
+    if(EXISTS "${CMAKE_SOURCE_DIR}/python_embedded")
         add_custom_command(TARGET SLV POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_RUNTIME_DLLS:SLV>
-            $<TARGET_FILE_DIR:SLV>
-
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${FFMPEG_DLL_PATH}"
-            "$<TARGET_FILE_DIR:SLV>"
-
-            COMMAND_EXPAND_LISTS
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${MAC_RESOURCES_DIR}/python"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/python_embedded" "${MAC_RESOURCES_DIR}/python"
+            COMMENT "Copy embedded Python into app bundle Resources/python"
         )
-else()
-    message(FATAL_ERROR "Impossible de trouver la DLL FFmpeg dans ${OpenCV_DIR}.")
+    else()
+        message(STATUS "⚠️ python_embedded not found -> skip copy to bundle Resources/python")
+    endif()
+
+    # Copy Python scripts into the app bundle Resources (pyScripts)
+    if(EXISTS "${PYTHON_SCRIPTS_DIR}")
+        add_custom_command(TARGET SLV POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${MAC_RESOURCES_DIR}/pyScripts"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${PYTHON_SCRIPTS_DIR}" "${MAC_RESOURCES_DIR}/pyScripts"
+            COMMENT "Copy Python scripts into macOS app bundle Resources/pyScripts"
+        )
+    else()
+        message(STATUS "⚠️ pyScripts not found -> skip copy to bundle")
+    endif()
+
 endif()
+
+
 
 # =========================
 # QT DEPLOY TOOL
@@ -608,7 +596,9 @@ find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../.
 # =========================
 # DIST FOLDER (PORTABLE APP)
 # =========================
-set(DEPLOY_DIR "${CMAKE_BINARY_DIR}/dist")
+if(WIN32)
+    set(DEPLOY_DIR "${CMAKE_BINARY_DIR}/dist")
+endif()
 
 # =========================
 # POST BUILD PACKAGING
@@ -635,9 +625,11 @@ if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
 
 endif()
 
+if(WIN32)
 set_target_properties(SLV PROPERTIES
     WINDOWS_EXPORT_ALL_SYMBOLS ON
 )
+endif()
 
 if(WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -676,7 +668,7 @@ endif()
 if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE numalyse_logo_white.icns)
 
-    set_source_files_properties(Resosurces/logo/numalyse_logo_white.icns PROPERTIES
+    set_source_files_properties(Ressources/logo/numalyse_logo_white.icns PROPERTIES
         MACOSX_PACKAGE_LOCATION "Resources")
 
     target_sources(SLV PRIVATE Ressources/logo/numalyse_logo_white.icns)

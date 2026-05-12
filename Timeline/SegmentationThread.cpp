@@ -12,7 +12,9 @@
 #include <QString>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <QApplication>
+
+#include <QCoreApplication>
+#include <QFile>
 
 
 SegmentationThread::SegmentationThread(const QString &mediaPath, QObject *parent) : QThread(parent), m_videoPath{mediaPath}
@@ -115,12 +117,25 @@ void SegmentationThread::run()
 #if defined(Q_OS_WIN)
     pythonExe = appDir + "/python/python.exe";
 #elif defined(Q_OS_MAC)
-    pythonExe = appDir + "/python/bin/python3";
+    //pythonExe = appDir + "/python/bin/python3";
+    pythonExe = "python3";
 #else
     pythonExe = appDir + "/python/bin/python3";
 #endif
 
-    QString scriptPath = appDir + "/pyScripts/segmentation.py";
+    QString scriptPath = appDir + "/python/pyScripts/segmentation.py";
+    if (!QFile::exists(scriptPath)) {
+        // Try inside app bundle Resources (macOS) as a fallback
+        scriptPath = QCoreApplication::applicationDirPath() + "/../Resources/pyScripts/segmentation.py";
+    }    
+    
+    qDebug() << "Python script path:" << scriptPath;
+
+    if (!QFile::exists(scriptPath)) {
+        qCritical() << "Python script not found:" << scriptPath;
+        emit segmentationFinished({});
+        return;
+    }
 
     QStringList arguments;
     arguments << scriptPath << m_videoPath << "1";

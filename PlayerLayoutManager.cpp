@@ -81,6 +81,11 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
 
     QWidget* container = nullptr;
     PlayerWidget* player = nullptr;
+
+    if(count != 1){
+        m_activePlayers[0]->resetLayerWidgets();
+    }
+
     switch (count){
         case 1: 
             container = create1();
@@ -89,7 +94,7 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
             break;
         case 2:
             {
-                Qt::Orientation orientation = arrangement == Arrangement2H ? Qt::Horizontal : Qt::Vertical;
+                Qt::Orientation orientation = arrangement == Arrangement2V ? Qt::Vertical : Qt::Horizontal;
                 container = create2(QStringList(), orientation);
                 emit disableNavPanelRequested();
             }
@@ -434,6 +439,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::showDrawingModeRequested, activePlayer, &PlayerWidget::pause);
 
     connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {
+        activePlayer->resetLayerWidgets();
         this->duplicatePlayer(activePlayer);
     });
 

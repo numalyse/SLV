@@ -118,7 +118,8 @@ void SegmentationThread::run()
     pythonExe = appDir + "/python/python.exe";
 #elif defined(Q_OS_MAC)
     //pythonExe = appDir + "/python/bin/python3";
-    pythonExe = "python3";
+    pythonExe = appDir + "/../Resources/python/bin/python3";
+    //pythonExe = "python3";
 #else
     pythonExe = appDir + "/python/bin/python3";
 #endif

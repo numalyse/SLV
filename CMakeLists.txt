@@ -564,20 +564,40 @@ if(APPLE)
 
     # Copy embedded Python runtime into the app bundle if present
     if(EXISTS "${CMAKE_SOURCE_DIR}/python_embedded")
+        message(STATUS "python_embedded path = ${CMAKE_SOURCE_DIR}/python_embedded")
+
         add_custom_command(TARGET SLV POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${MAC_RESOURCES_DIR}/python"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/python_embedded" "${MAC_RESOURCES_DIR}/python"
-            COMMENT "Copy embedded Python into app bundle Resources/python"
+
+            COMMAND ${CMAKE_COMMAND} -E echo
+            "Copy embedded Python..."
+
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:SLV>/../Resources/python"
+
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/python_embedded"
+            "$<TARGET_FILE_DIR:SLV>/../Resources/python"
+
+            COMMENT "Copy python_embedded into bundle Resources/python"
         )
     else()
-        message(STATUS "⚠️ python_embedded not found -> skip copy to bundle Resources/python")
+        message(STATUS "⚠️ Embedded Python runtime not found -> skip copy to bundle")
     endif()
 
     # Copy Python scripts into the app bundle Resources (pyScripts)
     if(EXISTS "${PYTHON_SCRIPTS_DIR}")
+        message(STATUS "PyScripts path = ${PYTHON_SCRIPTS_DIR}")
         add_custom_command(TARGET SLV POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${MAC_RESOURCES_DIR}/pyScripts"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${PYTHON_SCRIPTS_DIR}" "${MAC_RESOURCES_DIR}/pyScripts"
+            COMMAND ${CMAKE_COMMAND} -E echo
+            "Copy pyScripts into bundle..."
+
+            COMMAND ${CMAKE_COMMAND} -E make_directory 
+            "${MAC_RESOURCES_DIR}/pyScripts"
+            
+            COMMAND ${CMAKE_COMMAND} -E copy_directory 
+            "${PYTHON_SCRIPTS_DIR}"
+            "${MAC_RESOURCES_DIR}/pyScripts"
+
             COMMENT "Copy Python scripts into macOS app bundle Resources/pyScripts"
         )
     else()

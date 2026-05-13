@@ -517,6 +517,9 @@ void MediaWidget::transformMedia()
     setAudioTrack(m_currentAudioTrack);
     setSubtitleTrack(m_currentSubtitlesTrack);
 
+    emit rotationTooltipUpdateRequested(m_rotationIndex);
+    emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
+
     // shows a black screen when rotating but playing again shows the media back
     if(!wasPlaying)
         pause();

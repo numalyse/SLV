@@ -161,7 +161,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
-    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip_vertical"));
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip"));
     
     m_drawingBtn = new ToolbarToggleButton(
         this, 

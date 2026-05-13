@@ -303,6 +303,37 @@ void AdvancedToolbar::disableSlider(){
     m_slider->setToolTip(PrefManager::instance().getText("tooltip_slider_disabled"));
 }
 
+void AdvancedToolbar::updateRotationTooltip(const int rotationIndex)
+{
+    QString tooltipIndicator;
+    switch(rotationIndex){
+    case 0:
+        tooltipIndicator = "";
+        break;
+    case 1:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "270°";
+        break;
+    case 2:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "180°";
+        break;
+    case 3:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "90°";
+    }
+
+    m_extensionToolbar->m_rotateBtn->setToolTip(PrefManager::instance().getText("tooltip_rotate") + tooltipIndicator);
+}
+
+void AdvancedToolbar::updateFlipTooltip(const bool hFlip, const bool vFlip)
+{
+    QString tooltipIndicator = PrefManager::instance().getText("tooltip_flip");
+    if(hFlip)
+        tooltipIndicator += "\n" + PrefManager::instance().getText("tooltip_h_flipped");
+    if(vFlip)
+        tooltipIndicator += "\n" + PrefManager::instance().getText("tooltip_v_flipped");
+
+    m_extensionToolbar->m_invBtn->setToolTip(tooltipIndicator);
+}
+
 void AdvancedToolbar::onSliderPressed() {
     SimpleToolbar::onSliderPressed(); 
 }

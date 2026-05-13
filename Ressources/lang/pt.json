@@ -22,12 +22,16 @@
     "tooltip_backward" : "Recuar",
     "tooltip_forward" : "Avançar",
     "tooltip_rotate" : "Rodar 90°",
+    "tooltip_current_rotation" : "Rotação atual",
     "tooltip_capture" : "Captura de ecrã",
     "tooltip_record_off" : "Iniciar gravação",
     "tooltip_record_on" : "Parar gravação",
     "tooltip_segmentation_on" : "Mostrar linha temporal detalhada",
     "tooltip_segmentation_off" : "Ocultar linha temporal detalhada",
     "tooltip_composition" : "Ferramenta de composição",
+    "tooltip_flip" : "Inverter mídia",
+    "tooltip_h_flipped" : "Invertido verticalmente",
+    "tooltip_v_flipped" : "Invertido horizontalmente",
     "tooltip_flip_vertical" : "Inverter verticalmente",
     "tooltip_flip_horizontal" : "Inverter horizontalmente",
     "tooltip_expand_toolbar" : "Expandir barra de ferramentas",
@@ -354,5 +358,5 @@
 
     "messagebox_global_screenshot_completed" : "A captura de tela foi feita com sucesso.",
     "messagebox_global_screenshot_error" : "Ocorreu um problema durante o processo de captura de tela.",
-    "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
+    "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso."
 }

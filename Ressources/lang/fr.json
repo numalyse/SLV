@@ -353,6 +353,6 @@
 
     "messagebox_global_screenshot_completed" : "La capture a été effectuée avec succès.",
     "messagebox_global_screenshot_error" : "Un problème est survenu lors de la capture.",
-    "messagebox_record_completed" : "L'enregistrement a été effectué avec succès.",
+    "messagebox_record_completed" : "L'enregistrement a été effectué avec succès."
 
 }

@@ -79,6 +79,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
     connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
     connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
+    connect(m_mediaWidget, &MediaWidget::pauseUiUpdateRequested, this, &PlayerWidget::pauseUiUpdateRequested);
     connect(m_mediaWidget, &MediaWidget::volumeChanged, m_toolBar, &SimpleToolbar::volumeUiUpdate);
     connect(m_mediaWidget, &MediaWidget::speedChanged, m_toolBar, &SimpleToolbar::speedUiUpdate);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::enableButtons);

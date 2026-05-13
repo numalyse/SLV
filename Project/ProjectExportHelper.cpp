@@ -557,7 +557,36 @@ namespace ProjectExportHelper {
         pythonProcess.setProcessChannelMode(QProcess::MergedChannels); // Pour lire les prints normaux et les erreurs
 
         // On passe le chemin du JSON
-        pythonProcess.start("py", QStringList() << pythonScriptPath << jsonFile.fileName());
+        //pythonProcess.start("py", QStringList() << pythonScriptPath << jsonFile.fileName());
+
+        QString appDir = QCoreApplication::applicationDirPath();
+        QString pythonExe;
+
+        #if defined(Q_OS_WIN)
+            pythonExe = appDir + "/python/python.exe";
+        #elif defined(Q_OS_MAC)
+            //pythonExe = appDir + "/python/bin/python3";
+            pythonExe = appDir + "/../Resources/python/bin/python3";
+            //pythonExe = "python3";
+        #else
+            pythonExe = appDir + "/python/bin/python3";
+        #endif
+
+        QString scriptPath = appDir + "/" + pythonScriptPath;
+        #if defined(Q_OS_MAC) 
+            scriptPath = appDir + "/../Resources/" + pythonScriptPath;
+        #endif
+        
+        qDebug() << "Python script path: " << scriptPath;
+
+        if(!QFile::exists(scriptPath)){
+            qDebug() << "Python script not found: " << scriptPath;
+            return false;
+        }
+
+        QStringList arguments;
+        arguments << scriptPath << jsonFile.fileName();
+        pythonProcess.start(pythonExe, arguments);
 
         // Boucle d'attente active pour lire la progression en temps réel
         while (pythonProcess.waitForReadyRead(-1)) {

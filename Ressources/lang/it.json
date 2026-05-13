@@ -358,5 +358,8 @@
 
     "messagebox_global_screenshot_completed" : "Lo screenshot è stato acquisito correttamente.",
     "messagebox_global_screenshot_error" : "Si è verificato un problema durante il processo di acquisizione dello screenshot.",
-    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo."
+    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
+
+    "dialog_save_project_dialog_title" : "Salvataggio del progetto",
+    "dialog_save_project_dialog_text" : "Le modifiche al progetto corrente non sono state salvate. Vuoi salvare il progetto?"
 }

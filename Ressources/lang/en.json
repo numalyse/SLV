@@ -357,5 +357,8 @@
 
     "messagebox_global_screenshot_completed" : "The screenshot was taken successfully.",
     "messagebox_global_screenshot_error" : "A problem occurred during the screenshot process.",
-    "messagebox_record_completed" : "The media record was completed successfully."
+    "messagebox_record_completed" : "The media record was completed successfully.",
+
+    "dialog_save_project_dialog_title" : "Save project",
+    "dialog_save_project_dialog_text" : "Changes to the current project have not been saved. Do you want to save the project?"
 }

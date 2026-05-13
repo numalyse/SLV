@@ -358,5 +358,10 @@
 
     "messagebox_global_screenshot_completed" : "La captura de pantalla se realizó correctamente.",
     "messagebox_global_screenshot_error" : "Se produjo un problema durante el proceso de captura de pantalla.",
-    "messagebox_record_completed" : "La grabación en los medios se completó con éxito."
+    "messagebox_record_completed" : "La grabación en los medios se completó con éxito.",
+
+    "dialog_save_project_dialog_title" : "Guardando el proyecto",
+    "dialog_save_project_dialog_text" : "Los cambios en el proyecto actual no se han guardado. ¿Desea guardar el proyecto?"
+
+
 }

@@ -349,5 +349,9 @@
     "media_meta_disc_total" : "Disc total",
 
     "copy" : "Copy",
-    "paste" : "Paste"
+    "paste" : "Paste",
+
+    "messagebox_global_screenshot_completed" : "The screenshot was taken successfully.",
+    "messagebox_global_screenshot_error" : "A problem occurred during the screenshot process.",
+    "messagebox_record_completed" : "The media record was completed successfully.",
 }

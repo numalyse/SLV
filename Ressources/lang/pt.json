@@ -350,5 +350,9 @@
     "media_meta_disc_total" : "Total de discos",
 
     "copy" : "Copiar",
-    "paste" : "Colar"
+    "paste" : "Colar",
+
+    "messagebox_global_screenshot_completed" : "A captura de tela foi feita com sucesso.",
+    "messagebox_global_screenshot_error" : "Ocorreu um problema durante o processo de captura de tela.",
+    "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
 }

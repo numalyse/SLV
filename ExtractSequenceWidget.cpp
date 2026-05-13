@@ -25,7 +25,6 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
             msg->setStandardButtons(QMessageBox::StandardButton::Ok);
             msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
             msg->setIcon(QMessageBox::Information);
-            msg->adjustSize();
             msg->exec();
         }
     });

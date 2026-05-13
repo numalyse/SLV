@@ -350,5 +350,9 @@
     "media_meta_disc_total" : "Totale dischi",
 
     "copy" : "Copia",
-    "paste" : "Incolla"
+    "paste" : "Incolla",
+
+    "messagebox_global_screenshot_completed" : "Lo screenshot è stato acquisito correttamente.",
+    "messagebox_global_screenshot_error" : "Si è verificato un problema durante il processo di acquisizione dello screenshot.",
+    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
 }

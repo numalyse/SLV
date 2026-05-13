@@ -349,5 +349,9 @@
     "media_meta_disc_total" : "Discs insgesamt",
 
     "copy" : "Kopieren",
-    "paste" : "Einfügen"
+    "paste" : "Einfügen",
+
+    "messagebox_global_screenshot_completed" : "Der Screenshot wurde erfolgreich aufgenommen.",
+    "messagebox_global_screenshot_error" : "Beim Erstellen des Screenshots ist ein Problem aufgetreten.",
+    "messagebox_record_completed" : "Die Medienaufzeichnung wurde erfolgreich abgeschlossen.",
 }

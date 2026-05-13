@@ -694,5 +694,20 @@ void PlayerLayoutManager::takeGlobalScreenshot()
     QList<int> playersTimes = getActivePlayersCurrentTimes();
     GlobalScreenshotHelper* globalScreenshot = new GlobalScreenshotHelper(playersPaths, playersTimes, m_currentArrangement);
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
+    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_completed"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
+    });
+    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedError, this, [this](){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_error"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
+    });
+
     globalScreenshot->start();
 }

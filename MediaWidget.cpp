@@ -469,6 +469,12 @@ void MediaWidget::endRecord()
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
 
+    QMessageBox *msg = new QMessageBox(this);
+    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
+    msg->setIcon(QMessageBox::Information);
+    msg->exec();
+
     m_startRecordTime = -1;
 }
 

@@ -14,7 +14,7 @@
 
 class GlobalScreenshotHelper : public QThread
 {
-
+Q_OBJECT
 public:
     const QStringList playersPaths;
     const QList<int> playersTimes;
@@ -24,6 +24,10 @@ public:
     inline void run() override{
         takeGlobalScreenshot();
     };
+
+signals:
+    void finishedSuccess();
+    void finishedError();
 
 private:
 
@@ -45,9 +49,7 @@ private:
 
             if (!cap.isOpened()) {
                 qDebug() << "Impossible d'ouvrir le média";
-                // QMessageBox messageBox;
-                // messageBox.critical(0,"Error","Impossible de lire le média " + QString::number(IPlayer) + " !");
-                // messageBox.exec();
+                emit finishedError();
                 return;
             }
             QString p2 = playersPaths[IPlayer];
@@ -55,9 +57,7 @@ private:
             cv::Mat playerFrame;
             if(!cap.read(playerFrame)){
                 qDebug() << "Erreur dans le chargement du screenshot de " + playersPaths[IPlayer];
-                // QMessageBox messageBox;
-                // messageBox.critical(0,"Error","Erreur dans le chargement du screenshot de " + playersPaths[IPlayer]);
-                // messageBox.exec();
+                emit finishedError();
                 return;
             }
             screenshots.append(playerFrame);
@@ -74,9 +74,8 @@ private:
 
             if(!cv::imwrite(fullOutputPath.toStdString(), playerFrame)){
                 qDebug() << "Erreur dans l'enregistrement de la capture multiple";
-                // QMessageBox messageBox;
-                // messageBox.critical(0,"Error","Erreur dans l'enregistrement de la capture multiple !");
-                // messageBox.exec();
+                emit finishedError();
+                return;
             }
             mergedPath += path.left(std::min(5, int(path.size()))) 
                         + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) 
@@ -182,6 +181,7 @@ private:
         mergedPath += ".png";
         qDebug() << "final mergedPath : " << mergedPath;
         cv::imwrite(mergedPath.toUtf8().constData(), mergedScreenshot);
+        emit finishedSuccess();
     }
 
     /// @brief Adds black padding to the smaller images in matList.

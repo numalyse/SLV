@@ -360,6 +360,6 @@
     "messagebox_record_completed" : "Die Medienaufzeichnung wurde erfolgreich abgeschlossen.",
 
     "dialog_save_project_dialog_title" : "Speichern des Projekts",
-    "dialog_save_project_dialog_text" : "Änderungen am aktuellen Projekt wurden nicht gespeichert. Möchten Sie das Projekt speichern?",
+    "dialog_save_project_dialog_text" : "Die Timeline enthält nicht gespeicherte Änderungen. Möchten Sie das Projekt speichern?",
     "messagebox_record_completed" : "Die Medienaufzeichnung wurde erfolgreich abgeschlossen."
 }

@@ -361,6 +361,6 @@
     "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
 
     "dialog_save_project_dialog_title" : "Salvando o projeto",
-    "dialog_save_project_dialog_text" : "As alterações no projeto atual não foram salvas. Deseja salvar o projeto?",
+    "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. Deseja salvar o projeto?",
     "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso."
 }

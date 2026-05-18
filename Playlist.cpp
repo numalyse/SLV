@@ -2,6 +2,8 @@
 #include "PrefManager.h"
 #include "./ToolbarButtons/ToolbarButton.h"
 #include "FileFormatManager.h"
+#include "Project/ProjectManager.h"
+#include "GenericDialog.h"
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -417,6 +419,23 @@ void Playlist::deleteItem(const unsigned int index)
 
 void Playlist::playMedia(const QString& filePath, const bool isClicked)
 {
+    ProjectManager& projManager = ProjectManager::instance();
+    bool changeMedia = true;
+    if(projManager.needSave()){
+        SLV::showGenericDialog(
+            this,
+            PrefManager::instance().getText("dialog_save_project_dialog_title"),
+            PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+            [&projManager]() {
+                projManager.saveProject(false);
+            },
+
+            [](){},
+            [&changeMedia](){ changeMedia = false; }
+            );
+    }
+    if(!changeMedia) return;
     emit openMediaFileRequested(filePath);
     for(size_t IMedia = 0; IMedia < m_items.size(); ++IMedia){
         unsigned int index = m_playlistShuffled && !isClicked ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
@@ -431,6 +450,23 @@ void Playlist::playPreviousMedia()
 {
     if(m_currentMediaIndex > 0)
     {
+        ProjectManager& projManager = ProjectManager::instance();
+        bool changeMedia = true;
+        if(projManager.needSave()){
+            SLV::showGenericDialog(
+                this,
+                PrefManager::instance().getText("dialog_save_project_dialog_title"),
+                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+                [&projManager]() {
+                    projManager.saveProject(false);
+                },
+
+                [](){},
+                [&changeMedia](){ changeMedia = false; }
+            );
+        }
+        if(!changeMedia) return;
         m_currentMediaIndex--;
         unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
         m_items[m_itemsSortOrder[index]]->playMedia();
@@ -441,11 +477,45 @@ void Playlist::playNextMedia()
 {
     if(m_currentMediaIndex < m_items.size()-1)
     {
+        ProjectManager& projManager = ProjectManager::instance();
+        bool changeMedia = true;
+        if(projManager.needSave()){
+            SLV::showGenericDialog(
+                this,
+                PrefManager::instance().getText("dialog_save_project_dialog_title"),
+                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+                [&projManager]() {
+                    projManager.saveProject(false);
+                },
+
+                [](){},
+                [&changeMedia](){ changeMedia = false; }
+                );
+        }
+        if(!changeMedia) return;
         m_currentMediaIndex++;
         unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
         m_items[m_itemsSortOrder[index]]->playMedia();
     }
     else if(m_playlistLooping){
+        ProjectManager& projManager = ProjectManager::instance();
+        bool changeMedia = true;
+        if(projManager.needSave()){
+            SLV::showGenericDialog(
+                this,
+                PrefManager::instance().getText("dialog_save_project_dialog_title"),
+                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+                [&projManager]() {
+                    projManager.saveProject(false);
+                },
+
+                [](){},
+                [&changeMedia](){ changeMedia = false; }
+            );
+        }
+        if(!changeMedia) return;
         m_currentMediaIndex = 0;
         unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
         m_items[m_itemsSortOrder[index]]->playMedia();

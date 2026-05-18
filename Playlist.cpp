@@ -433,7 +433,7 @@ void Playlist::playMedia(const QString& filePath, const bool isClicked)
 
             [](){},
             [&changeMedia](){ changeMedia = false; }
-            );
+        );
     }
     if(!changeMedia) return;
     emit openMediaFileRequested(filePath);
@@ -491,7 +491,7 @@ void Playlist::playNextMedia()
 
                 [](){},
                 [&changeMedia](){ changeMedia = false; }
-                );
+            );
         }
         if(!changeMedia) return;
         m_currentMediaIndex++;

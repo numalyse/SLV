@@ -173,5 +173,7 @@
         <file alias="copy_white">icons/copy_white.png</file>
         <file alias="paste">icons/paste.png</file>
         <file alias="paste_white">icons/paste_white.png</file>
+        <file alias="folder">icons/folder.png</file>
+        <file alias="folder_white">icons/folder_white.png</file>
     </qresource>
 </RCC>

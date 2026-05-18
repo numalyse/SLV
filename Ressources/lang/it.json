@@ -362,5 +362,7 @@
 
     "dialog_save_project_dialog_title" : "Salvataggio del progetto",
     "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. Vuoi salvare il progetto?",
-    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo."
+    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
+
+    "tooltip_access_folder" : "Apri la cartella delle catture"
 }

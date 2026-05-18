@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QAction>
 #include <QFileDialog>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -162,6 +163,12 @@ void MainWindow::createToolBar()
     m_navPanelBtn->setIconSize(QSize(20, 20));
     m_navPanelBtn->setStyleSheet("border: none;");
 
+    ToolbarButton *accessFolderBtn = new ToolbarButton(m_toolbarQt, "folder_white", PrefManager::instance().getText("tooltip_access_folder"));
+    accessFolderBtn->setIconSize(QSize(20, 20));
+    connect(accessFolderBtn, &ToolbarButton::clicked, this, [](){
+        QDesktopServices::openUrl(QUrl::fromLocalFile(PrefManager::instance().getPref("Paths", "screenshot")));
+    });
+
     m_toolbarQt->setMovable(false);
     m_toolbarQt->setFloatable(false);
     // toolbar->addSeparator();
@@ -169,11 +176,8 @@ void MainWindow::createToolBar()
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_toolbarQt->addWidget(spacer);
+    m_toolbarQt->addWidget(accessFolderBtn);
     m_toolbarQt->addWidget(m_viewGridBtn);
-    // m_toolbarQt->addWidget(m_view1);
-    // m_toolbarQt->addWidget(m_view2);
-    // m_toolbarQt->addWidget(m_view3);
-    // m_toolbarQt->addWidget(m_view4);
     m_toolbarQt->addWidget(m_navPanelBtn);
     m_toolbarQt->setStyleSheet("border: none;");
 

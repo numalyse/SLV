@@ -346,7 +346,7 @@ void MainWindow::createViewGridBtn()
     m_view4 = new ToolbarButton(nullptr, "view_4_white", PrefManager::instance().getText("tooltip_view_4"));
     viewLayout->addWidget(m_view4);
 
-    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white"),  PrefManager::instance().getText("tooltip_view_grid");
+    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"));
     m_viewGridBtn->setOnTop(false);
 }
 

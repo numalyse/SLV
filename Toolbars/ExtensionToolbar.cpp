@@ -75,9 +75,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         this, 
         false,
         "timeline_on_white",
-        PrefManager::instance().getText("tooltip_segmentation_on"),
+        PrefManager::instance().getText("tooltip_segmentation_off"),
         "timeline_off_white",
-        PrefManager::instance().getText("tooltip_segmentation_off")
+        PrefManager::instance().getText("tooltip_segmentation_on")
     );
 
     m_adjustmentWidget = new AdjustmentsWidget(this);

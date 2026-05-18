@@ -202,12 +202,10 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
-    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-    timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
+    timecodeLayout->addWidget(m_timeEdit);
+    timecodeLayout->addWidget(m_slider, 1);
+    timecodeLayout->addWidget(m_durationBtn);
     mainLayout->addLayout(timecodeLayout);
-
-    mainLayout->addWidget(m_slider);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->setContentsMargins(0,0,0,0);
@@ -218,16 +216,16 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addSpacing(m_speedBtn->width()+1);
     buttonLayout->addSpacing(m_speedBtn->width()+1);
     buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_zoomIndicator->width()+4);
+    buttonLayout->addSpacing(m_zoomIndicator->width()+1);
 
     buttonLayout->addStretch();
 
     buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_prevMediaBtn);
+    buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_nextMediaBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_nextMediaBtn);
     buttonLayout->addWidget(m_loopBtn);
 
     buttonLayout->addStretch();

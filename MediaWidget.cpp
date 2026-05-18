@@ -455,8 +455,8 @@ void MediaWidget::endRecord()
     pause();
     auto& prefManager = PrefManager::instance();
     QString saveRecordPath = QFileDialog::getSaveFileName(
-        this, 
-        prefManager.getText("dialog_capture"),
+        this,
+        prefManager.getText("dialog_capture") + m_media->fileName() + "_record",
         prefManager.getPref("Paths", "lp_capture")
     );
 

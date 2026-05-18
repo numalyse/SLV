@@ -132,9 +132,11 @@ void ABManager::extractLoop()
     QString dialogDir = (projManager.projet()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.projet()->path;
 
     QString selectedPath = QFileDialog::getSaveFileName(
-        nullptr, 
-        prefManager.getText("export_file_path_title"), 
-        dialogDir
+        nullptr,
+        prefManager.getText("export_file_path_title"),
+        dialogDir + "/" + mediaFileInfo.baseName() + "_"
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_abMarkersItems[0]->time(), projManager.projet()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_abMarkersItems[1]->time(), projManager.projet()->media->fps())
     );
 
     selectedPath += '.' + mediaFileInfo.suffix();

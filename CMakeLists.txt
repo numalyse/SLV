@@ -359,7 +359,6 @@ elseif(APPLE)
 
     set(VLC_APP "/Applications/VLC.app")
 
-    # Détection architecture Homebrew
     if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
         set(HOMEBREW_PREFIX /opt/homebrew)
     else()
@@ -388,6 +387,81 @@ elseif(APPLE)
     target_link_libraries(SLV PRIVATE
         ${VLC_LIB}
         ${VLCCORE_LIB}
+    )
+
+    # =====================================================
+    # macOS VLC EMBEDDED
+    # =====================================================
+
+    set(VLC_APP "/Applications/VLC.app")
+    set(VLC_LIB_DIR "${VLC_APP}/Contents/MacOS/lib")
+    set(VLC_PLUGIN_DIR "${VLC_APP}/Contents/MacOS/plugins")
+
+    # Vérification
+    if(NOT EXISTS "${VLC_LIB_DIR}/libvlc.dylib")
+        message(FATAL_ERROR "libvlc.dylib not found")
+    endif()
+
+    if(NOT EXISTS "${VLC_LIB_DIR}/libvlccore.dylib")
+        message(FATAL_ERROR "libvlccore.dylib not found")
+    endif()
+
+    # Include VLC headers
+    target_include_directories(SLV PRIVATE
+        "${VLC_APP}/Contents/MacOS/include"
+        "${VLC_APP}/Contents/Resources/include"
+    )
+
+    # Link VLC directly from installed VLC.app
+    target_link_libraries(SLV PRIVATE
+        "${VLC_LIB_DIR}/libvlc.dylib"
+        "${VLC_LIB_DIR}/libvlccore.dylib"
+    )
+
+    # =====================================================
+    # Embed VLC inside .app bundle
+    # =====================================================
+
+    add_custom_command(TARGET SLV POST_BUILD
+
+        # -----------------------------
+        # Create directories
+        # -----------------------------
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:SLV>/../Frameworks"
+
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:SLV>/../Resources/vlc"
+
+        # -----------------------------
+        # Copy VLC dylibs
+        # -----------------------------
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${VLC_LIB_DIR}/libvlc.dylib"
+        "$<TARGET_FILE_DIR:SLV>/../Frameworks/"
+
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${VLC_LIB_DIR}/libvlccore.dylib"
+        "$<TARGET_FILE_DIR:SLV>/../Frameworks/"
+
+        # -----------------------------
+        # Copy VLC plugins
+        # ditto preserves symlinks
+        # -----------------------------
+        COMMAND ditto
+        "${VLC_PLUGIN_DIR}"
+        "$<TARGET_FILE_DIR:SLV>/../Resources/vlc/plugins"
+
+        COMMENT "Embedding VLC into app bundle"
+    )
+
+    # =====================================================
+    # RPATH
+    # =====================================================
+
+    set_target_properties(SLV PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH "@executable_path/../Frameworks"
     )
 
 else()
@@ -564,20 +638,40 @@ if(APPLE)
 
     # Copy embedded Python runtime into the app bundle if present
     if(EXISTS "${CMAKE_SOURCE_DIR}/python_embedded")
+        message(STATUS "python_embedded path = ${CMAKE_SOURCE_DIR}/python_embedded")
+
         add_custom_command(TARGET SLV POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${MAC_RESOURCES_DIR}/python"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/python_embedded" "${MAC_RESOURCES_DIR}/python"
-            COMMENT "Copy embedded Python into app bundle Resources/python"
+
+            COMMAND ${CMAKE_COMMAND} -E echo
+            "Copy embedded Python..."
+
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:SLV>/../Resources/python"
+
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/python_embedded"
+            "$<TARGET_FILE_DIR:SLV>/../Resources/python"
+
+            COMMENT "Copy python_embedded into bundle Resources/python"
         )
     else()
-        message(STATUS "⚠️ python_embedded not found -> skip copy to bundle Resources/python")
+        message(STATUS "⚠️ Embedded Python runtime not found -> skip copy to bundle")
     endif()
 
     # Copy Python scripts into the app bundle Resources (pyScripts)
     if(EXISTS "${PYTHON_SCRIPTS_DIR}")
+        message(STATUS "PyScripts path = ${PYTHON_SCRIPTS_DIR}")
         add_custom_command(TARGET SLV POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${MAC_RESOURCES_DIR}/pyScripts"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${PYTHON_SCRIPTS_DIR}" "${MAC_RESOURCES_DIR}/pyScripts"
+            COMMAND ${CMAKE_COMMAND} -E echo
+            "Copy pyScripts into bundle..."
+
+            COMMAND ${CMAKE_COMMAND} -E make_directory 
+            "${MAC_RESOURCES_DIR}/pyScripts"
+            
+            COMMAND ${CMAKE_COMMAND} -E copy_directory 
+            "${PYTHON_SCRIPTS_DIR}"
+            "${MAC_RESOURCES_DIR}/pyScripts"
+
             COMMENT "Copy Python scripts into macOS app bundle Resources/pyScripts"
         )
     else()

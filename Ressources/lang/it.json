@@ -361,5 +361,6 @@
     "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
 
     "dialog_save_project_dialog_title" : "Salvataggio del progetto",
-    "dialog_save_project_dialog_text" : "Le modifiche al progetto corrente non sono state salvate. Vuoi salvare il progetto?"
+    "dialog_save_project_dialog_text" : "Le modifiche al progetto corrente non sono state salvate. Vuoi salvare il progetto?",
+    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo."
 }

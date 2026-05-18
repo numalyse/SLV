@@ -86,6 +86,9 @@ private:
     unsigned int m_rotationIndex = 0;
     int m_currentAudioTrack = 1;
     int m_currentSubtitlesTrack = 0;
+    bool m_adjustmentsEnabled = false;
+    int m_volume = 100;
+    bool m_muted = false;
     std::vector<const char*> m_vlcArgs ={"--quiet",
         "--aout=directsound",
         "--no-video-title-show",
@@ -109,7 +112,7 @@ private:
     void transformMedia();
 
     void createEventManager();
-    void createMedia(const QString& filePath);
+    void createMedia(const QString& filePath, const bool fromTransform = false);
 
     void releaseMedia();
     void releaseEventManager();

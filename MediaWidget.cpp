@@ -303,6 +303,7 @@ bool MediaWidget::mute()
 {
     if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 1);
+    m_muted = true;
     return true;
 }
 
@@ -311,6 +312,7 @@ bool MediaWidget::unmute()
 {
     if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 0);
+    m_muted = false;
     return true;
 }
 
@@ -320,6 +322,7 @@ void MediaWidget::setVolume(const int &vol)
 {
     if (!m_player) return;
     libvlc_audio_set_volume(m_player, vol);
+    m_volume = vol;
     const QString & volStr = QString::number(vol);
     emit volumeChanged(volStr);
     emit SignalManager::instance().mediaVolumeChanged(volStr);
@@ -484,6 +487,13 @@ void MediaWidget::transformMedia()
 
     float pos = libvlc_media_player_get_position(m_player);
     bool wasPlaying = libvlc_media_player_is_playing(m_player);
+    float brightnessValue, contrastValue, saturationValue, hueValue;
+    if(m_adjustmentsEnabled){
+        brightnessValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
+        contrastValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast);
+        saturationValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation);
+        hueValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue);
+    }
 
     releaseEventManager();
 
@@ -508,7 +518,7 @@ void MediaWidget::transformMedia()
     createEventManager();
 
     managePlayerSystem();
-    createMedia(m_media->filePath());
+    createMedia(m_media->filePath(), true);
     libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
     libvlc_media_player_play(m_player);
@@ -516,6 +526,19 @@ void MediaWidget::transformMedia()
 
     setAudioTrack(m_currentAudioTrack);
     setSubtitleTrack(m_currentSubtitlesTrack);
+
+    if(m_adjustmentsEnabled){
+        libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Brightness, brightnessValue);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Contrast, contrastValue);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Saturation, saturationValue);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Hue, hueValue);
+    }
+
+    if(m_zoomActivated) libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+
+    libvlc_audio_set_mute(m_player, m_muted);
+    libvlc_audio_set_volume(m_player, m_volume);
 
     emit rotationTooltipUpdateRequested(m_rotationIndex);
     emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
@@ -576,12 +599,14 @@ void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, c
     if(!m_player || !m_media) return;
     libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
     libvlc_video_set_adjust_float(m_player, adjustOption, value);
+    m_adjustmentsEnabled = true;
 }
 
 void MediaWidget::resetAdjustments()
 {
     if(!m_player || !m_media) return;
     libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0);
+    m_adjustmentsEnabled = false;
 }
 
 void MediaWidget::openMediaInfoDialog()
@@ -825,7 +850,7 @@ void MediaWidget::createEventManager(){
 
 /// @brief Helper pour recréer une classe média et connecter ses signaux
 /// @param filePath 
-void MediaWidget::createMedia(const QString& filePath){
+void MediaWidget::createMedia(const QString& filePath, const bool fromTransform){
     releaseMedia();
     emit nameUiUpdateRequested(tr(""));
     m_media = new Media(filePath, this, m_vlcInstance);
@@ -835,7 +860,7 @@ void MediaWidget::createMedia(const QString& filePath){
     }, Qt::QueuedConnection);
     connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested);
     connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested);
-    connect(m_media, &Media::resolutionParsed, this, [this](){ m_zoomHelper = ZoomHelper(m_media->width(), m_media->height()); });
+    connect(m_media, &Media::resolutionParsed, this, [this, fromTransform](){ if(!fromTransform) m_zoomHelper = ZoomHelper(m_media->width(), m_media->height()); });
     connect(m_media, &Media::tracksParsed, this, &MediaWidget::updateTracks);
     connect(m_media, &Media::typeParsed, this, &MediaWidget::typeParsed);
     m_media->parse();

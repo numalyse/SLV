@@ -121,7 +121,7 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
             "}"
             "ToolbarToggleButton:checked:hover{"
             // "   background-color: palette(button);"
-            "   border: 1px solid" + color +
+            "   border: 1px solid " + color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:disabled{"

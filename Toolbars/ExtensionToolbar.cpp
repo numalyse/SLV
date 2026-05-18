@@ -238,8 +238,8 @@ void ExtensionToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_hideImgBtn);
     mainLayout->addWidget(m_adjustmentsBtn);
-    mainLayout->addWidget(m_rotateBtn);
-    mainLayout->addWidget(m_invBtn);
+    mainLayout->addWidget(m_drawingBtn);
+    mainLayout->addWidget(m_compoRuleBtn);
     
     mainLayout->addWidget(m_backwardBtn);
     mainLayout->addWidget(m_prevFrameBtn);
@@ -249,8 +249,9 @@ void ExtensionToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_recordBtn);
     // mainLayout->addWidget(m_abloopBtn);
-    mainLayout->addWidget(m_compoRuleBtn);
-    mainLayout->addWidget(m_drawingBtn);
+
+    mainLayout->addWidget(m_rotateBtn);
+    mainLayout->addWidget(m_invBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addStretch();
 

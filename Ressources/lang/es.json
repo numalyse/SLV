@@ -22,12 +22,16 @@
     "tooltip_backward" : "Rebobinar",
     "tooltip_forward" : "Avanzar",
     "tooltip_rotate" : "Girar 90°",
+    "tooltip_current_rotation" : "Rotación actual: ",
     "tooltip_capture" : "Captura de pantalla",
     "tooltip_record_off" : "Iniciar grabación",
     "tooltip_record_on" : "Detener grabación",
     "tooltip_segmentation_on" : "Mostrar línea de tiempo detallada",
     "tooltip_segmentation_off" : "Ocultar línea de tiempo detallada",
     "tooltip_composition" : "Herramienta de composición",
+    "tooltip_flip" : "Voltear el medio",
+    "tooltip_h_flipped" : "Volteado horizontalmente",
+    "tooltip_v_flipped" : "Volteado verticalmente",
     "tooltip_flip_vertical" : "Voltear verticalmente",
     "tooltip_flip_horizontal" : "Voltear horizontalmente",
     "tooltip_expand_toolbar" : "Expandir barra de herramientas",
@@ -354,5 +358,11 @@
 
     "messagebox_global_screenshot_completed" : "La captura de pantalla se realizó correctamente.",
     "messagebox_global_screenshot_error" : "Se produjo un problema durante el proceso de captura de pantalla.",
+    "messagebox_record_completed" : "La grabación en los medios se completó con éxito.",
+
+    "dialog_save_project_dialog_title" : "Guardando el proyecto",
+    "dialog_save_project_dialog_text" : "Los cambios en el proyecto actual no se han guardado. ¿Desea guardar el proyecto?",
+
+
     "messagebox_record_completed" : "La grabación en los medios se completó con éxito."
 }

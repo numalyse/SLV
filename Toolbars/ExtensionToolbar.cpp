@@ -75,9 +75,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         this, 
         false,
         "timeline_on_white",
-        PrefManager::instance().getText("tooltip_segmentation_on"),
+        PrefManager::instance().getText("tooltip_segmentation_off"),
         "timeline_off_white",
-        PrefManager::instance().getText("tooltip_segmentation_off")
+        PrefManager::instance().getText("tooltip_segmentation_on")
     );
 
     m_adjustmentWidget = new AdjustmentsWidget(this);
@@ -161,7 +161,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
-    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip_vertical"));
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip"));
     
     m_drawingBtn = new ToolbarToggleButton(
         this, 
@@ -238,8 +238,8 @@ void ExtensionToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_hideImgBtn);
     mainLayout->addWidget(m_adjustmentsBtn);
-    mainLayout->addWidget(m_rotateBtn);
-    mainLayout->addWidget(m_invBtn);
+    mainLayout->addWidget(m_drawingBtn);
+    mainLayout->addWidget(m_compoRuleBtn);
     
     mainLayout->addWidget(m_backwardBtn);
     mainLayout->addWidget(m_prevFrameBtn);
@@ -249,8 +249,9 @@ void ExtensionToolbar::setDefaultUI()
 
     mainLayout->addWidget(m_recordBtn);
     // mainLayout->addWidget(m_abloopBtn);
-    mainLayout->addWidget(m_compoRuleBtn);
-    mainLayout->addWidget(m_drawingBtn);
+
+    mainLayout->addWidget(m_rotateBtn);
+    mainLayout->addWidget(m_invBtn);
     mainLayout->addWidget(m_segmBtn);
     mainLayout->addStretch();
 

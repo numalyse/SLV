@@ -22,12 +22,16 @@
     "tooltip_backward" : "Reculer",
     "tooltip_forward" : "Avancer",
     "tooltip_rotate" : "Rotation de 90°",
+    "tooltip_current_rotation" : "Rotation actuelle : ",
     "tooltip_capture" : "Capture d'écran",
     "tooltip_record_off" : "Démarrer l'enregistrement",
     "tooltip_record_on" : "Stopper l'enregistrement",
     "tooltip_segmentation_on" : "Afficher la timeline détaillée",
     "tooltip_segmentation_off" : "Cacher la timeline détaillée",
     "tooltip_composition" : "Outil de composition",
+    "tooltip_flip" : "Retourner le média",
+    "tooltip_h_flipped" : "Retourné horizontalement",
+    "tooltip_v_flipped" : "Retourné verticalement",
     "tooltip_flip_vertical" : "Retourner verticalement",
     "tooltip_flip_horizontal" : "Retourner horizontalement",
     "tooltip_expand_toolbar" : "Étendre la barre d'outils",
@@ -354,5 +358,8 @@
     "messagebox_global_screenshot_completed" : "La capture a été effectuée avec succès.",
     "messagebox_global_screenshot_error" : "Un problème est survenu lors de la capture.",
     "messagebox_record_completed" : "L'enregistrement a été effectué avec succès."
+
+    "dialog_save_project_dialog_title" : "Sauvegarde du projet",
+    "dialog_save_project_dialog_text" : "Des modifications sur le projet en cours ne sont pas enregistrées. Voulez-vous sauvegarder le projet ?"
 
 }

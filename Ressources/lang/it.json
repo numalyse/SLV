@@ -22,12 +22,16 @@
     "tooltip_backward" : "Indietro",
     "tooltip_forward" : "Avanti",
     "tooltip_rotate" : "Ruota di 90°",
+    "tooltip_current_rotation" : "Rotazione attuale: ",
     "tooltip_capture" : "Screenshot",
     "tooltip_record_off" : "Avvia registrazione",
     "tooltip_record_on" : "Ferma registrazione",
     "tooltip_segmentation_on" : "Mostra timeline dettagliata",
     "tooltip_segmentation_off" : "Nascondi timeline dettagliata",
     "tooltip_composition" : "Strumento di composizione",
+    "tooltip_flip" : "Capovolgi il media",
+    "tooltip_h_flipped" : "Capovolto orizzontalmente",
+    "tooltip_v_flipped" : "Capovolto verticalmente",
     "tooltip_flip_vertical" : "Capovolgi verticalmente",
     "tooltip_flip_horizontal" : "Capovolgi orizzontalmente",
     "tooltip_expand_toolbar" : "Espandi barra degli strumenti",
@@ -354,5 +358,9 @@
 
     "messagebox_global_screenshot_completed" : "Lo screenshot è stato acquisito correttamente.",
     "messagebox_global_screenshot_error" : "Si è verificato un problema durante il processo di acquisizione dello screenshot.",
+    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
+
+    "dialog_save_project_dialog_title" : "Salvataggio del progetto",
+    "dialog_save_project_dialog_text" : "Le modifiche al progetto corrente non sono state salvate. Vuoi salvare il progetto?",
     "messagebox_record_completed" : "La registrazione dei media è stata completata con successo."
 }

@@ -22,12 +22,16 @@
     "tooltip_backward" : "Backward",
     "tooltip_forward" : "Forward",
     "tooltip_rotate" : "Rotate by 90°",
+    "tooltip_current_rotation" : "Current rotation: ",
     "tooltip_capture" : "Screenshot",
     "tooltip_record_off" : "Start recording",
     "tooltip_record_on" : "Stop recording",
     "tooltip_segmentation_on" : "Show detailed timeline",
     "tooltip_segmentation_off" : "Hide detailed timeline",
     "tooltip_composition" : "Composition tool",
+    "tooltip_flip" : "Flip media",
+    "tooltip_h_flipped" : "Horizontally flipped",
+    "tooltip_v_flipped" : "Vertically flipped",
     "tooltip_flip_vertical" : "Flip vertically",
     "tooltip_flip_horizontal" : "Flip horizontally",
     "tooltip_expand_toolbar" : "Expand toolbar",
@@ -353,5 +357,9 @@
 
     "messagebox_global_screenshot_completed" : "The screenshot was taken successfully.",
     "messagebox_global_screenshot_error" : "A problem occurred during the screenshot process.",
+    "messagebox_record_completed" : "The media record was completed successfully.",
+
+    "dialog_save_project_dialog_title" : "Save project",
+    "dialog_save_project_dialog_text" : "Changes to the current project have not been saved. Do you want to save the project?",
     "messagebox_record_completed" : "The media record was completed successfully."
 }

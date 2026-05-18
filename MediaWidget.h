@@ -142,8 +142,11 @@ signals:
     void rotateUiUpdateRequested();
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
+    void pauseUiUpdateRequested();
     void mediaIsVideoParsed();
     void zoomValueUpdated(const QString&);
+    void rotationTooltipUpdateRequested(const int);
+    void flipTooltipUpdateRequested(const bool, const bool);
 
 };
 

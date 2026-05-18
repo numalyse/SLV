@@ -95,12 +95,28 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
     }
     if (newToolbar){
         m_toolbarWidget = newToolbar;
+        auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+        if(!advancedToolbar){
+           //  QHBoxLayout* separationLayout = new QHBoxLayout();
+           //  separationLayout->addStretch(0);
+
+           //  separationLayout->addWidget(separationLine);
+           //  separationLayout->addStretch(0);
+           //  layout->addLayout(separationLayout);
+            QFrame* separationLine = new QFrame();
+            separationLine->setFrameShape(QFrame::HLine);
+            separationLine->setFrameShadow(QFrame::Sunken);
+            separationLine->setLineWidth(1);
+            separationLine->setContentsMargins(10,0,10,0);
+            layout->addWidget(separationLine);
+        }
         layout->addWidget(m_toolbarWidget);
     }
 
+
     m_player = player;
 
-    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(newToolbar);
 
     if(advancedToolbar){
         connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
@@ -109,6 +125,7 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
     }
+
     
 }
 

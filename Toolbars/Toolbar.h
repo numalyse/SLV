@@ -26,6 +26,8 @@ public:
         );
         m_playPauseBtn->setButtonState(false);
         m_playPauseBtn->setEnabled(true);
+        m_playPauseBtn->setFixedSize(35, 35);
+        m_playPauseBtn->setIconSize(QSize(25, 25));
         
         m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop"));
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));

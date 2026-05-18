@@ -33,6 +33,8 @@ public slots:
     void disableButtons();
     void enableSlider();
     void disableSlider();
+    void updateRotationTooltip(const int);
+    void updateFlipTooltip(const bool, const bool);
 
     virtual void ejectRequested() override;
     virtual void disableFullscreenRequested() override;

@@ -517,6 +517,9 @@ void MediaWidget::transformMedia()
     setAudioTrack(m_currentAudioTrack);
     setSubtitleTrack(m_currentSubtitlesTrack);
 
+    emit rotationTooltipUpdateRequested(m_rotationIndex);
+    emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
+
     // shows a black screen when rotating but playing again shows the media back
     if(!wasPlaying)
         pause();
@@ -546,6 +549,7 @@ void MediaWidget::nextFrame()
 {
     if(!m_player || !m_media) return;
     pause();
+    emit pauseUiUpdateRequested();
     qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
     libvlc_media_player_next_frame(m_player);
     const int mspf = int(1000.0/m_media->fps());

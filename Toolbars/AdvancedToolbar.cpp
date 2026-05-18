@@ -202,12 +202,10 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
 
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
-    timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-    timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
+    timecodeLayout->addWidget(m_timeEdit);
+    timecodeLayout->addWidget(m_slider, 1);
+    timecodeLayout->addWidget(m_durationBtn);
     mainLayout->addLayout(timecodeLayout);
-
-    mainLayout->addWidget(m_slider);
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->setContentsMargins(0,0,0,0);
@@ -218,16 +216,16 @@ void AdvancedToolbar::setDefaultUI()
     buttonLayout->addSpacing(m_speedBtn->width()+1);
     buttonLayout->addSpacing(m_speedBtn->width()+1);
     buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_zoomIndicator->width()+4);
+    buttonLayout->addSpacing(m_zoomIndicator->width()+1);
 
     buttonLayout->addStretch();
 
     buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_prevMediaBtn);
+    buttonLayout->addWidget(m_stopBtn);
     buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_nextMediaBtn);
     buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_nextMediaBtn);
     buttonLayout->addWidget(m_loopBtn);
 
     buttonLayout->addStretch();
@@ -301,6 +299,37 @@ void AdvancedToolbar::enableSlider(){
 void AdvancedToolbar::disableSlider(){
     m_slider->setDisabled(true);
     m_slider->setToolTip(PrefManager::instance().getText("tooltip_slider_disabled"));
+}
+
+void AdvancedToolbar::updateRotationTooltip(const int rotationIndex)
+{
+    QString tooltipIndicator;
+    switch(rotationIndex){
+    case 0:
+        tooltipIndicator = "";
+        break;
+    case 1:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "270°";
+        break;
+    case 2:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "180°";
+        break;
+    case 3:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "90°";
+    }
+
+    m_extensionToolbar->m_rotateBtn->setToolTip(PrefManager::instance().getText("tooltip_rotate") + tooltipIndicator);
+}
+
+void AdvancedToolbar::updateFlipTooltip(const bool hFlip, const bool vFlip)
+{
+    QString tooltipIndicator = PrefManager::instance().getText("tooltip_flip");
+    if(hFlip)
+        tooltipIndicator += "\n" + PrefManager::instance().getText("tooltip_h_flipped");
+    if(vFlip)
+        tooltipIndicator += "\n" + PrefManager::instance().getText("tooltip_v_flipped");
+
+    m_extensionToolbar->m_invBtn->setToolTip(tooltipIndicator);
 }
 
 void AdvancedToolbar::onSliderPressed() {

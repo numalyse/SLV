@@ -25,6 +25,7 @@ private:
     TimelineWidget* m_timeline = nullptr;
     PlayerWidget* m_player = nullptr;
     QVBoxLayout* layout;
+    QFrame* m_separationLine = nullptr;
 
 public slots:
 

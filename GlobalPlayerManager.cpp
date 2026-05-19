@@ -24,6 +24,12 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     m_navPanel = new NavPanel(this);
     mainLayout->addWidget(m_navPanel);
 
+    m_separationLine = new QFrame();
+    m_separationLine->setFrameShape(QFrame::HLine);
+    m_separationLine->setFrameShadow(QFrame::Sunken);
+    m_separationLine->setLineWidth(1);
+    m_separationLine->setContentsMargins(10,0,10,0);
+
     m_layoutManager = new PlayerLayoutManager();
 
     connect(&ProjectManager::instance(), &ProjectManager::loadMediaProjectRequested, m_layoutManager, &PlayerLayoutManager::createLayoutFromProject);
@@ -97,18 +103,12 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         m_toolbarWidget = newToolbar;
         auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
         if(!advancedToolbar){
-           //  QHBoxLayout* separationLayout = new QHBoxLayout();
-           //  separationLayout->addStretch(0);
-
-           //  separationLayout->addWidget(separationLine);
-           //  separationLayout->addStretch(0);
-           //  layout->addLayout(separationLayout);
-            QFrame* separationLine = new QFrame();
-            separationLine->setFrameShape(QFrame::HLine);
-            separationLine->setFrameShadow(QFrame::Sunken);
-            separationLine->setLineWidth(1);
-            separationLine->setContentsMargins(10,0,10,0);
-            layout->addWidget(separationLine);
+            layout->addWidget(m_separationLine);
+            m_separationLine->show();
+        }
+        else if(m_separationLine){
+            layout->removeWidget(m_separationLine);
+            m_separationLine->hide();
         }
         layout->addWidget(m_toolbarWidget);
     }

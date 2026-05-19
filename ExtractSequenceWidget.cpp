@@ -1,5 +1,7 @@
 #include "ExtractSequenceWidget.h"
 #include <QMessageBox>
+#include <QGuiApplication>
+#include <QScreen>
 
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
     : QDialog{parent}, m_media(media)
@@ -53,18 +55,17 @@ void ExtractSequenceWidget::initUiLayout()
     QVBoxLayout *startTimeSelectionLayout = new QVBoxLayout();
     QLabel *startLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_start_label") + " :<b>");
 
-    m_startFrameDisplay->setScaledContents(true);
-    m_endFrameDisplay->setScaledContents(true);
+    // m_startFrameDisplay->setScaledContents(true);
+    // m_endFrameDisplay->setScaledContents(true);
     m_startFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_endFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_thumbnailWidth = m_media.width();
-    while(m_thumbnailWidth * 2 > 1400){
+    int maxDialogWidth = double(QGuiApplication::primaryScreen()->size().width()) / 1.25;
+    while(m_thumbnailWidth * 2 > maxDialogWidth){
         m_thumbnailWidth /= 1.15;
     }
     if(m_media.height() > 0 && (m_media.width() / m_media.height()) > 0) m_thumbnailHeight = m_thumbnailWidth / (double(m_media.width()) / m_media.height());
-    qDebug() << "Aspect ratio : " << double(m_media.width()) / m_media.height();
-    qDebug() << "New aspect ratio : " << m_thumbnailWidth / m_thumbnailHeight;
 
     m_startFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
     m_endFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));

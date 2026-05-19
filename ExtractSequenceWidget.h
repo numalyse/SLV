@@ -40,6 +40,8 @@ private:
     TimeEditor* m_endTimeEditor;
     QLabel* m_startFrameDisplay;
     QLabel* m_endFrameDisplay;
+    double m_thumbnailWidth;
+    double m_thumbnailHeight;
     ThumbnailWorker* m_thumbnailWorker;
     QTimer* m_thumbnailStartTimer;
     QTimer* m_thumbnailEndTimer;

@@ -342,8 +342,12 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == mergeWithNextShot){
         mergeWithNextShotAction();
     } else if(selectedAction == actionExtractShot){
-        ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_media, this, item->shot().start, item->shot().end);
-        sequenceExtractor->open();
+        QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"),
+            PrefManager::instance().getPref("Paths", "lp_extract_sequence")
+                + '/' + m_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, m_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, m_media->fps()));
+        if(saveSequencePath != ""){
+            QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + m_media->fileExtension());
+        }
     }
 }
 

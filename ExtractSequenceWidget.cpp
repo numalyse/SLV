@@ -58,8 +58,16 @@ void ExtractSequenceWidget::initUiLayout()
     m_startFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_endFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_startFrameDisplay->setPixmap(QPixmap(720, 480));
-    m_endFrameDisplay->setPixmap(QPixmap(720, 480));
+    m_thumbnailWidth = m_media.width();
+    while(m_thumbnailWidth * 2 > 1400){
+        m_thumbnailWidth /= 1.15;
+    }
+    if(m_media.height() > 0 && (m_media.width() / m_media.height()) > 0) m_thumbnailHeight = m_thumbnailWidth / (double(m_media.width()) / m_media.height());
+    qDebug() << "Aspect ratio : " << double(m_media.width()) / m_media.height();
+    qDebug() << "New aspect ratio : " << m_thumbnailWidth / m_thumbnailHeight;
+
+    m_startFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
+    m_endFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
 
     startTimeSelectionLayout->addWidget(startLabel);
     startTimeSelectionLayout->addWidget(m_startFrameDisplay);
@@ -89,13 +97,13 @@ void ExtractSequenceWidget::initUiLayout()
 void ExtractSequenceWidget::requestStartFrameDisplay()
 {
     m_thumbnailWorker->keepNQueue(2); // Pour clear la queue sauf 2 éléments (clearQueue empêche parfois d'afficher les frames sur un des deux)
-    m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {720, 480});
+    m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)});
 }
 
 void ExtractSequenceWidget::requestEndFrameDisplay()
 {
     m_thumbnailWorker->keepNQueue(2);
-    m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {720, 480});
+    m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)});
 }
 
 void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)

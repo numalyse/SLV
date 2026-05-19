@@ -163,6 +163,8 @@ void SimpleToolbar::setDefaultUI()
     mainLayout->setContentsMargins(5,5,5,5);
     mainLayout->setSpacing(1);
 
+    m_nameLabel->hide();
+
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
     timecodeLayout->setSpacing(2);
     timecodeLayout->addWidget(m_timeEdit);

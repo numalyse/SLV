@@ -201,6 +201,8 @@ void AdvancedToolbar::setDefaultUI()
     mainLayout->setContentsMargins(5,5,5,5);
     mainLayout->setSpacing(1);
 
+    m_nameLabel->hide();
+
     QHBoxLayout* timecodeLayout = new QHBoxLayout();
     timecodeLayout->addWidget(m_timeEdit);
     timecodeLayout->addWidget(m_slider, 1);

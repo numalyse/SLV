@@ -21,6 +21,10 @@ ToolbarToggleButton::ToolbarToggleButton(
     setChecked(state);
 
     // setIconSize(QSize(12,30));
+    if (iconSize() == QSize(512, 512))
+    {
+        setIconSize(QSize(16, 16));
+    }
     setFixedSize(30, 30);
 
     updateIcons(state);

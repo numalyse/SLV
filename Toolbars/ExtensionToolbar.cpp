@@ -64,12 +64,12 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
-        "record_on.png",
+        "record_on_white",
         PrefManager::instance().getText("tooltip_record_on"),
         "record_off_white",
         PrefManager::instance().getText("tooltip_record_off")
         );
-    m_recordBtn->setIconSize(QSize(30, 30));
+    //m_recordBtn->setIconSize(QSize(30, 30));
 
     m_segmBtn = new ToolbarToggleButton(
         this, 

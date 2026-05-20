@@ -50,7 +50,13 @@ ToolbarButton::ToolbarButton(QWidget *parent, const QString &iconName, const QSt
         setIcon(normalIcon);
 
         //setIcon(QIcon(ICONS_PATH + iconName));
-        // setIconSize(QSize(12,30));
+
+        // Par défaut redimension auto à QSize(16,16)
+        if(img.size() == QSize(512,512)){
+            setIconSize(QSize(16, 16));
+        }
+        // qDebug() << iconName << " - taille img : " << img.size();
+        // qDebug() << iconName << " - taille icon : " << iconSize();
         setFixedSize(30, 30);
         // setStyleSheet("background-color: palette(button);");
 

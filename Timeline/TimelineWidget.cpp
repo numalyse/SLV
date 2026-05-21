@@ -63,6 +63,15 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);
 
+    m_abLoopBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_ab_loop"));
+    connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
+    ButtonLayout->addWidget(m_abLoopBtn);
+
+    QFrame *btnSeparator = new QFrame();
+    btnSeparator->setFrameShape(QFrame::VLine);
+    btnSeparator->setFrameShadow(QFrame::Sunken);
+    ButtonLayout->addWidget(btnSeparator);
+
     m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_segmentation_auto"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
     ButtonLayout->addWidget(m_autoSegmentationBtn);
@@ -70,10 +79,6 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     m_splitShotBtn = new ToolbarButton(this, "split_shot_white", PrefManager::instance().getText("tooltip_split_shot"));
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitShotAtCursor);
     ButtonLayout->addWidget(m_splitShotBtn);
-
-    m_abLoopBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_ab_loop"));
-    connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
-    ButtonLayout->addWidget(m_abLoopBtn);
 
     m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", PrefManager::instance().getText("tooltip_merge_with_prev_shot"));
     connect(m_mergeWithPrevShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithPrevShotAction);

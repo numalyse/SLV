@@ -483,6 +483,11 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     // Charger le fichier en attente après eject
     if (!m_pendingFilePath.isEmpty()) {
         setMediaFromPath(m_pendingFilePath);
+        if(!m_toolBar->isVisible()){
+            ProjectManager::instance().requestProjectCreation({m_pendingFilePath});
+            QFileInfo fileInfo (m_pendingFilePath);
+            PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+        }
         m_pendingFilePath.clear();
     }
 }

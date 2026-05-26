@@ -41,6 +41,10 @@ protected:
 
     /// @brief Sets the right widget in parameter with a label role
     void setRightWidgetLabel(QWidget* rightWidget);
+
+    protected:
+    /// @brief Applique le style du frame à un widget enfant
+    void applyFrameStyleToChild(QWidget* child);
 };
 
 #endif // BASEPREFERENCEFRAME_H

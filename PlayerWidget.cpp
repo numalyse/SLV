@@ -5,6 +5,7 @@
 #include "CompositionWidget.h"
 #include "BlackOpacityWidget.h"
 #include "FileFormatManager.h"
+#include "GenericDialog.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -531,6 +532,22 @@ void PlayerWidget::dropEvent(QDropEvent *event)
         if (filePaths.size() == 1) {
 
             if(m_mediaWidget->media()){
+                if(ProjectManager::instance().needSave()){
+
+                    PrefManager& txtManager = PrefManager::instance();
+                    bool canceled = false;
+                    SLV::showGenericDialog(
+                        this,
+                        txtManager.getText("dialog_save_project_dialog_title"),
+                        txtManager.getText("dialog_save_project_dialog_text"),
+                        []() {
+                            ProjectManager::instance().saveProject(false);
+                        },
+                        [](){},
+                        [&canceled](){ canceled = true; }
+                    );
+                    if(canceled) return;
+                }
                 m_pendingFilePath = filePaths.first();
                 eject();
             }

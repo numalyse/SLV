@@ -13,7 +13,7 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
     m_pathLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     m_pathLabel->setToolTip(m_pathLabel->text());
     m_browseBtn = new QPushButton("...", this);
-    m_browseBtn->setToolTip(PrefManager::instance().getText("change_savingfolder_path"));
+    m_browseBtn->setToolTip(PrefManager::instance().getText("change_saving_folder"));
     //m_browseBtn->setStyleSheet("");
     m_browseBtn->setCursor(Qt::PointingHandCursor);
     // TODO: changer design

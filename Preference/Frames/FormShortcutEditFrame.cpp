@@ -14,6 +14,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
 {
     m_keySequenceEdit = new QKeySequenceEdit(value, this);
     m_keySequenceEdit->setMaximumSequenceLength(1);
+    applyFrameStyleToChild(m_keySequenceEdit);
     
     if (QLineEdit* internalLineEdit = m_keySequenceEdit->findChild<QLineEdit*>()) {
         internalLineEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

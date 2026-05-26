@@ -357,11 +357,15 @@
 
     "messagebox_global_screenshot_completed" : "The screenshot was taken successfully.",
     "messagebox_global_screenshot_error" : "A problem occurred during the screenshot process.",
-    "messagebox_record_completed" : "The media record was completed successfully.",
 
     "dialog_save_project_dialog_title" : "Save project",
     "dialog_save_project_dialog_text" : "The timeline contains unsaved changes. Do you want to save the project?",
     "messagebox_record_completed" : "The media record was completed successfully.",
 
-    "tooltip_access_folder" : "Open captures folder"
+    "tooltip_access_folder" : "Open captures folder",
+    
+    "select_file" : "Select a file",
+    "select_folder" : "Select a folder",
+    "all_files" : "All files (*.*)",
+    "change_saving_folder" : "Change saving folder"
 }

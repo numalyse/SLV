@@ -358,11 +358,16 @@
 
     "messagebox_global_screenshot_completed" : "La captura de pantalla se realizó correctamente.",
     "messagebox_global_screenshot_error" : "Se produjo un problema durante el proceso de captura de pantalla.",
-    "messagebox_record_completed" : "La grabación en los medios se completó con éxito.",
 
     "dialog_save_project_dialog_title" : "Guardando el proyecto",
     "dialog_save_project_dialog_text" : "La línea de tiempo contiene cambios no guardados. ¿Desea guardar el proyecto?",
     "messagebox_record_completed" : "La grabación en los medios se completó con éxito.",
 
-    "tooltip_access_folder" : "Abrir carpeta de capturas"
+    "tooltip_access_folder" : "Abrir carpeta de capturas",
+
+    "select_file" : "Seleccionar archivo",
+    "select_folder" : "Seleccionar carpeta",
+    "all_files" : "Todos los archivos (*.*)",
+    "change_saving_folder" : "Cambiar carpeta de guardado"
+    
 }

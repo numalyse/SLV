@@ -357,12 +357,16 @@
 
     "messagebox_global_screenshot_completed" : "La capture a été effectuée avec succès.",
     "messagebox_global_screenshot_error" : "Un problème est survenu lors de la capture.",
-    "messagebox_record_completed" : "L'enregistrement a été effectué avec succès.",
 
     "dialog_save_project_dialog_title" : "Sauvegarde du projet",
     "dialog_save_project_dialog_text" : "La timeline contient des modifications non enregistrées. Voulez-vous sauvegarder le projet ?",
     "messagebox_record_completed" : "L'enregistrement du média a été effectué.",
 
-    "tooltip_access_folder" : "Accéder au dossier de captures"
+    "tooltip_access_folder" : "Accéder au dossier de captures",
+
+    "select_file" : "Sélectionner un fichier",
+    "select_folder" : "Sélectionner un dossier",
+    "all_files" : "Tous les fichiers (*.*)",
+    "change_saving_folder" : "Changer le dossier de sauvegarde"
 
 }

@@ -26,6 +26,7 @@ private:
     PlayerWidget* m_player = nullptr;
     QVBoxLayout* layout;
     QFrame* m_separationLine = nullptr;
+    bool m_wasTimelineVisible = false;
 
 public slots:
 

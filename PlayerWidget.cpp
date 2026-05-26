@@ -530,7 +530,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 eject();
             }
             else{
-                if (!m_toolBar->isVisible() && setMediaFromPath(filePaths.first())){
+                if (setMediaFromPath(filePaths.first()) && !m_toolBar->isVisible()){
                     ProjectManager::instance().requestProjectCreation({filePaths.first()});
                     QFileInfo fileInfo (filePaths.first());
                     PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());

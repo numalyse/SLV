@@ -287,7 +287,7 @@
     "close" : "Cerrar",
 
     "about_dialog_title" : "Acerca de",
-    "about_dialog_project" : "Aplicación desarrollada en el marco del proyecto ANR Numalyse\n© 2026 - Software libre (GPL)",
+    "about_dialog_project" : "Aplicación desarrollada en el marco del proyecto ANR Numalyse\n2026 - Software libre (GPL)",
     "about_dialog_qt" : "Desarrollado con Qt",
     "about_dialog_version" : "Version",
     "about_dialog_last_update" : "Última actualización : ",

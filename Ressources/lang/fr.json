@@ -370,6 +370,11 @@
     "change_saving_folder" : "Changer le dossier de sauvegarde",
     "click_to_modify" : "Cliquer pour modifier",
     "restore_defaults" : "Restaurer les valeurs par défaut",
-    "restore_defaults_asked" : "Restaurer les valeurs par défaut ?"
+    "restore_defaults_asked" : "Restaurer les valeurs par défaut ?",
+
+    "tab_param_general" : "Paramètres généraux",
+    "tab_param_shortcuts" : "Configuration des raccourcis",
+    "tab_param_paths" : "Personnalisation des chemins"
+
 
 }

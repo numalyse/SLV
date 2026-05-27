@@ -371,6 +371,10 @@
     "change_saving_folder" : "Cambiar carpeta de guardado",
     "click_to_modify" : "Haga clic para modificar",
     "restore_defaults" : "Restaurar valores predeterminados",
-    "restore_defaults_asked" : "¿Restaurar valores predeterminados?"
+    "restore_defaults_asked" : "¿Restaurar valores predeterminados?",
+
+    "tab_param_general" : "Configuración general",
+    "tab_param_shortcuts" : "Configuración de atajos",
+    "tab_param_paths" : "Personalización de rutas"
     
 }

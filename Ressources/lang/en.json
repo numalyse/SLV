@@ -370,5 +370,10 @@
     "change_saving_folder" : "Change saving folder",
     "click_to_modify" : "Click to modify",
     "restore_defaults" : "Restore defaults",
-    "restore_defaults_asked" : "Restore defaults?"
+    "restore_defaults_asked" : "Restore defaults?",
+
+    "tab_param_general" : "General settings",
+    "tab_param_shortcuts" : "Shortcuts configuration",
+    "tab_param_paths" : "Paths customization"
+    
 }

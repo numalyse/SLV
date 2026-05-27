@@ -371,5 +371,10 @@
     "change_saving_folder" : "Cambia cartella di salvataggio",
     "click_to_modify" : "Clicca per modificare",
     "restore_defaults" : "Ripristina valori predefiniti",
-    "restore_defaults_asked" : "Ripristinare i valori predefiniti?"
+    "restore_defaults_asked" : "Ripristinare i valori predefiniti?",
+
+    "tab_param_general" : "Impostazioni generali",
+    "tab_param_shortcuts" : "Configurazione scorciatoie",
+    "tab_param_paths" : "Personalizzazione percorsi"
+    
 }

@@ -3,6 +3,9 @@
         "Lang" : {
             "code" : "en"
         },
+        "Advanced_timeline_options":{
+            "display_timeline_by_tagFrames" : false 
+        },
         "Export" : {
             "capture_path" : ""
         }

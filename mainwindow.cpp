@@ -166,6 +166,7 @@ void MainWindow::createToolBar()
     ToolbarButton *accessFolderBtn = new ToolbarButton(m_toolbarQt, "folder_white", PrefManager::instance().getText("tooltip_access_folder"));
     accessFolderBtn->setIconSize(QSize(20, 20));
     connect(accessFolderBtn, &ToolbarButton::clicked, this, [](){
+        if(!QDir(PrefManager::instance().getPref("Paths", "screenshot")).exists()) QDir().mkdir(PrefManager::instance().getPref("Paths", "screenshot"));
         QDesktopServices::openUrl(QUrl::fromLocalFile(PrefManager::instance().getPref("Paths", "screenshot")));
     });
 

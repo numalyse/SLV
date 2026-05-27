@@ -373,6 +373,7 @@ void MediaWidget::takeScreenshot()
     
     auto& prefManager = PrefManager::instance();
     QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
+    if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
 
     QByteArray capturePathBytes = capturePath.toUtf8();
 

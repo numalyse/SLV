@@ -19,12 +19,13 @@ BasePreferenceFrame::BasePreferenceFrame(const QString &name, const QString &sub
     nameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     nameLabel->setStyleSheet("font-weight: bold;");
 
-
     m_layout->setWidget(0, QFormLayout::LabelRole, nameLabel);
+    m_layout->setAlignment(nameLabel, Qt::AlignLeft);
 }
 
 void BasePreferenceFrame::setRightWidget(QWidget* rightWidget) {
     m_layout->setWidget(0, QFormLayout::FieldRole, rightWidget);
+    m_layout->setAlignment(rightWidget, Qt::AlignRight);
 }
 
 void BasePreferenceFrame::setRightLayout(QLayout* rightLayout) {

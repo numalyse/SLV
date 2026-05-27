@@ -54,7 +54,10 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     );
     
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
-    connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
+    connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this](){
+        if(m_timeline) m_wasTimelineVisible = m_timeline->isVisible();
+        disableSegmentation();
+    });
 
 
 
@@ -124,6 +127,8 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+        connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
+        connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     }
 
     
@@ -219,8 +224,6 @@ void GlobalPlayerManager::createTimelineWidget()
     Q_ASSERT( m_player );
 
     auto* toolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
-    connect(toolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
-    connect(toolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     
     if(m_timeline){
         m_timeline->deleteLater();
@@ -258,6 +261,8 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 
     connect(m_timeline, &TimelineWidget::updateShotDetailRequest, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+    // Pour initialiser les informations dans le ShotDetail
+    m_timeline->initShotDetail();
     connect(m_timeline, &TimelineWidget::disableTimeRelatedUI, m_navPanel, &NavPanel::disableShotControlButtons );
     connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, m_navPanel, &NavPanel::enableShotControlButtons );
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
@@ -270,7 +275,8 @@ void GlobalPlayerManager::createTimelineWidget()
     layout->setSpacing(1);
 
     layout->addWidget(m_timeline);
-    m_timeline->hide();
+    if(m_wasTimelineVisible) m_timeline->show();
+    else m_timeline->hide();
 }
 
 

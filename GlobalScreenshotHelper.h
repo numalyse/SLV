@@ -41,6 +41,7 @@ private:
         int minWidth = 10000000;
         int minHeight = 10000000;
         QString mergedPath(prefManager.getPref("Paths", "screenshot") + '/');
+        if(!QDir(mergedPath).exists()) QDir().mkdir(mergedPath);
 
         for(size_t IPlayer = 0; IPlayer<playersPaths.size(); ++IPlayer){
             cap.release();

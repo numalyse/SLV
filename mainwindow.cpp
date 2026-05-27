@@ -166,6 +166,7 @@ void MainWindow::createToolBar()
     ToolbarButton *accessFolderBtn = new ToolbarButton(m_toolbarQt, "folder_white", PrefManager::instance().getText("tooltip_access_folder"));
     accessFolderBtn->setIconSize(QSize(20, 20));
     connect(accessFolderBtn, &ToolbarButton::clicked, this, [](){
+        if(!QDir(PrefManager::instance().getPref("Paths", "screenshot")).exists()) QDir().mkdir(PrefManager::instance().getPref("Paths", "screenshot"));
         QDesktopServices::openUrl(QUrl::fromLocalFile(PrefManager::instance().getPref("Paths", "screenshot")));
     });
 
@@ -252,13 +253,13 @@ void MainWindow::selectAndLoadMediaFiles()
         qDebug() << "Pas de fichier sélectionné";
         return;
     }
-    if(files_paths.size() == 1)
-        emit SignalManager::instance().addPlaylistItems(files_paths);
+    // if(files_paths.size() == 1)
+    //     emit SignalManager::instance().addPlaylistItems(files_paths);
     if(files_paths.size() > 4){
-        SLV::showGenericDialog(this, "open_more_than_four_files_title", "open_more_than_four_files_dialog", [files_paths](){
+        SLV::showGenericDialog(this, prefManager.getText("open_more_than_four_files_title"), prefManager.getText("open_more_than_four_files_dialog"), [files_paths, this](){
             emit SignalManager::instance().addPlaylistItems(files_paths);
+            m_navPanelBtn->click();
         });
-        emit SignalManager::instance().addPlaylistItems(files_paths);
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }
@@ -267,8 +268,18 @@ void MainWindow::selectAndLoadMediaFiles()
     prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
     
     qDebug() << "Fichiers sélectionnés : " << files_paths;
+    bool formatNotAccepted = false;
     for(const QString& path : files_paths){
         qDebug() << path;
+        if(!FileFormatManager::instance().isFormatAccepted(QFileInfo(path).suffix()))
+            formatNotAccepted = true;
+    }
+    if(formatNotAccepted){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
     }
     
     m_globalPlayerManager->setPlayersFromPaths(files_paths);

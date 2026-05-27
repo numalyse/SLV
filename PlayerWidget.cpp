@@ -5,6 +5,7 @@
 #include "CompositionWidget.h"
 #include "BlackOpacityWidget.h"
 #include "FileFormatManager.h"
+#include "GenericDialog.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -253,7 +254,6 @@ void PlayerWidget::playFromAdvanced()
                 QFileInfo fileInfo (file_path);
                 prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
             }
-            emit SignalManager::instance().addPlaylistItems(QStringList(file_path));
         }
         else
             emit m_toolBar->selectFilePlayCanceled();
@@ -483,6 +483,11 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     // Charger le fichier en attente après eject
     if (!m_pendingFilePath.isEmpty()) {
         setMediaFromPath(m_pendingFilePath);
+        if(!m_toolBar->isVisible()){
+            ProjectManager::instance().requestProjectCreation({m_pendingFilePath});
+            QFileInfo fileInfo (m_pendingFilePath);
+            PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+        }
         m_pendingFilePath.clear();
     }
 }
@@ -523,19 +528,46 @@ void PlayerWidget::dropEvent(QDropEvent *event)
             if (filePaths.size() >= 4) break;
         }
 
-        if (filePaths.size() == 1) {
+        bool fileNotSupported = filePaths.size() < event->mimeData()->urls().size();
+        if(fileNotSupported){
+            QMessageBox *msg = new QMessageBox();
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+            msg->setIcon(QMessageBox::Information);
+            msg->exec();
+        }
 
+        if(filePaths.empty()){
+            event->ignore();
+            return;
+        }
+        else if (filePaths.size() == 1) {
             if(m_mediaWidget->media()){
+                if(ProjectManager::instance().needSave()){
+
+                    PrefManager& txtManager = PrefManager::instance();
+                    bool canceled = false;
+                    SLV::showGenericDialog(
+                        this,
+                        txtManager.getText("dialog_save_project_dialog_title"),
+                        txtManager.getText("dialog_save_project_dialog_text"),
+                        []() {
+                            ProjectManager::instance().saveProject(false);
+                        },
+                        [](){},
+                        [&canceled](){ canceled = true; }
+                    );
+                    if(canceled) return;
+                }
                 m_pendingFilePath = filePaths.first();
                 eject();
             }
             else{
-                if (!m_toolBar->isVisible() && setMediaFromPath(filePaths.first())){
+                if (setMediaFromPath(filePaths.first()) && !m_toolBar->isVisible()){
                     ProjectManager::instance().requestProjectCreation({filePaths.first()});
                     QFileInfo fileInfo (filePaths.first());
                     PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
                 }
-                emit SignalManager::instance().addPlaylistItems(QStringList(filePaths.first()));
             }
         } else {
             emit mediaDropped(filePaths);

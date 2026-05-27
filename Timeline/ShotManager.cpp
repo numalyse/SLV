@@ -58,6 +58,10 @@ void ShotManager::updateCurrentShot(int64_t time){
 } 
 
 
+void ShotManager::initShotDetail(){
+    int currentShotId = m_shotItems.indexOf(m_currentShotItem);
+    emit updateShotDetailRequested(static_cast<int>(m_shotItems.size()), currentShotId, &m_shotItems[currentShotId]->shot());
+}
 
 
 /// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur

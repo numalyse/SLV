@@ -286,7 +286,7 @@
     "close" : "Fermer",
 
     "about_dialog_title" : "À propos",
-    "about_dialog_project" : "Application développée dans le cadre du projet ANR Numalyse\n© 2026 - Logiciel libre (GPL)",
+    "about_dialog_project" : "Application développée dans le cadre du projet ANR Numalyse\n2026 - Logiciel libre (GPL)",
     "about_dialog_qt" : "Développé avec Qt",
     "about_dialog_version" : "Version",
     "about_dialog_last_update" : "Dernière mise à jour : ",
@@ -374,7 +374,15 @@
 
     "tab_param_general" : "Paramètres généraux",
     "tab_param_shortcuts" : "Configuration des raccourcis",
-    "tab_param_paths" : "Personnalisation des chemins"
+    "tab_param_paths" : "Personnalisation des chemins",
 
+    "open_more_than_four_files_title" : "Sélection de plusieurs médias",
+    "open_more_than_four_files_dialog" : "Le lecteur multimédia est limité à 4 médias en simultané. Voulez-vous charger votre sélection dans la playlist ?",
+
+    "project_exportation_finished" : "L'exportation du média a été effectuée avec succès.",
+    "project_exportation_error" : "Une erreur est survenue lors de l'exportation.",
+    "open_file_directory" : "Ouvrir l'emplacement du fichier",
+
+    "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en compte."
 
 }

@@ -286,7 +286,7 @@
     "close" : "Schließen",
 
     "about_dialog_title" : "Über",
-    "about_dialog_project" : "Im Rahmen des ANR-Projekts Numalyse entwickelt\n© 2026 - Freie Software (GPL)",
+    "about_dialog_project" : "Im Rahmen des ANR-Projekts Numalyse entwickelt\n2026 - Freie Software (GPL)",
     "about_dialog_qt" : "Entwickelt mit Qt",
     "about_dialog_version" : "Version",
     "about_dialog_last_update" : "Letzte Aktualisierung : ",
@@ -374,5 +374,14 @@
 
     "tab_param_general" : "Allgemeine Einstellungen",
     "tab_param_shortcuts" : "Tastenkombinationen",
-    "tab_param_paths" : "Pfade anpassen"
+    "tab_param_paths" : "Pfade anpassen",
+
+    "open_more_than_four_files_title" : "Auswahl mehrerer Mediendateien",
+    "open_more_than_four_files_dialog" : "Der Medienplayer ist auf 4 gleichzeitige Mediendateien beschränkt. Möchten Sie Ihre Auswahl zur Wiedergabeliste hinzufügen?",
+
+    "project_exportation_finished" : "Der Medienexport wurde erfolgreich abgeschlossen.",
+    "project_exportation_error" : "Beim Export ist ein Fehler aufgetreten.",
+    "open_file_directory" : "Dateispeicherort öffnen",
+
+    "messagebox_format_not_accepted" : "Eine der ausgewählten Dateien hat ein nicht unterstütztes Format."
 }

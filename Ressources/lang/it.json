@@ -287,7 +287,7 @@
     "close" : "Chiudi",
 
     "about_dialog_title" : "Informazioni",
-    "about_dialog_project" : "Applicazione sviluppata nell'ambito del progetto ANR Numalyse\n© 2026 - Software libero (GPL)",
+    "about_dialog_project" : "Applicazione sviluppata nell'ambito del progetto ANR Numalyse\n2026 - Software libero (GPL)",
     "about_dialog_qt" : "Sviluppato con Qt",
     "about_dialog_version" : "Version",
     "about_dialog_last_update" : "Ultimo aggiornamento : ",
@@ -375,6 +375,14 @@
 
     "tab_param_general" : "Impostazioni generali",
     "tab_param_shortcuts" : "Configurazione scorciatoie",
-    "tab_param_paths" : "Personalizzazione percorsi"
+    "tab_param_paths" : "Personalizzazione percorsi",
     
+    "open_more_than_four_files_title" : "Selezione multipla di file multimediali",
+    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. Vuoi caricare la tua selezione nella playlist?",
+
+    "project_exportation_finished" : "L'esportazione del file multimediale è stata completata con successo.",
+    "project_exportation_error" : "Si è verificato un errore durante l'esportazione.",
+    "open_file_directory" : "Apri la posizione del file",
+
+    "messagebox_format_not_accepted" : "Uno dei file selezionati ha un formato non supportato."
 }

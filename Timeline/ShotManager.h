@@ -42,6 +42,8 @@ public:
 
     void createShotItemsFromCuts(const std::vector<int>& cuts);
 
+    void initShotDetail();
+
 signals:
     void updateShotDetailRequested(int shotCount, int requestId, Shot*);
     void showMergeWithPreviousShotAction(bool);

@@ -74,7 +74,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     } else {
         m_deleteBtn->setIcon(QIcon(":/icons/delete"));
     }
-    m_deleteBtn->setToolTip(PrefManager::instance().getText("delete"));
+    m_deleteBtn->setToolTip(PrefManager::instance().getText("remove"));
 
     mainLayout->addWidget(m_deleteBtn);
     mainLayout->addSpacing(10);

@@ -174,12 +174,20 @@
     "sort_addition_down_playlist" : "Por adição crescente ↓",
     "sort_addition_up_playlist" : "Por adição decrescente ↑",
     "tooltip_add_item_playlist" : "Adicionar média",
+    
     "delete" : "Eliminar",
     "delete_all" : "Eliminar tudo",
-    "delete_all_items_playlist" : "Eliminar lista de reprodução",
-    "tooltip_delete_all_items_playlist" : "Eliminar todos os elementos da lista de reprodução",
-    "delete_all_items" : "Deseja eliminar todos os elementos da lista de reprodução?",
+    "delete_all_items_playlist" : "Eliminar playlist",
+    "tooltip_delete_all_items_playlist" : "Eliminar todos os elementos da playlist",
+    "delete_all_items" : "Deseja eliminar todos os elementos da playlist?",
     "delete_all_items_confirm" : "Esta ação é irreversível.",
+
+    "remove" : "Remover",
+    "remove_all" : "Remover tudo",
+    "remove_all_items_playlist" : "Remover playlist",
+    "tooltip_remove_all_items_playlist" : "Remover todos os elementos da playlist",
+    "remove_all_items" : "Deseja remover todos os elementos da playlist?",
+
     "duration" : "Duração",
 
     "messagebox_not_a_video" : "Este média não é um vídeo",

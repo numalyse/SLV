@@ -25,14 +25,13 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
 
         internalLineEdit->setStyleSheet(R"(
             QLineEdit{
-                color : white;
                 background-color : palette(base);
                 font : normal;
             }
 
             QLineEdit:focus{
                 color : red;
-                background-color : palette(dark);
+                background-color : palette(Window);
                 font : bold;
             }
         )");

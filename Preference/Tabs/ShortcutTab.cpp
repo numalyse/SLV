@@ -37,6 +37,7 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
     setFrameShape(QFrame::NoFrame);
 
     QWidget* resetWidget = new QWidget(this);
+    resetWidget->setFixedHeight(30);
     resetWidget->setContentsMargins(0,0,0,0);
     resetWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     QHBoxLayout* resetLayout = new QHBoxLayout;

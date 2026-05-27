@@ -8,7 +8,27 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QFrame>
+#include <QJsonArray>
 #include <QMessageBox>
+
+static QStringList orderedKeys(const QJsonObject& object)
+{
+    QStringList keys;
+    if (object.contains("_order") && object.value("_order").isArray()) {
+        for (const QJsonValue& value : object.value("_order").toArray()) {
+            if (value.isString()) {
+                keys << value.toString();
+            }
+        }
+    } else {
+        for (const QString& key : object.keys()) {
+            if (!key.startsWith('_')) {
+                keys << key;
+            }
+        }
+    }
+    return keys;
+}
 
 ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", parent)
 {
@@ -66,29 +86,40 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
 
     connect(resetShortcutsBtn, &QPushButton::clicked, this, &ShortcutTab::AskResetDefault);
 
-    for (auto IsubCategory = m_baseJson.begin(); IsubCategory != m_baseJson.end(); ++IsubCategory) {
-        
-        m_layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" +  IsubCategory.key()), m_container));
-        QJsonObject shortCutSubcategory = IsubCategory.value().toObject();
+    QJsonObject defaultShortcuts = prefManager.getDefaultCategory(m_categoryName);
+    QStringList sections = orderedKeys(defaultShortcuts);
 
-        for(auto IKey = shortCutSubcategory.begin(); IKey != shortCutSubcategory.end(); ++IKey){
-            QString internalKey = IKey.key();
+    for (const QString& section : sections) {
+        if (!m_baseJson.contains(section)) {
+            continue;
+        }
+
+        m_layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" + section), m_container));
+        QJsonObject shortCutSubcategory = m_baseJson.value(section).toObject();
+        QJsonObject defaultSection = defaultShortcuts.value(section).toObject();
+        QStringList shortcutKeys = orderedKeys(defaultSection);
+
+        for (const QString& internalKey : shortcutKeys) {
+            if (!shortCutSubcategory.contains(internalKey)) {
+                continue;
+            }
+
             QString keyTranslated = prefManager.getText("shortcut_" + internalKey);
-    
+            QString value = shortCutSubcategory.value(internalKey).toString();
+
             FormShortcutEditFrame* formShortcutEditFrame = new FormShortcutEditFrame(
-                keyTranslated, 
-                IsubCategory.key(), 
-                internalKey, 
-                IKey.value().toString(), 
+                keyTranslated,
+                section,
+                internalKey,
+                value,
                 m_container
             );
-            
+
             connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutUIRequested, this, &ShortcutTab::emptyShortcutUI);
             addPreferenceFrame(formShortcutEditFrame);
 
             m_shortcutFrames.insert(internalKey, formShortcutEditFrame);
         }
-
     }
 }
 
@@ -172,18 +203,24 @@ void ShortcutTab::AskResetDefault(){
 void ShortcutTab::resetDefault(){
     auto& prefManager = PrefManager::instance();
 
-    QJsonObject defaultCat = prefManager.getDefaultCategory(m_categoryName);
+    QJsonObject defaultShortcuts = prefManager.getDefaultCategory(m_categoryName);
+    QStringList sections = orderedKeys(defaultShortcuts);
 
-    for (auto IsubCategory = defaultCat.begin(); IsubCategory != defaultCat.end(); ++IsubCategory) {
-        if (!IsubCategory.value().isObject()) continue;
+    for (const QString& section : sections) {
+        if (!defaultShortcuts.contains(section)) {
+            continue;
+        }
 
-        QJsonObject subObj = IsubCategory.value().toObject();
+        QJsonObject defaultSection = defaultShortcuts.value(section).toObject();
+        QStringList shortcutKeys = orderedKeys(defaultSection);
 
-        for (auto IKey = subObj.begin(); IKey != subObj.end(); ++IKey) {
-            QString internalKey = IKey.key();
-            QString defaultValue = IKey.value().toString();
+        for (const QString& internalKey : shortcutKeys) {
+            if (!defaultSection.contains(internalKey)) {
+                continue;
+            }
 
-            BasePreferenceTab::updateJsonObj(IsubCategory.key(), internalKey, defaultValue);
+            QString defaultValue = defaultSection.value(internalKey).toString();
+            BasePreferenceTab::updateJsonObj(section, internalKey, defaultValue);
 
             if (m_shortcutFrames.contains(internalKey)) {
                 m_shortcutFrames[internalKey]->setUIValue(defaultValue);

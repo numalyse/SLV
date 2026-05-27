@@ -39,6 +39,19 @@ namespace SLV {
             default:                   return "export_type_unknown"; 
         }
     }
+
+    inline QString getExportExtensionString(ExportType type) {
+        switch (type) {
+        case ExportType::TXT:      return "txt";
+        case ExportType::PDF:      return "pdf";
+        case ExportType::PPTX:     return "pptx";
+        case ExportType::DOCX:     return "docx";
+        case ExportType::MP4:      return "mp4";
+        case ExportType::SRC:      return "src";
+        case ExportType::TagImage: return "tagframe";
+        default:                   return "unknown";
+        }
+    }
 }
 
 

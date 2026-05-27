@@ -367,5 +367,9 @@
     "tooltip_access_folder" : "Abrir pasta de capturas",
 
     "open_more_than_four_files_title" : "Seleção de múltiplas mídias",
-    "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. Deseja carregar sua seleção na playlist?"
+    "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. Deseja carregar sua seleção na playlist?",
+
+    "project_exportation_finished" : "A exportação da mídia foi concluída com sucesso.",
+    "project_exportation_error" : "Ocorreu um erro durante a exportação.",
+    "open_file_directory" : "Abrir local do arquivo"
 }

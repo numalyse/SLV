@@ -366,5 +366,9 @@
     "tooltip_access_folder" : "Open captures folder",
 
     "open_more_than_four_files_title" : "Multiple media selection",
-    "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?"
+    "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?",
+
+    "project_exportation_finished" : "The media export was completed successfully.",
+    "project_exportation_error" : "An error occurred during export",
+    "open_file_directory" : "Open file location"
 }

@@ -366,5 +366,9 @@
     "tooltip_access_folder" : "Aufnahmeordner öffnen",
 
     "open_more_than_four_files_title" : "Auswahl mehrerer Mediendateien",
-    "open_more_than_four_files_dialog" : "Der Medienplayer ist auf 4 gleichzeitige Mediendateien beschränkt. Möchten Sie Ihre Auswahl zur Wiedergabeliste hinzufügen?"
+    "open_more_than_four_files_dialog" : "Der Medienplayer ist auf 4 gleichzeitige Mediendateien beschränkt. Möchten Sie Ihre Auswahl zur Wiedergabeliste hinzufügen?",
+
+    "project_exportation_finished" : "Der Medienexport wurde erfolgreich abgeschlossen.",
+    "project_exportation_error" : "Beim Export ist ein Fehler aufgetreten.",
+    "open_file_directory" : "Dateispeicherort öffnen"
 }

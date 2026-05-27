@@ -366,6 +366,10 @@
     "tooltip_access_folder" : "Accéder au dossier de captures",
 
     "open_more_than_four_files_title" : "Sélection de plusieurs médias",
-    "open_more_than_four_files_dialog" : "Le lecteur multimédia est limité à 4 médias en simultané. Voulez-vous charger votre sélection dans la playlist ?"
+    "open_more_than_four_files_dialog" : "Le lecteur multimédia est limité à 4 médias en simultané. Voulez-vous charger votre sélection dans la playlist ?",
+
+    "project_exportation_finished" : "L'exportation du média a été effectuée avec succès.",
+    "project_exportation_error" : "Une erreur est survenue lors de l'exportation.",
+    "open_file_directory" : "Ouvrir l'emplacement du fichier"
 
 }

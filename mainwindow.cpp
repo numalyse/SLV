@@ -268,8 +268,18 @@ void MainWindow::selectAndLoadMediaFiles()
     prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
     
     qDebug() << "Fichiers sélectionnés : " << files_paths;
+    bool formatNotAccepted = false;
     for(const QString& path : files_paths){
         qDebug() << path;
+        if(!FileFormatManager::instance().isFormatAccepted(QFileInfo(path).suffix()))
+            formatNotAccepted = true;
+    }
+    if(formatNotAccepted){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
     }
     
     m_globalPlayerManager->setPlayersFromPaths(files_paths);

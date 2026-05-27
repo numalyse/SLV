@@ -371,5 +371,7 @@
 
     "project_exportation_finished" : "A exportação da mídia foi concluída com sucesso.",
     "project_exportation_error" : "Ocorreu um erro durante a exportação.",
-    "open_file_directory" : "Abrir local do arquivo"
+    "open_file_directory" : "Abrir local do arquivo",
+
+    "messagebox_format_not_accepted" : "Um dos arquivos selecionados possui um formato não suportado."
 }

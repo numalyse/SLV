@@ -26,7 +26,6 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
 
     setRightLayout(pathLayout);
 
-    // TODO : changer langue
     connect(m_browseBtn, &QPushButton::clicked, this, [this, isFolder]() {
         QString selectedPath = isFolder ? 
             QFileDialog::getExistingDirectory(this, PrefManager::instance().getText("select_folder"), m_pathLabel->text()) : 

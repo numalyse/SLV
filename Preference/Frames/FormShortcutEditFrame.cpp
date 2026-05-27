@@ -14,6 +14,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
 {
     m_keySequenceEdit = new QKeySequenceEdit(value, this);
     m_keySequenceEdit->setMaximumSequenceLength(1);
+    m_keySequenceEdit->setToolTip(PrefManager::instance().getText("click_to_modify"));
     applyFrameStyleToChild(m_keySequenceEdit);
 
     m_keySequenceEdit->setFixedHeight(30);
@@ -47,6 +48,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
         QString newShortcutString = m_keySequenceEdit->keySequence().toString();
         
         if (newShortcutString != m_prevValue) {
+            this->setFocus();
             emit updateJsonObjRequested(m_subCategory, m_key, newShortcutString);
         }
     });

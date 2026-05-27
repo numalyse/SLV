@@ -369,5 +369,7 @@
     "all_files" : "Tous les fichiers (*.*)",
     "change_saving_folder" : "Changer le dossier de sauvegarde",
     "click_to_modify" : "Cliquer pour modifier",
-    "restore_defaults" : "Restaurer les valeurs par défaut"
+    "restore_defaults" : "Restaurer les valeurs par défaut",
+    "restore_defaults_asked" : "Restaurer les valeurs par défaut ?"
+
 }

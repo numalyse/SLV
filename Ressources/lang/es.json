@@ -370,6 +370,7 @@
     "all_files" : "Todos los archivos (*.*)",
     "change_saving_folder" : "Cambiar carpeta de guardado",
     "click_to_modify" : "Haga clic para modificar",
-    "restore_defaults" : "Restaurar valores predeterminados"
+    "restore_defaults" : "Restaurar valores predeterminados",
+    "restore_defaults_asked" : "¿Restaurar valores predeterminados?"
     
 }

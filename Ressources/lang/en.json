@@ -369,5 +369,6 @@
     "all_files" : "All files (*.*)",
     "change_saving_folder" : "Change saving folder",
     "click_to_modify" : "Click to modify",
-    "restore_defaults" : "Restore defaults"
+    "restore_defaults" : "Restore defaults",
+    "restore_defaults_asked" : "Restore defaults?"
 }

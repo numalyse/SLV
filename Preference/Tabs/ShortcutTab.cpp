@@ -4,9 +4,9 @@
 #include "Preference/Frames/FormShortcutEditFrame.h"
 #include "GenericDialog.h"
 
-
 #include <QFormLayout>
 #include <QLabel>
+#include <QMessageBox>
 
 ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", parent)
 {
@@ -108,20 +108,23 @@ void ShortcutTab::emptyShortcutUI(const QString& stolenKey)
 void ShortcutTab::AskResetDefault(){
     auto& prefManager = PrefManager::instance();
 
-    SLV::showGenericDialog(
-        this,
-        prefManager.getText("reset"),
-        prefManager.getText("restore_defaults"),
-        [this]() { resetDefault(); },
-        nullptr,
-        nullptr
-    );
+    QMessageBox msgBox(this);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setWindowTitle(prefManager.getText("reset"));
+    msgBox.setText(prefManager.getText("restore_defaults_asked"));
+
+    QPushButton* confirmBtn = msgBox.addButton(prefManager.getText("confirm"), QMessageBox::YesRole);
+    msgBox.addButton(prefManager.getText("generic_dialog_btn_cancel"), QMessageBox::RejectRole);
+
+    msgBox.exec();
+    if (msgBox.clickedButton() == confirmBtn) {
+        resetDefault();
+    }
 }
 
 void ShortcutTab::resetDefault(){
     auto& prefManager = PrefManager::instance();
 
-    // Retrieve the default category (no user overrides)
     QJsonObject defaultCat = prefManager.getDefaultCategory(m_categoryName);
 
     for (auto IsubCategory = defaultCat.begin(); IsubCategory != defaultCat.end(); ++IsubCategory) {
@@ -133,7 +136,6 @@ void ShortcutTab::resetDefault(){
             QString internalKey = IKey.key();
             QString defaultValue = IKey.value().toString();
 
-            // Bypass conflict dialog when restoring defaults by using BasePreferenceTab implementation
             BasePreferenceTab::updateJsonObj(IsubCategory.key(), internalKey, defaultValue);
 
             if (m_shortcutFrames.contains(internalKey)) {

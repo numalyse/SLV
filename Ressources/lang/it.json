@@ -370,5 +370,6 @@
     "all_files" : "Tutti i file (*.*)",
     "change_saving_folder" : "Cambia cartella di salvataggio",
     "click_to_modify" : "Clicca per modificare",
-    "restore_defaults" : "Ripristina valori predefiniti"
+    "restore_defaults" : "Ripristina valori predefiniti",
+    "restore_defaults_asked" : "Ripristinare i valori predefiniti?"
 }

@@ -370,5 +370,6 @@
     "all_files" : "Todos os arquivos (*.*)",
     "change_saving_folder" : "Alterar pasta de salvamento",
     "click_to_modify" : "Clique para modificar",
-    "restore_defaults" : "Restaurar padrões"   
+    "restore_defaults" : "Restaurar padrões",
+    "restore_defaults_asked" : "Restaurar padrões?"   
 }

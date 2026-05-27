@@ -369,5 +369,6 @@
     "all_files" : "Alle Dateien (*.*)",
     "change_saving_folder" : "Speicherordner ändern",
     "click_to_modify" : "Zum Ändern klicken",
-    "restore_defaults" : "Standard wiederherstellen"
+    "restore_defaults" : "Standard wiederherstellen",
+    "restore_defaults_asked" : "Standardwerte wiederherstellen?"
 }

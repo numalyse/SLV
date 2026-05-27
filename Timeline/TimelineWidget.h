@@ -46,6 +46,7 @@ public slots:
     void mergeWithNextShotAction();
     void computeMediaAmplitudes(const QString& mediaPath);
     void initAudioVisualizer();
+    void initShotDetail();
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 

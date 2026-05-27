@@ -528,8 +528,20 @@ void PlayerWidget::dropEvent(QDropEvent *event)
             if (filePaths.size() >= 4) break;
         }
 
-        if (filePaths.size() == 1) {
+        bool fileNotSupported = filePaths.size() < event->mimeData()->urls().size();
+        if(fileNotSupported){
+            QMessageBox *msg = new QMessageBox();
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+            msg->setIcon(QMessageBox::Information);
+            msg->exec();
+        }
 
+        if(filePaths.empty()){
+            event->ignore();
+            return;
+        }
+        else if (filePaths.size() == 1) {
             if(m_mediaWidget->media()){
                 if(ProjectManager::instance().needSave()){
 

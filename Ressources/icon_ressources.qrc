@@ -176,5 +176,9 @@
         <file alias="view_4">icons/view_4.png</file>
         <file alias="zoom_white">icons/zoom_white.png</file>
         <file alias="zoom_on">icons/zoom.png</file>
+        <file alias="playlist">icons/playlist.png</file>
+        <file alias="playlist_white">icons/playlist_white.png</file>
+        <file alias="shot_detail">icons/shot_detail.png</file>
+        <file alias="shot_detail_white">icons/shot_detail_white.png</file>
     </qresource>
 </RCC>

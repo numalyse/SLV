@@ -151,14 +151,22 @@ void MainWindow::createToolBar()
 
     createViewGridBtn();
 
-    m_navPanelBtn = new ToolbarToggleButton(
+    QHBoxLayout *panelDisplayLayout = new QHBoxLayout();
+    m_playlistBtn = new ToolbarButton(nullptr, "playlist_white", PrefManager::instance().getText("tooltip_playlist_button"));
+    m_shotDetailBtn = new ToolbarButton(nullptr, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    panelDisplayLayout->addWidget(m_playlistBtn);
+    panelDisplayLayout->addWidget(m_shotDetailBtn);
+
+    m_navPanelBtn = new ToolbarToggleHoverButton(
         m_toolbarQt,
+        panelDisplayLayout,
         false,
         "nav_panel_menu_open_white",
         PrefManager::instance().getText("tooltip_nav_panel_close"),
         "nav_panel_menu_closed_white",
         PrefManager::instance().getText("tooltip_nav_panel_open")
     );
+    m_navPanelBtn->setOnTop(false);
     m_navPanelBtn->setFixedSize(30, 30);
     m_navPanelBtn->setIconSize(QSize(20, 20));
     m_navPanelBtn->setStyleSheet("border: none;");
@@ -169,6 +177,10 @@ void MainWindow::createToolBar()
         if(!QDir(PrefManager::instance().getPref("Paths", "screenshot")).exists()) QDir().mkdir(PrefManager::instance().getPref("Paths", "screenshot"));
         QDesktopServices::openUrl(QUrl::fromLocalFile(PrefManager::instance().getPref("Paths", "screenshot")));
     });
+    connect(m_playlistBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::displayPlaylist);
+    connect(m_playlistBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
+    connect(m_shotDetailBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail);
+    connect(m_shotDetailBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
 
     m_toolbarQt->setMovable(false);
     m_toolbarQt->setFloatable(false);

@@ -372,5 +372,8 @@
     "project_exportation_error" : "An error occurred during export",
     "open_file_directory" : "Open file location",
 
-    "messagebox_format_not_accepted" : "One of the selected files has an unsupported format."
+    "messagebox_format_not_accepted" : "One of the selected files has an unsupported format.",
+
+    "tooltip_playlist_button" : "Open playlist",
+    "tooltip_shot_detail_button" : "Open shot information"
 }

@@ -373,5 +373,8 @@
     "project_exportation_error" : "Ocurrió un error durante la exportación.",
     "open_file_directory" : "Abrir ubicación del archivo",
 
-    "messagebox_format_not_accepted" : "Uno de los archivos seleccionados tiene un formato no compatible."
+    "messagebox_format_not_accepted" : "Uno de los archivos seleccionados tiene un formato no compatible.",
+
+    "tooltip_playlist_button" : "Abrir lista de reproducción",
+    "tooltip_shot_detail_button" : "Abrir información del plano"
 }

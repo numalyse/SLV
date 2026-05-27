@@ -367,5 +367,9 @@
     "tooltip_access_folder" : "Apri la cartella delle catture",
 
     "open_more_than_four_files_title" : "Selezione multipla di file multimediali",
-    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. Vuoi caricare la tua selezione nella playlist?"
+    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. Vuoi caricare la tua selezione nella playlist?",
+
+    "project_exportation_finished" : "L'esportazione del file multimediale è stata completata con successo.",
+    "project_exportation_error" : "Si è verificato un errore durante l'esportazione.",
+    "open_file_directory" : "Apri la posizione del file"
 }

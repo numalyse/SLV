@@ -367,5 +367,9 @@
     "tooltip_access_folder" : "Abrir carpeta de capturas",
 
     "open_more_than_four_files_title" : "Selección de varios medios",
-    "open_more_than_four_files_dialog" : "El reproductor multimedia está limitado a 4 medios simultáneos. ¿Desea cargar su selección en la lista de reproducción?"
+    "open_more_than_four_files_dialog" : "El reproductor multimedia está limitado a 4 medios simultáneos. ¿Desea cargar su selección en la lista de reproducción?",
+
+    "project_exportation_finished" : "La exportación del medio se completó correctamente.",
+    "project_exportation_error" : "Ocurrió un error durante la exportación.",
+    "open_file_directory" : "Abrir ubicación del archivo"
 }

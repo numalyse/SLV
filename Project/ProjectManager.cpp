@@ -18,6 +18,7 @@
 #include <QProgressDialog>
 #include <QDebug>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 #include <fstream>
 #include <iostream>
@@ -470,11 +471,14 @@ void ProjectManager::exportProject(){
             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
         );
     }else {
+        QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
+        if(selectedFormat == ExportType::SRC)
+            dialogFilter.replace(".src", '.'+mediaPathExtension());
         selectedPath = QFileDialog::getSaveFileName(
             nullptr, 
             prefManager.getText("export_file_path_title"), 
-            dialogDir, 
-            prefManager.getText(SLV::getExportTypeString(selectedFormat)) 
+            dialogDir+'/'+m_project->media->fileName() + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
+            dialogFilter
         );
     }
 
@@ -490,7 +494,7 @@ void ProjectManager::exportProject(){
     int64_t duration = m_project->media->duration();
     QString mediaPath = m_project->media->filePath();
 
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath, this);
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath.split(".")[0], this);
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();
@@ -502,11 +506,32 @@ void ProjectManager::exportProject(){
         exportThread->requestInterruption();
     });
 
-    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog](bool success) {
+    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog, selectedPath, this](bool success) {
         if (success) {
             qDebug() << "Export réussi";
+            QMessageBox *msg = new QMessageBox();
+            QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
+            bool ok = connect(openDirBtn, &QPushButton::clicked, this, [selectedPath](){
+                QFileInfo fi(selectedPath);
+                QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+            });
+            qDebug() << "Connected ? " << ok;
+            msg->addButton(openDirBtn, QMessageBox::AcceptRole);
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("project_exportation_finished"));
+            msg->setIcon(QMessageBox::Information);
+            msg->adjustSize();
+            msg->exec();
+            return;
         }else {
             qDebug() << "Export annulé ou erreur";
+            QMessageBox *msg = new QMessageBox();
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("project_exportation_error"));
+            msg->setIcon(QMessageBox::Information);
+            msg->adjustSize();
+            msg->exec();
+            return;
         }
         progressDialog->close(); 
         progressDialog->deleteLater(); 

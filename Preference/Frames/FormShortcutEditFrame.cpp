@@ -35,9 +35,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
                 background-color : palette(dark);
                 font : bold;
             }
-
         )");
-
     }
 
     setRightWidget(m_keySequenceEdit);

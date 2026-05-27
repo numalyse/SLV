@@ -5,7 +5,9 @@
 #include "GenericDialog.h"
 
 #include <QFormLayout>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QFrame>
 #include <QMessageBox>
 
 ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", parent)
@@ -14,10 +16,55 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
     setWidgetResizable(true); 
     setFrameShape(QFrame::NoFrame);
 
-    QPushButton* resetShortcuts = new QPushButton(PrefManager::instance().getText("reset"), this);
-    resetShortcuts->setToolTip(PrefManager::instance().getText("restore_defaults"));
-    m_layout->addWidget(resetShortcuts);
-    connect(resetShortcuts, &QPushButton::clicked, this, &ShortcutTab::AskResetDefault);
+    QWidget* resetWidget = new QWidget(this);
+    resetWidget->setContentsMargins(0,0,0,0);
+    resetWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    QHBoxLayout* resetLayout = new QHBoxLayout;
+    resetLayout->setContentsMargins(0,0,0,0);
+    resetWidget->setLayout(resetLayout);
+
+    QPushButton* resetShortcutsBtn = new QPushButton(PrefManager::instance().getText("reset"), this);
+    resetShortcutsBtn->setToolTip(PrefManager::instance().getText("restore_defaults"));
+    resetShortcutsBtn->setFixedHeight(30);
+    //resetShortcutsBtn->
+    //resetShortcutsBtn->setFixedWidth(40);
+    resetShortcutsBtn->setStyleSheet(R"(
+        QPushButton{
+            background-color: palette(Window);
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px
+        }
+        QPushButton:hover{
+            background-color: palette(base);
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px
+        }
+        )");
+    
+    QLabel* tabTitle = new QLabel;
+    tabTitle->setText(PrefManager::instance().getText("tab_param_shortcuts"));
+
+    QFont tabTitleFont = tabTitle->font();
+    tabTitleFont.setPointSize(12);
+    tabTitleFont.setBold(true);
+    tabTitle->setFont(tabTitleFont);
+
+    resetLayout->addWidget(tabTitle);
+    resetLayout->addStretch();
+    resetLayout->addWidget(resetShortcutsBtn);
+
+    QFrame *line = new QFrame;
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    m_containerLayout->insertWidget(0, line);
+    m_containerLayout->insertWidget(0, resetWidget);
+    
+    resetShortcutsBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+
+    connect(resetShortcutsBtn, &QPushButton::clicked, this, &ShortcutTab::AskResetDefault);
 
     for (auto IsubCategory = m_baseJson.begin(); IsubCategory != m_baseJson.end(); ++IsubCategory) {
         

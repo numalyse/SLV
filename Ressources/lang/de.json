@@ -363,5 +363,8 @@
     "dialog_save_project_dialog_text" : "Die Timeline enthält nicht gespeicherte Änderungen. Möchten Sie das Projekt speichern?",
     "messagebox_record_completed" : "Die Medienaufzeichnung wurde erfolgreich abgeschlossen.",
 
-    "tooltip_access_folder" : "Aufnahmeordner öffnen"
+    "tooltip_access_folder" : "Aufnahmeordner öffnen",
+
+    "open_more_than_four_files_title" : "Auswahl mehrerer Mediendateien",
+    "open_more_than_four_files_dialog" : "Der Medienplayer ist auf 4 gleichzeitige Mediendateien beschränkt. Möchten Sie Ihre Auswahl zur Wiedergabeliste hinzufügen?"
 }

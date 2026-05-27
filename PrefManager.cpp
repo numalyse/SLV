@@ -158,6 +158,15 @@ QJsonObject PrefManager::getCategory(const QString &category) const
     return result;
 }
 
+QJsonObject PrefManager::getDefaultCategory(const QString &category) const
+{
+    if (m_defaultPrefs.contains(category) && m_defaultPrefs[category].isObject()) {
+        return m_defaultPrefs.value(category).toObject();
+    }
+
+    qWarning() << "[PrefManager] La catégorie par défaut :" << category << "n'existe pas";
+    return QJsonObject();
+}
 
 QJsonObject PrefManager::getSubCategory(const QString &category, const QString &subCategory) const
 {
@@ -344,4 +353,3 @@ QStringList PrefManager::getAvailableLangs(){
 
     return langs;
 }
-

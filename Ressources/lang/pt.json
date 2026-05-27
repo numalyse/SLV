@@ -358,7 +358,6 @@
 
     "messagebox_global_screenshot_completed" : "A captura de tela foi feita com sucesso.",
     "messagebox_global_screenshot_error" : "Ocorreu um problema durante o processo de captura de tela.",
-    "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
 
     "dialog_save_project_dialog_title" : "Salvando o projeto",
     "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. Deseja salvar o projeto?",
@@ -366,6 +365,18 @@
 
     "tooltip_access_folder" : "Abrir pasta de capturas",
 
+    "select_file" : "Selecionar um arquivo",
+    "select_folder" : "Selecionar uma pasta",
+    "all_files" : "Todos os arquivos (*.*)",
+    "change_saving_folder" : "Alterar pasta de salvamento",
+    "click_to_modify" : "Clique para modificar",
+    "restore_defaults" : "Restaurar padrões",
+    "restore_defaults_asked" : "Restaurar padrões?",
+
+    "tab_param_general" : "Configurações gerais",
+    "tab_param_shortcuts" : "Configurações de atalhos",
+    "tab_param_paths" : "Personalização de caminhos",
+  
     "open_more_than_four_files_title" : "Seleção de múltiplas mídias",
     "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. Deseja carregar sua seleção na playlist?",
 

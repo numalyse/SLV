@@ -358,7 +358,6 @@
 
     "messagebox_global_screenshot_completed" : "Lo screenshot è stato acquisito correttamente.",
     "messagebox_global_screenshot_error" : "Si è verificato un problema durante il processo di acquisizione dello screenshot.",
-    "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
 
     "dialog_save_project_dialog_title" : "Salvataggio del progetto",
     "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. Vuoi salvare il progetto?",
@@ -366,6 +365,18 @@
 
     "tooltip_access_folder" : "Apri la cartella delle catture",
 
+    "select_file" : "Seleziona un file",
+    "select_folder" : "Seleziona una cartella",
+    "all_files" : "Tutti i file (*.*)",
+    "change_saving_folder" : "Cambia cartella di salvataggio",
+    "click_to_modify" : "Clicca per modificare",
+    "restore_defaults" : "Ripristina valori predefiniti",
+    "restore_defaults_asked" : "Ripristinare i valori predefiniti?",
+
+    "tab_param_general" : "Impostazioni generali",
+    "tab_param_shortcuts" : "Configurazione scorciatoie",
+    "tab_param_paths" : "Personalizzazione percorsi",
+    
     "open_more_than_four_files_title" : "Selezione multipla di file multimediali",
     "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. Vuoi caricare la tua selezione nella playlist?",
 

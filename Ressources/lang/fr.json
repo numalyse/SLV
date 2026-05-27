@@ -272,7 +272,7 @@
     "project_manager_create_project_dialog": "Créer un projet",
     "project_manager_create_project_dialog_file_type": "Dossier du projet",
 
-    "confirm" : "Valider",
+    "confirm" : "Confirmer",
 
     "brightness" : "Luminosité",
     "contrast" : "Contraste",
@@ -357,13 +357,24 @@
 
     "messagebox_global_screenshot_completed" : "La capture a été effectuée avec succès.",
     "messagebox_global_screenshot_error" : "Un problème est survenu lors de la capture.",
-    "messagebox_record_completed" : "L'enregistrement a été effectué avec succès.",
 
     "dialog_save_project_dialog_title" : "Sauvegarde du projet",
     "dialog_save_project_dialog_text" : "La timeline contient des modifications non enregistrées. Voulez-vous sauvegarder le projet ?",
     "messagebox_record_completed" : "L'enregistrement du média a été effectué.",
 
     "tooltip_access_folder" : "Accéder au dossier de captures",
+
+    "select_file" : "Sélectionner un fichier",
+    "select_folder" : "Sélectionner un dossier",
+    "all_files" : "Tous les fichiers (*.*)",
+    "change_saving_folder" : "Changer le dossier de sauvegarde",
+    "click_to_modify" : "Cliquer pour modifier",
+    "restore_defaults" : "Restaurer les valeurs par défaut",
+    "restore_defaults_asked" : "Restaurer les valeurs par défaut ?",
+
+    "tab_param_general" : "Paramètres généraux",
+    "tab_param_shortcuts" : "Configuration des raccourcis",
+    "tab_param_paths" : "Personnalisation des chemins",
 
     "open_more_than_four_files_title" : "Sélection de plusieurs médias",
     "open_more_than_four_files_dialog" : "Le lecteur multimédia est limité à 4 médias en simultané. Voulez-vous charger votre sélection dans la playlist ?",

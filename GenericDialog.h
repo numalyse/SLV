@@ -10,8 +10,6 @@
 
 namespace SLV
 {
-
-    // 1. La fonction "Maître" (celle qui fait le vrai travail)
     inline void showGenericDialog(
         QWidget* parent,
         const QString& title,

@@ -368,5 +368,7 @@
     "select_file" : "Seleziona un file",
     "select_folder" : "Seleziona una cartella",
     "all_files" : "Tutti i file (*.*)",
-    "change_saving_folder" : "Cambia cartella di salvataggio"
+    "change_saving_folder" : "Cambia cartella di salvataggio",
+    "click_to_modify" : "Clicca per modificare",
+    "restore_defaults" : "Ripristina valori predefiniti"
 }

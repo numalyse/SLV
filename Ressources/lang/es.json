@@ -368,6 +368,8 @@
     "select_file" : "Seleccionar archivo",
     "select_folder" : "Seleccionar carpeta",
     "all_files" : "Todos los archivos (*.*)",
-    "change_saving_folder" : "Cambiar carpeta de guardado"
+    "change_saving_folder" : "Cambiar carpeta de guardado",
+    "click_to_modify" : "Haga clic para modificar",
+    "restore_defaults" : "Restaurar valores predeterminados"
     
 }

@@ -367,5 +367,7 @@
     "select_file" : "Datei auswählen",
     "select_folder" : "Ordner auswählen",
     "all_files" : "Alle Dateien (*.*)",
-    "change_saving_folder" : "Speicherordner ändern"
+    "change_saving_folder" : "Speicherordner ändern",
+    "click_to_modify" : "Zum Ändern klicken",
+    "restore_defaults" : "Standard wiederherstellen"
 }

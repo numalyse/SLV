@@ -391,6 +391,10 @@ void TimelineWidget::goToShot(int idShot){
     }
 }
 
+void TimelineWidget::initShotDetail(){
+    m_shotManager->initShotDetail();
+}
+
 
 // private slots
 

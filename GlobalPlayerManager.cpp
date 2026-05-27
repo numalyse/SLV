@@ -261,6 +261,8 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 
     connect(m_timeline, &TimelineWidget::updateShotDetailRequest, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+    // Pour initialiser les informations dans le ShotDetail
+    m_timeline->initShotDetail();
     connect(m_timeline, &TimelineWidget::disableTimeRelatedUI, m_navPanel, &NavPanel::disableShotControlButtons );
     connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, m_navPanel, &NavPanel::enableShotControlButtons );
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);

@@ -252,13 +252,13 @@ void MainWindow::selectAndLoadMediaFiles()
         qDebug() << "Pas de fichier sélectionné";
         return;
     }
-    if(files_paths.size() == 1)
-        emit SignalManager::instance().addPlaylistItems(files_paths);
+    // if(files_paths.size() == 1)
+    //     emit SignalManager::instance().addPlaylistItems(files_paths);
     if(files_paths.size() > 4){
-        SLV::showGenericDialog(this, "open_more_than_four_files_title", "open_more_than_four_files_dialog", [files_paths](){
+        SLV::showGenericDialog(this, prefManager.getText("open_more_than_four_files_title"), prefManager.getText("open_more_than_four_files_dialog"), [files_paths, this](){
             emit SignalManager::instance().addPlaylistItems(files_paths);
+            m_navPanelBtn->click();
         });
-        emit SignalManager::instance().addPlaylistItems(files_paths);
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }

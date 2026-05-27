@@ -14,6 +14,11 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
     setWidgetResizable(true); 
     setFrameShape(QFrame::NoFrame);
 
+    QPushButton* resetShortcuts = new QPushButton(PrefManager::instance().getText("reset"), this);
+    resetShortcuts->setToolTip(PrefManager::instance().getText("restore_defaults"));
+    m_layout->addWidget(resetShortcuts);
+    connect(resetShortcuts, &QPushButton::clicked, this, &ShortcutTab::AskResetDefault);
+
     for (auto IsubCategory = m_baseJson.begin(); IsubCategory != m_baseJson.end(); ++IsubCategory) {
         
         m_layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" +  IsubCategory.key()), m_container));
@@ -97,5 +102,43 @@ void ShortcutTab::emptyShortcutUI(const QString& stolenKey)
 {
     if(m_shortcutFrames.contains(stolenKey)) {
         m_shortcutFrames[stolenKey]->clearShortcutUI();
+    }
+}
+
+void ShortcutTab::AskResetDefault(){
+    auto& prefManager = PrefManager::instance();
+
+    SLV::showGenericDialog(
+        this,
+        prefManager.getText("reset"),
+        prefManager.getText("restore_defaults"),
+        [this]() { resetDefault(); },
+        nullptr,
+        nullptr
+    );
+}
+
+void ShortcutTab::resetDefault(){
+    auto& prefManager = PrefManager::instance();
+
+    // Retrieve the default category (no user overrides)
+    QJsonObject defaultCat = prefManager.getDefaultCategory(m_categoryName);
+
+    for (auto IsubCategory = defaultCat.begin(); IsubCategory != defaultCat.end(); ++IsubCategory) {
+        if (!IsubCategory.value().isObject()) continue;
+
+        QJsonObject subObj = IsubCategory.value().toObject();
+
+        for (auto IKey = subObj.begin(); IKey != subObj.end(); ++IKey) {
+            QString internalKey = IKey.key();
+            QString defaultValue = IKey.value().toString();
+
+            // Bypass conflict dialog when restoring defaults by using BasePreferenceTab implementation
+            BasePreferenceTab::updateJsonObj(IsubCategory.key(), internalKey, defaultValue);
+
+            if (m_shortcutFrames.contains(internalKey)) {
+                m_shortcutFrames[internalKey]->setUIValue(defaultValue);
+            }
+        }
     }
 }

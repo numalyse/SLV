@@ -174,12 +174,20 @@
     "sort_addition_down_playlist" : "By ascending addition ↓",
     "sort_addition_up_playlist" : "By descending addition ↑",
     "tooltip_add_item_playlist" : "Add media",
+
     "delete" : "Delete",
     "delete_all" : "Delete all",
     "delete_all_items_playlist" : "Delete playlist",
     "tooltip_delete_all_items_playlist" : "Delete all items in the playlist",
     "delete_all_items" : "Do you want to delete all items in the playlist?",
     "delete_all_items_confirm" : "This action is irreversible.",
+
+    "remove" : "Remove",
+    "remove_all" : "Remove all",
+    "remove_all_items_playlist" : "Remove playlist",
+    "tooltip_remove_all_items_playlist" : "Remove all items in the playlist",
+    "remove_all_items" : "Do you want to remove all items in the playlist ?",
+    
     "duration" : "Duration",
 
     "messagebox_not_a_video" : "This media is not a video",

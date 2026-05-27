@@ -100,7 +100,7 @@ Playlist::Playlist(QWidget *parent)
         "   border: 1px solid palette(button);"
         "   border-radius: 4px;"
         "}");
-    m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_delete_all_items_playlist"));
+    m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_remove_all_items_playlist"));
     playlistLabelLayout->addWidget(m_deleteAllBtn);
 
     // [Bouton] Ajouter un élément à la playlist
@@ -324,7 +324,7 @@ void Playlist::deleteAllItemsDialog()
 
     QLabel* titleLabel = new QLabel;
     titleLabel->setAlignment(Qt::AlignCenter);
-    titleLabel->setText(prefManager.getText("delete_all_items_playlist"));
+    titleLabel->setText(prefManager.getText("remove_all_items_playlist"));
     
     QFont titleFont = titleLabel->font();
     titleFont.setPointSize(12);
@@ -339,12 +339,12 @@ void Playlist::deleteAllItemsDialog()
     textLabel->setAlignment(Qt::AlignCenter);
     textLabel->setTextFormat(Qt::RichText);
     textLabel->setText(
-                        prefManager.getText("delete_all_items") + "<br>" +
-                        "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i>");
+                        prefManager.getText("remove_all_items") + "<br>" +
+                        "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i><br>");
     layout.addWidget(textLabel);
 
     QHBoxLayout* btnLayout = new QHBoxLayout;
-    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("delete_all"));
+    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("remove_all"));
     QPushButton* cancelBtn = new QPushButton(prefManager.getText("generic_dialog_btn_cancel"));
 
     QFont btnFont = deleteAllBtn->font();

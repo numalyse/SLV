@@ -60,7 +60,9 @@ private:
     QToolBar* m_toolbarQt = nullptr;
     GlobalPlayerManager* m_globalPlayerManager = nullptr;
     QWidget* m_currentLayout = nullptr;
-    ToolbarToggleButton *m_navPanelBtn = nullptr; // Utilisation d'un toggle button pour le bouton de menu
+    ToolbarToggleHoverButton *m_navPanelBtn = nullptr; // Utilisation d'un toggle button pour le bouton de menu
+    ToolbarButton *m_playlistBtn = nullptr;
+    ToolbarButton *m_shotDetailBtn = nullptr;
     ToolbarToggleHoverButton *m_viewGridBtn = nullptr;
     ToolbarButton *m_view1 = nullptr;
     ToolbarToggleHoverButton *m_view2 = nullptr;

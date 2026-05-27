@@ -384,5 +384,8 @@
     "project_exportation_error" : "Si è verificato un errore durante l'esportazione.",
     "open_file_directory" : "Apri la posizione del file",
 
-    "messagebox_format_not_accepted" : "Uno dei file selezionati ha un formato non supportato."
+    "messagebox_format_not_accepted" : "Uno dei file selezionati ha un formato non supportato.",
+
+    "tooltip_playlist_button" : "Apri playlist",
+    "tooltip_shot_detail_button" : "Apri informazioni dell'inquadratura"
 }

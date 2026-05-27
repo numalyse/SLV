@@ -47,8 +47,6 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
     QPushButton* resetShortcutsBtn = new QPushButton(PrefManager::instance().getText("reset"), this);
     resetShortcutsBtn->setToolTip(PrefManager::instance().getText("restore_defaults"));
     resetShortcutsBtn->setFixedHeight(30);
-    //resetShortcutsBtn->
-    //resetShortcutsBtn->setFixedWidth(40);
     resetShortcutsBtn->setStyleSheet(R"(
         QPushButton{
             background-color: palette(Window);
@@ -134,10 +132,12 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
         SLV::showGenericDialog(
             this, 
             prefManager.getText("dialog_update_shortcut_conflict_title"),
-            prefManager.getText("dialog_update_shortcut_conflict_text") 
+            prefManager.getText("dialog_update_shortcut_conflict_text")
+            + "\n\n\n" 
             + prefManager.getText("shortcut_subsection_" + conflictSubCat) 
-            + ", " + prefManager.getText("shortcut_" + conflictKey)
-            + " : " + newValue,
+            + " > " + prefManager.getText("shortcut_" + conflictKey)
+            + " : " + newValue
+            + "\n",
             prefManager.getText("dialog_update_shortcut_conflict_text_info"),
             
             [this, subCategory, key, newValue, conflictSubCat, conflictKey]() { // chose to override, set the value and empties the other

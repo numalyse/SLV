@@ -62,7 +62,9 @@ protected:
 
     void initDrawingSurface();
 
-    QIcon genIconPreviewColor(QColor color, int sizePen = 30);
+    QIcon genIconPreviewColor(QColor color, int sizePen = 30, bool outlineActivated = false);
+    QIcon genIconPreviewColor(QColor color, bool outlineActivated);
+
     void updatePen();
     void initDrawingToolbar();
 

@@ -15,9 +15,28 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
     m_keySequenceEdit = new QKeySequenceEdit(value, this);
     m_keySequenceEdit->setMaximumSequenceLength(1);
     applyFrameStyleToChild(m_keySequenceEdit);
-    
+
+    m_keySequenceEdit->setFixedHeight(30);
+    m_keySequenceEdit->setFixedWidth(150);
+
     if (QLineEdit* internalLineEdit = m_keySequenceEdit->findChild<QLineEdit*>()) {
         internalLineEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+        internalLineEdit->setStyleSheet(R"(
+            QLineEdit{
+                color : white;
+                background-color : palette(base);
+                font : normal;
+            }
+
+            QLineEdit:focus{
+                color : red;
+                background-color : palette(dark);
+                font : bold;
+            }
+
+        )");
+
     }
 
     setRightWidget(m_keySequenceEdit);

@@ -94,6 +94,13 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
+    m_shotInfo = new ToolbarButton(this, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    connect(m_shotInfo, &ToolbarButton::pressed, this, [](){
+        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
+        emit SignalManager::instance().openNavPanel();
+    });
+    ButtonLayout->addWidget(m_shotInfo);
+
     ButtonLayout->addStretch(1);
     layout->addLayout(ButtonLayout);
 
@@ -309,6 +316,8 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionAB = nullptr;
     QAction *deleteABMarkers = nullptr;
     QAction *actionExtractAB = nullptr;
+    // Pour ouvrir le nav panel sur le plan sélectionné
+    QAction* actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
 
     if(m_showMergeWithPrevShotBtn){
         mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
@@ -353,6 +362,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         if(saveSequencePath != ""){
             QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + m_media->fileExtension());
         }
+    } else if(selectedAction == actionOpenShotInfo){
+        moveCursor(m_mathManager->timeToPos(item->shot().start));
+        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
+        emit SignalManager::instance().openNavPanel();
     }
 }
 

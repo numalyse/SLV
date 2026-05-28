@@ -181,6 +181,7 @@ void MainWindow::createToolBar()
     connect(m_playlistBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(m_shotDetailBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail);
     connect(m_shotDetailBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
+    connect(&SignalManager::instance(), &SignalManager::openNavPanel, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
 
     m_toolbarQt->setMovable(false);
     m_toolbarQt->setFloatable(false);

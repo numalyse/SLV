@@ -44,6 +44,8 @@ public:
 
     void initShotDetail();
 
+    const int getCurrentShotId(){ return m_shotItems.indexOf(m_currentShotItem); }
+
 signals:
     void updateShotDetailRequested(int shotCount, int requestId, Shot*);
     void showMergeWithPreviousShotAction(bool);

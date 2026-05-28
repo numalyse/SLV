@@ -85,6 +85,20 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
     m_mergeWithPrevShotBtn->setEnabled(false);
 
+    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", PrefManager::instance().getText("tooltip_to_prev_shot"));
+    connect(m_toPrevShotBtn, &ToolbarButton::pressed, this, [this](){
+        goToShot(m_shotManager->getCurrentShotId()-1);
+    });
+    ButtonLayout->addWidget(m_toPrevShotBtn);
+    m_toPrevShotBtn->setEnabled(false);
+
+    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", PrefManager::instance().getText("tooltip_to_next_shot"));
+    connect(m_toNextShotBtn, &ToolbarButton::pressed, this, [this](){
+        goToShot(m_shotManager->getCurrentShotId()+1);
+    });
+    ButtonLayout->addWidget(m_toNextShotBtn);
+    m_toNextShotBtn->setEnabled(false);
+
     m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", PrefManager::instance().getText("tooltip_merge_with_next_shot"));
     connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
@@ -441,12 +455,14 @@ void TimelineWidget::mergeWithNextShotAction()
 void TimelineWidget::updateShowMergeWithPreviousShot(bool state)
 {
     m_mergeWithPrevShotBtn->setEnabled(state);
+    m_toPrevShotBtn->setEnabled(state);
     m_showMergeWithPrevShotBtn = state;
 }
 
 void TimelineWidget::updateShowMergeWithNextShot(bool state)
 {
     m_mergeWithNextShotBtn->setEnabled(state);
+    m_toNextShotBtn->setEnabled(state);
     m_showMergeWithNextShotBtn = state;
 }
 

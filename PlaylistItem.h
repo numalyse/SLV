@@ -40,7 +40,6 @@ private:
     unsigned int m_itemIndex = 0;
     QLabel *m_indexLabel = nullptr;
     QPushButton *m_deleteBtn = nullptr;
-    bool m_isClicked = false;
     QSize m_thumbnailSize {64, 36};
     bool m_isCurrentMedia = false;
     QPoint m_dragStartPosition;

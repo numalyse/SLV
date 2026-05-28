@@ -172,19 +172,18 @@ void PlaylistItem::leaveEvent(QEvent *event)
     QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(!m_isCurrentMedia)
         setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 3px;}");
-    m_isClicked = false;
     // QWidget::leaveEvent(event);
 }
 
 void PlaylistItem::mousePressEvent(QMouseEvent *event)
 {
-    m_isClicked = true; // pas besoin de vérifier si bouton delete cliqué car le bouton bypass l'event de PlaylistItem
+    // pas besoin de vérifier si bouton delete cliqué car le bouton bypass l'event de PlaylistItem
     m_dragStartPosition = event->pos();
 }
 
 void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(m_isClicked && rect().contains(event->pos())){
+    if(rect().contains(event->pos())){
         emit updatePlaylistCurrentIndex(m_itemIndex);
         playMedia(true);
     }

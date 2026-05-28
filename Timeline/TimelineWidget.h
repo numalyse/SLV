@@ -100,6 +100,8 @@ private:
     bool m_showMergeWithNextShotBtn = false;
     ToolbarButton* m_exportBtn = nullptr;
     ToolbarButton* m_shotInfo = nullptr;
+    ToolbarButton* m_toPrevShotBtn = nullptr;
+    ToolbarButton* m_toNextShotBtn = nullptr;
 
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;

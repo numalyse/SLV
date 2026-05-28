@@ -724,9 +724,9 @@ void MediaWidget::mousePressEvent(QMouseEvent *event)
 
 void MediaWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(!m_zoomActivated /*&& (m_lastPanPos - event->pos()).manhattanLength() < 5*/){
-        emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
-    }
+    // if(!m_zoomActivated /*&& (m_lastPanPos - event->pos()).manhattanLength() < 5*/){
+    //     emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+    // }
     if(!m_player || !m_media) return;
     else if(m_zoomActivated){
         setCursor(Qt::ArrowCursor);

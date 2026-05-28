@@ -35,6 +35,7 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
+    void openNavPanel();
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void playlistEjectPlayer();

@@ -14,19 +14,21 @@ void PrefManager::loadLanguage(const QString& langCode)
     QStringList availableLangs = getAvailableLangs();
 
     // si le langcode est bien dans les langues supportées, utilisation de celui-ci sinon fallback sur en
-    QString filePath = (availableLangs.contains(langCode)) ? ":/lang/" + langCode + ".json" : ":/lang/en.json";
+    QString selectedLangCode = (availableLangs.contains(langCode)) ? langCode : "en";
+    QString filePath = ":/lang/" + selectedLangCode + ".json";
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly)) {
         QByteArray data = file.readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
         m_texts = doc.object();
+        m_currentLangCode = selectedLangCode;
         file.close();
     } else {
         qDebug() << "[PrefManager] Impossible de charger le fichier de langue:" << filePath;
+        m_currentLangCode = "en";
     }
 }
-
 
 QString PrefManager::getText(const QString &key) const
 {
@@ -352,4 +354,9 @@ QStringList PrefManager::getAvailableLangs(){
     }
 
     return langs;
+}
+
+QString PrefManager::getLangCode() const
+{
+    return m_currentLangCode.isEmpty() ? "en" : m_currentLangCode;
 }

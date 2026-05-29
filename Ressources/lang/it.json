@@ -122,6 +122,8 @@
     "shot_detail_note_name" : "Nota",
 
     "shot_detail_id_text" : "Piano n°",
+    "shot" : "Piano",
+    "number_of_shots" : "Numero totale di piani",
 
     "compo_rule_None" : "Nessuno",
     "compo_rule_RuleOfThirds" : "Regola dei terzi",

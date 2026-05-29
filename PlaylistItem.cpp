@@ -27,9 +27,9 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     m_mediaThumbnailLabel = new QLabel();
     m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
     if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
-        m_mediaThumbnailImage = new QPixmap(":/icons/hide_image_white");
+        m_mediaThumbnailImage = new QPixmap(":/icons/image_preview_white");
     } else {
-        m_mediaThumbnailImage = new QPixmap(":/icons/hide_image");
+        m_mediaThumbnailImage = new QPixmap(":/icons/image_preview");
     }
     m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
@@ -50,9 +50,9 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     // icone
     m_mediaTypeIconLabel = new QLabel();
     if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
-        m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+        m_mediaTypeIcon = new QPixmap(":/icons/image_preview_white");
     } else {
-        m_mediaTypeIcon = new QPixmap(":/icons/show_image");
+        m_mediaTypeIcon = new QPixmap(":/icons/image_preview");
     }
     m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16,16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
@@ -242,9 +242,9 @@ void PlaylistItem::updateTypeIcon(){
         
     if (m_mediaData->type() == MediaType::Image){
         if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
-            m_mediaTypeIcon = new QPixmap(":/icons/show_image_white");
+            m_mediaTypeIcon = new QPixmap(":/icons/image_preview_white");
         } else {
-            m_mediaTypeIcon = new QPixmap(":/icons/show_image");
+            m_mediaTypeIcon = new QPixmap(":/icons/image_preview");
         }
         m_mediaTypeIconLabel->setPixmap(m_mediaTypeIcon->scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         m_mediaTypeIconLabel->setToolTip(PrefManager::instance().getText("file_image") + " (" + m_mediaData->fileExtension().toUpper() + ")");   

@@ -397,5 +397,7 @@
     "messagebox_format_not_accepted" : "One of the selected files has an unsupported format.",
 
     "tooltip_playlist_button" : "Open playlist",
-    "tooltip_shot_detail_button" : "Open shot information"
+    "tooltip_shot_detail_button" : "Open shot information",
+
+    "messagebox_fullscreen_experimental" : "The software's fullscreen feature is currently under development."
 }

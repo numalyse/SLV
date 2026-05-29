@@ -27,6 +27,42 @@ ToolbarToggleButton::ToolbarToggleButton(
     }
     setFixedSize(30, 30);
 
+    QImage gray_imgOn = QImage(m_iconPathOn);
+
+    for (int y = 0; y < gray_imgOn.height(); ++y) {
+        for (int x = 0; x < gray_imgOn.width(); ++x) {
+            QColor c = gray_imgOn.pixelColor(x, y);
+
+            if (c.alpha() > 0) {
+                c.setRgb(64, 64, 64);
+                gray_imgOn.setPixelColor(x, y, c);
+            }
+        }
+    }
+
+    QImage gray_imgOff = QImage(m_iconPathOff);
+
+    for (int y = 0; y < gray_imgOff.height(); ++y) {
+        for (int x = 0; x < gray_imgOff.width(); ++x) {
+            QColor c = gray_imgOff.pixelColor(x, y);
+
+            if (c.alpha() > 0) {
+                c.setRgb(64, 64, 64);
+                gray_imgOff.setPixelColor(x, y, c);
+            }
+        }
+    }
+
+    QIcon normalIconOn((QPixmap(m_iconPathOn)));
+    QIcon grayIconOn(QPixmap::fromImage(gray_imgOn));
+    QIcon normalIconOff((QPixmap(m_iconPathOff)));
+    QIcon grayIconOff(QPixmap::fromImage(gray_imgOff));
+
+    setProperty("normalIconOn", normalIconOn);
+    setProperty("grayIconOn", grayIconOn);
+    setProperty("normalIconOff", normalIconOff);
+    setProperty("grayIconOff", grayIconOff);
+
     updateIcons(state);
 
     connect(this, &QPushButton::clicked, this, &ToolbarToggleButton::onButtonToggled);
@@ -133,4 +169,21 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
             "}"
         );
     }
+}
+
+void ToolbarToggleButton::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange) {
+        if(isChecked()){
+            setIcon(isEnabled()
+                    ? property("normalIconOn").value<QIcon>()
+                    : property("grayIconOn").value<QIcon>());
+        }
+        else{
+            setIcon(isEnabled()
+                    ? property("normalIconOff").value<QIcon>()
+                    : property("grayIconOff").value<QIcon>());
+        }
+    }
+    QPushButton::changeEvent(event);
 }

@@ -30,6 +30,7 @@ public:
 
 protected:
     QIcon updateIconColor(QString iconName);
+    void changeEvent(QEvent *event) override;
 
 
 signals:

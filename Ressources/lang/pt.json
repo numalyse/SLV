@@ -397,5 +397,7 @@
     "messagebox_format_not_accepted" : "Um dos arquivos selecionados possui um formato não suportado.",
 
     "tooltip_playlist_button" : "Abrir playlist",
-    "tooltip_shot_detail_button" : "Abrir informações do plano"
+    "tooltip_shot_detail_button" : "Abrir informações do plano",
+
+    "messagebox_fullscreen_experimental" : "O recurso de tela cheia do software está atualmente em desenvolvimento."
 }

@@ -397,5 +397,7 @@
     "messagebox_format_not_accepted" : "Uno de los archivos seleccionados tiene un formato no compatible.",
 
     "tooltip_playlist_button" : "Abrir lista de reproducción",
-    "tooltip_shot_detail_button" : "Abrir información del plano"
+    "tooltip_shot_detail_button" : "Abrir información del plano",
+
+    "messagebox_fullscreen_experimental" : "La función de pantalla completa del software está actualmente en desarrollo."
 }

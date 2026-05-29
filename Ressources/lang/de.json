@@ -396,5 +396,7 @@
     "messagebox_format_not_accepted" : "Eine der ausgewählten Dateien hat ein nicht unterstütztes Format.",
 
     "tooltip_playlist_button" : "Wiedergabeliste öffnen",
-    "tooltip_shot_detail_button" : "Shot-Informationen öffnen"
+    "tooltip_shot_detail_button" : "Shot-Informationen öffnen",
+
+    "messagebox_fullscreen_experimental" : "Die Vollbildfunktion der Software befindet sich derzeit in Entwicklung."
 }

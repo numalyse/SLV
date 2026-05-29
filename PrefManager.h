@@ -66,6 +66,9 @@ public:
     /// @return True if successfully written to, false otherwise  
     bool writeUserJson();
 
+    /// @brief Returns the currently loaded language code
+    QString getLangCode() const;
+
 private:
     /// @brief Creates the preference file in SLV Contents
     /// @return True if successfully created, false otherwise 
@@ -81,11 +84,12 @@ private:
     /// sets the paths if they are empty and writes to the json if m_userPrefs was modified 
     void syncUserPrefs();
 
-    PrefManager() {} ;
+    PrefManager() : m_currentLangCode("en") {} ;
 
     QJsonObject m_texts;
     QJsonObject m_userPrefs;
     QJsonObject m_defaultPrefs;
+    QString m_currentLangCode;
 };
 
 #endif

@@ -591,8 +591,12 @@ namespace ProjectExportHelper {
             return false;
         }
 
+        QString shot_name = PrefManager::instance().getText("shot");
+        QString start_time_name = PrefManager::instance().getText("shot_detail_end_time_name");
+        QString duration_time_name = PrefManager::instance().getText("shot_detail_duration_time_name");
+
         QStringList arguments;
-        arguments << scriptPath << jsonFile.fileName();
+        arguments << scriptPath << jsonFile.fileName() << shot_name << start_time_name << duration_time_name;
         pythonProcess.start(pythonExe, arguments);
 
         // Boucle d'attente active pour lire la progression en temps réel

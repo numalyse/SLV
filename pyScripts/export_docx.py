@@ -22,21 +22,29 @@ def format_time(time_val):
     return f"{h:02d}:{m:02d}:{s:02d}:{f:02d}"
 
 def main():
-    # 1. Vérification des arguments
-    if len(sys.argv) < 2:
-        print("Erreur: Chemin du fichier JSON manquant.")
+    if len(sys.argv) < 3:
+        print("Erreur: Chemin d'un des fichiers JSON manquant.")
         sys.exit(1)
 
-    json_path = sys.argv[1]
+    data_json_path = sys.argv[1]
+    #lang_json_path = sys.argv[2]
+    shot_name = sys.argv[2]
+    start_time_name = sys.argv[3]
+    duration_time_name = sys.argv[4]
     
-    # 2. Lecture du fichier JSON
-    with open(json_path, 'r', encoding='utf-8') as f:
+    with open(data_json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
     temp_dir = data['tempDir']
     dst_path = data['dstPath']
-    
-    # Assurer la bonne extension
+
+    #with open(lang_json_path, 'r', encoding='utf-8') as f:
+    #    lang = json.load(f)
+
+    #shot_name = lang['shot']
+    # start_time_name = lang['shot_detail_end_time_name']
+    # duration_time_name = lang['shot_detail_duration_time_name']
+
     if not dst_path.endswith('.docx'):
         dst_path += '.docx'
 
@@ -61,9 +69,9 @@ def main():
         for idx, shot in enumerate(shots):
             time_str = format_time(shot.get('start', 0))
             end_str = format_time(shot.get('duration', 0))
-            plan_title = shot.get('title', f"Plan {idx+1}")
+            plan_title = shot.get('title', f"{shot_name} {idx+1}")
             
-            heading_text = f"- [Plan {idx+1}] {plan_title} -> Début : {time_str} / Durée : {end_str}"
+            heading_text = f"- [{shot_name} {idx+1}] {plan_title} -> {start_time_name} : {time_str} / {duration_time_name} : {end_str}"
             heading = doc.add_heading(heading_text, level=2)
             
             run_heading = heading.runs[0]

@@ -180,5 +180,7 @@
         <file alias="playlist_white">icons/playlist_white.png</file>
         <file alias="shot_detail">icons/shot_detail.png</file>
         <file alias="shot_detail_white">icons/shot_detail_white.png</file>
+        <file alias="image_preview">icons/image_preview.png</file>
+        <file alias="image_preview_white">icons/image_preview_white.png</file>
     </qresource>
 </RCC>

@@ -394,6 +394,8 @@
     "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en compte.",
 
     "tooltip_playlist_button" : "Ouvrir la playlist",
-    "tooltip_shot_detail_button" : "Ouvrir les informations du plan"
+    "tooltip_shot_detail_button" : "Ouvrir les informations du plan",
+
+    "messagebox_fullscreen_experimental" : "La fonctionnalité de plein écran du logiciel est en cours de développement."
 
 }

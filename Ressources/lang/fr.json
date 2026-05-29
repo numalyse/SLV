@@ -122,6 +122,8 @@
     "shot_detail_note_name" : "Note",
     
     "shot_detail_id_text" : "Plan n°",
+    "shot" : "Plan",
+    "number_of_shots" : "Nombre total de plans",
 
     "compo_rule_None" : "Aucun",
     "compo_rule_RuleOfThirds" : "Tiers",

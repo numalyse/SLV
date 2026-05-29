@@ -122,6 +122,8 @@
     "shot_detail_note_name" : "Nota",
 
     "shot_detail_id_text" : "Plano n.º",
+    "shot" : "Plano",
+    "number_of_shots" : "Número total de planos",
 
     "compo_rule_None" : "Ninguno",
     "compo_rule_RuleOfThirds" : "Regla de los tercios",

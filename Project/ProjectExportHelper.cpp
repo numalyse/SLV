@@ -250,8 +250,8 @@ namespace ProjectExportHelper {
         QTextStream out(&file);
         out.setEncoding(QStringConverter::Utf8);
 
-        out << "=== Etude cinematographique ===\n\n";
-        out << "Nombre total de plans : " << shots.size() << "\n\n";
+        out << "=== " << "Étude cinématographique" << " ===\n\n";
+        out << PrefManager::instance().getText("number_of_shots") << " : " << shots.size() << "\n\n";
 
         int totalShots = shots.size();
 
@@ -263,8 +263,9 @@ namespace ProjectExportHelper {
             QString timeStr = TimeFormatter::msToHHMMSSFF(shot.start, fps);
             QString endStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
 
-            out << "- [Plan " << (IShot + 1) << "] " << shot.title 
-                << " -> Debut : " << timeStr << " / Duree : " << endStr << "\n";
+            out << "- [" << PrefManager::instance().getText("shot") << " " << (IShot + 1) << "] " << shot.title 
+                << " -> "<< PrefManager::instance().getText("shot_detail_start_time_name") <<" : " << timeStr 
+                << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << endStr << "\n";
 
             if (!shot.note.trimmed().isEmpty()) {
                 out << shot.note.trimmed() << "\n"; 
@@ -428,8 +429,14 @@ namespace ProjectExportHelper {
             QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
             QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
 
-            QString planHeader = QString("- [Plan %1] %2 -> Début : %3 / Durée : %4")
-                                        .arg(currentShot + 1).arg(shot.title).arg(start).arg(shotDuration);
+            QString planHeader = QString("- [%1 %2] %3 -> %4 : %5 / %6 : %7")
+                                        .arg(PrefManager::instance().getText("shot"))
+                                        .arg(currentShot + 1)
+                                        .arg(shot.title)
+                                        .arg(PrefManager::instance().getText("shot_detail_start_time_name"))
+                                        .arg(start)
+                                        .arg(PrefManager::instance().getText("shot_detail_duration_time_name"))
+                                        .arg(shotDuration);
             
             cursor.insertBlock(leftAlignment);
             cursor.insertText(planHeader, subtitleFormat);
@@ -702,14 +709,16 @@ namespace ProjectExportHelper {
                  // Récupère le temps et l'id du plan comprenant imgData.timeMs
                 currentShot = findShotIndexAtTime(shots, imgData.timeMs);
                 if(currentShot == -1){ // Si pas de temps trouvé, le text devient vide
-                    qDebug() << "Impossible de trouver un plan qui comprends : " << imgData.timeMs << "garde le textPrecende";
+                    qDebug() << "Impossible de trouver un plan qui comprend : " << imgData.timeMs << "garde le textPrecende";
                     wrappedText.clear();
                     textOverlay.fill(Qt::transparent); 
                 }else { // Le texte est mis à jour avec les infos du nouveau plan
                     auto& s = shots[currentShot];
                     endShotTime = s.end;
-                    QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;
-                    QString timecodeTxt = "Début : " + TimeFormatter::msToHHMMSSFF(s.start, fps) + " / Durée : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
+                    QString shotTitleTxt = "["+ PrefManager::instance().getText("shot") + " " + QString::number(currentShot+1) + "] " + s.title;
+                    QString timecodeTxt = PrefManager::instance().getText("shot_detail_start_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps) 
+                                        + " / "
+                                        + PrefManager::instance().getText("shot_detail_duration_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
                     QString noteTxt = s.note;
                     wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width, fontSize);
                     textOverlay.fill(Qt::transparent); 

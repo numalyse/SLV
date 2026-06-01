@@ -208,63 +208,62 @@ void AdvancedToolbar::setDefaultUI()
 {
     Toolbar::setDefaultUI();
     
-    m_extensionToolbar->getSegmBtn()->setDisabled(false);
+    delete layout();
 
-    if ( !layout() ) {
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(5,5,5,5);
+    mainLayout->setSpacing(1);
 
-        QVBoxLayout* mainLayout = new QVBoxLayout(this);
-        mainLayout->setContentsMargins(5,5,5,5);
-        mainLayout->setSpacing(1);
+    if(m_nameLabel) m_nameLabel->hide();
 
-        m_nameLabel->hide();
+    QHBoxLayout* timecodeLayout = new QHBoxLayout();
+    timecodeLayout->addWidget(m_timeEdit);
+    timecodeLayout->addWidget(m_slider, 1);
+    timecodeLayout->addWidget(m_durationBtn);
+    mainLayout->addLayout(timecodeLayout);
 
-        QHBoxLayout* timecodeLayout = new QHBoxLayout();
-        timecodeLayout->addWidget(m_timeEdit);
-        timecodeLayout->addWidget(m_slider, 1);
-        timecodeLayout->addWidget(m_durationBtn);
-        mainLayout->addLayout(timecodeLayout);
 
-        QHBoxLayout* buttonLayout = new QHBoxLayout();
-        buttonLayout->setContentsMargins(0,0,0,0);
-        buttonLayout->setSpacing(1);
-        buttonLayout->addWidget(m_muteBtn);
-        buttonLayout->addWidget(m_langBtn);
-        buttonLayout->addWidget(m_mediaInfoBtn);
-        buttonLayout->addSpacing(m_speedBtn->width()+1);
-        buttonLayout->addSpacing(m_speedBtn->width()+1);
-        buttonLayout->addSpacing(m_speedBtn->width()+1);
-        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
+    QGridLayout* buttonLayout = new QGridLayout();
+    buttonLayout->setContentsMargins(0,0,0,0);
+    buttonLayout->setSpacing(0);
 
-        buttonLayout->addStretch();
+    QHBoxLayout* leftLayout = new QHBoxLayout();
+    leftLayout->setSpacing(1);
+    leftLayout->addWidget(m_muteBtn);
+    leftLayout->addWidget(m_langBtn);
+    leftLayout->addWidget(m_mediaInfoBtn);
 
-        buttonLayout->addWidget(m_speedBtn);
-        buttonLayout->addWidget(m_stopBtn);
-        buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_playPauseBtn);
-        buttonLayout->addWidget(m_nextMediaBtn);
-        buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addWidget(m_loopBtn);
-        buttonLayout->addWidget(m_speedBtn);
-        buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_stopBtn);
-        buttonLayout->addWidget(m_playPauseBtn);
-        buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addWidget(m_nextMediaBtn);
-        buttonLayout->addWidget(m_loopBtn);
+    QHBoxLayout* centerLayout = new QHBoxLayout();
+    centerLayout->setSpacing(1);
+    centerLayout->addWidget(m_speedBtn);
+    centerLayout->addWidget(m_prevMediaBtn);
+    centerLayout->addWidget(m_stopBtn);
+    centerLayout->addWidget(m_playPauseBtn);
+    centerLayout->addWidget(m_ejectBtn);
+    centerLayout->addWidget(m_nextMediaBtn);
+    centerLayout->addWidget(m_loopBtn);
 
-        buttonLayout->addStretch();
+    QHBoxLayout* rightLayout = new QHBoxLayout();
+    rightLayout->setSpacing(1);
+    rightLayout->addWidget(m_zoomIndicator);
+    rightLayout->addWidget(m_zoomBtn);
+    rightLayout->addWidget(m_screenshotBtn);
+    rightLayout->addWidget(m_extractSequenceBtn);
+    rightLayout->addWidget(m_duplicatePlayerBtn);
+    rightLayout->addWidget(m_fullscreenBtn);
+    rightLayout->addWidget(m_extensionBtn);
 
-        buttonLayout->addWidget(m_zoomIndicator);
-        buttonLayout->addWidget(m_zoomBtn);
-        buttonLayout->addWidget(m_screenshotBtn);
-        buttonLayout->addWidget(m_extractSequenceBtn);
-        buttonLayout->addWidget(m_duplicatePlayerBtn);
-        buttonLayout->addWidget(m_fullscreenBtn);
-        buttonLayout->addWidget(m_extensionBtn);
-        mainLayout->addLayout(buttonLayout);
+    buttonLayout->addLayout(leftLayout, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
+    buttonLayout->addLayout(centerLayout, 0, 1, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonLayout->addLayout(rightLayout, 0, 2, Qt::AlignRight | Qt::AlignVCenter);
 
-        mainLayout->addWidget(m_extensionToolbar);
-    }
+    buttonLayout->setColumnStretch(0, 1);
+    buttonLayout->setColumnStretch(1, 0);
+    buttonLayout->setColumnStretch(2, 1);
+
+    mainLayout->addLayout(buttonLayout);
+
+    mainLayout->addWidget(m_extensionToolbar);
 }
 
 

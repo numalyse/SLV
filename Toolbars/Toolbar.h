@@ -187,35 +187,6 @@ protected:
         setWindowOpacity(0.01); 
     }
 
-    QShortcut* m_dynamicFullscreenShortcut = nullptr;
-
-    bool m_isFullscreen = false;
-    QWidget* m_parent = nullptr;
-
-    void moveOnTopOfParent(){
-        if (m_parent && m_isFullscreen) {
-            QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
-            int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
-            int posY = parentGlobalPos.y() + m_parent->height() - this->height() - 20;
-            move(posX, posY);
-        }
-    }
-
-    void addEnterFullscreenShortcut(){
-        if(m_dynamicFullscreenShortcut){
-            delete m_dynamicFullscreenShortcut;
-        }
-        QString keyString = PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "enter_fullscreen");
-        m_dynamicFullscreenShortcut = SLV::createGlobalButtonShortcut(this, keyString, m_fullscreenBtn,  false);
-    }
-
-    void enterEvent(QEnterEvent *event) override {
-        setWindowOpacity(1.0); 
-    }
-
-    void leaveEvent(QEvent *event) override {
-        setWindowOpacity(0.01); 
-    }
 
 signals:
     void playRequest();

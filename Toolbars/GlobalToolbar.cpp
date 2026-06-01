@@ -53,29 +53,42 @@ void GlobalToolbar::setDefaultUI()
 {
     Toolbar::setDefaultUI();
 
-    if( !layout() ){
+    delete layout();
 
-        QVBoxLayout* mainLayout = new QVBoxLayout(this);
-        mainLayout->setContentsMargins(0,0,0,0);
-        mainLayout->setSpacing(1);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(1);
 
-        QHBoxLayout* buttonLayout = new QHBoxLayout();
-        buttonLayout->setContentsMargins(5,5,5,5);
-        buttonLayout->setSpacing(1);
-        buttonLayout->addWidget(m_muteBtn);
-        buttonLayout->addSpacing(m_muteBtn->width()+1);
-        buttonLayout->addSpacing(m_muteBtn->width()+1);
-        buttonLayout->addStretch();
-        buttonLayout->addWidget(m_stopBtn);
-        buttonLayout->addWidget(m_playPauseBtn);
-        buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addStretch();
-        buttonLayout->addWidget(m_zoomBtn);
-        buttonLayout->addWidget(m_screenshotBtn);
-        buttonLayout->addWidget(m_fullscreenBtn);
+    QGridLayout* buttonLayout = new QGridLayout();
+    buttonLayout->setContentsMargins(5,5,5,5);
+    buttonLayout->setSpacing(0);
 
-        mainLayout->addLayout(buttonLayout);
-    }
+    QHBoxLayout* leftLayout = new QHBoxLayout();
+    leftLayout->setSpacing(1);
+    leftLayout->addWidget(m_muteBtn);
+
+    QHBoxLayout* centerLayout = new QHBoxLayout();
+    centerLayout->setSpacing(1);
+    centerLayout->addWidget(m_stopBtn);
+    centerLayout->addWidget(m_playPauseBtn);
+    centerLayout->addWidget(m_ejectBtn);
+
+
+    QHBoxLayout* rightLayout = new QHBoxLayout();
+    rightLayout->setSpacing(1);
+    rightLayout->addWidget(m_zoomBtn);
+    rightLayout->addWidget(m_screenshotBtn);
+    rightLayout->addWidget(m_fullscreenBtn);
+
+    buttonLayout->addLayout(leftLayout, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
+    buttonLayout->addLayout(centerLayout, 0, 1, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonLayout->addLayout(rightLayout, 0, 2, Qt::AlignRight | Qt::AlignVCenter);
+
+    buttonLayout->setColumnStretch(0, 1); 
+    buttonLayout->setColumnStretch(1, 0); 
+    buttonLayout->setColumnStretch(2, 1); 
+
+    mainLayout->addLayout(buttonLayout);
 }
 
 void GlobalToolbar::enableButtons()

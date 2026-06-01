@@ -272,11 +272,11 @@ namespace ProjectExportHelper {
             int64_t shotDuration = shot.end - shot.start;
 
             QString timeStr = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString endStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
+            QString durStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
 
             out << "- [" << PrefManager::instance().getText("shot") << " " << (IShot + 1) << "] " << shot.title 
                 << " -> "<< PrefManager::instance().getText("shot_detail_start_time_name") <<" : " << timeStr 
-                << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << endStr << "\n";
+                << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << durStr << "\n";
 
             if (!shot.note.trimmed().isEmpty()) {
                 out << shot.note.trimmed() << "\n"; 
@@ -603,7 +603,7 @@ namespace ProjectExportHelper {
         }
 
         QString shot_name = PrefManager::instance().getText("shot");
-        QString start_time_name = PrefManager::instance().getText("shot_detail_end_time_name");
+        QString start_time_name = PrefManager::instance().getText("shot_detail_start_time_name");
         QString duration_time_name = PrefManager::instance().getText("shot_detail_duration_time_name");
 
         QStringList arguments;

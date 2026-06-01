@@ -163,6 +163,8 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
         updateTimelineGeometry();
 
     }
+
+    ProjectManager::instance().setSaveNeeded();
 }
 
 TimelineWidget::~TimelineWidget()

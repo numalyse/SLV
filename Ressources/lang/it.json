@@ -151,7 +151,7 @@
     "main_window_menu_bar_file": "File",
     "main_window_file_open_media_action": "Apri file multimediali",
     "main_window_file_open_project_action": "Apri progetto",
-    "main_window_file_save_project_action": "Salva",
+    "main_window_file_save_project_action": "Salva il progetto",
     "project_manager_open_project_dialog" : "Apri progetto",
 
     "main_window_menu_bar_option" : "Opzioni",

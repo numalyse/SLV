@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QEnterEvent>
 #include <QLayout>
+#include <QPainter>
 #include "PrefManager.h"
 #include "SignalManager.h"
 
@@ -20,6 +21,7 @@ Q_OBJECT
 public:
 
     explicit Toolbar(QWidget* parent = nullptr) : QWidget(parent) {
+        setAttribute(Qt::WA_TranslucentBackground);
         m_playPauseBtn = new ToolbarToggleButton(
             this,
             true,
@@ -87,21 +89,17 @@ public:
     /// @brief Met à jour le layout pour afficher l'interface en plein écran
     virtual void setFullscreenUI() {
         m_isFullscreen = true;
-
         setParent(nullptr);
-
+        setAttribute(Qt::WA_TranslucentBackground); // 👈 ajout
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-        //adjustSize();
-        int targetWidth = width()/2.5;  
+        int targetWidth = width() / 2.5;
         resize(targetWidth, sizeHint().height());
         moveOnTopOfParent();
         show();
         raise();
         QWidget::activateWindow();
-
         setWindowOpacity(0.01);
-
-    };
+    }
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
     virtual void setDefaultUI(){
@@ -185,6 +183,16 @@ protected:
 
     void leaveEvent(QEvent *event) override {
         setWindowOpacity(0.01); 
+    }
+
+    void paintEvent(QPaintEvent *event) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(30, 30, 30, 255));
+        if( m_isFullscreen ) painter.drawRoundedRect(rect(), 12, 12);
+        else painter.drawRect(rect()); // pas de bords arrondies en mode normal
+        QWidget::paintEvent(event);
     }
 
 

@@ -507,6 +507,7 @@ void ProjectManager::exportProject(){
     });
 
     connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog, selectedPath, this](bool success) {
+        disconnect(progressDialog, &QProgressDialog::canceled, nullptr, nullptr);
         if (success) {
             qDebug() << "Export réussi";
             QMessageBox *msg = new QMessageBox();
@@ -522,7 +523,6 @@ void ProjectManager::exportProject(){
             msg->setIcon(QMessageBox::Information);
             msg->adjustSize();
             msg->exec();
-            return;
         }else {
             qDebug() << "Export annulé ou erreur";
             QMessageBox *msg = new QMessageBox();
@@ -531,7 +531,6 @@ void ProjectManager::exportProject(){
             msg->setIcon(QMessageBox::Information);
             msg->adjustSize();
             msg->exec();
-            return;
         }
         progressDialog->close(); 
         progressDialog->deleteLater(); 

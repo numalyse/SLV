@@ -14,6 +14,8 @@
 #include <QIcon>
 #include <QVariant>
 #include <QShortcut>
+#include <QGuiApplication>
+#include <QStyleHints>
 
 
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
@@ -135,7 +137,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_CenterCross"), QVariant::fromValue(OverlayMode::CenterCross));
     m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_Diagonals"), QVariant::fromValue(OverlayMode::Diagonals));
     m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_L_Shape"), QVariant::fromValue(OverlayMode::L_Shape));
-    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_GoldenRatio"), QVariant::fromValue(OverlayMode::GoldenRatio));
+    // m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_GoldenRatio"), QVariant::fromValue(OverlayMode::GoldenRatio));
 
     connect(m_compoRuleComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExtensionToolbar::updateOverlayMode);
 
@@ -143,8 +145,11 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     m_compoRuleCheckboxHFlip = new QCheckBox(this); 
     m_compoRuleCheckboxVFlip = new QCheckBox(this);
-    m_compoRuleCheckboxVFlip->setIcon(QIcon(":/icons/invert_v_white"));
-    m_compoRuleCheckboxHFlip->setIcon(QIcon(":/icons/invert_h_white"));
+
+    QString userTheme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
+
+    m_compoRuleCheckboxVFlip->setIcon(QIcon(":/icons/invert_v" + userTheme));
+    m_compoRuleCheckboxHFlip->setIcon(QIcon(":/icons/invert_h" + userTheme));
     m_compoRuleCheckboxVFlip->setIconSize(QSize(20, 20));
     m_compoRuleCheckboxHFlip->setIconSize(QSize(20, 20));
     m_compoRuleCheckboxHFlip->setToolTip(PrefManager::instance().getText("tooltip_compo_rule_VFlip"));

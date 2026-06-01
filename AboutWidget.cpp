@@ -28,7 +28,7 @@ AboutWidget::AboutWidget(QWidget *parent)
     QLabel *version = new QLabel(
                                 "<i>V1.0-alpha (" 
                                 + PrefManager::instance().getText("about_dialog_last_update") 
-                                + "2026-05-07)</i>",
+                                + "2026-06-01)</i>",
                                 this
     );
     version->setAlignment(Qt::AlignCenter);

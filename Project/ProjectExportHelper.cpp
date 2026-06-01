@@ -214,7 +214,18 @@ namespace  {
 
         qDebug() << "[export_video] Démarrage du mixage FFmpeg...";
 
-        ffmpegProcess.start("ffmpeg", arguments);
+        QString appDir = QCoreApplication::applicationDirPath();
+        QString ffmpegExe;
+#if defined(Q_OS_WIN)
+        ffmpegExe = appDir + "/bin/ffmpeg.exe";
+#elif defined(Q_OS_MAC)
+        ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
+#else
+        ffmpegExe = appDir + "/bin/ffmpeg";
+#endif
+
+        ffmpegProcess.start(ffmpegExe, arguments);
+        //ffmpegProcess.start(QString(FFMPEG_EXECUTABLE), arguments);
 
         if (!ffmpegProcess.waitForStarted()) {
             qCritical() << "Impossible de lancer FFmpeg.";

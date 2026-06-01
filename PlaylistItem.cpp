@@ -272,7 +272,18 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
          << "-vcodec" << "png"   
          << "-";                 
 
-    ffmpeg.start("ffmpeg", args);
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString ffmpegExe;
+#if defined(Q_OS_WIN)
+    ffmpegExe = appDir + "/bin/ffmpeg.exe";
+#elif defined(Q_OS_MAC)
+    ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
+#else
+    ffmpegExe = appDir + "/bin/ffmpeg";
+#endif
+
+    ffmpeg.start(ffmpegExe, args);
+    //ffmpeg.start(QString(FFMPEG_EXECUTABLE), args);
     ffmpeg.waitForFinished(-1);
 
     QByteArray imageData = ffmpeg.readAllStandardOutput();

@@ -280,6 +280,17 @@ if(WIN32)
         "${FFMPEG_DIR}/lib/swscale.lib"
     )
 
+    # Expose the bundled ffmpeg executable path to the C++ code
+    if(WIN32)
+        set(FFMPEG_EXE_SUFFIX ".exe")
+    else()
+        set(FFMPEG_EXE_SUFFIX "")
+    endif()
+
+    set(FFMPEG_EXECUTABLE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/bin/ffmpeg${FFMPEG_EXE_SUFFIX}")
+
+    target_compile_definitions(SLV PRIVATE "FFMPEG_EXECUTABLE=\"${FFMPEG_EXECUTABLE_PATH}\"")
+
 elseif(APPLE)
 
     # =====================================================

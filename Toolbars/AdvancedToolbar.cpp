@@ -204,69 +204,57 @@ void AdvancedToolbar::setFullscreenUI()
     m_extensionToolbar->getSegmBtn()->setDisabled(true);
 }
 
+
 void AdvancedToolbar::setDefaultUI()
 {
-    Toolbar::setDefaultUI();
-    
-    m_extensionToolbar->getSegmBtn()->setDisabled(false);
+    delete layout();
 
-    if ( !layout() ) {
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(5,5,5,5);
+    mainLayout->setSpacing(1);
 
-        QVBoxLayout* mainLayout = new QVBoxLayout(this);
-        mainLayout->setContentsMargins(5,5,5,5);
-        mainLayout->setSpacing(1);
+    m_nameLabel->hide();
 
-        m_nameLabel->hide();
+    QHBoxLayout* timecodeLayout = new QHBoxLayout();
+    timecodeLayout->addWidget(m_timeEdit);
+    timecodeLayout->addWidget(m_slider, 1);
+    timecodeLayout->addWidget(m_durationBtn);
+    mainLayout->addLayout(timecodeLayout);
 
-        QHBoxLayout* timecodeLayout = new QHBoxLayout();
-        timecodeLayout->addWidget(m_timeEdit);
-        timecodeLayout->addWidget(m_slider, 1);
-        timecodeLayout->addWidget(m_durationBtn);
-        mainLayout->addLayout(timecodeLayout);
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->setContentsMargins(0,0,0,0);
+    buttonLayout->setSpacing(1);
+    buttonLayout->addWidget(m_muteBtn);
+    buttonLayout->addWidget(m_langBtn);
+    buttonLayout->addWidget(m_mediaInfoBtn);
+    buttonLayout->addSpacing(m_speedBtn->width()+1);
+    buttonLayout->addSpacing(m_speedBtn->width()+1);
+    buttonLayout->addSpacing(m_speedBtn->width()+1);
+    buttonLayout->addSpacing(m_zoomIndicator->width()+1);
 
-        QHBoxLayout* buttonLayout = new QHBoxLayout();
-        buttonLayout->setContentsMargins(0,0,0,0);
-        buttonLayout->setSpacing(1);
-        buttonLayout->addWidget(m_muteBtn);
-        buttonLayout->addWidget(m_langBtn);
-        buttonLayout->addWidget(m_mediaInfoBtn);
-        buttonLayout->addSpacing(m_speedBtn->width()+1);
-        buttonLayout->addSpacing(m_speedBtn->width()+1);
-        buttonLayout->addSpacing(m_speedBtn->width()+1);
-        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
+    buttonLayout->addStretch();
 
-        buttonLayout->addStretch();
+    buttonLayout->addWidget(m_speedBtn);
+    buttonLayout->addWidget(m_prevMediaBtn);
+    buttonLayout->addWidget(m_stopBtn);
+    buttonLayout->addWidget(m_playPauseBtn);
+    buttonLayout->addWidget(m_ejectBtn);
+    buttonLayout->addWidget(m_nextMediaBtn);
+    buttonLayout->addWidget(m_loopBtn);
 
-        buttonLayout->addWidget(m_speedBtn);
-        buttonLayout->addWidget(m_stopBtn);
-        buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_playPauseBtn);
-        buttonLayout->addWidget(m_nextMediaBtn);
-        buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addWidget(m_loopBtn);
-        buttonLayout->addWidget(m_speedBtn);
-        buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_stopBtn);
-        buttonLayout->addWidget(m_playPauseBtn);
-        buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addWidget(m_nextMediaBtn);
-        buttonLayout->addWidget(m_loopBtn);
+    buttonLayout->addStretch();
 
-        buttonLayout->addStretch();
+    buttonLayout->addWidget(m_zoomIndicator);
+    buttonLayout->addWidget(m_zoomBtn);
+    buttonLayout->addWidget(m_screenshotBtn);
+    buttonLayout->addWidget(m_extractSequenceBtn);
+    buttonLayout->addWidget(m_duplicatePlayerBtn);
+    buttonLayout->addWidget(m_fullscreenBtn);
+    buttonLayout->addWidget(m_extensionBtn);
+    mainLayout->addLayout(buttonLayout);
 
-        buttonLayout->addWidget(m_zoomIndicator);
-        buttonLayout->addWidget(m_zoomBtn);
-        buttonLayout->addWidget(m_screenshotBtn);
-        buttonLayout->addWidget(m_extractSequenceBtn);
-        buttonLayout->addWidget(m_duplicatePlayerBtn);
-        buttonLayout->addWidget(m_fullscreenBtn);
-        buttonLayout->addWidget(m_extensionBtn);
-        mainLayout->addLayout(buttonLayout);
-
-        mainLayout->addWidget(m_extensionToolbar);
-    }
+    mainLayout->addWidget(m_extensionToolbar);
 }
-
 
 void AdvancedToolbar::enableButtons()
 {

@@ -86,7 +86,7 @@ private:
     QCheckBox* m_compoRuleCheckboxVFlip;
     QCheckBox* m_compoRuleCheckboxHFlip;
 
-    QVector<QShortcut*> m_extensionShortcuts;
+    QVector<QShortcut*> m_globalShortcuts;
 
 signals:
     void enableRecordRequested();

@@ -568,7 +568,19 @@ void TimelineWidget::computeMediaAmplitudes(const QString &mediaPath)
         initAudioVisualizer();
     });
 
-    m_audioComputeProcess->start("ffmpeg", args);
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString ffmpegExe;
+#if defined(Q_OS_WIN)
+    ffmpegExe = appDir + "/bin/ffmpeg.exe";
+#elif defined(Q_OS_MAC)
+    ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
+#else
+    ffmpegExe = appDir + "/bin/ffmpeg";
+#endif
+
+    m_audioComputeProcess->start(ffmpegExe, args);
+    //m_audioComputeProcess->start(QString(FFMPEG_EXECUTABLE), args);
+
 }
 
 void TimelineWidget::initAudioVisualizer()

@@ -1,7 +1,7 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarToggleButton.h"
-
-
+#include <QStyleHints>
+#include <QGuiApplication>
 
 ToolbarToggleButton::ToolbarToggleButton(
     QWidget *parent, 
@@ -21,21 +21,89 @@ ToolbarToggleButton::ToolbarToggleButton(
     setChecked(state);
 
     // setIconSize(QSize(12,30));
+    if (iconSize() == QSize(512, 512))
+    {
+        setIconSize(QSize(16, 16));
+    }
     setFixedSize(30, 30);
+
+    QImage gray_imgOn = QImage(m_iconPathOn);
+
+    for (int y = 0; y < gray_imgOn.height(); ++y) {
+        for (int x = 0; x < gray_imgOn.width(); ++x) {
+            QColor c = gray_imgOn.pixelColor(x, y);
+
+            if (c.alpha() > 0) {
+                c.setRgb(64, 64, 64);
+                gray_imgOn.setPixelColor(x, y, c);
+            }
+        }
+    }
+
+    QImage gray_imgOff = QImage(m_iconPathOff);
+
+    for (int y = 0; y < gray_imgOff.height(); ++y) {
+        for (int x = 0; x < gray_imgOff.width(); ++x) {
+            QColor c = gray_imgOff.pixelColor(x, y);
+
+            if (c.alpha() > 0) {
+                c.setRgb(64, 64, 64);
+                gray_imgOff.setPixelColor(x, y, c);
+            }
+        }
+    }
+
+    QIcon normalIconOn((QPixmap(m_iconPathOn)));
+    QIcon grayIconOn(QPixmap::fromImage(gray_imgOn));
+    QIcon normalIconOff((QPixmap(m_iconPathOff)));
+    QIcon grayIconOff(QPixmap::fromImage(gray_imgOff));
+
+    setProperty("normalIconOn", normalIconOn);
+    setProperty("grayIconOn", grayIconOn);
+    setProperty("normalIconOff", normalIconOff);
+    setProperty("grayIconOff", grayIconOff);
 
     updateIcons(state);
 
     connect(this, &QPushButton::clicked, this, &ToolbarToggleButton::onButtonToggled);
 }
 
+QIcon ToolbarToggleButton::updateIconColor(QString iconName){
+    QPixmap pix(iconName);
+
+    QImage img = pix.toImage();
+
+    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark)
+    {
+        for (int y = 0; y < img.height(); ++y)
+        {
+            for (int x = 0; x < img.width(); ++x)
+            {
+                QColor c = img.pixelColor(x, y);
+
+                if (c.alpha() > 0)
+                {
+                    c.setRgb(0, 0, 0);
+                    c.setAlpha(255);
+                    img.setPixelColor(x, y, c);
+                }
+            }
+        }
+    }
+
+    return QIcon(QPixmap::fromImage(img));
+}
+
 
 void ToolbarToggleButton::updateIcons(bool checked)
 {
     if (checked) {
-        setIcon(QIcon(m_iconPathOn));
+        //setIcon(QIcon(m_iconPathOn));
+        setIcon(updateIconColor(m_iconPathOn));
         setToolTip(m_toolTipTextOn);
     } else {
-        setIcon(QIcon(m_iconPathOff));
+        //setIcon(QIcon(m_iconPathOff));
+        setIcon(updateIconColor(m_iconPathOff));
         setToolTip(m_toolTipTextOff);
     }
 }
@@ -43,11 +111,13 @@ void ToolbarToggleButton::updateIcons(bool checked)
 void ToolbarToggleButton::toggleUpdateIcon()
 {
     if(isChecked()){
-        setIcon(QIcon(m_iconPathOn));
+        //setIcon(QIcon(m_iconPathOn));
+        setIcon(updateIconColor(m_iconPathOn));
         setToolTip(m_toolTipTextOn);
     }
     else{
-        setIcon(QIcon(m_iconPathOff));
+        //setIcon(QIcon(m_iconPathOff));
+        setIcon(updateIconColor(m_iconPathOff));
         setToolTip(m_toolTipTextOff);
     }
 }
@@ -72,6 +142,7 @@ void ToolbarToggleButton::setButtonState(bool state)
 void ToolbarToggleButton::setToggledIconFrame(bool framed)
 {
     if(framed){
+        QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "rgba(240,240,240,1);" : "rgba(0,0,0,1);";
         setStyleSheet(
             "ToolbarToggleButton{"
             "   background-color: rgba(0,0,0,0);"
@@ -85,12 +156,12 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
             "}"
             "ToolbarToggleButton:checked{"
             // "   background-color: palette(button);"
-            "   border: 1px solid rgba(240,240,240,1);"
+            "   border: 1px solid " + color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:checked:hover{"
             // "   background-color: palette(button);"
-            "   border: 1px solid rgba(240,240,240,1);"
+            "   border: 1px solid " + color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:disabled{"
@@ -98,4 +169,21 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
             "}"
         );
     }
+}
+
+void ToolbarToggleButton::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange) {
+        if(isChecked()){
+            setIcon(isEnabled()
+                    ? property("normalIconOn").value<QIcon>()
+                    : property("grayIconOn").value<QIcon>());
+        }
+        else{
+            setIcon(isEnabled()
+                    ? property("normalIconOff").value<QIcon>()
+                    : property("grayIconOff").value<QIcon>());
+        }
+    }
+    QPushButton::changeEvent(event);
 }

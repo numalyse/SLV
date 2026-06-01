@@ -4,18 +4,46 @@
 #include <QWidget>
 #include <QTimer>
 #include <QEvent>
-#include <qapplication.h>
-#include <qboxlayout.h>
-#include <qevent.h>
-#include <qframe.h>
-#include <qscreen.h>
-
+#include <QApplication>
+#include <QBoxLayout>
+#include <QEvent>
+#include <QFrame>
+#include <QScreen>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QLayout *layoutToDisplay, const QString &iconName, const QString &toolTipText) : ToolbarButton(parent, iconName, toolTipText)
 {
     Q_ASSERT(layoutToDisplay != nullptr);
 
     setFocusPolicy(Qt::NoFocus);
+
+    if(iconName == ""){
+        setText("Icon");
+    }else {
+        QPixmap pix(ICONS_PATH + iconName);
+
+        QImage img = pix.toImage();
+
+        if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
+            for (int y = 0; y < img.height(); ++y) {
+                for (int x = 0; x < img.width(); ++x) {
+                    QColor c = img.pixelColor(x, y);
+
+                    if (c.alpha() > 0) {
+                        c.setRgb(0, 0, 0);
+                        c.setAlpha(255);
+                        img.setPixelColor(x, y, c);
+                    }
+                }
+            }
+        } 
+
+        QIcon normalIcon(QPixmap::fromImage(img));
+
+        setProperty("normalIcon", normalIcon);
+        setIcon(normalIcon);
+    }
 
     layoutToDisplay->setParent(nullptr);
     // m_widgetToDisplay = widgetToDisplay;
@@ -48,6 +76,60 @@ ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QLayout *layoutToDisplay
     connect(this, &QPushButton::clicked, this, &ToolbarPopupButton::displayPopup);    
 }
 
+ToolbarPopupButton::ToolbarPopupButton(QWidget *parent, QWidget* widgetToDisplay, const QString &iconName, const QString &toolTipText) : ToolbarButton(parent, iconName, toolTipText)
+{
+    Q_ASSERT(widgetToDisplay != nullptr);
+
+    setFocusPolicy(Qt::NoFocus);
+
+    if(iconName == ""){
+        setText("Icon");
+    }else {
+        QPixmap pix(ICONS_PATH + iconName);
+
+        QImage img = pix.toImage();
+
+        if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
+            for (int y = 0; y < img.height(); ++y) {
+                for (int x = 0; x < img.width(); ++x) {
+                    QColor c = img.pixelColor(x, y);
+
+                    if (c.alpha() > 0) {
+                        c.setRgb(0, 0, 0);
+                        c.setAlpha(255);
+                        img.setPixelColor(x, y, c);
+                    }
+                }
+            }
+        } 
+
+        QIcon normalIcon(QPixmap::fromImage(img));
+
+        setProperty("normalIcon", normalIcon);
+        setIcon(normalIcon);
+    }
+
+    widgetToDisplay->setParent(nullptr);
+    m_widgetToDisplay = widgetToDisplay;
+    QWidget* container = new QWidget();
+    container->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowSystemMenuHint);
+    container->setAttribute(Qt::WA_TranslucentBackground);
+    container->setAttribute(Qt::WA_ShowWithoutActivating);
+
+    QHBoxLayout* containerLayout = new QHBoxLayout(container);
+    containerLayout->setContentsMargins(0,0,0,0);
+
+    containerLayout->addWidget(m_widgetToDisplay);
+
+    m_widgetToDisplay->setContentsMargins(6,6,6,6);
+
+    m_widgetToDisplay = container;
+
+    m_widgetToDisplay->installEventFilter(this);
+    m_widgetToDisplay->hide();
+
+    connect(this, &QPushButton::clicked, this, &ToolbarPopupButton::displayPopup);
+}
 
 void ToolbarPopupButton::displayPopup(){
     if (m_blockNextShow){
@@ -117,3 +199,4 @@ bool ToolbarPopupButton::eventFilter(QObject *watched, QEvent *event)
 
     return ToolbarButton::eventFilter(watched, event);
 }
+

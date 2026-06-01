@@ -30,13 +30,15 @@ public:
 
     void setFullscreenUI() override;
     void setDefaultUI() override;
-    void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
+    ExtensionToolbar* getExtendedToolbar(){ return m_extensionToolbar; }
 
 public slots:
     void enableButtons();
     void disableButtons();
     void enableSlider();
     void disableSlider();
+    void updateRotationTooltip(const int);
+    void updateFlipTooltip(const bool, const bool);
 
     virtual void ejectRequested() override;
     virtual void disableFullscreenRequested() override;
@@ -79,7 +81,9 @@ signals:
     void previousMediaRequested();
     void nextMediaRequested();
     void toolbarCursorPositionRequested(int);
+    void showBlackOpacityModeRequested(bool isEnabled, double opacity);
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void showDrawingModeRequested(bool isEnabled);
 
 };
 

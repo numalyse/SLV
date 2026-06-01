@@ -1,5 +1,5 @@
 #include "NavPanel.h"
-#include <QLabel.h>
+#include <QLabel>
 #include "SignalManager.h"
 #include <QScrollArea>
 

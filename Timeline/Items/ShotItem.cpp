@@ -25,19 +25,19 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    p->setPen(Qt::black);
-    p->setBrush(QBrush(m_shot.color)); 
+    p->setPen(m_shot.borderColor);
+    p->setBrush(QBrush(m_shot.color));
     p->drawRect(0, m_topMargin, m_width, m_height);
 
 
     if(!m_pixmap.isNull() && m_width > s_minSizeForImage){
 
-        double targetHeight = m_height / 1.5;
+        double targetHeight = m_height - 4;
         double scaleRatio = targetHeight / m_pixmap.height();
         double scaledImgWidth = m_pixmap.width() * scaleRatio;
         double finalDrawWidth = qMin(scaledImgWidth, m_width);
 
-        QRectF target(0.0, m_topMargin, finalDrawWidth, targetHeight);
+        QRectF target(2.0, m_topMargin+2.0, finalDrawWidth, targetHeight);
         double sourceCropWidth = finalDrawWidth / scaleRatio;
 
         QRectF srcRect(0, 0, sourceCropWidth, m_pixmap.height());

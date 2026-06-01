@@ -12,8 +12,11 @@ BasePreferenceTab::BasePreferenceTab(const QString& categoryName, QWidget* paren
     setFrameShape(QFrame::NoFrame);
 
     m_container = new QWidget(this);
-    m_layout = new QFormLayout(m_container);
+    m_containerLayout = new QVBoxLayout(m_container);
+    m_layout = new QFormLayout;
     setWidget(m_container);
+    m_containerLayout->addLayout(m_layout);
+    m_container->setLayout(m_containerLayout);
 
     auto& prefManager = PrefManager::instance();
     m_baseJson = prefManager.getCategory(m_categoryName);

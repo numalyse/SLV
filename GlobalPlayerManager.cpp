@@ -5,7 +5,7 @@
 
 #include "Project/ProjectManager.h"
 
-#include <qlayout.h>
+#include <QLayout>
 
 #include <QDebug>
 
@@ -23,6 +23,12 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     //m_navPanel = new NavPanel(this, m_shotInfoController);
     m_navPanel = new NavPanel(this);
     mainLayout->addWidget(m_navPanel);
+
+    m_separationLine = new QFrame();
+    m_separationLine->setFrameShape(QFrame::HLine);
+    m_separationLine->setFrameShadow(QFrame::Sunken);
+    m_separationLine->setLineWidth(1);
+    m_separationLine->setContentsMargins(10,0,10,0);
 
     m_layoutManager = new PlayerLayoutManager();
 
@@ -51,6 +57,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
+    connect(m_layoutManager, &PlayerLayoutManager::setGlobalZoomStateRequested, this, &GlobalPlayerManager::setGlobalZoomState);
 
     connect(m_layoutManager, &PlayerLayoutManager::disableNavPanelRequested, this, &GlobalPlayerManager::disableNavPanelRequested);
     connect(m_layoutManager, &PlayerLayoutManager::enableNavPanelRequested, this, &GlobalPlayerManager::enableNavPanelRequested);
@@ -60,7 +67,10 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     );
     
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &GlobalPlayerManager::createTimelineWidget);
-    connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, &GlobalPlayerManager::disableSegmentation);
+    connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this](){
+        if(m_timeline) m_wasTimelineVisible = m_timeline->isVisible();
+        disableSegmentation();
+    });
 
 
 
@@ -107,13 +117,23 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
     }
     if (newToolbar){
         m_toolbarWidget = newToolbar;
+        auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+        if(!advancedToolbar){
+            layout->addWidget(m_separationLine);
+            m_separationLine->show();
+        }
+        else if(m_separationLine){
+            layout->removeWidget(m_separationLine);
+            m_separationLine->hide();
+        }
         layout->addWidget(m_toolbarWidget);
         m_toolbarWidget->setTBParent(this); // since toolbar was created in playerlayoutmanager, need to update its internal m_parent 
     }
 
+
     m_player = player;
 
-    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(newToolbar);
 
     if(advancedToolbar){
         connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
@@ -121,7 +141,10 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+        connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
+        connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     }
+
     
 }
 
@@ -160,6 +183,15 @@ void GlobalPlayerManager::setGlobalMuteState(bool state)
 {
     if(m_toolbarWidget){
         m_toolbarWidget->muteBtn()->setButtonState(state);
+    }
+}
+
+/// @brief Met à jour l'état du bouton zoom
+/// @param state
+void GlobalPlayerManager::setGlobalZoomState(bool state)
+{
+    if(m_toolbarWidget){
+        m_toolbarWidget->zoomBtn()->setButtonState(state);
     }
 }
 
@@ -209,8 +241,6 @@ void GlobalPlayerManager::createTimelineWidget()
     Q_ASSERT( m_player );
 
     auto* toolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
-    connect(toolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
-    connect(toolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     
     if(m_timeline){
         m_timeline->deleteLater();
@@ -236,8 +266,8 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), projMedia->filePath(), proj->shots, this);
-    m_timeline->setFixedHeight(150);
+    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), *projMedia, proj->shots, this, width());
+    m_timeline->setFixedHeight(160);
 
     projManager.setTimeline(m_timeline);
 
@@ -248,6 +278,8 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_timeline, &TimelineWidget::timelineSetPosition, m_player, &PlayerWidget::setTime);
 
     connect(m_timeline, &TimelineWidget::updateShotDetailRequest, m_navPanel, &NavPanel::timelineWidgetUpdateShotDetail);
+    // Pour initialiser les informations dans le ShotDetail
+    m_timeline->initShotDetail();
     connect(m_timeline, &TimelineWidget::disableTimeRelatedUI, m_navPanel, &NavPanel::disableShotControlButtons );
     connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, m_navPanel, &NavPanel::enableShotControlButtons );
     connect(m_navPanel, &NavPanel::goToShotRequest, m_timeline, &TimelineWidget::goToShot);
@@ -257,9 +289,11 @@ void GlobalPlayerManager::createTimelineWidget()
     connect(m_timeline, &TimelineWidget::enableTimeRelatedUI, toolbar, &AdvancedToolbar::enableSlider );
 
     connect(toolbar, &AdvancedToolbar::toolbarCursorPositionRequested, m_timeline, &TimelineWidget::updateCursorVisually);
+    layout->setSpacing(1);
 
     layout->addWidget(m_timeline);
-    m_timeline->hide();
+    if(m_wasTimelineVisible) m_timeline->show();
+    else m_timeline->hide();
 }
 
 

@@ -3,6 +3,9 @@
         "Lang" : {
             "code" : "en"
         },
+        "Advanced_timeline_options":{
+            "display_timeline_by_tagFrames" : false 
+        },
         "Export" : {
             "capture_path" : ""
         }
@@ -17,12 +20,15 @@
         "lp_extract_sequence": ""
     },
     "Shortcuts" : {
+        "_order": ["MainWindow", "CommonToolbar", "AdvancedTB", "ExtensionTB"],
         "MainWindow" : {
+            "_order": ["open_media", "open_project", "save_project"],
             "open_media" : "Ctrl + O",
             "open_project" : "Ctrl + A",
             "save_project" : "Ctrl + S"
         },
         "CommonToolbar" : {
+            "_order": ["play_pause", "stop", "mute", "enter_fullscreen", "exit_fullscreen", "screenshot"],
             "play_pause" : "Space",
             "stop" : "S",
             "mute" : "M",
@@ -31,6 +37,7 @@
             "screenshot" : "Shift + S"
         },
         "AdvancedTB" : {
+            "_order": ["increase_speed", "decrease_speed", "base_speed", "next_media", "prev_media", "loop"],
             "increase_speed" : "+",
             "decrease_speed" : "-",
             "base_speed" : "=",
@@ -39,6 +46,7 @@
             "loop" : "L"
         },
         "ExtensionTB" : {
+            "_order": ["prev_frame", "next_frame", "forward", "backward", "rotate", "record", "h_flip", "v_flip", "hide_img"],
             "prev_frame" : "A",
             "next_frame" : "E",
             "forward" : "Right",

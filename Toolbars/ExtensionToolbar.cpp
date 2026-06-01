@@ -8,7 +8,7 @@
 #include "ShortcutHelper.h"
 
 #include <QHBoxLayout>
-#include <qframe.h>
+#include <QFrame>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QIcon>
@@ -19,23 +19,40 @@
 ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 {
 
-    m_zoomBtn = new ToolbarToggleButton(
-        this, 
-        false,
-        "zoom_white",
-        PrefManager::instance().getText("tooltip_zoom_on"),
-        "zoom_white",
-        PrefManager::instance().getText("tooltip_zoom_off")
-    );
+    // BOUTON CACHER MEDIA + OPACITE CHOISIE
+    QVBoxLayout* blackFrameLayout = new QVBoxLayout();
 
-    m_hideImgBtn = new ToolbarToggleButton(
+    m_blackFrameSlider = new QSlider(Qt::Vertical);
+    m_blackFrameSlider->setRange(0,100);
+    m_blackFrameSlider->setValue(100);
+    m_blackFrameSlider->adjustSize();
+
+    m_blackFrameLabel = new QLabel("100%");
+    blackFrameLayout->addWidget(m_blackFrameLabel);
+    blackFrameLayout->addWidget(m_blackFrameSlider);
+    
+    blackFrameLayout->setAlignment(m_blackFrameLabel, Qt::AlignHCenter);
+    blackFrameLayout->setAlignment(m_blackFrameSlider, Qt::AlignHCenter);
+
+    m_hideImgBtn = new ToolbarToggleHoverButton(
         this, 
+        blackFrameLayout,
         false,
         "hide_image_white",
-        PrefManager::instance().getText("tooltip_hide_image"),
+        PrefManager::instance().getText("tooltip_show_image"),
         "show_image_white",
-        PrefManager::instance().getText("tooltip_show_image")
+        PrefManager::instance().getText("tooltip_hide_image")
     );
+    connect(m_blackFrameSlider, &QSlider::valueChanged, this, [this](int newValue){
+        double opacity = newValue / 100.0;
+        m_blackFrameLabel->setText(QString::number(newValue) + "%");
+        qDebug() << "QSlider new opacity : " << opacity;
+        updateBlackOpacityMode(true, opacity);
+    });
+    connect(m_hideImgBtn, &ToolbarToggleHoverButton::clicked, this, [this](){
+        double opacity = m_blackFrameSlider->value() / 100.0;
+        updateBlackOpacityMode(false, opacity);
+    });
 
     m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", PrefManager::instance().getText("tooltip_prev_frame"));
     m_nextFrameBtn = new ToolbarButton(this, "next_frame_white", PrefManager::instance().getText("tooltip_next_frame"));
@@ -48,36 +65,39 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
-        "record_on.png",
+        "record_on_white",
         PrefManager::instance().getText("tooltip_record_on"),
         "record_off_white",
         PrefManager::instance().getText("tooltip_record_off")
         );
-    m_recordBtn->setIconSize(QSize(30, 30));
+    //m_recordBtn->setIconSize(QSize(30, 30));
 
     m_segmBtn = new ToolbarToggleButton(
         this, 
         false,
         "timeline_on_white",
-        PrefManager::instance().getText("tooltip_segmentation_on"),
+        PrefManager::instance().getText("tooltip_segmentation_off"),
         "timeline_off_white",
-        PrefManager::instance().getText("tooltip_segmentation_off")
+        PrefManager::instance().getText("tooltip_segmentation_on")
     );
+
+    m_adjustmentWidget = new AdjustmentsWidget(this);
+    m_adjustmentsBtn = new ToolbarPopupButton(this, m_adjustmentWidget, "adjustments_white", PrefManager::instance().getText("tooltip_adjust"));
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
         if( ProjectManager::instance().projet()){
+            qDebug() << "oui projet";
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
             emit SignalManager::instance().extensionToolbarDisplayShotDetail();
+        } else {
+            qDebug() << "non projet";
         }
     });
 
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this] { // quand le projet est détruit, on force le button segmentation en false   
             m_segmBtn->setButtonState(false); 
     });
-
-    connect(m_hideImgBtn, &ToolbarToggleButton::stateActivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled);
-    connect(m_hideImgBtn, &ToolbarToggleButton::stateDeactivated, &SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled);
 
     connect(m_prevFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::prevFrameRequested);
     connect(m_nextFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::nextFrameRequested);
@@ -104,6 +124,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         emit SignalManager::instance().displayPlaylist();
     });
     connect(&SignalManager::instance(), &SignalManager::recordButtonUiUpdate, this, &ExtensionToolbar::updateRecordButtonUI);
+    connect(m_adjustmentWidget, &AdjustmentsWidget::adjustmentChangeRequested, this, &ExtensionToolbar::adjustmentChangeRequested);
+    connect(m_adjustmentWidget, &AdjustmentsWidget::resetAdjustmentsRequested, this, &ExtensionToolbar::resetAdjustmentsRequested);
 
     QHBoxLayout* compoRuleLayout = new QHBoxLayout();
 
@@ -140,8 +162,18 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
-    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip_vertical"));
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip"));
     
+    m_drawingBtn = new ToolbarToggleButton(
+        this, 
+        false,
+        "draw_white",
+        PrefManager::instance().getText("deactivate") + " " + PrefManager::instance().getText("tooltip_drawing_mode"),
+        "draw_white",
+        PrefManager::instance().getText("activate") + " " + PrefManager::instance().getText("tooltip_drawing_mode")
+    );
+    m_drawingBtn->setToggledIconFrame(true);
+    connect(m_drawingBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::updateDrawingMode);
 
 
     setDefaultUI();
@@ -152,9 +184,30 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
 ExtensionToolbar::~ExtensionToolbar()
 {
-    SLV::clearShortcuts(m_extensionShortcuts);
+    SLV::clearShortcuts(m_globalShortcuts);
 }
 
+// BLACKFRAME
+void ExtensionToolbar::updateBlackOpacityMode(bool sliderUpdated, double opacity){
+    if(sliderUpdated){
+        if(opacity == 0){
+            m_hideImgBtn->setButtonState(false);  
+        } else {
+            m_hideImgBtn->setButtonState(true);  
+        }
+    } else {
+        m_hideImgBtn->setButtonState(m_hideImgBtn->isChecked());        
+    }
+    emit showBlackOpacityModeRequested(m_hideImgBtn->isChecked(), opacity);
+}
+
+// DRAWING MODE
+void ExtensionToolbar::updateDrawingMode(){
+    m_drawingBtn->setButtonState(m_drawingBtn->isChecked());
+    emit showDrawingModeRequested(m_drawingBtn->isChecked());
+}
+
+// OVERLAY MODE
 void ExtensionToolbar::updateOverlayMode(){
     auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex());
     emit setOverlayModeRequested(
@@ -184,22 +237,30 @@ void ExtensionToolbar::setDefaultUI()
     mainLayout->setSpacing(1);
     mainLayout->addStretch();
 
-    mainLayout->addWidget(m_zoomBtn);
     mainLayout->addWidget(m_hideImgBtn);
+    mainLayout->addWidget(m_adjustmentsBtn);
+    mainLayout->addWidget(m_drawingBtn);
+    mainLayout->addWidget(m_compoRuleBtn);
     
     mainLayout->addWidget(m_backwardBtn);
     mainLayout->addWidget(m_prevFrameBtn);
     mainLayout->addWidget(m_nextFrameBtn);
     mainLayout->addWidget(m_forwardBtn);
     
-    mainLayout->addWidget(m_rotateBtn);
+
     mainLayout->addWidget(m_recordBtn);
-    mainLayout->addWidget(m_invBtn);
     // mainLayout->addWidget(m_abloopBtn);
+
+    mainLayout->addWidget(m_rotateBtn);
+    mainLayout->addWidget(m_invBtn);
     mainLayout->addWidget(m_segmBtn);
-    mainLayout->addWidget(m_compoRuleBtn);
     mainLayout->addStretch();
 
+}
+
+void ExtensionToolbar::updateDrawingButtonUI()
+{
+    m_drawingBtn->toggleUpdateIcon();
 }
 
 void ExtensionToolbar::updateRecordButtonUI()
@@ -218,20 +279,37 @@ void ExtensionToolbar::updateVFlipButtonUI()
 }
 
 
+
 void ExtensionToolbar::addShortcuts()
 {
     auto& prefManager = PrefManager::instance();
     QJsonObject extShortcuts = prefManager.getSubCategory("Shortcuts", "ExtensionTB");
 
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("h_flip").toString(), m_horizontalInvBtn, false));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("v_flip").toString(), m_verticalInvBtn, false));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("record").toString(), m_recordBtn, false));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("rotate").toString(), m_rotateBtn, false));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("hide_img").toString(), m_hideImgBtn));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("next_frame").toString(), m_nextFrameBtn));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("prev_frame").toString(), m_prevFrameBtn));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("forward").toString(), m_forwardBtn));
-    m_extensionShortcuts.append(SLV::createGlobalButtonShortcut(this, extShortcuts.value("backward").toString(), m_backwardBtn));
+    qDebug() << "[ExtensionToolbar] raccourcis : " << extShortcuts;
+
+    auto createGlobalShortcut = [this](const QString& keyString, QPushButton* button, bool autoRepeat = true) {
+        if (keyString.isEmpty()) return; 
+        QWidget* mainWindow = this->window(); // need to add this so shortcuts can be used event if this is hidden
+        QShortcut* shortcut = new QShortcut(QKeySequence(keyString), mainWindow);
+        shortcut->setContext(Qt::ApplicationShortcut); 
+        shortcut->setAutoRepeat(autoRepeat);
+        if (autoRepeat){
+            connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
+        }else {
+            connect(shortcut, &QShortcut::activated, button, &QPushButton::animateClick);
+        }
+        m_globalShortcuts.append(shortcut);
+    };
+
+    createGlobalShortcut(extShortcuts.value("h_flip").toString(), m_horizontalInvBtn, false);
+    createGlobalShortcut(extShortcuts.value("v_flip").toString(), m_verticalInvBtn, false);
+    createGlobalShortcut(extShortcuts.value("record").toString(), m_recordBtn, false);
+    createGlobalShortcut(extShortcuts.value("rotate").toString(), m_rotateBtn, false);
+    createGlobalShortcut(extShortcuts.value("hide_img").toString(), m_hideImgBtn);
+    createGlobalShortcut(extShortcuts.value("next_frame").toString(), m_nextFrameBtn);
+    createGlobalShortcut(extShortcuts.value("prev_frame").toString(), m_prevFrameBtn);
+    createGlobalShortcut(extShortcuts.value("forward").toString(), m_forwardBtn);
+    createGlobalShortcut(extShortcuts.value("backward").toString(), m_backwardBtn);
 
 }
 
@@ -243,8 +321,8 @@ void ExtensionToolbar::enableButtons()
     m_recordBtn->setEnabled(true);
     m_rotateBtn->setEnabled(true);
     m_segmBtn->setEnabled(true);
-    m_zoomBtn->setEnabled(true);
     m_compoRuleBtn->setEnabled(true);
+    m_drawingBtn->setEnabled(true);
     m_hideImgBtn->setEnabled(true);
     m_horizontalInvBtn->setEnabled(true);
     m_verticalInvBtn->setEnabled(true);
@@ -260,8 +338,8 @@ void ExtensionToolbar::disableButtons()
     m_recordBtn->setEnabled(false);
     m_rotateBtn->setEnabled(false);
     m_segmBtn->setEnabled(false);
-    m_zoomBtn->setEnabled(false);
     m_compoRuleBtn->setEnabled(false);
+    m_drawingBtn->setEnabled(false);
     m_hideImgBtn->setEnabled(false);
     m_horizontalInvBtn->setEnabled(false);
     m_verticalInvBtn->setEnabled(false);
@@ -269,3 +347,10 @@ void ExtensionToolbar::disableButtons()
     m_prevFrameBtn->setEnabled(false);
 }
 
+
+void ExtensionToolbar::clearShortcuts(){
+    for (auto& shortcut : m_globalShortcuts){
+        shortcut->deleteLater();
+    }
+    m_globalShortcuts.clear();
+}

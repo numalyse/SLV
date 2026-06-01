@@ -2,7 +2,7 @@
 #define TIMELINE_H
 
 #include "Shot.h"
-
+#include "Media.h"
 
 #include "Timeline/TimelineView.h"
 #include "Timeline/TimelineMath.h"
@@ -14,6 +14,7 @@
 #include "Timeline/Items/RulerItem.h"
 #include "Timeline/Items/CursorItem.h"
 #include "Timeline/Items/ShotItem.h"
+#include "Timeline/Items/AudioVisualizerItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -24,6 +25,7 @@
 #include <QVector>
 #include <QPoint>
 #include <QTimer>
+#include <QProcess>
 
 class TimelineWidget : public QWidget
 {
@@ -31,7 +33,8 @@ Q_OBJECT
 
 public:
 
-    explicit TimelineWidget(double fps, int64_t duration, const QString &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent);
+explicit TimelineWidget(double fps, int64_t duration, Media &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+    ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
 
@@ -41,6 +44,9 @@ public slots:
     void goToShot(int);
     void mergeWithPrevShotAction();
     void mergeWithNextShotAction();
+    void computeMediaAmplitudes(const QString& mediaPath);
+    void initAudioVisualizer();
+    void initShotDetail();
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
@@ -51,7 +57,7 @@ signals:
     void enableTimeRelatedUI();
     void disableTimeRelatedUI();
     void saveNeeded();
-    
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
@@ -63,19 +69,23 @@ private slots:
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
+    void updateTimelineGeometry();
     void autoSegmentation();
-    
+    void dragABMarker(QGraphicsItem*, const int);
+
 private:
     void applyZoom(double zoomFactor, int mouseX);
-    
+
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
+    Media* m_media = nullptr;
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;
 
     RulerItem* m_ruler = nullptr;
     CursorItem* m_cursor = nullptr;
+    AudioVisualizerItem* m_audioVisualizer = nullptr;
 
     TimelineMath* m_mathManager = nullptr;
     ShotManager* m_shotManager = nullptr;
@@ -89,6 +99,9 @@ private:
     ToolbarButton* m_mergeWithNextShotBtn = nullptr;
     bool m_showMergeWithNextShotBtn = false;
     ToolbarButton* m_exportBtn = nullptr;
+    ToolbarButton* m_shotInfo = nullptr;
+    ToolbarButton* m_toPrevShotBtn = nullptr;
+    ToolbarButton* m_toNextShotBtn = nullptr;
 
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
@@ -103,6 +116,9 @@ private:
 
     int m_rulerHeight = 25;
 
+    QProcess *m_audioComputeProcess = nullptr;
+    QByteArray m_audioBuffer;
+    QVector<double> m_amplitudeList;
 
 };
 

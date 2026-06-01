@@ -10,6 +10,7 @@ namespace SLV {
         TypeCursorItem = QGraphicsItem::UserType + 2,
         TypeShotItem = QGraphicsItem::UserType + 3,
         TypeABMarkerItem = QGraphicsItem::UserType + 4,
+        TypeAudioVisualizerItem = QGraphicsItem::UserType + 5
     };
 }
 

@@ -1,11 +1,11 @@
 #include "MediaWidget.h"
 
 #include "VlcParseHelper.h"
-#include "VlcInstance.h"
 #include "Media.h"
 #include "SequenceExtractionHelper.h"
 #include "MediaTransformHelper.h"
 #include "PrefManager.h"
+#include "MediaInfoDialog.h"
 
 #include <QFile>
 #include <QUrl>
@@ -18,55 +18,97 @@
 #include <QSize>
 #include <QRect>
 #include <QProcess>
-#include <QFileDialog.h>
+#include <QFileDialog>
 #include <QTextStream>
-
+#include <QMessageBox>
+#include <QPushButton>
 #include <QThreadPool>
+
+
+// Fonction helper pour appliquer les transformations VLC correctes au média
+void applyTransformOptions(libvlc_media_t* vlcMedia, unsigned int rotation, bool hflip, bool vflip) {
+    auto transformArgs = getArgsFromTransform(rotation, hflip, vflip);
+
+    // Si size > 4, il y a une transformation à appliquer
+    if (transformArgs.size() > 4) {
+        // Activer le filtre transform
+        libvlc_media_add_option(vlcMedia, "--video-filter=transform");
+        qDebug() << "[applyTransformOptions] Filtre transform activé";
+
+        // Si size > 5, il y a une option spécifique de transformation
+        if (transformArgs.size() > 5) {
+            const char* transformOption = transformArgs.back();
+            libvlc_media_add_option(vlcMedia, transformOption);
+            qDebug() << "[applyTransformOptions] Option de transformation appliquée:" << transformOption;
+        }
+    } else {
+        qDebug() << "[applyTransformOptions] Aucune transformation à appliquer";
+    }
+}
 
 MediaWidget::MediaWidget(QWidget *parent)
     : QWidget{parent}
 {
-
-    m_blackFrame = new QFrame(this);
-    m_blackFrame->setStyleSheet("background: black;");
-    m_blackFrame->lower();
     m_mediaSurface = new QWidget(this);
     m_mediaSurface->setAutoFillBackground(false);
-    //m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
-    //m_mediaSurface->hide();
-    //setAutoFillBackground(true);
+    m_mediaSurface->setAttribute(Qt::WA_NativeWindow);
+
     QPalette pal = palette();
     pal.setColor(QPalette::Window, Qt::black);
     setPalette(pal);
 
     setAttribute(Qt::WA_NativeWindow);
-    //setAttribute(Qt::WA_DontCreateNativeAncestors);
-    //setAttribute(Qt::WA_OpaquePaintEvent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+#ifdef Q_OS_MAC
+    setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
+#endif
 
-    // ===== VLC ===== //
+    const char* const vlc_args[] = {
+        "--quiet",
+        "--no-video-title-show",
+        "--no-input-fast-seek"
+    };
 
-    m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
+    int argc = sizeof(vlc_args) / sizeof(vlc_args[0]);
+
+#ifdef Q_OS_WIN
+    QByteArray pluginPath = QCoreApplication::applicationDirPath()
+        .append("/plugins")
+        .toLocal8Bit();
+
+    std::string pluginArg = "--plugin-path=" + std::string(pluginPath.constData());
+
+    const char* const vlc_args_win[] = {
+        "--quiet",
+        "--no-video-title-show",
+        "--no-input-fast-seek",
+        "--aout=directsound",
+        pluginArg.c_str(),
+        "--verbose=2"
+    };
+    m_vlcInstance = libvlc_new(4, vlc_args_win);
+#else
+    m_vlcInstance = libvlc_new(argc, vlc_args);
+#endif
+
     if (!m_vlcInstance) {
-        qDebug() << "Erreur création VLC";
+        qCritical() << "Erreur création VLC";
         return;
     }
+
     m_player = libvlc_media_player_new(m_vlcInstance);
     libvlc_video_set_mouse_input(m_player, 0);
     libvlc_video_set_key_input(m_player, 0);
 
     createEventManager();
-
     managePlayerSystem();
 
     m_eventManager = libvlc_media_player_event_manager(m_player);
 
-    // On lui dit d'écouter le changement de temps, d'appeler notre fonction statique,
-    // et on lui donne 'this' (notre widget) pour qu'il nous le renvoie dans userData
-    connect(this, &MediaWidget::mediaFinished, &SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished);
-    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageEnabled, this, &MediaWidget::hideMedia);
-    connect(&SignalManager::instance(), &SignalManager::extendedToolbarHideImageDisabled, this, &MediaWidget::showMedia);
+    connect(this, &MediaWidget::mediaFinished,
+            &SignalManager::instance(),
+            &SignalManager::mediaWidgetMediaFinished);
 
     libvlc_media_player_play(m_player);
 }
@@ -75,8 +117,6 @@ void MediaWidget::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.fillRect(rect(), Qt::black);
 }
-
-
 
 /// @brief Sets the media player in the application window instead of a new window
 void MediaWidget::managePlayerSystem()
@@ -94,44 +134,46 @@ void MediaWidget::managePlayerSystem()
         m_player,
         m_mediaSurface->winId());
 #endif
-
 }
 
 /// @brief Destructeur qui détache les event managers vlc
 MediaWidget::~MediaWidget()
 {
-
-    // if (m_vlc) {
-    //     libvlc_release(m_vlc);
-    // }
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
     }
-    
+
     m_videoCaptureManager.deleteMediaTempDirectory();
     releaseMedia();
 
+    if (m_player) {
+        libvlc_media_player_stop(m_player);
+        libvlc_media_player_release(m_player);
+    }
+
+    if (m_vlcInstance) {
+        libvlc_release(m_vlcInstance);
+    }
 }
 
 bool MediaWidget::play()
 {
     if (!m_player || !m_media) return false;
-    if (libvlc_media_player_play(m_player) == -1) return false;
-    return true;
+    return libvlc_media_player_play(m_player) != -1;
 }
 
 bool MediaWidget::pause()
 {
-    if (!m_player || !m_media)  return false;
+    if (!m_player || !m_media) return false;
     libvlc_media_player_set_pause(m_player, 1);
     return true;
 }
 
 void MediaWidget::togglePlayPause()
 {
-    if (!m_player || !m_media ) return;
+    if (!m_player || !m_media) return;
 
     if (libvlc_media_player_is_playing(m_player)) {
         libvlc_media_player_pause(m_player);
@@ -145,7 +187,7 @@ void MediaWidget::togglePlayPause()
 /// @brief Set the media player position to 0 and pause
 bool MediaWidget::stop()
 {
-    if (!m_player || !m_media ) return false;
+    if (!m_player || !m_media) return false;
 
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
@@ -162,17 +204,21 @@ bool MediaWidget::eject()
 
     releaseEventManager();
 
+    m_hflipped = false;
+    m_vflipped = false;
+    m_rotationIndex = 0;
+
     QThreadPool::globalInstance()->start([this]() {
-        
+
         if(m_player){
             libvlc_media_player_stop(m_player);
-            libvlc_media_player_release(m_player); 
+            libvlc_media_player_release(m_player);
         }
 
-        m_player = libvlc_media_player_new(SLV::VlcInstance::get());
+        m_player = libvlc_media_player_new(m_vlcInstance);
         libvlc_video_set_mouse_input(m_player, 0);
         libvlc_video_set_key_input(m_player, 0);
-        
+
         QMetaObject::invokeMethod(this, [this]() {
             releaseMedia();
             createEventManager();
@@ -195,6 +241,7 @@ void MediaWidget::parseTracks()
 void MediaWidget::setAudioTrack(int trackId)
 {
     if (!m_player) return;
+    m_currentAudioTrack = trackId;
     libvlc_audio_set_track(m_player, trackId);
     qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
 }
@@ -202,6 +249,7 @@ void MediaWidget::setAudioTrack(int trackId)
 void MediaWidget::setSubtitleTrack(int trackId)
 {
     if (!m_player) return;
+    m_currentSubtitlesTrack = trackId;
     libvlc_video_set_spu(m_player, trackId);
     qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
 }
@@ -255,6 +303,7 @@ bool MediaWidget::mute()
 {
     if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 1);
+    m_muted = true;
     return true;
 }
 
@@ -263,6 +312,7 @@ bool MediaWidget::unmute()
 {
     if (!m_player || !m_media ) return false;
     libvlc_audio_set_mute(m_player, 0);
+    m_muted = false;
     return true;
 }
 
@@ -272,6 +322,7 @@ void MediaWidget::setVolume(const int &vol)
 {
     if (!m_player) return;
     libvlc_audio_set_volume(m_player, vol);
+    m_volume = vol;
     const QString & volStr = QString::number(vol);
     emit volumeChanged(volStr);
     emit SignalManager::instance().mediaVolumeChanged(volStr);
@@ -294,14 +345,49 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
 void MediaWidget::takeScreenshot()
 {
     if (!m_player) return;
+
+    bool cancelScreenShot = false;
+    bool isMediaAdjusted = libvlc_video_get_adjust_int(m_player, libvlc_adjust_Enable) == 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness) != 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast) != 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation) != 1 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue) != 0 ||
+                            libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma) != 1;
+
+    if(isMediaAdjusted){
+        QMessageBox *msg = new QMessageBox(this);
+        QPushButton *cancelBtn = new QPushButton(PrefManager::instance().getText("cancel_action"));
+        msg->addButton(cancelBtn, QMessageBox::RejectRole);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_screenshot_with_adjustment"));
+        msg->setIcon(QMessageBox::Information);
+        QPushButton *screenshotWithoutAdjustments = new QPushButton(PrefManager::instance().getText("screenshot_without_adjustment_button"));
+        msg->addButton(screenshotWithoutAdjustments, QMessageBox::AcceptRole);
+        msg->adjustSize();
+
+        connect(msg, &QMessageBox::accepted, this, [this, &cancelScreenShot](){ libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0); cancelScreenShot = false;});
+        connect(msg, &QMessageBox::rejected, this, [this, &cancelScreenShot](){ cancelScreenShot = true; });
+
+        msg->exec();
+        if(cancelScreenShot) return;
+    }
+    
     auto& prefManager = PrefManager::instance();
-    QString captureDirectory = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
+    if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
+
+    QByteArray capturePathBytes = capturePath.toUtf8();
+
+    int w = m_media->width();
+    int h = m_media->height();
 
     // if there is a problem with media resolution here, make sure to recieve Media::resolutionParsed(tuple<int, int>) signal first
     if(m_rotationIndex % 2 == 0)
-        libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->width(), m_media->height());
+        libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), w, h);
     else
-        libvlc_video_take_snapshot(m_player, 0, captureDirectory.toUtf8(), m_media->height(), m_media->width());
+        libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), h, w);
+
+    if(isMediaAdjusted)
+         libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
 }
 
 void MediaWidget::setTime(int64_t time)
@@ -341,15 +427,19 @@ void MediaWidget::disableLoopMode()
     m_loopActivated = false;
 }
 
-void MediaWidget::hideMedia()
+void MediaWidget::enableZoomMode()
 {
-    qDebug() << "hide Media";
-    m_blackFrame->raise();
+    m_zoomActivated = true;
+    emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
+    if(!m_player || !m_media) return;
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
 }
 
-void MediaWidget::showMedia()
+void MediaWidget::disableZoomMode()
 {
-    m_blackFrame->lower();
+    m_zoomActivated = false;
+    if(!m_player || !m_media) return;
+    libvlc_video_set_crop_geometry(m_player, QString("%1x%2+%3+%4").arg(m_media->width()).arg(m_media->height()).arg(0).arg(0).toUtf8().constData());
 }
 
 void MediaWidget::startRecord()
@@ -366,8 +456,8 @@ void MediaWidget::endRecord()
     pause();
     auto& prefManager = PrefManager::instance();
     QString saveRecordPath = QFileDialog::getSaveFileName(
-        this, 
-        prefManager.getText("dialog_capture"),
+        this,
+        prefManager.getText("dialog_capture") + m_media->fileName() + "_record",
         prefManager.getPref("Paths", "lp_capture")
     );
 
@@ -383,6 +473,12 @@ void MediaWidget::endRecord()
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
 
+    QMessageBox *msg = new QMessageBox(this);
+    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
+    msg->setIcon(QMessageBox::Information);
+    msg->exec();
+
     m_startRecordTime = -1;
 }
 
@@ -391,17 +487,31 @@ void MediaWidget::transformMedia()
     if(!m_player || !m_media) return;
 
     float pos = libvlc_media_player_get_position(m_player);
-    bool wasPlaying = libvlc_media_player_is_playing(m_player) != 0;
+    bool wasPlaying = libvlc_media_player_is_playing(m_player);
+    float brightnessValue, contrastValue, saturationValue, hueValue;
+    if(m_adjustmentsEnabled){
+        brightnessValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
+        contrastValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Contrast);
+        saturationValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Saturation);
+        hueValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Hue);
+    }
 
     releaseEventManager();
 
     libvlc_media_player_stop(m_player);
     libvlc_media_player_release(m_player);
-    libvlc_release(m_vlcInstance);
 
-    m_vlcArgs = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
+    if (m_vlcInstance) {
+        libvlc_release(m_vlcInstance);
+    }
 
-    m_vlcInstance = libvlc_new(m_vlcArgs.size(), m_vlcArgs.data());
+#ifdef Q_OS_MAC
+    setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
+#endif
+
+    auto args = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
+
+    m_vlcInstance = libvlc_new(args.size(), args.data());
     m_player = libvlc_media_player_new(m_vlcInstance);
     libvlc_video_set_mouse_input(m_player, 0);
     libvlc_video_set_key_input(m_player, 0);
@@ -409,11 +519,30 @@ void MediaWidget::transformMedia()
     createEventManager();
 
     managePlayerSystem();
-    createMedia(m_media->filePath());
+    createMedia(m_media->filePath(), true);
     libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
     libvlc_media_player_play(m_player);
     libvlc_media_player_set_position(m_player, pos);
+
+    setAudioTrack(m_currentAudioTrack);
+    setSubtitleTrack(m_currentSubtitlesTrack);
+
+    if(m_adjustmentsEnabled){
+        libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Brightness, brightnessValue);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Contrast, contrastValue);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Saturation, saturationValue);
+        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Hue, hueValue);
+    }
+
+    if(m_zoomActivated) libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+
+    libvlc_audio_set_mute(m_player, m_muted);
+    libvlc_audio_set_volume(m_player, m_volume);
+
+    emit rotationTooltipUpdateRequested(m_rotationIndex);
+    emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
 
     // shows a black screen when rotating but playing again shows the media back
     if(!wasPlaying)
@@ -444,11 +573,14 @@ void MediaWidget::nextFrame()
 {
     if(!m_player || !m_media) return;
     pause();
-
-    // libvlc_media_player_next_frame(m_player);
-    const int newTime = getCurrentTime() + int(1000/m_media->fps());
-    setTime(newTime);
+    emit pauseUiUpdateRequested();
     qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+    libvlc_media_player_next_frame(m_player);
+    const int mspf = int(1000.0/m_media->fps());
+    // const int newTime = getCurrentTime() + int(1000/m_media->fps());
+    // setTime(newTime);
+    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+    m_vlcTime += mspf;
     emit vlcTimeChanged(m_vlcTime);
 
 }
@@ -457,9 +589,33 @@ void MediaWidget::prevFrame()
 {
     if(!m_player || !m_media) return;
     pause();
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
-    const int newTime = getCurrentTime() - int(1000/m_media->fps());
+    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime << "," << int(1000.0/m_media->fps());
+    const int mspf = int(1000.0/m_media->fps());
+    const int newTime = m_vlcTime - mspf;
     setTime(newTime);
+}
+
+void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value)
+{
+    if(!m_player || !m_media) return;
+    libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
+    libvlc_video_set_adjust_float(m_player, adjustOption, value);
+    m_adjustmentsEnabled = true;
+}
+
+void MediaWidget::resetAdjustments()
+{
+    if(!m_player || !m_media) return;
+    libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0);
+    m_adjustmentsEnabled = false;
+}
+
+void MediaWidget::openMediaInfoDialog()
+{
+    if(!m_player || !m_media) return;
+
+    MediaInfoDialog infoDialog(*m_media);
+    // infoDialog.exec();
 }
 
 QPoint MediaWidget::getMediaPosRect() const
@@ -535,8 +691,8 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
                 mediaWidget->parseTracks();
                 if(!mediaWidget->m_media->audioTracks().isEmpty()){
-                    emit mediaWidget->setAudioTrackDefaultRequested();
-                    emit mediaWidget->setSubtitlesTrackDefaultRequested();
+                    emit mediaWidget->setAudioTrackRequested(mediaWidget->m_currentAudioTrack);
+                    emit mediaWidget->setSubtitlesTrackRequested(mediaWidget->m_currentSubtitlesTrack);
                 }
             }
             
@@ -549,8 +705,44 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
 void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
-    // emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player)); diabled for now
-    QWidget::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton) {
+
+        if (event->modifiers() & Qt::ControlModifier) {
+            if(!m_player || !m_media || !m_zoomActivated) return;
+            setCursor(Qt::ClosedHandCursor);
+            m_isPanning = true;
+            m_lastPanPos = event->pos();
+        }
+        else{
+            // emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+        }
+
+        QWidget::mousePressEvent(event);
+
+    }
+}
+
+void MediaWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    // if(!m_zoomActivated /*&& (m_lastPanPos - event->pos()).manhattanLength() < 5*/){
+    //     emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
+    // }
+    if(!m_player || !m_media) return;
+    else if(m_zoomActivated){
+        setCursor(Qt::ArrowCursor);
+        m_isPanning = false;
+    }
+}
+
+void MediaWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if(!m_player || !m_media || !m_zoomActivated) return;
+    if(m_isPanning){
+        QPoint deltaPos = event->pos() - m_lastPanPos;
+        m_zoomHelper.move(deltaPos);
+        m_lastPanPos = event->pos();
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+    }
 }
 
 void MediaWidget::resizeEvent(QResizeEvent *event)
@@ -558,13 +750,23 @@ void MediaWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
     QRect mediaRect = getMediaDisplayRect();
     m_mediaSurface->setGeometry(mediaRect);
-    m_blackFrame->setGeometry(mediaRect);
     emit mediaRectChanged(mediaRect);
-    qDebug() << "mediaWidget size:" << this->size();
-    qDebug() << "m_mediaSurface size:" << m_mediaSurface->size();
-    qDebug() << "m_blackFrame size:" << m_blackFrame->size();
-    qDebug() << "Displayed video rect:" << mediaRect;
-    qDebug() << "mediasize:" << m_mediaSize;
+}
+
+void MediaWidget::wheelEvent(QWheelEvent *event)
+{
+    if(!m_player || !m_media || !m_zoomActivated) return;
+
+    int delta = event->angleDelta().y();
+
+    QPointF cursorPosNormalized = QPointF(event->position().x() / geometry().width(), event->position().y() / geometry().height());
+
+    if (delta < 0)
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(0.1, cursorPosNormalized).toUtf8().constData());
+    else
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(-0.1, cursorPosNormalized).toUtf8().constData());
+
+    emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
 }
 
 /// @brief Stops the current media player and load a new media from a path
@@ -590,7 +792,7 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
         QByteArray urlBytes =
             url.toString(QUrl::FullyEncoded).toUtf8();
 
-        libvlc_media_t *vlcMedia = m_media->vlcMedia();
+        libvlc_media_t *vlcMedia = libvlc_media_new_location(m_vlcInstance, urlBytes.constData());
 
         if (!vlcMedia)
             return;
@@ -649,7 +851,7 @@ void MediaWidget::createEventManager(){
 
 /// @brief Helper pour recréer une classe média et connecter ses signaux
 /// @param filePath 
-void MediaWidget::createMedia(const QString& filePath){
+void MediaWidget::createMedia(const QString& filePath, const bool fromTransform){
     releaseMedia();
     emit nameUiUpdateRequested(tr(""));
     m_media = new Media(filePath, this, m_vlcInstance);
@@ -657,11 +859,13 @@ void MediaWidget::createMedia(const QString& filePath){
         if (m_media)
             emit nameUiUpdateRequested(m_media->fileName());
     }, Qt::QueuedConnection);
-    connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested); 
-    connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested); 
-    m_media->parse();
+    connect(m_media, &Media::fpsParsed, this, &MediaWidget::updateFpsRequested);
+    connect(m_media, &Media::durationParsed, this, &MediaWidget::updateSliderRangeRequested);
+    connect(m_media, &Media::resolutionParsed, this, [this, fromTransform](){ if(!fromTransform) m_zoomHelper = ZoomHelper(m_media->width(), m_media->height()); });
     connect(m_media, &Media::tracksParsed, this, &MediaWidget::updateTracks);
     connect(m_media, &Media::typeParsed, this, &MediaWidget::typeParsed);
+    m_media->parse();
+
+
     m_media->parseTracks(m_player);
 }
-

@@ -6,11 +6,11 @@
 #include "ShortcutHelper.h"
 
 #include <QWidget>
+#include <QMessageBox>
 #include <QEnterEvent>
 #include <QLayout>
-#include <PrefManager.h>
-#include <SignalManager.h>
-
+#include "PrefManager.h"
+#include "SignalManager.h"
 
 /// @brief Classe abstraite qui sert de base pour les différentes toolbars.
 class Toolbar : public QWidget
@@ -30,6 +30,8 @@ public:
         );
         m_playPauseBtn->setButtonState(false);
         m_playPauseBtn->setEnabled(true);
+        m_playPauseBtn->setFixedSize(35, 35);
+        m_playPauseBtn->setIconSize(QSize(25, 25));
 
         m_parent = parent;
         
@@ -37,6 +39,15 @@ public:
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));
         m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white", PrefManager::instance().getText("tooltip_fullscreen"), "fullscreen_white", PrefManager::instance().getText("tooltip_fullscreen"));
         m_screenshotBtn = new ToolbarButton(this, "capture_white", PrefManager::instance().getText("tooltip_capture"));
+        m_zoomBtn = new ToolbarToggleButton(
+            this,
+            false,
+            "zoom_white",
+            PrefManager::instance().getText("tooltip_zoom_on"),
+            "zoom_white",
+            PrefManager::instance().getText("tooltip_zoom_off")
+        );
+        m_zoomBtn->setToggledIconFrame(true);
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
@@ -47,6 +58,19 @@ public:
         connect(m_screenshotBtn, &ToolbarButton::clicked, this, &Toolbar::screenshotRequest);
         connect(&SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled, m_playPauseBtn, [this](){ m_playPauseBtn->setButtonState(false); });
         connect(this, &Toolbar::selectFilePlayCanceled, &SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled);
+        connect(m_zoomBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::enableZoomMode);
+        connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableZoomMode);
+        connect(m_fullscreenBtn, &ToolbarToggleButton::stateActivated, this, [this](){
+            if(!m_firstTimeDialog){
+                QMessageBox *msg = new QMessageBox(this);
+                msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+                msg->setInformativeText(PrefManager::instance().getText("messagebox_fullscreen_experimental"));
+                msg->setIcon(QMessageBox::Warning);
+                msg->adjustSize();
+                msg->exec();
+                m_firstTimeDialog = true;
+            }
+        });
     }
 
     ToolbarToggleButton* playPauseBtn() const { return m_playPauseBtn; }
@@ -54,6 +78,7 @@ public:
     ToolbarButton* ejectBtn() const { return m_ejectBtn; }
     ToolbarToggleButton* fullscreenBtn() const { return m_fullscreenBtn; }
     ToolbarToggleButton* muteBtn() { return m_muteBtn; };
+    ToolbarToggleButton* zoomBtn() { return m_zoomBtn; };
 
     virtual ~Toolbar() {
         if(m_dynamicFullscreenShortcut) delete m_dynamicFullscreenShortcut;
@@ -129,6 +154,38 @@ protected:
     ToolbarToggleButton* m_fullscreenBtn = nullptr;
     ToolbarButton* m_screenshotBtn = nullptr;
     ToolbarToggleButton* m_muteBtn = nullptr;
+    ToolbarToggleButton* m_zoomBtn = nullptr;
+    bool m_firstTimeDialog = false;
+
+    QShortcut* m_dynamicFullscreenShortcut = nullptr;
+
+    bool m_isFullscreen = false;
+    QWidget* m_parent = nullptr;
+
+    void moveOnTopOfParent(){
+        if (m_parent && m_isFullscreen) {
+            QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
+            int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
+            int posY = parentGlobalPos.y() + m_parent->height() - this->height() - 20;
+            move(posX, posY);
+        }
+    }
+
+    void addEnterFullscreenShortcut(){
+        if(m_dynamicFullscreenShortcut){
+            delete m_dynamicFullscreenShortcut;
+        }
+        QString keyString = PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "enter_fullscreen");
+        m_dynamicFullscreenShortcut = SLV::createGlobalButtonShortcut(this, keyString, m_fullscreenBtn,  false);
+    }
+
+    void enterEvent(QEnterEvent *event) override {
+        setWindowOpacity(1.0); 
+    }
+
+    void leaveEvent(QEvent *event) override {
+        setWindowOpacity(0.01); 
+    }
 
     QShortcut* m_dynamicFullscreenShortcut = nullptr;
 
@@ -170,6 +227,8 @@ signals:
     void enableMuteRequest();
     void screenshotRequest();
     void selectFilePlayCanceled();
+    void enableZoomMode();
+    void disableZoomMode();
 };
 
 #endif // TOOLBAR_H

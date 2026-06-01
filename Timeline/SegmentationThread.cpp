@@ -13,6 +13,9 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+#include <QCoreApplication>
+#include <QFile>
+
 
 SegmentationThread::SegmentationThread(const QString &mediaPath, QObject *parent) : QThread(parent), m_videoPath{mediaPath}
 {
@@ -90,17 +93,57 @@ std::vector<int> SegmentationThread::detectCuts(const std::vector<float>& scores
 
 void SegmentationThread::run()
 {
-
     emit progress(0);
 
-	QProcess pythonProcess;
+    QProcess pythonProcess;
     pythonProcess.setProcessChannelMode(QProcess::MergedChannels);
 
-    QStringList arguments;
-    arguments << "pyScripts/segmentation.py" << m_videoPath;
-    arguments << ("1"); 
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
-    pythonProcess.start("py", arguments);
+    if (env.value("LANG").isEmpty()) {
+        env.insert("LANG", "en_US.UTF-8");
+    }
+    if (env.value("LC_ALL").isEmpty()) {
+        env.insert("LC_ALL", "en_US.UTF-8");
+    }
+
+    env.insert("PYTHONIOENCODING", "utf-8");
+    pythonProcess.setProcessEnvironment(env);
+
+    QString appDir = QCoreApplication::applicationDirPath();
+
+    QString pythonExe;
+
+#if defined(Q_OS_WIN)
+    pythonExe = appDir + "/python/python.exe";
+#elif defined(Q_OS_MAC)
+    //pythonExe = appDir + "/python/bin/python3";
+    pythonExe = appDir + "/../Resources/python/bin/python3";
+    //pythonExe = "python3";
+#else
+    pythonExe = appDir + "/python/bin/python3";
+#endif
+
+    QString scriptPath = appDir + "/pyScripts/segmentation.py";
+#if defined(Q_OS_MAC)
+    if (!QFile::exists(scriptPath)) {
+        // Try inside app bundle Resources (macOS) as a fallback
+        scriptPath = QCoreApplication::applicationDirPath() + "/../Resources/pyScripts/segmentation.py";
+    }
+#endif    
+    
+    qDebug() << "Python script path:" << scriptPath;
+
+    if (!QFile::exists(scriptPath)) {
+        qCritical() << "Python script not found:" << scriptPath;
+        emit segmentationFinished({});
+        return;
+    }
+
+    QStringList arguments;
+    arguments << scriptPath << m_videoPath << "1";
+
+    pythonProcess.start(pythonExe, arguments);
 
     if (!pythonProcess.waitForStarted()) {
         qCritical() << "Impossible de lancer le script Python.";
@@ -111,12 +154,15 @@ void SegmentationThread::run()
     std::vector<int> finalCuts;
 
     while (pythonProcess.waitForReadyRead(-1)) {
+
         if (isInterruptionRequested()) {
             pythonProcess.kill();
             emit segmentationFinished({});
             return;
         }
+
         while (pythonProcess.canReadLine()) {
+
             QString line = QString::fromUtf8(pythonProcess.readLine()).trimmed();
 
             if (isInterruptionRequested()) {
@@ -127,17 +173,17 @@ void SegmentationThread::run()
 
             if (line.startsWith("PROGRESS:")) {
                 int percent = line.mid(9).toInt();
-                emit progress(percent); 
-            } 
+                emit progress(percent);
+            }
             else if (line.startsWith("RESULT:")) {
                 QString jsonStr = line.mid(7);
                 QJsonDocument doc = QJsonDocument::fromJson(jsonStr.toUtf8());
                 QJsonArray arr = doc.array();
-                
+
                 for (const QJsonValue& val : arr) {
                     finalCuts.push_back(val.toInt());
                 }
-            } 
+            }
             else {
                 qDebug() << "[PYTHON LOG]:" << line;
             }
@@ -149,7 +195,7 @@ void SegmentationThread::run()
         emit segmentationFinished({});
         return;
     }
-    
+
     pythonProcess.waitForFinished();
 
     if (pythonProcess.exitCode() != 0) {

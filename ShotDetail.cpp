@@ -50,13 +50,13 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     QFrame* frameButtonsActions = new QFrame(this);
     QGridLayout* frameButtonsLayout = new QGridLayout(frameButtonsActions);
 
-    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", "tooltip_to_prev_shot");
+    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", PrefManager::instance().getText("tooltip_to_prev_shot"));
     connect(m_toPrevShotBtn, &ToolbarButton::clicked, this, [this](){
         emit goToShotRequested(m_shotId - 1);
     });
     frameButtonsLayout->addWidget(m_toPrevShotBtn, 0, 0);
 
-    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", "tooltip_to_next_shot");
+    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", PrefManager::instance().getText("tooltip_to_next_shot"));
     connect(m_toNextShotBtn, &ToolbarButton::clicked, this, [this](){
         emit goToShotRequested(m_shotId + 1);
     });

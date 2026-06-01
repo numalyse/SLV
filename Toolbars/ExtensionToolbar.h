@@ -7,11 +7,16 @@
 #include "ToolbarButtons/ToolbarPopupButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 #include "OverlayMode.h"
+#include "AdjustmentsWidget.h"
 
 #include <QWidget>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QVector>
+#include <QShortcut>
+#include <vlc/vlc.h>
+#include <QSlider>
+#include <QLabel>
 
 /// @brief Extension de la Toolbar avancée.
 class ExtensionToolbar : public QWidget
@@ -27,12 +32,12 @@ public:
     void setOverlayMode(int index);
     void setFullscreenUI();
     void setDefaultUI();
+    void initAdjustmentLayout();
 
     ToolbarToggleButton* getSegmBtn() { return m_segmBtn; };
     
     //QComboBox* comboBoxCompoRuleBtn = nullptr;
 
-    ToolbarToggleButton* m_zoomBtn = nullptr;
     ToolbarToggleButton* m_hideImgBtn= nullptr;
     ToolbarButton* m_prevFrameBtn= nullptr;
     ToolbarButton* m_nextFrameBtn= nullptr;
@@ -41,14 +46,13 @@ public:
     ToolbarButton* m_rotateBtn= nullptr;
     ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
-    //ToolbarToggleHoverButton* m_compoRuleBtn = nullptr;
-    ToolbarPopupButton* m_compoRuleBtn = nullptr; 
-    //ToolbarButton* m_compoRuleBtn= nullptr;
+    ToolbarPopupButton* m_compoRuleBtn = nullptr;
     ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarToggleButton* m_verticalInvBtn= nullptr;
     ToolbarToggleButton* m_horizontalInvBtn= nullptr;
-    // ToolbarButton* m_abloopBtn = nullptr;
-    // ToolbarPopupButton* m_multiviewBtn;
+    ToolbarToggleButton* m_drawingBtn = nullptr;
+    ToolbarPopupButton* m_adjustmentsBtn = nullptr;
+    AdjustmentsWidget* m_adjustmentWidget = nullptr;
 
     // playlist btn ?
     // A / B Button voir comment
@@ -59,9 +63,17 @@ public slots:
     void updateRecordButtonUI();
     void updateHFlipButtonUI();
     void updateVFlipButtonUI();
+    void updateDrawingButtonUI();
 
 private slots:
+    void updateBlackOpacityMode(bool sliderUpdated, double opacity);
+    void updateDrawingMode();
     void updateOverlayMode(); 
+
+protected:
+
+    QSlider* m_blackFrameSlider = nullptr;
+    QLabel* m_blackFrameLabel = nullptr;
 
 private:
     /// @brief Adds global shortcuts (that are child of the mainWindow) to be usable when the widget is hidden
@@ -86,9 +98,13 @@ signals:
     void rotateRequested();
     void horizontalFlipRequested();
     void verticalFlipRequested();
+    void showBlackOpacityModeRequested(bool isEnabled, double opacity);
     void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void showDrawingModeRequested(bool isEnabled);
     void prevFrameRequested();
     void nextFrameRequested();
+    void adjustmentChangeRequested(const libvlc_video_adjust_option_t, const float);
+    void resetAdjustmentsRequested();
 
 };
 

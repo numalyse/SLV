@@ -72,17 +72,25 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     speedFrameLayout->addWidget(m_speedSlider);
 
-    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "speed_white",  PrefManager::instance().getText("tooltip_speed"), "speed_white", PrefManager::instance().getText("tooltip_speed"));
+    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "slow_white",  PrefManager::instance().getText("tooltip_speed"), "slow_white", PrefManager::instance().getText("tooltip_speed"));
 
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
         "loop_off_white",
-        PrefManager::instance().getText("tooltip_loop_on"),
+        PrefManager::instance().getText("tooltip_loop_off"),
         "loop_off_white",
-        PrefManager::instance().getText("tooltip_loop_off")
+        PrefManager::instance().getText("tooltip_loop_on")
     );
     m_loopBtn->setToggledIconFrame(true);
+
+    m_zoomIndicator = new QLabel(this);
+    m_zoomIndicator->setText("");
+    // m_zoomIndicator->hide();
+    m_zoomIndicator->setContentsMargins(0,0,3,0);
+    m_zoomIndicator->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    QFontMetrics fm(m_zoomIndicator->font());
+    m_zoomIndicator->setFixedWidth(fm.horizontalAdvance("-88888%"));
 
     // Languages/Subtitles Popup display
     QVBoxLayout* langLayout = new QVBoxLayout();
@@ -117,6 +125,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_removePlayerBtn = new ToolbarButton(this, "remove_media_white", PrefManager::instance().getText("tooltip_delete_player"));
     m_duplicatePlayerBtn = new ToolbarButton(this, "duplicate_media_white", PrefManager::instance().getText("tooltip_duplicate_player"));
     m_extractSequenceBtn = new ToolbarButton(this, "extract_sequence_white", PrefManager::instance().getText("tooltip_extract_sequence"));
+    m_mediaInfoBtn = new ToolbarButton(this, "media_info_white", PrefManager::instance().getText("tooltip_media_information"));
 
     connect(m_duplicatePlayerBtn, &ToolbarButton::clicked, this,  &SimpleToolbar::duplicatePlayerAction);
     connect(m_removePlayerBtn, &ToolbarButton::clicked, this, &SimpleToolbar::removePlayerRequest);
@@ -127,8 +136,10 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_loopBtn, &ToolbarToggleButton::stateActivated, this, &SimpleToolbar::enableLoopModeRequest);
     connect(m_loopBtn, &ToolbarToggleButton::stateDeactivated, this, &SimpleToolbar::disableLoopModeRequest);
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
-
+    connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
+    connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, m_zoomIndicator, [this]{ m_zoomIndicator->setText(""); });
     
+    setDefaultUI();
     disableButtons();
 
     QTimer* mTimer = new QTimer(this);
@@ -153,38 +164,49 @@ void SimpleToolbar::setDefaultUI()
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(5,5,5,5);
         mainLayout->setSpacing(1);
+        
+        m_nameLabel->hide();
 
         QHBoxLayout* timecodeLayout = new QHBoxLayout();
-        timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
-        timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-        timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
+        timecodeLayout->setSpacing(2);
+        timecodeLayout->addWidget(m_timeEdit);
+        timecodeLayout->addWidget(m_slider, 1);
+        timecodeLayout->addWidget(m_durationBtn);
         mainLayout->addLayout(timecodeLayout);
 
-        mainLayout->addWidget(m_slider);
+        // mainLayout->addWidget(m_slider);
 
         QHBoxLayout* buttonLayout = new QHBoxLayout();
         buttonLayout->setContentsMargins(0,0,0,0);
         buttonLayout->setSpacing(1);
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addWidget(m_langBtn);
-        buttonLayout->addSpacing(m_langBtn->width());
-        buttonLayout->addSpacing(m_langBtn->width());
-        buttonLayout->addSpacing(m_langBtn->width());
+        buttonLayout->addWidget(m_mediaInfoBtn);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_speedBtn);
         buttonLayout->addWidget(m_stopBtn);
+        // buttonLayout->addWidget(m_slowDownBtn);
         buttonLayout->addWidget(m_playPauseBtn);
+        // buttonLayout->addWidget(m_speedUpBtn);
+
         buttonLayout->addWidget(m_ejectBtn);
         buttonLayout->addWidget(m_loopBtn);
+
         buttonLayout->addStretch();
+        buttonLayout->addWidget(m_zoomIndicator);
+        buttonLayout->addWidget(m_zoomBtn);
         buttonLayout->addWidget(m_screenshotBtn);
         buttonLayout->addWidget(m_extractSequenceBtn);
         buttonLayout->addWidget(m_duplicatePlayerBtn);
         buttonLayout->addWidget(m_removePlayerBtn);
         buttonLayout->addWidget(m_fullscreenBtn);
-        
         mainLayout->addLayout(buttonLayout);
     }
+
 }
 
 void SimpleToolbar::resetSlider()
@@ -290,9 +312,19 @@ void SimpleToolbar::disableLoopUiUpdate()
     m_loopBtn->setButtonState(false);
 }
 
+void SimpleToolbar::enableZoomUiUpdate()
+{
+    m_zoomBtn->setButtonState(true);
+}
+
+void SimpleToolbar::disableZoomUiUpdate()
+{
+    m_zoomBtn->setButtonState(false);
+}
+
 void SimpleToolbar::nameUiUpdate(const QString & mediaName)
 {
-    m_nameLabel->setText(mediaName);
+    // m_nameLabel->setText(mediaName);
 }
 
 void SimpleToolbar::volumeUiUpdate(const QString & newVolume)
@@ -326,31 +358,26 @@ void SimpleToolbar::enableButtons()
     m_playPauseBtn->setEnabled(true);
     m_stopBtn->setEnabled(true);
     m_ejectBtn->setEnabled(true);
-    // m_muteBtn->setEnabled(true);
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
-    if(m_extractable)
-        m_extractSequenceBtn->setEnabled(true);
-    // m_removePlayerBtn->setEnabled(true);
-    // m_speedBtn->setEnabled(true);
+    m_extractSequenceBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
     m_screenshotBtn->setEnabled(true);
+    m_mediaInfoBtn->setEnabled(true);
 }
 
 void SimpleToolbar::disableButtons()
 {
     m_stopBtn->setEnabled(false);
     m_ejectBtn->setEnabled(false);
-    // m_muteBtn->setEnabled(false);
     m_langBtn->setEnabled(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
     m_extractSequenceBtn->setEnabled(false);
-    // m_removePlayerBtn->setEnabled(false);
-    // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
+    m_mediaInfoBtn->setEnabled(false);
 }
 
 
@@ -385,6 +412,7 @@ void SimpleToolbar::updateFullscreenPosition()
 }
 
 void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
+    m_audioLangComboBox->blockSignals(true);
     m_audioLangComboBox->clear();
 
     if (tracks.isEmpty()) {
@@ -396,11 +424,13 @@ void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
         //qDebug() << "n° " << track.second << " : " << track.first;
         m_audioLangComboBox->addItem(track.second, track.first);
     }
-
+    m_audioLangComboBox->blockSignals(false);
 }
 
 void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks){
+    m_subLangComboBox->blockSignals(true);
     m_subLangComboBox->clear();
+    qDebug() << "DEBUG" << tracks;
 
     if (tracks.isEmpty()) {
         //qDebug() << "[SIMPLETOOLBAR] No subtitles available";
@@ -411,19 +441,21 @@ void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& trac
         //qDebug() << "n° " << track.second << " : " << track.first;
         m_subLangComboBox->addItem(track.second, track.first);
     }
-
+    m_subLangComboBox->blockSignals(false);
 }
 
-void SimpleToolbar::setAudioTrackDefault(){
+void SimpleToolbar::setAudioTrackDefault(const int trackId){
     //m_audioLangComboBox->blockSignals(true);
-    m_audioLangComboBox->setCurrentIndex(1);
+    m_audioLangComboBox->setCurrentIndex(trackId);
     //m_audioLangComboBox->blockSignals(false);
 }
 
-void SimpleToolbar::setSubtitlesTrackDefault(){
-    //m_subLangComboBox->blockSignals(true);
-    m_subLangComboBox->setCurrentIndex(0);
-    //m_subLangComboBox->blockSignals(false);
+void SimpleToolbar::setSubtitlesTrackDefault(const int trackId){
+    // m_subLangComboBox->blockSignals(true);
+    int trackIndex = m_subLangComboBox->findData(trackId);
+    if(trackIndex < 0) trackIndex = 0;
+    m_subLangComboBox->setCurrentIndex(trackIndex);
+    // m_subLangComboBox->blockSignals(false);
 }
 
 void SimpleToolbar::setAudioTrack(int index){
@@ -447,9 +479,15 @@ void SimpleToolbar::setSubtitlesTrack(int index){
         return;
 
     int trackNumber = data.toInt();
+    if(trackNumber < 0) trackNumber = 0;
     qDebug() << "[SimpleToolbar] changement demandé sur : " << trackNumber;
     emit setSubtitlesTrackRequested(trackNumber);
     
+}
+
+void SimpleToolbar::setZoomIndicatorText(const QString& value)
+{
+    if(m_zoomBtn->isChecked()) m_zoomIndicator->setText(value);
 }
 
 void SimpleToolbar::createTimeEdit(){

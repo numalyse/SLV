@@ -2,11 +2,11 @@
 #define PLAYLISTITEM_H
 
 #include <QWidget>
-#include <Media.h>
+#include "Media.h"
 #include <QLabel>
 #include <QPushButton>
 #include <QLayout>
-#include <TimeFormatter.h>
+#include "TimeFormatter.h"
 #include <QImage>
 #include <QDrag>
 #include <QMimeData>
@@ -40,7 +40,6 @@ private:
     unsigned int m_itemIndex = 0;
     QLabel *m_indexLabel = nullptr;
     QPushButton *m_deleteBtn = nullptr;
-    bool m_isClicked = false;
     QSize m_thumbnailSize {64, 36};
     bool m_isCurrentMedia = false;
     QPoint m_dragStartPosition;

@@ -13,20 +13,22 @@ void PrefManager::loadLanguage(const QString& langCode)
 
     QStringList availableLangs = getAvailableLangs();
 
-    // si le langcode est bien dans les langues supportées, utilisation de celui ci sinon fallback sur en
-    QString filePath = (availableLangs.contains(langCode)) ? ":/lang/" + langCode + ".json" : ":/lang/en.json";
+    // si le langcode est bien dans les langues supportées, utilisation de celui-ci sinon fallback sur en
+    QString selectedLangCode = (availableLangs.contains(langCode)) ? langCode : "en";
+    QString filePath = ":/lang/" + selectedLangCode + ".json";
     QFile file(filePath);
 
     if (file.open(QIODevice::ReadOnly)) {
         QByteArray data = file.readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
         m_texts = doc.object();
+        m_currentLangCode = selectedLangCode;
         file.close();
     } else {
         qDebug() << "[PrefManager] Impossible de charger le fichier de langue:" << filePath;
+        m_currentLangCode = "en";
     }
 }
-
 
 QString PrefManager::getText(const QString &key) const
 {
@@ -158,6 +160,15 @@ QJsonObject PrefManager::getCategory(const QString &category) const
     return result;
 }
 
+QJsonObject PrefManager::getDefaultCategory(const QString &category) const
+{
+    if (m_defaultPrefs.contains(category) && m_defaultPrefs[category].isObject()) {
+        return m_defaultPrefs.value(category).toObject();
+    }
+
+    qWarning() << "[PrefManager] La catégorie par défaut :" << category << "n'existe pas";
+    return QJsonObject();
+}
 
 QJsonObject PrefManager::getSubCategory(const QString &category, const QString &subCategory) const
 {
@@ -338,9 +349,14 @@ QStringList PrefManager::getAvailableLangs(){
     while (it.hasNext()) {
         QFile f(it.next());
         QFileInfo fileInfo(f);
+        //qDebug() << "LANG : " << fileInfo.baseName();
         langs.append(fileInfo.baseName());
     }
 
     return langs;
 }
 
+QString PrefManager::getLangCode() const
+{
+    return m_currentLangCode.isEmpty() ? "en" : m_currentLangCode;
+}

@@ -1,0 +1,122 @@
+#ifndef DRAWINGWIDGET_H
+#define DRAWINGWIDGET_H
+
+#include "./ToolbarButtons/ToolbarToggleButton.h"
+#include "./ToolbarButtons/ToolbarToggleHoverButton.h"
+#include "./ToolbarButtons/ToolbarButton.h"
+#include <QWidget>
+#include <QFrame>
+#include <QSize>
+#include <QPainter>
+#include <QPen>
+#include <QPainterPath>
+#include <QColor>
+#include <QButtonGroup>
+
+struct DrawingStroke {
+    QPainterPath path;
+    QColor color;
+    int lineWidth;
+};
+
+class DrawingWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit DrawingWidget(QWidget *parent = nullptr);
+
+    void showDrawingMode(bool isEnabled);
+
+    void setColor(const QColor &color);
+    void updateCurrentLineWidthBtnActive(double lineWidth);
+    void setLineWidth(int width);
+    void setOpacity(float opacity);
+
+    void enterEvent(QEnterEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+public slots:
+    void onMediaRectChanged(const QRect &rect);
+    void updateToolbarButtonsState();
+
+    
+    void updateCurrentOpacityBtnActive(double opacity);
+
+    void binRequested();
+    void updatePathsFromHistory();
+    void undoDrawing();
+    void redoDrawing();
+
+protected:
+    QWidget *m_drawingSurface = nullptr;
+    //QFrame * m_drawingSurface = nullptr;
+    QImage m_drawingCanvas;
+
+    QWidget *m_drawingToolbar = nullptr;
+    QFrame *containerBackground = nullptr;
+
+    void paintEvent(QPaintEvent *event) override;
+
+    void initDrawingSurface();
+
+    QIcon genIconPreviewColor(QColor color, int sizePen = 30, bool outlineActivated = false);
+    QIcon genIconPreviewColor(QColor color, bool outlineActivated);
+
+    void updatePen();
+    void initDrawingToolbar();
+
+    QPainterPath m_currentEraserPath;
+
+    void scaleStrokeList(QVector<DrawingStroke> &strokes, double scaleX, double scaleY);
+    void scaleCurrentEraserPath(double scaleX, double scaleY);
+
+    void updateHistoryButtons();
+
+private:
+    QRect m_mediaRect;
+    bool m_isEnabled = false;
+
+    QVector<DrawingStroke> m_paths; // Stocke tous les traits dessinés
+    QVector<QVector<DrawingStroke>> m_historyPathlist; // Stocke les différentes étapes de l'historique des traits dessinés
+    int m_currentHistoryIndex = -1;
+    bool m_pathsHasChanged = false; // Met à jour m_paths 
+
+    QPoint m_lastPoint;
+    bool m_hasLastPoint = false;
+
+    bool m_drawing = false;
+    bool m_erasing = false;
+
+    // Toolbar de dessin
+    ToolbarToggleHoverButton* m_pencilToolBtn = nullptr;
+    QVector<ToolbarToggleButton*> m_lineWidthBtns;
+    QVector<ToolbarToggleButton*> m_opacityBtns;
+    ToolbarToggleHoverButton* m_colorToolBtn = nullptr;
+    ToolbarToggleButton* m_eraserToolBtn = nullptr;
+    ToolbarButton* m_binToolBtn = nullptr;
+    ToolbarButton* m_undoToolBtn = nullptr;
+    ToolbarButton* m_redoToolBtn = nullptr;
+    ToolbarToggleButton* m_minimizeToolbarBtn = nullptr;
+    
+    // Paramètre de dessin
+    QPen m_pen;
+
+    int m_lineWidth = 4;
+    QVector<int> m_lineWidthLevels = {4, 8, 12};
+
+    double m_opacity = 1.0;
+    QVector<double> m_opacityLevels = {0.25, 0.5, 1.0};
+
+    QColor m_color = QColor(255, 255, 255, 255);
+    QVector<QPair<QString, QColor>> m_palette;
+
+    QPixmap eraseColor();
+    QPixmap m_eraseBrush = eraseColor();
+    int m_eraserLineWidth = 4;
+
+};
+
+#endif // DRAWINGWIDGET_H

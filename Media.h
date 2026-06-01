@@ -12,6 +12,19 @@ enum MediaType{
     Unknown
 };
 
+struct MediaTrackInfo{
+    libvlc_track_type_t _type;
+    unsigned int _codec; // video + audio
+    unsigned int _bitrate; // video + audio
+    char* _description;
+    char* _language; // audio + subtitles
+    int _sarNum; // video
+    int _sarDen; // video
+    unsigned int _channels; // audio
+    unsigned int _rate; // audio (= taux d'échantillonnage)
+    char* _encoding; // subtitle
+};
+
 class Media : public QObject
 {
 Q_OBJECT
@@ -25,17 +38,18 @@ public:
 
     QString fileName() const { return m_name; }
     QString filePath() const { return m_filePath; }
-    QString fileExtension() const { return m_fileInfo->suffix(); }
-    qint64 fileSize() const { return m_fileInfo->size(); }
-    bool exists() const { return m_fileInfo->exists(); }
+    QString fileExtension() const { return m_fileInfo ? m_fileInfo->suffix() : QString(); }
+    qint64 fileSize() const { return m_fileInfo ? m_fileInfo->size() : 0; }
+    bool exists() const { return m_fileInfo ? m_fileInfo->exists() : false; }
     MediaType type() const { return m_type; }
-    int64_t duration() const { return m_duration; }
-    double fps() const { return m_fps; }
-    int height() const { return m_height; }
-    int width() const { return m_width; }
+    int64_t duration() const { return m_vlcMedia ? m_duration : 0; }
+    double fps() const { return m_vlcMedia ? m_fps : 0.0; }
+    int height() const { return m_vlcMedia ? m_height : 0; }
+    int width() const { return m_vlcMedia ? m_width : 0; }
     libvlc_instance_t* vlcInstance() const { return m_vlcInstance; }
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
     QMap<libvlc_meta_t, QString> metaData() const { return m_metaData; }
+    QVector<MediaTrackInfo> tracks() const { return m_tracks; }
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }
@@ -43,12 +57,14 @@ public:
     void setHeight(int height) { m_height = height; }
     void setWidth(int width) { m_width = width; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
+    void addTrack(const MediaTrackInfo trackInfo) { m_tracks.push_back(trackInfo); }
 
     QList<QPair<int, QString>> audioTracks() const { return m_audioTracks; }
     QList<QPair<int, QString>> subtitlesTracks() const { return m_subtitlesTracks; }
     void parseTracks(libvlc_media_player_t* player);
 
     MediaType detectTypeFromFile(const QString &path);
+    QString metaToString(const libvlc_meta_t) const;
 
 signals:
     void fpsParsed(double);
@@ -69,6 +85,7 @@ private:
     int m_width = 0;
 
     QMap<libvlc_meta_t, QString> m_metaData;
+    QVector<MediaTrackInfo> m_tracks;
 
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     libvlc_instance_t* m_vlcInstance = nullptr;

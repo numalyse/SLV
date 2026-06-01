@@ -3,7 +3,7 @@
 #include "Timeline/ItemTypes.h"
 
 #include <QDebug>
-#include <QScrollbar>
+#include <QScrollBar>
 
 TimelineView::TimelineView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent)
 {
@@ -31,12 +31,21 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             
             if (QGraphicsItem *item = itemAt(event->pos())) {
                 emit itemLeftClick(item);
-            } 
+            }
         } else {
-            m_isDragging = true;
-            emit isDragging(true);
-            double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
-            emit cursorPositionRequested(clickPosition);
+            QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
+            for (auto* item : itemsAtCursor){
+                if(item->type() == SLV::TypeABMarkerItem){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
+                    setCursor(Qt::ClosedHandCursor);
+                    m_draggedABMarker = item;
+                }
+            }
+            if(!m_draggedABMarker){
+                m_isDragging = true;
+                emit isDragging(true);
+                double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
+                emit cursorPositionRequested(clickPosition);
+            }
         }
     }else if (event->button() == Qt::RightButton) {
         QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
@@ -56,6 +65,12 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - deltaX);
         m_lastPanPos = event->pos();
     }
+    if(m_draggedABMarker){
+        emit abMarkerDragged(m_draggedABMarker, mapToScene(event->pos()).x());
+    }
+    else{
+        unsetCursor();
+    }
 
 }
 
@@ -66,5 +81,8 @@ void TimelineView::mouseReleaseEvent(QMouseEvent *event)
     if (m_isPanning) {
         m_isPanning = false;
         setCursor(Qt::ArrowCursor); 
+    }
+    if (m_draggedABMarker) {
+        m_draggedABMarker = nullptr;
     }
 }

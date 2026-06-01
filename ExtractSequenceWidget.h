@@ -18,7 +18,7 @@ class ExtractSequenceWidget : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int timeStart = 0);
+    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int startTime = 0, int endTime = -1);
 
     void createButtons();
     void initUiLayout();
@@ -35,10 +35,13 @@ private:
     const Media& m_media;
     int m_startTime;
     int m_endTime;
+    bool m_isExec;
     TimeEditor* m_startTimeEditor;
     TimeEditor* m_endTimeEditor;
     QLabel* m_startFrameDisplay;
     QLabel* m_endFrameDisplay;
+    double m_thumbnailWidth;
+    double m_thumbnailHeight;
     ThumbnailWorker* m_thumbnailWorker;
     QTimer* m_thumbnailStartTimer;
     QTimer* m_thumbnailEndTimer;

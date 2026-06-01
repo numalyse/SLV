@@ -6,3 +6,6 @@ vlc-sdk/
 .qtcreator/*
 .qtcreator/CMakeLists.txt.user
 /.qtcreator
+.DS_Store
+installer/Output/
+python_embedded/

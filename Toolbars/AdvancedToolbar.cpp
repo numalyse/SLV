@@ -42,7 +42,8 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
         m_extensionToolbar->show();
         m_extensionBtn->setButtonState(true);
-        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr) emit enableSegmentationRequest();
+        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr)
+            emit enableSegmentationRequest();
     });
     m_extensionBtn->setIconSize(QSize(13, 13));
 
@@ -71,8 +72,12 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     connect(m_extensionToolbar, &ExtensionToolbar::prevFrameRequested, this, &AdvancedToolbar::prevFrameRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::nextFrameRequested, this, &AdvancedToolbar::nextFrameRequested);
     
+    connect(m_extensionToolbar, &ExtensionToolbar::showBlackOpacityModeRequested, this, &AdvancedToolbar::showBlackOpacityModeRequested);
+
     connect(m_extensionToolbar, &ExtensionToolbar::setOverlayModeRequested, this, &AdvancedToolbar::setOverlayModeRequested);
     
+    connect(m_extensionToolbar, &ExtensionToolbar::showDrawingModeRequested, this, &AdvancedToolbar::showDrawingModeRequested);
+
     connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, [this](){
         emit AdvancedToolbar::enableSegmentationRequest();
         m_prevMediaBtn->setEnabled(false);
@@ -211,22 +216,24 @@ void AdvancedToolbar::setDefaultUI()
         mainLayout->setContentsMargins(5,5,5,5);
         mainLayout->setSpacing(1);
 
-        QHBoxLayout* timecodeLayout = new QHBoxLayout();
-        timecodeLayout->addWidget(m_timeEdit, 1, Qt::AlignLeft);
-        timecodeLayout->addWidget(m_nameLabel, 1, Qt::AlignCenter);
-        timecodeLayout->addWidget(m_durationBtn, 1, Qt::AlignRight);
-        mainLayout->addLayout(timecodeLayout);
+        m_nameLabel->hide();
 
-        mainLayout->addWidget(m_slider);
+        QHBoxLayout* timecodeLayout = new QHBoxLayout();
+        timecodeLayout->addWidget(m_timeEdit);
+        timecodeLayout->addWidget(m_slider, 1);
+        timecodeLayout->addWidget(m_durationBtn);
+        mainLayout->addLayout(timecodeLayout);
 
         QHBoxLayout* buttonLayout = new QHBoxLayout();
         buttonLayout->setContentsMargins(0,0,0,0);
         buttonLayout->setSpacing(1);
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addWidget(m_langBtn);
-        buttonLayout->addSpacing(m_speedBtn->size().width());
-        buttonLayout->addSpacing(m_speedBtn->size().width());
-        buttonLayout->addSpacing(m_speedBtn->size().width());
+        buttonLayout->addWidget(m_mediaInfoBtn);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
 
         buttonLayout->addStretch();
 
@@ -237,9 +244,18 @@ void AdvancedToolbar::setDefaultUI()
         buttonLayout->addWidget(m_nextMediaBtn);
         buttonLayout->addWidget(m_ejectBtn);
         buttonLayout->addWidget(m_loopBtn);
+        buttonLayout->addWidget(m_speedBtn);
+        buttonLayout->addWidget(m_prevMediaBtn);
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addWidget(m_nextMediaBtn);
+        buttonLayout->addWidget(m_loopBtn);
 
         buttonLayout->addStretch();
 
+        buttonLayout->addWidget(m_zoomIndicator);
+        buttonLayout->addWidget(m_zoomBtn);
         buttonLayout->addWidget(m_screenshotBtn);
         buttonLayout->addWidget(m_extractSequenceBtn);
         buttonLayout->addWidget(m_duplicatePlayerBtn);
@@ -249,7 +265,6 @@ void AdvancedToolbar::setDefaultUI()
 
         mainLayout->addWidget(m_extensionToolbar);
     }
-
 }
 
 
@@ -263,8 +278,7 @@ void AdvancedToolbar::enableButtons()
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
-    if(m_extractable)
-        m_extractSequenceBtn->setEnabled(false);
+    m_extractSequenceBtn->setEnabled(true);
     // m_removePlayerBtn->setEnabled(true);
     // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
@@ -274,6 +288,7 @@ void AdvancedToolbar::enableButtons()
     m_screenshotBtn->setEnabled(true);
     m_prevMediaBtn->setEnabled(true);
     m_nextMediaBtn->setEnabled(true);
+    m_mediaInfoBtn->setEnabled(true);
     m_extensionToolbar->enableButtons();
 }
 
@@ -297,6 +312,7 @@ void AdvancedToolbar::disableButtons()
     m_screenshotBtn->setEnabled(false);
     m_prevMediaBtn->setEnabled(false);
     m_nextMediaBtn->setEnabled(false);
+    m_mediaInfoBtn->setEnabled(false);
     m_extensionToolbar->disableButtons();
 }
 
@@ -308,6 +324,37 @@ void AdvancedToolbar::enableSlider(){
 void AdvancedToolbar::disableSlider(){
     m_slider->setDisabled(true);
     m_slider->setToolTip(PrefManager::instance().getText("tooltip_slider_disabled"));
+}
+
+void AdvancedToolbar::updateRotationTooltip(const int rotationIndex)
+{
+    QString tooltipIndicator;
+    switch(rotationIndex){
+    case 0:
+        tooltipIndicator = "";
+        break;
+    case 1:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "270°";
+        break;
+    case 2:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "180°";
+        break;
+    case 3:
+        tooltipIndicator = "\n" + PrefManager::instance().getText("tooltip_current_rotation") + "90°";
+    }
+
+    m_extensionToolbar->m_rotateBtn->setToolTip(PrefManager::instance().getText("tooltip_rotate") + tooltipIndicator);
+}
+
+void AdvancedToolbar::updateFlipTooltip(const bool hFlip, const bool vFlip)
+{
+    QString tooltipIndicator = PrefManager::instance().getText("tooltip_flip");
+    if(hFlip)
+        tooltipIndicator += "\n" + PrefManager::instance().getText("tooltip_h_flipped");
+    if(vFlip)
+        tooltipIndicator += "\n" + PrefManager::instance().getText("tooltip_v_flipped");
+
+    m_extensionToolbar->m_invBtn->setToolTip(tooltipIndicator);
 }
 
 void AdvancedToolbar::onSliderPressed() {

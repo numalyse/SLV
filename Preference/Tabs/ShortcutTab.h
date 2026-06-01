@@ -31,6 +31,9 @@ private:
     /// @return True if a conflict was found
     bool hasConflict(const QString& newShortcut, const QString& currentKey, QString& outSubCategory, QString& outKey);
 
+    void AskResetDefault();
+    void resetDefault();
+
     QMap<QString, FormShortcutEditFrame*> m_shortcutFrames; // keeping this easily update on conflict
 
 };

@@ -12,11 +12,20 @@ struct Shot
     int64_t tagImageTime;
     QString note;
     QColor color = QColor(79, 134, 198, 255);
+    QColor borderColor = QColor(33, 71, 115, 255);
 
     int64_t middle() {
         return start + (end - start) / 2;
     }
     
+};
+
+struct AudioShot : Shot
+{
+    AudioShot() {
+        color = QColor(66, 52, 94, 255);
+        borderColor = QColor(42, 21, 84, 255);
+    }
 };
 
 

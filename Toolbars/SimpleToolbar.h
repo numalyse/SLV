@@ -25,7 +25,6 @@ public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
 
     void setDefaultUI() override;
-    void setExtractable(const bool extractable) { m_extractable = extractable; m_extractSequenceBtn->setEnabled(true); };
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
@@ -56,6 +55,8 @@ public slots:
     void stopUiUpdate();
     void enableLoopUiUpdate();
     void disableLoopUiUpdate();
+    void enableZoomUiUpdate();
+    void disableZoomUiUpdate();
     void nameUiUpdate(const QString &);
     void volumeUiUpdate(const QString &);
     void speedUiUpdate(const QString &);
@@ -69,11 +70,13 @@ public slots:
     void updateAudioTracks(const QList<QPair<int, QString>>& tracks);
     void updateSubtitlesTracks(const QList<QPair<int, QString>>& tracks);
 
-    void setAudioTrackDefault();
-    void setSubtitlesTrackDefault();
+    void setAudioTrackDefault(const int trackId);
+    void setSubtitlesTrackDefault(const int trackId);
     void setAudioTrack(int index);
     //void setAudioTrack(int index, bool emitSimpleToolbarRequest);
     void setSubtitlesTrack(int index);
+
+    void setZoomIndicatorText(const QString&);
 
     virtual void updateFullscreenPosition() override;
 
@@ -96,7 +99,6 @@ protected:
     bool m_showRemainingTime = false;
     QLabel* m_nameLabel = nullptr;
     bool m_discardVlcUiUpdates = false;
-    bool m_extractable = false;
 
     QSlider* m_volumeSlider = nullptr;
     QLabel* m_volumeLabel = nullptr;
@@ -107,10 +109,12 @@ protected:
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;
     ToolbarButton* m_extractSequenceBtn = nullptr;
+    QLabel* m_zoomIndicator = nullptr;
 
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;
     ToolbarPopupButton* m_langBtn = nullptr;
+    ToolbarButton* m_mediaInfoBtn = nullptr;
 
 protected slots: 
     virtual void onSliderPressed();
@@ -132,6 +136,7 @@ signals:
     void duplicatePlayerRequested();
     void setCursorPositionRequested(int64_t);
     void extractSequenceRequest();
+    void mediaInformationRequest();
     
 };
 

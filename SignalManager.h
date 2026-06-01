@@ -2,7 +2,8 @@
 #define SIGNALMANAGER_H
 
 #include "Shot.h"
-#include <QObject.h>
+#include <QObject>
+#include <vlc/vlc.h>
 
 enum PlayerLayoutArrangement
 {
@@ -34,13 +35,12 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
+    void openNavPanel();
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void playlistEjectPlayer();
     void simpleToolbarUpdateCursorPosition(int);
     void timelineSetPosition(int64_t);
-    void extendedToolbarHideImageEnabled();
-    void extendedToolbarHideImageDisabled();
     void playerWidgetSelectFileCanceled();
     void mediaVolumeChanged(const QString&);
     void mediaSpeedChanged(const QString&);
@@ -51,6 +51,7 @@ signals:
     void windowMovedOrResized();
     void recordButtonUiUpdate();
     void addPlaylistItems(const QStringList&);
+    void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
 };
 
 

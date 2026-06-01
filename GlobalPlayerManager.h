@@ -25,6 +25,8 @@ private:
     TimelineWidget* m_timeline = nullptr;
     PlayerWidget* m_player = nullptr;
     QVBoxLayout* layout;
+    QFrame* m_separationLine = nullptr;
+    bool m_wasTimelineVisible = false;
 
 public slots:
 
@@ -44,6 +46,7 @@ public slots:
 
     void setGlobalPlayState(bool);
     void setGlobalMuteState(bool);
+    void setGlobalZoomState(bool);
 
 private slots:
     void createTimelineWidget();

@@ -28,6 +28,11 @@ public:
 
     inline static const QString ICONS_PATH = ":/icons/";
 
+protected:
+    QIcon updateIconColor(QString iconName);
+    void changeEvent(QEvent *event) override;
+
+
 signals:
     void stateActivated();  // Emis quand le bouton est "On"
     void stateDeactivated(); // Emis quand le bouton est "Off"
@@ -38,12 +43,10 @@ private:
     QString m_iconPathOff;
     QString m_toolTipTextOff;
 
-protected:
-    /// @brief Met à jour les icones en fonction de l'état
-    void updateIcons(bool checked);
-
 public slots:
     void toggleUpdateIcon();
+    /// @brief Met à jour les icones en fonction de l'état
+    void updateIcons(bool checked);
 
 protected slots:
     /// @brief Appelé lorsque le bouton est cliqué. Met à jour les icônes puis emet le signal stateActivated ou stateDeactivated

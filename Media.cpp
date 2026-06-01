@@ -1,8 +1,9 @@
 #include "Media.h"
 #include "VlcInstance.h"
 #include "VlcParseHelper.h"
+#include "PrefManager.h"
 
-#include <qurl.h>
+#include <QUrl>
 #include <QDebug>
 #include <QMimeDatabase>
 #include <QMimeType>
@@ -10,24 +11,35 @@
 
 Media::Media(const QString &filePath, QObject *parent, libvlc_instance_t *vlcInstance) : QObject(parent), m_filePath(filePath)
 {
+    // Créer m_fileInfo en premier pour éviter les null-ptr dereferences
+    m_fileInfo = new QFileInfo(filePath);
 
     QFile f(m_filePath);
-    qDebug() << "Fichier existe ?" << f.exists();
+    qDebug() << "[Media::constructor] Vérification du fichier" << filePath << "- Existe?" << f.exists();
 
     QUrl url = QUrl::fromLocalFile(m_filePath);
     QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
+    qDebug() << "[Media::constructor] URL convertie:" << url.toString();
 
     if(vlcInstance) m_vlcInstance = vlcInstance;
     else m_vlcInstance = SLV::VlcInstance::get();
 
+    if (!m_vlcInstance) {
+        qDebug() << "[Media::constructor] Erreur : instance VLC non disponible";
+        return;
+    }
+    
+    qDebug() << "[Media::constructor] VLC instance obtenue, création du média";
+
     m_vlcMedia = libvlc_media_new_location(m_vlcInstance, urlBytes.constData());
 
     if (!m_vlcMedia){
-        qDebug() << "Erreur lors de l'allocation du média";
+        qDebug() << "[Media::constructor] Erreur lors de l'allocation du média VLC";
         return;
     }
 
-    m_fileInfo = new QFileInfo(filePath);
+    qDebug() << "[Media::constructor] Média VLC créé avec succès";
+
     m_name = m_fileInfo->baseName();
     setType(detectTypeFromFile(filePath));
     //qDebug() << m_name << " type détecté : " << m_type;
@@ -133,25 +145,46 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                 bool hasVideo = false; bool hasAudio = false; bool hasText = false;
                 MediaType type = MediaType::Unknown;
                 for (unsigned int i = 0; i < count; ++i) {
+                    MediaTrackInfo trackInfo = MediaTrackInfo();
+                    trackInfo._description = tracks[i]->psz_description;
+                    trackInfo._type = tracks[i]->i_type;
                     switch (tracks[i]->i_type) {
                     case libvlc_track_video:
                         hasVideo = true;
+                        trackInfo._bitrate = tracks[i]->i_bitrate;
+                        trackInfo._codec = tracks[i]->i_codec;
+                        trackInfo._sarNum = tracks[i]->video->i_sar_num;
+                        trackInfo._sarDen = tracks[i]->video->i_sar_den;
                         break;
                     case libvlc_track_audio:
                         hasAudio = true;
+                        trackInfo._bitrate = tracks[i]->i_bitrate;
+                        trackInfo._codec = tracks[i]->i_codec;
+                        trackInfo._channels = tracks[i]->audio->i_channels;
+                        trackInfo._rate = tracks[i]->audio->i_rate;
+                        trackInfo._language = tracks[i]->psz_language;
                         break;
-                    // case libvlc_track_text:
-                    //     hasText = true;
-                    //     break;
-                    // case libvlc_track_unknown:
-                    //     break;
+                    case libvlc_track_text:
+                        trackInfo._encoding = tracks[i]->subtitle->psz_encoding;
+                        trackInfo._language = tracks[i]->psz_language;
+                        break;
+                    case libvlc_track_unknown:
+                        break;
                     }
+                    media->addTrack(trackInfo);
                 }
                 if(hasVideo)
                     type = MediaType::Video;
                 else if(hasAudio)
                     type = MediaType::Audio;
                 //à voir pour image
+
+                QMap<libvlc_meta_t, QString> metaData;
+                for(int IMeta = libvlc_meta_Title; IMeta <= libvlc_meta_DiscTotal; ++IMeta){
+                    libvlc_meta_t meta = static_cast<libvlc_meta_t>(IMeta);
+                    metaData[meta] = libvlc_media_get_meta(parsedMedia, meta);
+                }
+                media->setMeta(metaData);
 
                 libvlc_media_tracks_release(tracks, count);
                 
@@ -172,5 +205,63 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
             qDebug() << "Le parsing a changé de statut, mais n'est pas terminé. Statut :" << parseStatus;
         }
 
+    }
+}
+
+QString Media::metaToString(const libvlc_meta_t meta) const
+{
+    switch(meta){
+    case libvlc_meta_Title:
+        return PrefManager::instance().getText("media_meta_title");
+    case libvlc_meta_Artist:
+        return PrefManager::instance().getText("media_meta_artist");
+    case libvlc_meta_Genre:
+        return PrefManager::instance().getText("media_meta_genre");
+    case libvlc_meta_Copyright:
+        return PrefManager::instance().getText("media_meta_copyright");
+    case libvlc_meta_Album:
+        return PrefManager::instance().getText("media_meta_album");
+    case libvlc_meta_TrackNumber:
+        return PrefManager::instance().getText("media_meta_track_number");
+    case libvlc_meta_Description:
+        return PrefManager::instance().getText("media_meta_description");
+    case libvlc_meta_Rating:
+        return PrefManager::instance().getText("media_meta_rating");
+    case libvlc_meta_Date:
+        return PrefManager::instance().getText("media_meta_date");
+    case libvlc_meta_Setting:
+        return PrefManager::instance().getText("media_meta_setting");
+    case libvlc_meta_URL:
+        return PrefManager::instance().getText("media_meta_url");
+    case libvlc_meta_Language:
+        return PrefManager::instance().getText("media_meta_language");
+    case libvlc_meta_NowPlaying:
+        return PrefManager::instance().getText("media_meta_now_playing");
+    case libvlc_meta_Publisher:
+        return PrefManager::instance().getText("media_meta_publisher");
+    case libvlc_meta_EncodedBy:
+        return PrefManager::instance().getText("media_meta_encoded_by");
+    case libvlc_meta_ArtworkURL:
+        return PrefManager::instance().getText("media_meta_artwork_url");
+    case libvlc_meta_TrackID:
+        return PrefManager::instance().getText("media_meta_track_id");
+    case libvlc_meta_TrackTotal:
+        return PrefManager::instance().getText("media_meta_track_total");
+    case libvlc_meta_Director:
+        return PrefManager::instance().getText("media_meta_director");
+    case libvlc_meta_Season:
+        return PrefManager::instance().getText("media_meta_season");
+    case libvlc_meta_Episode:
+        return PrefManager::instance().getText("media_meta_episode");
+    case libvlc_meta_ShowName:
+        return PrefManager::instance().getText("media_meta_show_name");
+    case libvlc_meta_Actors:
+        return PrefManager::instance().getText("media_meta_actors");
+    case libvlc_meta_AlbumArtist:
+        return PrefManager::instance().getText("media_meta_album_artist");
+    case libvlc_meta_DiscNumber:
+        return PrefManager::instance().getText("media_meta_disc_number");
+    case libvlc_meta_DiscTotal:
+        return PrefManager::instance().getText("media_meta_disc_total");
     }
 }

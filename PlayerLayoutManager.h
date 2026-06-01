@@ -50,6 +50,7 @@ private:
 
     bool newGlobalMuteState();
     bool newGlobalPlayState();
+    bool newGlobalZoomState();
 
     PlayerLayoutArrangement m_currentArrangement = ArrangementUnknown;
 
@@ -67,6 +68,7 @@ signals:
 
     void setGlobalPlayStateRequested(bool);
     void setGlobalMuteStateRequested(bool);
+    void setGlobalZoomStateRequested(bool);
 
     void disableNavPanelRequested();
     void enableNavPanelRequested();
@@ -94,6 +96,7 @@ public slots:
 
     void checkPlayersPlayStatus();
     void checkPlayersMuteStatus();
+    void checkPlayersZoomStatus();
 
     void createLayoutFromPaths(const QStringList& filesPaths);
     void createLayoutFromProject(const QStringList &filesPaths);

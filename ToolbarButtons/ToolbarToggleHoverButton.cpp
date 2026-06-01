@@ -4,10 +4,10 @@
 #include <QWidget>
 #include <QTimer>
 #include <QEvent>
-#include <qapplication.h>
-#include <qframe.h>
-#include <qlayout.h>
-#include <qscreen.h>
+#include <QApplication>
+#include <QFrame>
+#include <QBoxLayout>
+#include <QScreen>
 
 
 ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *layoutToDisplay, bool state, const QString &iconNameOn, const QString &toolTipTextOn, const QString &iconNameOff, const QString &toolTipTextOff, int timerDuration)
@@ -59,6 +59,13 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
 void ToolbarToggleHoverButton::setOnTop(const bool &onTop)
 {
     m_onTop = onTop;
+    m_onRight = false;
+}
+
+void ToolbarToggleHoverButton::setOnRight(const bool &onRight)
+{
+    m_onRight = onRight;
+    m_onTop = false;
 }
 
 void ToolbarToggleHoverButton::moveWidget()
@@ -71,6 +78,11 @@ void ToolbarToggleHoverButton::moveWidget()
     int y = globalPos.y() - m_widgetToDisplay->height();
     if(!m_onTop){
         y = globalPos.y() + height();
+    }
+
+    if(m_onRight){
+        x = globalPos.x() + width() + 10;
+        y = globalPos.y() + (height() / 2) - (m_widgetToDisplay->height() / 2);
     }
 
     QRect popupRect(x, y,

@@ -32,7 +32,7 @@ public:
     /// @param lenghtMs if == 0 will get the frame at msStart else if > 0 will retrieve the frame between msStart and msStart + lenghtMs
     /// @param mediaPath Path of the media
     /// @param targetSize Target size of the thumnails, will use opencv to resize the frame
-    void requestThumbnail(int requestId, int64_t msStart, int64_t lenghtMs, const QString& mediaPath, QSize targetSize = {100, 75});
+    void requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize = {100, 75});
     void stop();
     void clearQueue();
     void keepNQueue(const int n);

@@ -3,6 +3,7 @@
 
 #include "Timeline/TimelineMath.h"
 #include "Timeline/Items/ShotItem.h"
+#include "Timeline/Items/AudioShotItem.h"
 #include "Timeline/TimelineView.h"
 #include "Timeline/ThumbnailWorker.h"
 
@@ -36,9 +37,14 @@ public:
     const QVector<ShotItem*>& shotItems() const {return m_shotItems;};
 
     const QVector<Shot> shotItemsData() const;
-    void setShotItemsData(const QVector<Shot>& shots);
+    void extracted(int &shotHeight, const Shot &IShot, double &width);
+    void setShotItemsData(const QVector<Shot> &shots);
 
     void createShotItemsFromCuts(const std::vector<int>& cuts);
+
+    void initShotDetail();
+
+    const int getCurrentShotId(){ return m_shotItems.indexOf(m_currentShotItem); }
 
 signals:
     void updateShotDetailRequested(int shotCount, int requestId, Shot*);
@@ -49,6 +55,7 @@ private:
     void mergeCurrentInto(int ShotItemId);
 
     QVector<ShotItem*> m_shotItems;
+    QVector<AudioShotItem*> m_audioShotItems;
     const QString m_mediaPath;
     ShotItem* m_currentShotItem = nullptr;
 

@@ -1,14 +1,19 @@
 #include "ExtractSequenceWidget.h"
+#include <QMessageBox>
+#include <QGuiApplication>
+#include <QScreen>
 
-ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime)
+ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
     : QDialog{parent}, m_media(media)
 {
-    m_startTime = 0;
-    m_endTime = 0;
+    m_startTime = startTime;
+    if(endTime < 0) m_endTime = startTime+10000;
+    else m_endTime = endTime;
     m_thumbnailPendingTime = 50;
+    m_isExec = false;
     int duration = media.duration();
     m_startTimeEditor = new TimeEditor(this, startTime, duration, 0, duration, media.fps());
-    m_endTimeEditor = new TimeEditor(this, startTime+10000, duration, startTime, duration, media.fps());
+    m_endTimeEditor = new TimeEditor(this, m_endTime, duration, startTime, duration, media.fps());
     m_thumbnailStartTimer = new QTimer(this);
     m_thumbnailStartTimer->setSingleShot(true);
     connect(m_thumbnailStartTimer, &QTimer::timeout, this, [this](){ requestStartFrameDisplay(); });
@@ -17,6 +22,14 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
     connect(m_thumbnailEndTimer, &QTimer::timeout, this, [this](){ requestEndFrameDisplay(); });
     createButtons();
     initUiLayout();
+    connect(this, &QDialog::finished, this, [this, parent](int res){ if(res == QDialog::Accepted){
+            QMessageBox *msg = new QMessageBox(parent);
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
+            msg->setIcon(QMessageBox::Information);
+            msg->exec();
+        }
+    });
 }
 
 void ExtractSequenceWidget::createButtons()
@@ -40,13 +53,29 @@ void ExtractSequenceWidget::initUiLayout()
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QHBoxLayout *timeSelectionLayout = new QHBoxLayout();
     QVBoxLayout *startTimeSelectionLayout = new QVBoxLayout();
-    QLabel *startLabel = new QLabel(PrefManager::instance().getText("extract_start_label") + " :");
+    QLabel *startLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_start_label") + " :<b>");
+
+    // m_startFrameDisplay->setScaledContents(true);
+    // m_endFrameDisplay->setScaledContents(true);
+    m_startFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_endFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_thumbnailWidth = m_media.width();
+    int maxDialogWidth = double(QGuiApplication::primaryScreen()->size().width()) / 1.25;
+    while(m_thumbnailWidth * 2 > maxDialogWidth){
+        m_thumbnailWidth /= 1.15;
+    }
+    if(m_media.height() > 0 && (m_media.width() / m_media.height()) > 0) m_thumbnailHeight = m_thumbnailWidth / (double(m_media.width()) / m_media.height());
+
+    m_startFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
+    m_endFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
+
     startTimeSelectionLayout->addWidget(startLabel);
     startTimeSelectionLayout->addWidget(m_startFrameDisplay);
     startTimeSelectionLayout->addWidget(m_startTimeEditor);
 
     QVBoxLayout *endTimeSelectionLayout = new QVBoxLayout();
-    QLabel *endLabel = new QLabel(PrefManager::instance().getText("extract_end_label") + " :");
+    QLabel *endLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_end_label") + " :<b>");
     endTimeSelectionLayout->addWidget(endLabel);
     endTimeSelectionLayout->addWidget(m_endFrameDisplay);
     endTimeSelectionLayout->addWidget(m_endTimeEditor);
@@ -55,6 +84,7 @@ void ExtractSequenceWidget::initUiLayout()
     timeSelectionLayout->addLayout(endTimeSelectionLayout);
 
     QHBoxLayout *confirmLayout = new QHBoxLayout();
+    confirmLayout->addStretch();
     confirmLayout->addWidget(m_okButton);
     confirmLayout->addWidget(m_cancelButton);
 
@@ -68,13 +98,13 @@ void ExtractSequenceWidget::initUiLayout()
 void ExtractSequenceWidget::requestStartFrameDisplay()
 {
     m_thumbnailWorker->keepNQueue(2); // Pour clear la queue sauf 2 éléments (clearQueue empêche parfois d'afficher les frames sur un des deux)
-    m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {720, 480});
+    m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)});
 }
 
 void ExtractSequenceWidget::requestEndFrameDisplay()
 {
     m_thumbnailWorker->keepNQueue(2);
-    m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {720, 480});
+    m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)});
 }
 
 void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)
@@ -107,9 +137,11 @@ void ExtractSequenceWidget::onEndTimeChanged(const int newTime)
 void ExtractSequenceWidget::confirmExtraction()
 {
     auto& prefManager = PrefManager::instance();
-    QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), prefManager.getPref("Paths", "lp_extract_sequence"));
+    QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), prefManager.getPref("Paths", "lp_extract_sequence")
+        + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
     if(saveSequencePath != ""){
-        QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath + '.' + m_media.fileExtension());
+        // On garde seulement la base du nom sans l'extension avec un split
+        QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
         connect(sequenceExtractor, &QProcess::finished, this, &QDialog::accept);
         QFileInfo fileInfo (saveSequencePath);
         prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());

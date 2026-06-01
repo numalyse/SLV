@@ -6,7 +6,8 @@
 #include <QString>
 #include <QStringList>
 #include <QProcess>
-#include <qdebug.h>
+#include <QDebug>
+#include <QCoreApplication>
 
 //TODO : à mettre dans une classe pour les signaux/barre de progression si possible
 class SequenceExtractionHelper : QObject
@@ -27,7 +28,18 @@ public:
              << "-c" << "copy"
              << savePath;
 
-        ffmpeg->start("ffmpeg", args);
+        QString appDir = QCoreApplication::applicationDirPath();
+        QString ffmpegExe;
+#if defined(Q_OS_WIN)
+        ffmpegExe = appDir + "/bin/ffmpeg.exe";
+#elif defined(Q_OS_MAC)
+        ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
+#else
+        ffmpegExe = appDir + "/bin/ffmpeg";
+#endif
+
+        ffmpeg->start(ffmpegExe, args);
+        //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
         return ffmpeg;
     }
 
@@ -40,7 +52,19 @@ public:
              << "-c" << "copy"
              << savePath;
 
-        ffmpeg->start("ffmpeg", args);
+                QString appDir = QCoreApplication::applicationDirPath();
+        QString ffmpegExe;
+#if defined(Q_OS_WIN)
+        ffmpegExe = appDir + "/bin/ffmpeg.exe";
+#elif defined(Q_OS_MAC)
+        ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
+#else
+        ffmpegExe = appDir + "/bin/ffmpeg";
+#endif
+
+        ffmpeg->start(ffmpegExe, args);
+        //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
+
         QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(), [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
         return ffmpeg;
     }

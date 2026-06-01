@@ -7,7 +7,7 @@
 
 #include <QWidget>
 #include <QBoxLayout>
-#include <Playlist.h>
+#include "Playlist.h"
 #include <QSize>
 #include <QStackedWidget>
 #include <QScrollArea>

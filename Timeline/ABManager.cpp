@@ -40,7 +40,7 @@ std::optional<int64_t> ABManager::clampToLoopRange(int64_t time)
     int64_t aTime = m_abMarkersItems[0]->time();
     int64_t bTime = m_abMarkersItems[1]->time();
 
-    return std::clamp(time, aTime, bTime);
+    return aTime <= bTime ? std::clamp(time, aTime, bTime) : std::clamp(time, bTime, aTime);
 }
 
 void ABManager::deleteMarkers()
@@ -91,7 +91,24 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight){
     }
 }
 
+void ABManager::changeMarkerTime(ABMarkerItem* marker, const int64_t time)
+{
+    marker->setTime(time);
+    unsigned int markerIndex = m_abMarkersItems.indexOf(marker);
+    if(m_abMarkersItems.size() == 2){
+        switch(markerIndex){
+        case 0:
+            if(marker->time() >= m_abMarkersItems[1 - markerIndex]->time())
+                marker->setTime(m_abMarkersItems[1 - markerIndex]->time() - 1000.0 / p_mathManager->fps());
+            break;
+        case 1:
+            if(marker->time() <= m_abMarkersItems[1 - markerIndex]->time())
+                marker->setTime(m_abMarkersItems[1 - markerIndex]->time() + 1000.0 / p_mathManager->fps());
+        }
+    }
 
+    updateMarkersPosition();
+}
 
 void ABManager::updateMarkersPosition(){
     double newXPos{};
@@ -115,9 +132,11 @@ void ABManager::extractLoop()
     QString dialogDir = (projManager.projet()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.projet()->path;
 
     QString selectedPath = QFileDialog::getSaveFileName(
-        nullptr, 
-        prefManager.getText("export_file_path_title"), 
-        dialogDir
+        nullptr,
+        prefManager.getText("export_file_path_title"),
+        dialogDir + "/" + mediaFileInfo.baseName() + "_"
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_abMarkersItems[0]->time(), projManager.projet()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_abMarkersItems[1]->time(), projManager.projet()->media->fps())
     );
 
     selectedPath += '.' + mediaFileInfo.suffix();

@@ -23,7 +23,8 @@ public:
         const QString& toolTipTextOn = "ToolTipOn",
         const QString& iconNameOff = "", 
         const QString& toolTipTextOff = "ToolTipOff",
-        int timerDuration = 100
+        int timerDuration = 100//,
+        //bool moveWidget = true
     );
 
     ~ToolbarToggleHoverButton() { 
@@ -32,6 +33,7 @@ public:
     }; // Le widget n'a pas de parent, il doit être détruit manuellement
 
     void setOnTop(const bool &onTop);
+    void setOnRight(const bool &onRight);
 
 private:
     QWidget* m_widgetToDisplay = nullptr;
@@ -44,6 +46,7 @@ private:
 
     /// @brief pour savoir où déplacer le widget
     bool m_onTop = true;
+    bool m_onRight = false;
 
 protected:
     /// @brief Lorsque la souris survole le bouton, arret du timer et show de la popup

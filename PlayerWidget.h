@@ -2,13 +2,16 @@
 #define PLAYERWIDGET_H
 
 #include "MediaWidget.h"
+#include "BlackOpacityWidget.h"
 #include "CompositionWidget.h"
+#include "DrawingWidget.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "ExtractSequenceWidget.h"
 #include "SignalManager.h"
 
+#include <QMessageBox>
 #include <QWidget>
-#include <qmainwindow.h>
+#include <QMainWindow>
 #include <vlc/vlc.h>
 #include <QSize>
 
@@ -30,6 +33,7 @@ public:
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };
+    bool zoomed() { return m_toolBar->zoomBtn()->isChecked(); }
 
 public slots:
     void play();
@@ -51,18 +55,25 @@ public slots:
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
+    void enableZoomMode();
+    void disableZoomMode();
     void startRecord();
     void endRecord();
     void rotate();
+    void setBlackOpacityMode(bool isShown, double opacity);
+    void showDrawingMode(bool isEnabled);
     void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void onMediaRectChanged(const QRect &rect);
     void widgetSizeChange();
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
     void openSequenceExtractionDialog();
 
     void enableButtons();
     void disableButtons();
     void mediaPlayerEjectedHandler();
+
+    /// @brief Reset compositionWidget, drawingWidget and blackOpacityWidget
+    void resetLayerWidgets();
 
 signals:
     void addPlayerRequest();
@@ -86,6 +97,8 @@ signals:
     void unmuteUiUpdateRequested();
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
+    void enableZoomUiUpdateRequested();
+    void disableZoomUiUpdateRequested();
     void nameUiUpdateRequest(const QString& );
     void enableFullscreenUiUpdateRequested();
     void disableFullscreenUiUpdateRequested();
@@ -110,7 +123,9 @@ private:
     QAction* m_addPlayerAction;
     QAction* m_removePlayerAction;
     MediaWidget* m_mediaWidget = nullptr;
+    BlackOpacityWidget* m_blackOpacityWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
+    DrawingWidget* m_drawingWidget = nullptr;
     QSize m_mediaSize;
     QRect m_mediaRect;
     QString m_pendingFilePath;

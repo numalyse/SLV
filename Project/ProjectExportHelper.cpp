@@ -214,7 +214,18 @@ namespace  {
 
         qDebug() << "[export_video] Démarrage du mixage FFmpeg...";
 
-        ffmpegProcess.start("ffmpeg", arguments);
+        QString appDir = QCoreApplication::applicationDirPath();
+        QString ffmpegExe;
+#if defined(Q_OS_WIN)
+        ffmpegExe = appDir + "/bin/ffmpeg.exe";
+#elif defined(Q_OS_MAC)
+        ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
+#else
+        ffmpegExe = appDir + "/bin/ffmpeg";
+#endif
+
+        ffmpegProcess.start(ffmpegExe, arguments);
+        //ffmpegProcess.start(QString(FFMPEG_EXECUTABLE), arguments);
 
         if (!ffmpegProcess.waitForStarted()) {
             qCritical() << "Impossible de lancer FFmpeg.";
@@ -250,8 +261,8 @@ namespace ProjectExportHelper {
         QTextStream out(&file);
         out.setEncoding(QStringConverter::Utf8);
 
-        out << "=== Etude cinematographique ===\n\n";
-        out << "Nombre total de plans : " << shots.size() << "\n\n";
+        out << "=== " << "Étude cinématographique" << " ===\n\n";
+        out << PrefManager::instance().getText("number_of_shots") << " : " << shots.size() << "\n\n";
 
         int totalShots = shots.size();
 
@@ -263,8 +274,9 @@ namespace ProjectExportHelper {
             QString timeStr = TimeFormatter::msToHHMMSSFF(shot.start, fps);
             QString endStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
 
-            out << "- [Plan " << (IShot + 1) << "] " << shot.title 
-                << " -> Debut : " << timeStr << " / Duree : " << endStr << "\n";
+            out << "- [" << PrefManager::instance().getText("shot") << " " << (IShot + 1) << "] " << shot.title 
+                << " -> "<< PrefManager::instance().getText("shot_detail_start_time_name") <<" : " << timeStr 
+                << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << endStr << "\n";
 
             if (!shot.note.trimmed().isEmpty()) {
                 out << shot.note.trimmed() << "\n"; 
@@ -292,9 +304,6 @@ namespace ProjectExportHelper {
         if(progressCallback) progressCallback(0);
 
         QDir folder(dstPath);
-        if( folder.exists() ) {
-            folder.removeRecursively();
-        }
 
         if (!QDir().mkpath(dstPath)) {
             qDebug() << "Erreur : Impossible de créer le dossier " << dstPath;
@@ -327,15 +336,16 @@ namespace ProjectExportHelper {
             if (progressCallback && totalShots > 0) {
                 int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
                 if (!progressCallback(percent)) {
-                    folder.removeRecursively();
+                    // folder.removeRecursively();
                     return false;  
                 }
             }
             
             QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
             timeString.replace(":", "-");
+            timeString.replace(".", "-");
         
-            QString fileName = QDir(dstPath).filePath("TagImage" + QString::number(currentShot+1) + '_' + timeString + ".png");
+            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currentShot+1) + '_' + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
@@ -430,8 +440,14 @@ namespace ProjectExportHelper {
             QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
             QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
 
-            QString planHeader = QString("- [Plan %1] %2 -> Début : %3 / Durée : %4")
-                                        .arg(currentShot + 1).arg(shot.title).arg(start).arg(shotDuration);
+            QString planHeader = QString("- [%1 %2] %3 -> %4 : %5 / %6 : %7")
+                                        .arg(PrefManager::instance().getText("shot"))
+                                        .arg(currentShot + 1)
+                                        .arg(shot.title)
+                                        .arg(PrefManager::instance().getText("shot_detail_start_time_name"))
+                                        .arg(start)
+                                        .arg(PrefManager::instance().getText("shot_detail_duration_time_name"))
+                                        .arg(shotDuration);
             
             cursor.insertBlock(leftAlignment);
             cursor.insertText(planHeader, subtitleFormat);
@@ -559,7 +575,40 @@ namespace ProjectExportHelper {
         pythonProcess.setProcessChannelMode(QProcess::MergedChannels); // Pour lire les prints normaux et les erreurs
 
         // On passe le chemin du JSON
-        pythonProcess.start("py", QStringList() << pythonScriptPath << jsonFile.fileName());
+        //pythonProcess.start("py", QStringList() << pythonScriptPath << jsonFile.fileName());
+
+        QString appDir = QCoreApplication::applicationDirPath();
+        QString pythonExe;
+
+        #if defined(Q_OS_WIN)
+            pythonExe = appDir + "/python/python.exe";
+        #elif defined(Q_OS_MAC)
+            //pythonExe = appDir + "/python/bin/python3";
+            pythonExe = appDir + "/../Resources/python/bin/python3";
+            //pythonExe = "python3";
+        #else
+            pythonExe = appDir + "/python/bin/python3";
+        #endif
+
+        QString scriptPath = appDir + "/" + pythonScriptPath;
+        #if defined(Q_OS_MAC) 
+            scriptPath = appDir + "/../Resources/" + pythonScriptPath;
+        #endif
+        
+        qDebug() << "Python script path: " << scriptPath;
+
+        if(!QFile::exists(scriptPath)){
+            qDebug() << "Python script not found: " << scriptPath;
+            return false;
+        }
+
+        QString shot_name = PrefManager::instance().getText("shot");
+        QString start_time_name = PrefManager::instance().getText("shot_detail_end_time_name");
+        QString duration_time_name = PrefManager::instance().getText("shot_detail_duration_time_name");
+
+        QStringList arguments;
+        arguments << scriptPath << jsonFile.fileName() << shot_name << start_time_name << duration_time_name;
+        pythonProcess.start(pythonExe, arguments);
 
         // Boucle d'attente active pour lire la progression en temps réel
         while (pythonProcess.waitForReadyRead(-1)) {
@@ -675,14 +724,16 @@ namespace ProjectExportHelper {
                  // Récupère le temps et l'id du plan comprenant imgData.timeMs
                 currentShot = findShotIndexAtTime(shots, imgData.timeMs);
                 if(currentShot == -1){ // Si pas de temps trouvé, le text devient vide
-                    qDebug() << "Impossible de trouver un plan qui comprends : " << imgData.timeMs << "garde le textPrecende";
+                    qDebug() << "Impossible de trouver un plan qui comprend : " << imgData.timeMs << "garde le textPrecende";
                     wrappedText.clear();
                     textOverlay.fill(Qt::transparent); 
                 }else { // Le texte est mis à jour avec les infos du nouveau plan
                     auto& s = shots[currentShot];
                     endShotTime = s.end;
-                    QString shotTitleTxt = "[Plan " + QString::number(currentShot+1) + "] " + s.title;
-                    QString timecodeTxt = "Début : " + TimeFormatter::msToHHMMSSFF(s.start, fps) + " / Durée : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
+                    QString shotTitleTxt = "["+ PrefManager::instance().getText("shot") + " " + QString::number(currentShot+1) + "] " + s.title;
+                    QString timecodeTxt = PrefManager::instance().getText("shot_detail_start_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps) 
+                                        + " / "
+                                        + PrefManager::instance().getText("shot_detail_duration_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
                     QString noteTxt = s.note;
                     wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width, fontSize);
                     textOverlay.fill(Qt::transparent); 

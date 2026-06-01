@@ -1,17 +1,22 @@
 #include "Playlist.h"
 #include "PrefManager.h"
 #include "./ToolbarButtons/ToolbarButton.h"
+#include "FileFormatManager.h"
+#include "Project/ProjectManager.h"
+#include "GenericDialog.h"
+
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
 #include <QDir>
 #include <QDirIterator>
 #include <QCheckBox>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 namespace {
 QStringList collectValidFilesFromPath(const QString &path)
 {
-    const QStringList allowedExtensions = {"mp4", "avi", "mkv", "mov", "m4v", "vob", "png", "wav"};
     QStringList collected;
 
     QDir dir(path);
@@ -22,7 +27,7 @@ QStringList collectValidFilesFromPath(const QString &path)
     while (it.hasNext()) {
         QString filePath = it.next();
         QString ext = QFileInfo(filePath).suffix().toLower();
-        if (allowedExtensions.contains(ext)) {
+        if (FileFormatManager::instance().isFormatAccepted(ext)) {
             collected.append(filePath);
         }
     }
@@ -42,19 +47,19 @@ Playlist::Playlist(QWidget *parent)
     m_mainLayout->addLayout(playlistLabelLayout);
 
     QLabel *playlistLabel = new QLabel();
-    QFont font = playlistLabel->font();
-    font.setPointSize(12);
-    font.setBold(true);
-    playlistLabel->setFont(font);
+    QFont playlistFont = playlistLabel->font();
+    playlistFont.setPointSize(12);
+    playlistFont.setBold(true);
+    playlistLabel->setFont(playlistFont);
     //playlistLabel->setTextFormat(Qt::RichText);
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
 
     m_loopItemBtn = new ToolbarToggleButton(this, 
-        false, 
-        "loop_off_white", 
+        false,
+        "playlist_loop_white",
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(activated)"),
-        "loop_off_white", 
+        "playlist_loop_white",
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_loopItemBtn->setFixedSize(24,24);
     m_loopItemBtn->setToggledIconFrame(true);
@@ -77,29 +82,57 @@ Playlist::Playlist(QWidget *parent)
     createSortBtn();
     playlistLabelLayout->addWidget(m_sortPlaylistBtn);
 
+    // [Bouton] Supprimer tous les éléments
+    m_deleteAllBtn = new QPushButton;
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_deleteAllBtn->setIcon(QIcon(":/icons/delete_white"));
+    } else {
+        m_deleteAllBtn->setIcon(QIcon(":/icons/delete"));
+    }
+    m_deleteAllBtn->setFixedSize(24,24);
+    m_deleteAllBtn->setMaximumWidth(24);
+    m_deleteAllBtn->setStyleSheet("QPushButton{"
+        "   background-color: rgba(0,0,0,0);"
+        "   border: none;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: tomato;"
+        "   border: 1px solid palette(button);"
+        "   border-radius: 4px;"
+        "}");
+    m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_remove_all_items_playlist"));
+    playlistLabelLayout->addWidget(m_deleteAllBtn);
+
     // [Bouton] Ajouter un élément à la playlist
     m_addItemBtn = new QPushButton;
-    m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
+    } else {
+        m_addItemBtn->setIcon(QIcon(":/icons/plus"));
+    }
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     m_addItemBtn->setStyleSheet("QPushButton{"
         "   background-color: rgba(0,0,0,0);"
-        "   border: 2px dashed palette(button);"
+        "   border: 2px dashed " + color +
         "   border-radius: 4px;"
         "}"
         "QPushButton:hover{"
         "   background-color: palette(button);"
-        "   border: 2px solid palette(button);"
+        "   border: 2px solid " + color +
         "   border-radius: 4px;"
         "}");
     playlistLabelLayout->addWidget(m_addItemBtn);
 
+    // LAYOUT ITEMS
     m_itemsLayout = new QVBoxLayout();
     m_mainLayout->addLayout(m_itemsLayout);
     m_mainLayout->addWidget(m_addItemBtn);
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
+    connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsFromPaths);
 
@@ -111,7 +144,30 @@ void Playlist::resizeEvent(QResizeEvent *event)
     qDebug() << "Playlist height : " << this->height();
 }
 
+QStringList Playlist::dataHasValidUrls(const QMimeData *mimeData) const{
+    QList<QUrl> urlList = mimeData->urls();
+    QStringList filePaths;
+
+    for (const QUrl &url : urlList) {
+        QString filePath = url.toLocalFile();
+
+        QFileInfo info(filePath);
+        if (info.isDir()) {
+            filePaths.append(collectValidFilesFromPath(filePath));
+        } else if (info.isFile() && FileFormatManager::instance().isFormatAccepted(info.suffix())) {
+            filePaths.append(filePath);
+        }
+    }
+    return filePaths;
+}
+
 void Playlist::dragEnterEvent(QDragEnterEvent *event){
+    if (!event->mimeData()->hasFormat("move-PlaylistItem") && event->mimeData()->hasUrls()) {
+        QStringList filePaths = dataHasValidUrls(event->mimeData());
+        if(filePaths.empty())
+            event->ignore();
+    }
+
     if (event->mimeData()->hasUrls() || event->mimeData()->hasFormat("move-PlaylistItem")) {
         event->acceptProposedAction();
     } else {
@@ -150,21 +206,14 @@ void Playlist::dropEvent(QDropEvent *event)
 
         event->acceptProposedAction();
     } else if (mimeData->hasUrls()) {
-        QList<QUrl> urlList = mimeData->urls();
-        QStringList filePaths;
-
-        for (const QUrl &url : urlList) {
-            QString filePath = url.toLocalFile();
-            qDebug() << "Fichier ou dossier droppé :" << filePath;
-
-            QFileInfo info(filePath);
-            if (info.isDir()) {
-                filePaths.append(collectValidFilesFromPath(filePath));
-            } else if (info.isFile()) {
-                filePaths.append(filePath);
-            }
+        QStringList filePaths = dataHasValidUrls(event->mimeData());
+        if(filePaths.size() < event->mimeData()->urls().size()){
+            QMessageBox *msg = new QMessageBox();
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+            msg->setIcon(QMessageBox::Information);
+            msg->exec();
         }
-
         if (!filePaths.isEmpty()) {
             addItemsFromPaths(filePaths);
             // updateItemIndices();
@@ -184,8 +233,8 @@ void Playlist::addItemDialog()
     QStringList filesPaths = QFileDialog::getOpenFileNames(
         this, 
         prefManager.getText("dialog_open_files"), 
-        prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        prefManager.getPref("Paths", "lp_open_media"),
+        FileFormatManager::instance().getOpenFileDialogFilters()
     ); 
 
     if(filesPaths.empty()){
@@ -216,7 +265,7 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         this->updateGeometry();
         
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
-        connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [&](unsigned int index){
+        connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [this](unsigned int index){
             m_currentMediaIndex = index;
         });
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
@@ -237,14 +286,129 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
     emit disableToolbarLoopRequested();
 }
 
+void Playlist::deleteAllItemsDialog()
+{
+
+    auto& prefManager = PrefManager::instance();
+    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+
+    QDialog dialog;
+    dialog.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    dialog.setAttribute(Qt::WA_TranslucentBackground);
+    dialog.setFixedSize(500,220);
+    dialog.setObjectName("dialogWindow");
+    dialog.setStyleSheet(
+        "#dialogWindow {"
+            "background-color: transparent;"
+        "}"
+    );    
+
+    QVBoxLayout outerLayout(&dialog);
+    outerLayout.setContentsMargins(0,0,0,0);
+
+    QWidget* container = new QWidget;
+    container->setObjectName("dialogContainer");
+
+    container->setStyleSheet(
+        "#dialogContainer {"
+            "background-color: palette(Window);"
+            "border: 2px solid " + color + ";"
+            "border-radius: 20px;"
+        "}"
+    );
+
+    outerLayout.addWidget(container);
+
+    QVBoxLayout layout(container);
+    layout.setContentsMargins(20,20,20,20);
+
+    QLabel* titleLabel = new QLabel;
+    titleLabel->setAlignment(Qt::AlignCenter);
+    titleLabel->setText(prefManager.getText("remove_all_items_playlist"));
+    
+    QFont titleFont = titleLabel->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    titleLabel->setFont(titleFont);
+    layout.addWidget(titleLabel);
+
+    QLabel* textLabel = new QLabel;
+    QFont textFont = textLabel->font();
+    textFont.setPointSize(10);
+    textLabel->setFont(textFont);
+    textLabel->setAlignment(Qt::AlignCenter);
+    textLabel->setTextFormat(Qt::RichText);
+    textLabel->setText(
+                        prefManager.getText("remove_all_items") + "<br>" +
+                        "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i><br>");
+    layout.addWidget(textLabel);
+
+    QHBoxLayout* btnLayout = new QHBoxLayout;
+    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("remove_all"));
+    QPushButton* cancelBtn = new QPushButton(prefManager.getText("generic_dialog_btn_cancel"));
+
+    QFont btnFont = deleteAllBtn->font();
+    btnFont.setPointSize(10);
+    btnFont.setBold(true);
+
+    deleteAllBtn->setFont(btnFont);
+    cancelBtn->setFont(btnFont);
+
+    deleteAllBtn->setFixedSize(200,40);
+    cancelBtn->setFixedSize(200,40);
+
+    deleteAllBtn->setStyleSheet("QPushButton{"
+        "   background-color: tomato;"
+        "   border: 1px solid tomato;"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: salmon;"
+        "   border: 2px solid salmon;"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    cancelBtn->setStyleSheet("QPushButton{"
+        "   background-color: palette(Window);"
+        "   border: 1px solid palette(Button);"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: palette(Button);"
+        "   border: 2px solid palette(Button);"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    connect(deleteAllBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+    connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+    btnLayout->addWidget(deleteAllBtn);
+    btnLayout->setSpacing(20);
+    btnLayout->addWidget(cancelBtn);
+    layout.addLayout(btnLayout);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        deleteAllItems();
+    }
+}
+
+void Playlist::deleteAllItems()
+{
+    while(!m_items.isEmpty()){
+        deleteItem(static_cast<unsigned int>(m_items.size() - 1));
+    }
+}
+
 void Playlist::deleteItem(const unsigned int index)
 {
     if(m_currentMediaIndex == index){
         playPreviousMedia();
         if(m_currentMediaIndex == 0)
-                playNextMedia();
+            playNextMedia();
     }
-    if(m_currentMediaIndex >= index)
+    if(m_currentMediaIndex >= index && m_currentMediaIndex > 0)
         m_currentMediaIndex--;
     m_items[m_itemsSortOrder[index]]->deleteLater();
     m_items.remove(m_itemsSortOrder.indexOf(index));
@@ -262,6 +426,23 @@ void Playlist::deleteItem(const unsigned int index)
 
 void Playlist::playMedia(const QString& filePath, const bool isClicked)
 {
+    ProjectManager& projManager = ProjectManager::instance();
+    bool changeMedia = true;
+    if(projManager.needSave()){
+        SLV::showGenericDialog(
+            this,
+            PrefManager::instance().getText("dialog_save_project_dialog_title"),
+            PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+            [&projManager]() {
+                projManager.saveProject(false);
+            },
+
+            [](){},
+            [&changeMedia](){ changeMedia = false; }
+        );
+    }
+    if(!changeMedia) return;
     emit openMediaFileRequested(filePath);
     for(size_t IMedia = 0; IMedia < m_items.size(); ++IMedia){
         unsigned int index = m_playlistShuffled && !isClicked ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
@@ -276,6 +457,23 @@ void Playlist::playPreviousMedia()
 {
     if(m_currentMediaIndex > 0)
     {
+        ProjectManager& projManager = ProjectManager::instance();
+        bool changeMedia = true;
+        if(projManager.needSave()){
+            SLV::showGenericDialog(
+                this,
+                PrefManager::instance().getText("dialog_save_project_dialog_title"),
+                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+                [&projManager]() {
+                    projManager.saveProject(false);
+                },
+
+                [](){},
+                [&changeMedia](){ changeMedia = false; }
+            );
+        }
+        if(!changeMedia) return;
         m_currentMediaIndex--;
         unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
         m_items[m_itemsSortOrder[index]]->playMedia();
@@ -286,11 +484,45 @@ void Playlist::playNextMedia()
 {
     if(m_currentMediaIndex < m_items.size()-1)
     {
+        ProjectManager& projManager = ProjectManager::instance();
+        bool changeMedia = true;
+        if(projManager.needSave()){
+            SLV::showGenericDialog(
+                this,
+                PrefManager::instance().getText("dialog_save_project_dialog_title"),
+                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+                [&projManager]() {
+                    projManager.saveProject(false);
+                },
+
+                [](){},
+                [&changeMedia](){ changeMedia = false; }
+            );
+        }
+        if(!changeMedia) return;
         m_currentMediaIndex++;
         unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
         m_items[m_itemsSortOrder[index]]->playMedia();
     }
     else if(m_playlistLooping){
+        ProjectManager& projManager = ProjectManager::instance();
+        bool changeMedia = true;
+        if(projManager.needSave()){
+            SLV::showGenericDialog(
+                this,
+                PrefManager::instance().getText("dialog_save_project_dialog_title"),
+                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+
+                [&projManager]() {
+                    projManager.saveProject(false);
+                },
+
+                [](){},
+                [&changeMedia](){ changeMedia = false; }
+            );
+        }
+        if(!changeMedia) return;
         m_currentMediaIndex = 0;
         unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
         m_items[m_itemsSortOrder[index]]->playMedia();

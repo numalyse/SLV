@@ -18,6 +18,7 @@
 #include <QProgressDialog>
 #include <QDebug>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 #include <fstream>
 #include <iostream>
@@ -104,6 +105,7 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
     setSaveNotNeeded();
     m_isDurationParsed = false;
     m_isFpsParsed = false;
+    m_projectInitialized = false;
 
     connect(m_project->media, &Media::durationParsed, this, [this]() {
         m_isDurationParsed = true;
@@ -189,9 +191,10 @@ QString ProjectManager::mediaPathExtension()
 /// @brief Une fois que les fps et la durée on été parsed, Créer un project avec un plan de la longueur de la vidéo
 void ProjectManager::initProjectShot(){
 
-    if( ! m_isFpsParsed || ! m_isDurationParsed ){
+    if( ! m_isFpsParsed || ! m_isDurationParsed || m_projectInitialized ){
         return;
     }
+    m_projectInitialized = true;
 
     Q_ASSERT(m_project);
 
@@ -200,7 +203,7 @@ void ProjectManager::initProjectShot(){
         return;
     }
 
-    Shot shot{"Titre", 0, m_project->media->duration()};
+    Shot shot{PrefManager::instance().getText("shot_detail_title_name"), 0, m_project->media->duration()};
     shot.tagImageTime = shot.middle();
     m_project->shots.append(shot);
     
@@ -210,6 +213,7 @@ void ProjectManager::initProjectShot(){
 
     qDebug() << "project initialisé";
     emit projectInitialized();
+
 }
 
 
@@ -342,14 +346,22 @@ void ProjectManager::openProject()
         prefManager.getPref("Paths", "lp_project")
     );
 
-    if(selectedPath.isEmpty()){
+    openProjectFromPath(selectedPath);
+
+}
+
+void ProjectManager::openProjectFromPath(const QString& path)
+{
+    auto& prefManager = PrefManager::instance();
+
+    if(path.isEmpty()){
         return;
     }
 
-    QFileInfo fileInfo(selectedPath);
+    QFileInfo fileInfo(path);
     prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
-    auto loaded = ProjectFileHelper::loadProject(selectedPath);
+    auto loaded = ProjectFileHelper::loadProject(path);
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
@@ -360,10 +372,10 @@ void ProjectManager::openProject()
     ProjectSaveData projectData = loaded.value();
 
     Project* project = new Project{
-        projectData.shots, 
-        new Media(projectData.mediaAbsolutePath, this), 
-        QFileInfo(selectedPath).baseName(), 
-        selectedPath
+        projectData.shots,
+        new Media(projectData.mediaAbsolutePath, this),
+        QFileInfo(path).baseName(),
+        path
     };
 
     deleteProject();
@@ -376,7 +388,7 @@ void ProjectManager::openProject()
 
 
     connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
-        
+
         if(durationJson == durationFile){
             m_isDurationParsed = true;
             checkMediaFullyLoaded();
@@ -388,7 +400,7 @@ void ProjectManager::openProject()
     });
 
     connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
-        
+
         if(fpsJson == fpsFile){
             m_isFpsParsed = true;
             checkMediaFullyLoaded();
@@ -398,12 +410,11 @@ void ProjectManager::openProject()
         }
 
     });
-    
-    m_project->media->parse();
 
+    m_project->media->parse();
 }
 
-///@brief Quand les fps et la duréer sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
+///@brief Quand les fps et la durée sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
 void ProjectManager::checkMediaFullyLoaded()
 {
     if(m_isDurationParsed && m_isFpsParsed){
@@ -460,11 +471,14 @@ void ProjectManager::exportProject(){
             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
         );
     }else {
+        QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
+        if(selectedFormat == ExportType::SRC)
+            dialogFilter.replace(".src", '.'+mediaPathExtension());
         selectedPath = QFileDialog::getSaveFileName(
             nullptr, 
             prefManager.getText("export_file_path_title"), 
-            dialogDir, 
-            prefManager.getText(SLV::getExportTypeString(selectedFormat)) 
+            dialogDir+'/'+m_project->media->fileName() + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
+            dialogFilter
         );
     }
 
@@ -480,7 +494,7 @@ void ProjectManager::exportProject(){
     int64_t duration = m_project->media->duration();
     QString mediaPath = m_project->media->filePath();
 
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath, this);
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath.split(".")[0], this);
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();
@@ -492,11 +506,32 @@ void ProjectManager::exportProject(){
         exportThread->requestInterruption();
     });
 
-    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog](bool success) {
+    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog, selectedPath, this](bool success) {
         if (success) {
             qDebug() << "Export réussi";
+            QMessageBox *msg = new QMessageBox();
+            QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
+            bool ok = connect(openDirBtn, &QPushButton::clicked, this, [selectedPath](){
+                QFileInfo fi(selectedPath);
+                QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+            });
+            qDebug() << "Connected ? " << ok;
+            msg->addButton(openDirBtn, QMessageBox::AcceptRole);
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("project_exportation_finished"));
+            msg->setIcon(QMessageBox::Information);
+            msg->adjustSize();
+            msg->exec();
+            return;
         }else {
             qDebug() << "Export annulé ou erreur";
+            QMessageBox *msg = new QMessageBox();
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("project_exportation_error"));
+            msg->setIcon(QMessageBox::Information);
+            msg->adjustSize();
+            msg->exec();
+            return;
         }
         progressDialog->close(); 
         progressDialog->deleteLater(); 

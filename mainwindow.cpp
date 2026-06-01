@@ -4,10 +4,13 @@
 #include "Project/ProjectManager.h"
 #include "PlayerWidget.h"
 #include "PrefManager.h"
+#include "HelperWidget.h"
+#include "AboutWidget.h"
 #include "GenericDialog.h"
 #include "Preference/PreferenceDialog.h"
+#include "FileFormatManager.h"
 
-#include <qtoolbar.h>
+#include <QToolBar>
 #include <vlc/vlc.h>
 
 #include <QTimer>
@@ -22,6 +25,7 @@
 #include <QDir>
 #include <QAction>
 #include <QFileDialog>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,7 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
     //this->setCentralWidget(ui->centralwidget);
 
     // ===== Info ===== //
-    setWindowTitle("SLV (Windows) (dev version)");
+    setWindowTitle("Numalyse Player (alpha version)");
+    setWindowIcon(QIcon(":/logo/numalyse_logo_white"));
     // setWindowIcon(QIcon("../icon/numalyse_logo.ico"));
     // QString path = "../icon/numalyse_logo.ico";
     // QFile f(path);
@@ -128,6 +133,13 @@ void MainWindow::createMenuBar()
     auto *openPrefAction = OptionMenu->addAction("&" + prefManager.getText("main_window_option_open_pref"));
     connect(openPrefAction, &QAction::triggered, this, &MainWindow::openPrefWidget);
 
+    auto *HelpMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_help"));
+
+    auto *openHelperAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
+    connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);    
+
+    auto *openAboutAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_about"));
+    connect(openAboutAction, &QAction::triggered, this, &MainWindow::openAboutWidget);
 
     // menuBar()->setCornerWidget(m_navPanelBtn, Qt::TopRightCorner);
 
@@ -139,17 +151,37 @@ void MainWindow::createToolBar()
 
     createViewGridBtn();
 
-    m_navPanelBtn = new ToolbarToggleButton(
+    QHBoxLayout *panelDisplayLayout = new QHBoxLayout();
+    m_playlistBtn = new ToolbarButton(nullptr, "playlist_white", PrefManager::instance().getText("tooltip_playlist_button"));
+    m_shotDetailBtn = new ToolbarButton(nullptr, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    panelDisplayLayout->addWidget(m_playlistBtn);
+    panelDisplayLayout->addWidget(m_shotDetailBtn);
+
+    m_navPanelBtn = new ToolbarToggleHoverButton(
         m_toolbarQt,
+        panelDisplayLayout,
         false,
         "nav_panel_menu_open_white",
         PrefManager::instance().getText("tooltip_nav_panel_close"),
         "nav_panel_menu_closed_white",
         PrefManager::instance().getText("tooltip_nav_panel_open")
     );
+    m_navPanelBtn->setOnTop(false);
     m_navPanelBtn->setFixedSize(30, 30);
     m_navPanelBtn->setIconSize(QSize(20, 20));
     m_navPanelBtn->setStyleSheet("border: none;");
+
+    ToolbarButton *accessFolderBtn = new ToolbarButton(m_toolbarQt, "folder_white", PrefManager::instance().getText("tooltip_access_folder"));
+    accessFolderBtn->setIconSize(QSize(20, 20));
+    connect(accessFolderBtn, &ToolbarButton::clicked, this, [](){
+        if(!QDir(PrefManager::instance().getPref("Paths", "screenshot")).exists()) QDir().mkdir(PrefManager::instance().getPref("Paths", "screenshot"));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(PrefManager::instance().getPref("Paths", "screenshot")));
+    });
+    connect(m_playlistBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::displayPlaylist);
+    connect(m_playlistBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
+    connect(m_shotDetailBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail);
+    connect(m_shotDetailBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
+    connect(&SignalManager::instance(), &SignalManager::openNavPanel, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
 
     m_toolbarQt->setMovable(false);
     m_toolbarQt->setFloatable(false);
@@ -158,11 +190,8 @@ void MainWindow::createToolBar()
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_toolbarQt->addWidget(spacer);
+    m_toolbarQt->addWidget(accessFolderBtn);
     m_toolbarQt->addWidget(m_viewGridBtn);
-    // m_toolbarQt->addWidget(m_view1);
-    // m_toolbarQt->addWidget(m_view2);
-    // m_toolbarQt->addWidget(m_view3);
-    // m_toolbarQt->addWidget(m_view4);
     m_toolbarQt->addWidget(m_navPanelBtn);
     m_toolbarQt->setStyleSheet("border: none;");
 
@@ -228,22 +257,22 @@ void MainWindow::selectAndLoadMediaFiles()
     auto& prefManager = PrefManager::instance();
     QStringList files_paths = QFileDialog::getOpenFileNames(
         this, 
-        prefManager.getText("open_files"), 
-        prefManager.getPref("Paths", "lp_open_media"), 
-        "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
+        prefManager.getText("open_files"),
+        prefManager.getPref("Paths", "lp_open_media"),
+        FileFormatManager::instance().getOpenFileDialogFilters()
     );
     
     if(files_paths.empty()){
         qDebug() << "Pas de fichier sélectionné";
         return;
     }
-    if(files_paths.size() == 1)
-        emit SignalManager::instance().addPlaylistItems(files_paths);
+    // if(files_paths.size() == 1)
+    //     emit SignalManager::instance().addPlaylistItems(files_paths);
     if(files_paths.size() > 4){
-        SLV::showGenericDialog(this, "open_more_than_four_files_title", "open_more_than_four_files_dialog", [files_paths](){
+        SLV::showGenericDialog(this, prefManager.getText("open_more_than_four_files_title"), prefManager.getText("open_more_than_four_files_dialog"), [files_paths, this](){
             emit SignalManager::instance().addPlaylistItems(files_paths);
+            m_navPanelBtn->click();
         });
-        emit SignalManager::instance().addPlaylistItems(files_paths);
         qDebug() << "Trop de fichiers sélectionnés";
         return;
     }
@@ -252,8 +281,18 @@ void MainWindow::selectAndLoadMediaFiles()
     prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
     
     qDebug() << "Fichiers sélectionnés : " << files_paths;
+    bool formatNotAccepted = false;
     for(const QString& path : files_paths){
         qDebug() << path;
+        if(!FileFormatManager::instance().isFormatAccepted(QFileInfo(path).suffix()))
+            formatNotAccepted = true;
+    }
+    if(formatNotAccepted){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
     }
     
     m_globalPlayerManager->setPlayersFromPaths(files_paths);
@@ -335,7 +374,7 @@ void MainWindow::createViewGridBtn()
     m_view4 = new ToolbarButton(nullptr, "view_4_white", PrefManager::instance().getText("tooltip_view_4"));
     viewLayout->addWidget(m_view4);
 
-    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white"),  PrefManager::instance().getText("tooltip_view_grid");
+    m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"));
     m_viewGridBtn->setOnTop(false);
 }
 
@@ -380,4 +419,16 @@ void MainWindow::openPrefWidget()
 {
     PreferenceDialog* prefDialog = new PreferenceDialog(this);
     prefDialog->exec();
+}
+
+void MainWindow::openHelperWidget()
+{
+    HelperWidget* helpDialog = new HelperWidget(this);
+    helpDialog->exec();
+}
+
+void MainWindow::openAboutWidget()
+{
+    AboutWidget* aboutDialog = new AboutWidget(this);
+    aboutDialog->exec();
 }

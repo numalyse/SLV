@@ -2,9 +2,9 @@
 #define PLAYLIST_H
 
 #include <QWidget>
-#include <PlaylistItem.h>
+#include "PlaylistItem.h"
 #include <QFileDialog>
-#include <SignalManager.h>
+#include "SignalManager.h"
 #include <QImage>
 #include "./ToolbarButtons/ToolbarToggleButton.h"
 #include "./ToolbarButtons/ToolbarPopupButton.h"
@@ -18,8 +18,9 @@ class Playlist : public QWidget
 public:
     explicit Playlist(QWidget *parent = nullptr);
     void updateThumbnail(int playlistItemId, QImage image);
+    QStringList dataHasValidUrls(const QMimeData *mimedata) const;
 
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -36,6 +37,7 @@ private:
     ToolbarToggleButton *m_shuffleItemBtn = nullptr;
     ToolbarPopupButton *m_sortPlaylistBtn = nullptr;
     QPushButton *m_addItemBtn = nullptr;
+    QPushButton *m_deleteAllBtn = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
     QVBoxLayout *m_itemsLayout = nullptr;
     QButtonGroup *m_sortButtons;
@@ -47,8 +49,10 @@ signals:
 
 public slots:
     void addItemDialog();
+    void deleteAllItemsDialog();
     void addItemsFromPaths(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);
+    void deleteAllItems();
     void playMedia(const QString &filePath, const bool isClicked);
     void playPreviousMedia();
     void playNextMedia();

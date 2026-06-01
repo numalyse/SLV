@@ -29,9 +29,12 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::disablePlayerFullscreenRequested, this, &PlayerLayoutManager::disablePlayerLayoutFullscreen);
         connect(player, &PlayerWidget::checkPlayersPlayStatusRequested, this, &PlayerLayoutManager::checkPlayersPlayStatus);
         connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
+        connect(player, &PlayerWidget::enableZoomUiUpdateRequested, this, &PlayerLayoutManager::checkPlayersZoomStatus);
+        connect(player, &PlayerWidget::disableZoomUiUpdateRequested, this, &PlayerLayoutManager::checkPlayersZoomStatus);
         connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
         m_players.append(player);
     }
+    connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, m_players[0], &PlayerWidget::eject);
     
 }
 
@@ -78,6 +81,11 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
 
     QWidget* container = nullptr;
     PlayerWidget* player = nullptr;
+
+    if(count != 1){
+        m_activePlayers[0]->resetLayerWidgets();
+    }
+
     switch (count){
         case 1: 
             container = create1();
@@ -86,7 +94,7 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
             break;
         case 2:
             {
-                Qt::Orientation orientation = arrangement == Arrangement2H ? Qt::Horizontal : Qt::Vertical;
+                Qt::Orientation orientation = arrangement == Arrangement2V ? Qt::Vertical : Qt::Horizontal;
                 container = create2(QStringList(), orientation);
                 emit disableNavPanelRequested();
             }
@@ -270,7 +278,7 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
             adjacentPlayers->addWidget(m_activePlayers[2]);
             mainSplitter->addWidget(m_activePlayers[0]);
             mainSplitter->addWidget(adjacentPlayers);
-            m_currentArrangement = Arrangement3Left;
+            // m_currentArrangement = Arrangement3Left;
         }
 
         adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
@@ -337,6 +345,8 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
         connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
         connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
+        connect(globalToolbar, &GlobalToolbar::enableZoomMode, IActivePlayer, &PlayerWidget::enableZoomMode);
+        connect(globalToolbar, &GlobalToolbar::disableZoomMode, IActivePlayer, &PlayerWidget::disableZoomMode);
         // connect(globalToolbar, &GlobalToolbar::screenshotRequest, IActivePlayer, &PlayerWidget::takeScreenshot);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerLoaded, globalToolbar, &GlobalToolbar::enableButtons);
         connect(IActivePlayer, &PlayerWidget::mediaPlayerEjected, this, &PlayerLayoutManager::disableGlobalToolbarButtons);
@@ -394,9 +404,13 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableRecordRequested, activePlayer, &PlayerWidget::startRecord);
     connect(advancedToolbar, &AdvancedToolbar::disableRecordRequested, activePlayer, &PlayerWidget::endRecord);
     connect(advancedToolbar, &AdvancedToolbar::extractSequenceRequest, activePlayer, &PlayerWidget::openSequenceExtractionDialog);
+    connect(advancedToolbar, &AdvancedToolbar::mediaInformationRequest, activePlayer->mediaWidget(), &MediaWidget::openMediaInfoDialog);
+    connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
+    connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
+    connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
+    connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
     connect(activePlayer, &PlayerWidget::mediaPlayerEjected, advancedToolbar, &AdvancedToolbar::disableButtons);
-    connect(activePlayer->mediaWidget(), &MediaWidget::mediaIsVideoParsed, advancedToolbar, [advancedToolbar](){ advancedToolbar->setExtractable(true); });
 
     // Redirection audio/sous-titres vers la toolbar avancée (toolbar simple cachée)
     //disconnect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, activePlayerToolbar, &SimpleToolbar::updateAudioTracks);
@@ -404,8 +418,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, advancedToolbar, &SimpleToolbar::updateAudioTracks);
     connect(activePlayer->mediaWidget(), &MediaWidget::updateSubtitlesTracksRequested, advancedToolbar, &SimpleToolbar::updateSubtitlesTracks);
 
-    connect(activePlayer->mediaWidget(), &MediaWidget::setAudioTrackDefaultRequested, advancedToolbar, &SimpleToolbar::setAudioTrackDefault);
-    connect(activePlayer->mediaWidget(), &MediaWidget::setSubtitlesTrackDefaultRequested, advancedToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
+    connect(activePlayer->mediaWidget(), &MediaWidget::setAudioTrackRequested, advancedToolbar, &SimpleToolbar::setAudioTrackDefault);
+    connect(activePlayer->mediaWidget(), &MediaWidget::setSubtitlesTrackRequested, advancedToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
 
     // Connecte choix audio/sous-titres au mediawidget
     connect(advancedToolbar, &SimpleToolbar::setAudioTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setAudioTrack);
@@ -417,9 +431,15 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
         advancedToolbar->updateSubtitlesTracks(activePlayer->mediaWidget()->subtitlesTracks());
     }
 
+    connect(advancedToolbar, &AdvancedToolbar::showBlackOpacityModeRequested, activePlayer, &PlayerWidget::setBlackOpacityMode);
+
     connect(advancedToolbar, &AdvancedToolbar::setOverlayModeRequested, activePlayer, &PlayerWidget::setOverlayMode);
+    
+    connect(advancedToolbar, &AdvancedToolbar::showDrawingModeRequested, activePlayer, &PlayerWidget::showDrawingMode);
+    connect(advancedToolbar, &AdvancedToolbar::showDrawingModeRequested, activePlayer, &PlayerWidget::pause);
 
     connect(advancedToolbar, &SimpleToolbar::duplicatePlayerRequested, this, [this, activePlayer]() {
+        activePlayer->resetLayerWidgets();
         this->duplicatePlayer(activePlayer);
     });
 
@@ -435,12 +455,15 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(activePlayer, &PlayerWidget::stopUiUpdateRequested, advancedToolbar, &SimpleToolbar::stopUiUpdate);
     connect(&SignalManager::instance(), &SignalManager::mediaVolumeChanged, advancedToolbar, &AdvancedToolbar::volumeUiUpdate);
     connect(&SignalManager::instance(), &SignalManager::mediaSpeedChanged, advancedToolbar, &AdvancedToolbar::speedUiUpdate);
-    connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, activePlayer, &PlayerWidget::eject);
+
     connect(activePlayer, &PlayerWidget::enableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::enableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::disableLoopUiUpdateRequested, advancedToolbar, &SimpleToolbar::disableLoopUiUpdate);
     connect(activePlayer, &PlayerWidget::nameUiUpdateRequest, advancedToolbar, &SimpleToolbar::nameUiUpdate);
     connect(activePlayer->mediaWidget(), &MediaWidget::hFlipUiUpdateRequested, advancedToolbar, &AdvancedToolbar::hFlipUiUpdate);
     connect(activePlayer->mediaWidget(), &MediaWidget::vFlipUiUpdateRequested, advancedToolbar, &AdvancedToolbar::vFlipUiUpdate);
+    connect(activePlayer->mediaWidget(), &MediaWidget::zoomValueUpdated, advancedToolbar, &AdvancedToolbar::setZoomIndicatorText);
+    connect(activePlayer->mediaWidget(), &MediaWidget::rotationTooltipUpdateRequested, advancedToolbar, &AdvancedToolbar::updateRotationTooltip);
+    connect(activePlayer->mediaWidget(), &MediaWidget::flipTooltipUpdateRequested, advancedToolbar, &AdvancedToolbar::updateFlipTooltip);
 
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, advancedToolbar, &SimpleToolbar::updateSliderValue);
 
@@ -589,6 +612,26 @@ void PlayerLayoutManager::checkPlayersMuteStatus(){
     emit setGlobalMuteStateRequested(newGlobalMuteState());
 }
 
+/// @brief Vérifie combien de players sont zoomés
+/// puis retourne un bool correspondant au nouvel état du bouton zoom de la toolbar globale
+bool PlayerLayoutManager::newGlobalZoomState()
+{
+    int activePlayerCount = static_cast<int>(m_activePlayers.size());
+
+    for (int Iplayer = 0; Iplayer < activePlayerCount; Iplayer++) {
+        if ( !m_activePlayers[Iplayer]->zoomed() ) return false;
+    }
+
+    return true;
+}
+
+/// @brief Envoie le nouvel état du bouton zoom à la toolbar globale
+void PlayerLayoutManager::checkPlayersZoomStatus(){
+    if( m_activePlayers.size() == 1 ) return;
+
+    emit setGlobalZoomStateRequested(newGlobalZoomState());
+}
+
 void PlayerLayoutManager::disableGlobalToolbarButtons()
 {
     bool allEmpty = true;
@@ -654,5 +697,20 @@ void PlayerLayoutManager::takeGlobalScreenshot()
     QList<int> playersTimes = getActivePlayersCurrentTimes();
     GlobalScreenshotHelper* globalScreenshot = new GlobalScreenshotHelper(playersPaths, playersTimes, m_currentArrangement);
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
+    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_completed"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
+    });
+    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedError, this, [this](){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_error"));
+        msg->setIcon(QMessageBox::Information);
+        msg->exec();
+    });
+
     globalScreenshot->start();
 }

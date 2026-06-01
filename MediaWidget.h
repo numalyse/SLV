@@ -3,13 +3,15 @@
 
 #include "Media.h"
 #include "VideoCaptureManager.h"
+#include "SignalManager.h"
+#include "ZoomHelper.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
-#include <SignalManager.h>
 #include <QFrame>
 #include <QDir>
 #include <QComboBox>
+#include <QLabel>
 
 class MediaWidget : public QWidget
 {
@@ -26,7 +28,7 @@ public:
     libvlc_media_player_t *m_player = nullptr;
 
     Media* media(){ return m_media;};
-    int getCurrentTime(){ return std::max(libvlc_media_player_get_time(m_player), m_vlcTime); }
+    int getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
 
     QList<QPair<int, QString>> audioTracks() const;
     QList<QPair<int, QString>> subtitlesTracks() const;
@@ -54,8 +56,8 @@ public slots:
     void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
-    void hideMedia();
-    void showMedia();
+    void enableZoomMode();
+    void disableZoomMode();
     void startRecord();
     void endRecord();
     void rotate();
@@ -63,6 +65,9 @@ public slots:
     void vFlip();
     void nextFrame();
     void prevFrame();
+    void adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value);
+    void resetAdjustments();
+    void openMediaInfoDialog();
 
     QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
@@ -73,11 +78,17 @@ private:
     QSize m_mediaSize;
 
     bool m_loopActivated = true;
+    bool m_zoomActivated = false;
     bool m_vflipped = false;
     bool m_hflipped = false;
     int64_t m_vlcTime;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     unsigned int m_rotationIndex = 0;
+    int m_currentAudioTrack = 1;
+    int m_currentSubtitlesTrack = 0;
+    bool m_adjustmentsEnabled = false;
+    int m_volume = 100;
+    bool m_muted = false;
     std::vector<const char*> m_vlcArgs ={"--quiet",
         "--aout=directsound",
         "--no-video-title-show",
@@ -88,9 +99,12 @@ private:
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
     QWidget* m_mediaSurface = nullptr;
-    QFrame* m_blackFrame = nullptr;
+
     int m_startRecordTime = -1;
     VideoCaptureManager m_videoCaptureManager;
+    ZoomHelper m_zoomHelper;
+    QPoint m_lastPanPos;
+    bool m_isPanning = false;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
 
@@ -98,15 +112,18 @@ private:
     void transformMedia();
 
     void createEventManager();
-    void createMedia(const QString& filePath);
+    void createMedia(const QString& filePath, const bool fromTransform = false);
 
     void releaseMedia();
     void releaseEventManager();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 signals:
     void vlcTimeChanged(int64_t newTime);
@@ -123,11 +140,16 @@ signals:
     void mediaRectChanged(const QRect &rect);
     void updateAudioTracksRequested(const QList<QPair<int, QString>>& tracks);
     void updateSubtitlesTracksRequested(const QList<QPair<int, QString>>& tracks);
-    void setAudioTrackDefaultRequested();
-    void setSubtitlesTrackDefaultRequested();
+    void setAudioTrackRequested(int trackId);
+    void setSubtitlesTrackRequested(int trackId);
+    void rotateUiUpdateRequested();
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
+    void pauseUiUpdateRequested();
     void mediaIsVideoParsed();
+    void zoomValueUpdated(const QString&);
+    void rotationTooltipUpdateRequested(const int);
+    void flipTooltipUpdateRequested(const bool, const bool);
 
 };
 

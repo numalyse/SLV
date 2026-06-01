@@ -29,12 +29,22 @@ void VideoCaptureManager::initMediaTempDirectory()
 void VideoCaptureManager::deleteMediaTempDirectory()
 {
     if(!m_mediaFile.exists()) return;
-    QDir tempDir(m_concatMediaPath);
-    if(tempDir.exists())
-        tempDir.removeRecursively();
-    QDir concatDir(m_tempDirectoryPath);
-    if(concatDir.exists() && concatDir.isEmpty())
-        QDir(m_tempDirectoryPath).removeRecursively();
+    // Protect against empty paths which would target the current working directory
+    if (!m_concatMediaPath.isEmpty()) {
+        QDir tempDir(m_concatMediaPath);
+        if(tempDir.exists())
+            tempDir.removeRecursively();
+    } else {
+        qWarning() << "deleteMediaTempDirectory: m_concatMediaPath is empty, skipping removal.";
+    }
+
+    if (!m_tempDirectoryPath.isEmpty()) {
+        QDir concatDir(m_tempDirectoryPath);
+        if(concatDir.exists() && concatDir.isEmpty())
+            QDir(m_tempDirectoryPath).removeRecursively();
+    } else {
+        qWarning() << "deleteMediaTempDirectory: m_tempDirectoryPath is empty, skipping removal.";
+    }
 }
 
 void VideoCaptureManager::startMediaRecording(const int startTime)

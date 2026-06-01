@@ -1,4 +1,5 @@
 #include "FormPathEditFrame.h"
+#include "PrefManager.h"
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -9,9 +10,13 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
 {
 
     m_pathLabel = new QLabel(value, this);
+    m_pathLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    m_pathLabel->setToolTip(m_pathLabel->text());
     m_browseBtn = new QPushButton("...", this);
+    m_browseBtn->setToolTip(PrefManager::instance().getText("change_saving_folder"));
     m_browseBtn->setCursor(Qt::PointingHandCursor);
-    m_browseBtn->setFixedWidth(30);
+    m_browseBtn->setFixedSize(30,30);
+
 
     QHBoxLayout* pathLayout = new QHBoxLayout();
     pathLayout->setContentsMargins(0, 0, 0, 0);
@@ -23,8 +28,8 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
 
     connect(m_browseBtn, &QPushButton::clicked, this, [this, isFolder]() {
         QString selectedPath = isFolder ? 
-            QFileDialog::getExistingDirectory(this, "Sélectionner un dossier", m_pathLabel->text()) : 
-            QFileDialog::getOpenFileName(this, "Sélectionner un fichier", m_pathLabel->text(), "Tous les fichiers (*.*)");
+            QFileDialog::getExistingDirectory(this, PrefManager::instance().getText("select_folder"), m_pathLabel->text()) : 
+            QFileDialog::getOpenFileName(this, PrefManager::instance().getText("select_file"), m_pathLabel->text(), PrefManager::instance().getText("all_files"));
 
         if (!selectedPath.isEmpty() && selectedPath != m_prevValue) {
             m_pathLabel->setText(selectedPath);

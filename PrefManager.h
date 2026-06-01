@@ -33,12 +33,15 @@ public:
     /// @brief Load the file in SLV Content if present, if not present creates a new one before loading
     void loadUserPrefs();
 
-    /// @brief Gets an entire subcategory
-    /// retrieves the default subcategory then adds user prefs, also checks is user pref key is in default pref. Prevents user adding random keys
-    QJsonObject getCategory(const QString &category) const;
-
     /// @brief Gets an entire category
     /// retrieves the default category then adds user prefs, also checks is user pref key is in default pref. Prevents user adding random keys
+    QJsonObject getCategory(const QString &category) const;
+
+    /// @brief Returns the default category object (from bundled defaults, without user overrides)
+    QJsonObject getDefaultCategory(const QString &category) const;
+
+    /// @brief Gets an entire subcategory
+    /// retrieves the default subcategory then adds user prefs, also checks is user pref key is in default pref. Prevents user adding random keys
     QJsonObject getSubCategory(const QString &category, const QString &subCategory) const;
 
     /// @brief Finds the value of the specified key in the specified category
@@ -63,6 +66,9 @@ public:
     /// @return True if successfully written to, false otherwise  
     bool writeUserJson();
 
+    /// @brief Returns the currently loaded language code
+    QString getLangCode() const;
+
 private:
     /// @brief Creates the preference file in SLV Contents
     /// @return True if successfully created, false otherwise 
@@ -78,11 +84,12 @@ private:
     /// sets the paths if they are empty and writes to the json if m_userPrefs was modified 
     void syncUserPrefs();
 
-    PrefManager() {} ;
+    PrefManager() : m_currentLangCode("en") {} ;
 
     QJsonObject m_texts;
     QJsonObject m_userPrefs;
     QJsonObject m_defaultPrefs;
+    QString m_currentLangCode;
 };
 
 #endif

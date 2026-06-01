@@ -3,6 +3,9 @@
 #include "Project/ProjectManager.h"
 #include "SignalManager.h"
 #include "CompositionWidget.h"
+#include "BlackOpacityWidget.h"
+#include "FileFormatManager.h"
+#include "GenericDialog.h"
 
 #include <QDebug>
 #include <QApplication>
@@ -44,6 +47,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     });
 
     connect(m_toolBar, &SimpleToolbar::duplicatePlayerRequested, this, [this](){
+        resetLayerWidgets();
         emit duplicatePlayerRequest(this);
     });
 
@@ -64,6 +68,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableLoopModeRequest, this, &PlayerWidget::enableLoopMode);
     connect(m_toolBar, &SimpleToolbar::disableLoopModeRequest, this, &PlayerWidget::disableLoopMode);
     connect(m_toolBar, &SimpleToolbar::extractSequenceRequest, this, &PlayerWidget::openSequenceExtractionDialog);
+    connect(m_toolBar, &SimpleToolbar::mediaInformationRequest, m_mediaWidget, &MediaWidget::openMediaInfoDialog);
+    connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
+    connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -74,28 +81,34 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
     connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
     connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
+    connect(m_mediaWidget, &MediaWidget::pauseUiUpdateRequested, this, &PlayerWidget::pauseUiUpdateRequested);
     connect(m_mediaWidget, &MediaWidget::volumeChanged, m_toolBar, &SimpleToolbar::volumeUiUpdate);
     connect(m_mediaWidget, &MediaWidget::speedChanged, m_toolBar, &SimpleToolbar::speedUiUpdate);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::enableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::disableButtons);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerLoaded, this, &PlayerWidget::mediaPlayerLoaded);
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
-    connect(m_mediaWidget, &MediaWidget::mediaIsVideoParsed, this, [this](){ m_toolBar->setExtractable(true); });
     connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
-
+    connect(m_mediaWidget, &MediaWidget::zoomValueUpdated, m_toolBar, &SimpleToolbar::setZoomIndicatorText);
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);
     QStackedLayout* stack = new QStackedLayout(containerWidget);
     stack->setContentsMargins(0,0,0,0);
+    stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_mediaWidget);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
-    stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_compositionWidget);
 
+    m_drawingWidget = new DrawingWidget(containerWidget);
+    stack->addWidget(m_drawingWidget);
+
+    m_blackOpacityWidget = new BlackOpacityWidget(containerWidget);
+    stack->addWidget(m_blackOpacityWidget);
+
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
-    //m_compositionWidget->raise(); 
+    //m_compositionWidget->raise();
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -115,14 +128,16 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::timelineSetPosition, this, &PlayerWidget::setTime);
 
     connect(m_mediaWidget, &MediaWidget::mediaRectChanged, this, &PlayerWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_blackOpacityWidget, &BlackOpacityWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_drawingWidget, &DrawingWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
     connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
     connect(m_mediaWidget, &MediaWidget::updateSubtitlesTracksRequested, m_toolBar, &SimpleToolbar::updateSubtitlesTracks);
 
-    connect(m_mediaWidget, &MediaWidget::setAudioTrackDefaultRequested, m_toolBar, &SimpleToolbar::setAudioTrackDefault);
-    connect(m_mediaWidget, &MediaWidget::setSubtitlesTrackDefaultRequested, m_toolBar, &SimpleToolbar::setSubtitlesTrackDefault);
+    connect(m_mediaWidget, &MediaWidget::setAudioTrackRequested, m_toolBar, &SimpleToolbar::setAudioTrackDefault);
+    connect(m_mediaWidget, &MediaWidget::setSubtitlesTrackRequested, m_toolBar, &SimpleToolbar::setSubtitlesTrackDefault);
     connect(m_toolBar, &SimpleToolbar::setAudioTrackRequested, m_mediaWidget, &MediaWidget::setAudioTrack);
     connect(m_toolBar, &SimpleToolbar::setSubtitlesTrackRequested, m_mediaWidget, &MediaWidget::setSubtitleTrack);
 
@@ -190,7 +205,7 @@ void PlayerWidget::disablePlayerFullscreen()
     m_toolBar->disableFullscreenUiUpdate();
 }
 
-// slots 
+// slots
 
 /// @brief Play la video, si pas de media dans le player : créer un QFileDialog pour choisir un fichier à charger.
 void PlayerWidget::play()
@@ -202,11 +217,11 @@ void PlayerWidget::play()
     }else {
         auto& prefManager = PrefManager::instance();
         QString file_path = QFileDialog::getOpenFileName(
-            this, 
-            prefManager.getText("dialog_open_file"), 
-            prefManager.getPref("Paths", "lp_open_media"), 
-            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
-        ); 
+            this,
+            prefManager.getText("dialog_open_file"),
+            prefManager.getPref("Paths", "lp_open_media"),
+            FileFormatManager::instance().getOpenFileDialogFilters()
+        );
         if(file_path != ""){
             setMediaFromPath(file_path);
             QFileInfo fileInfo (file_path);
@@ -228,11 +243,11 @@ void PlayerWidget::playFromAdvanced()
 
         auto& prefManager = PrefManager::instance();
         QString file_path = QFileDialog::getOpenFileName(
-            this, 
-            prefManager.getText("dialog_open_file"), 
-            prefManager.getPref("Paths", "lp_open_media"), 
-            "Fichiers vidéo (*.mp4 *.avi *.mkv *.mov *.m4v *.vob *.png *.wav)"
-        ); 
+            this,
+            prefManager.getText("dialog_open_file"),
+            prefManager.getPref("Paths", "lp_open_media"),
+            FileFormatManager::instance().getOpenFileDialogFilters()
+        );
 
         if(file_path != ""){
             if (setMediaFromPath(file_path)){
@@ -240,7 +255,6 @@ void PlayerWidget::playFromAdvanced()
                 QFileInfo fileInfo (file_path);
                 prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
             }
-            emit SignalManager::instance().addPlaylistItems(QStringList(file_path));
         }
         else
             emit m_toolBar->selectFilePlayCanceled();
@@ -260,6 +274,7 @@ void PlayerWidget::pause()
 void PlayerWidget::togglePlayPause(bool isPlaying)
 {
     if(isPlaying) pause();
+    else if(!m_toolBar->isVisible()) playFromAdvanced();
     else play();
 }
 
@@ -275,7 +290,9 @@ void PlayerWidget::stop()
 
 void PlayerWidget::eject()
 {
-   m_mediaWidget->eject();
+    resetLayerWidgets();
+    m_mediaWidget->eject();
+    // disconnect(this, nullptr, nullptr, nullptr);
 }
 
 void PlayerWidget::mute()
@@ -340,6 +357,20 @@ void PlayerWidget::disableLoopMode()
     emit disableLoopUiUpdateRequested();
 }
 
+void PlayerWidget::enableZoomMode()
+{
+    m_mediaWidget->enableZoomMode();
+    m_toolBar->zoomBtn()->setButtonState(true);
+    emit enableZoomUiUpdateRequested();
+}
+
+void PlayerWidget::disableZoomMode()
+{
+    m_mediaWidget->disableZoomMode();
+    m_toolBar->zoomBtn()->setButtonState(false);
+    emit disableZoomUiUpdateRequested();
+}
+
 void PlayerWidget::startRecord()
 {
     m_mediaWidget->startRecord();
@@ -357,6 +388,14 @@ void PlayerWidget::rotate()
     m_mediaWidget->rotate();
 }
 
+void PlayerWidget::setBlackOpacityMode(bool isShown, double opacity){
+    m_blackOpacityWidget->setBlackOpacityMode(isShown, opacity);
+}
+
+void PlayerWidget::showDrawingMode(bool isEnabled){
+    m_drawingWidget->showDrawingMode(isEnabled);
+}
+
 void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
 
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
@@ -364,10 +403,20 @@ void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bo
 
 void PlayerWidget::openSequenceExtractionDialog()
 {
+    if(m_mediaWidget->media()->type() != MediaType::Video){
+        QMessageBox *msg = new QMessageBox(this);
+        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+        msg->setInformativeText(PrefManager::instance().getText("messagebox_not_a_video"));
+        msg->setIcon(QMessageBox::Warning);
+        msg->adjustSize();
+        msg->exec();
+        return;
+    }
     pause();
     ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
-    connect(sequenceExtractor, &QDialog::finished, this, [](int){ /* afficher une fenêtre ? */ });
+
     sequenceExtractor->open();
+
 }
 
 void PlayerWidget::onMediaRectChanged(const QRect &rect)
@@ -379,7 +428,7 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
 
 void PlayerWidget::widgetSizeChange()
 {
-    if (!m_compositionWidget || !m_mediaWidget)
+    if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget)
         return;
 
     QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
@@ -387,7 +436,9 @@ void PlayerWidget::widgetSizeChange()
     int w = m_mediaWidget->width();
     int h = m_mediaWidget->height();
 
+    m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+    m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
 }
 
 bool PlayerWidget::event(QEvent *event)
@@ -395,8 +446,10 @@ bool PlayerWidget::event(QEvent *event)
     switch (event->type())
     {
     case QEvent::Show:
+        m_blackOpacityWidget->show();
         m_compositionWidget->show();
-        QTimer::singleShot(50, this, SLOT(widgetSizeChange())); 
+        m_drawingWidget->show();
+        QTimer::singleShot(50, this, SLOT(widgetSizeChange()));
         break;
     case QEvent::WindowActivate:
     case QEvent::Resize:
@@ -433,8 +486,20 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     // Charger le fichier en attente après eject
     if (!m_pendingFilePath.isEmpty()) {
         setMediaFromPath(m_pendingFilePath);
+        if(!m_toolBar->isVisible()){
+            ProjectManager::instance().requestProjectCreation({m_pendingFilePath});
+            QFileInfo fileInfo (m_pendingFilePath);
+            PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+        }
         m_pendingFilePath.clear();
     }
+}
+
+void PlayerWidget::resetLayerWidgets()
+{
+    m_compositionWidget->setOverlayMode(OverlayMode::None, false, false);
+    m_drawingWidget->showDrawingMode(false);
+    m_blackOpacityWidget->setBlackOpacityMode(false, 0);
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){
@@ -455,14 +520,58 @@ void PlayerWidget::dropEvent(QDropEvent *event)
 
         for (const QUrl &url : urlList) {
             QString filePath = url.toLocalFile();
+            QFileInfo info(filePath);
             qDebug() << "Fichier droppé :" << filePath;
-            filePaths.append(filePath);
-            if (filePaths.size() >= 4) break; 
+            if(FileFormatManager::instance().isFormatAccepted(info.suffix())) filePaths.append(filePath);
+            else if(info.isDir()){
+                ProjectManager::instance().openProjectFromPath(filePath);
+                event->acceptProposedAction();
+                return;
+            }
+            if (filePaths.size() >= 4) break;
         }
 
-        if (filePaths.size() == 1 && m_mediaWidget->media()) {
-            m_pendingFilePath = filePaths.first();
-            eject();
+        bool fileNotSupported = filePaths.size() < event->mimeData()->urls().size();
+        if(fileNotSupported){
+            QMessageBox *msg = new QMessageBox();
+            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+            msg->setIcon(QMessageBox::Information);
+            msg->exec();
+        }
+
+        if(filePaths.empty()){
+            event->ignore();
+            return;
+        }
+        else if (filePaths.size() == 1) {
+            if(m_mediaWidget->media()){
+                if(ProjectManager::instance().needSave()){
+
+                    PrefManager& txtManager = PrefManager::instance();
+                    bool canceled = false;
+                    SLV::showGenericDialog(
+                        this,
+                        txtManager.getText("dialog_save_project_dialog_title"),
+                        txtManager.getText("dialog_save_project_dialog_text"),
+                        []() {
+                            ProjectManager::instance().saveProject(false);
+                        },
+                        [](){},
+                        [&canceled](){ canceled = true; }
+                    );
+                    if(canceled) return;
+                }
+                m_pendingFilePath = filePaths.first();
+                eject();
+            }
+            else{
+                if (setMediaFromPath(filePaths.first()) && !m_toolBar->isVisible()){
+                    ProjectManager::instance().requestProjectCreation({filePaths.first()});
+                    QFileInfo fileInfo (filePaths.first());
+                    PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
+                }
+            }
         } else {
             emit mediaDropped(filePaths);
         }

@@ -2,6 +2,10 @@
     <qresource prefix="/lang">
         <file alias="fr.json">lang/fr.json</file>
         <file alias="en.json">lang/en.json</file>
+        <file alias="es.json">lang/es.json</file>
+        <file alias="de.json">lang/de.json</file>
+        <file alias="it.json">lang/it.json</file>
+        <file alias="pt.json">lang/pt.json</file>
     </qresource>
     <qresource prefix="/">
         <file alias="defaultPref.json">defaultPref.json</file>

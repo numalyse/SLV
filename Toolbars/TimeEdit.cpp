@@ -6,6 +6,7 @@
 #include <QPropertyAnimation>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QStyleHints>
 
 TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
 {
@@ -15,15 +16,17 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     
     setFixedWidth(75);
 
-    m_paste = addAction(QIcon(":/icons/paste_white"), QLineEdit::TrailingPosition);
+    QString userTheme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
+
+    m_paste = addAction(QIcon(":/icons/paste"+userTheme), QLineEdit::TrailingPosition);
     m_paste->setVisible(false);
     m_paste->setToolTip(PrefManager::instance().getText("paste"));
 
-    m_copy = addAction(QIcon(":/icons/copy_white"), QLineEdit::TrailingPosition);
+    m_copy = addAction(QIcon(":/icons/copy"+userTheme), QLineEdit::TrailingPosition);
     m_copy->setVisible(false);
     m_copy->setToolTip(PrefManager::instance().getText("copy"));
 
-    m_action = addAction(QIcon(":/icons/check_white"), QLineEdit::TrailingPosition);
+    m_action = addAction(QIcon(":/icons/check"+userTheme), QLineEdit::TrailingPosition);
     m_action->setVisible(false);
     m_action->setToolTip(PrefManager::instance().getText("confirm"));
 

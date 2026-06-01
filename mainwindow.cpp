@@ -151,11 +151,38 @@ void MainWindow::createToolBar()
 
     createViewGridBtn();
 
-    QHBoxLayout *panelDisplayLayout = new QHBoxLayout();
+    QVBoxLayout *panelDisplayLayout = new QVBoxLayout();
+    // QHBoxLayout *playlistOption = new QHBoxLayout();
+    // QHBoxLayout *shotDetailOption = new QHBoxLayout();
+    // QLabel *playlistLabel = new QLabel(PrefManager::instance().getText("tooltip_playlist_button"));
+    // QLabel *shotDetailLabel = new QLabel(PrefManager::instance().getText("tooltip_shot_detail_button"));
     m_playlistBtn = new ToolbarButton(nullptr, "playlist_white", PrefManager::instance().getText("tooltip_playlist_button"));
     m_shotDetailBtn = new ToolbarButton(nullptr, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
-    panelDisplayLayout->addWidget(m_playlistBtn);
-    panelDisplayLayout->addWidget(m_shotDetailBtn);
+    // playlistOption->addWidget(playlistLabel);
+    // playlistOption->addWidget(m_playlistBtn);
+    // shotDetailOption->addWidget(shotDetailLabel);
+    // shotDetailOption->addWidget(m_shotDetailBtn);
+    m_playlistBtn->setText("  " + PrefManager::instance().getText("tooltip_playlist_button"));
+    m_shotDetailBtn->setText("  " + PrefManager::instance().getText("tooltip_shot_detail_button"));
+    panelDisplayLayout->addWidget(m_playlistBtn, 0, Qt::AlignLeft);
+    panelDisplayLayout->addWidget(m_shotDetailBtn, 0, Qt::AlignLeft);
+
+    m_playlistBtn->setMinimumSize(QSize(0, 0));
+    m_playlistBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    m_shotDetailBtn->setMinimumSize(QSize(0, 0));
+    m_shotDetailBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    int maxWidth = qMax(
+        m_playlistBtn->sizeHint().width(),
+        m_shotDetailBtn->sizeHint().width()
+    ) + 3;
+
+    m_playlistBtn->setFixedWidth(maxWidth);
+    m_shotDetailBtn->setFixedWidth(maxWidth);
+    m_playlistBtn->setIconSize(QSize(18, 18));
+    m_shotDetailBtn->setIconSize(QSize(18, 18));
+
+    m_playlistBtn->setStyleSheet("text-align:left;");
+    m_shotDetailBtn->setStyleSheet("text-align:left;");
 
     m_navPanelBtn = new ToolbarToggleHoverButton(
         m_toolbarQt,

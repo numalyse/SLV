@@ -27,6 +27,22 @@ ToolbarToggleButton::ToolbarToggleButton(
     }
     setFixedSize(30, 30);
 
+    QImage imgOn = QImage(m_iconPathOn);
+
+    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
+        for (int y = 0; y < imgOn.height(); ++y) {
+            for (int x = 0; x < imgOn.width(); ++x) {
+                QColor c = imgOn.pixelColor(x, y);
+
+                if (c.alpha() > 0) {
+                    c.setRgb(0, 0, 0);
+                    c.setAlpha(255);
+                    imgOn.setPixelColor(x, y, c);
+                }
+            }
+        }
+    }
+
     QImage gray_imgOn = QImage(m_iconPathOn);
 
     for (int y = 0; y < gray_imgOn.height(); ++y) {
@@ -36,6 +52,22 @@ ToolbarToggleButton::ToolbarToggleButton(
             if (c.alpha() > 0) {
                 c.setRgb(64, 64, 64);
                 gray_imgOn.setPixelColor(x, y, c);
+            }
+        }
+    }
+
+    QImage imgOff = QImage(m_iconPathOff);
+
+    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
+        for (int y = 0; y < imgOff.height(); ++y) {
+            for (int x = 0; x < imgOff.width(); ++x) {
+                QColor c = imgOff.pixelColor(x, y);
+
+                if (c.alpha() > 0) {
+                    c.setRgb(0, 0, 0);
+                    c.setAlpha(255);
+                    imgOff.setPixelColor(x, y, c);
+                }
             }
         }
     }
@@ -53,9 +85,9 @@ ToolbarToggleButton::ToolbarToggleButton(
         }
     }
 
-    QIcon normalIconOn((QPixmap(m_iconPathOn)));
+    QIcon normalIconOn((QPixmap::fromImage(imgOn)));
     QIcon grayIconOn(QPixmap::fromImage(gray_imgOn));
-    QIcon normalIconOff((QPixmap(m_iconPathOff)));
+    QIcon normalIconOff((QPixmap::fromImage(imgOff)));
     QIcon grayIconOff(QPixmap::fromImage(gray_imgOff));
 
     setProperty("normalIconOn", normalIconOn);

@@ -748,8 +748,11 @@ namespace ProjectExportHelper {
             writer.write(imgData.img);
 
             if (progressCallback && totalFrames > 0) {
-                int percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
-                if( !progressCallback(percent)){
+                percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
+                if(percent == 0){
+                    qDebug() << "Ici ça va pas";
+                }
+                if(percent != 0 && !progressCallback(percent)){
                     writer.release();
                     return false;
                 }

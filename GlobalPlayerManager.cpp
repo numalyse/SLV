@@ -50,7 +50,17 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         if(m_toolbarWidget){
             m_toolbarWidget->setParent(this);
             m_toolbarWidget->setDefaultUI();
-            layout->insertWidget(1, m_toolbarWidget);
+            
+            layout->removeWidget(m_separationLine);
+            layout->removeWidget(m_toolbarWidget);
+
+            layout->insertWidget(1, m_separationLine);
+            layout->insertWidget(2, m_toolbarWidget);
+
+            auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+            if(!advancedToolbar){
+                m_separationLine->show();
+            }
         }
         disableFullscreenMainRequested();
     });
@@ -163,8 +173,10 @@ void GlobalPlayerManager::closeNavPanel()
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    if(m_toolbarWidget){
+
+    if(m_toolbarWidget && m_toolbarWidget->fullscreenBtn()->isChecked()){
         m_toolbarWidget->updateFullscreenPosition();
+        m_toolbarWidget->adjustSize();
     }
 }
 
@@ -206,8 +218,24 @@ void GlobalPlayerManager::enableFullscreenPlayer()
 /// @brief Affiche la toolbar si elle est présente et envoie un signal à la mainWindow
 void GlobalPlayerManager::disableFullscreenPlayer()
 {
-    if(m_toolbarWidget)
+    if(m_toolbarWidget) {
+        layout->removeWidget(m_separationLine);
+        layout->removeWidget(m_toolbarWidget);
+
+        m_toolbarWidget->setDefaultUI();
+
+        layout->insertWidget(1, m_separationLine);
+        layout->insertWidget(2, m_toolbarWidget);
+
+        auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+        if(!advancedToolbar){
+            m_separationLine->show();
+        }
+        
         m_toolbarWidget->show();
+        m_toolbarWidget->fullscreenBtn()->setButtonState(false);
+    }
+
     emit disableFullscreenMainRequested();
 }
 

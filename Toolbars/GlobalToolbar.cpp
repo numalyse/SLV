@@ -7,6 +7,8 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QTimer>
+
 #include "GlobalToolbar.h"
 
 
@@ -113,4 +115,9 @@ void GlobalToolbar::addShortcuts(){
 void GlobalToolbar::disableFullscreenRequested(){
     addEnterFullscreenShortcut();
     emit disableFullscreenRequest();
+}
+
+void GlobalToolbar::updateFullscreenPosition()
+{
+    Toolbar::moveOnTopOfParent();
 }

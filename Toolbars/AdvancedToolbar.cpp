@@ -218,8 +218,10 @@ void AdvancedToolbar::setFullscreenUI()
 
 void AdvancedToolbar::setDefaultUI()
 {
-    delete layout();
+    Toolbar::setDefaultUI();
 
+    delete layout();
+    
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(5,5,5,5);
     mainLayout->setSpacing(1);

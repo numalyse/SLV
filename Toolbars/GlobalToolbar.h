@@ -20,6 +20,8 @@ public:
     void setDefaultUI() override;
     void disableFullscreenRequested() override;
 
+    void updateFullscreenPosition() override;
+
 public slots:
     void enableButtons();
     void disableButtons();

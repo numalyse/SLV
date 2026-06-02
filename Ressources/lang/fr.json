@@ -234,6 +234,7 @@
 
     "dialog_preference_tab_interface" : "Interface",
     "dialog_preference_tab_shortcut" : "Raccourcis",
+    "tooltip_shortcut" : "Raccourci : ",
     "dialog_preference_tab_paths" : "Chemins",
 
     "shortcut_subsection_MainWindow": "Fenêtre principale",

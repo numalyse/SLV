@@ -235,6 +235,7 @@
 
     "dialog_preference_tab_interface" : "Interfaccia",
     "dialog_preference_tab_shortcut" : "Scorciatoie",
+    "tooltip_shortcut" : "Scorciatoia: ",
     "dialog_preference_tab_paths" : "Percorsi",
 
     "shortcut_subsection_MainWindow": "Finestra principale",

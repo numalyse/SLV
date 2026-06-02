@@ -235,6 +235,7 @@
 
     "dialog_preference_tab_interface" : "Interface",
     "dialog_preference_tab_shortcut" : "Atalhos",
+    "tooltip_shortcut" : "Atalho: ",
     "dialog_preference_tab_paths" : "Caminhos",
 
     "shortcut_subsection_MainWindow": "Janela principal",

@@ -21,19 +21,34 @@ public:
             this,
             true,
             "pause_white",
-            PrefManager::instance().getText("tooltip_pause"),
+            PrefManager::instance().getText("tooltip_pause") + "<br><i>("
+            + PrefManager::instance().getText("tooltip_shortcut")
+            + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "play_pause") + ")</i>",
             "play_white",
-            PrefManager::instance().getText("tooltip_play")
+            PrefManager::instance().getText("tooltip_play") + "<br><i>("
+            + PrefManager::instance().getText("tooltip_shortcut")
+            + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "play_pause") + ")</i>"
         );
         m_playPauseBtn->setButtonState(false);
         m_playPauseBtn->setEnabled(true);
         m_playPauseBtn->setFixedSize(35, 35);
         m_playPauseBtn->setIconSize(QSize(25, 25));
         
-        m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop"));
+        m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>");
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));
-        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white", PrefManager::instance().getText("tooltip_fullscreen"), "fullscreen_white", PrefManager::instance().getText("tooltip_fullscreen"));
-        m_screenshotBtn = new ToolbarButton(this, "capture_white", PrefManager::instance().getText("tooltip_capture"));
+        m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white",
+        PrefManager::instance().getText("tooltip_fullscreen") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "exit_fullscreen") + ")</i>",
+        "fullscreen_white",
+        PrefManager::instance().getText("tooltip_fullscreen") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "enter_fullscreen") + ")</i>");
+        m_screenshotBtn = new ToolbarButton(this, "capture_white", PrefManager::instance().getText("tooltip_capture") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "screenshot") + ")</i>");
         m_zoomBtn = new ToolbarToggleButton(
             this,
             false,

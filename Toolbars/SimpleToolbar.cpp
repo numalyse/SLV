@@ -154,10 +154,27 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
 }
 
+void SimpleToolbar::setFullscreenUI()
+{
+
+    m_duplicatePlayerBtn->hide();
+    m_removePlayerBtn->hide();
+    m_extractSequenceBtn->hide();
+    m_mediaInfoBtn->hide();
+
+    adjustSize();
+
+    Toolbar::setFullscreenUI();
+}
 
 void SimpleToolbar::setDefaultUI()
 {
     Toolbar::setDefaultUI();
+
+    m_duplicatePlayerBtn->show();
+    m_removePlayerBtn->show();
+    m_extractSequenceBtn->show();
+    m_mediaInfoBtn->show();
 
     if ( !layout() ) {
         
@@ -178,12 +195,10 @@ void SimpleToolbar::setDefaultUI()
 
         QHBoxLayout* buttonLayout = new QHBoxLayout();
         buttonLayout->setContentsMargins(0,0,0,0);
-        buttonLayout->setSpacing(1);
+        //buttonLayout->setSpacing(1);
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addWidget(m_langBtn);
         buttonLayout->addWidget(m_mediaInfoBtn);
-        buttonLayout->addSpacing(m_langBtn->width()+1);
-        buttonLayout->addSpacing(m_langBtn->width()+1);
         buttonLayout->addSpacing(m_langBtn->width()+1);
         buttonLayout->addSpacing(m_zoomIndicator->width()+1);
         buttonLayout->addStretch();
@@ -205,8 +220,10 @@ void SimpleToolbar::setDefaultUI()
         buttonLayout->addWidget(m_removePlayerBtn);
         buttonLayout->addWidget(m_fullscreenBtn);
         mainLayout->addLayout(buttonLayout);
+        
     }
 
+    adjustSize();
 }
 
 void SimpleToolbar::resetSlider()

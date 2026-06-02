@@ -25,6 +25,7 @@ public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
 
     void setDefaultUI() override;
+    void setFullscreenUI() override;
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }

@@ -533,7 +533,10 @@ void PlayerLayoutManager::removePlayer(PlayerWidget* playerToRemove){
 
 void PlayerLayoutManager::enablePlayerLayoutFullscreen(PlayerWidget* playerToFullscreen){
     for(auto &IPlayer : m_activePlayers){
-        if(playerToFullscreen != IPlayer) IPlayer->hide();
+        if(playerToFullscreen != IPlayer) {
+            IPlayer->toolbar()->setDefaultUI();
+            IPlayer->hide();
+        }
         else IPlayer->toolbar()->setFullscreenUI();
     }
     emit enableFullscreenPlayerRequested();

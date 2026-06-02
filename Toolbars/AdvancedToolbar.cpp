@@ -44,7 +44,13 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_extensionBtn->setButtonState(true);
         if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr)
             emit enableSegmentationRequest();
+        else if (m_isFullscreen) {
+            setFullscreenUI();
+            setWindowOpacity(1.0); // force l'affichage de la barre 
+        }
+            
     });
+
     m_extensionBtn->setIconSize(QSize(13, 13));
 
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
@@ -52,6 +58,11 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_extensionToolbar->hide();
         m_extensionBtn->setButtonState(false);
         emit disableSegmentationRequest();
+        if (m_isFullscreen) {
+            setFullscreenUI();
+            setWindowOpacity(1.0); // force l'affichage de la barre 
+        }
+            
     });
 
     connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);

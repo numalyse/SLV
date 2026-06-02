@@ -10,6 +10,8 @@
 #include <QEnterEvent>
 #include <QLayout>
 #include <QPainter>
+#include <QTimer>
+#include <QPropertyAnimation>
 #include "PrefManager.h"
 #include "SignalManager.h"
 
@@ -92,8 +94,14 @@ public:
         setParent(nullptr);
         setAttribute(Qt::WA_TranslucentBackground); // 👈 ajout
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-        int targetWidth = width() / 2.5;
+
+        int targetWidth = sizeHint().width(); 
+        if (m_parent) {
+            targetWidth = m_parent->width() / 2.5; 
+        }
+
         resize(targetWidth, sizeHint().height());
+        adjustSize();
         moveOnTopOfParent();
         show();
         raise();
@@ -162,9 +170,10 @@ protected:
 
     void moveOnTopOfParent(){
         if (m_parent && m_isFullscreen) {
+            int bottomMargin = 40;
             QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
             int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
-            int posY = parentGlobalPos.y() + m_parent->height() - this->height() - 20;
+            int posY = parentGlobalPos.y() + m_parent->height() - this->height() - bottomMargin;
             move(posX, posY);
         }
     }

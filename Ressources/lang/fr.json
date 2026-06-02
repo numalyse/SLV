@@ -149,7 +149,7 @@
     "file_multimedia" : "Fichiers multimédia",
 
     "main_window_menu_bar_file": "Fichier",
-    "main_window_file_open_media_action": "Ouvrir des fichiers multimédia",
+    "main_window_file_open_media_action": "Ouvrir un ou plusieurs médias",
     "main_window_file_open_project_action": "Ouvrir un projet",
     "main_window_file_save_project_action": "Enregistrer le projet",
     "project_manager_open_project_dialog" : "Ouvrir un projet",

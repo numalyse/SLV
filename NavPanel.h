@@ -46,6 +46,7 @@ signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
     void goToShotRequest(int);
+    void ejectCurrentMedia();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

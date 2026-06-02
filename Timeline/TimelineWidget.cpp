@@ -164,7 +164,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
 
     }
 
-    ProjectManager::instance().setSaveNeeded();
+    // ProjectManager::instance().setSaveNeeded();
 }
 
 TimelineWidget::~TimelineWidget()

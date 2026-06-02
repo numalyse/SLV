@@ -35,6 +35,7 @@ NavPanel::NavPanel(QWidget *parent)
 
     connect(m_playlistWidget, &Playlist::openMediaFileRequested, this, &NavPanel::openMediaFileRequested);
     connect(m_playlistWidget, &Playlist::disableToolbarLoopRequested, this, &NavPanel::disableToolbarLoopRequested);
+    connect(m_playlistWidget, &Playlist::ejectCurrentMedia, this, &NavPanel::ejectCurrentMedia);
     
     connect(m_shotDetail, &ShotDetail::goToShotRequested, this, &NavPanel::goToShotRequest);
 

@@ -11,6 +11,24 @@
 PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     : QWidget{parent}
 {
+    m_isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+
+#ifdef Q_OS_MAC
+    QColor colorBtn = qApp->palette().color(QPalette::Button);
+    QColor enhancedColor = m_isDarkMode ? colorBtn.lighter(150) : colorBtn.darker(150);   
+    m_palbtnColor = m_isDarkMode ? enhancedColor : "palette(mid)";
+    m_palbtnColorStr = m_isDarkMode ? QString(enhancedColor.name()) : "palette(mid)";
+#else
+    m_palbtnColor = m_isDarkMode ? "palette(button)" : "palette(mid)";
+    m_palbtnColorStr = m_isDarkMode ? "palette(button)" : "palette(mid)";
+    
+#endif
+
+    // qDebug() << "DARKMODE ? " << m_isDarkMode;
+    // qDebug() << "PALBTN COLOR ? " << m_palbtnColor;
+    // qDebug() << "PALBTN STR ? " << m_palbtnColorStr;
+
+
     m_mediaData = new Media(mediaFilePath);
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -94,10 +112,10 @@ void PlaylistItem::initStyle()
     setFixedHeight(50);
     setAttribute(Qt::WA_StyledBackground, true);
     setContentsMargins(0,0,0,0);
-    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
-    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 4px;}");
+    //QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+    setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + m_palbtnColorStr + "; border-radius: 4px;}");
     m_indexLabel->setMaximumWidth(15);
-    m_mediaThumbnailLabel->setStyleSheet("background: palette(button);");
+    m_mediaThumbnailLabel->setStyleSheet("background: " + m_palbtnColorStr + " ;");
 
     m_deleteBtn->setFixedSize(24,24);
     m_deleteBtn->setMaximumWidth(20);
@@ -107,7 +125,7 @@ void PlaylistItem::initStyle()
         "}"
         "QPushButton:hover{"
         "   background-color: tomato;"
-        "   border: 1px solid palette(button);"
+        "   border: 1px solid " + m_palbtnColorStr + ";"
         "   border-radius: 4px;"
         "}");
 }
@@ -161,17 +179,17 @@ void PlaylistItem::setIndex(int index)
 
 void PlaylistItem::enterEvent(QEnterEvent *event)
 {
-    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+    //QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(!m_isCurrentMedia)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid " + color + " border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 2px solid " + m_palbtnColorStr + "; border-radius: 3px;}");
     // QWidget::enterEvent(event);
 }
 
 void PlaylistItem::leaveEvent(QEvent *event)
 {
-    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+    //QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(!m_isCurrentMedia)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 3px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + m_palbtnColorStr + "; border-radius: 3px;}");
     // QWidget::leaveEvent(event);
 }
 
@@ -213,11 +231,11 @@ void PlaylistItem::mouseMoveEvent(QMouseEvent *event)
 void PlaylistItem::setCurrentMedia(bool isCurrent)
 {
     m_isCurrentMedia = isCurrent;
-    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
+    //QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     if(isCurrent)
-        setStyleSheet("PlaylistItem{border-style: solid; border: 3px solid " + color +  " border-radius: 4px; background-color: palette(button);}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 3px solid " + m_palbtnColorStr +  "; border-radius: 4px; background-color: " + m_palbtnColorStr + ";}");
     else
-        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + color + " border-radius: 4px;}");
+        setStyleSheet("PlaylistItem{border-style: solid; border: 1px solid " + m_palbtnColorStr + "; border-radius: 4px;}");
 }
 
 void PlaylistItem::playMedia(bool isClicked)

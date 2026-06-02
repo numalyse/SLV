@@ -39,6 +39,19 @@ QStringList collectValidFilesFromPath(const QString &path)
 Playlist::Playlist(QWidget *parent)
     : QWidget{parent}
 {
+    m_isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+
+#ifdef Q_OS_MAC
+    QColor colorBtn = qApp->palette().color(QPalette::Button);
+    QColor enhancedColor = m_isDarkMode ? colorBtn.lighter(150) : colorBtn.darker(150);   
+    m_palbtnColor = m_isDarkMode ? enhancedColor : "palette(mid)";
+    m_palbtnColorStr = m_isDarkMode ? QString(enhancedColor.name()) : "palette(mid)";
+#else
+    m_palbtnColor = m_isDarkMode ? "palette(button)" : "palette(mid)";
+    m_palbtnColorStr = m_isDarkMode ? "palette(button)" : "palette(mid)";
+    
+#endif
+
     setAcceptDrops(true);
     m_mainLayout = new QVBoxLayout();
     this->setLayout(m_mainLayout);
@@ -97,7 +110,7 @@ Playlist::Playlist(QWidget *parent)
         "}"
         "QPushButton:hover{"
         "   background-color: tomato;"
-        "   border: 1px solid palette(button);"
+        "   border: 1px solid " + m_palbtnColorStr + ";"
         "   border-radius: 4px;"
         "}");
     m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_remove_all_items_playlist"));
@@ -112,15 +125,14 @@ Playlist::Playlist(QWidget *parent)
     }
     m_addItemBtn->setToolTip(PrefManager::instance().getText("tooltip_add_item_playlist"));
     m_addItemBtn->setFixedHeight(50);
-    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
     m_addItemBtn->setStyleSheet("QPushButton{"
         "   background-color: rgba(0,0,0,0);"
-        "   border: 2px dashed " + color +
+        "   border: 2px dashed " + m_palbtnColorStr + ";"
         "   border-radius: 4px;"
         "}"
         "QPushButton:hover{"
-        "   background-color: palette(button);"
-        "   border: 2px solid " + color +
+        "   background-color: " + m_palbtnColorStr + ";"
+        "   border: 2px solid " + m_palbtnColorStr + ";"
         "   border-radius: 4px;"
         "}");
     playlistLabelLayout->addWidget(m_addItemBtn);
@@ -290,7 +302,6 @@ void Playlist::deleteAllItemsDialog()
 {
 
     auto& prefManager = PrefManager::instance();
-    QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "palette(button);" : "black;";
 
     QDialog dialog;
     dialog.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
@@ -312,7 +323,7 @@ void Playlist::deleteAllItemsDialog()
     container->setStyleSheet(
         "#dialogContainer {"
             "background-color: palette(Window);"
-            "border: 2px solid " + color + ";"
+            "border: 2px solid " + m_palbtnColorStr + ";"
             "border-radius: 20px;"
         "}"
     );
@@ -371,12 +382,12 @@ void Playlist::deleteAllItemsDialog()
 
     cancelBtn->setStyleSheet("QPushButton{"
         "   background-color: palette(Window);"
-        "   border: 1px solid palette(Button);"
+        "   border: 1px solid " + m_palbtnColorStr + ";"
         "   border-radius: 4px;"
         "}"
         "QPushButton:hover{"
-        "   background-color: palette(Button);"
-        "   border: 2px solid palette(Button);"
+        "   background-color: " + m_palbtnColorStr + ";"
+        "   border: 2px solid " + m_palbtnColorStr + ";"
         "   border-radius: 4px;"
         "}"
     );

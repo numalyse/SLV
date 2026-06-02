@@ -234,6 +234,7 @@
 
     "dialog_preference_tab_interface": "Interface",
     "dialog_preference_tab_shortcut": "Shortcuts",
+    "tooltip_shortcut" : "Shortcut: ",
     "dialog_preference_tab_paths": "Paths",
 
     "shortcut_subsection_MainWindow": "Main Window",

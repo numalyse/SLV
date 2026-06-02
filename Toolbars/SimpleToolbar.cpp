@@ -43,9 +43,13 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         volumeFrameLayout,
         false,
         "sound_off_white",
-        PrefManager::instance().getText("tooltip_sound_on"),
+        PrefManager::instance().getText("tooltip_sound_on") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "mute") + ")</i>",
         "sound_on_white",
-        PrefManager::instance().getText("tooltip_sound_off")
+        PrefManager::instance().getText("tooltip_sound_off") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "mute") + ")</i>"
     );
     m_muteBtn->setEnabled(true);
     
@@ -72,15 +76,29 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     speedFrameLayout->addWidget(m_speedSlider);
 
-    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "slow_white",  PrefManager::instance().getText("tooltip_speed"), "slow_white", PrefManager::instance().getText("tooltip_speed"));
+    m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "slow_white",  PrefManager::instance().getText("tooltip_speed") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>",
+        "slow_white",
+        PrefManager::instance().getText("tooltip_speed") +  "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>");
 
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
         "loop_off_white",
-        PrefManager::instance().getText("tooltip_loop_off"),
+        PrefManager::instance().getText("tooltip_loop_off") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "loop") + ")</i>",
         "loop_off_white",
-        PrefManager::instance().getText("tooltip_loop_on")
+        PrefManager::instance().getText("tooltip_loop_on") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "loop") + ")</i>"
     );
     m_loopBtn->setToggledIconFrame(true);
 

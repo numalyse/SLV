@@ -21,8 +21,12 @@
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
-    m_nextMediaBtn = new ToolbarButton(this, "next_white", PrefManager::instance().getText("tooltip_next_media"));
-    m_prevMediaBtn = new ToolbarButton(this, "prev_white", PrefManager::instance().getText("tooltip_prev_media"));
+    m_nextMediaBtn = new ToolbarButton(this, "next_white", PrefManager::instance().getText("tooltip_next_media") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "next_media") + ")</i>");
+    m_prevMediaBtn = new ToolbarButton(this, "prev_white", PrefManager::instance().getText("tooltip_prev_media") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "prev_media") + ")</i>");
 
     m_extensionBtn = new ToolbarToggleButton(this,
         false,

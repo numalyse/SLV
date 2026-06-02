@@ -234,6 +234,7 @@
 
     "dialog_preference_tab_interface" : "Oberfläche",
     "dialog_preference_tab_shortcut" : "Tastenkombinationen",
+    "tooltip_shortcut" : "Tastenkürzel: ",
     "dialog_preference_tab_paths" : "Pfade",
 
     "shortcut_subsection_MainWindow": "Hauptfenster",

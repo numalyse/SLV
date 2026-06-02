@@ -236,6 +236,7 @@
 
     "dialog_preference_tab_interface" : "Interfaz",
     "dialog_preference_tab_shortcut" : "Atajos",
+    "tooltip_shortcut" : "Atajo: ",
     "dialog_preference_tab_paths" : "Rutas",
 
     "shortcut_subsection_MainWindow": "Ventana principal",

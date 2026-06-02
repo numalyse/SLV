@@ -40,9 +40,13 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         blackFrameLayout,
         false,
         "hide_image_white",
-        PrefManager::instance().getText("tooltip_show_image"),
+        PrefManager::instance().getText("tooltip_show_image") + "<br><i>("
+            + PrefManager::instance().getText("tooltip_shortcut")
+            + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "hide_img") + ")</i>",
         "show_image_white",
-        PrefManager::instance().getText("tooltip_hide_image")
+        PrefManager::instance().getText("tooltip_hide_image") + "<br><i>("
+            + PrefManager::instance().getText("tooltip_shortcut")
+            + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "hide_img") + ")</i>"
     );
     connect(m_blackFrameSlider, &QSlider::valueChanged, this, [this](int newValue){
         double opacity = newValue / 100.0;
@@ -55,21 +59,37 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
         updateBlackOpacityMode(false, opacity);
     });
 
-    m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white", PrefManager::instance().getText("tooltip_prev_frame"));
-    m_nextFrameBtn = new ToolbarButton(this, "next_frame_white", PrefManager::instance().getText("tooltip_next_frame"));
+    m_prevFrameBtn = new ToolbarButton(this, "prev_frame_white",
+    PrefManager::instance().getText("tooltip_prev_frame") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "prev_frame") + ")</i>");
+    m_nextFrameBtn = new ToolbarButton(this, "next_frame_white",
+    PrefManager::instance().getText("tooltip_next_frame") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "next_frame") + ")</i>");
     
-    m_backwardBtn = new ToolbarButton(this, "backward_white", PrefManager::instance().getText("tooltip_backward"));
-    m_forwardBtn = new ToolbarButton(this, "forward_white", PrefManager::instance().getText("tooltip_forward"));
+    m_backwardBtn = new ToolbarButton(this, "backward_white", PrefManager::instance().getText("tooltip_backward") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "backward") + ")</i>");
+    m_forwardBtn = new ToolbarButton(this, "forward_white", PrefManager::instance().getText("tooltip_forward") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "forward") + ")</i>");
     
-    m_rotateBtn = new ToolbarButton(this, "rotate_white", PrefManager::instance().getText("tooltip_rotate"));
+    m_rotateBtn = new ToolbarButton(this, "rotate_white", PrefManager::instance().getText("tooltip_rotate") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "rotate") + ")</i>");
 
     m_recordBtn = new ToolbarToggleButton(
         this,
         false,
         "record_on_white",
-        PrefManager::instance().getText("tooltip_record_on"),
+        PrefManager::instance().getText("tooltip_record_on") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "record") + ")</i>",
         "record_off_white",
-        PrefManager::instance().getText("tooltip_record_off")
+        PrefManager::instance().getText("tooltip_record_off") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "record") + ")</i>"
         );
     //m_recordBtn->setIconSize(QSize(30, 30));
 
@@ -166,7 +186,10 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     invFrameLayout->addWidget(m_verticalInvBtn);
     invFrameLayout->addWidget(m_horizontalInvBtn);
-    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip"));
+    m_invBtn = new ToolbarPopupButton(this, invFrameLayout, "invert_h_white", PrefManager::instance().getText("tooltip_flip") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "h_flip") + "/" + PrefManager::instance().getPref("Shortcuts", "ExtensionTB", "v_flip") + ")</i>"
+    );
     
     m_drawingBtn = new ToolbarToggleButton(
         this, 

@@ -146,6 +146,15 @@ void GlobalPlayerManager::closeNavPanel()
 {
     m_navPanel->hidePanel();
 }
+
+void GlobalPlayerManager::toggleNavPanel()
+{
+
+    if(m_navPanel->isOpen())
+        closeNavPanel();
+    else
+        openNavPanel();
+}
 // slots
 
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)

@@ -61,12 +61,14 @@ void NavPanel::resizeEvent(QResizeEvent *event) {
 void NavPanel::showPanel()
 {
     qDebug() << "bouton cliqué";
+    m_isOpen = true;
     m_sideWidget->show();
     setFixedWidth(300);
 }
 
 void NavPanel::hidePanel()
 {
+    m_isOpen = false;
     m_sideWidget->hide();
     setFixedWidth(0);
 }

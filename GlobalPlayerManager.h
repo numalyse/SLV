@@ -48,6 +48,8 @@ public slots:
     void setGlobalMuteState(bool);
     void setGlobalZoomState(bool);
 
+    void toggleNavPanel();
+
 private slots:
     void createTimelineWidget();
     void playPreviousMedia();

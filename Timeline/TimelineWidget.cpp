@@ -92,6 +92,13 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     ButtonLayout->addWidget(m_toPrevShotBtn);
     m_toPrevShotBtn->setEnabled(false);
 
+    m_shotInfo = new ToolbarButton(this, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    connect(m_shotInfo, &ToolbarButton::pressed, this, [](){
+        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
+        emit SignalManager::instance().toggleNavPanel();
+    });
+    ButtonLayout->addWidget(m_shotInfo);
+
     m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", PrefManager::instance().getText("tooltip_to_next_shot"));
     connect(m_toNextShotBtn, &ToolbarButton::pressed, this, [this](){
         goToShot(m_shotManager->getCurrentShotId()+1);
@@ -107,13 +114,6 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     m_exportBtn = new ToolbarButton(this, "export_white", PrefManager::instance().getText("tooltip_export"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
-
-    m_shotInfo = new ToolbarButton(this, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
-    connect(m_shotInfo, &ToolbarButton::pressed, this, [](){
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
-        emit SignalManager::instance().openNavPanel();
-    });
-    ButtonLayout->addWidget(m_shotInfo);
 
     ButtonLayout->addStretch(1);
     layout->addLayout(ButtonLayout);
@@ -381,7 +381,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().extensionToolbarDisplayShotDetail();
-        emit SignalManager::instance().openNavPanel();
+        emit SignalManager::instance().toggleNavPanel();
     }
 }
 

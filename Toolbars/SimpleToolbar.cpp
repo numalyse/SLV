@@ -154,17 +154,19 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
 }
 
-void SimpleToolbar::setFullscreenUI()
+void SimpleToolbar::setFullscreenUI(int bottomMargin)
 {
 
     m_duplicatePlayerBtn->hide();
     m_removePlayerBtn->hide();
     m_extractSequenceBtn->hide();
     m_mediaInfoBtn->hide();
+    m_stopBtn->hide();
+    m_ejectBtn->hide();
 
     adjustSize();
 
-    Toolbar::setFullscreenUI();
+    Toolbar::setFullscreenUI(bottomMargin);
 }
 
 void SimpleToolbar::setDefaultUI()
@@ -175,6 +177,8 @@ void SimpleToolbar::setDefaultUI()
     m_removePlayerBtn->show();
     m_extractSequenceBtn->show();
     m_mediaInfoBtn->show();
+    m_stopBtn->show();
+    m_ejectBtn->show();
 
     if ( !layout() ) {
         
@@ -425,7 +429,7 @@ void SimpleToolbar::duplicatePlayerAction()
 
 void SimpleToolbar::updateFullscreenPosition()
 {
-    Toolbar::moveOnTopOfParent();
+    Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
 }
 
 void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){

@@ -712,7 +712,7 @@ if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
 
     add_custom_command(TARGET SLV POST_BUILD
 
-        COMMAND "${WINDEPLOYQT_EXECUTABLE}" <- ça 
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}"
             $<$<CONFIG:Debug>:--debug>
             $<$<CONFIG:Release>:--release>
             --no-compiler-runtime

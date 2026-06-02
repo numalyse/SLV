@@ -53,6 +53,8 @@ void GlobalToolbar::disableFullscreenUiUpdate()
 
 void GlobalToolbar::setDefaultUI()
 {
+    m_zoomBtn->show();
+
     Toolbar::setDefaultUI();
 
     if( !layout() ){
@@ -67,10 +69,14 @@ void GlobalToolbar::setDefaultUI()
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
+        
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_stopBtn);
         buttonLayout->addWidget(m_playPauseBtn);
         buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addSpacing(m_ejectBtn->width()+1);
+        buttonLayout->addSpacing(m_ejectBtn->width()+1);
+
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_zoomBtn);
         buttonLayout->addWidget(m_screenshotBtn);
@@ -78,6 +84,12 @@ void GlobalToolbar::setDefaultUI()
 
         mainLayout->addLayout(buttonLayout);
     }
+}
+
+void GlobalToolbar::setFullscreenUI(int bottomMargin)
+{
+    m_zoomBtn->hide();
+    Toolbar::setFullscreenUI(bottomMargin);
 }
 
 void GlobalToolbar::enableButtons()
@@ -119,5 +131,5 @@ void GlobalToolbar::disableFullscreenRequested(){
 
 void GlobalToolbar::updateFullscreenPosition()
 {
-    Toolbar::moveOnTopOfParent();
+    Toolbar::moveOnTopOfParent(GlobalToolbar::s_bottomMarginFullscreen);
 }

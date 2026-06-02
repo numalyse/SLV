@@ -206,9 +206,9 @@ AdvancedToolbar::~AdvancedToolbar()
     SLV::clearShortcuts(m_advancedShortcuts);
 }
 
-void AdvancedToolbar::setFullscreenUI()
+void AdvancedToolbar::setFullscreenUI(int bottomMargin)
 {
-    Toolbar::setFullscreenUI();
+    Toolbar::setFullscreenUI(bottomMargin);
     if(m_extensionToolbar && m_extensionToolbar->getSegmBtn()->isChecked()){
         m_extensionToolbar->getSegmBtn()->click();
     }

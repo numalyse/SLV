@@ -23,9 +23,9 @@ Q_OBJECT
 
 public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
-
+    
     void setDefaultUI() override;
-    void setFullscreenUI() override;
+    void setFullscreenUI(int bottomMargin = SimpleToolbar::s_bottomMarginFullscreen) override;
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
@@ -80,6 +80,9 @@ public slots:
     void setZoomIndicatorText(const QString&);
 
     virtual void updateFullscreenPosition() override;
+
+private:
+    static constexpr int s_bottomMarginFullscreen = 60;
 
 protected:
     void createSlider();

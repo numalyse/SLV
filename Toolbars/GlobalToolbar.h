@@ -18,6 +18,7 @@ public:
     ~GlobalToolbar();
 
     void setDefaultUI() override;
+    void setFullscreenUI(int bottomMargin = GlobalToolbar::s_bottomMarginFullscreen) override;
     void disableFullscreenRequested() override;
 
     void updateFullscreenPosition() override;
@@ -32,9 +33,11 @@ signals:
     void enableMute();
     void disableMute();
 private: 
-    void addShortcuts();
 
     QVector<QShortcut*> m_globalShortcuts;
+    static constexpr int s_bottomMarginFullscreen = 10;
+
+    void addShortcuts();
 };
 
 #endif

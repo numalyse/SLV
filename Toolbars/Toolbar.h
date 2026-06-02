@@ -106,20 +106,14 @@ public:
     };
 
     /// @brief Met à jour le layout pour afficher l'interface en plein écran
-    virtual void setFullscreenUI() {
+    virtual void setFullscreenUI(int bottomMargin = 40) {
         m_isFullscreen = true;
         setParent(nullptr);
-        setAttribute(Qt::WA_TranslucentBackground); // 👈 ajout
+        setAttribute(Qt::WA_TranslucentBackground);
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
-        int targetWidth = sizeHint().width(); 
-        if (m_parent) {
-            targetWidth = m_parent->width() / 2.5; 
-        }
-
-        resize(targetWidth, sizeHint().height());
         adjustSize();
-        moveOnTopOfParent();
+        moveOnTopOfParent(bottomMargin);
         show();
         raise();
         QWidget::activateWindow();
@@ -188,9 +182,8 @@ protected:
     bool m_isFullscreen = false;
     QWidget* m_parent = nullptr;
 
-    void moveOnTopOfParent(){
+    void moveOnTopOfParent(int bottomMargin){
         if (m_parent && m_isFullscreen) {
-            int bottomMargin = 40;
             QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
             int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
             int posY = parentGlobalPos.y() + m_parent->height() - this->height() - bottomMargin;

@@ -41,7 +41,8 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, [this](){
         if(m_toolbarWidget){
-            m_toolbarWidget->setFullscreenUI();
+            m_separationLine->hide();
+            m_toolbarWidget->setFullscreenUI(10);
         }
         enableFullscreenMainRequested();
     });

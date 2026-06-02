@@ -222,14 +222,6 @@ void ExtensionToolbar::updateOverlayMode(){
     );
 }
 
-void ExtensionToolbar::setFullscreenUI()
-{    
-    if (layout() != nullptr) {
-        delete layout();
-    }
-    // Créer un layout quand on est en fullscreen
-}
-
 
 void ExtensionToolbar::setDefaultUI()
 {

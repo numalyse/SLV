@@ -16,19 +16,19 @@
 #include <QShortcut>
 #include <QVector>
 
-
 /// @brief Toolbar Avancé, utilisé pour la lecture classique, peut être étendu pour afficher des contrôles supplémentaires.
 class AdvancedToolbar : public SimpleToolbar
 {
 Q_OBJECT
 
 public:
+
     explicit AdvancedToolbar(QWidget* parent = nullptr);
     explicit AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar);
 
     ~AdvancedToolbar();
 
-    void setFullscreenUI() override;
+    void setFullscreenUI(int bottomMargin = AdvancedToolbar::s_bottomMarginFullscreen) override;
     void setDefaultUI() override;
     ExtensionToolbar* getExtendedToolbar(){ return m_extensionToolbar; }
 
@@ -44,6 +44,9 @@ public slots:
     virtual void disableFullscreenRequested() override;
     
 private:
+
+    static constexpr int s_bottomMarginFullscreen = 60;
+
     void addShortcuts();
     void incrementSpeedSlider();
     void decrementSpeedSlider();

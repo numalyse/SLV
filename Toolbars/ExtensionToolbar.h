@@ -30,7 +30,6 @@ public:
     ~ExtensionToolbar();
 
     void setOverlayMode(int index);
-    void setFullscreenUI();
     void setDefaultUI();
     void initAdjustmentLayout();
 

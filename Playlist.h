@@ -46,6 +46,7 @@ private:
 signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
+    void ejectCurrentMedia();
 
 public slots:
     void addItemDialog();

@@ -396,9 +396,19 @@ void Playlist::deleteAllItemsDialog()
 
 void Playlist::deleteAllItems()
 {
-    while(!m_items.isEmpty()){
-        deleteItem(static_cast<unsigned int>(m_items.size() - 1));
+    // while(!m_items.isEmpty()){
+    //     deleteItem(static_cast<unsigned int>(m_items.size() - 1));
+    // }
+
+    for(size_t IItem = 0; IItem < m_items.size(); ++IItem){
+        m_items[IItem]->deleteLater();
     }
+
+    emit ejectCurrentMedia();
+    m_currentMediaIndex = 0;
+    m_items.clear();
+    m_itemsShuffleOrder.clear();
+    m_itemsSortOrder.clear();
 }
 
 void Playlist::deleteItem(const unsigned int index)

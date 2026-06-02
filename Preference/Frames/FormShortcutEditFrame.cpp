@@ -8,6 +8,8 @@
 #include <QKeySequenceEdit>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, QWidget *parent)
 : BasePreferenceFrame(name, subCategory, key, value, parent)
@@ -20,12 +22,24 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
     m_keySequenceEdit->setFixedHeight(30);
     m_keySequenceEdit->setFixedWidth(150);
 
+    QString backgroundFillColor;
+
+#ifdef Q_OS_MAC
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        backgroundFillColor = "palette(mid)";
+    } else {
+        backgroundFillColor = "palette(base)";
+    }
+#else
+    backgroundFillColor = "palette(base)";
+#endif
+
     if (QLineEdit* internalLineEdit = m_keySequenceEdit->findChild<QLineEdit*>()) {
         internalLineEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
         internalLineEdit->setStyleSheet(R"(
             QLineEdit{
-                background-color : palette(base);
+                background-color : )" + backgroundFillColor + R"(;
                 font : normal;
             }
 

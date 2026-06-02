@@ -1,10 +1,24 @@
 #include "FormTextEditWidget.h"
+#include <QStyleHints>
+#include <QGuiApplication>
 
 FormTextEditWidget::FormTextEditWidget(const QString &name, const QString &text, bool editable, QWidget *parent) : QFrame(parent)
 {
     setAutoFillBackground(true);
-    setStyleSheet("border: none; background-color: palette(base); padding: 1px; border-radius: 5px;");
-        
+    QString backgroundFillColor;
+
+#ifdef Q_OS_MAC
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        backgroundFillColor = "palette(mid)";
+    } else {
+        backgroundFillColor = "palette(base)";
+    }
+#else
+    backgroundFillColor = "palette(base)";
+#endif
+
+    setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+
     m_frameLayout = new QVBoxLayout(this);
     m_frameLayout->setContentsMargins(0, 0, 0, 0);
     m_frameLayout->setSpacing(2);

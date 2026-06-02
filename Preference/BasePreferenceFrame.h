@@ -28,6 +28,7 @@ signals:
     void tabChanges();
 
 protected:
+    QString backgroundFillColor = "palette(base)";
     QString m_subCategory;
     QString m_key;
     QString m_prevValue;

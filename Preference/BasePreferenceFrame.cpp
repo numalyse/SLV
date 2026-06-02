@@ -1,13 +1,26 @@
 #include "BasePreferenceFrame.h"
+#include <QStyleHints>
+#include <QGuiApplication>
 
 BasePreferenceFrame::BasePreferenceFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, QWidget *parent)
 : QFrame(parent), m_subCategory(subCategory), m_key(key), m_prevValue(value)
 {
+
+#ifdef Q_OS_MAC
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        backgroundFillColor = "palette(mid)";
+    } else {
+        backgroundFillColor = "palette(base)";
+    }
+#else
+    backgroundFillColor = "palette(base)";
+#endif
+
     setAutoFillBackground(true);
     setStyleSheet(R"(
         BasePreferenceFrame {
             border: none; 
-            background-color: palette(base); 
+            background-color: )" + backgroundFillColor + R"(; 
             padding: 1px; 
             border-radius: 5px;
         }
@@ -34,9 +47,10 @@ void BasePreferenceFrame::setRightLayout(QLayout* rightLayout) {
 }
 
 void BasePreferenceFrame::applyFrameStyleToChild(QWidget* child) {
+    
     child->setStyleSheet(R"(
             border: none; 
-            background-color: palette(base); 
+            background-color: )" + backgroundFillColor + R"(; 
             padding: 1px; 
             border-radius: 5px;
     )");

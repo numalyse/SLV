@@ -149,7 +149,7 @@
     "file_multimedia" : "Ficheiro de multimédia",
 
     "main_window_menu_bar_file": "Ficheiro",
-    "main_window_file_open_media_action": "Abrir ficheiros multimédia",
+    "main_window_file_open_media_action": "Abra um ou mais dispositivos de mídia",
     "main_window_file_open_project_action": "Abrir projeto",
     "main_window_file_save_project_action": "Salve o projeto",
     "project_manager_open_project_dialog" : "Abrir projeto",
@@ -235,6 +235,7 @@
 
     "dialog_preference_tab_interface" : "Interface",
     "dialog_preference_tab_shortcut" : "Atalhos",
+    "tooltip_shortcut" : "Atalho: ",
     "dialog_preference_tab_paths" : "Caminhos",
 
     "shortcut_subsection_MainWindow": "Janela principal",

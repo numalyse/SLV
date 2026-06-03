@@ -29,6 +29,9 @@ public:
     QString setThumbnailTime();
 
 private:
+    bool m_isDarkMode = true;
+    QColor m_palbtnColor;
+    QString m_palbtnColorStr;
     Media *m_mediaData = nullptr;
     QLabel *m_mediaThumbnailLabel = nullptr;
     QPixmap *m_mediaThumbnailImage = nullptr;

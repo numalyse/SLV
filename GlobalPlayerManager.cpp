@@ -151,7 +151,9 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
 
         connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
         connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
+        disconnect(m_navPanel, &NavPanel::ejectCurrentMedia, nullptr, nullptr);
         connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+        connect(m_navPanel, &NavPanel::ejectCurrentMedia, m_player, &PlayerWidget::eject);
         connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
         connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     }
@@ -168,6 +170,15 @@ void GlobalPlayerManager::openNavPanel()
 void GlobalPlayerManager::closeNavPanel()
 {
     m_navPanel->hidePanel();
+}
+
+void GlobalPlayerManager::toggleNavPanel()
+{
+
+    if(m_navPanel->isOpen())
+        closeNavPanel();
+    else
+        openNavPanel();
 }
 // slots
 

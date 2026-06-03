@@ -18,9 +18,13 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
         this,
         false,
         "sound_off_white",
-        PrefManager::instance().getText("tooltip_sound_on"),
+        PrefManager::instance().getText("tooltip_sound_on") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "mute") + ")</i>",
         "sound_on_white",
-        PrefManager::instance().getText("tooltip_sound_off")
+        PrefManager::instance().getText("tooltip_sound_off") + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "mute") + ")</i>"
     );
     m_muteBtn->setEnabled(true);
 

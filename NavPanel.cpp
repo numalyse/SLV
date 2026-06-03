@@ -35,6 +35,7 @@ NavPanel::NavPanel(QWidget *parent)
 
     connect(m_playlistWidget, &Playlist::openMediaFileRequested, this, &NavPanel::openMediaFileRequested);
     connect(m_playlistWidget, &Playlist::disableToolbarLoopRequested, this, &NavPanel::disableToolbarLoopRequested);
+    connect(m_playlistWidget, &Playlist::ejectCurrentMedia, this, &NavPanel::ejectCurrentMedia);
     
     connect(m_shotDetail, &ShotDetail::goToShotRequested, this, &NavPanel::goToShotRequest);
 
@@ -60,12 +61,14 @@ void NavPanel::resizeEvent(QResizeEvent *event) {
 void NavPanel::showPanel()
 {
     qDebug() << "bouton cliqué";
+    m_isOpen = true;
     m_sideWidget->show();
     setFixedWidth(300);
 }
 
 void NavPanel::hidePanel()
 {
+    m_isOpen = false;
     m_sideWidget->hide();
     setFixedWidth(0);
 }

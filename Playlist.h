@@ -27,6 +27,9 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
+    bool m_isDarkMode = true;
+    QColor m_palbtnColor;
+    QString m_palbtnColorStr;
     bool m_playlistLooping = false;
     bool m_playlistShuffled = false;
     unsigned int m_currentMediaIndex = 0;
@@ -46,6 +49,7 @@ private:
 signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
+    void ejectCurrentMedia();
 
 public slots:
     void addItemDialog();

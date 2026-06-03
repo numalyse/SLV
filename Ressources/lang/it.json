@@ -149,7 +149,7 @@
     "file_multimedia" : "File multimediali",
 
     "main_window_menu_bar_file": "File",
-    "main_window_file_open_media_action": "Apri file multimediali",
+    "main_window_file_open_media_action": "Apri uno o più media",
     "main_window_file_open_project_action": "Apri progetto",
     "main_window_file_save_project_action": "Salva il progetto",
     "project_manager_open_project_dialog" : "Apri progetto",
@@ -235,6 +235,7 @@
 
     "dialog_preference_tab_interface" : "Interfaccia",
     "dialog_preference_tab_shortcut" : "Scorciatoie",
+    "tooltip_shortcut" : "Scorciatoia: ",
     "dialog_preference_tab_paths" : "Percorsi",
 
     "shortcut_subsection_MainWindow": "Finestra principale",

@@ -149,7 +149,7 @@
     "file_multimedia" : "Mediendateien",
 
     "main_window_menu_bar_file": "Datei",
-    "main_window_file_open_media_action": "Mediendateien öffnen",
+    "main_window_file_open_media_action": "Öffnen Sie ein oder mehrere Medien",
     "main_window_file_open_project_action": "Projekt öffnen",
     "main_window_file_save_project_action": "Speichern Sie das Projekt",
     "project_manager_open_project_dialog" : "Projekt öffnen",
@@ -234,6 +234,7 @@
 
     "dialog_preference_tab_interface" : "Oberfläche",
     "dialog_preference_tab_shortcut" : "Tastenkombinationen",
+    "tooltip_shortcut" : "Tastenkürzel: ",
     "dialog_preference_tab_paths" : "Pfade",
 
     "shortcut_subsection_MainWindow": "Hauptfenster",

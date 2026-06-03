@@ -149,7 +149,7 @@
     "file_multimedia" : "Multimedia files",
 
     "main_window_menu_bar_file": "File",
-    "main_window_file_open_media_action": "Open multimedia files",
+    "main_window_file_open_media_action": "Open one or more media",
     "main_window_file_open_project_action": "Open a project",
     "main_window_file_save_project_action": "Save project",
     "project_manager_open_project_dialog" : "Open a project",
@@ -234,6 +234,7 @@
 
     "dialog_preference_tab_interface": "Interface",
     "dialog_preference_tab_shortcut": "Shortcuts",
+    "tooltip_shortcut" : "Shortcut: ",
     "dialog_preference_tab_paths": "Paths",
 
     "shortcut_subsection_MainWindow": "Main Window",

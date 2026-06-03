@@ -23,8 +23,14 @@
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
-    m_nextMediaBtn = new ToolbarButton(this, "next_white", PrefManager::instance().getText("tooltip_next_media"));
-    m_prevMediaBtn = new ToolbarButton(this, "prev_white", PrefManager::instance().getText("tooltip_prev_media"));
+    m_nextMediaBtn = new ToolbarButton(this, "next_white", PrefManager::instance().getText("tooltip_next_media") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "next_media") + ")</i>");
+    m_prevMediaBtn = new ToolbarButton(this, "prev_white", PrefManager::instance().getText("tooltip_prev_media") + "<br><i>("
+    + PrefManager::instance().getText("tooltip_shortcut")
+    + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "prev_media") + ")</i>");
+    m_nextMediaBtn->setEnabled(false);
+    m_prevMediaBtn->setEnabled(false);
 
     m_extensionBtn = new ToolbarToggleButton(this,
         false,
@@ -101,13 +107,22 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_nextMediaBtn->setEnabled(true);
     });
 
+    connect(&SignalManager::instance(), &SignalManager::activateMediaChangeBtn, this, [this](const bool state){
+        m_prevMediaBtn->setEnabled(state);
+        m_nextMediaBtn->setEnabled(state);
+    });
+
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
     m_removePlayerBtn = nullptr;
 
     delete layout(); // supprime le layout créer par le constructeur de SimpleToobar
     setDefaultUI();
     disableButtons();
-
+    connect(&SignalManager::instance(), &SignalManager::playlistSizeResponse, this, [this](){
+        m_prevMediaBtn->setEnabled(true);
+        m_nextMediaBtn->setEnabled(true);
+    });
+    emit SignalManager::instance().requestPlaylistSize();
     addShortcuts();
 }
 
@@ -296,11 +311,9 @@ void AdvancedToolbar::enableButtons()
     // m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
     m_extensionBtn->setEnabled(true);
-    m_nextMediaBtn->setEnabled(true);
-    m_prevMediaBtn->setEnabled(true);
+    // m_nextMediaBtn->setEnabled(true);
+    // m_prevMediaBtn->setEnabled(true);
     m_screenshotBtn->setEnabled(true);
-    m_prevMediaBtn->setEnabled(true);
-    m_nextMediaBtn->setEnabled(true);
     m_mediaInfoBtn->setEnabled(true);
     m_extensionToolbar->enableButtons();
 }
@@ -320,11 +333,9 @@ void AdvancedToolbar::disableButtons()
     // m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_extensionBtn->setEnabled(false);
-    m_nextMediaBtn->setEnabled(false);
-    m_prevMediaBtn->setEnabled(false);
+    // m_nextMediaBtn->setEnabled(false);
+    // m_prevMediaBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
-    m_prevMediaBtn->setEnabled(false);
-    m_nextMediaBtn->setEnabled(false);
     m_mediaInfoBtn->setEnabled(false);
     m_extensionToolbar->disableButtons();
 }

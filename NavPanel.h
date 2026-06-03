@@ -18,6 +18,7 @@ class NavPanel : public QWidget
     Q_OBJECT
 public:
     explicit NavPanel(QWidget *parent = nullptr);
+    const bool isOpen(){return m_isOpen;}
 private:
 
     bool m_isOpen = false;
@@ -46,6 +47,7 @@ signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
     void goToShotRequest(int);
+    void ejectCurrentMedia();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

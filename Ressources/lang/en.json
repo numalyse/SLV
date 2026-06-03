@@ -271,6 +271,8 @@
     "shortcut_prev_frame": "Previous Frame",
     "shortcut_next_frame": "Next Frame",
 
+    "tagimage_tooltip" : "Tag frame: Allows to identify the shot with a representative image of the content of the shot.",
+
     "paths_screenshot": "Screenshot Save Folder",
 
     "interface_lang_code": "Interface Language : ",

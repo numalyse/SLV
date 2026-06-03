@@ -17,6 +17,7 @@ public:
     void setUIValue(const QString &path);
 
 private:
+    QFrame* m_pathFrame = nullptr;
     QLabel* m_pathLabel = nullptr;
     QPushButton* m_browseBtn = nullptr;
 };

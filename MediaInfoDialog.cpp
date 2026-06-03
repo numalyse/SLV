@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QFormLayout>
 #include <QLabel>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 MediaInfoDialog::MediaInfoDialog(const Media& media)
 {
@@ -98,8 +100,19 @@ MediaInfoDialog::MediaInfoDialog(const Media& media)
 
 QFrame* MediaInfoDialog::createFrame(const QString& key, const QString& value)
 {
+    QString backgroundFillColor;
+#ifdef Q_OS_MAC
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        backgroundFillColor = "palette(mid)";
+    } else {
+        backgroundFillColor = "palette(base)";
+    }
+#else
+    backgroundFillColor = "palette(base)";
+#endif
+
     QFrame* frameRes = new QFrame();
-    frameRes->setStyleSheet("border: none; background-color: palette(base); padding: 1px; border-radius: 5px;");
+    frameRes->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
     QFormLayout* frameLayout = new QFormLayout(frameRes);
     frameLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 

@@ -8,9 +8,12 @@
 FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, bool isFolder, QWidget *parent)
 : BasePreferenceFrame(name, subCategory, key, value, parent)
 {
+    m_pathFrame = new QFrame(this);
 
-    m_pathLabel = new QLabel(value, this);
-    m_pathLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    m_pathLabel = new QLabel(this);
+    m_pathLabel->setText(value);
+    //m_pathLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    m_pathLabel->setWordWrap(true);
     m_pathLabel->setToolTip(m_pathLabel->text());
     m_browseBtn = new QPushButton("...", this);
     m_browseBtn->setToolTip(PrefManager::instance().getText("change_saving_folder"));
@@ -19,12 +22,14 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
 
 
     QHBoxLayout* pathLayout = new QHBoxLayout();
+    m_pathFrame->setLayout(pathLayout);
     pathLayout->setContentsMargins(0, 0, 0, 0);
     pathLayout->setSpacing(5);
     pathLayout->addWidget(m_pathLabel);
     pathLayout->addWidget(m_browseBtn);
 
-    setRightLayout(pathLayout);
+    //setRightLayout(pathLayout);
+    setRightWidget(m_pathFrame);
 
     connect(m_browseBtn, &QPushButton::clicked, this, [this, isFolder]() {
         QString selectedPath = isFolder ? 

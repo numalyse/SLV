@@ -272,6 +272,8 @@
     "shortcut_prev_frame": "Fotogramma precedente",
     "shortcut_next_frame": "Fotogramma successivo",
 
+    "tagimage_tooltip" : "Immagine di riferimento (TagFrame) : Permette di identificare il piano con un'immagine rappresentativa del contenuto del piano.",
+
     "paths_screenshot" : "Cartella screenshot",
 
     "interface_lang_code" : "Lingua interfaccia: ",

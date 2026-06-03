@@ -151,8 +151,7 @@
     "main_window_menu_bar_file": "Archivo",
     "main_window_file_open_media_action": "Abra uno o más medios",
     "main_window_file_open_project_action": "Abrir proyecto",
-    "main_window_file_save_project_action": "Guardar el proyecto
-",
+    "main_window_file_save_project_action": "Guardar el proyecto",
     "project_manager_open_project_dialog" : "Abrir proyecto",
 
     "main_window_menu_bar_option" : "Opciones",
@@ -272,6 +271,8 @@
 
     "shortcut_prev_frame": "Fotograma anterior",
     "shortcut_next_frame": "Fotograma siguiente",
+    
+    "tagimage_tooltip" : "Imagen de referencia (TagFrame) : Permite identificar el plano con una imagen representativa del contenido del plano.",
 
     "paths_screenshot" : "Carpeta de capturas de pantalla",
 

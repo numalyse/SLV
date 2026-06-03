@@ -175,6 +175,20 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
 {
     if(framed){
         QString color = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "rgba(240,240,240,1);" : "rgba(0,0,0,1);";
+
+        bool isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+        QColor palbtnColor;
+        QString palbtnColorStr;
+
+#ifdef Q_OS_MAC
+        QColor colorBtn = qApp->palette().color(QPalette::Button);
+        QColor enhancedColor = colorBtn.lighter(150);
+        palbtnColorStr = QString(enhancedColor.name());
+#else
+        palbtnColorStr = "palette(button)";
+
+#endif
+
         setStyleSheet(
             "ToolbarToggleButton{"
             "   background-color: rgba(0,0,0,0);"
@@ -182,24 +196,25 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:hover{"
-            "   background-color: palette(button);"
-            "   border: 1px solid palette(button);"
+            "   background-color: " + palbtnColorStr + ";"
+            "   border: 1px solid " + palbtnColorStr + ";"
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:checked{"
             // "   background-color: palette(button);"
-            "   border: 1px solid " + color +
+            "   border: 1px solid " +
+            color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:checked:hover{"
             // "   background-color: palette(button);"
-            "   border: 1px solid " + color +
+            "   border: 1px solid " +
+            color +
             "   border-radius: 4px;"
             "}"
             "ToolbarToggleButton:disabled{"
             "   border: none;"
-            "}"
-        );
+            "}");
     }
 }
 

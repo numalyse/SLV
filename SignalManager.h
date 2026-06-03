@@ -52,6 +52,9 @@ signals:
     void recordButtonUiUpdate();
     void addPlaylistItems(const QStringList&);
     void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
+    void activateMediaChangeBtn(const bool);
+    void requestPlaylistSize();
+    void playlistSizeResponse();
 };
 
 

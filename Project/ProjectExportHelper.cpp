@@ -261,7 +261,7 @@ namespace ProjectExportHelper {
         QTextStream out(&file);
         out.setEncoding(QStringConverter::Utf8);
 
-        out << "=== " << "Étude cinématographique" << " ===\n\n";
+        out << "=== " << dstPath.split("/").last() << " ===\n\n";
         out << PrefManager::instance().getText("number_of_shots") << " : " << shots.size() << "\n\n";
 
         int totalShots = shots.size();
@@ -403,7 +403,7 @@ namespace ProjectExportHelper {
         imageAlignment.setBottomMargin(15);
 
         cursor.insertBlock(titleAlignment);
-        cursor.insertText("Étude cinématographique", titleFormat);
+        cursor.insertText(dstPath.split("/").last(), titleFormat);
         
         ImgData imgData{};
         int totalShots = shots.size();

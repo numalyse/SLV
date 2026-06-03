@@ -325,4 +325,31 @@ void GlobalPlayerManager::createTimelineWidget()
     else m_timeline->hide();
 }
 
+void GlobalPlayerManager::showAllToolbars(bool visible) {
+    if (m_toolbarWidget) {
+        visible ? m_toolbarWidget->showAnimation() : m_toolbarWidget->hideAnimation();
+    }
+    if (m_layoutManager) {
+        m_layoutManager->showAllActivePlayersToolbars(visible);
+    }
+}
 
+
+bool GlobalPlayerManager::isMouseOverAnyToolbar() const {
+    if (m_toolbarWidget && m_toolbarWidget->rect().contains(m_toolbarWidget->mapFromGlobal(QCursor::pos()))) {
+        return true;
+    }
+
+    if (m_layoutManager) {
+        for (PlayerWidget* IPlayer : m_layoutManager->activePlayers()) { 
+            if (IPlayer && IPlayer->toolbar()) {
+                auto* toolbar = IPlayer->toolbar();
+                if (toolbar->rect().contains(toolbar->mapFromGlobal(QCursor::pos()))) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}

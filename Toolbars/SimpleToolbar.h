@@ -25,7 +25,7 @@ public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
     
     void setDefaultUI() override;
-    void setFullscreenUI(int bottomMargin = SimpleToolbar::s_bottomMarginFullscreen) override;
+    void setFullscreenUI(bool hideFullscreenBtn, int bottomMargin = SimpleToolbar::s_bottomMarginFullscreen);
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }

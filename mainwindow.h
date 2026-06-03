@@ -50,7 +50,6 @@ signals:
 protected:
     void moveEvent(QMoveEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
@@ -60,9 +59,10 @@ private:
     void openAboutWidget();
 
     void enableMouseTrackingRecursive(QWidget* widget);
+    
     void restartFullscreenToolbarHideTimer();
     void stopFullscreenToolbarHideTimer();
-    void hideFullscreenToolbar();
+    void hideFullscreenToolbars();
 
     Ui::MainWindow *ui;
 

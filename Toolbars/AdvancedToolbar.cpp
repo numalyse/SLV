@@ -104,6 +104,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
     m_removePlayerBtn = nullptr;
 
+    delete layout(); // supprime le layout créer par le constructeur de SimpleToobar
     setDefaultUI();
     disableButtons();
 
@@ -208,11 +209,16 @@ AdvancedToolbar::~AdvancedToolbar()
 
 void AdvancedToolbar::setFullscreenUI(int bottomMargin)
 {
-    Toolbar::setFullscreenUI(bottomMargin);
-    if(m_extensionToolbar && m_extensionToolbar->getSegmBtn()->isChecked()){
-        m_extensionToolbar->getSegmBtn()->click();
+
+    m_duplicatePlayerBtn->setDisabled(true);
+    auto* segmentationBtn = m_extensionToolbar->getSegmBtn();
+
+    if(m_extensionToolbar && segmentationBtn->isChecked()){ // si la timeline est affiché on simule le click pour la cacher
+        segmentationBtn->click();
     }
-    m_extensionToolbar->getSegmBtn()->setDisabled(true);
+    segmentationBtn->setDisabled(true);
+
+    Toolbar::setFullscreenUI(bottomMargin);
 }
 
 
@@ -220,53 +226,59 @@ void AdvancedToolbar::setDefaultUI()
 {
     Toolbar::setDefaultUI();
 
-    delete layout();
+    m_duplicatePlayerBtn->setDisabled(false);
+    m_extensionToolbar->getSegmBtn()->setDisabled(false);
+
+    if( !layout() ) {
+
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(5,5,5,5);
+        mainLayout->setSpacing(1);
+
+        m_nameLabel->hide();
+
+        QHBoxLayout* timecodeLayout = new QHBoxLayout();
+        timecodeLayout->addWidget(m_timeEdit);
+        timecodeLayout->addWidget(m_slider, 1);
+        timecodeLayout->addWidget(m_durationBtn);
+        mainLayout->addLayout(timecodeLayout);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(0,0,0,0);
+        buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addWidget(m_langBtn);
+        buttonLayout->addWidget(m_mediaInfoBtn);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
+
+        buttonLayout->addStretch();
+
+        buttonLayout->addWidget(m_speedBtn);
+        buttonLayout->addWidget(m_prevMediaBtn);
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addWidget(m_nextMediaBtn);
+        buttonLayout->addWidget(m_loopBtn);
+
+        buttonLayout->addStretch();
+
+        buttonLayout->addWidget(m_zoomIndicator);
+        buttonLayout->addWidget(m_zoomBtn);
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_extractSequenceBtn);
+        buttonLayout->addWidget(m_duplicatePlayerBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+        buttonLayout->addWidget(m_extensionBtn);
+        mainLayout->addLayout(buttonLayout);
+
+        mainLayout->addWidget(m_extensionToolbar);
+    }
+
     
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(5,5,5,5);
-    mainLayout->setSpacing(1);
-
-    m_nameLabel->hide();
-
-    QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_timeEdit);
-    timecodeLayout->addWidget(m_slider, 1);
-    timecodeLayout->addWidget(m_durationBtn);
-    mainLayout->addLayout(timecodeLayout);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0,0,0,0);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addWidget(m_mediaInfoBtn);
-    buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_zoomIndicator->width()+1);
-
-    buttonLayout->addStretch();
-
-    buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_prevMediaBtn);
-    buttonLayout->addWidget(m_stopBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_nextMediaBtn);
-    buttonLayout->addWidget(m_loopBtn);
-
-    buttonLayout->addStretch();
-
-    buttonLayout->addWidget(m_zoomIndicator);
-    buttonLayout->addWidget(m_zoomBtn);
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_extractSequenceBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-    buttonLayout->addWidget(m_extensionBtn);
-    mainLayout->addLayout(buttonLayout);
-
-    mainLayout->addWidget(m_extensionToolbar);
 }
 
 void AdvancedToolbar::enableButtons()

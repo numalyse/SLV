@@ -537,7 +537,7 @@ void PlayerLayoutManager::enablePlayerLayoutFullscreen(PlayerWidget* playerToFul
             IPlayer->toolbar()->setDefaultUI();
             IPlayer->hide();
         }
-        else IPlayer->toolbar()->setFullscreenUI();
+        else IPlayer->toolbar()->setFullscreenUI(false);
     }
     emit enableFullscreenPlayerRequested();
 }
@@ -553,7 +553,7 @@ void PlayerLayoutManager::disablePlayerLayoutFullscreen(PlayerWidget* playerToFu
 void PlayerLayoutManager::enableGlobalLayoutFullscreen(){
     for(auto &IPlayer : m_activePlayers){
         IPlayer->show();
-        IPlayer->toolbar()->setFullscreenUI();
+        IPlayer->toolbar()->setFullscreenUI(true);
     }
     emit enableFullscreenGlobalRequested();
 }
@@ -716,4 +716,12 @@ void PlayerLayoutManager::takeGlobalScreenshot()
     });
 
     globalScreenshot->start();
+}
+
+void PlayerLayoutManager::showAllActivePlayersToolbars(bool visible) {
+    for (PlayerWidget* player : m_activePlayers) {
+        if (player && player->toolbar()) {
+            visible ? player->toolbar()->showAnimation() : player->toolbar()->hideAnimation();
+        }
+    }
 }

@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_fullscreenToolbarHideTimer = new QTimer(this);
     m_fullscreenToolbarHideTimer->setSingleShot(true);
     m_fullscreenToolbarHideTimer->setInterval(m_fullscreenToolbarHideDelayMs);
-    connect(m_fullscreenToolbarHideTimer, &QTimer::timeout, this, &MainWindow::hideFullscreenToolbar);
+    connect(m_fullscreenToolbarHideTimer, &QTimer::timeout, this, &MainWindow::hideFullscreenToolbars);
 
 }
 
@@ -429,32 +429,21 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     emit windowMovedOrResizedRequested();
 }
 
-void MainWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    auto* toolbar = m_globalPlayerManager ? m_globalPlayerManager->toolbar() : nullptr;
-    if (toolbar && toolbar->fullscreenBtn()->isChecked()) {
-        if (toolbar->windowOpacity() == 0)
-            toolbar->showAnimation();
-        restartFullscreenToolbarHideTimer();
-    }
-    QMainWindow::mouseMoveEvent(event);
-}
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseMove) {
-        QWidget *widget = qobject_cast<QWidget*>(obj);
-        if (widget && widget->window() == this) {
-            auto* toolbar = m_globalPlayerManager ? m_globalPlayerManager->toolbar() : nullptr;
-            if (toolbar && toolbar->fullscreenBtn()->isChecked()) {
-                if (toolbar->windowOpacity() == 0)
-                    toolbar->showAnimation();
+        QGuiApplication::restoreOverrideCursor(); 
+        if (isFullScreen()) {
+            if (m_globalPlayerManager) {
+                m_globalPlayerManager->showAllToolbars(true);
                 restartFullscreenToolbarHideTimer();
-            } else {
-                stopFullscreenToolbarHideTimer();
             }
+        } else {
+            stopFullscreenToolbarHideTimer();
         }
     }
+        
     return QMainWindow::eventFilter(obj, event);
 }
 
@@ -485,16 +474,17 @@ void MainWindow::stopFullscreenToolbarHideTimer()
         m_fullscreenToolbarHideTimer->stop();
 }
 
-void MainWindow::hideFullscreenToolbar()
+void MainWindow::hideFullscreenToolbars()
 {
-    auto* toolbar = m_globalPlayerManager ? m_globalPlayerManager->toolbar() : nullptr;
-    if (toolbar && toolbar->fullscreenBtn()->isChecked()) {
-        if (toolbar->rect().contains(toolbar->mapFromGlobal(QCursor::pos()))) {
+    if (m_globalPlayerManager && isFullScreen()) {
+        if (m_globalPlayerManager->isMouseOverAnyToolbar()) {
             restartFullscreenToolbarHideTimer();
         } else {
-            toolbar->hideAnimation();
+            m_globalPlayerManager->showAllToolbars(false);
+            QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
         }
     }
+
 }
 
 void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)

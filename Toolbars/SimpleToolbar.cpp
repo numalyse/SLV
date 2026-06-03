@@ -154,7 +154,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
 }
 
-void SimpleToolbar::setFullscreenUI(int bottomMargin)
+void SimpleToolbar::setFullscreenUI(bool hideFullscreenBtn, int bottomMargin)
 {
 
     m_duplicatePlayerBtn->hide();
@@ -163,6 +163,7 @@ void SimpleToolbar::setFullscreenUI(int bottomMargin)
     m_mediaInfoBtn->hide();
     m_stopBtn->hide();
     m_ejectBtn->hide();
+    hideFullscreenBtn ? m_fullscreenBtn->hide() : m_fullscreenBtn->show();
 
     adjustSize();
 
@@ -179,6 +180,7 @@ void SimpleToolbar::setDefaultUI()
     m_mediaInfoBtn->show();
     m_stopBtn->show();
     m_ejectBtn->show();
+    m_fullscreenBtn->show();
 
     if ( !layout() ) {
         

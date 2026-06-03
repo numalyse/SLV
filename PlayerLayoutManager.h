@@ -16,6 +16,8 @@ public:
 
     void createLayout(const int count, const PlayerLayoutArrangement& arrangement = ArrangementUnknown);
 
+    QVector<PlayerWidget*> activePlayers() { return m_activePlayers; };
+
 private:
 
     // Les 4 players sont créer à l'initialisation de PlayerLayoutManager
@@ -93,6 +95,8 @@ public slots:
     void disableGlobalLayoutFullscreen();
 
     void takeGlobalScreenshot();
+
+    void showAllActivePlayersToolbars(bool visible);
 
     void checkPlayersPlayStatus();
     void checkPlayersMuteStatus();

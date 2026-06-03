@@ -65,7 +65,6 @@ protected slots:
     virtual void onSliderReleased() override;
     virtual void onSliderMoved(int value) override;
     virtual void duplicatePlayerAction() override;
-
     
 signals:
     void enableRecordRequested();

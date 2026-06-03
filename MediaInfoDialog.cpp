@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QFormLayout>
 #include <QLabel>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 MediaInfoDialog::MediaInfoDialog(const Media& media)
 {

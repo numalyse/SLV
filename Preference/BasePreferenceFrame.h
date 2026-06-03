@@ -33,6 +33,7 @@ protected:
     QString m_key;
     QString m_prevValue;
     QFormLayout* m_layout;
+    QHBoxLayout* m_layoutHB;
 
     /// @brief Use this if needing to set the right side of the row to a widget 
     void setRightWidget(QWidget* rightWidget);

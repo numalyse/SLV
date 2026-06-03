@@ -147,6 +147,9 @@ Playlist::Playlist(QWidget *parent)
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
     connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsFromPaths);
+    connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
+        if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
+    });
 
 }
 
@@ -296,6 +299,8 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
         m_currentMediaIndex = 0;
     }
     emit disableToolbarLoopRequested();
+    if(m_items.size() > 1)
+        emit SignalManager::instance().activateMediaChangeBtn(true);
 }
 
 void Playlist::deleteAllItemsDialog()
@@ -420,6 +425,7 @@ void Playlist::deleteAllItems()
     m_items.clear();
     m_itemsShuffleOrder.clear();
     m_itemsSortOrder.clear();
+    emit SignalManager::instance().activateMediaChangeBtn(false);
 }
 
 void Playlist::deleteItem(const unsigned int index)
@@ -443,6 +449,8 @@ void Playlist::deleteItem(const unsigned int index)
         if(m_itemsShuffleOrder[IPlaylistItem] > index) m_itemsShuffleOrder[IPlaylistItem]--;
         m_items[m_itemsSortOrder[IPlaylistItem]]->setIndex(IPlaylistItem);
     }
+    if(m_items.size() <= 1)
+        emit SignalManager::instance().activateMediaChangeBtn(false);
 }
 
 void Playlist::playMedia(const QString& filePath, const bool isClicked)

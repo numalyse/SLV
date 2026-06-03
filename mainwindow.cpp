@@ -26,6 +26,9 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QCursor>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -97,6 +100,15 @@ MainWindow::MainWindow(QWidget *parent)
         });
     }
     
+    setMouseTracking(true);
+    enableMouseTrackingRecursive(this);
+    qApp->installEventFilter(this);
+
+    m_fullscreenToolbarHideTimer = new QTimer(this);
+    m_fullscreenToolbarHideTimer->setSingleShot(true);
+    m_fullscreenToolbarHideTimer->setInterval(m_fullscreenToolbarHideDelayMs);
+    connect(m_fullscreenToolbarHideTimer, &QTimer::timeout, this, &MainWindow::hideFullscreenToolbar);
+
 }
 
 void MainWindow::createMenuBar()
@@ -415,6 +427,74 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     emit windowMovedOrResizedRequested();
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    auto* toolbar = m_globalPlayerManager ? m_globalPlayerManager->toolbar() : nullptr;
+    if (toolbar && toolbar->fullscreenBtn()->isChecked()) {
+        if (toolbar->windowOpacity() == 0)
+            toolbar->showAnimation();
+        restartFullscreenToolbarHideTimer();
+    }
+    QMainWindow::mouseMoveEvent(event);
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::MouseMove) {
+        QWidget *widget = qobject_cast<QWidget*>(obj);
+        if (widget && widget->window() == this) {
+            auto* toolbar = m_globalPlayerManager ? m_globalPlayerManager->toolbar() : nullptr;
+            if (toolbar && toolbar->fullscreenBtn()->isChecked()) {
+                if (toolbar->windowOpacity() == 0)
+                    toolbar->showAnimation();
+                restartFullscreenToolbarHideTimer();
+            } else {
+                stopFullscreenToolbarHideTimer();
+            }
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::enableMouseTrackingRecursive(QWidget* widget)
+{
+    if (!widget)
+        return;
+
+    widget->setMouseTracking(true);
+    for (QObject* child : widget->children()) {
+        if (QWidget* childWidget = qobject_cast<QWidget*>(child)) {
+            enableMouseTrackingRecursive(childWidget);
+        }
+    }
+}
+
+void MainWindow::restartFullscreenToolbarHideTimer()
+{
+    if (m_fullscreenToolbarHideTimer) {
+        m_fullscreenToolbarHideTimer->stop();
+        m_fullscreenToolbarHideTimer->start();
+    }
+}
+
+void MainWindow::stopFullscreenToolbarHideTimer()
+{
+    if (m_fullscreenToolbarHideTimer)
+        m_fullscreenToolbarHideTimer->stop();
+}
+
+void MainWindow::hideFullscreenToolbar()
+{
+    auto* toolbar = m_globalPlayerManager ? m_globalPlayerManager->toolbar() : nullptr;
+    if (toolbar && toolbar->fullscreenBtn()->isChecked()) {
+        if (toolbar->rect().contains(toolbar->mapFromGlobal(QCursor::pos()))) {
+            restartFullscreenToolbarHideTimer();
+        } else {
+            toolbar->hideAnimation();
+        }
+    }
 }
 
 void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)

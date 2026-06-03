@@ -57,19 +57,6 @@ public:
         m_opacityAnimation = new QPropertyAnimation(this, "windowOpacity", this);
         m_opacityAnimation->setDuration(200); 
 
-        m_hideTimer = new QTimer(this);
-        m_hideTimer->setSingleShot(true);
-        m_hideTimer->setInterval(250);
-
-        connect(m_hideTimer, &QTimer::timeout, this, [this](){
-            if (m_isFullscreen) {
-                m_opacityAnimation->stop(); 
-                m_opacityAnimation->setStartValue(windowOpacity());
-                m_opacityAnimation->setEndValue(0.01);
-                m_opacityAnimation->start();
-            }
-        });
-
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
         connect(m_stopBtn, &ToolbarButton::clicked, this, &Toolbar::stopRequest);
@@ -117,7 +104,7 @@ public:
         show();
         raise();
         QWidget::activateWindow();
-        setWindowOpacity(0.01);
+        setWindowOpacity(0);
     }
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
@@ -137,6 +124,24 @@ public:
     void setTBParent(QWidget* parent){
         m_parent = parent;
         setParent(parent);
+    }
+
+    void showAnimation() {
+    if (m_isFullscreen) {
+        m_opacityAnimation->stop();
+        m_opacityAnimation->setStartValue(windowOpacity());
+        m_opacityAnimation->setEndValue(1.0);
+        m_opacityAnimation->start();
+    }
+    }
+
+    void hideAnimation() {
+        if (m_isFullscreen) {
+            m_opacityAnimation->stop(); 
+            m_opacityAnimation->setStartValue(windowOpacity());
+            m_opacityAnimation->setEndValue(0);
+            m_opacityAnimation->start();
+        }
     }
 
 public slots:
@@ -176,7 +181,6 @@ protected:
 
     QShortcut* m_dynamicFullscreenShortcut = nullptr;
 
-    QTimer* m_hideTimer = nullptr;
     QPropertyAnimation* m_opacityAnimation = nullptr;
 
     bool m_isFullscreen = false;
@@ -199,30 +203,18 @@ protected:
         m_dynamicFullscreenShortcut = SLV::createGlobalButtonShortcut(this, keyString, m_fullscreenBtn,  false);
     }
 
+
     void enterEvent(QEnterEvent *event) override {
-        if (m_isFullscreen) {
-            m_hideTimer->stop();
-        
-            m_opacityAnimation->stop();
-            m_opacityAnimation->setStartValue(windowOpacity());
-            m_opacityAnimation->setEndValue(1.0);
-            m_opacityAnimation->start();
-        }
+        /*
+
+        */
         QWidget::enterEvent(event);
     }
 
     void leaveEvent(QEvent *event) override {
-        if (m_isFullscreen) {
-            QPoint globalMousePos = QCursor::pos();
-            QPoint localMousePos = this->mapFromGlobal(globalMousePos);
-            
-            if (this->rect().contains(localMousePos)) {
-                event->ignore();
-                return; 
-            }
+        /*
 
-            m_hideTimer->start(); // souris bien en dehors du widget on lance le timer
-        }
+        */
         QWidget::leaveEvent(event);
     }
 

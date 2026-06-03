@@ -69,12 +69,12 @@ void GlobalToolbar::setDefaultUI()
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
+        buttonLayout->addSpacing(m_muteBtn->width()+1);
         
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_stopBtn);
         buttonLayout->addWidget(m_playPauseBtn);
         buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addSpacing(m_ejectBtn->width()+1);
         buttonLayout->addSpacing(m_ejectBtn->width()+1);
 
         buttonLayout->addStretch();

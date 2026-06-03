@@ -10,6 +10,10 @@
 class PlayerWidget;
 class PlayerLayoutManager;
 class QWidget;
+class QPoint;
+class QTimer;
+class QMouseEvent;
+class QEvent;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -41,16 +45,24 @@ public slots:
     
 signals:
     void windowMovedOrResizedRequested();
+    void mouseMovedInMainWindow(const QPoint &pos);
 
 protected:
     void moveEvent(QMoveEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     void changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement);
     void openPrefWidget();
     void openHelperWidget();
     void openAboutWidget();
+
+    void enableMouseTrackingRecursive(QWidget* widget);
+    void restartFullscreenToolbarHideTimer();
+    void stopFullscreenToolbarHideTimer();
+    void hideFullscreenToolbar();
 
     Ui::MainWindow *ui;
 
@@ -77,6 +89,9 @@ private:
     ToolbarButton *m_view3VAlign = nullptr;
     ToolbarButton *m_view4 = nullptr;
     bool wasMaximized = false;
+
+    QTimer* m_fullscreenToolbarHideTimer = nullptr;
+    int m_fullscreenToolbarHideDelayMs = 1000;
     // QVector<PlayerWidget*> m_players;
 };
 #endif // MAINWINDOW_H

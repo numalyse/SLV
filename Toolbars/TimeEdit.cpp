@@ -13,6 +13,7 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     setText(txt);
     setInputMask("99:99:99.99");
     setValidator(new TimeValidator(this));
+    setFocusPolicy(Qt::ClickFocus);
     
     setFixedWidth(75);
 
@@ -93,7 +94,7 @@ void TimeEdit::focusOutEvent(QFocusEvent *e)
     
     QPropertyAnimation *animMax = new QPropertyAnimation(this, "maximumWidth");
     animMax->setDuration(150);
-    animMin->setStartValue(width());
+    animMax->setStartValue(width());
     animMax->setEndValue(75);
 
     animMin->start(QAbstractAnimation::DeleteWhenStopped);

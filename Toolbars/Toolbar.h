@@ -3,9 +3,15 @@
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
+#include "ShortcutHelper.h"
 
 #include <QWidget>
 #include <QMessageBox>
+#include <QEnterEvent>
+#include <QLayout>
+#include <QPainter>
+#include <QTimer>
+#include <QPropertyAnimation>
 #include "PrefManager.h"
 #include "SignalManager.h"
 
@@ -17,6 +23,7 @@ Q_OBJECT
 public:
 
     explicit Toolbar(QWidget* parent = nullptr) : QWidget(parent) {
+        setAttribute(Qt::WA_TranslucentBackground);
         m_playPauseBtn = new ToolbarToggleButton(
             this,
             true,
@@ -33,6 +40,8 @@ public:
         m_playPauseBtn->setEnabled(true);
         m_playPauseBtn->setFixedSize(35, 35);
         m_playPauseBtn->setIconSize(QSize(25, 25));
+
+        m_parent = parent;
         
         m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop") + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
@@ -58,6 +67,10 @@ public:
             PrefManager::instance().getText("tooltip_zoom_off")
         );
         m_zoomBtn->setToggledIconFrame(true);
+
+
+        m_opacityAnimation = new QPropertyAnimation(this, "windowOpacity", this);
+        m_opacityAnimation->setDuration(200); 
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
@@ -90,13 +103,61 @@ public:
     ToolbarToggleButton* muteBtn() { return m_muteBtn; };
     ToolbarToggleButton* zoomBtn() { return m_zoomBtn; };
 
-    virtual ~Toolbar() = default;
+    virtual ~Toolbar() {
+        if(m_dynamicFullscreenShortcut) delete m_dynamicFullscreenShortcut;
+    };
 
     /// @brief Met à jour le layout pour afficher l'interface en plein écran
-    virtual void setFullscreenUI() = 0;
+    virtual void setFullscreenUI(int bottomMargin = 40) {
+        m_isFullscreen = true;
+        setParent(nullptr);
+        setAttribute(Qt::WA_TranslucentBackground);
+        setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+
+        adjustSize();
+        moveOnTopOfParent(bottomMargin);
+        show();
+        raise();
+        QWidget::activateWindow();
+        setWindowOpacity(0);
+    }
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
-    virtual void setDefaultUI() = 0;
+    virtual void setDefaultUI(){
+        m_isFullscreen = false;
+
+        if (m_parent) {
+            if (m_parent->layout()) m_parent->layout()->addWidget(this); 
+        }
+        show();
+        raise();
+    };
+
+    /// @brief Move toolbar on resize when in fullscreen
+    virtual void updateFullscreenPosition() {};
+
+    void setTBParent(QWidget* parent){
+        m_parent = parent;
+        setParent(parent);
+    }
+
+    void showAnimation() {
+    if (m_isFullscreen) {
+        m_opacityAnimation->stop();
+        m_opacityAnimation->setStartValue(windowOpacity());
+        m_opacityAnimation->setEndValue(1.0);
+        m_opacityAnimation->start();
+    }
+    }
+
+    void hideAnimation() {
+        if (m_isFullscreen) {
+            m_opacityAnimation->stop(); 
+            m_opacityAnimation->setStartValue(windowOpacity());
+            m_opacityAnimation->setEndValue(0);
+            m_opacityAnimation->start();
+        }
+    }
 
 public slots:
     virtual void ejectRequested(){
@@ -104,17 +165,23 @@ public slots:
     };
 
     void enableFullscreenRequested(){
-        // permet d'ajouter un shortcut a la toolbar pour pouvoir quitter le fullscreen avec le raccourcis meme si la toolbar n'a pas de raccourcis
-        m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "exit_fullscreen")));
+        if (m_dynamicFullscreenShortcut) {
+            delete m_dynamicFullscreenShortcut;
+            m_dynamicFullscreenShortcut = nullptr;
+        }
+
+        QString keyString = PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "exit_fullscreen");
+        m_dynamicFullscreenShortcut = SLV::createGlobalButtonShortcut(this, keyString, m_fullscreenBtn, false);
         emit enableFullscreenRequest();
     }
 
     virtual void disableFullscreenRequested(){
-        // par défaut on supprime le shortcut, dans advanced / global toolbar on override cette fonction pour le rajouter le bon
-        m_fullscreenBtn->setShortcut(QKeySequence()); 
+        if (m_dynamicFullscreenShortcut) {
+            delete m_dynamicFullscreenShortcut;
+            m_dynamicFullscreenShortcut = nullptr;
+        }
         emit disableFullscreenRequest();
     }
-
 
 // Les classes filles pourront modifier ces widgets
 protected: 
@@ -126,6 +193,65 @@ protected:
     ToolbarToggleButton* m_muteBtn = nullptr;
     ToolbarToggleButton* m_zoomBtn = nullptr;
     bool m_firstTimeDialog = false;
+
+    QShortcut* m_dynamicFullscreenShortcut = nullptr;
+
+    QPropertyAnimation* m_opacityAnimation = nullptr;
+
+    bool m_isFullscreen = false;
+    QWidget* m_parent = nullptr;
+
+    void moveOnTopOfParent(int bottomMargin){
+        if (m_parent && m_isFullscreen) {
+            QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
+            int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
+            int posY = parentGlobalPos.y() + m_parent->height() - this->height() - bottomMargin;
+
+            QScreen* screen = QGuiApplication::primaryScreen();
+
+            if (screen) {
+                QRect geo = screen->availableGeometry();
+                posX = qMax(geo.left(), qMin(posX, geo.right() - width()));
+                posY = qMax(geo.top(), qMin(posY, geo.bottom() - height()));
+            }
+
+            move(posX, posY);
+        }
+    }
+
+    void addEnterFullscreenShortcut(){
+        if(m_dynamicFullscreenShortcut){
+            delete m_dynamicFullscreenShortcut;
+        }
+        QString keyString = PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "enter_fullscreen");
+        m_dynamicFullscreenShortcut = SLV::createGlobalButtonShortcut(this, keyString, m_fullscreenBtn,  false);
+    }
+
+
+    void enterEvent(QEnterEvent *event) override {
+        /*
+
+        */
+        QWidget::enterEvent(event);
+    }
+
+    void leaveEvent(QEvent *event) override {
+        /*
+
+        */
+        QWidget::leaveEvent(event);
+    }
+
+    void paintEvent(QPaintEvent *event) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(30, 30, 30, 255));
+        if( m_isFullscreen ) painter.drawRoundedRect(rect(), 12, 12);
+        else painter.drawRect(rect()); // pas de bords arrondies en mode normal
+        QWidget::paintEvent(event);
+    }
+
 
 signals:
     void playRequest();

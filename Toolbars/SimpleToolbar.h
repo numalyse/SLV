@@ -23,9 +23,9 @@ Q_OBJECT
 
 public:
     explicit SimpleToolbar(QWidget* parent = nullptr);
-
-    void setFullscreenUI() override;
+    
     void setDefaultUI() override;
+    void setFullscreenUI(bool hideFullscreenBtn, int bottomMargin = SimpleToolbar::s_bottomMarginFullscreen);
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
@@ -79,7 +79,10 @@ public slots:
 
     void setZoomIndicatorText(const QString&);
 
+    virtual void updateFullscreenPosition() override;
 
+private:
+    static constexpr int s_bottomMarginFullscreen = 60;
 
 protected:
     void createSlider();
@@ -116,7 +119,6 @@ protected:
     QComboBox* m_subLangComboBox = nullptr;
     ToolbarPopupButton* m_langBtn = nullptr;
     ToolbarButton* m_mediaInfoBtn = nullptr;
-
 
 protected slots: 
     virtual void onSliderPressed();

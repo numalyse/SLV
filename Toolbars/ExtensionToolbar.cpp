@@ -5,6 +5,7 @@
 #include "ExtensionToolbar.h"
 #include "OverlayMode.h"
 #include "SignalManager.h"
+#include "ShortcutHelper.h"
 
 #include <QHBoxLayout>
 #include <QFrame>
@@ -106,7 +107,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_adjustmentsBtn = new ToolbarPopupButton(this, m_adjustmentWidget, "adjustments_white", PrefManager::instance().getText("tooltip_adjust"));
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
-        if( ProjectManager::instance().projet() ){
+        if( ProjectManager::instance().projet()){
             qDebug() << "oui projet";
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
@@ -211,7 +212,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
 ExtensionToolbar::~ExtensionToolbar()
 {
-    clearShortcuts();
+    SLV::clearShortcuts(m_globalShortcuts);
 }
 
 // BLACKFRAME
@@ -242,14 +243,6 @@ void ExtensionToolbar::updateOverlayMode(){
         m_compoRuleCheckboxVFlip->isChecked(),
         m_compoRuleCheckboxHFlip->isChecked()
     );
-}
-
-void ExtensionToolbar::setFullscreenUI()
-{    
-    if (layout() != nullptr) {
-        delete layout();
-    }
-    // Créer un layout quand on est en fullscreen
 }
 
 
@@ -306,13 +299,13 @@ void ExtensionToolbar::updateVFlipButtonUI()
 }
 
 
+
 void ExtensionToolbar::addShortcuts()
 {
     auto& prefManager = PrefManager::instance();
     QJsonObject extShortcuts = prefManager.getSubCategory("Shortcuts", "ExtensionTB");
 
     qDebug() << "[ExtensionToolbar] raccourcis : " << extShortcuts;
-
 
     auto createGlobalShortcut = [this](const QString& keyString, QPushButton* button, bool autoRepeat = true) {
         if (keyString.isEmpty()) return; 

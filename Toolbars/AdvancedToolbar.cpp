@@ -15,6 +15,8 @@
 
 #include "TimeFormatter.h"
 
+#include "ShortcutHelper.h"
+
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
@@ -48,7 +50,13 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_extensionBtn->setButtonState(true);
         if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr)
             emit enableSegmentationRequest();
+        else if (m_isFullscreen) {
+            setFullscreenUI();
+            setWindowOpacity(1.0); // force l'affichage de la barre 
+        }
+            
     });
+
     m_extensionBtn->setIconSize(QSize(13, 13));
 
     connect(m_extensionBtn, &ToolbarToggleButton::stateDeactivated, m_extensionToolbar, [this](){
@@ -56,6 +64,11 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_extensionToolbar->hide();
         m_extensionBtn->setButtonState(false);
         emit disableSegmentationRequest();
+        if (m_isFullscreen) {
+            setFullscreenUI();
+            setWindowOpacity(1.0); // force l'affichage de la barre 
+        }
+            
     });
 
     connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
@@ -102,6 +115,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar
     m_removePlayerBtn = nullptr;
 
+    delete layout(); // supprime le layout créer par le constructeur de SimpleToobar
     setDefaultUI();
     disableButtons();
     connect(&SignalManager::instance(), &SignalManager::playlistSizeResponse, this, [this](){
@@ -117,28 +131,33 @@ void AdvancedToolbar::addShortcuts(){
     QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
     QJsonObject atShortcuts = prefManager.getSubCategory("Shortcuts", "AdvancedTB");
 
-    m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
-    m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
-    m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
-    m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
-    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("screenshot").toString()));
+    addEnterFullscreenShortcut();
 
-    m_nextMediaBtn->setShortcut(QKeySequence(atShortcuts.value("next_media").toString()));
-    m_prevMediaBtn->setShortcut(QKeySequence(atShortcuts.value("prev_media").toString()));
-    m_loopBtn->setShortcut(QKeySequence(atShortcuts.value("loop").toString())); 
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("play_pause").toString(), m_playPauseBtn));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, atShortcuts.value("next_media").toString(), m_nextMediaBtn, false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, atShortcuts.value("prev_media").toString(), m_prevMediaBtn,  false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, atShortcuts.value("loop").toString(), m_loopBtn));
 
     QShortcut* shortcutIncSpeed = new QShortcut(QKeySequence(atShortcuts.value("increase_speed").toString()), this);
     shortcutIncSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutIncSpeed, &QShortcut::activated, this, &AdvancedToolbar::incrementSpeedSlider);
+    m_advancedShortcuts.append(shortcutIncSpeed);
 
     QShortcut* shortcutDecSpeed = new QShortcut(QKeySequence(atShortcuts.value("decrease_speed").toString()), this);
     shortcutDecSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutDecSpeed, &QShortcut::activated, this, &AdvancedToolbar::decrementSpeedSlider);
+    m_advancedShortcuts.append(shortcutDecSpeed);
 
     QShortcut* shortcutResetSpeed = new QShortcut(QKeySequence(atShortcuts.value("base_speed").toString()), this);
     shortcutResetSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutResetSpeed, &QShortcut::activated, this, &AdvancedToolbar::resetSpeedSlider);
+    m_advancedShortcuts.append(shortcutResetSpeed);
 }
+
 
 /// @brief Constructeur qui va copier les états des boutons de le toolbar passé en paramète 
 /// @param parent 
@@ -198,66 +217,83 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     //addShortcuts();
 }
 
-void AdvancedToolbar::setFullscreenUI()
+AdvancedToolbar::~AdvancedToolbar()
 {
-    if (layout() != nullptr) {
-        delete layout();
-    }
-    // Créer un layout quand on est en fullscreen
+    SLV::clearShortcuts(m_advancedShortcuts);
 }
+
+void AdvancedToolbar::setFullscreenUI(int bottomMargin)
+{
+
+    m_duplicatePlayerBtn->setDisabled(true);
+    auto* segmentationBtn = m_extensionToolbar->getSegmBtn();
+
+    if(m_extensionToolbar && segmentationBtn->isChecked()){ // si la timeline est affiché on simule le click pour la cacher
+        segmentationBtn->click();
+    }
+    segmentationBtn->setDisabled(true);
+
+    Toolbar::setFullscreenUI(bottomMargin);
+}
+
 
 void AdvancedToolbar::setDefaultUI()
 {
-    if (layout() != nullptr) {
-        delete layout();
+    Toolbar::setDefaultUI();
+
+    m_duplicatePlayerBtn->setDisabled(false);
+    m_extensionToolbar->getSegmBtn()->setDisabled(false);
+
+    if( !layout() ) {
+
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(5,5,5,5);
+        mainLayout->setSpacing(1);
+
+        m_nameLabel->hide();
+
+        QHBoxLayout* timecodeLayout = new QHBoxLayout();
+        timecodeLayout->addWidget(m_timeEdit);
+        timecodeLayout->addWidget(m_slider, 1);
+        timecodeLayout->addWidget(m_durationBtn);
+        mainLayout->addLayout(timecodeLayout);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(0,0,0,0);
+        buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addWidget(m_langBtn);
+        buttonLayout->addWidget(m_mediaInfoBtn);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_speedBtn->width()+1);
+        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
+
+        buttonLayout->addStretch();
+
+        buttonLayout->addWidget(m_speedBtn);
+        buttonLayout->addWidget(m_prevMediaBtn);
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addWidget(m_nextMediaBtn);
+        buttonLayout->addWidget(m_loopBtn);
+
+        buttonLayout->addStretch();
+
+        buttonLayout->addWidget(m_zoomIndicator);
+        buttonLayout->addWidget(m_zoomBtn);
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_extractSequenceBtn);
+        buttonLayout->addWidget(m_duplicatePlayerBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+        buttonLayout->addWidget(m_extensionBtn);
+        mainLayout->addLayout(buttonLayout);
+
+        mainLayout->addWidget(m_extensionToolbar);
     }
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(5,5,5,5);
-    mainLayout->setSpacing(1);
-
-    m_nameLabel->hide();
-
-    QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->addWidget(m_timeEdit);
-    timecodeLayout->addWidget(m_slider, 1);
-    timecodeLayout->addWidget(m_durationBtn);
-    mainLayout->addLayout(timecodeLayout);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0,0,0,0);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addWidget(m_mediaInfoBtn);
-    buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_speedBtn->width()+1);
-    buttonLayout->addSpacing(m_zoomIndicator->width()+1);
-
-    buttonLayout->addStretch();
-
-    buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_prevMediaBtn);
-    buttonLayout->addWidget(m_stopBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_nextMediaBtn);
-    buttonLayout->addWidget(m_loopBtn);
-
-    buttonLayout->addStretch();
-
-    buttonLayout->addWidget(m_zoomIndicator);
-    buttonLayout->addWidget(m_zoomBtn);
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_extractSequenceBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-    buttonLayout->addWidget(m_extensionBtn);
-    mainLayout->addLayout(buttonLayout);
-
-    mainLayout->addWidget(m_extensionToolbar);
-
+    
 }
 
 void AdvancedToolbar::enableButtons()
@@ -409,7 +445,7 @@ void AdvancedToolbar::ejectRequested(){
 }
 
 void AdvancedToolbar::disableFullscreenRequested(){
-    m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar" , "enter_fullscreen")));
+    addEnterFullscreenShortcut();
     emit disableFullscreenRequest();
 }
 

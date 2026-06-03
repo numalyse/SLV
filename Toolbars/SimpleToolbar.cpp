@@ -156,73 +156,98 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
     connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
     connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, m_zoomIndicator, [this]{ m_zoomIndicator->setText(""); });
-
+    
     setDefaultUI();
     disableButtons();
+
+    QTimer* mTimer = new QTimer(this);
+    setMouseTracking(true);
+    mTimer->setInterval(500);
+    mTimer->setSingleShot(true);
+
+    connect(mTimer, &QTimer::timeout, this, []() {
+      qDebug("Mouse stopped moving!!!");
+    });
+
+
 }
 
-void SimpleToolbar::setFullscreenUI()
+void SimpleToolbar::setFullscreenUI(bool hideFullscreenBtn, int bottomMargin)
 {
-    if (layout() != nullptr) {
-        delete layout();
-    }
 
-    // Créer un layout quand on est en fullscreen
+    m_duplicatePlayerBtn->hide();
+    m_removePlayerBtn->hide();
+    m_extractSequenceBtn->hide();
+    m_mediaInfoBtn->hide();
+    m_stopBtn->hide();
+    m_ejectBtn->hide();
+    hideFullscreenBtn ? m_fullscreenBtn->hide() : m_fullscreenBtn->show();
+
+    adjustSize();
+
+    Toolbar::setFullscreenUI(bottomMargin);
 }
-
 
 void SimpleToolbar::setDefaultUI()
 {
-    if (layout() != nullptr) {
-        delete layout();
+    Toolbar::setDefaultUI();
+
+    m_duplicatePlayerBtn->show();
+    m_removePlayerBtn->show();
+    m_extractSequenceBtn->show();
+    m_mediaInfoBtn->show();
+    m_stopBtn->show();
+    m_ejectBtn->show();
+    m_fullscreenBtn->show();
+
+    if ( !layout() ) {
+        
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(5,5,5,5);
+        mainLayout->setSpacing(1);
+        
+        m_nameLabel->hide();
+
+        QHBoxLayout* timecodeLayout = new QHBoxLayout();
+        timecodeLayout->setSpacing(2);
+        timecodeLayout->addWidget(m_timeEdit);
+        timecodeLayout->addWidget(m_slider, 1);
+        timecodeLayout->addWidget(m_durationBtn);
+        mainLayout->addLayout(timecodeLayout);
+
+        // mainLayout->addWidget(m_slider);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(0,0,0,0);
+        //buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addWidget(m_langBtn);
+        buttonLayout->addWidget(m_mediaInfoBtn);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_speedBtn);
+        buttonLayout->addWidget(m_stopBtn);
+        // buttonLayout->addWidget(m_slowDownBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        // buttonLayout->addWidget(m_speedUpBtn);
+
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addWidget(m_loopBtn);
+
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_zoomIndicator);
+        buttonLayout->addWidget(m_zoomBtn);
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_extractSequenceBtn);
+        buttonLayout->addWidget(m_duplicatePlayerBtn);
+        buttonLayout->addWidget(m_removePlayerBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+        mainLayout->addLayout(buttonLayout);
+        
     }
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(5,5,5,5);
-    mainLayout->setSpacing(1);
-
-    m_nameLabel->hide();
-
-    QHBoxLayout* timecodeLayout = new QHBoxLayout();
-    timecodeLayout->setSpacing(2);
-    timecodeLayout->addWidget(m_timeEdit);
-    timecodeLayout->addWidget(m_slider, 1);
-    timecodeLayout->addWidget(m_durationBtn);
-    mainLayout->addLayout(timecodeLayout);
-
-    // mainLayout->addWidget(m_slider);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0,0,0,0);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addWidget(m_langBtn);
-    buttonLayout->addWidget(m_mediaInfoBtn);
-    buttonLayout->addSpacing(m_langBtn->width()+1);
-    buttonLayout->addSpacing(m_langBtn->width()+1);
-    buttonLayout->addSpacing(m_langBtn->width()+1);
-    buttonLayout->addSpacing(m_zoomIndicator->width()+1);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_speedBtn);
-    buttonLayout->addWidget(m_stopBtn);
-    // buttonLayout->addWidget(m_slowDownBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    // buttonLayout->addWidget(m_speedUpBtn);
-
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addWidget(m_loopBtn);
-
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_zoomIndicator);
-    buttonLayout->addWidget(m_zoomBtn);
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_extractSequenceBtn);
-    buttonLayout->addWidget(m_duplicatePlayerBtn);
-    buttonLayout->addWidget(m_removePlayerBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-    mainLayout->addLayout(buttonLayout);
-
-
+    adjustSize();
 }
 
 void SimpleToolbar::resetSlider()
@@ -422,6 +447,11 @@ void SimpleToolbar::duplicatePlayerAction()
     emit duplicatePlayerRequested();
 }
 
+void SimpleToolbar::updateFullscreenPosition()
+{
+    Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
+}
+
 void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){
     m_audioLangComboBox->blockSignals(true);
     m_audioLangComboBox->clear();
@@ -503,7 +533,7 @@ void SimpleToolbar::setZoomIndicatorText(const QString& value)
 
 void SimpleToolbar::createTimeEdit(){
     m_timeEdit = new TimeEdit("00:00:00.00", this);
-    m_timeEdit->setFixedWidth(75);
+
     connect(m_timeEdit, &TimeEdit::focusIn, this, [this](){
         emit pauseRequest();  
         m_editingTime = true;

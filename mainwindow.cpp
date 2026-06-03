@@ -26,6 +26,9 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QCursor>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -97,6 +100,15 @@ MainWindow::MainWindow(QWidget *parent)
         });
     }
     
+    setMouseTracking(true);
+    enableMouseTrackingRecursive(this);
+    qApp->installEventFilter(this);
+
+    m_fullscreenToolbarHideTimer = new QTimer(this);
+    m_fullscreenToolbarHideTimer->setSingleShot(true);
+    m_fullscreenToolbarHideTimer->setInterval(m_fullscreenToolbarHideDelayMs);
+    connect(m_fullscreenToolbarHideTimer, &QTimer::timeout, this, &MainWindow::hideFullscreenToolbars);
+
 }
 
 void MainWindow::createMenuBar()
@@ -418,6 +430,64 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     emit windowMovedOrResizedRequested();
+}
+
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::MouseMove) {
+        QGuiApplication::restoreOverrideCursor(); 
+        if (isFullScreen()) {
+            if (m_globalPlayerManager) {
+                m_globalPlayerManager->showAllToolbars(true);
+                restartFullscreenToolbarHideTimer();
+            }
+        } else {
+            stopFullscreenToolbarHideTimer();
+        }
+    }
+        
+    return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::enableMouseTrackingRecursive(QWidget* widget)
+{
+    if (!widget)
+        return;
+
+    widget->setMouseTracking(true);
+    for (QObject* child : widget->children()) {
+        if (QWidget* childWidget = qobject_cast<QWidget*>(child)) {
+            enableMouseTrackingRecursive(childWidget);
+        }
+    }
+}
+
+void MainWindow::restartFullscreenToolbarHideTimer()
+{
+    if (m_fullscreenToolbarHideTimer) {
+        m_fullscreenToolbarHideTimer->stop();
+        m_fullscreenToolbarHideTimer->start();
+    }
+}
+
+void MainWindow::stopFullscreenToolbarHideTimer()
+{
+    if (m_fullscreenToolbarHideTimer)
+        m_fullscreenToolbarHideTimer->stop();
+}
+
+void MainWindow::hideFullscreenToolbars()
+{
+    if (m_globalPlayerManager && isFullScreen()) {
+        if (m_globalPlayerManager->isMouseOverAnyToolbar()) {
+            restartFullscreenToolbarHideTimer();
+        } else {
+            m_globalPlayerManager->showAllToolbars(false);
+            QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+        }
+    }
+
 }
 
 void MainWindow::changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement)

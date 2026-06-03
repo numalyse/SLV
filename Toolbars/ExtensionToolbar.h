@@ -30,9 +30,10 @@ public:
     ~ExtensionToolbar();
 
     void setOverlayMode(int index);
-    void setFullscreenUI();
     void setDefaultUI();
     void initAdjustmentLayout();
+
+    ToolbarToggleButton* getSegmBtn() { return m_segmBtn; };
     
     //QComboBox* comboBoxCompoRuleBtn = nullptr;
 

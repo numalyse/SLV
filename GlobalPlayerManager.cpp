@@ -39,8 +39,32 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenPlayerRequested, this, &GlobalPlayerManager::enableFullscreenPlayer);
     connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenPlayerRequested, this, &GlobalPlayerManager::disableFullscreenPlayer);
 
-    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, &GlobalPlayerManager::enableFullscreenMainRequested);
-    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, &GlobalPlayerManager::disableFullscreenMainRequested);
+    connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, [this](){
+        if(m_toolbarWidget){
+            m_separationLine->hide();
+            m_toolbarWidget->setFullscreenUI(10);
+        }
+        enableFullscreenMainRequested();
+    });
+
+    connect(m_layoutManager, &PlayerLayoutManager::disableFullscreenGlobalRequested, this, [this](){
+        if(m_toolbarWidget){
+            m_toolbarWidget->setParent(this);
+            m_toolbarWidget->setDefaultUI();
+            
+            layout->removeWidget(m_separationLine);
+            layout->removeWidget(m_toolbarWidget);
+
+            layout->insertWidget(1, m_separationLine);
+            layout->insertWidget(2, m_toolbarWidget);
+
+            auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+            if(!advancedToolbar){
+                m_separationLine->show();
+            }
+        }
+        disableFullscreenMainRequested();
+    });
 
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
@@ -114,6 +138,7 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
             m_separationLine->hide();
         }
         layout->addWidget(m_toolbarWidget);
+        m_toolbarWidget->setTBParent(this); // since toolbar was created in playerlayoutmanager, need to update its internal m_parent 
     }
 
 
@@ -160,6 +185,11 @@ void GlobalPlayerManager::toggleNavPanel()
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+
+    if(m_toolbarWidget && m_toolbarWidget->fullscreenBtn()->isChecked()){
+        m_toolbarWidget->updateFullscreenPosition();
+        m_toolbarWidget->adjustSize();
+    }
 }
 
 /// @brief Met à jour l'état du bouton play pause 
@@ -200,8 +230,24 @@ void GlobalPlayerManager::enableFullscreenPlayer()
 /// @brief Affiche la toolbar si elle est présente et envoie un signal à la mainWindow
 void GlobalPlayerManager::disableFullscreenPlayer()
 {
-    if(m_toolbarWidget)
+    if(m_toolbarWidget) {
+        layout->removeWidget(m_separationLine);
+        layout->removeWidget(m_toolbarWidget);
+
+        m_toolbarWidget->setDefaultUI();
+
+        layout->insertWidget(1, m_separationLine);
+        layout->insertWidget(2, m_toolbarWidget);
+
+        auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
+        if(!advancedToolbar){
+            m_separationLine->show();
+        }
+        
         m_toolbarWidget->show();
+        m_toolbarWidget->fullscreenBtn()->setButtonState(false);
+    }
+
     emit disableFullscreenMainRequested();
 }
 
@@ -290,4 +336,31 @@ void GlobalPlayerManager::createTimelineWidget()
     else m_timeline->hide();
 }
 
+void GlobalPlayerManager::showAllToolbars(bool visible) {
+    if (m_toolbarWidget) {
+        visible ? m_toolbarWidget->showAnimation() : m_toolbarWidget->hideAnimation();
+    }
+    if (m_layoutManager) {
+        m_layoutManager->showAllActivePlayersToolbars(visible);
+    }
+}
 
+
+bool GlobalPlayerManager::isMouseOverAnyToolbar() const {
+    if (m_toolbarWidget && m_toolbarWidget->rect().contains(m_toolbarWidget->mapFromGlobal(QCursor::pos()))) {
+        return true;
+    }
+
+    if (m_layoutManager) {
+        for (PlayerWidget* IPlayer : m_layoutManager->activePlayers()) { 
+            if (IPlayer && IPlayer->toolbar()) {
+                auto* toolbar = IPlayer->toolbar();
+                if (toolbar->rect().contains(toolbar->mapFromGlobal(QCursor::pos()))) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}

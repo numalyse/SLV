@@ -17,6 +17,11 @@ class GlobalPlayerManager : public QWidget
 public:
     explicit GlobalPlayerManager(QWidget *parent = nullptr);
 
+    Toolbar* toolbar() { return m_toolbarWidget; }
+    
+    void showAllToolbars(bool visible);
+    bool isMouseOverAnyToolbar() const;
+
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
     QWidget* m_playersWidget = nullptr;

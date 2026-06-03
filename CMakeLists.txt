@@ -712,6 +712,13 @@ if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
 
     add_custom_command(TARGET SLV POST_BUILD
 
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+            $<$<CONFIG:Debug>:--debug>
+            $<$<CONFIG:Release>:--release>
+            --no-compiler-runtime
+            --dir "$<TARGET_FILE_DIR:SLV>"
+            "$<TARGET_FILE:SLV>"
+
         COMMAND ${CMAKE_COMMAND} -E make_directory "${DEPLOY_DIR}"
 
         COMMAND ${CMAKE_COMMAND} -E copy

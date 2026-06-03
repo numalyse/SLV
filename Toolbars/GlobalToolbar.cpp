@@ -3,9 +3,13 @@
 #include "PrefManager.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarButton.h"
+#include "ShortcutHelper.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QTimer>
+
+#include "GlobalToolbar.h"
 
 
 GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
@@ -36,13 +40,9 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     addShortcuts();
 }
 
-void GlobalToolbar::setFullscreenUI()
+GlobalToolbar::~GlobalToolbar()
 {
-    if (layout() != nullptr) {
-        delete layout();
-    }
-
-    // Créer un layout quand on est en fullscreen
+    SLV::clearShortcuts(m_globalShortcuts);
 }
 
 void GlobalToolbar::enableFullscreenUiUpdate()
@@ -57,32 +57,43 @@ void GlobalToolbar::disableFullscreenUiUpdate()
 
 void GlobalToolbar::setDefaultUI()
 {
+    m_zoomBtn->show();
 
-    if (layout() != nullptr) {
-        delete layout();
+    Toolbar::setDefaultUI();
+
+    if( !layout() ){
+
+        QVBoxLayout* mainLayout = new QVBoxLayout(this);
+        mainLayout->setContentsMargins(0,0,0,0);
+        mainLayout->setSpacing(1);
+
+        QHBoxLayout* buttonLayout = new QHBoxLayout();
+        buttonLayout->setContentsMargins(5,5,5,5);
+        buttonLayout->setSpacing(1);
+        buttonLayout->addWidget(m_muteBtn);
+        buttonLayout->addSpacing(m_muteBtn->width()+1);
+        buttonLayout->addSpacing(m_muteBtn->width()+1);
+        buttonLayout->addSpacing(m_muteBtn->width()+1);
+        
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_playPauseBtn);
+        buttonLayout->addWidget(m_ejectBtn);
+        buttonLayout->addSpacing(m_ejectBtn->width()+1);
+
+        buttonLayout->addStretch();
+        buttonLayout->addWidget(m_zoomBtn);
+        buttonLayout->addWidget(m_screenshotBtn);
+        buttonLayout->addWidget(m_fullscreenBtn);
+
+        mainLayout->addLayout(buttonLayout);
     }
+}
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(1);
-
-    QHBoxLayout* buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(5,5,5,5);
-    buttonLayout->setSpacing(1);
-    buttonLayout->addWidget(m_muteBtn);
-    buttonLayout->addSpacing(m_muteBtn->width()+1);
-    buttonLayout->addSpacing(m_muteBtn->width()+1);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_stopBtn);
-    buttonLayout->addWidget(m_playPauseBtn);
-    buttonLayout->addWidget(m_ejectBtn);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_zoomBtn);
-    buttonLayout->addWidget(m_screenshotBtn);
-    buttonLayout->addWidget(m_fullscreenBtn);
-
-    mainLayout->addLayout(buttonLayout);
-
+void GlobalToolbar::setFullscreenUI(int bottomMargin)
+{
+    m_zoomBtn->hide();
+    Toolbar::setFullscreenUI(bottomMargin);
 }
 
 void GlobalToolbar::enableButtons()
@@ -109,14 +120,20 @@ void GlobalToolbar::addShortcuts(){
     auto& prefManager = PrefManager::instance();
     QJsonObject commonShortcuts = prefManager.getSubCategory("Shortcuts", "CommonToolbar");
     
-    m_playPauseBtn->setShortcut(QKeySequence(commonShortcuts.value("play_pause").toString()));
-    m_stopBtn->setShortcut(QKeySequence(commonShortcuts.value("stop").toString()));
-    m_fullscreenBtn->setShortcut(QKeySequence(commonShortcuts.value("enter_fullscreen").toString()));
-    m_muteBtn->setShortcut(QKeySequence(commonShortcuts.value("mute").toString()));
-    m_screenshotBtn->setShortcut(QKeySequence(commonShortcuts.value("screenshot").toString()));
+    addEnterFullscreenShortcut();
+
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("play_pause").toString(), m_playPauseBtn));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
 }
 
 void GlobalToolbar::disableFullscreenRequested(){
-    m_fullscreenBtn->setShortcut(QKeySequence(PrefManager::instance().getPref("Shortcuts", "CommonToolbar" , "enter_fullscreen")));
+    addEnterFullscreenShortcut();
     emit disableFullscreenRequest();
+}
+
+void GlobalToolbar::updateFullscreenPosition()
+{
+    Toolbar::moveOnTopOfParent(GlobalToolbar::s_bottomMarginFullscreen);
 }

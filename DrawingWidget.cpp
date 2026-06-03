@@ -21,6 +21,8 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
     setWindowFlag(Qt::NoDropShadowWindowHint);
 
+    setMouseTracking(true);
+
     m_pen = QPen(m_color, m_lineWidth);
 
     m_palette = {
@@ -70,7 +72,9 @@ void DrawingWidget::initDrawingSurface(){
         m_drawingSurface->setAttribute(Qt::WA_TranslucentBackground);
         m_drawingSurface->setAttribute(Qt::WA_NoSystemBackground);
         m_drawingSurface->setAttribute(Qt::WA_OpaquePaintEvent, false);
+        m_drawingSurface->setMouseTracking(true);
         m_drawingSurface->hide();
+        
     }
 
     if (m_drawingCanvas.size() != m_drawingSurface->size()) {
@@ -123,6 +127,7 @@ void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar->setContentsMargins(0,0,0,0);
     containerBackground = new QFrame(m_drawingToolbar);
     containerBackground->setContentsMargins(0,0,0,0);
+    m_drawingToolbar->setMouseTracking(true);
     m_drawingToolbar->setStyleSheet(
         "QFrame {"
         " background-color: palette(base);"
@@ -621,6 +626,8 @@ void DrawingWidget::mousePressEvent(QMouseEvent *event)
 
 void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!m_isEnabled || !(event->buttons() & Qt::LeftButton)) return;
+
     QPoint p = event->pos() - m_mediaRect.topLeft();
 
     if (m_erasing)
@@ -661,6 +668,8 @@ void DrawingWidget::mouseMoveEvent(QMouseEvent *event)
 
         update();
     }
+
+    QWidget::mouseMoveEvent(event);
 }
 
 void DrawingWidget::mouseReleaseEvent(QMouseEvent *event)

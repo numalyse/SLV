@@ -2,6 +2,7 @@
 
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
+#include "Toolbars/GlobalToolbar.h"
 
 #include "Project/ProjectManager.h"
 
@@ -42,7 +43,16 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, [this](){
         if(m_toolbarWidget){
             m_separationLine->hide();
-            m_toolbarWidget->setFullscreenUI(10);
+            // cast pour appeler la setFullscreenUI avec la bonne marge
+            if (auto *globalToolbar = qobject_cast<GlobalToolbar*>(m_toolbarWidget)) {
+                globalToolbar->setFullscreenUI(); 
+            }
+            else if (auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget)) {
+                advancedToolbar->setFullscreenUI(); 
+            }
+            else {
+                m_toolbarWidget->setFullscreenUI();
+            }
         }
         enableFullscreenMainRequested();
     });

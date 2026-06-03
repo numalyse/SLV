@@ -93,7 +93,9 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
             continue;
         }
 
-        m_layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" + section), m_container));
+        //m_layout->addRow(new QLabel(prefManager.getText("shortcut_subsection_" + section), m_container));
+        m_containerLayout->addWidget(new QLabel(prefManager.getText("shortcut_subsection_" + section)));
+
         QJsonObject shortCutSubcategory = m_baseJson.value(section).toObject();
         QJsonObject defaultSection = defaultShortcuts.value(section).toObject();
         QStringList shortcutKeys = orderedKeys(defaultSection);
@@ -114,8 +116,10 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
                 m_container
             );
 
+            m_containerLayout->addWidget(formShortcutEditFrame);
+
             connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutUIRequested, this, &ShortcutTab::emptyShortcutUI);
-            addPreferenceFrame(formShortcutEditFrame);
+            //addPreferenceFrame(formShortcutEditFrame);
 
             m_shortcutFrames.insert(internalKey, formShortcutEditFrame);
         }

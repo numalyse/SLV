@@ -191,6 +191,15 @@ protected:
             QPoint parentGlobalPos = m_parent->mapToGlobal(QPoint(0, 0));
             int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
             int posY = parentGlobalPos.y() + m_parent->height() - this->height() - bottomMargin;
+
+            QScreen* screen = QGuiApplication::primaryScreen();
+
+            if (screen) {
+                QRect geo = screen->availableGeometry();
+                posX = qMax(geo.left(), qMin(posX, geo.right() - width()));
+                posY = qMax(geo.top(), qMin(posY, geo.bottom() - height()));
+            }
+
             move(posX, posY);
         }
     }

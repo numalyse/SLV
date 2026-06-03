@@ -207,8 +207,11 @@ protected:
             int posX = parentGlobalPos.x() + (m_parent->width() - this->width()) / 2;
             int posY = parentGlobalPos.y() + m_parent->height() - this->height() - bottomMargin;
 
-            QScreen* screen = QGuiApplication::primaryScreen();
-
+            QScreen* screen = nullptr;
+            if(m_parent){
+                screen = m_parent->screen();
+            }
+        
             if (screen) {
                 QRect geo = screen->availableGeometry();
                 posX = qMax(geo.left(), qMin(posX, geo.right() - width()));

@@ -270,6 +270,8 @@
     "shortcut_prev_frame": "Vorheriges Bild",
     "shortcut_next_frame": "Nächstes Bild",
 
+    "tagimage_tooltip" : "Tag-Bild (TagFrame): Ermöglicht die Identifizierung des Schnitts mit einem repräsentativen Bild des Inhalts des Schnitts.",
+
     "paths_screenshot" : "Speicherordner für Screenshots",
 
     "interface_lang_code" : "Oberflächensprache: ",

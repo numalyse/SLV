@@ -1,4 +1,3 @@
-
 #include "ShotDetail.h"
 #include "TimeFormatter.h"
 #include "Project/ProjectManager.h"
@@ -17,7 +16,8 @@
 
 ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 {
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 
     PrefManager& PrefManager = PrefManager::instance();
 
@@ -28,11 +28,13 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     m_duration = new FormLineEditWidget(PrefManager.getText("shot_detail_duration_time_name") , "", false, this);
     m_notes = new FormTextEditWidget(PrefManager.getText("shot_detail_note_name") , "", true, this);
     m_tagImage = new QLabel(this);
+    m_tagImage->setToolTip(PrefManager.getText("tagimage_tooltip"));
     m_tagImage->setStyleSheet("");
 
 
     m_notes->setMaximumHeight(250);
-
+    
+    m_notes->setToolTip(PrefManager.getText("click_to_modify"));
     connect(m_notes->textEdit(), &QTextEdit::textChanged, this, [this](){
         if(m_shotData) {
             QString text = m_notes->textEdit()->toPlainText();
@@ -40,6 +42,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
         }
     });
 
+    m_shotTitle->setToolTip(PrefManager.getText("click_to_modify"));
     connect(m_shotTitle->lineEdit(), &QLineEdit::textChanged, this, [this](const QString &newTitle){
         if(m_shotData) {
             m_shotData->title = newTitle;

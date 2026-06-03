@@ -2,6 +2,8 @@
 
 #include "SignalManager.h"
 #include "Project/ProjectManager.h"
+#include <QScrollBar>
+#include <QApplication>
 
 FormTextEdit::FormTextEdit(const QString &text, bool editable, QWidget *parent) : QTextEdit(parent)
 {
@@ -16,6 +18,7 @@ FormTextEdit::FormTextEdit(const QString &text, bool editable, QWidget *parent) 
             }
         });
     }
+
 }
 
 void FormTextEdit::focusInEvent(QFocusEvent *e)

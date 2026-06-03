@@ -21,7 +21,8 @@ public:
     FormLineEdit* lineEdit() { return m_lineEdit;}
 
 private:
-    QFormLayout* m_frameLayout = nullptr;
+    //QFormLayout* m_frameLayout = nullptr;
+    QHBoxLayout* m_frameLayout = nullptr;
     QLabel* m_nameLabel = nullptr;
     FormLineEdit* m_lineEdit = nullptr;
 };

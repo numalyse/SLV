@@ -20,7 +20,8 @@ FormLineEditWidget::FormLineEditWidget(const QString &name, const QString &text,
 
     setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
 
-    m_frameLayout = new QFormLayout(this);
+    //m_frameLayout = new QFormLayout(this);
+    m_frameLayout = new QHBoxLayout(this);
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setAlignment(Qt::AlignLeft);
@@ -30,7 +31,9 @@ FormLineEditWidget::FormLineEditWidget(const QString &name, const QString &text,
     m_lineEdit = new FormLineEdit(text, editable, this);
     m_lineEdit->setAlignment(Qt::AlignRight);
     
-    m_frameLayout->addRow(m_nameLabel, m_lineEdit);
+    //m_frameLayout->addRow(m_nameLabel, m_lineEdit);
+    m_frameLayout->addWidget(m_nameLabel);
+    m_frameLayout->addWidget(m_lineEdit);
 }
 
 void FormLineEditWidget::setText(const QString &newText)

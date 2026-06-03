@@ -62,7 +62,6 @@ void GlobalToolbar::setDefaultUI()
     Toolbar::setDefaultUI();
 
     if( !layout() ){
-
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(0,0,0,0);
         mainLayout->setSpacing(1);
@@ -70,10 +69,12 @@ void GlobalToolbar::setDefaultUI()
         QHBoxLayout* buttonLayout = new QHBoxLayout();
         buttonLayout->setContentsMargins(5,5,5,5);
         buttonLayout->setSpacing(1);
+        
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
-        buttonLayout->addSpacing(m_muteBtn->width()+1);
+        m_extraSpacingItem = new QSpacerItem(m_muteBtn->width()+1, 1, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        buttonLayout->addSpacerItem(m_extraSpacingItem);
         
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_stopBtn);
@@ -87,13 +88,24 @@ void GlobalToolbar::setDefaultUI()
         buttonLayout->addWidget(m_fullscreenBtn);
 
         mainLayout->addLayout(buttonLayout);
+    } else if (m_extraSpacingItem) { // si on vient de quitter le mode plein écran, on a déja un layout
+        m_extraSpacingItem->changeSize(m_muteBtn->width()+1, 1, QSizePolicy::Fixed, QSizePolicy::Minimum); // augmente la taille du spacer
+        layout()->invalidate(); // pour forcer a recalculer les positions des btns 
+
     }
 }
 
 void GlobalToolbar::setFullscreenUI(int bottomMargin)
 {
+
     m_zoomBtn->hide();
+
     Toolbar::setFullscreenUI(bottomMargin);
+
+    if (layout() && m_extraSpacingItem) {
+        m_extraSpacingItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        layout()->invalidate(); // pour forcer a recalculer les positions des btns 
+    }
 }
 
 void GlobalToolbar::enableButtons()

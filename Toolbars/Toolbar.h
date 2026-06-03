@@ -115,11 +115,14 @@ public:
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
         adjustSize();
-        moveOnTopOfParent(bottomMargin);
         show();
         raise();
         QWidget::activateWindow();
         setWindowOpacity(0);
+
+        QTimer::singleShot(0, this, [this, bottomMargin]() {
+            moveOnTopOfParent(bottomMargin);
+        });
     }
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut

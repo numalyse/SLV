@@ -82,6 +82,8 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::disableNavPanelRequested, this, &GlobalPlayerManager::disableNavPanelRequested);
     connect(m_layoutManager, &PlayerLayoutManager::enableNavPanelRequested, this, &GlobalPlayerManager::enableNavPanelRequested);
+    connect(m_layoutManager, &PlayerLayoutManager::activePlayersMediaStateChanged, this, &GlobalPlayerManager::activePlayersMediaStateChanged);
+    connect(m_layoutManager, &PlayerLayoutManager::activePlayersCountChanged, this, &GlobalPlayerManager::activePlayersCountChanged);
     
     connect(m_navPanel, &NavPanel::openMediaFileRequested, m_layoutManager, [this](const QString &filePath)
         { m_layoutManager->createLayoutFromPaths(QStringList(filePath)); qDebug() << "connexion russie " << filePath; }

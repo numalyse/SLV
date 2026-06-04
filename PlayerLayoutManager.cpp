@@ -112,6 +112,7 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
     }
     auto* toolbar = createLayoutToolbar();
     ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    updateActivePlayersMediaState();
     emit updateContainerRequest(player, container, toolbar);
 }
 
@@ -147,6 +148,7 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     }
     auto* toolbar = createLayoutToolbar();
     ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+    updateActivePlayersMediaState();
     emit updateContainerRequest(player, container, toolbar);
 
 }
@@ -160,6 +162,7 @@ void PlayerLayoutManager::createLayoutFromProject(const QStringList& filesPaths)
     emit enableNavPanelRequested();
 
     auto* toolbar = createLayoutToolbar();
+    updateActivePlayersMediaState();
     emit updateContainerRequest(player, container, toolbar);
 }
 
@@ -410,7 +413,9 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
+    connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, this, &PlayerLayoutManager::updateActivePlayersMediaState);
     connect(activePlayer, &PlayerWidget::mediaPlayerEjected, advancedToolbar, &AdvancedToolbar::disableButtons);
+    connect(activePlayer, &PlayerWidget::mediaPlayerEjected, this, &PlayerLayoutManager::updateActivePlayersMediaState);
 
     // Redirection audio/sous-titres vers la toolbar avancée (toolbar simple cachée)
     //disconnect(activePlayer->mediaWidget(), &MediaWidget::updateAudioTracksRequested, activePlayerToolbar, &SimpleToolbar::updateAudioTracks);
@@ -637,13 +642,28 @@ void PlayerLayoutManager::checkPlayersZoomStatus(){
 
 void PlayerLayoutManager::disableGlobalToolbarButtons()
 {
-    bool allEmpty = true;
     for(unsigned int IPlayer = 0; IPlayer < m_activePlayers.size(); ++IPlayer){
         if(m_activePlayers[IPlayer]->mediaWidget()->media()){
             return;
         }
     }
     emit buttonsDisabled();
+    updateActivePlayersMediaState();
+}
+
+void PlayerLayoutManager::updateActivePlayersMediaState()
+{
+    bool isSingle = (m_activePlayers.size() == 1);
+    emit activePlayersCountChanged(isSingle);
+
+    bool enabled = false;
+    if (isSingle) {
+        PlayerWidget* player = m_activePlayers[0];
+        if (player && player->mediaWidget() && player->mediaWidget()->media()) {
+            enabled = true;
+        }
+    }
+    emit activePlayersMediaStateChanged(enabled);
 }
 
 void PlayerLayoutManager::arrangePlayerLayout(const PlayerLayoutArrangement& arrangement)

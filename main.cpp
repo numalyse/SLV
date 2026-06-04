@@ -9,6 +9,10 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
 #if defined(Q_OS_MAC)
+
+    QString ffmpegPath = QCoreApplication::applicationDirPath() + "/../Resources/ffmpeg/ffmpeg";
+    QProcess::execute("xattr", {"-dr", "com.apple.quarantine", ffmpegPath});
+
     app.setStyleSheet(
         "ToolbarButton, ToolbarToggleButton, #durationToggleBtn {"
         "   background-color: rgba(0,0,0,0);"

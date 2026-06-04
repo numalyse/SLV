@@ -219,8 +219,8 @@ namespace  {
 #if defined(Q_OS_WIN)
         ffmpegExe = appDir + "/bin/ffmpeg.exe";
 #elif defined(Q_OS_MAC)
-        ffmpegExe = appDir + "/../Resources/bin/ffmpeg";
-#else
+        ffmpegExe = appDir + "/../Resources/ffmpeg/ffmpeg";
+    #else
         ffmpegExe = appDir + "/bin/ffmpeg";
 #endif
 

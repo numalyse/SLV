@@ -12,6 +12,9 @@
 #include <QPainter>
 #include <QTimer>
 #include <QPropertyAnimation>
+#include <QStyleHints>
+#include <QGuiApplication>
+#include <QColor>
 #include "PrefManager.h"
 #include "SignalManager.h"
 
@@ -244,8 +247,15 @@ protected:
         QPainter painter(this);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setPen(Qt::NoPen);
-        painter.setBrush(QColor(30, 30, 30, 255));
-        if( m_isFullscreen ) painter.drawRoundedRect(rect(), 12, 12);
+        if(m_isFullscreen){
+            if(QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+                painter.setBrush(QColor(30, 30, 30, 255));
+            } else {
+                QColor colorBtn = qApp->palette().color(QPalette::Window);
+                painter.setBrush(colorBtn);
+            }
+            painter.drawRoundedRect(rect(), 12, 12);
+        }
         else painter.drawRect(rect()); // pas de bords arrondies en mode normal
         QWidget::paintEvent(event);
     }

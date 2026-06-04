@@ -453,8 +453,6 @@ bool PlayerWidget::event(QEvent *event)
         break;
     case QEvent::WindowActivate:
     case QEvent::Resize:
-        m_toolBar->updateFullscreenPosition();
-        break;
     case QEvent::Move:
         widgetSizeChange();
         break;

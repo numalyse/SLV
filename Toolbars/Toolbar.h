@@ -70,7 +70,8 @@ public:
 
 
         m_opacityAnimation = new QPropertyAnimation(this, "windowOpacity", this);
-        m_opacityAnimation->setDuration(200); 
+        m_opacityAnimation->setDuration(200);
+        m_maxFullscreenOpacity = 1.0; 
 
         connect(m_playPauseBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::playRequest);
         connect(m_playPauseBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::pauseRequest);
@@ -83,17 +84,6 @@ public:
         connect(this, &Toolbar::selectFilePlayCanceled, &SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled);
         connect(m_zoomBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::enableZoomMode);
         connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableZoomMode);
-        connect(m_fullscreenBtn, &ToolbarToggleButton::stateActivated, this, [this](){
-            if(!m_firstTimeDialog){
-                QMessageBox *msg = new QMessageBox(this);
-                msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-                msg->setInformativeText(PrefManager::instance().getText("messagebox_fullscreen_experimental"));
-                msg->setIcon(QMessageBox::Warning);
-                msg->adjustSize();
-                msg->exec();
-                m_firstTimeDialog = true;
-            }
-        });
     }
 
     ToolbarToggleButton* playPauseBtn() const { return m_playPauseBtn; }
@@ -102,6 +92,8 @@ public:
     ToolbarToggleButton* fullscreenBtn() const { return m_fullscreenBtn; }
     ToolbarToggleButton* muteBtn() { return m_muteBtn; };
     ToolbarToggleButton* zoomBtn() { return m_zoomBtn; };
+
+    QVariant m_maxFullscreenOpacity = 1.0;
 
     virtual ~Toolbar() {
         if(m_dynamicFullscreenShortcut) delete m_dynamicFullscreenShortcut;
@@ -148,7 +140,7 @@ public:
     if (m_isFullscreen) {
         m_opacityAnimation->stop();
         m_opacityAnimation->setStartValue(windowOpacity());
-        m_opacityAnimation->setEndValue(1.0);
+        m_opacityAnimation->setEndValue(m_maxFullscreenOpacity);
         m_opacityAnimation->start();
     }
     }

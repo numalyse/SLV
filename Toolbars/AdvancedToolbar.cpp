@@ -93,7 +93,10 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 
     connect(m_extensionToolbar, &ExtensionToolbar::setOverlayModeRequested, this, &AdvancedToolbar::setOverlayModeRequested);
     
-    connect(m_extensionToolbar, &ExtensionToolbar::showDrawingModeRequested, this, &AdvancedToolbar::showDrawingModeRequested);
+    connect(m_extensionToolbar, &ExtensionToolbar::showDrawingModeRequested, this, [this](bool isEnabled) {
+        m_maxFullscreenOpacity = isEnabled ? 0.3 : 1.0; 
+        emit showDrawingModeRequested(isEnabled);
+    });
 
     connect(m_extensionToolbar, &ExtensionToolbar::enableSegmentationRequested, this, [this](){
         emit AdvancedToolbar::enableSegmentationRequest();

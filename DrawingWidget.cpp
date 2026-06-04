@@ -38,6 +38,7 @@ DrawingWidget::DrawingWidget(QWidget *parent)
 
     initDrawingSurface();
     initDrawingToolbar();
+    hide();
 
     qDebug() << "[INIT]";
     qDebug() << "Pathlist size : " << m_historyPathlist.size();
@@ -49,6 +50,7 @@ void DrawingWidget::showDrawingMode(bool isEnabled)
     m_isEnabled = isEnabled;
 
     if (m_isEnabled) {
+        show();
         m_drawingSurface->show();
         m_drawingSurface->raise();
 
@@ -58,6 +60,7 @@ void DrawingWidget::showDrawingMode(bool isEnabled)
         if (!m_pencilToolBtn->isChecked())
             emit m_pencilToolBtn->click();
     } else {
+        hide();
         m_drawingSurface->hide();
         m_drawingToolbar->hide();
     }

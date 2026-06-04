@@ -78,6 +78,17 @@ MainWindow::MainWindow(QWidget *parent)
         m_navPanelBtn->setButtonState(false);
     });
 
+    connect(m_globalPlayerManager, &GlobalPlayerManager::activePlayersMediaStateChanged, this, [this](bool hasMedia){
+        m_shotDetailBtn->setEnabled(hasMedia);
+    });
+    
+    connect(m_globalPlayerManager, &GlobalPlayerManager::activePlayersCountChanged, this, [this](bool isSingle){
+        m_navPanelBtn->setEnabled(isSingle);
+        if(!isSingle){
+            m_navPanelBtn->setButtonState(false);
+        }
+    });
+
     connect(this, &MainWindow::windowMovedOrResizedRequested, &SignalManager::instance(), [](){ emit SignalManager::instance().windowMovedOrResized(); });
     std::vector<std::pair<ToolbarButton*, PlayerLayoutArrangement>> layoutButtons = {
         {m_view1, Arrangement1},
@@ -170,6 +181,7 @@ void MainWindow::createToolBar()
     // QLabel *shotDetailLabel = new QLabel(PrefManager::instance().getText("tooltip_shot_detail_button"));
     m_playlistBtn = new ToolbarButton(nullptr, "playlist_white", PrefManager::instance().getText("tooltip_playlist_button"));
     m_shotDetailBtn = new ToolbarButton(nullptr, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    m_shotDetailBtn->setEnabled(false);
     // playlistOption->addWidget(playlistLabel);
     // playlistOption->addWidget(m_playlistBtn);
     // shotDetailOption->addWidget(shotDetailLabel);
@@ -209,6 +221,7 @@ void MainWindow::createToolBar()
     m_navPanelBtn->setFixedSize(30, 30);
     m_navPanelBtn->setIconSize(QSize(20, 20));
     m_navPanelBtn->setStyleSheet("border: none;");
+    m_navPanelBtn->installEventFilter(this);
 
     ToolbarButton *accessFolderBtn = new ToolbarButton(m_toolbarQt, "folder_white", PrefManager::instance().getText("tooltip_access_folder"));
     accessFolderBtn->setIconSize(QSize(20, 20));
@@ -435,6 +448,13 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    if (obj == m_navPanelBtn && !m_navPanelBtn->isEnabled()) { // catch l'event hover si le bouton est désactivé
+        if (event->type() == QEvent::Enter || event->type() == QEvent::Leave ||
+            event->type() == QEvent::HoverEnter || event->type() == QEvent::HoverLeave) {
+            return true;
+        }
+    }
+
     if (event->type() == QEvent::MouseMove) {
         QGuiApplication::restoreOverrideCursor(); 
         if (isFullScreen()) {

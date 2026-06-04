@@ -54,6 +54,8 @@ private:
     bool newGlobalPlayState();
     bool newGlobalZoomState();
 
+    void updateActivePlayersMediaState();
+
     PlayerLayoutArrangement m_currentArrangement = ArrangementUnknown;
 
 
@@ -79,6 +81,8 @@ signals:
     void nextMediaRequested();
 
     void buttonsDisabled();
+    void activePlayersMediaStateChanged(bool hasMedia);
+    void activePlayersCountChanged(bool isSingle);
 
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);

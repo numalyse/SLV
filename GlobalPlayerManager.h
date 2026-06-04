@@ -65,6 +65,8 @@ signals:
     void disableFullscreenMainRequested();
     void disableNavPanelRequested();
     void enableNavPanelRequested();
+    void activePlayersMediaStateChanged(bool hasMedia);
+    void activePlayersCountChanged(bool isSingle);
 };
 
 #endif // GLOBALPLAYERMANAGER_H

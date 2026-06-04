@@ -448,7 +448,7 @@ bool PlayerWidget::event(QEvent *event)
     case QEvent::Show:
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
-        m_drawingWidget->show();
+        //m_drawingWidget->show();
         QTimer::singleShot(50, this, SLOT(widgetSizeChange()));
         break;
     case QEvent::WindowActivate:

@@ -84,17 +84,6 @@ public:
         connect(this, &Toolbar::selectFilePlayCanceled, &SignalManager::instance(), &SignalManager::playerWidgetSelectFileCanceled);
         connect(m_zoomBtn, &ToolbarToggleButton::stateActivated, this, &Toolbar::enableZoomMode);
         connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, this, &Toolbar::disableZoomMode);
-        connect(m_fullscreenBtn, &ToolbarToggleButton::stateActivated, this, [this](){
-            if(!m_firstTimeDialog){
-                QMessageBox *msg = new QMessageBox(this);
-                msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-                msg->setInformativeText(PrefManager::instance().getText("messagebox_fullscreen_experimental"));
-                msg->setIcon(QMessageBox::Warning);
-                msg->adjustSize();
-                msg->exec();
-                m_firstTimeDialog = true;
-            }
-        });
     }
 
     ToolbarToggleButton* playPauseBtn() const { return m_playPauseBtn; }

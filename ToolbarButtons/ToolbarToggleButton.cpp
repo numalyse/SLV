@@ -95,7 +95,7 @@ ToolbarToggleButton::ToolbarToggleButton(
     setProperty("normalIconOff", normalIconOff);
     setProperty("grayIconOff", grayIconOff);
 
-    updateIcons(state);
+    updateIcons(state, true);
 
     connect(this, &QPushButton::clicked, this, &ToolbarToggleButton::onButtonToggled);
 }
@@ -127,31 +127,25 @@ QIcon ToolbarToggleButton::updateIconColor(QString iconName){
 }
 
 
-void ToolbarToggleButton::updateIcons(bool checked)
+void ToolbarToggleButton::updateIcons(bool checked, bool enabled)
 {
     if (checked) {
-        //setIcon(QIcon(m_iconPathOn));
-        setIcon(updateIconColor(m_iconPathOn));
+        setIcon(enabled ? property("normalIconOn").value<QIcon>() : property("grayIconOn").value<QIcon>());
         setToolTip(m_toolTipTextOn);
     } else {
-        //setIcon(QIcon(m_iconPathOff));
-        setIcon(updateIconColor(m_iconPathOff));
+        setIcon(enabled ? property("normalIconOff").value<QIcon>() : property("grayIconOff").value<QIcon>());
         setToolTip(m_toolTipTextOff);
     }
 }
 
+void ToolbarToggleButton::updateIcons(bool checked)
+{
+    updateIcons(checked, true);
+}
+
 void ToolbarToggleButton::toggleUpdateIcon()
 {
-    if(isChecked()){
-        //setIcon(QIcon(m_iconPathOn));
-        setIcon(updateIconColor(m_iconPathOn));
-        setToolTip(m_toolTipTextOn);
-    }
-    else{
-        //setIcon(QIcon(m_iconPathOff));
-        setIcon(updateIconColor(m_iconPathOff));
-        setToolTip(m_toolTipTextOff);
-    }
+    updateIcons(isChecked(), isEnabled());
 }
 
 
@@ -168,7 +162,7 @@ void ToolbarToggleButton::onButtonToggled(bool checked)
 void ToolbarToggleButton::setButtonState(bool state)
 {
     setChecked(state);
-    updateIcons(state);
+    updateIcons(state, isEnabled());
 }
 
 void ToolbarToggleButton::setToggledIconFrame(bool framed)
@@ -221,16 +215,7 @@ void ToolbarToggleButton::setToggledIconFrame(bool framed)
 void ToolbarToggleButton::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::EnabledChange) {
-        if(isChecked()){
-            setIcon(isEnabled()
-                    ? property("normalIconOn").value<QIcon>()
-                    : property("grayIconOn").value<QIcon>());
-        }
-        else{
-            setIcon(isEnabled()
-                    ? property("normalIconOff").value<QIcon>()
-                    : property("grayIconOff").value<QIcon>());
-        }
+        updateIcons(isChecked(), isEnabled());
     }
     QPushButton::changeEvent(event);
 }

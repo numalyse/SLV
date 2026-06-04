@@ -30,6 +30,8 @@ public:
 
 protected:
     QIcon updateIconColor(QString iconName);
+    void updateIcons(bool checked, bool enabled);
+    void updateIcons(bool checked);
     void changeEvent(QEvent *event) override;
 
 
@@ -45,8 +47,6 @@ private:
 
 public slots:
     void toggleUpdateIcon();
-    /// @brief Met à jour les icones en fonction de l'état
-    void updateIcons(bool checked);
 
 protected slots:
     /// @brief Appelé lorsque le bouton est cliqué. Met à jour les icônes puis emet le signal stateActivated ou stateDeactivated

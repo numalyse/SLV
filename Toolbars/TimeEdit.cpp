@@ -15,7 +15,8 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent) : QLineEdit(parent)
     setValidator(new TimeValidator(this));
     setFocusPolicy(Qt::ClickFocus);
     
-    setFixedWidth(75);
+    setFixedWidth(TimeEdit::s_widthMin);
+    setAlignment(Qt::AlignCenter);
 
     QString userTheme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
 
@@ -55,16 +56,17 @@ void TimeEdit::focusInEvent(QFocusEvent *e)
 {
     QLineEdit::focusInEvent(e);
     emit focusIn(); 
+    setAlignment(Qt::AlignLeft);
 
     QPropertyAnimation *animMin = new QPropertyAnimation(this, "minimumWidth");
-    animMin->setDuration(150);
+    animMin->setDuration(TimeEdit::s_widthMax);
     animMin->setStartValue(width());
-    animMin->setEndValue(150);
+    animMin->setEndValue(TimeEdit::s_widthMax);
     
     QPropertyAnimation *animMax = new QPropertyAnimation(this, "maximumWidth");
-    animMax->setDuration(150);
+    animMax->setDuration(TimeEdit::s_widthMax);
     animMax->setStartValue(width());
-    animMax->setEndValue(150);
+    animMax->setEndValue(TimeEdit::s_widthMax);
 
     connect(animMax, &QPropertyAnimation::finished, this, [this](){
         if (this->hasFocus()) {
@@ -82,20 +84,21 @@ void TimeEdit::focusOutEvent(QFocusEvent *e)
 {
     QLineEdit::focusOutEvent(e);
     emit focusOut();
+    setAlignment(Qt::AlignCenter);
 
     m_action->setVisible(false);
     m_copy->setVisible(false);
     m_paste->setVisible(false);
 
     QPropertyAnimation *animMin = new QPropertyAnimation(this, "minimumWidth");
-    animMin->setDuration(150);
+    animMin->setDuration(TimeEdit::s_widthMax);
     animMin->setStartValue(width());
-    animMin->setEndValue(75);
+    animMin->setEndValue(TimeEdit::s_widthMin);
     
     QPropertyAnimation *animMax = new QPropertyAnimation(this, "maximumWidth");
-    animMax->setDuration(150);
+    animMax->setDuration(TimeEdit::s_widthMax);
     animMax->setStartValue(width());
-    animMax->setEndValue(75);
+    animMax->setEndValue(TimeEdit::s_widthMin);
 
     animMin->start(QAbstractAnimation::DeleteWhenStopped);
     animMax->start(QAbstractAnimation::DeleteWhenStopped);

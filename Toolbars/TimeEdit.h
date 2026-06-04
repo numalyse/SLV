@@ -12,6 +12,9 @@ public:
     explicit TimeEdit( const QString& txt , QWidget* parent = nullptr);
 
 private:
+    static constexpr int s_widthMin = 90;
+    static constexpr int s_widthMax = 160;
+
     QAction* m_action = nullptr;
     QAction* m_copy = nullptr;
     QAction* m_paste = nullptr;

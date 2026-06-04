@@ -348,6 +348,8 @@ void ExtensionToolbar::enableButtons()
     m_verticalInvBtn->setEnabled(true);
     m_nextFrameBtn->setEnabled(true);
     m_prevFrameBtn->setEnabled(true);
+    m_adjustmentsBtn->setEnabled(true);
+    m_invBtn->setEnabled(true);
 }
 
 void ExtensionToolbar::disableButtons()
@@ -365,6 +367,9 @@ void ExtensionToolbar::disableButtons()
     m_verticalInvBtn->setEnabled(false);
     m_nextFrameBtn->setEnabled(false);
     m_prevFrameBtn->setEnabled(false);
+    m_adjustmentsBtn->setEnabled(false);
+    m_invBtn->setEnabled(false);
+    
 }
 
 

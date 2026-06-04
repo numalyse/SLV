@@ -537,10 +537,11 @@ void DrawingWidget::onMediaRectChanged(const QRect &rect)
     }
 
     m_mediaRect = rect;
-    if(containerBackground)
+    if(containerBackground){
         //containerBackground->setGeometry(20, m_mediaRect.height()-200-20, 50, 200);
         containerBackground->adjustSize();
         containerBackground->move(20, m_mediaRect.height()-containerBackground->height()-20);
+    }
     if(m_drawingSurface)
         m_drawingSurface->setGeometry(m_mediaRect);
     update();

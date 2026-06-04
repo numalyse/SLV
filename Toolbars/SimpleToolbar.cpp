@@ -413,6 +413,7 @@ void SimpleToolbar::disableButtons()
     m_stopBtn->setEnabled(false);
     m_ejectBtn->setEnabled(false);
     m_langBtn->setEnabled(false);
+    m_loopBtn->setButtonState(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
     m_extractSequenceBtn->setEnabled(false);

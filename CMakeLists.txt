@@ -798,12 +798,12 @@ endif()
 # MACOS LOGO
 # =========================
 if(APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE numalyse_logo_white.icns)
+    set(MACOSX_BUNDLE_ICON_FILE numalyse_player_logo.icns)
 
-    set_source_files_properties(Ressources/logo/numalyse_logo_white.icns PROPERTIES
+    set_source_files_properties(Ressources/logo/numalyse_player_logo.icns PROPERTIES
         MACOSX_PACKAGE_LOCATION "Resources")
 
-    target_sources(SLV PRIVATE Ressources/logo/numalyse_logo_white.icns)
+    target_sources(SLV PRIVATE Ressources/logo/numalyse_player_logo.icns)
 endif()
 
 # =========================================================

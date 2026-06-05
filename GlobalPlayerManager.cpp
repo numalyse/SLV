@@ -236,6 +236,9 @@ void GlobalPlayerManager::enableFullscreenPlayer()
 {
     if(m_toolbarWidget)
         m_toolbarWidget->hide();
+    if(m_separationLine) 
+        m_separationLine->hide();
+        
     emit enableFullscreenMainRequested();
 }
 

@@ -863,17 +863,26 @@ void MediaWidget::pinchTriggered(QPinchGesture *gesture)
         return;
     }
 
-    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (gesture->state() == Qt::GestureUpdated) {
+        qreal scaleFactor = gesture->scaleFactor();
 
-    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
-        qreal currentStepScaleFactor = gesture->totalScaleFactor();
-
-        qDebug() << "pinchTriggered(): zoom by" <<
-            gesture->scaleFactor() << "->" << currentStepScaleFactor;
-            
-        //libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(zoomAmount, cursorPosNormalized).toUtf8().constData());
+        QPointF centerPoint = gesture->centerPoint();
+        QPoint localPos = mapFromGlobal(centerPoint.toPoint());
         
-        //emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
+        QPointF cursorPosNormalized = QPointF(
+            static_cast<qreal>(localPos.x()) / geometry().width(), 
+            static_cast<qreal>(localPos.y()) / geometry().height()
+        );
+
+        qreal zoomAmount = 1.0 - scaleFactor; 
+
+        if (qAbs(zoomAmount) < 0.005) { 
+            return;
+        }
+
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(zoomAmount, cursorPosNormalized).toUtf8().constData());
+        
+        emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
     }
 }
 

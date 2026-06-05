@@ -116,10 +116,9 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
                 m_container
             );
 
-            m_containerLayout->addWidget(formShortcutEditFrame);
 
             connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutUIRequested, this, &ShortcutTab::emptyShortcutUI);
-            //addPreferenceFrame(formShortcutEditFrame);
+            addPreferenceFrame(formShortcutEditFrame);
 
             m_shortcutFrames.insert(internalKey, formShortcutEditFrame);
         }
@@ -130,7 +129,10 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
 {
     QString conflictSubCat, conflictKey;
 
-    if (hasConflict(newValue, key, conflictSubCat, conflictKey)) { // if has conflict shows the dialog to override the value
+    QString formattedValue = newValue;
+    formattedValue.replace("+", " + ");
+
+    if (hasConflict(formattedValue, key, conflictSubCat, conflictKey)) { // if has conflict shows the dialog to override the value
         auto& prefManager = PrefManager::instance();
         
         SLV::showGenericDialog(
@@ -167,17 +169,32 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
 bool ShortcutTab::hasConflict(const QString &newShortcut, const QString &currentKey, QString &outSubCategory, QString &outKey)
 {
     if (newShortcut.isEmpty()) return false;
-    for (auto IsubCategory = m_updatedJson.begin(); IsubCategory != m_updatedJson.end(); ++IsubCategory) {
+
+    for (auto IsubCategory = m_baseJson.begin(); IsubCategory != m_baseJson.end(); ++IsubCategory) {
+        QString subCategoryKey = IsubCategory.key();
         QJsonObject subCatObj = IsubCategory.value().toObject();
         
         for (auto IKey = subCatObj.begin(); IKey != subCatObj.end(); ++IKey) {
-            if (IKey.key() != currentKey && IKey.value().toString() == newShortcut) {
-                outSubCategory = IsubCategory.key();
-                outKey = IKey.key();
-                return true;
+            QString key = IKey.key();
+
+            if (key.startsWith('_') || key == currentKey) continue;
+
+            QString valueToCheck;
+
+            if (m_updatedJson.contains(subCategoryKey) && m_updatedJson.value(subCategoryKey).toObject().contains(key)) { // verification si le json de l'utilisateur contient cette clé
+                valueToCheck = m_updatedJson.value(subCategoryKey).toObject().value(key).toString();
+            } else {
+                valueToCheck = IKey.value().toString();
+            }
+
+            if (!valueToCheck.isEmpty() && valueToCheck == newShortcut) { // conflit 
+                outSubCategory = subCategoryKey;
+                outKey = key;
+                return true; 
             }
         }
     }
+
     return false;
 }
 

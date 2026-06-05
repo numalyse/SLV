@@ -42,7 +42,6 @@ protected:
 
     QWidget* m_container;
     QVBoxLayout* m_containerLayout;
-    QFormLayout* m_layout;
 
     /// @brief Helper to add to the tab the frame by usnig addRow, also conencts its updateJsonObjRequested signal to updateJsonObj slot
     void addPreferenceFrame(BasePreferenceFrame* frame);

@@ -23,7 +23,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QThreadPool>
-
+#include <QGestureEvent>
+#include <QPinchGesture>
 
 // Fonction helper pour appliquer les transformations VLC correctes au média
 void applyTransformOptions(libvlc_media_t* vlcMedia, unsigned int rotation, bool hflip, bool vflip) {
@@ -59,6 +60,9 @@ MediaWidget::MediaWidget(QWidget *parent)
 
     setAttribute(Qt::WA_NativeWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    setAttribute(Qt::WA_AcceptTouchEvents);
+    grabGesture(Qt::PinchGesture);
 
 #ifdef Q_OS_MAC
     setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
@@ -703,6 +707,20 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
 // ===== Event ===== //
 
+bool MediaWidget::event(QEvent *event)
+{
+    if (event->type() == QEvent::Gesture) {
+        QGestureEvent *gestureEvent = static_cast<QGestureEvent*>(event);
+        
+        if (QPinchGesture *pinch = static_cast<QPinchGesture*>(gestureEvent->gesture(Qt::PinchGesture))) {
+            pinchTriggered(pinch);
+            return true; 
+        }
+    }
+    
+    return QWidget::event(event);
+}
+
 void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
@@ -838,6 +856,36 @@ void MediaWidget::releaseEventManager(){
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
     }
 }
+
+void MediaWidget::pinchTriggered(QPinchGesture *gesture)
+{
+    if (!m_player || !m_media || !m_zoomActivated) {
+        return;
+    }
+
+    if (gesture->state() == Qt::GestureUpdated) {
+        qreal scaleFactor = gesture->scaleFactor();
+
+        QPointF centerPoint = gesture->centerPoint();
+        QPoint localPos = mapFromGlobal(centerPoint.toPoint());
+        
+        QPointF cursorPosNormalized = QPointF(
+            static_cast<qreal>(localPos.x()) / geometry().width(), 
+            static_cast<qreal>(localPos.y()) / geometry().height()
+        );
+
+        qreal zoomAmount = 1.0 - scaleFactor; 
+
+        if (qAbs(zoomAmount) < 0.005) { 
+            return;
+        }
+
+        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(zoomAmount, cursorPosNormalized).toUtf8().constData());
+        
+        emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
+    }
+}
+
 
 /// @brief initialise m_eventManager et attach les events
 void MediaWidget::createEventManager(){

@@ -308,7 +308,7 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
     QPixmap pixmap;
     pixmap.loadFromData(imageData, "PNG");
 
-    if(m_mediaData->fileExtension() == "jpg" || m_mediaData->fileExtension() == "jpeg")
+    if(m_mediaData->type() == Image)
         pixmap.fromImage(QImage(m_mediaData->filePath()));
 
     return pixmap;

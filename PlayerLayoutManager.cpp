@@ -341,6 +341,7 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     // Parcours les players pour connecter le play / play de la global a ses players
     for(auto& IActivePlayer : m_activePlayers){
         IActivePlayer->toolbar()->show();
+        IActivePlayer->toolbar()->setReplacedByAdvanced(false);
 
         connect(globalToolbar, &GlobalToolbar::playRequest, IActivePlayer, &PlayerWidget::play);
         connect(globalToolbar, &GlobalToolbar::pauseRequest, IActivePlayer, &PlayerWidget::pause);
@@ -378,7 +379,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     AdvancedToolbar* advancedToolbar = nullptr;
 
-    activePlayerToolbar->hide();
+    //activePlayerToolbar->hide();
+    activePlayerToolbar->setReplacedByAdvanced(true);
     advancedToolbar = new AdvancedToolbar(nullptr, activePlayerToolbar); // la toolbar avancée aura les mêmes états que la simple toolbar du player
     if(activePlayer->mediaWidget()->media()) advancedToolbar->enableButtons();
 

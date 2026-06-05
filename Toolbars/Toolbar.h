@@ -129,7 +129,9 @@ public:
         }
 
         QTimer::singleShot(0, this, [this]() {
-            show();
+            if (!m_isReplacedByAdvanced) {
+                show();
+            }
         });
     };
 
@@ -139,6 +141,13 @@ public:
     void setTBParent(QWidget* parent){
         m_parent = parent;
         setParent(parent);
+    }
+
+    void setReplacedByAdvanced(bool replaced) {
+        m_isReplacedByAdvanced = replaced;
+        if (replaced) {
+            hide();
+        }
     }
 
     void showAnimation();
@@ -181,6 +190,7 @@ protected:
     ToolbarToggleButton* m_muteBtn = nullptr;
     ToolbarToggleButton* m_zoomBtn = nullptr;
     bool m_firstTimeDialog = false;
+    bool m_isReplacedByAdvanced = false; 
 
     QShortcut* m_dynamicFullscreenShortcut = nullptr;
 

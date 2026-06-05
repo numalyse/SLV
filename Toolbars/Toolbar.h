@@ -127,8 +127,10 @@ public:
         if (m_parent) {
             if (m_parent->layout()) m_parent->layout()->addWidget(this); 
         }
-        show();
-        raise();
+
+        QTimer::singleShot(0, this, [this]() {
+            show();
+        });
     };
 
     /// @brief Move toolbar on resize when in fullscreen
@@ -139,23 +141,11 @@ public:
         setParent(parent);
     }
 
-    void showAnimation() {
-    if (m_isFullscreen) {
-        m_opacityAnimation->stop();
-        m_opacityAnimation->setStartValue(windowOpacity());
-        m_opacityAnimation->setEndValue(m_maxFullscreenOpacity);
-        m_opacityAnimation->start();
-    }
-    }
+    void showAnimation();
+    void hideAnimation();
 
-    void hideAnimation() {
-        if (m_isFullscreen) {
-            m_opacityAnimation->stop(); 
-            m_opacityAnimation->setStartValue(windowOpacity());
-            m_opacityAnimation->setEndValue(0);
-            m_opacityAnimation->start();
-        }
-    }
+    virtual void enableButtons();
+    virtual void disableButtons();
 
 public slots:
     virtual void ejectRequested(){

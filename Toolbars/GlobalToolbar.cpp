@@ -110,22 +110,16 @@ void GlobalToolbar::setFullscreenUI(int bottomMargin)
 
 void GlobalToolbar::enableButtons()
 {
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(true);
-    m_ejectBtn->setEnabled(true);
-    // m_muteBtn->setEnabled(true);
-    m_fullscreenBtn->setEnabled(true);
-    m_screenshotBtn->setEnabled(true);
+    Toolbar::enableButtons();
+
+    m_zoomBtn->setEnabled(true);
 }
 
 void GlobalToolbar::disableButtons()
 {
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(false);
-    m_ejectBtn->setEnabled(false);
-    // m_muteBtn->setEnabled(false);
-    m_fullscreenBtn->setEnabled(false);
-    m_screenshotBtn->setEnabled(false);
+    Toolbar::disableButtons();
+
+    m_zoomBtn->setEnabled(false);
 }
 
 void GlobalToolbar::addShortcuts(){

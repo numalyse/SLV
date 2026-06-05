@@ -40,7 +40,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     // ===== Toolbar ===== //
     m_toolBar = new SimpleToolbar(this);
-    m_toolBar->setDefaultUI();
+    //m_toolBar->setDefaultUI();
 
     connect(m_toolBar, &SimpleToolbar::removePlayerRequest, this, [this]() {
         emit removePlayerRequest(this);

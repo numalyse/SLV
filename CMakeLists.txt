@@ -186,6 +186,7 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
     qt_add_executable(SLV
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        Ressources/help_dialog_illustrations.qrc
 
 
     )

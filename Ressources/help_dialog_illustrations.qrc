@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/help_dialog_illustrations">
+        <file alias="open_medias">help_dialog_illustrations/open_medias.png</file>
+        <file alias="open_medias_drag_drop">help_dialog_illustrations/open_medias_drag_drop.png</file>
+        <file alias="monoview_toolbar_display">help_dialog_illustrations/monoview_toolbar_display.png</file>
+    </qresource>
+</RCC>

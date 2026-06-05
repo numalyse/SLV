@@ -689,6 +689,26 @@ if(APPLE)
         message(STATUS "⚠️ pyScripts not found -> skip copy to bundle")
     endif()
 
+        # Copy ffmpeg into Resources/ffmpeg
+    if(EXISTS "${CMAKE_SOURCE_DIR}/ffmpeg")
+        message(STATUS "ffmpeg path = ${CMAKE_SOURCE_DIR}/ffmpeg")
+
+        add_custom_command(TARGET SLV POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E echo
+            "Copy ffmpeg into bundle..."
+
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${MAC_RESOURCES_DIR}/ffmpeg
+
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+            ${CMAKE_SOURCE_DIR}/ffmpeg/ffmpeg
+            ${MAC_RESOURCES_DIR}/ffmpeg/
+
+            COMMAND chmod +x
+            ${MAC_RESOURCES_DIR}/ffmpeg/ffmpeg
+        )
+    endif()
+
 endif()
 
 
@@ -778,12 +798,12 @@ endif()
 # MACOS LOGO
 # =========================
 if(APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE numalyse_logo_white.icns)
+    set(MACOSX_BUNDLE_ICON_FILE numalyse_player_logo.icns)
 
-    set_source_files_properties(Ressources/logo/numalyse_logo_white.icns PROPERTIES
+    set_source_files_properties(Ressources/logo/numalyse_player_logo.icns PROPERTIES
         MACOSX_PACKAGE_LOCATION "Resources")
 
-    target_sources(SLV PRIVATE Ressources/logo/numalyse_logo_white.icns)
+    target_sources(SLV PRIVATE Ressources/logo/numalyse_player_logo.icns)
 endif()
 
 # =========================================================

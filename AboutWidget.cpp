@@ -15,7 +15,10 @@ AboutWidget::AboutWidget(QWidget *parent)
     layout->setContentsMargins(20, 40, 20, 40);
 
     QLabel *appIcon = new QLabel();
-    appIcon->setPixmap(QPixmap(":/logo/numalyse_logo_white").scaled(100, 100));
+    appIcon->setPixmap(QPixmap(":/logo/numalyse_player_logo")
+            .scaled(100, 100, 
+                    Qt::KeepAspectRatio, 
+                    Qt::SmoothTransformation));
     appIcon->setAlignment(Qt::AlignCenter);
     layout->addWidget(appIcon);
 
@@ -28,7 +31,7 @@ AboutWidget::AboutWidget(QWidget *parent)
     QLabel *version = new QLabel(
                                 "<i>V1.0-alpha (" 
                                 + PrefManager::instance().getText("about_dialog_last_update") 
-                                + "2026-06-01)</i>",
+                                + "2026-06-05)</i>",
                                 this
     );
     version->setAlignment(Qt::AlignCenter);

@@ -158,7 +158,19 @@ void AdvancedToolbar::addShortcuts(){
     QShortcut* shortcutResetSpeed = new QShortcut(QKeySequence(atShortcuts.value("base_speed").toString()), this);
     shortcutResetSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutResetSpeed, &QShortcut::activated, this, &AdvancedToolbar::resetSpeedSlider);
-    m_advancedShortcuts.append(shortcutResetSpeed);
+    m_advancedShortcuts.append(shortcutResetSpeed); 
+
+    // raccourcis "matériels"
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaTogglePlayPause).toString(), m_playPauseBtn));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPlay).toString(), m_playPauseBtn));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPause).toString(), m_playPauseBtn));
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaNext).toString(), m_nextMediaBtn, false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPrevious).toString(), m_prevMediaBtn, false));
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_VolumeMute).toString(), m_muteBtn, false));
+
 }
 
 

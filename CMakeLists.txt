@@ -737,6 +737,12 @@ if(APPLE)
                         COMMENT "Copy ${_opencv_lib} into macOS app bundle Frameworks"
                     )
                 endforeach()
+
+                # Clean up duplicate OpenCV dylibs (keep only .414.dylib versions)
+                add_custom_command(TARGET SLV POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cleanup_opencv_bundle.cmake"
+                    COMMENT "Clean up duplicate OpenCV dylibs from app bundle"
+                )
             endif()
         endif()
     endif()

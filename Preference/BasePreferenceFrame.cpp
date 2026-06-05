@@ -26,29 +26,22 @@ BasePreferenceFrame::BasePreferenceFrame(const QString &name, const QString &sub
         }
     )");
 
-    //m_layout = new QFormLayout(this);
     m_layoutHB = new QHBoxLayout(this);
 
     QLabel* nameLabel = new QLabel(name, this);
     nameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     nameLabel->setStyleSheet("font-weight: bold;");
 
-    //m_layout->setWidget(0, QFormLayout::LabelRole, nameLabel);
     m_layoutHB->addWidget(nameLabel);
     m_layoutHB->setAlignment(nameLabel, Qt::AlignLeft);
 
 }
 
 void BasePreferenceFrame::setRightWidget(QWidget* rightWidget) {
-    //m_layout->setWidget(0, QFormLayout::FieldRole, rightWidget);
     m_layoutHB->addWidget(rightWidget);
     m_layoutHB->setAlignment(rightWidget, Qt::AlignRight);
 }
 
-void BasePreferenceFrame::setRightLayout(QLayout* rightLayout) {
-    //m_layout->setLayout(0, QFormLayout::FieldRole, rightLayout);
-
-}
 
 void BasePreferenceFrame::applyFrameStyleToChild(QWidget* child) {
     

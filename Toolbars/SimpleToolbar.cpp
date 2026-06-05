@@ -396,30 +396,36 @@ void SimpleToolbar::disableLoopMode()
 
 void SimpleToolbar::enableButtons()
 {
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(true);
-    m_ejectBtn->setEnabled(true);
+    Toolbar::enableButtons();
+
+    m_loopBtn->setEnabled(true);
+    m_speedBtn->setEnabled(true);
+    m_timeEdit->setEnabled(true);
+    m_slider->setEnabled(true);
+    m_durationBtn->setEnabled(true);
     m_langBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
     m_extractSequenceBtn->setEnabled(true);
-    m_fullscreenBtn->setEnabled(true);
-    m_screenshotBtn->setEnabled(true);
     m_mediaInfoBtn->setEnabled(true);
+    m_langBtn->setEnabled(true);
 }
 
 void SimpleToolbar::disableButtons()
 {
-    m_stopBtn->setEnabled(false);
-    m_ejectBtn->setEnabled(false);
-    m_langBtn->setEnabled(false);
+    Toolbar::disableButtons();
+
+    m_loopBtn->setEnabled(false);
+    m_speedBtn->setEnabled(false);
+    m_timeEdit->setEnabled(false);
+    m_slider->setEnabled(false);
+    m_durationBtn->setEnabled(false);
     m_loopBtn->setButtonState(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
     m_extractSequenceBtn->setEnabled(false);
-    m_fullscreenBtn->setEnabled(false);
-    m_screenshotBtn->setEnabled(false);
     m_mediaInfoBtn->setEnabled(false);
+    m_langBtn->setEnabled(false);
 }
 
 

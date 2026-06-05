@@ -63,7 +63,7 @@ set(PROJECT_SOURCES
     CompositionWidget.h CompositionWidget.cpp
     DrawingWidget.h DrawingWidget.cpp
 
-    Toolbars/Toolbar.h
+    Toolbars/Toolbar.h Toolbars/Toolbar.cpp
     Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp
     Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp
     Toolbars/SimpleToolbar.h Toolbars/SimpleToolbar.cpp

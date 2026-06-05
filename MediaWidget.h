@@ -12,8 +12,6 @@
 #include <QDir>
 #include <QComboBox>
 #include <QLabel>
-#include <QGestureEvent>
-#include <QPinchGesture>
 
 class MediaWidget : public QWidget
 {
@@ -119,10 +117,7 @@ private:
     void releaseMedia();
     void releaseEventManager();
 
-    void pinchTriggered(QPinchGesture *gesture);
-
 protected:
-    bool event(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

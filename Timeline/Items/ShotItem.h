@@ -20,7 +20,13 @@ public:
     double width(){return m_width;}
     Shot& shot(){return m_shot;};
 
-   int type() const override { return SLV::TypeShotItem; }
+    bool isSelected() {return m_selected;}
+    void setSelected(bool state) { 
+        m_selected = state;
+        update();
+     }
+
+    int type() const override { return SLV::TypeShotItem; }
 
 private:
     Shot m_shot;
@@ -28,6 +34,7 @@ private:
     double m_width{};
     double m_height{};
     double m_topMargin{};
+    bool m_selected = false;
 
     constexpr static int s_minSizeForImage{100};
 };

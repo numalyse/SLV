@@ -11,6 +11,7 @@
 
 #include <QObject>
 #include <QGraphicsScene>
+#include <QPair>
 
 class ShotManager : public QObject
 {
@@ -44,6 +45,13 @@ public:
 
     void initShotDetail();
 
+    /// @brief 
+    /// @param shotItem 
+    /// @param audioShotItem 
+    /// @param exclusive 
+    void toggleSelection(ShotItem* shotItem, AudioShotItem* audioShotItem, bool exclusive = false);
+    void clearSelection();
+
     const int getCurrentShotId(){ return m_shotItems.indexOf(m_currentShotItem); }
 
 signals:
@@ -56,6 +64,8 @@ private:
 
     QVector<ShotItem*> m_shotItems;
     QVector<AudioShotItem*> m_audioShotItems;
+    QVector<QPair<ShotItem*, AudioShotItem*>> m_selectedShots;
+
     const QString m_mediaPath;
     ShotItem* m_currentShotItem = nullptr;
 

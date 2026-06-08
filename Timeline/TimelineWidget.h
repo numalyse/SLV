@@ -66,6 +66,7 @@ private slots:
     void ABAction();
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
+    void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);

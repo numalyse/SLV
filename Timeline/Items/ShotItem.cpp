@@ -26,7 +26,10 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->setRenderHint(QPainter::Antialiasing, false);
 
     p->setPen(m_shot.borderColor);
-    p->setBrush(QBrush(m_shot.color));
+
+    QColor drawColor = m_selected ? m_shot.color.lighter(150) : m_shot.color;
+    p->setBrush(QBrush(drawColor));
+
     p->drawRect(0, m_topMargin, m_width, m_height);
 
 

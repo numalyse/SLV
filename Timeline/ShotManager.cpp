@@ -63,6 +63,67 @@ void ShotManager::initShotDetail(){
     emit updateShotDetailRequested(static_cast<int>(m_shotItems.size()), currentShotId, &m_shotItems[currentShotId]->shot());
 }
 
+void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* audioShotItemToSelect, bool exclusive)
+{
+    int shotId = -1;
+    int audioShotId = -1;
+
+    if( shotItemToSelect ){
+        shotId = m_shotItems.indexOf(shotItemToSelect);
+        if(shotId != -1) audioShotItemToSelect = m_audioShotItems[shotId];
+        else {
+            qDebug() << " [SHOTMANAGER]  Erreur, impossible de trouver l'index du shot selectionné";
+            return;
+        }
+    }else if ( !shotItemToSelect && audioShotItemToSelect ) {
+
+        audioShotId = m_audioShotItems.indexOf(audioShotItemToSelect);
+        if(audioShotId != -1) shotItemToSelect = m_shotItems[audioShotId];
+        else {
+            qDebug() << " [SHOTMANAGER]  Erreur, impossible de trouver l'index du shot audio selectionné";
+            return;
+        }
+    }
+
+    QPair<ShotItem*, AudioShotItem*> selected {shotItemToSelect, audioShotItemToSelect};
+    int selectedId = m_selectedShots.indexOf(selected);
+
+    if(exclusive) {
+
+        bool wasTheOnlySelected = (m_selectedShots.size() == 1 && m_selectedShots.first() == selected);
+
+        clearSelection();
+
+        if ( ! wasTheOnlySelected ){ // si on reclique sur le meme plan, on le désélectionne
+            m_selectedShots.append(selected);
+            shotItemToSelect->setSelected(true);
+            audioShotItemToSelect->setSelected(true);
+        }
+    
+    }else {
+        if(selectedId == -1){
+            m_selectedShots.append(selected);
+            shotItemToSelect->setSelected(true);
+            audioShotItemToSelect->setSelected(true);
+        }else {
+            m_selectedShots.removeAt(selectedId);
+            shotItemToSelect->setSelected(false);
+            audioShotItemToSelect->setSelected(false);
+        }
+    }
+}
+
+
+
+void ShotManager::clearSelection()
+{
+    for(auto& selected : m_selectedShots){
+        selected.first->setSelected(false);
+        selected.second->setSelected(false);
+    }
+    m_selectedShots.clear();
+}
+
 
 /// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur
 void ShotManager::splitShotAt( int64_t cutTime ) {
@@ -95,6 +156,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     double newWidth1 = p_mathManager->timeToPos( m_shotItems[index]->shot().end - m_shotItems[index]->shot().start );
     m_currentShotItem->setWidth(newWidth1);
+    m_audioShotItems[index]->setWidth(newWidth1);
 
     Shot newShotData =  Shot{ "Titre", cutTime, oldEnd};
     newShotData.tagImageTime = newShotData.middle();

@@ -128,6 +128,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
 
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
+    connect(m_view, &TimelineView::itemShiftLeftClick, this, &TimelineWidget::itemShiftLeftClick);
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
@@ -298,22 +299,46 @@ void TimelineWidget::moveCursor(double newCursorPosX){
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
-/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
-/// @param item
+
 void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {
     switch( item->type() ) {
-        case SLV::TypeShotItem:
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
+        case SLV::TypeAudioShotItem:{
+            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
+            m_shotManager->toggleSelection(nullptr, audioShotItem, true);
             break;
+        }
+        case SLV::TypeShotItem:{
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            m_shotManager->toggleSelection(shotItem, nullptr, true);
+            break;
+        }
+    }
+}
+
+/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
+/// @param item
+void TimelineWidget::itemShiftLeftClick(QGraphicsItem * item)
+{
+    switch( item->type() ) {
+        case SLV::TypeAudioShotItem:{
+            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
+            m_shotManager->toggleSelection(nullptr, audioShotItem, false);
+            break;
+        }
+        case SLV::TypeShotItem:{
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            m_shotManager->toggleSelection(shotItem, nullptr, false);
+            break;
+        }
     }
 }
 
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 {
     switch( item->type() ) {
-        case SLV::TypeShotItem:
+        case SLV::TypeAudioShotItem :
+        case SLV::TypeShotItem :
             ShotItem* shotItem = static_cast<ShotItem*>(item);
             showContextMenuForShot(globalPos, shotItem);
             break;

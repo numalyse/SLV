@@ -17,6 +17,7 @@ signals:
     void zoomRequested(double zoomFactor, int mouseX);
     void cursorPositionRequested(double);
     void itemLeftClick(QGraphicsItem*);
+    void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void isDragging(bool);
     void abMarkerDragged(QGraphicsItem*, const int);

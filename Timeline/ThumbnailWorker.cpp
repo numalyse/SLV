@@ -1,6 +1,7 @@
 #include "ThumbnailWorker.h"
 
 #include <QDebug>
+#include <QFile>
 
 ThumbnailWorker::ThumbnailWorker(QObject *parent) : QThread(parent)
 {
@@ -62,10 +63,32 @@ void ThumbnailWorker::run()
 
         if (req.videoPath != previousMediaPath){
             cap.release();
-            cap.open(req.videoPath.toStdString(), cv::CAP_FFMPEG);
-            if (!cap.isOpened()) {
-                qCritical() << "Thumbnail : Impossible de lire la video pour charger des thumbnails";
-                return;
+            // try to open the requested media and provide better diagnostics
+            if (!QFile::exists(req.videoPath)){
+                qCritical() << "Thumbnail: fichier introuvable:" << req.videoPath;
+            }
+
+            // try opening with a portable path encoding and try macOS AVFoundation first,
+            // then let OpenCV pick the backend, finally fallback to FFmpeg
+            std::string pathUtf8 = req.videoPath.toUtf8().constData();
+            bool opened = false;
+
+            opened = cap.open(pathUtf8, cv::CAP_AVFOUNDATION);
+            if (!opened) {
+                qWarning() << "Thumbnail: cap.open(CAP_AVFOUNDATION) failed, essayer CAP_ANY...";
+                opened = cap.open(pathUtf8, cv::CAP_ANY);
+            }
+            if (!opened) {
+                qWarning() << "Thumbnail: cap.open(CAP_ANY) failed, essayer CAP_FFMPEG...";
+                opened = cap.open(pathUtf8, cv::CAP_FFMPEG);
+            }
+
+            if (!opened) {
+                qCritical() << "Thumbnail: Impossible d'ouvrir la video pour charger des thumbnails:" << req.videoPath
+                            << "(exists:" << QFile::exists(req.videoPath) << ")";
+                continue;
+            } else {
+                qDebug() << "Thumbnail: media opened with path:" << req.videoPath;
             }
             //qDebug() << "Thumbnail : changement de média";
             previousMediaPath = req.videoPath;

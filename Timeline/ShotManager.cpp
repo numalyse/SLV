@@ -4,12 +4,15 @@
 #include "TimeFormatter.h"
 
 #include <QtAssert>
+#include <QFileDialog>
+
 
 ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, const QString& projectMediaPath, QVector<Shot> &projectShots, QObject *parent) 
 : QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, m_mediaPath{projectMediaPath}
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
+    connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentReady, this, &ShotManager::shotsExtractionFinished);
     m_thumbnailWorker->start();
 
     setShotItemsData(projectShots);
@@ -86,7 +89,7 @@ void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* aud
     }
 
     QPair<ShotItem*, AudioShotItem*> selected {shotItemToSelect, audioShotItemToSelect};
-    int selectedId = m_selectedShots.indexOf(selected);
+    int selectedId = m_selectedShots.indexOf(selected); 
 
     if(exclusive) {
 
@@ -95,24 +98,40 @@ void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* aud
         clearSelection();
 
         if ( ! wasTheOnlySelected ){ // si on reclique sur le meme plan, on le désélectionne
-            m_selectedShots.append(selected);
-            shotItemToSelect->setSelected(true);
-            audioShotItemToSelect->setSelected(true);
+            addSelected(selected);
         }
     
     }else {
         if(selectedId == -1){
-            m_selectedShots.append(selected);
-            shotItemToSelect->setSelected(true);
-            audioShotItemToSelect->setSelected(true);
+            addSelected(selected);
         }else {
-            m_selectedShots.removeAt(selectedId);
-            shotItemToSelect->setSelected(false);
-            audioShotItemToSelect->setSelected(false);
+            removeSelected(selectedId, selected);
+            updateSelectedNumbers();
         }
     }
 }
 
+void ShotManager::updateSelectedNumbers(){
+    for(int ISelectedShots = 0; ISelectedShots < m_selectedShots.size(); ++ISelectedShots){
+        m_selectedShots[ISelectedShots].first->setSelectedNumber(ISelectedShots+1);
+        m_selectedShots[ISelectedShots].second->setSelectedNumber(ISelectedShots+1);
+    }
+}
+
+void ShotManager::addSelected( QPair<ShotItem*, AudioShotItem*>& toBeAdded){
+    m_selectedShots.append(toBeAdded);
+    toBeAdded.first->setSelected(true);
+    toBeAdded.first->setSelectedNumber(m_selectedShots.size());
+    toBeAdded.second->setSelected(true);
+    toBeAdded.second->setSelectedNumber(m_selectedShots.size());
+}
+
+void ShotManager::removeSelected( int elementIdToRemove, QPair<ShotItem*, AudioShotItem*>& toBeRemoved ){
+    toBeRemoved.first->setSelected(false);
+    toBeRemoved.second->setSelected(false);
+
+    m_selectedShots.removeAt(elementIdToRemove);
+}
 
 
 void ShotManager::clearSelection()
@@ -124,6 +143,21 @@ void ShotManager::clearSelection()
     m_selectedShots.clear();
 }
 
+void ShotManager::extractShotsSelected(const QString& outputPath)
+{
+
+    m_videoCaptureManager.setMediaPath(m_mediaPath);
+    m_videoCaptureManager.initMediaTempDirectory();
+
+    m_videoCaptureManager.startMediaRecording(m_selectedShots.first().first->shot().start);
+
+    for(int ISelectedShot = 1; ISelectedShot < m_selectedShots.size(); ++ISelectedShot){
+        m_videoCaptureManager.mediaCutAndConcat(m_selectedShots[ISelectedShot-1].first->shot().end, m_selectedShots[ISelectedShot].first->shot().start);
+    }
+    m_videoCaptureManager.endMediaRecording(m_selectedShots.last().first->shot().end, outputPath);
+
+
+}
 
 /// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur
 void ShotManager::splitShotAt( int64_t cutTime ) {

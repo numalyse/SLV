@@ -73,6 +73,7 @@ private slots:
     void updateTimelineGeometry();
     void autoSegmentation();
     void dragABMarker(QGraphicsItem*, const int);
+    void exportDone(const QString& outputPath);
 
 private:
     void applyZoom(double zoomFactor, int mouseX);

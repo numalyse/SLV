@@ -24,7 +24,12 @@ public:
     void setSelected(bool state) { 
         m_selected = state;
         update();
-     }
+    }
+
+    void setSelectedNumber(int number) { 
+        m_selectedNumber = number;
+        update();
+    }
 
     int type() const override { return SLV::TypeShotItem; }
 
@@ -34,6 +39,7 @@ private:
     double m_width{};
     double m_height{};
     double m_topMargin{};
+    int m_selectedNumber = 0;
     bool m_selected = false;
 
     constexpr static int s_minSizeForImage{100};

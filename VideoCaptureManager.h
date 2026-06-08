@@ -7,8 +7,9 @@
 #include <QDir>
 
 /// @brief Class used to record a media (Video and Audio) in a single MediaWidget. Supports time warps with mediaCutAndConcat method.
-class VideoCaptureManager : QObject
+class VideoCaptureManager : public QObject
 {
+Q_OBJECT
 
 public:
 
@@ -40,6 +41,9 @@ private:
     unsigned int m_dirIndex = 0;
     int m_concatRecordNumber = 0;
     int m_startRecordTime = -1;
+
+signals:
+    void recordSegmentReady(const QString& segmentPath);
 };
 
 #endif // VIDEOCAPTUREMANAGER_H

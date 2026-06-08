@@ -24,6 +24,8 @@
 #include <QAction>
 #include <QTimer>
 #include <QProgressDialog>
+#include <QMessageBox>
+#include <QDesktopServices>
 
 #include <algorithm>
 #include "TimelineWidget.h"
@@ -144,6 +146,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
+    connect(m_shotManager, &ShotManager::shotsExtractionFinished, this, &TimelineWidget::exportDone);
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
     m_ruler->setPos(0, 0);
@@ -357,6 +360,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionAB = nullptr;
     QAction *deleteABMarkers = nullptr;
     QAction *actionExtractAB = nullptr;
+    QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
     QAction* actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
 
@@ -380,6 +384,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
         actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
         break;
+    }
+
+    if ( m_shotManager->getNbShotsSelected() > 0 ) {
+        actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
     }
 
     QAction *selectedAction = menu.exec(globalPos);
@@ -407,6 +415,23 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().extensionToolbarDisplayShotDetail();
         emit SignalManager::instance().toggleNavPanel();
+    }else if (selectedAction == actionExtractShotsSelected){
+
+        QFileInfo fileInfo (m_media->filePath());
+
+        auto& prefManager = PrefManager::instance();
+        QString saveRecordPath = QFileDialog::getSaveFileName(
+            this,
+            prefManager.getText("dialog_capture") + fileInfo.fileName() + "_record",
+            prefManager.getPref("Paths", "lp_capture")
+        );
+
+        if (saveRecordPath.isEmpty()){
+            qDebug() << "[TIMELINEWIDGET] Enregistrement des shots sélectionnés annulé";
+            return;
+        } 
+
+        m_shotManager->extractShotsSelected(saveRecordPath +"."+ fileInfo.suffix());
     }
 }
 
@@ -620,4 +645,20 @@ void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
     int64_t newTime = m_mathManager->posToTimeSnapped(pos);
     ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
     m_abManager->changeMarkerTime(abm, newTime);
+}
+
+void TimelineWidget::exportDone(const QString &outputPath)
+{
+    QMessageBox *msg = new QMessageBox();
+    QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
+    bool ok = connect(openDirBtn, &QPushButton::clicked, this, [outputPath](){
+        QFileInfo fi(outputPath);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+    });
+    msg->addButton(openDirBtn, QMessageBox::AcceptRole);
+    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
+    msg->setIcon(QMessageBox::Information);
+    msg->adjustSize();
+    msg->exec();
 }

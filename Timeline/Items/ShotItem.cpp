@@ -25,13 +25,14 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    p->setPen(m_shot.borderColor);
+    QPen borderPen(m_shot.borderColor);
+    borderPen.setWidth(m_selected ? 3 : 1);
+    p->setPen(borderPen);
 
     QColor drawColor = m_selected ? m_shot.color.lighter(150) : m_shot.color;
     p->setBrush(QBrush(drawColor));
 
     p->drawRect(0, m_topMargin, m_width, m_height);
-
 
     if(!m_pixmap.isNull() && m_width > s_minSizeForImage){
 
@@ -47,6 +48,18 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
         p->drawPixmap(target, m_pixmap, srcRect);
     }
+
+    if (m_selected) {
+        p->setPen(m_shot.borderColor);
+
+        QFont textFont = p->font(); 
+        textFont.setPointSize(16);
+        textFont.setBold(true); 
+        p->setFont(textFont);  
+
+        p->drawText(0, m_topMargin, m_width, m_height, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(m_selectedNumber));
+    }
+
 }
 
 void ShotItem::setWidth(double width)

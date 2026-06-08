@@ -39,13 +39,18 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                     setCursor(Qt::ClosedHandCursor);
                     m_draggedABMarker = item;
                 }
+                if(item->type() == SLV::TypeCursorItem){
+                    m_draggedCursor = item;
+                }
             }
-            if(!m_draggedABMarker){
+            if(!m_draggedABMarker && m_draggedCursor){
                 m_isDragging = true;
                 emit isDragging(true);
                 double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
                 emit cursorPositionRequested(clickPosition);
+                return;
             }
+            
         }
     }else if (event->button() == Qt::RightButton) {
         QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
@@ -82,7 +87,6 @@ void TimelineView::mouseReleaseEvent(QMouseEvent *event)
         m_isPanning = false;
         setCursor(Qt::ArrowCursor); 
     }
-    if (m_draggedABMarker) {
-        m_draggedABMarker = nullptr;
-    }
+    m_draggedABMarker = nullptr;
+    m_draggedCursor = nullptr;
 }

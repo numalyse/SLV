@@ -34,6 +34,7 @@ private:
     bool m_isPanning = false;
     QPoint m_lastPanPos;
     QGraphicsItem* m_draggedABMarker = nullptr;
+    QGraphicsItem* m_draggedCursor = nullptr;
 
 };
 

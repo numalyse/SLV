@@ -39,7 +39,7 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                     setCursor(Qt::ClosedHandCursor);
                     m_draggedABMarker = item;
                 }
-                if(item->type() == SLV::TypeCursorItem){
+                if(item->type() == SLV::TypeCursorItem || item->type() == SLV::TypeRulerItem){
                     m_draggedCursor = item;
                 }
             }

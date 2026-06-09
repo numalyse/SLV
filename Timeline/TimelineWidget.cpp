@@ -416,6 +416,13 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
                 + '/' + m_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, m_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, m_media->fps()));
         if(saveSequencePath != ""){
             QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + m_media->fileExtension());
+            connect(sequenceExtractor, &QProcess::finished, this, [this, sequenceExtractor, saveSequencePath](){
+                if (sequenceExtractor->exitStatus() == QProcess::NormalExit && sequenceExtractor->exitCode() == 0){
+                    exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
+                } else {
+                    QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shot_failed"));
+                }
+            });
         }
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));

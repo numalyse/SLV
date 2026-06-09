@@ -61,6 +61,12 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     m_abManager = new ABManager(m_scene, m_mathManager, this);
     connect(m_abManager, &ABManager::onPairCompleted, this, &TimelineWidget::disableTimeRelatedUI);
     connect(m_abManager, &ABManager::onMarkersCleared, this, &TimelineWidget::enableTimeRelatedUI);
+    connect(m_abManager, &ABManager::loopExtracted, this, [this](const QString& outputPath){
+        exportDone(PrefManager::instance().getText("messagebox_extract_ab_loop_done"), outputPath);
+    });
+    connect(m_abManager, &ABManager::loopExtractionFailed, this, [this](){
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_ab_loop_failed"));
+    });
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);

@@ -19,6 +19,11 @@ public:
     std::optional<int64_t> getLoopRestartTime(int64_t currentTime);
     std::optional<int64_t> clampToLoopRange(int64_t time);
     void extractLoop();
+
+signals:
+    void loopExtracted(const QString& outputPath);
+    void loopExtractionFailed();
+
 };
 
 

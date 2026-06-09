@@ -4,37 +4,9 @@
 #include <QCursor>
 
 ABMarkerItem::ABMarkerItem(int height, int64_t vlcTime, QGraphicsItem *parent) 
-: QGraphicsItem(parent), m_height{height}, m_vlcTime{vlcTime}
+: RangeMarkerItem(height, vlcTime, parent)
 {
     setZValue(10);
     setAcceptHoverEvents(true);
 }
 
-QRectF ABMarkerItem::boundingRect() const
-{
-    return QRectF(-4.5, 0, 10, m_height);
-}
-
-void ABMarkerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option); 
-    Q_UNUSED(widget);
-
-    p->setRenderHint(QPainter::Antialiasing, true);
-
-    p->setPen(QPen(QColor(255,140,56), 2));
-    p->drawLine(0, 0, 0, m_height);
-
-    p->setBrush(QColor(255,140,56));
-    p->drawPolygon(s_points, 5);
-}
-
-void ABMarkerItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
-{
-    setCursor(Qt::PointingHandCursor);
-}
-
-void ABMarkerItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
-{
-    unsetCursor();
-}

@@ -47,10 +47,6 @@ public:
 
     void initShotDetail();
 
-    /// @brief 
-    /// @param shotItem 
-    /// @param audioShotItem 
-    /// @param exclusive 
     void toggleSelection(ShotItem* shotItem, AudioShotItem* audioShotItem, bool exclusive = false);
     
     void updateSelectedNumbers();

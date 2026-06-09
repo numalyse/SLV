@@ -11,7 +11,8 @@ namespace SLV {
         TypeShotItem = QGraphicsItem::UserType + 3,
         TypeABMarkerItem = QGraphicsItem::UserType + 4,
         TypeAudioVisualizerItem = QGraphicsItem::UserType + 5,
-        TypeAudioShotItem = QGraphicsItem::UserType + 6
+        TypeAudioShotItem = QGraphicsItem::UserType + 6,
+        TypeTransitionMarkerItem = QGraphicsItem::UserType + 7,
     };
 }
 

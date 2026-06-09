@@ -147,6 +147,8 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/ShotItem.cpp Timeline/Items/ShotItem.h
     Timeline/Items/AudioShotItem.h Timeline/Items/AudioShotItem.cpp
     Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
+    Timeline/Items/TransitionMarkerItem.cpp Timeline/Items/TransitionMarkerItem.h
+    Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h

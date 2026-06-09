@@ -102,6 +102,7 @@ set(PROJECT_SOURCES
     Timeline/TimelineView.h Timeline/TimelineView.cpp
     Timeline/ABManager.h Timeline/ABManager.cpp
     Timeline/ShotManager.h Timeline/ShotManager.cpp
+    Timeline/BaseRangeManager.h
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp

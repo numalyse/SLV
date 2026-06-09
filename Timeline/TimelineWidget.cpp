@@ -59,8 +59,8 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
-    connect(m_abManager, &ABManager::ABLoopOn, this, &TimelineWidget::disableTimeRelatedUI);
-    connect(m_abManager, &ABManager::ABLoopOff, this, &TimelineWidget::enableTimeRelatedUI);
+    connect(m_abManager, &ABManager::onPairCompleted, this, &TimelineWidget::disableTimeRelatedUI);
+    connect(m_abManager, &ABManager::onMarkersCleared, this, &TimelineWidget::enableTimeRelatedUI);
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);

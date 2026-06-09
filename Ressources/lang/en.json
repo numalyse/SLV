@@ -88,9 +88,14 @@
     "timeline_ab_action_1": "Add marker B at cursor",
     "timeline_ab_action_2": "Remove markers",
     "timeline_ab_extract": "Extract AB sequence",
+    "messagebox_extract_ab_loop_done" : "Extraction of the A-B sequence completed.",
+    "messagebox_extract_ab_loop_failed" : "Extraction of the A-B sequence failed.",
     "timeline_merge_with_previous_shot" : "Merge the current shot with the previous shot", 
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
     "timeline_extract_selected_shots" : "Extract selected shots",
+    "messagebox_extract_selected_shots_completed" : "Extraction of the selected shots completed.",
+    "messagebox_extract_selected_shots_failed" : "Extraction of the selected shots failed.",
+
 
     "export_running": "Exporting...",
     "export_directory_path_title": "Select export folder",
@@ -195,7 +200,8 @@
 
     "messagebox_not_a_video" : "This media is not a video",
     "messagebox_extract_sequence_completed" : "Sequence successfully extracted.",
-  
+    "messagebox_error" : "Error",
+
     "tooltip_drawing_mode" : "Drawing Mode",
     "tooltip_pencil_tool" : "Pencil",
     "tooltip_color_tool" : "Color",
@@ -297,6 +303,8 @@
     "reset" : "Reset",
 
     "timeline_extract_selected_shot" : "Extract shot",
+    "messagebox_extract_shot_failed" : "Failed to extract the shot.",
+    "messagebox_extract_shot_completed" : "Shot extraction completed.",
     "close" : "Close",
 
     "about_dialog_title" : "About",

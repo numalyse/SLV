@@ -88,9 +88,14 @@
     "timeline_ab_action_1": "Añadir marcador B en el cabezal",
     "timeline_ab_action_2": "Eliminar marcadores",
     "timeline_ab_extract": "Extraer secuencia AB",
+    "messagebox_extract_ab_loop_done" : "Extracción de la secuencia AB completada.",
+    "messagebox_extract_ab_loop_failed" : "Falló la extracción de la secuencia AB.",
     "timeline_merge_with_previous_shot" : "Fusionar plano actual con el anterior",
     "timeline_merge_with_next_shot" : "Fusionar plano actual con el siguiente",
     "timeline_extract_selected_shots" : "Extraer planos seleccionados",
+    "messagebox_extract_selected_shots_completed" : "Extracción de los planos seleccionados completada.",
+    "messagebox_extract_selected_shots_failed" : "Falló la extracción de los planos seleccionados.",
+
 
     "export_running": "Exportación en curso...",
     "export_directory_path_title": "Seleccionar carpeta de exportación",
@@ -195,6 +200,7 @@
 
     "messagebox_not_a_video" : "Este medio no es un vídeo",
     "messagebox_extract_sequence_completed" : "La secuencia se ha extraído correctamente.",
+    "messagebox_error" : "Error",
 
     "tooltip_drawing_mode" : "Modo de dibujo",
     "tooltip_pencil_tool" : "Lápiz",
@@ -298,6 +304,8 @@
     "reset" : "Restablecer",
 
     "timeline_extract_selected_shot" : "Extraer plano",
+    "messagebox_extract_shot_failed" : "Falló la extracción del plano.",
+    "messagebox_extract_shot_completed" : "Extracción del plano completada.",
     "close" : "Cerrar",
 
     "about_dialog_title" : "Acerca de",

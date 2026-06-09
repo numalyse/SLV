@@ -254,7 +254,7 @@ void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
     int indexOfPrev = m_shotItems.indexOf(m_currentShotItem) - 1;
 
     mergeCurrentInto(indexOfPrev);
-
+    clearSelection();
     updateCurrentShot(cursorTime);
 }
 
@@ -265,7 +265,7 @@ void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
     int indexOfNext = m_shotItems.indexOf(m_currentShotItem) + 1;
 
     mergeCurrentInto(indexOfNext);
-
+    clearSelection();
     updateCurrentShot(cursorTime);
 }
 

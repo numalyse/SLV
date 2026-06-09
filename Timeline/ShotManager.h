@@ -65,6 +65,7 @@ signals:
     void showMergeWithPreviousShotAction(bool);
     void showMergeWithNextShotAction(bool);
     void shotsExtractionFinished(const QString& outputPath);
+    void shotsExtractionFailed();
 
 private:
     void mergeCurrentInto(int ShotItemId);

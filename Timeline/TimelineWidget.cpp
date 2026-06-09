@@ -391,12 +391,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     }
 
     QAction *selectedAction = menu.exec(globalPos);
-
-    if (selectedAction == actionSplit) {
+    if (!selectedAction) return;
         splitShotAtCursor();
     } else if (selectedAction == actionAB){
         ABAction();
-    } else if (selectedAction == deleteABMarkers) {
         m_abManager->deleteMarkers();
     } else if (selectedAction == actionExtractAB){
         m_abManager->extractLoop();

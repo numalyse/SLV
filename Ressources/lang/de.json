@@ -90,6 +90,7 @@
     "timeline_ab_extract": "AB-Sequenz extrahieren",
     "timeline_merge_with_previous_shot" : "Aktuellen Schnitt mit vorherigem zusammenführen",
     "timeline_merge_with_next_shot" : "Aktuellen Schnitt mit nächstem zusammenführen",
+    "timeline_extract_selected_shots" : "Ausgewählte Schnitte extrahieren",
 
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",

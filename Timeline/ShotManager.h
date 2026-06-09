@@ -6,11 +6,14 @@
 #include "Timeline/Items/AudioShotItem.h"
 #include "Timeline/TimelineView.h"
 #include "Timeline/ThumbnailWorker.h"
+#include "VideoCaptureManager.h"
 
 #include "Shot.h"
 
 #include <QObject>
 #include <QGraphicsScene>
+#include <QPair>
+#include <QString>
 
 class ShotManager : public QObject
 {
@@ -44,18 +47,36 @@ public:
 
     void initShotDetail();
 
+    /// @brief 
+    /// @param shotItem 
+    /// @param audioShotItem 
+    /// @param exclusive 
+    void toggleSelection(ShotItem* shotItem, AudioShotItem* audioShotItem, bool exclusive = false);
+    
+    void updateSelectedNumbers();
+    void addSelected(QPair<ShotItem *, AudioShotItem *> &toBeAdded);
+    void removeSelected(int elementIdToRemove, QPair<ShotItem *, AudioShotItem *> &toBeRemoved);
+    void clearSelection();
+
+    void extractShotsSelected(const QString& outputPath);
+
+    int getNbShotsSelected() { return static_cast<int>(m_selectedShots.size()) ;}
+
     const int getCurrentShotId(){ return m_shotItems.indexOf(m_currentShotItem); }
 
 signals:
     void updateShotDetailRequested(int shotCount, int requestId, Shot*);
     void showMergeWithPreviousShotAction(bool);
     void showMergeWithNextShotAction(bool);
+    void shotsExtractionFinished(const QString& outputPath);
 
 private:
     void mergeCurrentInto(int ShotItemId);
 
     QVector<ShotItem*> m_shotItems;
     QVector<AudioShotItem*> m_audioShotItems;
+    QVector<QPair<ShotItem*, AudioShotItem*>> m_selectedShots;
+
     const QString m_mediaPath;
     ShotItem* m_currentShotItem = nullptr;
 
@@ -65,6 +86,8 @@ private:
     TimelineMath* p_mathManager = nullptr;
 
     ThumbnailWorker* m_thumbnailWorker = nullptr;
+
+    VideoCaptureManager m_videoCaptureManager;
 
 private slots:
     void updateThumbnail(int requestId, QImage image);

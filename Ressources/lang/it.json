@@ -90,6 +90,7 @@
     "timeline_ab_extract": "Estrai sequenza AB",
     "timeline_merge_with_previous_shot" : "Unisci piano corrente con il precedente",
     "timeline_merge_with_next_shot" : "Unisci piano corrente con il successivo",
+    "timeline_extract_selected_shots" : "Estrai piani selezionati",
 
     "export_running": "Esportazione in corso...",
     "export_directory_path_title": "Seleziona cartella di esportazione",

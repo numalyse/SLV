@@ -157,6 +157,7 @@
     "main_window_file_open_media_action": "Ouvrir un ou plusieurs médias",
     "main_window_file_open_project_action": "Ouvrir un projet",
     "main_window_file_save_project_action": "Enregistrer le projet",
+    "main_window_file_save_as_project_action": "Enregistrer sous...",
     "project_manager_open_project_dialog" : "Ouvrir un projet",
 
     "main_window_menu_bar_option" : "Options",
@@ -251,6 +252,7 @@
     "shortcut_open_media": "Ouvrir un média",
     "shortcut_open_project": "Ouvrir un projet",
     "shortcut_save_project": "Enregistrer le projet",
+    "shortcut_save_as_project": "Enregistrer sous...",
 
     "shortcut_play_pause": "Lecture / Pause",
     "shortcut_stop": "Arrêter",

@@ -22,10 +22,11 @@
     "Shortcuts" : {
         "_order": ["MainWindow", "CommonToolbar", "AdvancedTB", "ExtensionTB"],
         "MainWindow" : {
-            "_order": ["open_media", "open_project", "save_project"],
+            "_order": ["open_media", "open_project", "save_project", "save_as_project"],
             "open_media" : "Ctrl + O",
             "open_project" : "Ctrl + A",
-            "save_project" : "Ctrl + S"
+            "save_project" : "Ctrl + S",
+            "save_as_project" : "Ctrl + Shift + S"
         },
         "CommonToolbar" : {
             "_order": ["play_pause", "stop", "mute", "enter_fullscreen", "exit_fullscreen", "screenshot"],

@@ -157,6 +157,7 @@
     "main_window_file_open_media_action": "Apri uno o più media",
     "main_window_file_open_project_action": "Apri progetto",
     "main_window_file_save_project_action": "Salva il progetto",
+    "main_window_file_save_as_project_action": "Salva con nome...",
     "project_manager_open_project_dialog" : "Apri progetto",
 
     "main_window_menu_bar_option" : "Opzioni",
@@ -252,6 +253,7 @@
     "shortcut_open_media": "Apri media",
     "shortcut_open_project": "Apri progetto",
     "shortcut_save_project": "Salva progetto",
+    "shortcut_save_as_project": "Salva come...",
 
     "shortcut_play_pause": "Riproduzione / Pausa",
     "shortcut_stop": "Stop",

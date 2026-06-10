@@ -90,6 +90,7 @@
     "timeline_ab_extract": "Extrair sequência AB",
     "timeline_merge_with_previous_shot" : "Fundir plano atual com o anterior",
     "timeline_merge_with_next_shot" : "Fundir plano atual com o seguinte",
+    "timeline_extract_selected_shots" : "Extrair planos selecionados",
 
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",

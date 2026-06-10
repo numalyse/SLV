@@ -110,22 +110,16 @@ void GlobalToolbar::setFullscreenUI(int bottomMargin)
 
 void GlobalToolbar::enableButtons()
 {
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(true);
-    m_ejectBtn->setEnabled(true);
-    // m_muteBtn->setEnabled(true);
-    m_fullscreenBtn->setEnabled(true);
-    m_screenshotBtn->setEnabled(true);
+    Toolbar::enableButtons();
+
+    m_zoomBtn->setEnabled(true);
 }
 
 void GlobalToolbar::disableButtons()
 {
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(false);
-    m_ejectBtn->setEnabled(false);
-    // m_muteBtn->setEnabled(false);
-    m_fullscreenBtn->setEnabled(false);
-    m_screenshotBtn->setEnabled(false);
+    Toolbar::disableButtons();
+
+    m_zoomBtn->setEnabled(false);
 }
 
 void GlobalToolbar::addShortcuts(){
@@ -138,6 +132,14 @@ void GlobalToolbar::addShortcuts(){
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("stop").toString(), m_stopBtn,  false));
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("mute").toString(), m_muteBtn,  false));
     m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, commonShortcuts.value("screenshot").toString(), m_screenshotBtn,  false));
+
+    // raccourcis "matériels"
+
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaTogglePlayPause).toString(), m_playPauseBtn));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPlay).toString(), m_playPauseBtn));
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPause).toString(), m_playPauseBtn));
+
+    m_globalShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_VolumeMute).toString(), m_muteBtn, false));
 }
 
 void GlobalToolbar::disableFullscreenRequested(){

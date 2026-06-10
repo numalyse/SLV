@@ -45,13 +45,27 @@ void DecodeThread::convertImage(cv::Mat& src)
 
 
 
+static bool openVideoCapture(cv::VideoCapture &cap, const QString &mediaPath)
+{
+    std::string pathUtf8 = mediaPath.toUtf8().constData();
+    bool opened = cap.open(pathUtf8, cv::CAP_AVFOUNDATION);
+    if (!opened) {
+        qWarning() << "DecodeThread: cap.open(CAP_AVFOUNDATION) failed, essayer CAP_ANY...";
+        opened = cap.open(pathUtf8, cv::CAP_ANY);
+    }
+    if (!opened) {
+        qWarning() << "DecodeThread: cap.open(CAP_ANY) failed, essayer CAP_FFMPEG...";
+        opened = cap.open(pathUtf8, cv::CAP_FFMPEG);
+    }
+    return opened;
+}
+
 void DecodeThread::decodeTagImages(){
 
-    cv::VideoCapture cap(m_mediaPath.toStdString(), cv::CAP_FFMPEG);
-
-    if (!cap.isOpened()) {
+    cv::VideoCapture cap;
+    if (!openVideoCapture(cap, m_mediaPath)) {
         qCritical() << "Impossible de lire la video pour segmenter";
-		p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
+        p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
         return;
     }
 
@@ -61,7 +75,6 @@ void DecodeThread::decodeTagImages(){
 
     for(auto& shot : m_shots){
         cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(shot.tagImageTime));
-        cap.read(frame);
 
         if (!cap.read(frame) || frame.empty()) {
             qWarning() << "Impossible de lire la frame au timestamp :" << shot.tagImageTime;
@@ -71,7 +84,6 @@ void DecodeThread::decodeTagImages(){
         processedFrame = frame;
 
         if(m_targetSize.has_value()){
-
             resizeImage(processedFrame, tempResized, cv::INTER_AREA);
             processedFrame = tempResized;
         }
@@ -89,11 +101,10 @@ void DecodeThread::decodeTagImages(){
 
 void DecodeThread::decodeMedia(){
 
-    cv::VideoCapture cap(m_mediaPath.toStdString(), cv::CAP_FFMPEG);
-
-    if (!cap.isOpened()) {
+    cv::VideoCapture cap;
+    if (!openVideoCapture(cap, m_mediaPath)) {
         qCritical() << "Impossible de lire la video pour segmenter";
-		p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
+        p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
         return;
     }
 

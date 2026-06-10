@@ -707,19 +707,22 @@ void MediaWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
 
-        if (event->modifiers() & Qt::ControlModifier) {
-            if(!m_player || !m_media || !m_zoomActivated) return;
+        if(m_zoomActivated){
             setCursor(Qt::ClosedHandCursor);
             m_isPanning = true;
             m_lastPanPos = event->pos();
         }
+/*         
+        if (event->modifiers() & Qt::ControlModifier) {
+            if(!m_player || !m_media || !m_zoomActivated) return;
+
+        }
         else{
             // emit togglePlayPauseRequested(libvlc_media_player_is_playing(m_player));
         }
-
-        QWidget::mousePressEvent(event);
-
+ */
     }
+    QWidget::mousePressEvent(event);
 }
 
 void MediaWidget::mouseReleaseEvent(QMouseEvent *event)

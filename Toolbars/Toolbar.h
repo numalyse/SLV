@@ -127,8 +127,12 @@ public:
         if (m_parent) {
             if (m_parent->layout()) m_parent->layout()->addWidget(this); 
         }
-        show();
-        raise();
+
+        QTimer::singleShot(0, this, [this]() {
+            if (!m_isReplacedByAdvanced) {
+                show();
+            }
+        });
     };
 
     /// @brief Move toolbar on resize when in fullscreen
@@ -139,23 +143,18 @@ public:
         setParent(parent);
     }
 
-    void showAnimation() {
-    if (m_isFullscreen) {
-        m_opacityAnimation->stop();
-        m_opacityAnimation->setStartValue(windowOpacity());
-        m_opacityAnimation->setEndValue(m_maxFullscreenOpacity);
-        m_opacityAnimation->start();
-    }
-    }
-
-    void hideAnimation() {
-        if (m_isFullscreen) {
-            m_opacityAnimation->stop(); 
-            m_opacityAnimation->setStartValue(windowOpacity());
-            m_opacityAnimation->setEndValue(0);
-            m_opacityAnimation->start();
+    void setReplacedByAdvanced(bool replaced) {
+        m_isReplacedByAdvanced = replaced;
+        if (replaced) {
+            hide();
         }
     }
+
+    void showAnimation();
+    void hideAnimation();
+
+    virtual void enableButtons();
+    virtual void disableButtons();
 
 public slots:
     virtual void ejectRequested(){
@@ -191,6 +190,7 @@ protected:
     ToolbarToggleButton* m_muteBtn = nullptr;
     ToolbarToggleButton* m_zoomBtn = nullptr;
     bool m_firstTimeDialog = false;
+    bool m_isReplacedByAdvanced = false; 
 
     QShortcut* m_dynamicFullscreenShortcut = nullptr;
 

@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ===== Info ===== //
     setWindowTitle("Numalyse Player (alpha version)");
-    setWindowIcon(QIcon(":/logo/numalyse_logo_white"));
+    setWindowIcon(QIcon(":/logo/numalyse_player_logo"));
     // setWindowIcon(QIcon("../icon/numalyse_logo.ico"));
     // QString path = "../icon/numalyse_logo.ico";
     // QFile f(path);

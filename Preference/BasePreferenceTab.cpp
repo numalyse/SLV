@@ -13,9 +13,7 @@ BasePreferenceTab::BasePreferenceTab(const QString& categoryName, QWidget* paren
 
     m_container = new QWidget(this);
     m_containerLayout = new QVBoxLayout(m_container);
-    m_layout = new QFormLayout;
     setWidget(m_container);
-    m_containerLayout->addLayout(m_layout);
     m_container->setLayout(m_containerLayout);
 
     auto& prefManager = PrefManager::instance();
@@ -26,7 +24,7 @@ BasePreferenceTab::BasePreferenceTab(const QString& categoryName, QWidget* paren
 void BasePreferenceTab::addPreferenceFrame(BasePreferenceFrame* frame)
 {
     m_frames.append(frame);
-    m_layout->addRow(frame); 
+    m_containerLayout->addWidget(frame);
     
     connect(frame, &BasePreferenceFrame::updateJsonObjRequested, this, &BasePreferenceTab::updateJsonObj);
 }

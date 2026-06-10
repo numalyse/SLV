@@ -24,6 +24,8 @@
 #include <QAction>
 #include <QTimer>
 #include <QProgressDialog>
+#include <QMessageBox>
+#include <QDesktopServices>
 
 #include <algorithm>
 #include "TimelineWidget.h"
@@ -128,6 +130,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
 
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
+    connect(m_view, &TimelineView::itemShiftLeftClick, this, &TimelineWidget::itemShiftLeftClick);
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
@@ -143,6 +146,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
+    connect(m_shotManager, &ShotManager::shotsExtractionFinished, this, &TimelineWidget::exportDone);
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
     m_ruler->setPos(0, 0);
@@ -298,22 +302,46 @@ void TimelineWidget::moveCursor(double newCursorPosX){
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
-/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
-/// @param item
+
 void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {
     switch( item->type() ) {
-        case SLV::TypeShotItem:
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            moveCursor(m_mathManager->timeToPos(shotItem->shot().start));
+        case SLV::TypeAudioShotItem:{
+            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
+            m_shotManager->toggleSelection(nullptr, audioShotItem, true);
             break;
+        }
+        case SLV::TypeShotItem:{
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            m_shotManager->toggleSelection(shotItem, nullptr, true);
+            break;
+        }
+    }
+}
+
+/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
+/// @param item
+void TimelineWidget::itemShiftLeftClick(QGraphicsItem * item)
+{
+    switch( item->type() ) {
+        case SLV::TypeAudioShotItem:{
+            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
+            m_shotManager->toggleSelection(nullptr, audioShotItem, false);
+            break;
+        }
+        case SLV::TypeShotItem:{
+            ShotItem* shotItem = static_cast<ShotItem*>(item);
+            m_shotManager->toggleSelection(shotItem, nullptr, false);
+            break;
+        }
     }
 }
 
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 {
     switch( item->type() ) {
-        case SLV::TypeShotItem:
+        case SLV::TypeAudioShotItem :
+        case SLV::TypeShotItem :
             ShotItem* shotItem = static_cast<ShotItem*>(item);
             showContextMenuForShot(globalPos, shotItem);
             break;
@@ -332,6 +360,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionAB = nullptr;
     QAction *deleteABMarkers = nullptr;
     QAction *actionExtractAB = nullptr;
+    QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
     QAction* actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
 
@@ -355,6 +384,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
         actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
         break;
+    }
+
+    if ( m_shotManager->getNbShotsSelected() > 0 ) {
+        actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
     }
 
     QAction *selectedAction = menu.exec(globalPos);
@@ -382,6 +415,23 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().extensionToolbarDisplayShotDetail();
         emit SignalManager::instance().toggleNavPanel();
+    }else if (selectedAction == actionExtractShotsSelected){
+
+        QFileInfo fileInfo (m_media->filePath());
+
+        auto& prefManager = PrefManager::instance();
+        QString saveRecordPath = QFileDialog::getSaveFileName(
+            this,
+            prefManager.getText("dialog_capture") + fileInfo.fileName() + "_record",
+            prefManager.getPref("Paths", "lp_capture")
+        );
+
+        if (saveRecordPath.isEmpty()){
+            qDebug() << "[TIMELINEWIDGET] Enregistrement des shots sélectionnés annulé";
+            return;
+        } 
+
+        m_shotManager->extractShotsSelected(saveRecordPath +"."+ fileInfo.suffix());
     }
 }
 
@@ -595,4 +645,20 @@ void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
     int64_t newTime = m_mathManager->posToTimeSnapped(pos);
     ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
     m_abManager->changeMarkerTime(abm, newTime);
+}
+
+void TimelineWidget::exportDone(const QString &outputPath)
+{
+    QMessageBox *msg = new QMessageBox();
+    QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
+    bool ok = connect(openDirBtn, &QPushButton::clicked, this, [outputPath](){
+        QFileInfo fi(outputPath);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+    });
+    msg->addButton(openDirBtn, QMessageBox::AcceptRole);
+    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
+    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
+    msg->setIcon(QMessageBox::Information);
+    msg->adjustSize();
+    msg->exec();
 }

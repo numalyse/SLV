@@ -80,7 +80,11 @@ void VideoCaptureManager::endMediaRecording(const int endTime, const QString& sa
     connect(sequenceExtractor, &QProcess::finished, this, [this, concatVideoName, savePath](){
         m_startRecordTime = -1;
 
-        if(m_concatRecordNumber == 0) return;
+        if(m_concatRecordNumber == 0) {
+            deleteMediaTempDirectory();
+            emit recordSegmentReady(savePath);
+            return;
+        }
 
         if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
         {
@@ -91,8 +95,9 @@ void VideoCaptureManager::endMediaRecording(const int endTime, const QString& sa
         }
         m_concatRecordNumber = 0;
         QProcess* sequenceConcatenate = SequenceExtractionHelper::concatenateSequences(QFileInfo(*m_concatFile).filePath(), savePath);
-        connect(sequenceConcatenate, &QProcess::finished, this, [this](){
+        connect(sequenceConcatenate, &QProcess::finished, this, [this, savePath](){
             deleteMediaTempDirectory();
+            emit recordSegmentReady(savePath);
         });
     });
 

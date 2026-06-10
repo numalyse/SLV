@@ -52,7 +52,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
 
     addPreferenceFrame(langFrame);
 
-    m_layout->addRow(langFrame);
+    //m_layout->addRow(langFrame);
  
     m_containerLayout->addStretch();
 }

@@ -158,7 +158,19 @@ void AdvancedToolbar::addShortcuts(){
     QShortcut* shortcutResetSpeed = new QShortcut(QKeySequence(atShortcuts.value("base_speed").toString()), this);
     shortcutResetSpeed->setContext(Qt::ApplicationShortcut);
     connect(shortcutResetSpeed, &QShortcut::activated, this, &AdvancedToolbar::resetSpeedSlider);
-    m_advancedShortcuts.append(shortcutResetSpeed);
+    m_advancedShortcuts.append(shortcutResetSpeed); 
+
+    // raccourcis "matériels"
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaTogglePlayPause).toString(), m_playPauseBtn));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPlay).toString(), m_playPauseBtn));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPause).toString(), m_playPauseBtn));
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaNext).toString(), m_nextMediaBtn, false));
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_MediaPrevious).toString(), m_prevMediaBtn, false));
+
+    m_advancedShortcuts.append(SLV::createGlobalButtonShortcut(this, QKeySequence(Qt::Key_VolumeMute).toString(), m_muteBtn, false));
+
 }
 
 
@@ -301,19 +313,8 @@ void AdvancedToolbar::setDefaultUI()
 
 void AdvancedToolbar::enableButtons()
 {
+    SimpleToolbar::enableButtons();
 
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(true);
-    m_ejectBtn->setEnabled(true);
-    //m_muteBtn->setEnabled(true);
-    m_langBtn->setEnabled(true);
-    m_loopBtn->setEnabled(true);
-    m_loopBtn->setButtonState(true);
-    m_duplicatePlayerBtn->setEnabled(true);
-    m_extractSequenceBtn->setEnabled(true);
-    // m_removePlayerBtn->setEnabled(true);
-    m_speedBtn->setEnabled(true);
-    m_fullscreenBtn->setEnabled(true);
     m_extensionBtn->setEnabled(true);
     // m_nextMediaBtn->setEnabled(true);
     // m_prevMediaBtn->setEnabled(true);
@@ -325,19 +326,8 @@ void AdvancedToolbar::enableButtons()
 
 void AdvancedToolbar::disableButtons()
 {
+    SimpleToolbar::disableButtons();
 
-    m_playPauseBtn->setEnabled(true);
-    m_stopBtn->setEnabled(false);
-    m_ejectBtn->setEnabled(false);
-    //m_muteBtn->setEnabled(false);
-    m_langBtn->setEnabled(false);
-    m_loopBtn->setButtonState(false);
-    m_loopBtn->setEnabled(false);
-    m_duplicatePlayerBtn->setEnabled(false);
-    m_extractSequenceBtn->setEnabled(false);
-    // m_removePlayerBtn->setEnabled(false);
-    m_speedBtn->setEnabled(false);
-    m_fullscreenBtn->setEnabled(false);
     m_extensionBtn->setEnabled(false);
     // m_nextMediaBtn->setEnabled(false);
     // m_prevMediaBtn->setEnabled(false);

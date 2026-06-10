@@ -66,12 +66,14 @@ private slots:
     void ABAction();
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
+    void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
     void updateTimelineGeometry();
     void autoSegmentation();
     void dragABMarker(QGraphicsItem*, const int);
+    void exportDone(const QString& outputPath);
 
 private:
     void applyZoom(double zoomFactor, int mouseX);

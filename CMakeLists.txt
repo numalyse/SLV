@@ -19,6 +19,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(PYTHON_SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/pyScripts")
+if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    option(ENABLE_MACDEPLOYQT "Run macdeployqt after building the app bundle on macOS" OFF)
+endif()
 
 # =========================================================
 # Qt
@@ -60,7 +63,7 @@ set(PROJECT_SOURCES
     CompositionWidget.h CompositionWidget.cpp
     DrawingWidget.h DrawingWidget.cpp
 
-    Toolbars/Toolbar.h
+    Toolbars/Toolbar.h Toolbars/Toolbar.cpp
     Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp
     Toolbars/AdvancedToolbar.h Toolbars/AdvancedToolbar.cpp
     Toolbars/SimpleToolbar.h Toolbars/SimpleToolbar.cpp
@@ -206,6 +209,12 @@ endif()
 # macOS → bundle .app
 if(APPLE)
     set_target_properties(SLV PROPERTIES MACOSX_BUNDLE TRUE)
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+        set_target_properties(SLV PROPERTIES
+            BUILD_WITH_INSTALL_RPATH TRUE
+            INSTALL_RPATH "@executable_path/../Frameworks"
+        )
+    endif()
 endif()
 
 # =========================================================
@@ -300,27 +309,31 @@ elseif(APPLE)
 
     if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
         set(HOMEBREW_PREFIX /opt/homebrew)
+        
+        set(FFMPEG_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
+        set(FFMPEG_LIB_DIR ${HOMEBREW_PREFIX}/lib)
+
+        target_include_directories(SLV PRIVATE
+            ${FFMPEG_INCLUDE_DIR}
+        )
+
+        target_link_directories(SLV PRIVATE
+            ${FFMPEG_LIB_DIR}
+        )
+
+        target_link_libraries(SLV PRIVATE
+            avcodec
+            avformat
+            avutil
+            swscale
+        )
+        
     else()
-        set(HOMEBREW_PREFIX /usr/local)
+        #set(HOMEBREW_PREFIX /usr/local)
+        set(HOMEBREW_PREFIX ${CMAKE_SOURCE_DIR}/ffmpeg/ffmpeg)
     endif()
 
-    set(FFMPEG_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
-    set(FFMPEG_LIB_DIR ${HOMEBREW_PREFIX}/lib)
 
-    target_include_directories(SLV PRIVATE
-        ${FFMPEG_INCLUDE_DIR}
-    )
-
-    target_link_directories(SLV PRIVATE
-        ${FFMPEG_LIB_DIR}
-    )
-
-    target_link_libraries(SLV PRIVATE
-        avcodec
-        avformat
-        avutil
-        swscale
-    )
 
 else()
 
@@ -690,7 +703,52 @@ if(APPLE)
         message(STATUS "⚠️ pyScripts not found -> skip copy to bundle")
     endif()
 
-        # Copy ffmpeg into Resources/ffmpeg
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+        if(OpenCV_DIR)
+            if(OpenCV_LIB_DIR)
+                set(OpenCV_LIBRARY_DIR "${OpenCV_LIB_DIR}")
+            else()
+                get_filename_component(OpenCV_LIBRARY_DIR "${OpenCV_DIR}/../.." REALPATH)
+            endif()
+
+            if(OpenCV_VERSION_MAJOR AND OpenCV_VERSION_MINOR)
+                set(OpenCV_DYLIB_VERSION_SUFFIX "${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}")
+            else()
+                set(OpenCV_DYLIB_VERSION_SUFFIX "*")
+            endif()
+
+            file(GLOB OpenCV_BUNDLE_LIBS
+                "${OpenCV_LIBRARY_DIR}/libopencv_*.${OpenCV_DYLIB_VERSION_SUFFIX}.dylib"
+            )
+
+            if(OpenCV_BUNDLE_LIBS)
+                message(STATUS "OpenCV bundle libs: ${OpenCV_BUNDLE_LIBS}")
+
+                add_custom_command(TARGET SLV POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E make_directory
+                    "$<TARGET_FILE_DIR:SLV>/../Frameworks"
+                    COMMENT "Ensure macOS app bundle Frameworks directory exists"
+                )
+
+                foreach(_opencv_lib IN LISTS OpenCV_BUNDLE_LIBS)
+                    add_custom_command(TARGET SLV POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            "${_opencv_lib}"
+                            "$<TARGET_FILE_DIR:SLV>/../Frameworks"
+                        COMMENT "Copy ${_opencv_lib} into macOS app bundle Frameworks"
+                    )
+                endforeach()
+
+                # Clean up duplicate OpenCV dylibs (keep only .414.dylib versions)
+                add_custom_command(TARGET SLV POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cleanup_opencv_bundle.cmake"
+                    COMMENT "Clean up duplicate OpenCV dylibs from app bundle"
+                )
+            endif()
+        endif()
+    endif()
+
+    # Copy ffmpeg into Resources/ffmpeg
     if(EXISTS "${CMAKE_SOURCE_DIR}/ffmpeg")
         message(STATUS "ffmpeg path = ${CMAKE_SOURCE_DIR}/ffmpeg")
 
@@ -717,6 +775,13 @@ endif()
 # =========================
 # QT DEPLOY TOOL
 # =========================
+if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS
+        "${CMAKE_PREFIX_PATH}/bin"
+        "${CMAKE_PREFIX_PATH}/../bin"
+    )
+endif()
+
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
 
 # =========================
@@ -724,6 +789,14 @@ find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../.
 # =========================
 if(WIN32)
     set(DEPLOY_DIR "${CMAKE_BINARY_DIR}/dist")
+endif()
+
+if(APPLE AND MACDEPLOYQT_EXECUTABLE AND ENABLE_MACDEPLOYQT)
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+            "$<TARGET_BUNDLE_DIR:SLV>"
+        COMMENT "📦 Deploy Qt frameworks into the macOS app bundle"
+    )
 endif()
 
 # =========================
@@ -771,11 +844,13 @@ endif()
 # =========================================================
 # Python scripts copy (cross-platform)
 # =========================================================
-add_custom_command(TARGET SLV POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${PYTHON_SCRIPTS_DIR}"
-    "$<TARGET_FILE_DIR:SLV>/pyScripts"
-)
+if(NOT APPLE)
+    add_custom_command(TARGET SLV POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PYTHON_SCRIPTS_DIR}"
+        "$<TARGET_FILE_DIR:SLV>/pyScripts"
+    )
+endif()
 
 # =========================================================
 # Install rules
@@ -799,12 +874,12 @@ endif()
 # MACOS LOGO
 # =========================
 if(APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE numalyse_logo_white.icns)
+    set(MACOSX_BUNDLE_ICON_FILE numalyse_player_logo.icns)
 
-    set_source_files_properties(Ressources/logo/numalyse_logo_white.icns PROPERTIES
+    set_source_files_properties(Ressources/logo/numalyse_player_logo.icns PROPERTIES
         MACOSX_PACKAGE_LOCATION "Resources")
 
-    target_sources(SLV PRIVATE Ressources/logo/numalyse_logo_white.icns)
+    target_sources(SLV PRIVATE Ressources/logo/numalyse_player_logo.icns)
 endif()
 
 # =========================================================

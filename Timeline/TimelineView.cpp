@@ -28,34 +28,63 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             setCursor(Qt::ClosedHandCursor);
             
         } else if (event->modifiers() & Qt::ShiftModifier) {
-            
-            if (QGraphicsItem *item = itemAt(event->pos())) {
-                emit itemLeftClick(item);
-            }
-        } else {
             QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
             for (auto* item : itemsAtCursor){
-                if(item->type() == SLV::TypeABMarkerItem){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
+                if (item->type() == SLV::TypeAudioShotItem || item->type() == SLV::TypeShotItem){
+                    emit itemShiftLeftClick(item);
+                }
+            }
+
+        } else {
+            QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
+            QGraphicsItem* shotItem = nullptr;
+            QGraphicsItem* audioShotItem = nullptr;
+            for (auto* item : itemsAtCursor){
+                if( item->type() == SLV::TypeABMarkerItem ){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
                     setCursor(Qt::ClosedHandCursor);
                     m_draggedABMarker = item;
                 }
+                if( item->type() == SLV::TypeCursorItem || item->type() == SLV::TypeRulerItem ){
+                    m_draggedCursor = item;
+                }
+
+                if(item->type() == SLV::TypeShotItem){
+                    shotItem = item;
+                }
+                if(item->type() == SLV::TypeAudioShotItem){
+                    audioShotItem = item;
+                }
+
             }
-            if(!m_draggedABMarker){
+            if(!m_draggedABMarker && m_draggedCursor){
                 m_isDragging = true;
                 emit isDragging(true);
                 double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
                 emit cursorPositionRequested(clickPosition);
+                return;
+            } // le click sur le curseur prend le dessus sur le reste
+
+            if(shotItem ){
+                emit itemLeftClick(shotItem);
+                return;
             }
+            if(audioShotItem){
+                emit itemLeftClick(audioShotItem);
+                return;
+            }
+   
         }
     }else if (event->button() == Qt::RightButton) {
         QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
         for (auto* item : itemsAtCursor){ 
-            if(item->type() == SLV::TypeShotItem){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
+            if(item->type() == SLV::TypeShotItem || item->type() == SLV::TypeAudioShotItem){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
                 emit itemRightClick( event->globalPos() , item);
+                break;
             }
         }
     }
 }
+
 void TimelineView::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_isDragging){
@@ -82,7 +111,6 @@ void TimelineView::mouseReleaseEvent(QMouseEvent *event)
         m_isPanning = false;
         setCursor(Qt::ArrowCursor); 
     }
-    if (m_draggedABMarker) {
-        m_draggedABMarker = nullptr;
-    }
+    m_draggedABMarker = nullptr;
+    m_draggedCursor = nullptr;
 }

@@ -341,6 +341,7 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     // Parcours les players pour connecter le play / play de la global a ses players
     for(auto& IActivePlayer : m_activePlayers){
         IActivePlayer->toolbar()->show();
+        IActivePlayer->toolbar()->setReplacedByAdvanced(false);
 
         connect(globalToolbar, &GlobalToolbar::playRequest, IActivePlayer, &PlayerWidget::play);
         connect(globalToolbar, &GlobalToolbar::pauseRequest, IActivePlayer, &PlayerWidget::pause);
@@ -361,8 +362,11 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     connect(globalToolbar, &Toolbar::disableFullscreenRequest, globalToolbar, &GlobalToolbar::disableFullscreenUiUpdate);
     connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
     connect(globalToolbar, &Toolbar::screenshotRequest, this, &PlayerLayoutManager::takeGlobalScreenshot);
+    
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
     globalToolbar->playPauseBtn()->setButtonState(newGlobalPlayState());
+
+    disableGlobalToolbarButtons();
 
     return static_cast<Toolbar*>(globalToolbar);
 }
@@ -375,7 +379,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     AdvancedToolbar* advancedToolbar = nullptr;
 
-    activePlayerToolbar->hide();
+    //activePlayerToolbar->hide();
+    activePlayerToolbar->setReplacedByAdvanced(true);
     advancedToolbar = new AdvancedToolbar(nullptr, activePlayerToolbar); // la toolbar avancée aura les mêmes états que la simple toolbar du player
     if(activePlayer->mediaWidget()->media()) advancedToolbar->enableButtons();
 
@@ -647,7 +652,7 @@ void PlayerLayoutManager::disableGlobalToolbarButtons()
             return;
         }
     }
-    emit buttonsDisabled();
+    emit buttonsDisabled(); 
     updateActivePlayersMediaState();
 }
 
@@ -657,12 +662,14 @@ void PlayerLayoutManager::updateActivePlayersMediaState()
     emit activePlayersCountChanged(isSingle);
 
     bool enabled = false;
-    if (isSingle) {
-        PlayerWidget* player = m_activePlayers[0];
-        if (player && player->mediaWidget() && player->mediaWidget()->media()) {
-            enabled = true;
+
+    for (PlayerWidget* player : m_activePlayers) {
+        if (player->mediaWidget() && player->mediaWidget()->media()) {
+            enabled = true; 
+            break;     
         }
     }
+    
     emit activePlayersMediaStateChanged(enabled);
 }
 

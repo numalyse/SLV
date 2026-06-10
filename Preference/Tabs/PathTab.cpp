@@ -42,8 +42,8 @@ PathTab::PathTab(QWidget *parent) : BasePreferenceTab("Paths", parent)
         this
     );
 
-    //addPreferenceFrame(projectPathFrame);
-    m_containerLayout->addWidget(projectPathFrame);
+    addPreferenceFrame(projectPathFrame);
+    //m_containerLayout->addWidget(projectPathFrame);
 
     m_containerLayout->addStretch();
 }

@@ -316,6 +316,11 @@ void AdvancedToolbar::enableButtons()
     SimpleToolbar::enableButtons();
 
     m_extensionBtn->setEnabled(true);
+    // m_nextMediaBtn->setEnabled(true);
+    // m_prevMediaBtn->setEnabled(true);
+    m_screenshotBtn->setEnabled(true);
+    m_mediaInfoBtn->setEnabled(true);
+    m_zoomBtn->setEnabled(true);
     m_extensionToolbar->enableButtons();
 }
 
@@ -324,6 +329,11 @@ void AdvancedToolbar::disableButtons()
     SimpleToolbar::disableButtons();
 
     m_extensionBtn->setEnabled(false);
+    // m_nextMediaBtn->setEnabled(false);
+    // m_prevMediaBtn->setEnabled(false);
+    m_screenshotBtn->setEnabled(false);
+    m_mediaInfoBtn->setEnabled(false);
+    m_zoomBtn->setEnabled(false);
     m_extensionToolbar->disableButtons();
 }
 

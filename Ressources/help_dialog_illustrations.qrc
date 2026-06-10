@@ -3,5 +3,16 @@
         <file alias="open_medias">help_dialog_illustrations/open_medias.png</file>
         <file alias="open_medias_drag_drop">help_dialog_illustrations/open_medias_drag_drop.png</file>
         <file alias="monoview_toolbar_display">help_dialog_illustrations/monoview_toolbar_display.png</file>
+        <file alias="monoview_extended_toolbar_display">help_dialog_illustrations/monoview_extended_toolbar_display.png</file>
+        <file alias="multiview_change_arrangement">help_dialog_illustrations/multiview_change_arrangement.png</file>
+        <file alias="multiview_change_arrangement_2">help_dialog_illustrations/multiview_change_arrangement_2.png</file>
+        <file alias="multiview_display">help_dialog_illustrations/multiview_display.png</file>
+        <file alias="multiview_global_toolbar">help_dialog_illustrations/multiview_global_toolbar.png</file>
+        <file alias="multiview_simplified_toolbar">help_dialog_illustrations/multiview_simplified_toolbar.png</file>
+        <file alias="multiview_captures">help_dialog_illustrations/multiview_captures.png</file>
+        <file alias="playlist_display">help_dialog_illustrations/playlist_display.png</file>
+        <file alias="timeline_display">help_dialog_illustrations/timeline_display.png</file>
+        <file alias="timeline_shot_infos">help_dialog_illustrations/timeline_shot_infos.png</file>
+        <file alias="timeline_exportation">help_dialog_illustrations/timeline_exportation.png</file>
     </qresource>
 </RCC>

@@ -139,6 +139,7 @@ void MainWindow::createMenuBar()
     saveProjectAction->setDisabled(true);
 
     auto *saveAsProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_as_project_action"));
+    saveAsProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "save_as_project")));
 
     connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){
         saveProjectAction->setEnabled(true);

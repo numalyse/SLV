@@ -4,7 +4,7 @@
             "code" : "en"
         },
         "Advanced_timeline_options":{
-            "display_timeline_by_tagFrames" : false 
+            "interface_timeline_shot_image" : "shot_start_image" 
         },
         "Export" : {
             "capture_path" : ""

@@ -479,6 +479,62 @@ namespace ProjectExportHelper {
         return true;
     }
 
+    bool exportToCSV(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+        if(progressCallback) progressCallback(0);
+
+        QString finalPath = dstPath + ".csv";
+        QFile file(finalPath);
+        
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qDebug() << "[EXPORT CSV] Impossible de créer le fichier " << finalPath;
+            return false;
+        }
+
+        QTextStream out(&file);
+        
+        out.setGenerateByteOrderMark(true); 
+
+        out << '"' << PrefManager::instance().getText("shot") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_title_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_start_time_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_end_time_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_duration_time_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_note_name") << '"'
+            << "\n"; 
+
+        int totalShots = shots.size();
+
+        for (int currentShot = 0; currentShot < totalShots; ++currentShot) {
+            
+            if (progressCallback && totalShots > 0) {
+                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+                if (!progressCallback(percent)) {
+                    file.close();
+                    return false; 
+                }
+            }
+
+            auto& shot = shots[currentShot];
+            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
+            QString end = TimeFormatter::msToHHMMSSFF(shot.end, fps);
+            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+
+            QString cleanNote = shot.note;
+            cleanNote.replace("\n", " ").replace(";", ",");
+
+            out << (currentShot + 1) << ";"
+                << shot.title << ";"
+                << start << ";"
+                << end << ";"
+                << shotDuration << ";"
+                << cleanNote << "\n";
+        }
+
+        file.close();
+        return true;
+
+    }
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
     /// @return 
@@ -796,6 +852,7 @@ namespace ProjectExportHelper {
         comboBox->addItem(".pdf", static_cast<int>(ExportType::PDF));
         comboBox->addItem(".pptx", static_cast<int>(ExportType::PPTX));
         comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
+        comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
         if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
         comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
         comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));

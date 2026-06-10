@@ -466,7 +466,7 @@ void ProjectManager::exportProject(){
     if(selectedFormat == ExportType::TagImage){
         selectedPath = QFileDialog::getExistingDirectory(
             nullptr, 
-            prefManager.getText("export_directory_path_title"), // N'oublie pas d'ajouter cette clé dans tes JSON !
+            prefManager.getText("export_directory_path_title"),
             dialogDir,
             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
         );
@@ -539,7 +539,4 @@ void ProjectManager::exportProject(){
     connect(exportThread, &QThread::finished, exportThread, &QObject::deleteLater);
 
     exportThread->start();
-
-    qDebug() << "Export";
-    // ProjectExportHelper::exportProject(m_project, p_timeline, ExportType::MP4, selectedPath);
 }

@@ -19,7 +19,8 @@ public:
 
 private:
 
-    //QVector<
+    QVector<TransitionMarkerItem*> m_markers;
+    //QVector<TransitionItem*> m_transitions;
 
     TimelineView* p_view = nullptr;
     TimelineMath* p_mathManager = nullptr;

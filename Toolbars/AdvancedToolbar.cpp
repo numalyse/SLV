@@ -315,8 +315,8 @@ void AdvancedToolbar::enableButtons()
     m_speedBtn->setEnabled(true);
     m_fullscreenBtn->setEnabled(true);
     m_extensionBtn->setEnabled(true);
-    m_nextMediaBtn->setEnabled(true);
-    m_prevMediaBtn->setEnabled(true);
+    // m_nextMediaBtn->setEnabled(true);
+    // m_prevMediaBtn->setEnabled(true);
     m_screenshotBtn->setEnabled(true);
     m_mediaInfoBtn->setEnabled(true);
     m_zoomBtn->setEnabled(true);
@@ -339,8 +339,8 @@ void AdvancedToolbar::disableButtons()
     m_speedBtn->setEnabled(false);
     m_fullscreenBtn->setEnabled(false);
     m_extensionBtn->setEnabled(false);
-    m_nextMediaBtn->setEnabled(false);
-    m_prevMediaBtn->setEnabled(false);
+    // m_nextMediaBtn->setEnabled(false);
+    // m_prevMediaBtn->setEnabled(false);
     m_screenshotBtn->setEnabled(false);
     m_mediaInfoBtn->setEnabled(false);
     m_zoomBtn->setEnabled(false);

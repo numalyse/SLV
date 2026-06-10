@@ -70,6 +70,7 @@ public:
         connect(m_checkbox, &QCheckBox::clicked, this, &CustomCheckbox::stateChanged);
     }
     void setChecked(){ m_checkbox->setChecked(true); };
+    void setUnchecked(){ m_checkbox->setChecked(false); }
 
 signals:
     void stateChanged(const bool state);
@@ -94,12 +95,17 @@ public:
     ~HelperWidget();
     void initLayout();
     void animateWidget(QWidget* widgetToAnimate, const bool state);
+    void addButtonDescription(QGridLayout* gridLayout, const QString& iconName, const QString& buttonLabel, const QString& buttonDescription, const unsigned int lineIndex);
 
 public slots:
     void setGeneralContent();
     void setClassicContent(int scrollLevel = 0);
+    void setMultiviewContent(int scrollLevel = 0);
+    void setPlaylistContent(int scrollLevel = 0);
+    void setTimelineContent(int scrollLevel = 0);
 
 private:
+    int m_imageWidth;
     QWidget *m_mainWidget = nullptr;
     QScrollArea *m_scrollArea = nullptr;
     QScrollArea *m_menuScrollArea = nullptr;

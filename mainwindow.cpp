@@ -138,6 +138,8 @@ void MainWindow::createMenuBar()
     saveProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "save_project")));
     saveProjectAction->setDisabled(true);
 
+    auto *saveAsProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_as_project_action"));
+
     connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){
         saveProjectAction->setEnabled(true);
     });
@@ -150,6 +152,12 @@ void MainWindow::createMenuBar()
 
     connect(openMediaAction, &QAction::triggered, this, &MainWindow::openMediaAction);
     connect(openProjectAction, &QAction::triggered, this, &MainWindow::openProjectAction);
+    connect(saveAsProjectAction, &QAction::triggered, this, [projManager]() {
+        bool neededSave = projManager->needSave();
+        projManager->setSaveNeeded();
+        projManager->saveProject(false);
+        if(!neededSave) projManager->setSaveNotNeeded(); // garde le bouton enregistrer actif si on annule la sauvegarde après le "save as"
+    });
 
     auto *OptionMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_option"));
 

@@ -157,6 +157,7 @@
     "main_window_file_open_media_action": "Öffnen Sie ein oder mehrere Medien",
     "main_window_file_open_project_action": "Projekt öffnen",
     "main_window_file_save_project_action": "Speichern Sie das Projekt",
+    "main_window_file_save_as_project_action": "Speichern unter...",
     "project_manager_open_project_dialog" : "Projekt öffnen",
 
     "main_window_menu_bar_option" : "Optionen",

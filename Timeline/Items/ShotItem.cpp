@@ -85,6 +85,12 @@ void ShotItem::setWidth(double width)
 }
 
 void ShotItem::setSelected(bool state) { 
+
+    if (!m_selectionBox) {
+        qDebug() << "[SHOTITEM] setSelected : m_selectionBox null";
+        return;
+    }
+    
     m_selected = state;
 
     if (m_selected) {

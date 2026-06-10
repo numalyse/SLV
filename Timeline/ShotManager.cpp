@@ -327,6 +327,8 @@ const QVector<Shot> ShotManager::shotItemsData() const
 void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 {
 
+    clearSelection();
+
     int shotHeight {40};
 
     qDeleteAll(m_shotItems);

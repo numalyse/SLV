@@ -96,10 +96,10 @@ void ThumbnailWorker::run()
         }
 
 
-        int64_t offset = std::round((static_cast<double>(m_frameOffset) * 1000.0) / fps);
+        int64_t offsetMs = std::round((static_cast<double>(m_frameOffset) * 1000.0) / fps);
         double msThumbnail = req.msStart;
-        if( req.msStart + req.shotLength > req.msStart + offset){
-            msThumbnail = req.msStart + offset;
+        if( req.msStart + req.shotLength > req.msStart + offsetMs){ // si la durée du plan est > à l'offset, on peut se decaler de l'offset pour éviter d'avoir une miniature du premier frame du plan
+            msThumbnail = req.msStart + offsetMs;
         }
 
         cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(msThumbnail));

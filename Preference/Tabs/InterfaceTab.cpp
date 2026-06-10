@@ -52,7 +52,22 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
 
     addPreferenceFrame(langFrame);
 
-    //m_layout->addRow(langFrame);
- 
+    QLabel* timelineOptionsLabel = new QLabel(prefManager.getText("Advanced_timeline_options"));
+    m_containerLayout->addWidget(timelineOptionsLabel);
+
+    QString shotImageType = prefManager.getPref("Interface", "Advanced_timeline_options", "interface_timeline_shot_image");
+    FormComboBoxFrame* timelineTagFrame = new FormComboBoxFrame(
+        prefManager.getText("interface_timeline_shot_image"),
+        "Advanced_timeline_options",
+        "interface_timeline_shot_image",
+        shotImageType,
+        QStringList({"shot_start_image", "shot_tag_image"}),
+        m_container
+    );
+
+    timelineTagFrame->comboBox()->setItemData(0, prefManager.getText("shot_start_image_tooltip"), Qt::ToolTipRole);
+
+    addPreferenceFrame(timelineTagFrame);
+    
     m_containerLayout->addStretch();
 }

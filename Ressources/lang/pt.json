@@ -287,6 +287,12 @@
 
     "interface_lang_code" : "Idioma da interface: ",
 
+    "Advanced_timeline_options" : "Configurações da linha do tempo",
+    "interface_timeline_shot_image" : "Exibição de miniaturas",
+    "shot_start_image" : "Quadro inicial",
+    "shot_start_image_tooltip" : "+100 quadros",
+    "shot_tag_image" : "Quadro de referência",
+
     "dialog_open_files" : "Abrir ficheiros multimédia",
     "dialog_open_file" : "Abrir ficheiro",
     "dialog_open_project" : "Abrir projeto",

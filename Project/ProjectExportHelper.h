@@ -15,6 +15,7 @@ enum class ExportType {
     PDF,
     PPTX,
     DOCX,
+    CSV,
     MP4,
     SRC,
     TagImage,
@@ -33,6 +34,7 @@ namespace SLV {
             case ExportType::PDF:      return "export_type_pdf";
             case ExportType::PPTX:     return "export_type_pptx";
             case ExportType::DOCX:     return "export_type_docx";
+            case ExportType::CSV:      return "export_type_csv";
             case ExportType::MP4:      return "export_type_mp4";
             case ExportType::SRC:      return "export_type_src";
             case ExportType::TagImage: return "export_type_tagimage"; 
@@ -46,6 +48,7 @@ namespace SLV {
         case ExportType::PDF:      return "pdf";
         case ExportType::PPTX:     return "pptx";
         case ExportType::DOCX:     return "docx";
+        case ExportType::CSV:      return "csv";
         case ExportType::MP4:      return "mp4";
         case ExportType::SRC:      return "src";
         case ExportType::TagImage: return "tagframe";
@@ -60,6 +63,7 @@ namespace ProjectExportHelper {
     bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
     bool exportToTagImage( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
     bool exportToPDF( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
+    bool exportToCSV( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
     bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback);
     bool exportVideo(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback);
 

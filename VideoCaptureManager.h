@@ -43,7 +43,8 @@ private:
     int m_startRecordTime = -1;
 
 signals:
-    void recordSegmentReady(const QString& segmentPath);
+    void recordSegmentDone(const QString& segmentPath);
+    void recordSegmentFailed();
 };
 
 #endif // VIDEOCAPTUREMANAGER_H

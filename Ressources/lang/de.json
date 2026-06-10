@@ -88,9 +88,13 @@
     "timeline_ab_action_1": "B-Marker am Abspielkopf setzen",
     "timeline_ab_action_2": "Marker entfernen",
     "timeline_ab_extract": "AB-Sequenz extrahieren",
+    "messagebox_extract_ab_loop_done" : "Extraction der AB-Sequenz abgeschlossen.",
+    "messagebox_extract_ab_loop_failed" : "Extraction der AB-Sequenz fehlgeschlagen.",
     "timeline_merge_with_previous_shot" : "Aktuellen Schnitt mit vorherigem zusammenführen",
     "timeline_merge_with_next_shot" : "Aktuellen Schnitt mit nächstem zusammenführen",
     "timeline_extract_selected_shots" : "Ausgewählte Schnitte extrahieren",
+    "messagebox_extract_selected_shots_completed" : "Extraction der ausgewählten Schnitte abgeschlossen.",
+    "messagebox_extract_selected_shots_failed" : "Extraction der ausgewählten Schnitte fehlgeschlagen.",
 
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",
@@ -195,6 +199,7 @@
 
     "messagebox_not_a_video" : "Dieses Medium ist kein Video",
     "messagebox_extract_sequence_completed" : "Die Sequenz wurde erfolgreich extrahiert.",
+    "messagebox_error" : "Fehler",
 
     "tooltip_drawing_mode" : "Zeichenmodus",
     "tooltip_pencil_tool" : "Stift",
@@ -297,6 +302,8 @@
     "reset" : "Zurücksetzen",
 
     "timeline_extract_selected_shot" : "Schnitt extrahieren",
+    "messagebox_extract_shot_failed" : "Fehler bei der Extraktion des Schnitts.",
+    "messagebox_extract_shot_completed" : "Extraktion des Schnitts abgeschlossen.",
     "close" : "Schließen",
 
     "about_dialog_title" : "Über",

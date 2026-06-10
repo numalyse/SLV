@@ -1,19 +1,16 @@
-#ifndef ABMARKERITEM_H
-#define ABMARKERITEM_H
+#ifndef TRANSITIONMARKERITEM_H
+#define TRANSITIONMARKERITEM_H
 
 #include "Timeline/ItemTypes.h"
-
 #include "Timeline/Items/RangeMarkerItem.h"
 
 #include <QGraphicsItem>
 
-class ABMarkerItem : public RangeMarkerItem
+class TransitionMarkerItem : public RangeMarkerItem
 {
 public:
-    explicit ABMarkerItem(int height, int64_t vlcTime, QGraphicsItem* parent = nullptr);
-
-    int type() const override { return SLV::TypeABMarkerItem; }
-
+    explicit TransitionMarkerItem(int height, int64_t vlcTime, QGraphicsItem* parent = nullptr);
+    int type() const override { return SLV::TypeTransitionMarkerItem; }
 protected:
     virtual const QPointF* getPolygonPoints() const override { return s_points; }
     virtual int getPolygonPointCount() const override { return 5; }
@@ -21,7 +18,7 @@ protected:
 private:
     int64_t m_vlcTime;
     int m_height;
-    QColor m_color = {255,140,56};
+    QColor m_color = {0, 255, 0};
 
     static constexpr QPointF s_points[5] {
         QPointF(1.5*-3.0, 0.0),
@@ -36,4 +33,5 @@ private:
 
 
 
-#endif // CURSORITEM_H
+
+#endif // TRANSITIONMARKERITEM_H

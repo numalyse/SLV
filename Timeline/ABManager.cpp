@@ -5,23 +5,17 @@
 #include "Project/ProjectManager.h"
 
 ABManager::ABManager(QGraphicsScene *scene, TimelineMath *mathManager, QObject *parent)
-: QObject(parent), p_scene{scene}, p_mathManager{mathManager}
+: BaseRangeManager(scene, mathManager, parent)
 {
 }
 
-std::optional<ABLoopData> ABManager::getABLoopData()
-{
-    if (m_abMarkersItems.size() < 2) return {};
-
-    return ABLoopData{m_abMarkersItems[0]->time(), m_abMarkersItems[0]->pos().x(), m_abMarkersItems[1]->time(), m_abMarkersItems[1]->pos().x()};
-}
 
 std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 {
-    if(m_abMarkersItems.size() < 2) return {};
+    if(m_markers.size() < 2) return {};
 
-    int64_t aTime = m_abMarkersItems[0]->time();
-    int64_t bTime = m_abMarkersItems[1]->time();
+    int64_t aTime = m_markers[0]->time();
+    int64_t bTime = m_markers[1]->time();
 
     // marge, apres avoir restart la loop, currentTime peut etre legerement inférieur à aTime, on ajoute une frame de marge pour ne pas restart en boucle
     int64_t margin = 1000.0 / p_mathManager->fps();
@@ -35,92 +29,18 @@ std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 
 std::optional<int64_t> ABManager::clampToLoopRange(int64_t time)
 {
-    if(m_abMarkersItems.size() < 2) return {}; 
+    if(m_markers.size() < 2) return {}; 
 
-    int64_t aTime = m_abMarkersItems[0]->time();
-    int64_t bTime = m_abMarkersItems[1]->time();
+    int64_t aTime = m_markers[0]->time();
+    int64_t bTime = m_markers[1]->time();
 
     return aTime <= bTime ? std::clamp(time, aTime, bTime) : std::clamp(time, bTime, aTime);
 }
 
-void ABManager::deleteMarkers()
-{
-    for (auto* marker : m_abMarkersItems)
-    {
-        p_scene->removeItem(marker);
-        delete marker;
-        marker = nullptr;
-    }
-    m_abMarkersItems.clear();
-    emit ABLoopOff();
-}
-
-/// @brief Ajoute un marqueur si 0 ou 1 marqueur présent. Si 1 marqueur déjà présent, garde l'ordre tel que element de 0 de m_abMarkersItems est le "A".
-/// Si 2 marqueurs présents, les supprimes.
-void ABManager::cycleMarkers(int64_t time, int markerHeight){
-
-    switch (m_abMarkersItems.size())
-    {
-    case 2:{
-        deleteMarkers();
-        break;
-    }
-    case 1 :{
-        ABMarkerItem* newMarker = new ABMarkerItem(markerHeight, time);
-
-        if(newMarker->time() >= m_abMarkersItems[0]->time()){
-            m_abMarkersItems.append(newMarker); 
-        }else if(newMarker->time() < m_abMarkersItems[0]->time()){
-            m_abMarkersItems.insert(0, newMarker);
-        }
-
-        newMarker->setX(p_mathManager->timeToPos(time));
-        p_scene->addItem(newMarker);
-        emit ABLoopOn();
-        break;
-    }
-    case 0 :{
-        ABMarkerItem* newMarker = new ABMarkerItem(markerHeight, time);
-
-        m_abMarkersItems.append(newMarker);
-        newMarker->setX(p_mathManager->timeToPos(time));
-        p_scene->addItem(newMarker);
-        break;
-    }
-
-    }
-}
-
-void ABManager::changeMarkerTime(ABMarkerItem* marker, const int64_t time)
-{
-    marker->setTime(time);
-    unsigned int markerIndex = m_abMarkersItems.indexOf(marker);
-    if(m_abMarkersItems.size() == 2){
-        switch(markerIndex){
-        case 0:
-            if(marker->time() >= m_abMarkersItems[1 - markerIndex]->time())
-                marker->setTime(m_abMarkersItems[1 - markerIndex]->time() - 1000.0 / p_mathManager->fps());
-            break;
-        case 1:
-            if(marker->time() <= m_abMarkersItems[1 - markerIndex]->time())
-                marker->setTime(m_abMarkersItems[1 - markerIndex]->time() + 1000.0 / p_mathManager->fps());
-        }
-    }
-
-    updateMarkersPosition();
-}
-
-void ABManager::updateMarkersPosition(){
-    double newXPos{};
-    for( auto* marker : m_abMarkersItems){
-        newXPos = marker->time() * p_mathManager->pixelsPerMs();
-        marker->setX(newXPos);
-    }
-}
 
 void ABManager::extractLoop()
 {
-    if(m_abMarkersItems.size() < 2) return;
+    if(m_markers.size() < 2) return;
 
     auto& prefManager = PrefManager::instance();
     auto& projManager = ProjectManager::instance();
@@ -135,12 +55,27 @@ void ABManager::extractLoop()
         nullptr,
         prefManager.getText("export_file_path_title"),
         dialogDir + "/" + mediaFileInfo.baseName() + "_"
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_abMarkersItems[0]->time(), projManager.projet()->media->fps())
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_abMarkersItems[1]->time(), projManager.projet()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[0]->time(), projManager.projet()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[1]->time(), projManager.projet()->media->fps())
     );
 
     selectedPath += '.' + mediaFileInfo.suffix();
 
-    SequenceExtractionHelper::extractSequence( mediaFileInfo.filePath() ,m_abMarkersItems[0]->time(), m_abMarkersItems[1]->time(), selectedPath);
+    QProcess* ffmpegProcess = SequenceExtractionHelper::extractSequence(
+        mediaFileInfo.filePath(), 
+        m_markers[0]->time(), 
+        m_markers[1]->time(), 
+        selectedPath
+    );
+
+    connect(ffmpegProcess, &QProcess::finished, this, [this, selectedPath, ffmpegProcess](int exitCode, QProcess::ExitStatus exitStatus) {
+        if (exitCode != 0) {
+            emit loopExtractionFailed();
+        } else {
+            emit loopExtracted(selectedPath);
+        }
+
+        ffmpegProcess->deleteLater();
+    });
 
 }

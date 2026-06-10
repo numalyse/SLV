@@ -88,9 +88,13 @@
     "timeline_ab_action_1": "Aggiungi marcatore B al cursore",
     "timeline_ab_action_2": "Rimuovi marcatori",
     "timeline_ab_extract": "Estrai sequenza AB",
+    "messagebox_extract_ab_loop_done" : "La sequenza AB è stata estratta con successo.",
+    "messagebox_extract_ab_loop_failed" : "Si è verificato un errore durante l'estrazione della sequenza AB.",
     "timeline_merge_with_previous_shot" : "Unisci piano corrente con il precedente",
     "timeline_merge_with_next_shot" : "Unisci piano corrente con il successivo",
     "timeline_extract_selected_shots" : "Estrai piani selezionati",
+    "messagebox_extract_selected_shots_completed" : "Estrazione dei piani selezionati completata.",
+    "messagebox_extract_selected_shots_failed" : "Si è verificato un errore durante l'estrazione dei piani selezionati.",
 
     "export_running": "Esportazione in corso...",
     "export_directory_path_title": "Seleziona cartella di esportazione",
@@ -195,6 +199,7 @@
 
     "messagebox_not_a_video" : "Questo media non è un video",
     "messagebox_extract_sequence_completed" : "La sequenza è stata estratta con successo.",
+    "messagebox_error" : "Errore",
 
     "tooltip_drawing_mode" : "Modalità disegno",
     "tooltip_pencil_tool" : "Matita",
@@ -298,6 +303,8 @@
     "reset" : "Ripristina",
 
     "timeline_extract_selected_shot" : "Estrai piano",
+    "messagebox_extract_shot_failed" : "Si è verificato un errore durante l'estrazione del piano.",
+    "messagebox_extract_shot_completed" : "Estrazione del piano completata.",
     "close" : "Chiudi",
 
     "about_dialog_title" : "Informazioni",

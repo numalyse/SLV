@@ -47,10 +47,6 @@ public:
 
     void initShotDetail();
 
-    /// @brief 
-    /// @param shotItem 
-    /// @param audioShotItem 
-    /// @param exclusive 
     void toggleSelection(ShotItem* shotItem, AudioShotItem* audioShotItem, bool exclusive = false);
     
     void updateSelectedNumbers();
@@ -69,6 +65,7 @@ signals:
     void showMergeWithPreviousShotAction(bool);
     void showMergeWithNextShotAction(bool);
     void shotsExtractionFinished(const QString& outputPath);
+    void shotsExtractionFailed();
 
 private:
     void mergeCurrentInto(int ShotItemId);

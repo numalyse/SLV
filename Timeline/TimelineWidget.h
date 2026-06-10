@@ -9,6 +9,7 @@
 #include "Timeline/ShotManager.h"
 #include "Timeline/ABManager.h"
 #include "Timeline/SegmentationThread.h"
+#include "Timeline/TransitionManager.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -73,7 +74,7 @@ private slots:
     void updateTimelineGeometry();
     void autoSegmentation();
     void dragABMarker(QGraphicsItem*, const int);
-    void exportDone(const QString& outputPath);
+    void exportDone(const QString& text, const QString& outputPath);
 
 private:
     void applyZoom(double zoomFactor, int mouseX);

@@ -59,8 +59,14 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
-    connect(m_abManager, &ABManager::ABLoopOn, this, &TimelineWidget::disableTimeRelatedUI);
-    connect(m_abManager, &ABManager::ABLoopOff, this, &TimelineWidget::enableTimeRelatedUI);
+    connect(m_abManager, &ABManager::onPairCompleted, this, &TimelineWidget::disableTimeRelatedUI);
+    connect(m_abManager, &ABManager::onMarkersCleared, this, &TimelineWidget::enableTimeRelatedUI);
+    connect(m_abManager, &ABManager::loopExtracted, this, [this](const QString& outputPath){
+        exportDone(PrefManager::instance().getText("messagebox_extract_ab_loop_done"), outputPath);
+    });
+    connect(m_abManager, &ABManager::loopExtractionFailed, this, [this](){
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_ab_loop_failed"));
+    });
 
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);
@@ -146,7 +152,12 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
-    connect(m_shotManager, &ShotManager::shotsExtractionFinished, this, &TimelineWidget::exportDone);
+    connect(m_shotManager, &ShotManager::shotsExtractionFinished, this, [this](const QString& outputPath){
+        exportDone(PrefManager::instance().getText("messagebox_extract_selected_shots_completed"), outputPath);
+    });
+    connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
+    });
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
     m_ruler->setPos(0, 0);
@@ -391,12 +402,13 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     }
 
     QAction *selectedAction = menu.exec(globalPos);
-
-    if (selectedAction == actionSplit) {
+    if (!selectedAction) return;
+    
+    if (selectedAction == actionSplit){
         splitShotAtCursor();
     } else if (selectedAction == actionAB){
         ABAction();
-    } else if (selectedAction == deleteABMarkers) {
+    } else if (selectedAction == deleteABMarkers){
         m_abManager->deleteMarkers();
     } else if (selectedAction == actionExtractAB){
         m_abManager->extractLoop();
@@ -410,6 +422,13 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
                 + '/' + m_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, m_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, m_media->fps()));
         if(saveSequencePath != ""){
             QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + m_media->fileExtension());
+            connect(sequenceExtractor, &QProcess::finished, this, [this, sequenceExtractor, saveSequencePath](){
+                if (sequenceExtractor->exitStatus() == QProcess::NormalExit && sequenceExtractor->exitCode() == 0){
+                    exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
+                } else {
+                    QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shot_failed"));
+                }
+            });
         }
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
@@ -647,7 +666,7 @@ void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
     m_abManager->changeMarkerTime(abm, newTime);
 }
 
-void TimelineWidget::exportDone(const QString &outputPath)
+void TimelineWidget::exportDone(const QString& text,const QString &outputPath)
 {
     QMessageBox *msg = new QMessageBox();
     QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
@@ -657,7 +676,7 @@ void TimelineWidget::exportDone(const QString &outputPath)
     });
     msg->addButton(openDirBtn, QMessageBox::AcceptRole);
     msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
+    msg->setInformativeText(text);
     msg->setIcon(QMessageBox::Information);
     msg->adjustSize();
     msg->exec();

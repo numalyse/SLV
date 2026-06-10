@@ -88,9 +88,13 @@
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
     "timeline_ab_action_2": "Supprimer les marqueurs",
     "timeline_ab_extract": "Extraire la séquence AB",
+    "messagebox_extract_ab_loop_done" : "Extraction de la séquence AB terminée.",
+    "messagebox_extract_ab_loop_failed" : "Échec de l'extraction de la séquence AB.",
     "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
     "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
     "timeline_extract_selected_shots" : "Extraire les plans sélectionnés",
+    "messagebox_extract_selected_shots_completed" : "Extraction des plans sélectionnés terminée.",
+    "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des plans sélectionnés.",
     
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",
@@ -195,6 +199,7 @@
 
     "messagebox_not_a_video" : "Ce média n'est pas une vidéo",
     "messagebox_extract_sequence_completed" : "La séquence a été extraite avec succès.",
+    "messagebox_error" : "Erreur",
   
     "tooltip_drawing_mode" : "Mode Dessin",
     "tooltip_pencil_tool" : "Crayon",
@@ -297,6 +302,8 @@
     "reset" : "Réinitialiser",
 
     "timeline_extract_selected_shot" : "Extraire le plan",
+    "messagebox_extract_shot_failed" : "Échec de l'extraction du plan.",
+    "messagebox_extract_shot_completed" : "Extraction du plan terminée.",
     "close" : "Fermer",
 
     "about_dialog_title" : "À propos",

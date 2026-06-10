@@ -102,6 +102,8 @@ set(PROJECT_SOURCES
     Timeline/TimelineView.h Timeline/TimelineView.cpp
     Timeline/ABManager.h Timeline/ABManager.cpp
     Timeline/ShotManager.h Timeline/ShotManager.cpp
+    Timeline/TransitionManager.h Timeline/TransitionManager.cpp
+    Timeline/BaseRangeManager.h
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp
@@ -147,6 +149,8 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/ShotItem.cpp Timeline/Items/ShotItem.h
     Timeline/Items/AudioShotItem.h Timeline/Items/AudioShotItem.cpp
     Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
+    Timeline/Items/TransitionMarkerItem.cpp Timeline/Items/TransitionMarkerItem.h
+    Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h

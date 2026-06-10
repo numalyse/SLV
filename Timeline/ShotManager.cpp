@@ -12,7 +12,8 @@ ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
-    connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentReady, this, &ShotManager::shotsExtractionFinished);
+    connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentDone, this, &ShotManager::shotsExtractionFinished);
+    connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentFailed, this, &ShotManager::shotsExtractionFailed);
     m_thumbnailWorker->start();
 
     setShotItemsData(projectShots);
@@ -325,6 +326,8 @@ const QVector<Shot> ShotManager::shotItemsData() const
 
 void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 {
+
+    clearSelection();
 
     int shotHeight {40};
 

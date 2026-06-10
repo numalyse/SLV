@@ -2,6 +2,7 @@
 
 #include "ShotManager.h"
 #include "TimeFormatter.h"
+#include "PrefManager.h"
 
 #include <QtAssert>
 #include <QFileDialog>
@@ -182,6 +183,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
         return;
     }
 
+    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
+
     auto oldEnd =  m_shotItems[index]->shot().end;
     m_shotItems[index]->shot().end = cutTime - 1; 
     m_shotItems[index]->shot().tagImageTime = m_shotItems[index]->shot().middle();
@@ -193,7 +196,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_currentShotItem->setWidth(newWidth1);
     m_audioShotItems[index]->setWidth(newWidth1);
 
-    Shot newShotData =  Shot{ "Titre", cutTime, oldEnd};
+    Shot newShotData =  Shot{ baseTitle, cutTime, oldEnd};
     newShotData.tagImageTime = newShotData.middle();
 
     double pos2 = p_mathManager->timeToPos(newShotData.start);
@@ -204,7 +207,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     newShotItem->setPos(pos2, m_currentShotItem->y());
 
     AudioShot newAudioShotData = AudioShot{};
-    newAudioShotData.title = "Title";
+    newAudioShotData.title = baseTitle;
     newAudioShotData.start = cutTime;
     newAudioShotData.end = oldEnd;
 
@@ -375,6 +378,8 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     int64_t startShot = 0;
     int64_t lengthShot = 0;
 
+    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
+
     for(int i=0; i < cuts.size(); ++i ){
 
         int64_t nextStartShot = p_mathManager->frameToTime(cuts[i]);
@@ -384,11 +389,11 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         double xPos =  p_mathManager->timeToPos(startShot);
         double width = p_mathManager->timeToPos(lengthShot);
         
-        Shot shot{"Titre", startShot, endShot};
+        Shot shot{baseTitle, startShot, endShot};
         shot.tagImageTime = shot.middle();
 
         AudioShot audioShot{};
-        audioShot.title = "Titre"; audioShot.start = startShot; audioShot.end = endShot;
+        audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = endShot;
 
         ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
@@ -409,10 +414,10 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     double xPos =  p_mathManager->timeToPos(startShot);
     double width = p_mathManager->timeToPos(lengthShot);
     
-    Shot shot{"Titre", startShot, p_mathManager->duration()};
+    Shot shot{baseTitle, startShot, p_mathManager->duration()};
     shot.tagImageTime = shot.middle();
     AudioShot audioShot{};
-    audioShot.title = "Title"; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
+    audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
     ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
     AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);

@@ -12,15 +12,20 @@
 #include <QThread>
 #include <QMessageBox>
 
+struct GlobalScreenshotPlayerData{
+    QString mediaPath;
+    int currentTime;
+    double sar{1.0};
+};
+
 class GlobalScreenshotHelper : public QThread
 {
 Q_OBJECT
 public:
-    const QStringList playersPaths;
-    const QList<int> playersTimes;
+    const QList<GlobalScreenshotPlayerData> m_playersData;
     const PlayerLayoutArrangement arrangement;
 
-    inline GlobalScreenshotHelper(const QStringList& paths, const QList<int>& times, const PlayerLayoutArrangement arr) : playersPaths(paths), playersTimes(times), arrangement(arr){};
+    inline GlobalScreenshotHelper(const QList<GlobalScreenshotPlayerData>& playersData, const PlayerLayoutArrangement arr) : m_playersData(playersData), arrangement(arr){};
     inline void run() override{
         takeGlobalScreenshot();
     };
@@ -33,7 +38,6 @@ private:
 
     inline void takeGlobalScreenshot(){
         qDebug() << "Global Screenshot";
-        Q_ASSERT(playersPaths.size() == playersTimes.size());
         auto& prefManager = PrefManager::instance();
         QList<cv::Mat> screenshots;
         QList<cv::Mat> resizedScreenshots;
@@ -43,44 +47,57 @@ private:
         QString mergedPath(prefManager.getPref("Paths", "screenshot") + '/');
         if(!QDir(mergedPath).exists()) QDir().mkdir(mergedPath);
 
-        for(size_t IPlayer = 0; IPlayer<playersPaths.size(); ++IPlayer){
+        GlobalScreenshotPlayerData currPlayerData;
+
+        for(size_t IPlayerData = 0; IPlayerData < m_playersData.size(); ++IPlayerData){
             cap.release();
-            cap.open(playersPaths[IPlayer].toStdString(), cv::CAP_FFMPEG);
-            QString p = playersPaths.at(IPlayer);
+            currPlayerData = m_playersData[IPlayerData];
+            cap.open(currPlayerData.mediaPath.toStdString(), cv::CAP_FFMPEG);
 
             if (!cap.isOpened()) {
                 qDebug() << "Impossible d'ouvrir le média";
                 emit finishedError();
                 return;
             }
-            QString p2 = playersPaths[IPlayer];
-            cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(playersTimes[IPlayer]));
+
+            cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(currPlayerData.currentTime));
             cv::Mat playerFrame;
+            cv::Mat playerFrameResized; // pour prendre en compte le sar
             if(!cap.read(playerFrame)){
-                qDebug() << "Erreur dans le chargement du screenshot de " + playersPaths[IPlayer];
+                qDebug() << "Erreur dans le chargement du screenshot de " + currPlayerData.mediaPath;
                 emit finishedError();
                 return;
             }
-            screenshots.append(playerFrame);
 
-            QString path = QFileInfo(playersPaths[IPlayer]).baseName();
+            QString path = QFileInfo(currPlayerData.mediaPath).baseName();
             double fps = cap.get(cv::CAP_PROP_FPS);
             QByteArray pathBytes = path.toUtf8();
 
             QString fullOutputPath = prefManager.getPref("Paths", "screenshot")
                                     + '/'
                                     + pathBytes.constData()
-                                    + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps)
+                                    + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps)
                                     + ".png";
 
-            if(!cv::imwrite(fullOutputPath.toStdString(), playerFrame)){
+            int origWidth = playerFrame.cols;
+            int origHeight = playerFrame.rows;
+            double sar = currPlayerData.sar;
+
+            int adjustedWidth = (sar > 0) ? origWidth * sar : origWidth;
+
+            cv::Size newSize(adjustedWidth, origHeight);
+            cv::resize(playerFrame, playerFrameResized, newSize, 0, 0, cv::INTER_AREA);
+
+            screenshots.append(playerFrameResized);
+
+            if(!cv::imwrite(fullOutputPath.toStdString(), playerFrameResized)){
                 qDebug() << "Erreur dans l'enregistrement de la capture multiple";
                 emit finishedError();
                 return;
             }
             mergedPath += path.left(std::min(5, int(path.size()))) 
-                        + TimeFormatter::fileFormatMsToHHMMSSFF(playersTimes[IPlayer], fps) 
-                        + (IPlayer != playersPaths.size()-1 ? "_" : "");
+                        + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps) 
+                        + (IPlayerData != m_playersData.size()-1 ? "_" : "");
                         
             minWidth = std::min(minWidth, playerFrame.cols);
             minHeight = std::min(minHeight, playerFrame.rows);

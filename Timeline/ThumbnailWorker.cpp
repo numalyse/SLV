@@ -11,11 +11,11 @@ ThumbnailWorker::~ThumbnailWorker() {
     stop();
 }
 
-void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize)
+void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize, double sar)
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize});
+    m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
 
@@ -114,15 +114,18 @@ void ThumbnailWorker::run()
         int origWidth = frame.cols;
         int origHeight = frame.rows;
 
+        double adjustedWidth = static_cast<double>(origWidth) * req.sar; // prend en compte le pixel aspect ratio pour compenser les pixels rectangulaires
+
         cv::Size cvTargetSize(req.targetSize.width(), req.targetSize.height());
 
-        double scaleWidth = static_cast<double>(cvTargetSize.width) / origWidth;
+        double scaleWidth = static_cast<double>(cvTargetSize.width) / adjustedWidth;
         double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
 
+        // On prend la plus petite échelle pour que l'image rentre entièrement (KeepAspectRatio)
         double scale = std::min(scaleWidth, scaleHeight);
 
         cv::Size newSize(
-            static_cast<int>(origWidth * scale),
+            static_cast<int>(adjustedWidth * scale),
             static_cast<int>(origHeight * scale)
         );
 

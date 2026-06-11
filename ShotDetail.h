@@ -5,6 +5,7 @@
 #include "FormTextEditWidget.h"
 #include "FormLineEditWidget.h"
 #include "ToolbarButtons/ToolbarButton.h"
+#include "Media.h"
 
 #include <QLabel>
 #include <QFrame>
@@ -26,7 +27,7 @@ public:
     void updateTagImage(QImage);
 signals:
     void goToShotRequested(int id);
-    void updateImageRequested(int requestId, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
+    void updateImageRequested(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize);
     void clearThumbnailQueueRequested();
 
 private:

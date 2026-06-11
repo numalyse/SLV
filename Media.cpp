@@ -67,7 +67,9 @@ void Media::parse(){
     }
 }
 
-void Media::parseTracks(libvlc_media_player_t* player)
+
+
+void Media::parseTracks(libvlc_media_player_t *player)
 {
     if (!player) return;
 
@@ -155,6 +157,7 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                         trackInfo._codec = tracks[i]->i_codec;
                         trackInfo._sarNum = tracks[i]->video->i_sar_num;
                         trackInfo._sarDen = tracks[i]->video->i_sar_den;
+                        media->setSar(static_cast<double>(trackInfo._sarNum) / static_cast<double>(trackInfo._sarDen));
                         break;
                     case libvlc_track_audio:
                         hasAudio = true;

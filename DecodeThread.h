@@ -18,6 +18,7 @@ Q_OBJECT
 public:
     explicit DecodeThread(
         QString mediaPath, 
+        double sar,
         TSQueue<ImgData>* imageQueue,
         const QVector<Shot>& shots, 
         QObject* parent = nullptr, 
@@ -46,6 +47,7 @@ private:
 
 
     QString m_mediaPath{};
+    double m_sar{1.0};
     QVector<Shot> m_shots{};
 
     std::optional<int> m_colorCode{std::nullopt};

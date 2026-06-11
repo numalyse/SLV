@@ -377,7 +377,7 @@ void MediaWidget::takeScreenshot()
 
     QByteArray capturePathBytes = capturePath.toUtf8();
 
-    int w = m_media->width();
+    int w = (m_media->sar() > 0 ) ? m_media->width() * m_media->sar() : m_media->width();
     int h = m_media->height();
 
     // if there is a problem with media resolution here, make sure to recieve Media::resolutionParsed(tuple<int, int>) signal first

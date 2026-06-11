@@ -8,6 +8,10 @@
 #include <QFrame>
 #include <QBoxLayout>
 #include <QScreen>
+#include <QComboBox>
+#include <QAbstractItemView>
+
+#include "ToolbarToggleHoverButton.h"
 
 
 ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *layoutToDisplay, bool state, const QString &iconNameOn, const QString &toolTipTextOn, const QString &iconNameOff, const QString &toolTipTextOff, int timerDuration)
@@ -50,7 +54,7 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
     m_widgetToDisplay->installEventFilter(this);
 
     // Quand le timer est terminé, lance la méthode Qt hide de la popup.
-    connect(m_hideTimer, &QTimer::timeout, m_widgetToDisplay, &QWidget::hide);
+    connect(m_hideTimer, &QTimer::timeout, this, &ToolbarToggleHoverButton::tryToHidePopup);
         
     moveWidget();
     m_widgetToDisplay->hide();
@@ -140,4 +144,34 @@ bool ToolbarToggleHoverButton::eventFilter(QObject *watched, QEvent *event)
     }
 
     return ToolbarToggleButton::eventFilter(watched, event);
+}
+
+void ToolbarToggleHoverButton::tryToHidePopup()
+{
+    // 1. Sécurité anti-ComboBox : On vérifie si une combobox enfant a sa liste ouverte
+    QList<QComboBox*> combos = m_widgetToDisplay->findChildren<QComboBox*>();
+    for (QComboBox* cb : combos) {
+        // Si la vue (la liste déroulante) existe et est visible, on ne cache rien !
+        if (cb->view() && cb->view()->isVisible()) {
+            m_hideTimer->start(); // On relance le timer et on attend
+            return;
+        }
+    }
+
+    // 2. Sécurité globale pour les autres popups Qt (ex: QMenu)
+    if (QApplication::activePopupWidget()) {
+        m_hideTimer->start();
+        return;
+    }
+
+    // 3. Vérification classique de la souris (pour le reste du widget)
+    QWidget *widgetUnderCursor = QApplication::widgetAt(QCursor::pos());
+
+    if (widgetUnderCursor && (widgetUnderCursor == m_widgetToDisplay || m_widgetToDisplay->isAncestorOf(widgetUnderCursor))) {
+        // La souris est sur le conteneur principal
+        m_hideTimer->start();
+    } else {
+        // La liste est fermée ET la souris est partie : on peut enfin cacher.
+        m_widgetToDisplay->hide();
+    }
 }

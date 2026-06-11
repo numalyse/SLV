@@ -136,6 +136,7 @@ set(ADDITIONAL_SOURCES
     TSQueue.h
     MediaTransformHelper.h
     SequenceExtractionHelper.h
+    AspectRatioPixmapLabel.h AspectRatioPixmapLabel.cpp
 
     # Timeline complet
     Timeline/TimelineMath.cpp Timeline/TimelineMath.h

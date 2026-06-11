@@ -16,6 +16,7 @@ struct ThumbnailRequest{
     int64_t shotLength;
     QString videoPath;
     QSize targetSize;
+    double sar{1.0}; 
 };
 
 class ThumbnailWorker : public QThread
@@ -32,7 +33,8 @@ public:
     /// @param lenghtMs if == 0 will get the frame at msStart else if > 0 and > offset, will retrieve the frame at msStart + offset
     /// @param mediaPath Path of the media
     /// @param targetSize Target size of the thumnails, will use opencv to resize the frame
-    void requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize = {100, 75});
+    /// @param sar Sample aspect ratio
+    void requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize = {100, 75}, double sar = 1.0);
     void stop();
     void clearQueue();
     void keepNQueue(const int n);

@@ -37,8 +37,10 @@ void ExtractSequenceWidget::createButtons()
     m_thumbnailWorker = new ThumbnailWorker(this);
     m_okButton = new QPushButton("OK");
     m_cancelButton = new QPushButton(PrefManager::instance().getText("cancel_action"));
-    m_startFrameDisplay = new QLabel();
-    m_endFrameDisplay = new QLabel();
+    m_startFrameDisplay = new AspectRatioPixmapLabel();
+    m_startFrameDisplay->setAlignment(Qt::AlignCenter);
+    m_endFrameDisplay = new AspectRatioPixmapLabel();
+    m_endFrameDisplay->setAlignment(Qt::AlignCenter);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ExtractSequenceWidget::onThumbnailReady);
     m_thumbnailWorker->start();
     connect(m_okButton, &QPushButton::released, this, &ExtractSequenceWidget::confirmExtraction);
@@ -55,17 +57,9 @@ void ExtractSequenceWidget::initUiLayout()
     QVBoxLayout *startTimeSelectionLayout = new QVBoxLayout();
     QLabel *startLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_start_label") + " :<b>");
 
-    // m_startFrameDisplay->setScaledContents(true);
-    // m_endFrameDisplay->setScaledContents(true);
-    m_startFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_endFrameDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_thumbnailWidth = m_media.width() * m_media.sar();
+    m_thumbnailHeight = m_media.height();
 
-    m_thumbnailWidth = m_media.width();
-    int maxDialogWidth = double(QGuiApplication::primaryScreen()->size().width()) / 1.25;
-    while(m_thumbnailWidth * 2 > maxDialogWidth){
-        m_thumbnailWidth /= 1.15;
-    }
-    if(m_media.height() > 0 && (m_media.width() / m_media.height()) > 0) m_thumbnailHeight = m_thumbnailWidth / (double(m_media.width()) / m_media.height());
 
     m_startFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
     m_endFrameDisplay->setPixmap(QPixmap(m_thumbnailWidth, m_thumbnailHeight));
@@ -98,13 +92,13 @@ void ExtractSequenceWidget::initUiLayout()
 void ExtractSequenceWidget::requestStartFrameDisplay()
 {
     m_thumbnailWorker->keepNQueue(2); // Pour clear la queue sauf 2 éléments (clearQueue empêche parfois d'afficher les frames sur un des deux)
-    m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)});
+    m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
 }
 
 void ExtractSequenceWidget::requestEndFrameDisplay()
 {
     m_thumbnailWorker->keepNQueue(2);
-    m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)});
+    m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
 }
 
 void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)

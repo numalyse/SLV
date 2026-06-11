@@ -4,6 +4,7 @@
 #include "Shot.h"
 #include "ShotDetail.h"
 #include "Timeline/ThumbnailWorker.h"
+#include "Media.h"
 
 #include <QWidget>
 #include <QBoxLayout>
@@ -54,7 +55,7 @@ protected:
 
 private slots:
     void updateThumbnail(int requestId, QImage image);
-    void updateImageRequest(int requestId, int64_t time, int64_t length, const QString& mediaPath, const QSize& targetSize);
+    void updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize);
     
 };
 

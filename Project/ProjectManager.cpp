@@ -22,6 +22,7 @@
 
 #include <fstream>
 #include <iostream>
+#include "ProjectManager.h"
 
 
 ProjectManager::ProjectManager(QObject* parent) : QObject(parent)
@@ -164,6 +165,14 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
         return;
     }
 
+}
+
+Media* ProjectManager::media()
+{
+    if(m_project){
+        return m_project->media;
+    }
+    return nullptr;
 }
 
 QString ProjectManager::mediaPath()

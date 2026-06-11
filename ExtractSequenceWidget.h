@@ -6,6 +6,7 @@
 #include "TimeEditor.h"
 #include "Timeline/ThumbnailWorker.h"
 #include "PrefManager.h"
+#include "AspectRatioPixmapLabel.h"
 
 #include <QWidget>
 #include <QLabel>
@@ -38,8 +39,8 @@ private:
     bool m_isExec;
     TimeEditor* m_startTimeEditor;
     TimeEditor* m_endTimeEditor;
-    QLabel* m_startFrameDisplay;
-    QLabel* m_endFrameDisplay;
+    AspectRatioPixmapLabel* m_startFrameDisplay;
+    AspectRatioPixmapLabel* m_endFrameDisplay;
     double m_thumbnailWidth;
     double m_thumbnailHeight;
     ThumbnailWorker* m_thumbnailWorker;

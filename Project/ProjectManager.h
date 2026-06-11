@@ -41,6 +41,7 @@ public:
 
     Project* projet(){ return m_project;}
 
+    Media* media();
     QString mediaPath();
     QString mediaPathExtension();
 

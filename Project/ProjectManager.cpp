@@ -503,7 +503,7 @@ void ProjectManager::exportProject(){
     int64_t duration = m_project->media->duration();
     QString mediaPath = m_project->media->filePath();
 
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, selectedPath.split(".")[0], this);
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();

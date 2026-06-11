@@ -6,13 +6,14 @@
 
 DecodeThread::DecodeThread(
     QString mediaPath, 
+    double sar,
     TSQueue<ImgData>* imageQueue,
     const QVector<Shot> &shots, 
     QObject *parent, 
     std::optional<int> colorCode, 
     std::optional<cv::Size> targetSize
 ) 
-: QThread(parent), m_mediaPath{mediaPath}, p_imageQueue{imageQueue}, m_shots{shots}, m_colorCode{colorCode}, m_targetSize{targetSize}
+: QThread(parent), m_mediaPath{mediaPath}, m_sar{sar}, p_imageQueue{imageQueue}, m_shots{shots}, m_colorCode{colorCode}, m_targetSize{targetSize}
 {
 }
 
@@ -23,15 +24,17 @@ void DecodeThread::resizeImage(cv::Mat& src, cv::Mat& dst, cv::InterpolationFlag
     int origWidth = src.cols;
     int origHeight = src.rows;
 
+    double adjustedWidth = static_cast<double>(origWidth) * m_sar; // prend en compte le pixel aspect ratio pour compenser les pixels rectangulaires
+
     cv::Size cvTargetSize(m_targetSize.value());
 
-    double scaleWidth = static_cast<double>(cvTargetSize.width) / origWidth;
+    double scaleWidth = static_cast<double>(cvTargetSize.width) / adjustedWidth;
     double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
 
     double scale = std::min(scaleWidth, scaleHeight);
 
     cv::Size newSize(
-        static_cast<int>(origWidth * scale),
+        static_cast<int>(adjustedWidth * scale),
         static_cast<int>(origHeight * scale)
     );
 

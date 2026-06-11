@@ -172,16 +172,18 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_compoRuleCheckboxHFlip->setIcon(QIcon(":/icons/invert_h" + userTheme));
     m_compoRuleCheckboxVFlip->setIconSize(QSize(20, 20));
     m_compoRuleCheckboxHFlip->setIconSize(QSize(20, 20));
+    m_compoRuleCheckboxHFlip->setEnabled(false);
+    m_compoRuleCheckboxVFlip->setEnabled(false);
     m_compoRuleCheckboxHFlip->setToolTip(PrefManager::instance().getText("tooltip_compo_rule_VFlip"));
     m_compoRuleCheckboxVFlip->setToolTip(PrefManager::instance().getText("tooltip_compo_rule_HFlip"));
 
-    connect(m_compoRuleCheckboxVFlip, &QCheckBox::toggled, this, &ExtensionToolbar::updateOverlayMode);
-    connect(m_compoRuleCheckboxHFlip, &QCheckBox::toggled, this, &ExtensionToolbar::updateOverlayMode);
+    connect(m_compoRuleCheckboxVFlip, &QCheckBox::clicked, this, &ExtensionToolbar::updateOverlayFlip);
+    connect(m_compoRuleCheckboxHFlip, &QCheckBox::clicked, this, &ExtensionToolbar::updateOverlayFlip);
     
     compoRuleLayout->addWidget(m_compoRuleCheckboxVFlip);
     compoRuleLayout->addWidget(m_compoRuleCheckboxHFlip);
 
-    m_compoRuleBtn = new ToolbarPopupButton(this, compoRuleLayout, "compo_rule_white", PrefManager::instance().getText("tooltip_composition"));
+    m_compoRuleBtn = new ToolbarToggleHoverButton(this, compoRuleLayout, "compo_rule_white", PrefManager::instance().getText("tooltip_composition"));
    
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
@@ -236,12 +238,55 @@ void ExtensionToolbar::updateDrawingMode(){
 }
 
 // OVERLAY MODE
-void ExtensionToolbar::updateOverlayMode(){
+void ExtensionToolbar::updateOverlayFlip(){
     auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex());
+
     emit setOverlayModeRequested(
         mode,
         m_compoRuleCheckboxVFlip->isChecked(),
         m_compoRuleCheckboxHFlip->isChecked()
+    );
+}
+
+void ExtensionToolbar::updateOverlayMode(){
+    auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex());
+
+    m_compoRuleCheckboxHFlip->setChecked(false);
+    m_compoRuleCheckboxVFlip->setChecked(false);
+
+    switch (mode) {
+    case OverlayMode::RuleOfThirds:{
+        m_compoRuleCheckboxHFlip->setEnabled(false);
+        m_compoRuleCheckboxVFlip->setEnabled(false);
+        break;
+    }
+    case OverlayMode::CenterCross:{
+        m_compoRuleCheckboxHFlip->setEnabled(false);
+        m_compoRuleCheckboxVFlip->setEnabled(false);
+        break;
+    }
+    case OverlayMode::Diagonals:{
+        m_compoRuleCheckboxHFlip->setEnabled(true);
+        m_compoRuleCheckboxVFlip->setEnabled(false);
+        break;
+    }
+    case OverlayMode::L_Shape:{
+        m_compoRuleCheckboxHFlip->setEnabled(true);
+        m_compoRuleCheckboxVFlip->setEnabled(true);
+        break;
+    }
+    case OverlayMode::GoldenRatio:{
+        break;   
+    }
+    default:
+        m_compoRuleCheckboxHFlip->setEnabled(false);
+        m_compoRuleCheckboxVFlip->setEnabled(false);
+        break;
+    }
+    emit setOverlayModeRequested(
+        mode,
+        false,
+        false
     );
 }
 

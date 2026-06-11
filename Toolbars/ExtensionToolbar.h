@@ -45,7 +45,7 @@ public:
     ToolbarButton* m_rotateBtn= nullptr;
     ToolbarToggleButton* m_recordBtn = nullptr;
     ToolbarToggleButton* m_segmBtn= nullptr;
-    ToolbarPopupButton* m_compoRuleBtn = nullptr;
+    ToolbarToggleHoverButton* m_compoRuleBtn = nullptr;
     ToolbarPopupButton* m_invBtn = nullptr;
     ToolbarToggleButton* m_verticalInvBtn= nullptr;
     ToolbarToggleButton* m_horizontalInvBtn= nullptr;
@@ -67,7 +67,8 @@ public slots:
 private slots:
     void updateBlackOpacityMode(bool sliderUpdated, double opacity);
     void updateDrawingMode();
-    void updateOverlayMode(); 
+    void updateOverlayMode();
+    void updateOverlayFlip();
 
 protected:
 

@@ -726,7 +726,7 @@ namespace ProjectExportHelper {
         cap.release();
 
         cv::Size displaySize(
-            static_cast<int>(originalSize.width * sar),
+            (sar > 0.0) ? static_cast<int>(originalSize.width * sar) : originalSize.width,
             originalSize.height
         );
 

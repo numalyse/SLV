@@ -18,8 +18,8 @@ struct MediaTrackInfo{
     unsigned int _bitrate; // video + audio
     char* _description;
     char* _language; // audio + subtitles
-    int _sarNum{-1}; // video
-    int _sarDen{-1}; // video
+    int _sarNum{1}; // video
+    int _sarDen{1}; // video
     unsigned int _channels; // audio
     unsigned int _rate; // audio (= taux d'échantillonnage)
     char* _encoding; // subtitle
@@ -50,7 +50,7 @@ public:
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
     QMap<libvlc_meta_t, QString> metaData() const { return m_metaData; }
     QVector<MediaTrackInfo> tracks() const { return m_tracks; }
-    double sar() const { return m_sar; };
+    double sar() const { return (m_sar > 0.0) ? m_sar : 1.0 ; };
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }

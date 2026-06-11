@@ -114,7 +114,7 @@ void ThumbnailWorker::run()
         int origWidth = frame.cols;
         int origHeight = frame.rows;
 
-        double adjustedWidth = static_cast<double>(origWidth) * req.sar; // prend en compte le pixel aspect ratio pour compenser les pixels rectangulaires
+        double adjustedWidth = (req.sar > 0) ? static_cast<double>(origWidth) * req.sar : origWidth; // prend en compte le pixel aspect ratio pour compenser les pixels rectangulaires
 
         cv::Size cvTargetSize(req.targetSize.width(), req.targetSize.height());
 

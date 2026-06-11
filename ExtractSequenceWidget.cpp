@@ -57,7 +57,7 @@ void ExtractSequenceWidget::initUiLayout()
     QVBoxLayout *startTimeSelectionLayout = new QVBoxLayout();
     QLabel *startLabel = new QLabel("<b>" + PrefManager::instance().getText("extract_start_label") + " :<b>");
 
-    m_thumbnailWidth = m_media.width() * m_media.sar();
+    m_thumbnailWidth = (m_media.sar() > 0 ) ? m_media.width() * m_media.sar() : m_media.width();
     m_thumbnailHeight = m_media.height();
 
 

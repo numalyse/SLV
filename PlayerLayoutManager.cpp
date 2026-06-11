@@ -3,7 +3,6 @@
 #include "Toolbars/Toolbar.h"
 #include "Toolbars/GlobalToolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
-#include "GlobalScreenshotHelper.h"
 #include "Project/ProjectManager.h"
 
 #include <QObject>
@@ -721,11 +720,18 @@ QList<int> PlayerLayoutManager::getActivePlayersCurrentTimes()
     return currentTimes;
 }
 
+QList<GlobalScreenshotPlayerData> PlayerLayoutManager::getActivePlayersData(){
+    QList<GlobalScreenshotPlayerData> activePlayersData;
+    for(auto& IActivePlayer : m_activePlayers){
+        activePlayersData.append({IActivePlayer->getMediaPath(), IActivePlayer->getCurrentTime(), IActivePlayer->getSar()});
+    }
+    return activePlayersData;
+}
+
 void PlayerLayoutManager::takeGlobalScreenshot()
 {
-    QStringList playersPaths = getActivePlayersMediaPath();
-    QList<int> playersTimes = getActivePlayersCurrentTimes();
-    GlobalScreenshotHelper* globalScreenshot = new GlobalScreenshotHelper(playersPaths, playersTimes, m_currentArrangement);
+    GlobalScreenshotHelper* globalScreenshot = new GlobalScreenshotHelper(getActivePlayersData(), m_currentArrangement);
+
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
         QMessageBox *msg = new QMessageBox(this);

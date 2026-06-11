@@ -30,6 +30,7 @@ public:
     MediaWidget* mediaWidget() { return m_mediaWidget; };
     QString getMediaPath();
     int getCurrentTime();
+    double getSar();
     double mediaFps() { return m_media_fps; };
     bool playing(){ return m_playing; };
     bool muted() { return m_muted; };

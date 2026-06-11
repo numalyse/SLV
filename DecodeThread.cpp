@@ -89,6 +89,17 @@ void DecodeThread::decodeTagImages(){
         if(m_targetSize.has_value()){
             resizeImage(processedFrame, tempResized, cv::INTER_AREA);
             processedFrame = tempResized;
+        }else if(m_sar > 0.0 && m_sar != 1.0 ){
+            int origWidth = processedFrame.cols;
+            int origHeight = processedFrame.rows;
+
+            cv::Size sarSize(
+                static_cast<int>(origWidth * m_sar),
+                origHeight
+            );
+
+            cv::resize(processedFrame, tempResized, sarSize, 0, 0, cv::INTER_LINEAR);
+            processedFrame = tempResized;
         }
 
         if(m_colorCode.has_value()){

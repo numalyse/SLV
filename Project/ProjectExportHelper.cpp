@@ -804,7 +804,7 @@ namespace ProjectExportHelper {
             }
 
             cv::Mat resizedImg;
-            if (sar != 1.0) {
+            if (sar > 0.0 && sar != 1.0) {
                 cv::resize(imgData.img, resizedImg, displaySize, 0, 0, cv::INTER_LINEAR);
             } else {
                 resizedImg = imgData.img; // Si ratio 1:1, on garde l'image telle quelle

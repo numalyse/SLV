@@ -115,7 +115,7 @@ void NavPanel::enableShotControlButtons()
 }
 
 void NavPanel::updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize){
-    m_thumbnailWorker->requestThumbnail(requestId, time, length, media->filePath(), targetSize, media->sar());
+    if(media->type() == MediaType::Video) m_thumbnailWorker->requestThumbnail(requestId, time, length, media->filePath(), targetSize, media->sar());
 }
 
 void NavPanel::updateThumbnail(int imageId, QImage image){

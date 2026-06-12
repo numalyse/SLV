@@ -402,8 +402,8 @@ void PlayerWidget::showDrawingMode(bool isEnabled){
     m_drawingWidget->showDrawingMode(isEnabled);
 }
 
-void PlayerWidget::setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
-
+void PlayerWidget::setOverlayMode(bool showOverlay, OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
+    overlayMode = (showOverlay) ? overlayMode : OverlayMode::None;
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
 }
 

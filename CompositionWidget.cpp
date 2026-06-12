@@ -21,6 +21,7 @@ void CompositionWidget::setOverlayMode(OverlayMode mode, bool isVFlipped, bool i
     m_mode = mode;
     m_isVFlipped = isVFlipped; 
     m_isHFlipped = isHFlipped; 
+
     update(); // redraw
 }
 

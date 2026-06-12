@@ -814,8 +814,12 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
 
 void MediaWidget::typeParsed(const MediaType type)
 {
-    if(type == MediaType::Video)
-        emit mediaIsVideoParsed();
+    if(type == MediaType::Video){
+        emit hideAudioLogo();
+    }
+    else if (type == MediaType::Audio) {
+        emit showAudioLogo();
+    }
 }
 
 /// @brief detach l'event manager avant de release le média, ne fait rien si déjà null

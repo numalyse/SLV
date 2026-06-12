@@ -21,7 +21,6 @@
 #include <QMimeData>
 #include <QStackedLayout>
 
-
 PlayerWidget::PlayerWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -90,6 +89,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
     connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
     connect(m_mediaWidget, &MediaWidget::zoomValueUpdated, m_toolBar, &SimpleToolbar::setZoomIndicatorText);
+    connect(m_mediaWidget, &MediaWidget::hideAudioLogo, this, [this](){
+        m_audioLogoWidget->setDisplay(false);
+    });
+    connect(m_mediaWidget, &MediaWidget::showAudioLogo, this, [this](){
+        m_audioLogoWidget->setDisplay(true);
+    });
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);
@@ -98,14 +103,17 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_mediaWidget);
 
-    m_compositionWidget = new CompositionWidget(containerWidget);
-    stack->addWidget(m_compositionWidget);
+    m_audioLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/music_note_white");
+    //stack->addWidget(m_audioLogoWidget);
 
-    m_drawingWidget = new DrawingWidget(containerWidget);
-    stack->addWidget(m_drawingWidget);
+    m_compositionWidget = new CompositionWidget(containerWidget);
+    //stack->addWidget(m_compositionWidget);
 
     m_blackOpacityWidget = new BlackOpacityWidget(containerWidget);
-    stack->addWidget(m_blackOpacityWidget);
+    //stack->addWidget(m_blackOpacityWidget);
+
+    m_drawingWidget = new DrawingWidget(containerWidget);
+    //stack->addWidget(m_drawingWidget);
 
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise();
@@ -131,6 +139,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::mediaRectChanged, m_blackOpacityWidget, &BlackOpacityWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_drawingWidget, &DrawingWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_audioLogoWidget, &MediaLogoWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
     connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
@@ -434,8 +443,9 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
 
 void PlayerWidget::widgetSizeChange()
 {
-    if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget)
-        return;
+
+    if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget ||!m_audioLogoWidget)
+        return; 
 
     QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
 
@@ -445,6 +455,12 @@ void PlayerWidget::widgetSizeChange()
     m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+    m_audioLogoWidget->setGeometry(globalPos.x(), globalPos.y(), w, h); 
+
+    m_audioLogoWidget->raise(); 
+    m_compositionWidget->raise();
+    m_blackOpacityWidget->raise();
+    m_drawingWidget->raise();
 }
 
 bool PlayerWidget::event(QEvent *event)
@@ -454,7 +470,7 @@ bool PlayerWidget::event(QEvent *event)
     case QEvent::Show:
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
-        QTimer::singleShot(50, this, SLOT(widgetSizeChange()));
+        QTimer::singleShot(0, this, SLOT(widgetSizeChange())); 
         break;
     case QEvent::WindowActivate:
     case QEvent::Resize:
@@ -482,6 +498,7 @@ void PlayerWidget::disableButtons()
 void PlayerWidget::mediaPlayerEjectedHandler()
 {
     m_playing = false;
+    m_audioLogoWidget->setDisplay(false);
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();
@@ -585,4 +602,3 @@ void PlayerWidget::dropEvent(QDropEvent *event)
         event->ignore();
     }
 }
-

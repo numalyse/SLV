@@ -146,7 +146,8 @@ signals:
     void hFlipUiUpdateRequested();
     void vFlipUiUpdateRequested();
     void pauseUiUpdateRequested();
-    void mediaIsVideoParsed();
+    void hideAudioLogo();
+    void showAudioLogo();
     void zoomValueUpdated(const QString&);
     void rotationTooltipUpdateRequested(const int);
     void flipTooltipUpdateRequested(const bool, const bool);

@@ -39,7 +39,7 @@
 /// @param parent
 TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
-    m_media = &projectMedia;
+    p_media = &projectMedia;
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -146,7 +146,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
 
     layout->addWidget(m_view);
 
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMedia.filePath(), projectShots, this);
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, &projectMedia, projectShots, this);
     computeMediaAmplitudes(projectMedia.filePath());
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
@@ -419,9 +419,9 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == actionExtractShot){
         QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"),
             PrefManager::instance().getPref("Paths", "lp_extract_sequence")
-                + '/' + m_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, m_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, m_media->fps()));
+                + '/' + p_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, p_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, p_media->fps()));
         if(saveSequencePath != ""){
-            QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + m_media->fileExtension());
+            QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
             connect(sequenceExtractor, &QProcess::finished, this, [this, sequenceExtractor, saveSequencePath](){
                 if (sequenceExtractor->exitStatus() == QProcess::NormalExit && sequenceExtractor->exitCode() == 0){
                     exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
@@ -436,7 +436,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         emit SignalManager::instance().toggleNavPanel();
     }else if (selectedAction == actionExtractShotsSelected){
 
-        QFileInfo fileInfo (m_media->filePath());
+        QFileInfo fileInfo (p_media->filePath());
 
         auto& prefManager = PrefManager::instance();
         QString saveRecordPath = QFileDialog::getSaveFileName(

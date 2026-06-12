@@ -12,10 +12,10 @@ class FormComboBoxFrame : public BasePreferenceFrame
 public:
     explicit FormComboBoxFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, const QStringList &values, QWidget *parent = nullptr);
 
+    QComboBox* comboBox() const { return m_comboBox; }
+
 private:
     QComboBox* m_comboBox = nullptr;
-
-    
 
     void setUIValue(const QString &value);
 };

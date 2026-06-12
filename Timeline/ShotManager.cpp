@@ -2,13 +2,14 @@
 
 #include "ShotManager.h"
 #include "TimeFormatter.h"
+#include "PrefManager.h"
 
 #include <QtAssert>
 #include <QFileDialog>
 
 
-ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, const QString& projectMediaPath, QVector<Shot> &projectShots, QObject *parent) 
-: QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, m_mediaPath{projectMediaPath}
+ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, Media* media, QVector<Shot> &projectShots, QObject *parent) 
+: QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, p_media{media}
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
@@ -147,7 +148,7 @@ void ShotManager::clearSelection()
 void ShotManager::extractShotsSelected(const QString& outputPath)
 {
 
-    m_videoCaptureManager.setMediaPath(m_mediaPath);
+    m_videoCaptureManager.setMediaPath(p_media->filePath());
     m_videoCaptureManager.initMediaTempDirectory();
 
     m_videoCaptureManager.startMediaRecording(m_selectedShots.first().first->shot().start);
@@ -182,18 +183,20 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
         return;
     }
 
-    auto oldEnd =  m_shotItems[index]->shot().end;
-    m_shotItems[index]->shot().end = cutTime - 1; 
-    m_shotItems[index]->shot().tagImageTime = m_shotItems[index]->shot().middle();
+    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
+
+    Shot& baseShot = m_shotItems[index]->shot();
+
+    auto oldEnd =  baseShot.end;
+    baseShot.end = cutTime - 1; 
+    baseShot.tagImageTime = baseShot.middle();
     m_audioShotItems[index]->shot().end = cutTime - 1;
 
-    m_thumbnailWorker->requestThumbnail(index, m_shotItems[index]->shot().start, m_shotItems[index]->shot().end - m_shotItems[index]->shot().start, m_mediaPath); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
-
-    double newWidth1 = p_mathManager->timeToPos( m_shotItems[index]->shot().end - m_shotItems[index]->shot().start );
+    double newWidth1 = p_mathManager->timeToPos(baseShot.end - baseShot.start );
     m_currentShotItem->setWidth(newWidth1);
     m_audioShotItems[index]->setWidth(newWidth1);
 
-    Shot newShotData =  Shot{ "Titre", cutTime, oldEnd};
+    Shot newShotData =  Shot{ baseTitle, cutTime, oldEnd};
     newShotData.tagImageTime = newShotData.middle();
 
     double pos2 = p_mathManager->timeToPos(newShotData.start);
@@ -204,7 +207,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     newShotItem->setPos(pos2, m_currentShotItem->y());
 
     AudioShot newAudioShotData = AudioShot{};
-    newAudioShotData.title = "Title";
+    newAudioShotData.title = baseTitle;
     newAudioShotData.start = cutTime;
     newAudioShotData.end = oldEnd;
 
@@ -214,7 +217,15 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     // on insère le plan juste apres le plan cut
     m_shotItems.insert(index + 1, newShotItem);
     m_audioShotItems.insert(index + 1, newAudioShotItem);
-    m_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, m_mediaPath);
+
+    if(PrefManager::instance().getPref("Interface", "Advanced_timeline_options", "display_timeline_by_tagFrames") == "True") {
+        m_thumbnailWorker->requestThumbnail(index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+        m_thumbnailWorker->requestThumbnail(index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); 
+    }else {
+        m_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+        m_thumbnailWorker->requestThumbnail(index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
+    }
+
     p_scene->addItem(newShotItem);
     p_scene->addItem(newAudioShotItem);
 
@@ -336,6 +347,8 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
     qDeleteAll(m_audioShotItems);
     m_audioShotItems.clear();
 
+    bool displayByTagFrames = PrefManager::instance().getPref("Interface", "Advanced_timeline_options", "display_timeline_by_tagFrames") == "True";
+
     for ( auto& IShot : shots ){
 
         double xPos =  p_mathManager->timeToPos(IShot.start);
@@ -356,7 +369,11 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         m_shotItems.push_back(shot);
         m_audioShotItems.push_back(audioShotItem);
 
-        m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, m_mediaPath);
+        if(displayByTagFrames) {
+            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+        }else {
+            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+        }
 
     }
 
@@ -375,6 +392,10 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     int64_t startShot = 0;
     int64_t lengthShot = 0;
 
+    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
+
+    bool displayByTagFrames = PrefManager::instance().getPref("Interface", "Advanced_timeline_options", "display_timeline_by_tagFrames") == "True";
+
     for(int i=0; i < cuts.size(); ++i ){
 
         int64_t nextStartShot = p_mathManager->frameToTime(cuts[i]);
@@ -384,11 +405,11 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         double xPos =  p_mathManager->timeToPos(startShot);
         double width = p_mathManager->timeToPos(lengthShot);
         
-        Shot shot{"Titre", startShot, endShot};
+        Shot shot{baseTitle, startShot, endShot};
         shot.tagImageTime = shot.middle();
 
         AudioShot audioShot{};
-        audioShot.title = "Titre"; audioShot.start = startShot; audioShot.end = endShot;
+        audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = endShot;
 
         ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
@@ -399,7 +420,12 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         audioShotItem->setX(xPos);
         m_shotItems.push_back(shotItem);
         m_audioShotItems.push_back(audioShotItem);
-        m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, startShot, lengthShot, m_mediaPath);
+
+        if(displayByTagFrames) {
+            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+        }else {
+            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+        }
 
         startShot = nextStartShot;
     }
@@ -409,10 +435,10 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     double xPos =  p_mathManager->timeToPos(startShot);
     double width = p_mathManager->timeToPos(lengthShot);
     
-    Shot shot{"Titre", startShot, p_mathManager->duration()};
+    Shot shot{baseTitle, startShot, p_mathManager->duration()};
     shot.tagImageTime = shot.middle();
     AudioShot audioShot{};
-    audioShot.title = "Title"; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
+    audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
     ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
     AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
@@ -422,7 +448,12 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     audioShotItem->setX(xPos);
     m_shotItems.push_back(shotItem);
     m_audioShotItems.push_back(audioShotItem);
-    m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, startShot, lengthShot, m_mediaPath);
+
+    if(displayByTagFrames) {
+        m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+    }else {
+        m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+    }
 
 }
 

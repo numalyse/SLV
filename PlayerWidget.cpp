@@ -193,6 +193,12 @@ int PlayerWidget::getCurrentTime()
     return -1;
 }
 
+double PlayerWidget::getSar()
+{
+    if(!m_mediaWidget || !m_mediaWidget->media()) return 1.0;
+    else return m_mediaWidget->media()->sar();
+}
+
 void PlayerWidget::enablePlayerFullscreen()
 {
     emit enablePlayerFullscreenRequested(this);

@@ -81,7 +81,7 @@ private:
 
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
 
-    Media* m_media = nullptr;
+    Media* p_media = nullptr; // non owner
     QGraphicsScene* m_scene = nullptr;
     TimelineView* m_view = nullptr;
     QVBoxLayout* m_layout = nullptr;

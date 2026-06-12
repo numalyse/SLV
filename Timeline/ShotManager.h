@@ -7,6 +7,7 @@
 #include "Timeline/TimelineView.h"
 #include "Timeline/ThumbnailWorker.h"
 #include "VideoCaptureManager.h"
+#include "Media.h"
 
 #include "Shot.h"
 
@@ -21,7 +22,7 @@ Q_OBJECT
 
 public:
 
-    explicit ShotManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, const QString &projectMediaPath, QVector<Shot> &projectShots, QObject *parent);
+    explicit ShotManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, Media* media, QVector<Shot> &projectShots, QObject *parent);
 
     void updateCurrentShot(int64_t time);
 
@@ -74,15 +75,17 @@ private:
     QVector<AudioShotItem*> m_audioShotItems;
     QVector<QPair<ShotItem*, AudioShotItem*>> m_selectedShots;
 
-    const QString m_mediaPath;
     ShotItem* m_currentShotItem = nullptr;
 
     // pointeurs non onwner, p_ pour les différencier
     QGraphicsScene* p_scene = nullptr;
     TimelineView* p_view = nullptr;
     TimelineMath* p_mathManager = nullptr;
+    Media* p_media = nullptr;
 
     ThumbnailWorker* m_thumbnailWorker = nullptr;
+    int m_thumbnailWidth{100};
+    int m_thumbnailHeight{75};
 
     VideoCaptureManager m_videoCaptureManager;
 

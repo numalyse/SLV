@@ -285,6 +285,12 @@
 
     "interface_lang_code" : "Oberflächensprache: ",
 
+    "Advanced_timeline_options" : "Timeline-Einstellungen",
+    "interface_timeline_shot_image" : "Vorschaubilder anzeigen",
+    "shot_start_image" : "Erstes Bild",
+    "shot_start_image_tooltip" : "+100 Bilder",
+    "shot_tag_image" : "Referenzbild",
+
     "dialog_open_files" : "Mediendateien öffnen",
     "dialog_open_file" : "Datei öffnen",
     "dialog_open_project" : "Projekt öffnen",

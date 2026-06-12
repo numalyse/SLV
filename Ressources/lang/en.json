@@ -286,6 +286,12 @@
 
     "interface_lang_code": "Interface Language : ",
 
+    "Advanced_timeline_options" : "Timeline settings",
+    "interface_timeline_shot_image" : "Thumbnail display",
+    "shot_start_image" : "Start frame",
+    "shot_start_image_tooltip" : "+100 frames",
+    "shot_tag_image" : "Tag frame",
+
     "dialog_open_files": "Open multimedia files",
     "dialog_open_file": "Open a file",
     "dialog_open_project": "Open a project",

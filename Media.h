@@ -18,8 +18,8 @@ struct MediaTrackInfo{
     unsigned int _bitrate; // video + audio
     char* _description;
     char* _language; // audio + subtitles
-    int _sarNum; // video
-    int _sarDen; // video
+    int _sarNum{1}; // video
+    int _sarDen{1}; // video
     unsigned int _channels; // audio
     unsigned int _rate; // audio (= taux d'échantillonnage)
     char* _encoding; // subtitle
@@ -50,6 +50,7 @@ public:
     libvlc_media_t* vlcMedia() const { return m_vlcMedia; }
     QMap<libvlc_meta_t, QString> metaData() const { return m_metaData; }
     QVector<MediaTrackInfo> tracks() const { return m_tracks; }
+    double sar() const { return (m_sar > 0.0) ? m_sar : 1.0 ; };
 
     void setType(MediaType type) { m_type = type; }
     void setDuration(int64_t duration) { m_duration = duration; }
@@ -58,6 +59,7 @@ public:
     void setWidth(int width) { m_width = width; }
     void setMeta(QMap<libvlc_meta_t, QString> metaData) { m_metaData = metaData; }
     void addTrack(const MediaTrackInfo trackInfo) { m_tracks.push_back(trackInfo); }
+    void setSar(double sar) { m_sar = sar; }
 
     QList<QPair<int, QString>> audioTracks() const { return m_audioTracks; }
     QList<QPair<int, QString>> subtitlesTracks() const { return m_subtitlesTracks; }
@@ -81,6 +83,7 @@ private:
     MediaType m_type = MediaType::Unknown;
     int64_t m_duration {}; 
     double m_fps {};
+    double m_sar {1.0};
     int m_height = 0;
     int m_width = 0;
 

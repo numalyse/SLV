@@ -286,6 +286,12 @@
 
     "interface_lang_code" : "Lingua interfaccia: ",
 
+    "Advanced_timeline_options" : "Impostazioni della timeline",
+    "interface_timeline_shot_image" : "Visualizzazione miniature",
+    "shot_start_image" : "Fotogramma iniziale",
+    "shot_start_image_tooltip" : "+100 fotogrammi",
+    "shot_tag_image" : "Fotogramma di riferimento",
+
     "dialog_open_files" : "Apri file multimediali",
     "dialog_open_file" : "Apri file",
     "dialog_open_project" : "Apri progetto",

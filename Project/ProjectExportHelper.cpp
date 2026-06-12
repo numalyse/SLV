@@ -299,7 +299,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -324,7 +324,7 @@ namespace ProjectExportHelper {
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
 
-        DecodeThread* decodeThread = new DecodeThread(mediaPath, imageQueue.get(), shots);
+        DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), shots);
         QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
         decodeThread->start();
 
@@ -358,7 +358,7 @@ namespace ProjectExportHelper {
 
     }
 
-   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
         
@@ -413,6 +413,7 @@ namespace ProjectExportHelper {
 
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, 
+            sar,
             imageQueue.get(), 
             shots, 
             nullptr, 
@@ -479,10 +480,66 @@ namespace ProjectExportHelper {
         return true;
     }
 
+    bool exportToCSV(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    {
+        if(progressCallback) progressCallback(0);
+
+        QString finalPath = dstPath + ".csv";
+        QFile file(finalPath);
+        
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qDebug() << "[EXPORT CSV] Impossible de créer le fichier " << finalPath;
+            return false;
+        }
+
+        QTextStream out(&file);
+        
+        out.setGenerateByteOrderMark(true); 
+
+        out << '"' << PrefManager::instance().getText("shot") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_title_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_start_time_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_end_time_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_duration_time_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_note_name") << '"'
+            << "\n"; 
+
+        int totalShots = shots.size();
+
+        for (int currentShot = 0; currentShot < totalShots; ++currentShot) {
+            
+            if (progressCallback && totalShots > 0) {
+                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+                if (!progressCallback(percent)) {
+                    file.close();
+                    return false; 
+                }
+            }
+
+            auto& shot = shots[currentShot];
+            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
+            QString end = TimeFormatter::msToHHMMSSFF(shot.end, fps);
+            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+
+            QString cleanNote = shot.note;
+            cleanNote.replace("\n", " ").replace(";", ",");
+
+            out << (currentShot + 1) << ";"
+                << shot.title << ";"
+                << start << ";"
+                << end << ";"
+                << shotDuration << ";"
+                << cleanNote << "\n";
+        }
+
+        file.close();
+        return true;
+
+    }
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
     /// @return 
-    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
         
@@ -511,7 +568,7 @@ namespace ProjectExportHelper {
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, imageQueue.get(), shots, nullptr, 
+            mediaPath, sar, imageQueue.get(), shots, nullptr, 
             std::optional<int>(), std::optional<cv::Size>(imgSize)
         );
 
@@ -635,7 +692,7 @@ namespace ProjectExportHelper {
     }
 
 
-    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -668,23 +725,27 @@ namespace ProjectExportHelper {
 
         cap.release();
 
+        cv::Size displaySize(
+            (sar > 0.0) ? static_cast<int>(originalSize.width * sar) : originalSize.width,
+            originalSize.height
+        );
+
         cv::VideoWriter writer(
             tempVideo.toLocal8Bit().constData(),
             fourcc,                      
             fps,                         
-            originalSize 
+            displaySize 
         );
 
         if (!writer.isOpened()) {
             qDebug() << "Le codec n'est pas supporté pour l'écriture. Utilisation de mp4v...";
             
-            // On tente mp4v si le codec ne fonctionne pas
             int fallbackFourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
             writer.open(
                 tempVideo.toLocal8Bit().constData(), 
                 fallbackFourcc, 
                 fps, 
-                originalSize
+                displaySize 
             );
             if(!writer.isOpened()){
                 qDebug() << "Impossible d'écrire";
@@ -700,13 +761,12 @@ namespace ProjectExportHelper {
 
         int percent = 0;
 
-        auto [fontSize, lineSpacing] = computeFontSizeAndSpacing(originalSize.width, originalSize.height, 0.020);
-
-        QImage textOverlay(originalSize.width, originalSize.height, QImage::Format_ARGB32_Premultiplied);
+        auto [fontSize, lineSpacing] = computeFontSizeAndSpacing(displaySize.width, displaySize.height, 0.020);
+        QImage textOverlay(displaySize.width, displaySize.height, QImage::Format_ARGB32_Premultiplied);
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, imageQueue.get(), {}
+            mediaPath, sar, imageQueue.get(), {}
         );
 
         QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
@@ -735,17 +795,27 @@ namespace ProjectExportHelper {
                                         + " / "
                                         + PrefManager::instance().getText("shot_detail_duration_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
                     QString noteTxt = s.note;
-                    wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, originalSize.width, fontSize);
+                    
+                    wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, displaySize.width, fontSize);
+                    
                     textOverlay.fill(Qt::transparent); 
                     writeOnOverlay(textOverlay, wrappedText, fontSize, lineSpacing); // Mise à jour de l'overlay à chaque fois que le plan change
                 }
-
             }
 
-            QImage img(imgData.img.data, imgData.img.cols, imgData.img.rows, static_cast<int>(imgData.img.step), QImage::Format_BGR888);
+            cv::Mat resizedImg;
+            if (sar > 0.0 && sar != 1.0) {
+                cv::resize(imgData.img, resizedImg, displaySize, 0, 0, cv::INTER_LINEAR);
+            } else {
+                resizedImg = imgData.img; // Si ratio 1:1, on garde l'image telle quelle
+            }
+
+            QImage img(resizedImg.data, resizedImg.cols, resizedImg.rows, static_cast<int>(resizedImg.step), QImage::Format_BGR888);
+            
             QPainter painter(&img);
-            painter.drawImage(0, 0, textOverlay); // Draw l'image transparent avec le texte par dessus l'image (rapide)
-            writer.write(imgData.img);
+            painter.drawImage(0, 0, textOverlay); // Draw l'image transparente avec le texte par-dessus l'image (rapide)
+            
+            writer.write(resizedImg);
 
             if (progressCallback && totalFrames > 0) {
                 percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
@@ -759,7 +829,6 @@ namespace ProjectExportHelper {
             }
             
             ++currentFrame;
-
         }
 
         writer.release();
@@ -796,6 +865,7 @@ namespace ProjectExportHelper {
         comboBox->addItem(".pdf", static_cast<int>(ExportType::PDF));
         comboBox->addItem(".pptx", static_cast<int>(ExportType::PPTX));
         comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
+        comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
         if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
         comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
         comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));

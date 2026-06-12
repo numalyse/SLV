@@ -101,44 +101,69 @@ public:
 
     QString zoom(const double n, const QPointF& centerPos = QPointF(-1, -1)){
 
-        double factor;
-        if(n < 0.0)
-            factor = 0.9;
-        else
-            factor = 1.0 / 0.9;
+        double factor = (n < 0.0) ? 0.9 : (1.0 / 0.9);
 
         double centerX = (fx1 + fx2) / 2.0;
         double centerY = (fy1 + fy2) / 2.0;
 
         if(centerPos != QPointF(-1, -1)){
-            centerX = centerPos.x() * std::abs(x1 - x2) + x2;
-            centerY = centerPos.y() * std::abs(y1 - y2) + y2;
+            centerX = centerPos.x() * (fx1 - fx2) + fx2;
+            centerY = centerPos.y() * (fy1 - fy2) + fy2;
         }
 
-        double tempX1 = centerX + (fx1 - centerX) * factor;
-        double tempY1 = centerY + (fy1 - centerY) * factor;
-        double tempX2 = centerX + (fx2 - centerX) * factor;
-        double tempY2 = centerY + (fy2 - centerY) * factor;
-
-        double width = fx1 - fx2;
-        double height = fy1 - fy2;
+        double newWidth  = (fx1 - fx2) * factor;
+        double newHeight = (fy1 - fy2) * factor;
 
         // Bloquer seulement le zoom IN
-        if (factor < 1.0 && (width < 10.0 || height < 10.0)) {
+        if (factor < 1.0 && (newWidth < 10.0 || newHeight < 10.0)) {
             return getZoomArg();
         }
 
-        fx1 = tempX1;
-        fy1 = tempY1;
-        fx2 = tempX2;
-        fy2 = tempY2;
+        // Ramener les dimensions dans les bornes vidéo en conservant le ratio
+        if (newWidth > maxWidth || newHeight > maxHeight) {
+            const double ar = double(maxWidth) / double(maxHeight);
+            if (newWidth / maxWidth >= newHeight / maxHeight) {
+                newWidth  = maxWidth;
+                newHeight = maxWidth / ar;
+            } else {
+                newHeight = maxHeight;
+                newWidth  = maxHeight * ar;
+            }
+        }
 
-        x1 = std::lround(fx1);
-        y1 = std::lround(fy1);
-        x2 = std::lround(fx2);
-        y2 = std::lround(fy2);
+        // Position relative du centre dans la région courante (0‥1)
+        const double relX = (centerX - fx2) / (fx1 - fx2);
+        const double relY = (centerY - fy2) / (fy1 - fy2);
 
-        clampValues();
+        // Appliquer la nouvelle taille centrée sur le même point
+        double newFx2 = centerX - relX * newWidth;
+        double newFx1 = newFx2 + newWidth;
+        double newFy2 = centerY - relY * newHeight;
+        double newFy1 = newFy2 + newHeight;
+
+        // Glisser la fenêtre dans les bornes sans la découper (préserve le ratio)
+        if (newFx1 > maxWidth) { 
+            newFx1 = maxWidth;  
+            newFx2 = maxWidth  - newWidth;  
+        }
+        if (newFx2 < 0) { 
+            newFx2 = 0;          
+            newFx1 = newWidth;             
+        }
+        if (newFy1 > maxHeight) {
+            newFy1 = maxHeight; 
+            newFy2 = maxHeight - newHeight; 
+        }
+        if (newFy2 < 0) { 
+            newFy2 = 0;          
+            newFy1 = newHeight;            
+        }
+
+        fx2 = newFx2; fx1 = newFx1;
+        fy2 = newFy2; fy1 = newFy1;
+
+        x2 = std::lround(fx2); x1 = std::lround(fx1);
+        y2 = std::lround(fy2); y1 = std::lround(fy1);
 
         return getZoomArg();
     }

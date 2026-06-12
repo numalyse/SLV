@@ -2,8 +2,10 @@
 #define PLAYERLAYOUTMANAGER_H
 
 #include <QObject>
+#include <QList>
 
 #include "PlayerWidget.h"
+#include "GlobalScreenshotHelper.h"
 
 class PlayerWidget;
 
@@ -55,6 +57,8 @@ private:
     bool newGlobalZoomState();
 
     void updateActivePlayersMediaState();
+
+    QList<GlobalScreenshotPlayerData> getActivePlayersData();
 
     PlayerLayoutArrangement m_currentArrangement = ArrangementUnknown;
 

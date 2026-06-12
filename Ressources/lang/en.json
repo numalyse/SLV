@@ -512,7 +512,7 @@
     "help_menu_playlist_delete_label" : "Remove all",
     "help_menu_playlist_delete_description" : "Remove all items from the playlist. A confirmation will be shown.",
     "help_menu_timeline_display_content_1" : "The detailed timeline provides a view of audio (purple bar) and the different video tracks (blue bar). Tracks are annotatable and can be added manually or automatically. Segmented videos can be saved as projects and exported in various formats.",
-    "help_menu_timeline_display_content_2" : "The timeline shows a time scale, a blue video view with the track's initial image, a purple audio view with the waveform and buttons to edit tracks. By default there is a single track.",
+    "help_menu_timeline_display_content_2" : "The timeline shows a time scale, a blue video view with the track's initial image, a purple audio view with the waveform and buttons to edit tracks. By default there is a single track. You can zoom in on the timeline using the scroll wheel, select a clip by left-clicking (Ctrl+left-click to select multiple clips), and move horizontally using Shift+left-click. Additional options are available by right-clicking on the clips.",
     "help_menu_ab_loop_label" : "A-B loop",
     "help_menu_ab_loop_description" : "Click: place an A/B marker at the current position. Once both markers are set the video loops on that range; clicking again removes the markers.",
     "help_menu_segmentation_label" : "Automatic segmentation",

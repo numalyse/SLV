@@ -511,7 +511,7 @@
     "help_menu_playlist_delete_label" : "Rimuovi tutto",
     "help_menu_playlist_delete_description" : "Rimuove tutti gli elementi dalla playlist. Verrà mostrata una conferma.",
     "help_menu_timeline_display_content_1" : "La timeline dettagliata offre una visualizzazione dell'audio (barra viola) e dei diversi piani del video (barra blu). I piani sono annotabili e possono essere aggiunti manualmente o automaticamente. I video segmentati possono essere salvati come progetti ed esportati in vari formati.",
-    "help_menu_timeline_display_content_2" : "La timeline presenta una scala temporale, una visualizzazione video in blu con l'immagine iniziale del piano, una visualizzazione audio in viola con la forma d'onda e pulsanti per modificare i piani. Per impostazione predefinita c'è un solo piano.",
+    "help_menu_timeline_display_content_2" : "La timeline presenta una scala temporale, una visualizzazione video in blu con l'immagine iniziale del piano, una visualizzazione audio in viola con la forma d'onda e pulsanti per modificare i piani. Per impostazione predefinita c'è un solo piano. È possibile ingrandire la timeline utilizzando la rotellina del mouse, selezionare un fotogramma con un clic sinistro (Ctrl+clic sinistro per selezionarne più di uno) e spostarsi orizzontalmente con Shift+clic sinistro. Cliccando con il tasto destro sui fotogrammi sono disponibili ulteriori opzioni.",
     "help_menu_ab_loop_label" : "Loop A-B",
     "help_menu_ab_loop_description" : "Clic: posiziona un marcatore A/B alla posizione corrente. Una volta posizionati entrambi i marker, il video esegue il loop su quel intervallo; un altro clic rimuove i marker.",
     "help_menu_segmentation_label" : "Segmentazione automatica",

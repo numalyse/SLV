@@ -511,7 +511,7 @@
     "help_menu_playlist_delete_label" : "Alles entfernen",
     "help_menu_playlist_delete_description" : "Entfernt alle Einträge aus der Playlist. Eine Bestätigungsabfrage erscheint.",
     "help_menu_timeline_display_content_1" : "Die detaillierte Timeline zeigt Audio (violette Spur) und Video-Segmente (blaue Spur). Schnitte sind annotierbar und können manuell oder automatisch hinzugefügt werden. Segmentierte Videos können als Projekte gespeichert und in verschiedene Formate exportiert werden.",
-    "help_menu_timeline_display_content_2" : "Die Timeline enthält eine Zeitskala, eine Videoanzeige in Blau mit Startbild des Schnitts, eine Audioanzeige in Violett mit Wellenform und Schaltflächen zur Bearbeitung der Schnitte. Standardmäßig existiert nur ein Schnitt.",
+    "help_menu_timeline_display_content_2" : "Die Timeline enthält eine Zeitskala, eine Videoanzeige in Blau mit Startbild des Schnitts, eine Audioanzeige in Violett mit Wellenform und Schaltflächen zur Bearbeitung der Schnitte. Standardmäßig existiert nur ein Schnitt. Sie können die Zeitleiste mit dem Mausrad zoomen, eine Einstellung mit einem Linksklick auswählen (Strg+Linksklick, um mehrere auszuwählen) und sich mit Umschalt+Linksklick horizontal bewegen. Weitere Funktionen stehen Ihnen zur Verfügung, wenn Sie mit der rechten Maustaste auf die Einstellungen klicken.",
     "help_menu_ab_loop_label" : "A-B-Schleife",
     "help_menu_ab_loop_description" : "Klicken: Setzt einen A/B-Marker an der aktuellen Position. Nach Setzen beider Marker wird der Intervall wiederholt; erneut klicken entfernt die Marker.",
     "help_menu_segmentation_label" : "Automatische Segmentierung",

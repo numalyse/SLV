@@ -512,7 +512,7 @@
     "help_menu_playlist_delete_label" : "Eliminar todo",
     "help_menu_playlist_delete_description" : "Elimina todos los elementos de la playlist. Se mostrará un mensaje de confirmación.",
     "help_menu_timeline_display_content_1" : "La timeline detallada ofrece una visualización del audio (barra violeta) y de los distintos planos del vídeo (barra azul). Los planos son anotables y pueden añadirse manual o automáticamente. Los vídeos segmentados pueden guardarse como proyectos y exportarse a varios formatos.",
-    "help_menu_timeline_display_content_2" : "La timeline tiene una escala temporal, una vista de vídeo en azul con la imagen inicial del plano, una vista de audio en violeta con la forma de onda y botones para modificar los planos. Por defecto solo hay un plano.",
+    "help_menu_timeline_display_content_2" : "La timeline tiene una escala temporal, una vista de vídeo en azul con la imagen inicial del plano, una vista de audio en violeta con la forma de onda y botones para modificar los planos. Por defecto solo hay un plano. Se puede ampliar la línea de tiempo con la rueda del ratón, seleccionar un plano con un clic izquierdo (Ctrl + clic izquierdo para seleccionar varios) y desplazarse horizontalmente con Mayús + clic izquierdo. Hay más opciones disponibles al hacer clic con el botón derecho del ratón sobre los planos.",
     "help_menu_ab_loop_label" : "Bucle AB",
     "help_menu_ab_loop_description" : "Clic: coloca un marcador A/B en la posición actual. Una vez colocados ambos marcadores, el vídeo hace bucle en ese intervalo; otro clic quita los marcadores.",
     "help_menu_segmentation_label" : "Segmentación automática",

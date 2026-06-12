@@ -35,6 +35,8 @@ public:
     void setOnTop(const bool &onTop);
     void setOnRight(const bool &onRight);
 
+    QWidget* widgetToDisplay() { return m_widgetToDisplay; }
+
 private:
     QWidget* m_widgetToDisplay = nullptr;
 

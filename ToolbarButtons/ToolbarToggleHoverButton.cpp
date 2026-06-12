@@ -148,30 +148,30 @@ bool ToolbarToggleHoverButton::eventFilter(QObject *watched, QEvent *event)
 
 void ToolbarToggleHoverButton::tryToHidePopup()
 {
-    // 1. Sécurité anti-ComboBox : On vérifie si une combobox enfant a sa liste ouverte
+    // si un enfant de m_widgetToDisplay est une combobox et est ouverte, on relance le timer et on ne cache pas m_widgetToDisplay
     QList<QComboBox*> combos = m_widgetToDisplay->findChildren<QComboBox*>();
     for (QComboBox* cb : combos) {
-        // Si la vue (la liste déroulante) existe et est visible, on ne cache rien !
         if (cb->view() && cb->view()->isVisible()) {
-            m_hideTimer->start(); // On relance le timer et on attend
+            m_hideTimer->start(); 
             return;
         }
     }
 
-    // 2. Sécurité globale pour les autres popups Qt (ex: QMenu)
-    if (QApplication::activePopupWidget()) {
-        m_hideTimer->start();
-        return;
+    // si un enfant est un ToolbarToggleHoverButton et son widgetToDisplay est ouvert, on relance le timer et on ne cache pas m_widgetToDisplay
+    QList<ToolbarToggleHoverButton*> toolbarToggleHoverButtons = m_widgetToDisplay->findChildren<ToolbarToggleHoverButton*>();
+    for (ToolbarToggleHoverButton* toolbarToggleHoverButton : toolbarToggleHoverButtons) {
+        if ( ! toolbarToggleHoverButton->widgetToDisplay()->isHidden() ) {
+            m_hideTimer->start(); 
+            return;
+        }
     }
+    
 
-    // 3. Vérification classique de la souris (pour le reste du widget)
     QWidget *widgetUnderCursor = QApplication::widgetAt(QCursor::pos());
 
     if (widgetUnderCursor && (widgetUnderCursor == m_widgetToDisplay || m_widgetToDisplay->isAncestorOf(widgetUnderCursor))) {
-        // La souris est sur le conteneur principal
         m_hideTimer->start();
     } else {
-        // La liste est fermée ET la souris est partie : on peut enfin cacher.
         m_widgetToDisplay->hide();
     }
 }

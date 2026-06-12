@@ -152,7 +152,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     QHBoxLayout* compoRuleLayout = new QHBoxLayout();
 
     m_compoRuleComboBox = new QComboBox(this);
-    m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_None"), QVariant::fromValue(OverlayMode::None));
     m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_RuleOfThirds"), QVariant::fromValue(OverlayMode::RuleOfThirds));
     m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_CenterCross"), QVariant::fromValue(OverlayMode::CenterCross));
     m_compoRuleComboBox->addItem(PrefManager::instance().getText("compo_rule_Diagonals"), QVariant::fromValue(OverlayMode::Diagonals));
@@ -183,7 +182,18 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     compoRuleLayout->addWidget(m_compoRuleCheckboxVFlip);
     compoRuleLayout->addWidget(m_compoRuleCheckboxHFlip);
 
-    m_compoRuleBtn = new ToolbarToggleHoverButton(this, compoRuleLayout, "compo_rule_white", PrefManager::instance().getText("tooltip_composition"));
+    m_compoRuleBtn = new ToolbarToggleHoverButton(
+        this, 
+        compoRuleLayout, 
+        false,
+        "compo_rule_white", 
+        PrefManager::instance().getText("tooltip_composition"),
+        "compo_rule_white", 
+        PrefManager::instance().getText("tooltip_composition")
+    );
+    m_compoRuleBtn->setToggledIconFrame(true);
+
+    connect(m_compoRuleBtn,  &QCheckBox::clicked, this,  &ExtensionToolbar::updateOverlayFlip);
    
     QHBoxLayout* invFrameLayout = new QHBoxLayout();
 
@@ -239,14 +249,16 @@ void ExtensionToolbar::updateDrawingMode(){
 
 // OVERLAY MODE
 void ExtensionToolbar::updateOverlayFlip(){
-    auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex());
+    auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex()); 
 
     emit setOverlayModeRequested(
+        m_compoRuleBtn->isChecked(),
         mode,
         m_compoRuleCheckboxVFlip->isChecked(),
         m_compoRuleCheckboxHFlip->isChecked()
     );
 }
+
 
 void ExtensionToolbar::updateOverlayMode(){
     auto mode = static_cast<OverlayMode>(m_compoRuleComboBox->currentIndex());
@@ -284,6 +296,7 @@ void ExtensionToolbar::updateOverlayMode(){
         break;
     }
     emit setOverlayModeRequested(
+        m_compoRuleBtn->isChecked(),
         mode,
         false,
         false

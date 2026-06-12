@@ -99,7 +99,7 @@ signals:
     void horizontalFlipRequested();
     void verticalFlipRequested();
     void showBlackOpacityModeRequested(bool isEnabled, double opacity);
-    void setOverlayModeRequested(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void setOverlayModeRequested(bool showOverlay, OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void showDrawingModeRequested(bool isEnabled);
     void prevFrameRequested();
     void nextFrameRequested();

@@ -63,7 +63,7 @@ public slots:
     void rotate();
     void setBlackOpacityMode(bool isShown, double opacity);
     void showDrawingMode(bool isEnabled);
-    void setOverlayMode(OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
+    void setOverlayMode(bool showOverlay, OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked);
     void onMediaRectChanged(const QRect &rect);
     void widgetSizeChange();
     bool event(QEvent *event) override;

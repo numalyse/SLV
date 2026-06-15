@@ -231,62 +231,72 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
 
     auto *mainSplitter = new QSplitter();
     m_currentArrangement = arrangement;
-    if(arrangement == Arrangement3Bot || arrangement == Arrangement3Top || arrangement == Arrangement3V){
 
-        mainSplitter->setOrientation(Qt::Vertical);
+    if(arrangement == Arrangement3V || arrangement == Arrangement3H ){
 
-        auto *adjacentPlayers = new QSplitter(Qt::Horizontal);
-        if(arrangement == Arrangement3V){
-            adjacentPlayers->setOrientation(Qt::Vertical);
-            // m_activePlayers[0]->sizePolicy().setHorizontalStretch(1);
-            // adjacentPlayers->sizePolicy().setHorizontalStretch(2);
-        }
-        if(arrangement == Arrangement3Bot){
-            adjacentPlayers->addWidget(m_activePlayers[0]);
-            adjacentPlayers->addWidget(m_activePlayers[1]);
-            mainSplitter->addWidget(adjacentPlayers);
-            mainSplitter->addWidget(m_activePlayers[2]);
-        }
-        else{
-            adjacentPlayers->addWidget(m_activePlayers[1]);
-            adjacentPlayers->addWidget(m_activePlayers[2]);
-            mainSplitter->addWidget(m_activePlayers[0]);
-            mainSplitter->addWidget(adjacentPlayers);
-        }
+        mainSplitter->setOrientation(arrangement == Arrangement3V ? Qt::Vertical : Qt::Horizontal);
 
-        adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+        mainSplitter->addWidget(m_activePlayers[0]);
+        mainSplitter->addWidget(m_activePlayers[1]);
+        mainSplitter->addWidget(m_activePlayers[2]);
 
-    }
-    else{
+        int minPlayerWidth = m_activePlayers[0]->minimumSizeHint().width(); 
+        if (minPlayerWidth <= 0) minPlayerWidth = 1000; 
 
-        mainSplitter->setOrientation(Qt::Horizontal);
+        mainSplitter->setSizes(QList<int>({minPlayerWidth, minPlayerWidth, minPlayerWidth})); // mettre INT_MAX, ne fonctionne pas
 
-        auto *adjacentPlayers = new QSplitter(Qt::Vertical);
-        if(arrangement == Arrangement3H){
-            adjacentPlayers->setOrientation(Qt::Horizontal);
+        mainSplitter->setStretchFactor(0, 1);
+        mainSplitter->setStretchFactor(1, 1);
+        mainSplitter->setStretchFactor(2, 1);
 
-            // m_activePlayers[1]->sizePolicy().setHorizontalStretch(1);
-            // adjacentPlayers->sizePolicy().setHorizontalStretch(2);
+    } else {
+        
+        if(arrangement == Arrangement3Bot || arrangement == Arrangement3Top){
 
-        }
-        if(arrangement == Arrangement3Right){
-            adjacentPlayers->addWidget(m_activePlayers[0]);
-            adjacentPlayers->addWidget(m_activePlayers[2]);
-            mainSplitter->addWidget(adjacentPlayers);
-            mainSplitter->addWidget(m_activePlayers[1]);
+            mainSplitter->setOrientation(Qt::Vertical);
+
+            auto *adjacentPlayers = new QSplitter(Qt::Horizontal);
+            if(arrangement == Arrangement3Bot){
+                adjacentPlayers->addWidget(m_activePlayers[0]);
+                adjacentPlayers->addWidget(m_activePlayers[1]);
+                mainSplitter->addWidget(adjacentPlayers);
+                mainSplitter->addWidget(m_activePlayers[2]);
+            }
+            else{
+                adjacentPlayers->addWidget(m_activePlayers[1]);
+                adjacentPlayers->addWidget(m_activePlayers[2]);
+                mainSplitter->addWidget(m_activePlayers[0]);
+                mainSplitter->addWidget(adjacentPlayers);
+            }
+
+            adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+
         }
         else{
-            adjacentPlayers->addWidget(m_activePlayers[1]);
-            adjacentPlayers->addWidget(m_activePlayers[2]);
-            mainSplitter->addWidget(m_activePlayers[0]);
-            mainSplitter->addWidget(adjacentPlayers);
-            // m_currentArrangement = Arrangement3Left;
-        }
 
-        adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+            mainSplitter->setOrientation(Qt::Horizontal);
+
+            auto *adjacentPlayers = new QSplitter(Qt::Vertical);
+
+            if(arrangement == Arrangement3Right){
+                adjacentPlayers->addWidget(m_activePlayers[0]);
+                adjacentPlayers->addWidget(m_activePlayers[2]);
+                mainSplitter->addWidget(adjacentPlayers);
+                mainSplitter->addWidget(m_activePlayers[1]);
+            }
+            else{
+                adjacentPlayers->addWidget(m_activePlayers[1]);
+                adjacentPlayers->addWidget(m_activePlayers[2]);
+                mainSplitter->addWidget(m_activePlayers[0]);
+                mainSplitter->addWidget(adjacentPlayers);
+                // m_currentArrangement = Arrangement3Left;
+            }
+
+            adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+        }
+        mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
     }
 
-    mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);
     layout->setContentsMargins(0,0,0,0);

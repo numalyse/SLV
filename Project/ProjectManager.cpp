@@ -461,7 +461,7 @@ void ProjectManager::exportProject(){
 
     if ( extension.isEmpty() ) return;
 
-    auto format = ProjectExportHelper::selectFormatWindow(extension);
+    auto format = ProjectExportHelper::selectFormatWindow(m_project->media->type(), extension);
 
     if ( ! format.has_value() ) return;
     

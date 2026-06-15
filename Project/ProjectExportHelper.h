@@ -67,7 +67,7 @@ namespace ProjectExportHelper {
     bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback);
     bool exportVideo(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar,const QString &dstPath, std::function<bool(int)> progressCallback);
 
-    std::optional<ExportType> selectFormatWindow(const QString& extension);
+    std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString& extension);
 }
 
 

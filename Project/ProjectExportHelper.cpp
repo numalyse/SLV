@@ -4,6 +4,7 @@
 #include "TimeFormatter.h"
 #include "TSQueue.h"
 #include "DecodeThread.h"
+#include "Media.h"
 
 #include <QDialog>
 #include <QVBoxLayout>
@@ -847,7 +848,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    std::optional<ExportType> selectFormatWindow(const QString &originalFormat)
+    std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString &originalFormat)
     {
         QDialog dialog;
         auto& txtManager = PrefManager::instance();
@@ -861,14 +862,19 @@ namespace ProjectExportHelper {
 
         QComboBox* comboBox = new QComboBox(&dialog);
         
-        comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
-        comboBox->addItem(".pdf", static_cast<int>(ExportType::PDF));
-        comboBox->addItem(".pptx", static_cast<int>(ExportType::PPTX));
-        comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
-        comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
-        if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
-        comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
-        comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+        if(mediaType == MediaType::Video){
+            comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(".pdf", static_cast<int>(ExportType::PDF));
+            comboBox->addItem(".pptx", static_cast<int>(ExportType::PPTX));
+            comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
+            comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
+            if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
+            comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
+            comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+        }else {
+            comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
+        }
         
         layout->addWidget(comboBox);
 

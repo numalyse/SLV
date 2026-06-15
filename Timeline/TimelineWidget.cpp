@@ -206,30 +206,21 @@ void TimelineWidget::setTimelineData(QVector<Shot> shots)
 void TimelineWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+    fitSceneToViewport();
+}
 
-    int viewportHeight = m_view->viewport()->height();
-    int viewportWidth = m_view->viewport()->width();
-
-    if (m_scene) {
-        if(m_sceneWidth < viewportWidth){
-            m_scene->setSceneRect(0, 0, viewportWidth, viewportHeight);
-            m_mathManager->fitToWidth(m_scene->width());
-        }else {
-            m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
-        }
-
-        if(m_ruler){
-            m_ruler->setSize(m_sceneWidth, m_rulerHeight, m_mathManager->pixelsPerMs());
-        }
-
-        m_abManager->updateMarkersPosition();
-
-        m_shotManager->updateShotItemsPosition();
-
-        if(m_cursor){
-            updateCursorPos(m_vlcTime);
-        }
+bool TimelineWidget::event(QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+        QTimer::singleShot(0, this, SLOT(fitSceneToViewport())); 
+        break;
+    default:
+        break;
     }
+
+    return QWidget::event(event);
 }
 
 
@@ -266,6 +257,22 @@ void TimelineWidget::applyZoom(double zoomFactor, int mouseX) {
 
     double newPixelPos = currentTimeUnderMouse * m_mathManager->pixelsPerMs();
     m_view->horizontalScrollBar()->setValue(qRound(newPixelPos - mouseX));
+}
+
+void TimelineWidget::fitSceneToViewport(){
+    int viewportHeight = m_view->viewport()->height();
+    int viewportWidth = m_view->viewport()->width();
+
+    if (m_scene) {
+        if(m_sceneWidth < viewportWidth){
+            m_scene->setSceneRect(0, 0, viewportWidth, viewportHeight);
+            m_mathManager->fitToWidth(m_scene->width());
+        }else {
+            m_scene->setSceneRect(0, 0, m_sceneWidth, viewportHeight);
+        }
+
+        updateTimelineGeometry();
+    }
 }
 
 void TimelineWidget::updateTimelineGeometry()

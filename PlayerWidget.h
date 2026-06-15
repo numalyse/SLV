@@ -8,6 +8,7 @@
 #include "Toolbars/SimpleToolbar.h"
 #include "ExtractSequenceWidget.h"
 #include "SignalManager.h"
+#include "MediaLogoWidget.h"
 
 #include <QMessageBox>
 #include <QWidget>
@@ -127,6 +128,7 @@ private:
     BlackOpacityWidget* m_blackOpacityWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
     DrawingWidget* m_drawingWidget = nullptr;
+    MediaLogoWidget* m_audioLogoWidget = nullptr;
     QSize m_mediaSize;
     QRect m_mediaRect;
     QString m_pendingFilePath;

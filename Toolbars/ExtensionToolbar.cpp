@@ -119,6 +119,8 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     connect(&ProjectManager::instance(), &ProjectManager::projectDeleted, this, [this] { // quand le projet est détruit, on force le button segmentation en false   
             m_segmBtn->setButtonState(false); 
+            emit disableSegmentationRequested();
+            emit SignalManager::instance().displayPlaylist();
     });
 
     connect(m_prevFrameBtn, &ToolbarButton::clicked, this, &ExtensionToolbar::prevFrameRequested);
@@ -137,8 +139,6 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
 
     connect(m_horizontalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::horizontalFlipRequested);
     connect(m_verticalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::verticalFlipRequested);
-
-    connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, &ExtensionToolbar::disableSegmentationRequested);
 
     connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
         emit disableSegmentationRequested();

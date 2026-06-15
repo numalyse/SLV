@@ -451,7 +451,9 @@ void MainWindow::moveEvent(QMoveEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    emit windowMovedOrResizedRequested();
+    QTimer::singleShot(0, this, [this]() {
+        emit windowMovedOrResizedRequested();
+    });
 }
 
 

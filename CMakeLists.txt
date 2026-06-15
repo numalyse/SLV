@@ -62,6 +62,7 @@ set(PROJECT_SOURCES
     BlackOpacityWidget.h BlackOpacityWidget.cpp
     CompositionWidget.h CompositionWidget.cpp
     DrawingWidget.h DrawingWidget.cpp
+    MediaLogoWidget.h MediaLogoWidget.cpp
 
     Toolbars/Toolbar.h Toolbars/Toolbar.cpp
     Toolbars/GlobalToolbar.h Toolbars/GlobalToolbar.cpp

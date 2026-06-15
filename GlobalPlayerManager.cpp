@@ -295,8 +295,13 @@ void GlobalPlayerManager::createTimelineWidget()
 {
     Q_ASSERT( m_player );
 
-    auto* toolbar = static_cast<AdvancedToolbar*>(m_toolbarWidget);
+    auto* toolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
     
+    if(!toolbar) {
+        qDebug() << "[GlobalPlayerManager] La toolbar n'est pas une AdvancedToolbar lors de la création de la timeline, la timeline n'est pas créée";
+        return;
+    }
+
     if(m_timeline){
         m_timeline->deleteLater();
         m_timeline = nullptr;
@@ -306,17 +311,17 @@ void GlobalPlayerManager::createTimelineWidget()
     Media* projMedia = proj->media;
 
     if( ! projMedia ){
-        qCritical() << "Pas de media dans le projet, impossible de créer une timeline";
+        qCritical() << "[GlobalPlayerManager] Pas de media dans le projet, impossible de créer une timeline";
         return;
     }
 
     if(projMedia->fps() == 0){
         projMedia->setFps(1);
-        qDebug() << "FPS == 0, utilisation de FPS = 1";
+        qDebug() << "[GlobalPlayerManager] FPS == 0, utilisation de FPS = 1";
     }
 
     if(projMedia->duration() == 0){
-        qCritical() << "Pas de duréer pour le média, impossible de créer une timeline";
+        qCritical() << "[GlobalPlayerManager] Pas de duréer pour le média, impossible de créer une timeline";
         return;
     }
 
@@ -347,7 +352,8 @@ void GlobalPlayerManager::createTimelineWidget()
     layout->setSpacing(1);
 
     layout->addWidget(m_timeline);
-    if(m_wasTimelineVisible) m_timeline->show();
+    if(m_wasTimelineVisible) toolbar->getExtendedToolbar()->getSegmBtn()->click();
+
     else m_timeline->hide();
 }
 

@@ -282,6 +282,8 @@
     "tagimage_tooltip" : "Tag-Bild (TagFrame): Ermöglicht die Identifizierung des Schnitts mit einem repräsentativen Bild des Inhalts des Schnitts.",
 
     "paths_screenshot" : "Speicherordner für Screenshots",
+    "paths_default_video" : "Standardordner für Videoaufnahmen",
+    "paths_screenshot_tooltip" : "Dieser Pfad wird automatisch durch die letzte Speicherung überschrieben",
 
     "interface_lang_code" : "Oberflächensprache: ",
 

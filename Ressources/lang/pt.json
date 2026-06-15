@@ -284,6 +284,8 @@
     "tagimage_tooltip" : "Imagem de referência (TagFrame) : Permite identificar o plano com uma imagem representativa do conteúdo do plano.",
 
     "paths_screenshot" : "Pasta de capturas de ecrã",
+    "paths_default_video" : "Pasta padrão para salvar capturas de vídeo",
+    "paths_screenshot_tooltip" : "Este caminho será automaticamente substituído pelo salvamento mais recente",
 
     "interface_lang_code" : "Idioma da interface: ",
 

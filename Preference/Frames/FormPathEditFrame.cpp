@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, bool isFolder, QWidget *parent)
+FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, bool isEditable, bool isFolder, QWidget *parent)
 : BasePreferenceFrame(name, subCategory, key, value, parent)
 {
     m_pathFrame = new QFrame(this);
@@ -15,33 +15,35 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
     //m_pathLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     m_pathLabel->setWordWrap(true);
     m_pathLabel->setToolTip(m_pathLabel->text());
-    m_browseBtn = new QPushButton("...", this);
-    m_browseBtn->setToolTip(PrefManager::instance().getText("change_saving_folder"));
-    m_browseBtn->setCursor(Qt::PointingHandCursor);
-    m_browseBtn->setFixedSize(30,30);
-
 
     QHBoxLayout* pathLayout = new QHBoxLayout();
     m_pathFrame->setLayout(pathLayout);
     pathLayout->setContentsMargins(0, 0, 0, 0);
     pathLayout->setSpacing(5);
     pathLayout->addWidget(m_pathLabel);
-    pathLayout->addWidget(m_browseBtn);
+
+    if(isEditable){
+        m_browseBtn = new QPushButton("...", this);
+        m_browseBtn->setToolTip(PrefManager::instance().getText("change_saving_folder"));
+        m_browseBtn->setCursor(Qt::PointingHandCursor);
+        m_browseBtn->setFixedSize(30,30);
+        pathLayout->addWidget(m_browseBtn);
+
+        connect(m_browseBtn, &QPushButton::clicked, this, [this, isFolder]() {
+            QString selectedPath = isFolder ? 
+                QFileDialog::getExistingDirectory(this, PrefManager::instance().getText("select_folder"), m_pathLabel->text()) : 
+                QFileDialog::getOpenFileName(this, PrefManager::instance().getText("select_file"), m_pathLabel->text(), PrefManager::instance().getText("all_files"));
+
+            if (!selectedPath.isEmpty() && selectedPath != m_prevValue) {
+                m_pathLabel->setText(selectedPath);
+                m_prevValue = selectedPath;
+                emit updateJsonObjRequested(m_subCategory, m_key, selectedPath); 
+            }
+        });
+    }
 
     //setRightLayout(pathLayout);
     setRightWidget(m_pathFrame);
-
-    connect(m_browseBtn, &QPushButton::clicked, this, [this, isFolder]() {
-        QString selectedPath = isFolder ? 
-            QFileDialog::getExistingDirectory(this, PrefManager::instance().getText("select_folder"), m_pathLabel->text()) : 
-            QFileDialog::getOpenFileName(this, PrefManager::instance().getText("select_file"), m_pathLabel->text(), PrefManager::instance().getText("all_files"));
-
-        if (!selectedPath.isEmpty() && selectedPath != m_prevValue) {
-            m_pathLabel->setText(selectedPath);
-            m_prevValue = selectedPath;
-            emit updateJsonObjRequested(m_subCategory, m_key, selectedPath); 
-        }
-    });
 }
 
 void FormPathEditFrame::clearPathUI(){

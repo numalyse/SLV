@@ -48,6 +48,7 @@ public slots:
     void computeMediaAmplitudes(const QString& mediaPath);
     void initAudioVisualizer();
     void initShotDetail();
+    bool event(QEvent *event) override;
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
@@ -75,6 +76,7 @@ private slots:
     void autoSegmentation();
     void dragABMarker(QGraphicsItem*, const int);
     void exportDone(const QString& text, const QString& outputPath);
+    void fitSceneToViewport();
 
 private:
     void applyZoom(double zoomFactor, int mouseX);

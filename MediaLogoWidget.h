@@ -12,7 +12,7 @@ class MediaLogoWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit MediaLogoWidget(QWidget *parent, const QString& iconPath);
+    explicit MediaLogoWidget(QWidget *parent, const QString& iconPath, int maxWidth);
 
 public slots:
     void paintEvent(QPaintEvent *event);

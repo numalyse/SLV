@@ -2,7 +2,7 @@
 
 #include <QHBoxLayout>
 
-MediaLogoWidget::MediaLogoWidget(QWidget *parent, const QString &iconPath)
+MediaLogoWidget::MediaLogoWidget(QWidget *parent, const QString &iconPath, int maxWidth)
 : QWidget(parent)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -13,7 +13,7 @@ MediaLogoWidget::MediaLogoWidget(QWidget *parent, const QString &iconPath)
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     m_logo = new AspectRatioPixmapLabel(this);
-    m_logo->setMaximumWidth(300);
+    m_logo->setMaximumWidth(maxWidth);
 
 
     QPixmap audioLogo(iconPath); 

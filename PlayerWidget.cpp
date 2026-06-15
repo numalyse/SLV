@@ -91,9 +91,11 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::zoomValueUpdated, m_toolBar, &SimpleToolbar::setZoomIndicatorText);
     connect(m_mediaWidget, &MediaWidget::hideAudioLogo, this, [this](){
         m_audioLogoWidget->setDisplay(false);
+        m_dragDropLogoWidget->setDisplay(false);
     });
     connect(m_mediaWidget, &MediaWidget::showAudioLogo, this, [this](){
         m_audioLogoWidget->setDisplay(true);
+        m_dragDropLogoWidget->setDisplay(false);
     });
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
@@ -103,8 +105,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_mediaWidget);
 
-    m_audioLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/music_note_white");
+    m_audioLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/music_note_grey", 200);
     //stack->addWidget(m_audioLogoWidget);
+
+    m_dragDropLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/drag_drop_grey", 100);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
     //stack->addWidget(m_compositionWidget);
@@ -456,7 +460,9 @@ void PlayerWidget::widgetSizeChange()
     m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_audioLogoWidget->setGeometry(globalPos.x(), globalPos.y(), w, h); 
+    m_dragDropLogoWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
 
+    m_dragDropLogoWidget->raise(); 
     m_audioLogoWidget->raise(); 
     m_compositionWidget->raise();
     m_blackOpacityWidget->raise();
@@ -468,6 +474,7 @@ bool PlayerWidget::event(QEvent *event)
     switch (event->type())
     {
     case QEvent::Show:
+        m_dragDropLogoWidget->setDisplay(true);
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
         QTimer::singleShot(0, this, SLOT(widgetSizeChange())); 
@@ -499,6 +506,7 @@ void PlayerWidget::mediaPlayerEjectedHandler()
 {
     m_playing = false;
     m_audioLogoWidget->setDisplay(false);
+    m_dragDropLogoWidget->setDisplay(true);
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();

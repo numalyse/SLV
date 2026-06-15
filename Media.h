@@ -82,7 +82,7 @@ private:
     QFileInfo* m_fileInfo = nullptr;
     MediaType m_type = MediaType::Unknown;
     int64_t m_duration {}; 
-    double m_fps {};
+    double m_fps {1.0};
     double m_sar {1.0};
     int m_height = 0;
     int m_width = 0;

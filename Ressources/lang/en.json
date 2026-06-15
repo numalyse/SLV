@@ -283,6 +283,8 @@
     "tagimage_tooltip" : "Tag frame: Allows to identify the shot with a representative image of the content of the shot.",
 
     "paths_screenshot": "Screenshot Save Folder",
+    "paths_default_video" : "Default folder for saving video captures",
+    "paths_screenshot_tooltip" : "This path will be automatically overwritten by the most recent save",
 
     "interface_lang_code": "Interface Language : ",
 

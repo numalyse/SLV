@@ -33,17 +33,32 @@ PathTab::PathTab(QWidget *parent) : BasePreferenceTab("Paths", parent)
     m_containerLayout->insertWidget(0, line);
     m_containerLayout->insertWidget(0, titleWidget);
     
-    FormPathEditFrame* projectPathFrame = new FormPathEditFrame(
-        prefManager.getText("paths_screenshot"),          
+    FormPathEditFrame* defaultVideoPath = new FormPathEditFrame(
+        prefManager.getText("paths_default_video"),          
         "Paths",                      
-        "screenshot",           
-        prefManager.getPref("Paths", "screenshot"),
+        "default",           
+        prefManager.getPref("Paths", "default"),
+        false,
         true,                           
         this
     );
 
-    addPreferenceFrame(projectPathFrame);
-    //m_containerLayout->addWidget(projectPathFrame);
+
+    FormPathEditFrame* screenshotPath = new FormPathEditFrame(
+        prefManager.getText("paths_screenshot"),          
+        "Paths",                      
+        "screenshot",           
+        prefManager.getPref("Paths", "screenshot"),
+        true,
+        true,                           
+        this
+    );
+
+
+    defaultVideoPath->setToolTip( prefManager.getText("paths_screenshot_tooltip"));
+
+    addPreferenceFrame(defaultVideoPath);
+    addPreferenceFrame(screenshotPath);
 
     m_containerLayout->addStretch();
 }

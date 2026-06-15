@@ -283,6 +283,8 @@
     "tagimage_tooltip" : "Immagine di riferimento (TagFrame) : Permette di identificare il piano con un'immagine rappresentativa del contenuto del piano.",
 
     "paths_screenshot" : "Cartella screenshot",
+    "paths_default_video" : "Cartella predefinita per il salvataggio delle acquisizioni video",
+    "paths_screenshot_tooltip" : "Questo percorso verrà sovrascritto automaticamente dal salvataggio più recente",
 
     "interface_lang_code" : "Lingua interfaccia: ",
 

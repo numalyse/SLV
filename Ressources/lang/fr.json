@@ -282,6 +282,8 @@
     "tagimage_tooltip" : "Image repère (TagFrame) : Permet d'identifier le plan avec une image répresentative du contenu du plan.",
 
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
+    "paths_default_video" : "Dossier par défaut de sauvegarde des captures vidéos",
+    "paths_screenshot_tooltip" : "Ce chemin sera automatiquement écrasé par la sauvegarde la plus récente",
 
     "interface_lang_code" : "Langue de l'interface : ",
 

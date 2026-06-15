@@ -124,7 +124,7 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 /// @brief 
 /// @param ejectMediaAfterSave Si true, va supprimer le projet + éjecter le média
 /// @return 
-void ProjectManager::saveProject(bool ejectMediaAfterSave){
+void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
     if(!m_project){
         qCritical() << "Trying to save on a null project"; 
         return;
@@ -137,7 +137,7 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave){
         return;
     }
 
-    if( ! m_project->path.isEmpty() ){ // si on est deja dans un projet avec un path,
+    if( ! m_project->path.isEmpty() && ! isSaveAs ){ // si on est deja dans un projet avec un path,
         // on écrit directement dans le json sans copier la vidéo
         ProjectFileHelper::writeJson(m_project, p_timeline);
         setSaveNotNeeded();

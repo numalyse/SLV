@@ -156,7 +156,7 @@ void MainWindow::createMenuBar()
     connect(saveAsProjectAction, &QAction::triggered, this, [projManager]() {
         bool neededSave = projManager->needSave();
         projManager->setSaveNeeded();
-        projManager->saveProject(false);
+        projManager->saveProject(false, true);
         if(!neededSave) projManager->setSaveNotNeeded(); // garde le bouton enregistrer actif si on annule la sauvegarde après le "save as"
     });
 

@@ -34,7 +34,7 @@ public:
     void openProject();
     void openProjectFromPath(const QString&);
 
-    void saveProject(bool ejectMedia);
+    void saveProject(bool ejectMedia, bool isSaveAs = false);
     void exportProject();
 
     void setTimeline(TimelineWidget* tl) { p_timeline = tl;}

@@ -182,5 +182,7 @@
         <file alias="shot_detail_white">icons/shot_detail_white.png</file>
         <file alias="image_preview">icons/image_preview.png</file>
         <file alias="image_preview_white">icons/image_preview_white.png</file>
+        <file alias="drag_drop_grey">icons/drag_drop_grey.png</file>
+        <file alias="music_note_grey">icons/music_note_grey.png</file>
     </qresource>
 </RCC>

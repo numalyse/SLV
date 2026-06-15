@@ -129,6 +129,9 @@ private:
     CompositionWidget* m_compositionWidget = nullptr;
     DrawingWidget* m_drawingWidget = nullptr;
     MediaLogoWidget* m_audioLogoWidget = nullptr;
+    // separate widget used for the drag and drop logo to prevent UI flickering 
+    // issues caused by having two labels inside a single widget.
+    MediaLogoWidget* m_dragDropLogoWidget = nullptr; 
     QSize m_mediaSize;
     QRect m_mediaRect;
     QString m_pendingFilePath;

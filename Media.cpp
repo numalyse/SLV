@@ -185,6 +185,8 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                     type = MediaType::Audio;
                 //à voir pour image
 
+                fps = (type == MediaType::Video) ? fps : 1.0; // pour ne pas casser la timeline il faut un fps > 0
+
                 QMap<libvlc_meta_t, QString> metaData;
                 for(int IMeta = libvlc_meta_Title; IMeta <= libvlc_meta_DiscTotal; ++IMeta){
                     libvlc_meta_t meta = static_cast<libvlc_meta_t>(IMeta);

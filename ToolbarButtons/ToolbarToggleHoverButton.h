@@ -35,6 +35,8 @@ public:
     void setOnTop(const bool &onTop);
     void setOnRight(const bool &onRight);
 
+    QWidget* widgetToDisplay() { return m_widgetToDisplay; }
+
 private:
     QWidget* m_widgetToDisplay = nullptr;
 
@@ -48,6 +50,9 @@ private:
     bool m_onTop = true;
     bool m_onRight = false;
 
+private slots:
+    void tryToHidePopup();
+
 protected:
     /// @brief Lorsque la souris survole le bouton, arret du timer et show de la popup
     void enterEvent(QEnterEvent * event) override;
@@ -57,7 +62,7 @@ protected:
 
     /// @brief Quand la souris entre dans la popup arrete le timer, 
     /// quand le souris sort de la popup, lance le timer.
-    bool eventFilter(QObject *watched, QEvent *event) override; 
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 };
 

@@ -8,6 +8,10 @@
 #include <QFrame>
 #include <QBoxLayout>
 #include <QScreen>
+#include <QComboBox>
+#include <QAbstractItemView>
+
+#include "ToolbarToggleHoverButton.h"
 
 
 ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *layoutToDisplay, bool state, const QString &iconNameOn, const QString &toolTipTextOn, const QString &iconNameOff, const QString &toolTipTextOff, int timerDuration)
@@ -50,7 +54,7 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
     m_widgetToDisplay->installEventFilter(this);
 
     // Quand le timer est terminé, lance la méthode Qt hide de la popup.
-    connect(m_hideTimer, &QTimer::timeout, m_widgetToDisplay, &QWidget::hide);
+    connect(m_hideTimer, &QTimer::timeout, this, &ToolbarToggleHoverButton::tryToHidePopup);
         
     moveWidget();
     m_widgetToDisplay->hide();
@@ -140,4 +144,34 @@ bool ToolbarToggleHoverButton::eventFilter(QObject *watched, QEvent *event)
     }
 
     return ToolbarToggleButton::eventFilter(watched, event);
+}
+
+void ToolbarToggleHoverButton::tryToHidePopup()
+{
+    // si un enfant de m_widgetToDisplay est une combobox et est ouverte, on relance le timer et on ne cache pas m_widgetToDisplay
+    QList<QComboBox*> combos = m_widgetToDisplay->findChildren<QComboBox*>();
+    for (QComboBox* cb : combos) {
+        if (cb->view() && cb->view()->isVisible()) {
+            m_hideTimer->start(); 
+            return;
+        }
+    }
+
+    // si un enfant est un ToolbarToggleHoverButton et son widgetToDisplay est ouvert, on relance le timer et on ne cache pas m_widgetToDisplay
+    QList<ToolbarToggleHoverButton*> toolbarToggleHoverButtons = m_widgetToDisplay->findChildren<ToolbarToggleHoverButton*>();
+    for (ToolbarToggleHoverButton* toolbarToggleHoverButton : toolbarToggleHoverButtons) {
+        if ( ! toolbarToggleHoverButton->widgetToDisplay()->isHidden() ) {
+            m_hideTimer->start(); 
+            return;
+        }
+    }
+    
+
+    QWidget *widgetUnderCursor = QApplication::widgetAt(QCursor::pos());
+
+    if (widgetUnderCursor && (widgetUnderCursor == m_widgetToDisplay || m_widgetToDisplay->isAncestorOf(widgetUnderCursor))) {
+        m_hideTimer->start();
+    } else {
+        m_widgetToDisplay->hide();
+    }
 }

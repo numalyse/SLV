@@ -22,12 +22,12 @@ void TimelineView::wheelEvent(QWheelEvent *event)
 void TimelineView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {   
-        if (event->modifiers() & Qt::ControlModifier) {
+        if (event->modifiers() & Qt::ShiftModifier) {
             m_isPanning = true;
             m_lastPanPos = event->pos(); 
             setCursor(Qt::ClosedHandCursor);
             
-        } else if (event->modifiers() & Qt::ShiftModifier) {
+        } else if (event->modifiers() & Qt::ControlModifier) {
             QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
             for (auto* item : itemsAtCursor){
                 if (item->type() == SLV::TypeAudioShotItem || item->type() == SLV::TypeShotItem){

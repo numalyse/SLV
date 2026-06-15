@@ -473,8 +473,12 @@ bool PlayerWidget::event(QEvent *event)
 {
     switch (event->type())
     {
+    case QEvent::Hide:
+        m_dragDropLogoWidget->setDisplay(false);
+        break;
     case QEvent::Show:
-        m_dragDropLogoWidget->setDisplay(true);
+        if(getMediaPath() == "")  m_dragDropLogoWidget->setDisplay(true);
+        else m_dragDropLogoWidget->setDisplay(false);
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
         QTimer::singleShot(0, this, SLOT(widgetSizeChange())); 
@@ -506,7 +510,7 @@ void PlayerWidget::mediaPlayerEjectedHandler()
 {
     m_playing = false;
     m_audioLogoWidget->setDisplay(false);
-    m_dragDropLogoWidget->setDisplay(true);
+    m_dragDropLogoWidget->setDisplay(isVisible() ? true : false);
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();

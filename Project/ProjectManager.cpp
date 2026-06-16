@@ -254,7 +254,7 @@ bool ProjectManager::createProjectFolder(){
     }
 
     m_project->path = QDir(fileInfo.absolutePath()).filePath(fileInfo.baseName());
-    m_project->name = fileInfo.baseName();
+    m_project->name = QDir(m_project->path).dirName();
     qDebug() << "dossier créé";
     return true;
 }

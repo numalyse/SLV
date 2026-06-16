@@ -772,6 +772,12 @@ void MediaWidget::wheelEvent(QWheelEvent *event)
     emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
 }
 
+bool MediaWidget::event(QEvent *event)
+{
+    if (event->type() == QEvent::Gesture) return gestureEvent(static_cast<QGestureEvent*>(event));
+    return QWidget::event(event);
+}
+
 /// @brief Stops the current media player and load a new media from a path
 /// @param QString filePath : string containing the path of the media
 bool MediaWidget::setMediaFromPath(const QString& filePath)
@@ -841,6 +847,26 @@ void MediaWidget::releaseEventManager(){
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
     }
+}
+
+bool MediaWidget::gestureEvent(QGestureEvent *event)
+{
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+    return true;
+}
+
+void MediaWidget::pinchTriggered(QPinchGesture *gesture)
+{
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        qreal currentStepScaleFactor = gesture->totalScaleFactor();
+        qDebug() << "pinchTriggered(): zoom by" << gesture->scaleFactor() << "->" << currentStepScaleFactor;
+    }
+    if (gesture->state() == Qt::GestureFinished) {  
+
+    }
+    update();
 }
 
 /// @brief initialise m_eventManager et attach les events

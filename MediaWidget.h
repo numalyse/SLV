@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QComboBox>
 #include <QLabel>
+#include <QGestureEvent>
 
 class MediaWidget : public QWidget
 {
@@ -117,6 +118,9 @@ private:
     void releaseMedia();
     void releaseEventManager();
 
+    bool gestureEvent(QGestureEvent *event);
+    void pinchTriggered(QPinchGesture *gesture);
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -124,6 +128,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+    bool event(QEvent *event) override;
 
 signals:
     void vlcTimeChanged(int64_t newTime);

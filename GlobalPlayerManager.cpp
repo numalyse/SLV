@@ -170,6 +170,32 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     }
 
+    // maintient la fenetre dans l'écran actuel
+    QTimer::singleShot(10, this, [this](){
+        if (window()->isMaximized() || window()->isFullScreen())
+            return;
+
+        QWidget* win = window();
+        QScreen* scr = QGuiApplication::screenAt(win->geometry().center());
+        if (!scr) scr = QGuiApplication::primaryScreen();
+
+        QRect available = scr->availableGeometry();
+        QRect frame = win->frameGeometry();
+
+        // clamp la taille si dépasse l'écran
+        int w = qMin(frame.width(),  available.width());
+        int h = qMin(frame.height(), available.height());
+
+        // clamp pos
+        int maxX = qMax(available.left(), available.right()  - w);
+        int maxY = qMax(available.top(),  available.bottom() - h);
+
+        int x = qBound(available.left(), frame.left(), maxX);
+        int y = qBound(available.top(),  frame.top(),  maxY);
+
+        win->move(x, y);
+        if (frame.width() > available.width() || frame.height() > available.height())  win->resize(w, h);
+    });
     
 }
 

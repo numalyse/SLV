@@ -56,15 +56,27 @@ namespace ProjectFileHelper {
 
     std::expected<ProjectSaveData, ProjectFileError> ProjectFileHelper::loadProject(const QString& projectAbsolutePath) {
         QFileInfo projectInfo(projectAbsolutePath);
+        qDebug() << "QFILEInfo Loading project from path:" << projectAbsolutePath;
 
         if (!projectInfo.exists() || !projectInfo.isDir()) {
             qCritical() << "Erreur : Le dossier du projet n'existe pas.";
             return std::unexpected(ProjectFileError::FolderNotFound);
         }
-
+#if defined(Q_OS_MACOS)
+        // Je récupère le nom du projet à partir de projectAbsolutePath sans passer par QFileInfo mais QString::split car QFileInfo ne gère pas correctement les chemins de type bundle sur macOS
+        QStringList pathComponents = projectAbsolutePath.split('/');
+        qDebug() << "Project Absolute Path Components: " << pathComponents;
+        // Le nom est l'avant dernier élément du chemin
+        QString projectName = pathComponents.value(pathComponents.size() - 2, "");
+        qDebug() << "Project Name with split: " << projectName;
+#else
         QString projectName = projectInfo.baseName(); 
+        qDebug() << "Project Name with baseName: " << projectName;
+#endif
         QString jsonFilePath = QDir(projectAbsolutePath).filePath(projectName + ".json");
-        
+        qDebug() << "Loading project from JSON file path:" << jsonFilePath;
+    
+
         QFileInfo saveFileInfo(jsonFilePath);
         if (!saveFileInfo.exists() || !saveFileInfo.isFile()) {
             qCritical() << "Erreur : Fichier de projet introuvable au chemin : " << jsonFilePath;

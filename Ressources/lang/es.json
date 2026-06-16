@@ -423,6 +423,9 @@
 
     "messagebox_fullscreen_experimental" : "La función de pantalla completa del software está actualmente en desarrollo.",
 
+    "extract_sequence_action" : "Extraer la secuencia",
+    "extract_sequence_audio_only_action" : "Extraer el audio",
+
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Reportar un problema",
     "help_menu_classic_checkbox" : "Pantalla de una vista",

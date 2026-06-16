@@ -422,6 +422,9 @@
 
     "messagebox_fullscreen_experimental" : "La funzionalità schermo intero del software è attualmente in fase di sviluppo.",
 
+    "extract_sequence_action" : "Estrarre la sequenza",
+    "extract_sequence_audio_only_action" : "Estrarre l'audio",
+
     "help_menu_general_checkbox" : "Generale",
     "help_menu_report_issues_label" : "Segnala un problema",
     "help_menu_classic_checkbox" : "Visualizzazione a vista singola",

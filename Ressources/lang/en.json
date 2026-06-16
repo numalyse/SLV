@@ -423,6 +423,9 @@
 
     "messagebox_fullscreen_experimental" : "The software's fullscreen feature is currently under development.",
 
+    "extract_sequence_action" : "Extract sequence",
+    "extract_sequence_audio_only_action" : "Extract audio",
+
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Report an issue",
     "help_menu_classic_checkbox" : "Mono-view interface",

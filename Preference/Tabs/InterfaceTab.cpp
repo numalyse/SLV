@@ -68,6 +68,20 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
     timelineTagFrame->comboBox()->setItemData(0, prefManager.getText("shot_start_image_tooltip"), Qt::ToolTipRole);
 
     addPreferenceFrame(timelineTagFrame);
+
+    QString userAudioPreference = PrefManager::instance().getPref("Interface", "Exports", "sequence_extraction_audio_format");
+
+    //Exports sequence_extraction_audio_format
+    FormComboBoxFrame* audioFormatType = new FormComboBoxFrame(
+        prefManager.getText("blabla"),
+        "Exports",
+        "sequence_extraction_audio_format",
+        userAudioPreference,
+        QStringList({"audio_format_mp3", "audio_format_aac"}),
+        m_container
+    );
+
+    addPreferenceFrame(audioFormatType);
     
     m_containerLayout->addStretch();
 }

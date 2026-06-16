@@ -371,6 +371,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
     prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
     auto loaded = ProjectFileHelper::loadProject(path);
+    qDebug() << "Project loaded from path:" << path << ", success:" << loaded.has_value() << ", error:" << (loaded.has_value() ? "none" : getErrorMessage(loaded.error()));
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
@@ -386,6 +387,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
         QFileInfo(path).baseName(),
         path
     };
+    qDebug() << "Project created with name:" << project->name << ", path:" << project->path << ", media path:" << project->media->filePath();
 
     deleteProject();
 

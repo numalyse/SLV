@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QDir>
 
 //TODO : à mettre dans une classe pour les signaux/barre de progression si possible
 class SequenceExtractionHelper : public QObject
@@ -65,7 +66,7 @@ public:
                         break;
                 }
 
-                finalSavePath = fileInfo.absolutePath() + "/" + fileInfo.completeBaseName() + newExtension;
+                finalSavePath = QDir(fileInfo.absolutePath()).filePath(fileInfo.completeBaseName() + newExtension);
         }
                 
         

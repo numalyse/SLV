@@ -239,7 +239,7 @@
     "dialog_preference_save_tilte" : "Einstellungen speichern",
     "dialog_preference_save_text" : "Möchten Sie Ihre Änderungen speichern?",
 
-    "dialog_preference_tab_interface" : "Oberfläche",
+    "dialog_preference_tab_general" : "Allgemeine Einstellungen",
     "dialog_preference_tab_shortcut" : "Tastenkombinationen",
     "tooltip_shortcut" : "Tastenkürzel: ",
     "dialog_preference_tab_paths" : "Pfade",
@@ -285,13 +285,17 @@
     "paths_default_video" : "Standardordner für Videoaufnahmen",
     "paths_screenshot_tooltip" : "Dieser Pfad wird automatisch durch die letzte Speicherung überschrieben",
 
-    "interface_lang_code" : "Oberflächensprache: ",
+    "general_lang_code" : "Oberflächensprache: ",
 
     "Advanced_timeline_options" : "Timeline-Einstellungen",
-    "interface_timeline_shot_image" : "Vorschaubilder anzeigen",
+    "general_timeline_shot_image" : "Vorschaubilder anzeigen",
     "shot_start_image" : "Erstes Bild",
     "shot_start_image_tooltip" : "+100 Bilder",
     "shot_tag_image" : "Referenzbild",
+
+    "sequence_extraction_audio_format" : "Extraktion der Audiosequenz",
+    "audio_format_mp3" : "MP3",
+    "audio_format_aac" : "M4A",
 
     "dialog_open_files" : "Mediendateien öffnen",
     "dialog_open_file" : "Datei öffnen",
@@ -403,7 +407,8 @@
     "restore_defaults" : "Standard wiederherstellen",
     "restore_defaults_asked" : "Standardwerte wiederherstellen?",
 
-    "tab_param_general" : "Allgemeine Einstellungen",
+    "tab_param_interface" : "Oberfläche",
+    "tab_param_export" : "Exportformate",
     "tab_param_shortcuts" : "Tastenkombinationen",
     "tab_param_paths" : "Pfade anpassen",
 
@@ -420,6 +425,9 @@
     "tooltip_shot_detail_button" : "Shot-Informationen öffnen",
 
     "messagebox_fullscreen_experimental" : "Die Vollbildfunktion der Software befindet sich derzeit in Entwicklung.",
+
+    "extract_sequence_action" : "Sequenz extrahieren",
+    "extract_sequence_audio_only_action" : "Audio extrahieren",
 
     "help_menu_general_checkbox" : "Allgemein",
     "help_menu_report_issues_label" : "Ein Problem melden",

@@ -240,7 +240,7 @@
     "dialog_preference_save_tilte": "Save Preferences",
     "dialog_preference_save_text": "Do you want to save your changes?",
 
-    "dialog_preference_tab_interface": "Interface",
+    "dialog_preference_tab_general": "General settings",
     "dialog_preference_tab_shortcut": "Shortcuts",
     "tooltip_shortcut" : "Shortcut: ",
     "dialog_preference_tab_paths": "Paths",
@@ -286,13 +286,17 @@
     "paths_default_video" : "Default folder for saving video captures",
     "paths_screenshot_tooltip" : "This path will be automatically overwritten by the most recent save",
 
-    "interface_lang_code": "Interface Language : ",
+    "general_lang_code": "Interface Language : ",
 
     "Advanced_timeline_options" : "Timeline settings",
-    "interface_timeline_shot_image" : "Thumbnail display",
+    "general_timeline_shot_image" : "Thumbnail display",
     "shot_start_image" : "Start frame",
     "shot_start_image_tooltip" : "+100 frames",
     "shot_tag_image" : "Tag frame",
+
+    "sequence_extraction_audio_format" : "Audio sequence extraction",
+    "audio_format_mp3" : "MP3",
+    "audio_format_aac" : "M4A",
 
     "dialog_open_files": "Open multimedia files",
     "dialog_open_file": "Open a file",
@@ -404,7 +408,8 @@
     "restore_defaults" : "Restore defaults",
     "restore_defaults_asked" : "Restore defaults?",
 
-    "tab_param_general" : "General settings",
+    "tab_param_interface" : "Interface",
+    "tab_param_export" : "Export formats",
     "tab_param_shortcuts" : "Shortcuts configuration",
     "tab_param_paths" : "Paths customization",
     
@@ -422,6 +427,9 @@
     "tooltip_shot_detail_button" : "Open shot information",
 
     "messagebox_fullscreen_experimental" : "The software's fullscreen feature is currently under development.",
+
+    "extract_sequence_action" : "Extract sequence",
+    "extract_sequence_audio_only_action" : "Extract audio",
 
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Report an issue",

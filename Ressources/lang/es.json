@@ -241,7 +241,7 @@
     "dialog_preference_save_tilte" : "Guardar preferencias",
     "dialog_preference_save_text" : "¿Desea guardar los cambios?",
 
-    "dialog_preference_tab_interface" : "Interfaz",
+    "dialog_preference_tab_general" : "Configuración general",
     "dialog_preference_tab_shortcut" : "Atajos",
     "tooltip_shortcut" : "Atajo: ",
     "dialog_preference_tab_paths" : "Rutas",
@@ -287,13 +287,17 @@
     "paths_default_video" : "Carpeta predeterminada para guardar capturas de vídeo",
     "paths_screenshot_tooltip" : "Esta ruta se sobrescribirá automáticamente con el guardado más reciente",
 
-    "interface_lang_code" : "Idioma de la interfaz: ",
+    "general_lang_code" : "Idioma de la interfaz: ",
 
     "Advanced_timeline_options" : "Ajustes de la línea de tiempo",
-    "interface_timeline_shot_image" : "Visualización de miniaturas",
+    "general_timeline_shot_image" : "Visualización de miniaturas",
     "shot_start_image" : "Fotograma inicial",
     "shot_start_image_tooltip" : "+100 fotogramas",
     "shot_tag_image" : "Fotograma de referencia",
+
+    "sequence_extraction_audio_format" : "Extracción de secuencia de audio",
+    "audio_format_mp3" : "MP3",
+    "audio_format_aac" : "M4A",
 
     "dialog_open_files" : "Abrir archivos multimedia",
     "dialog_open_file" : "Abrir archivo",
@@ -405,7 +409,8 @@
     "restore_defaults" : "Restaurar valores predeterminados",
     "restore_defaults_asked" : "¿Restaurar valores predeterminados?",
 
-    "tab_param_general" : "Configuración general",
+    "tab_param_interface" : "Interfaz",
+    "tab_param_export" : "Formatos de exportación",
     "tab_param_shortcuts" : "Configuración de atajos",
     "tab_param_paths" : "Personalización de rutas",
     
@@ -422,6 +427,9 @@
     "tooltip_shot_detail_button" : "Abrir información del plano",
 
     "messagebox_fullscreen_experimental" : "La función de pantalla completa del software está actualmente en desarrollo.",
+
+    "extract_sequence_action" : "Extraer la secuencia",
+    "extract_sequence_audio_only_action" : "Extraer el audio",
 
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Reportar un problema",

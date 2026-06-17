@@ -241,7 +241,7 @@
     "dialog_preference_save_tilte" : "Guardar preferências",
     "dialog_preference_save_text" : "Deseja guardar as alterações?",
 
-    "dialog_preference_tab_interface" : "Interface",
+    "dialog_preference_tab_general" : "Configurações gerais",
     "dialog_preference_tab_shortcut" : "Atalhos",
     "tooltip_shortcut" : "Atalho: ",
     "dialog_preference_tab_paths" : "Caminhos",
@@ -287,13 +287,17 @@
     "paths_default_video" : "Pasta padrão para salvar capturas de vídeo",
     "paths_screenshot_tooltip" : "Este caminho será automaticamente substituído pelo salvamento mais recente",
 
-    "interface_lang_code" : "Idioma da interface: ",
+    "general_lang_code" : "Idioma da interface: ",
 
     "Advanced_timeline_options" : "Configurações da linha do tempo",
-    "interface_timeline_shot_image" : "Exibição de miniaturas",
+    "general_timeline_shot_image" : "Exibição de miniaturas",
     "shot_start_image" : "Quadro inicial",
     "shot_start_image_tooltip" : "+100 quadros",
     "shot_tag_image" : "Quadro de referência",
+    
+    "sequence_extraction_audio_format" : "Extração de sequência de áudio",
+    "audio_format_mp3" : "MP3",
+    "audio_format_aac" : "M4A",
 
     "dialog_open_files" : "Abrir ficheiros multimédia",
     "dialog_open_file" : "Abrir ficheiro",
@@ -405,7 +409,8 @@
     "restore_defaults" : "Restaurar padrões",
     "restore_defaults_asked" : "Restaurar padrões?",
 
-    "tab_param_general" : "Configurações gerais",
+    "tab_param_interface" : "Interface",
+    "tab_param_export" : "Formatos de exportação",
     "tab_param_shortcuts" : "Configurações de atalhos",
     "tab_param_paths" : "Personalização de caminhos",
   

@@ -6,12 +6,32 @@
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
     : QDialog{parent}, m_media(media)
 {
-    m_startTime = startTime;
-    if(endTime < 0) m_endTime = startTime+10000;
-    else m_endTime = endTime;
+    const int MIN_END_MARGIN = 100;       
+    const int DEFAULT_DURATION = 10000; 
+
+    int duration = media.duration();
+
+    // limite le debut à duration - MIN_END_MARGIN
+    if (startTime >= duration - MIN_END_MARGIN) {
+        m_startTime = duration - MIN_END_MARGIN;
+    } else {
+        m_startTime = startTime;
+    }
+
+    // limite la fin à duration
+    if (endTime < 0) {
+        int defaultEndTime = m_startTime + DEFAULT_DURATION;
+        if (defaultEndTime < duration) {
+            m_endTime = defaultEndTime;
+        } else {
+            m_endTime = duration; 
+        }
+    } else {
+        m_endTime = endTime;
+    }
+
     m_thumbnailPendingTime = 50;
     m_isExec = false;
-    int duration = media.duration();
     m_startTimeEditor = new TimeEditor(this, startTime, duration, 0, duration, media.fps());
     m_endTimeEditor = new TimeEditor(this, m_endTime, duration, startTime, duration, media.fps());
     m_thumbnailStartTimer = new QTimer(this);
@@ -35,7 +55,8 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
 void ExtractSequenceWidget::createButtons()
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
-    m_okButton = new QPushButton("OK");
+    m_okButton = new QPushButton(PrefManager::instance().getText("extract_sequence_action"));
+    m_audioOnlyButton = new QPushButton(PrefManager::instance().getText("extract_sequence_audio_only_action"));
     m_cancelButton = new QPushButton(PrefManager::instance().getText("cancel_action"));
     m_startFrameDisplay = new AspectRatioPixmapLabel();
     m_startFrameDisplay->setAlignment(Qt::AlignCenter);
@@ -43,7 +64,12 @@ void ExtractSequenceWidget::createButtons()
     m_endFrameDisplay->setAlignment(Qt::AlignCenter);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ExtractSequenceWidget::onThumbnailReady);
     m_thumbnailWorker->start();
-    connect(m_okButton, &QPushButton::released, this, &ExtractSequenceWidget::confirmExtraction);
+    connect(m_okButton, &QPushButton::released, this, [this](){
+        confirmExtraction(SequenceExtractionHelper::ExtractionType::Original);
+    });    
+    connect(m_audioOnlyButton, &QPushButton::released, this, [this](){
+        confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
+    });
     connect(m_cancelButton, &QPushButton::released, this, &QDialog::reject);
     connect(m_startTimeEditor, &TimeEditor::timeChanged, m_endTimeEditor, &TimeEditor::onMinTimeChanged);
     connect(m_startTimeEditor, &TimeEditor::timeChanged, this, &ExtractSequenceWidget::onStartTimeChanged);
@@ -80,6 +106,7 @@ void ExtractSequenceWidget::initUiLayout()
     QHBoxLayout *confirmLayout = new QHBoxLayout();
     confirmLayout->addStretch();
     confirmLayout->addWidget(m_okButton);
+    confirmLayout->addWidget(m_audioOnlyButton);
     confirmLayout->addWidget(m_cancelButton);
 
     mainLayout->addLayout(timeSelectionLayout);
@@ -132,14 +159,14 @@ void ExtractSequenceWidget::onEndTimeChanged(const int newTime)
         m_thumbnailEndTimer->start(m_thumbnailPendingTime);
 }
 
-void ExtractSequenceWidget::confirmExtraction()
+void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::ExtractionType type)
 {
     auto& prefManager = PrefManager::instance();
     QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), prefManager.getPref("Paths", "lp_extract_sequence")
         + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
     if(saveSequencePath != ""){
         // On garde seulement la base du nom sans l'extension avec un split
-        QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
+        QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
         connect(sequenceExtractor, &QProcess::finished, this, &QDialog::accept);
         QFileInfo fileInfo (saveSequencePath);
         prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());

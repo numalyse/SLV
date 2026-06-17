@@ -10,6 +10,7 @@
 #include <QFrame>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QKeySequence>
 
 static QStringList orderedKeys(const QJsonObject& object)
 {
@@ -129,8 +130,11 @@ void ShortcutTab::updateJsonObj(const QString& subCategory, const QString& key, 
 {
     QString conflictSubCat, conflictKey;
 
-    QString formattedValue = newValue;
-    formattedValue.replace("+", " + ");
+    QString formattedValue;
+    if (!newValue.isEmpty()) {
+        QKeySequence seq(newValue);
+        formattedValue = seq.toString(QKeySequence::PortableText);
+    }
 
     if (hasConflict(formattedValue, key, conflictSubCat, conflictKey)) { // if has conflict shows the dialog to override the value
         auto& prefManager = PrefManager::instance();
@@ -170,10 +174,20 @@ bool ShortcutTab::hasConflict(const QString &newShortcut, const QString &current
 {
     if (newShortcut.isEmpty()) return false;
 
+    QKeySequence seqNew(newShortcut);
+
     for (auto IsubCategory = m_baseJson.begin(); IsubCategory != m_baseJson.end(); ++IsubCategory) {
         QString subCategoryKey = IsubCategory.key();
         QJsonObject subCatObj = IsubCategory.value().toObject();
         
+        QJsonObject updatedSubCatObj;
+        bool hasUpdatedSubCat = false;
+        
+        if (m_updatedJson.contains(subCategoryKey)) {
+            updatedSubCatObj = m_updatedJson.value(subCategoryKey).toObject();
+            hasUpdatedSubCat = true;
+        }
+
         for (auto IKey = subCatObj.begin(); IKey != subCatObj.end(); ++IKey) {
             QString key = IKey.key();
 
@@ -181,16 +195,20 @@ bool ShortcutTab::hasConflict(const QString &newShortcut, const QString &current
 
             QString valueToCheck;
 
-            if (m_updatedJson.contains(subCategoryKey) && m_updatedJson.value(subCategoryKey).toObject().contains(key)) { // verification si le json de l'utilisateur contient cette clé
-                valueToCheck = m_updatedJson.value(subCategoryKey).toObject().value(key).toString();
+            if (hasUpdatedSubCat && updatedSubCatObj.contains(key)) { 
+                valueToCheck = updatedSubCatObj.value(key).toString();
             } else {
                 valueToCheck = IKey.value().toString();
             }
 
-            if (!valueToCheck.isEmpty() && valueToCheck == newShortcut) { // conflit 
-                outSubCategory = subCategoryKey;
-                outKey = key;
-                return true; 
+            if (!valueToCheck.isEmpty()) {
+                QKeySequence seqToCheck(valueToCheck);
+                
+                if (!seqToCheck.isEmpty() && seqToCheck == seqNew) { // conflit
+                    outSubCategory = subCategoryKey;
+                    outKey = key;
+                    return true; 
+                }
             }
         }
     }

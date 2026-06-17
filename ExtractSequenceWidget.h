@@ -30,7 +30,7 @@ public slots:
     void onStartTimeChanged(const int newTime);
     void onEndTimeChanged(const int newTime);
     void onThumbnailReady(int requestId, const QImage& image);
-    void confirmExtraction();
+    void confirmExtraction(SequenceExtractionHelper::ExtractionType type);
 
 private:
     const Media& m_media;
@@ -48,6 +48,7 @@ private:
     QTimer* m_thumbnailEndTimer;
     int m_thumbnailPendingTime;
     QPushButton* m_okButton;
+    QPushButton* m_audioOnlyButton;
     QPushButton* m_cancelButton;
 
 signals:

@@ -106,9 +106,11 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->addWidget(m_mediaWidget);
 
     m_audioLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/music_note_grey", 200);
+    m_audioLogoWidget->setDisplay(false);
     //stack->addWidget(m_audioLogoWidget);
 
     m_dragDropLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/drag_drop_grey", 100);
+    m_audioLogoWidget->setDisplay(false);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
     //stack->addWidget(m_compositionWidget);
@@ -453,14 +455,17 @@ void PlayerWidget::widgetSizeChange()
 
     QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
 
+    QPoint localPos = m_mediaWidget->mapTo(this, QPoint(0, 0));
+
     int w = m_mediaWidget->width();
     int h = m_mediaWidget->height();
 
     m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
     m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
-    m_audioLogoWidget->setGeometry(globalPos.x(), globalPos.y(), w, h); 
-    m_dragDropLogoWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+
+    m_audioLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h); 
+    m_dragDropLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h);
 
     m_dragDropLogoWidget->raise(); 
     m_audioLogoWidget->raise(); 

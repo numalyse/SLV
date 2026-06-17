@@ -239,7 +239,7 @@
     "dialog_preference_save_tilte" : "Sauvegarde des préférences",
     "dialog_preference_save_text" : "Voulez-vous sauvegarder vos changements ?",
 
-    "dialog_preference_tab_interface" : "Interface",
+    "dialog_preference_tab_general" : "Paramètres généraux",
     "dialog_preference_tab_shortcut" : "Raccourcis",
     "tooltip_shortcut" : "Raccourci : ",
     "dialog_preference_tab_paths" : "Chemins",
@@ -285,13 +285,18 @@
     "paths_default_video" : "Dossier par défaut de sauvegarde des captures vidéos",
     "paths_screenshot_tooltip" : "Ce chemin sera automatiquement écrasé par la sauvegarde la plus récente",
 
-    "interface_lang_code" : "Langue de l'interface : ",
+    "general_lang_code" : "Langue de l'interface : ",
 
     "Advanced_timeline_options" : "Paramètres de la timeline",
-    "interface_timeline_shot_image" : "Affichage des vignettes",
+    "general_timeline_shot_image" : "Affichage des vignettes",
     "shot_start_image" : "Image du début",
     "shot_start_image_tooltip" : "+100 frames",
     "shot_tag_image" : "Image repère",
+
+
+    "sequence_extraction_audio_format" : "Extraction de séquence audio",
+    "audio_format_mp3" : "MP3",
+    "audio_format_aac" : "M4A",
 
     "dialog_open_files" : "Ouvrir des fichiers multimédia",
     "dialog_open_file" : "Ouvrir un fichier",
@@ -403,7 +408,8 @@
     "restore_defaults" : "Restaurer les valeurs par défaut",
     "restore_defaults_asked" : "Restaurer les valeurs par défaut ?",
 
-    "tab_param_general" : "Paramètres généraux",
+    "tab_param_interface" : "Interface",
+    "tab_param_export" : "Formats d'exportation",
     "tab_param_shortcuts" : "Configuration des raccourcis",
     "tab_param_paths" : "Personnalisation des chemins",
 

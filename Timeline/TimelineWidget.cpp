@@ -673,7 +673,7 @@ void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
     m_abManager->changeMarkerTime(abm, newTime);
 }
 
-void TimelineWidget::exportDone(const QString& text,const QString &outputPath)
+void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {
     QMessageBox *msg = new QMessageBox();
     QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));

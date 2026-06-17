@@ -240,7 +240,7 @@
     "dialog_preference_save_tilte" : "Salvataggio preferenze",
     "dialog_preference_save_text" : "Vuoi salvare le modifiche?",
 
-    "dialog_preference_tab_interface" : "Interfaccia",
+    "dialog_preference_tab_general" : "Impostazioni generali",
     "dialog_preference_tab_shortcut" : "Scorciatoie",
     "tooltip_shortcut" : "Scorciatoia: ",
     "dialog_preference_tab_paths" : "Percorsi",
@@ -286,13 +286,17 @@
     "paths_default_video" : "Cartella predefinita per il salvataggio delle acquisizioni video",
     "paths_screenshot_tooltip" : "Questo percorso verrà sovrascritto automaticamente dal salvataggio più recente",
 
-    "interface_lang_code" : "Lingua interfaccia: ",
+    "general_lang_code" : "Lingua interfaccia: ",
 
     "Advanced_timeline_options" : "Impostazioni della timeline",
-    "interface_timeline_shot_image" : "Visualizzazione miniature",
+    "general_timeline_shot_image" : "Visualizzazione miniature",
     "shot_start_image" : "Fotogramma iniziale",
     "shot_start_image_tooltip" : "+100 fotogrammi",
     "shot_tag_image" : "Fotogramma di riferimento",
+
+    "sequence_extraction_audio_format" : "Estrazione di sequenza audio",
+    "audio_format_mp3" : "MP3",
+    "audio_format_aac" : "M4A",
 
     "dialog_open_files" : "Apri file multimediali",
     "dialog_open_file" : "Apri file",
@@ -404,7 +408,8 @@
     "restore_defaults" : "Ripristina valori predefiniti",
     "restore_defaults_asked" : "Ripristinare i valori predefiniti?",
 
-    "tab_param_general" : "Impostazioni generali",
+    "tab_param_interface" : "Interfaccia",
+    "tab_param_export" : "Formati di esportazione",
     "tab_param_shortcuts" : "Configurazione scorciatoie",
     "tab_param_paths" : "Personalizzazione percorsi",
     

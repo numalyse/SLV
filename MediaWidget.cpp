@@ -412,9 +412,16 @@ void MediaWidget::moveTimeBackward()
 
 void MediaWidget::moveTimeForward()
 {
-    int64_t time = 5000;
-    int64_t currentTime = getCurrentTime();
-    setTime(currentTime + time);
+
+    int64_t timeForward = 5000;
+    int64_t newTime = getCurrentTime() + timeForward;
+
+    if(m_media && m_media->duration() < newTime) {
+        setTime(std::min(m_media->duration(), newTime));
+    }else {
+        setTime(newTime);
+    }
+
 }
 
 void MediaWidget::enableLoopMode()
@@ -581,6 +588,9 @@ void MediaWidget::nextFrame()
     // setTime(newTime);
     qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
     m_vlcTime += mspf;
+    if(m_media && m_media->duration() < m_vlcTime) {
+        m_vlcTime = m_media->duration();
+    }
     emit vlcTimeChanged(m_vlcTime);
 
 }
@@ -592,7 +602,8 @@ void MediaWidget::prevFrame()
     qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime << "," << int(1000.0/m_media->fps());
     const int mspf = int(1000.0/m_media->fps());
     const int newTime = m_vlcTime - mspf;
-    setTime(newTime);
+
+    setTime(std::max(newTime, 0));
 }
 
 void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value)

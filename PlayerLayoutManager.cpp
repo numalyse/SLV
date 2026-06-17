@@ -20,6 +20,9 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
 
     m_players.reserve(s_maxPlayerCount);
     connect(&SignalManager::instance(), &SignalManager::newArrangementRequested, this, &PlayerLayoutManager::arrangePlayerLayout);
+    connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
+    connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, this, &PlayerLayoutManager::handlePlaylistEject);
+
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
         PlayerWidget* player = new PlayerWidget(this);
         connect(player, &PlayerWidget::duplicatePlayerRequest, this, &PlayerLayoutManager::duplicatePlayer);
@@ -30,23 +33,15 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
         connect(player, &PlayerWidget::checkPlayersMuteStatusRequested, this, &PlayerLayoutManager::checkPlayersMuteStatus);
         connect(player, &PlayerWidget::enableZoomUiUpdateRequested, this, &PlayerLayoutManager::checkPlayersZoomStatus);
         connect(player, &PlayerWidget::disableZoomUiUpdateRequested, this, &PlayerLayoutManager::checkPlayersZoomStatus);
-        connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
         m_players.append(player);
     }
-    connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, m_players[0], &PlayerWidget::eject);
     
 }
 
 PlayerLayoutManager::~PlayerLayoutManager()
 {
-    for (size_t IPlayer = 0; IPlayer < m_players.size(); IPlayer++)
-    {
-        PlayerWidget* player = new PlayerWidget(this);
-        connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
-        m_players.append(player);
-    }
+    m_players.clear();
 }
-
 
 void PlayerLayoutManager::activePlayerUpdate(const int activePlayersNeeded){
     int activePlayerCount = m_activePlayers.size();
@@ -767,4 +762,11 @@ void PlayerLayoutManager::showAllActivePlayersToolbars(bool visible) {
             visible ? player->toolbar()->showAnimation() : player->toolbar()->hideAnimation();
         }
     }
+}
+
+void PlayerLayoutManager::handlePlaylistEject()
+{
+    if(m_activePlayers.size() <= 0) return;
+    PlayerWidget* player = m_activePlayers[0];
+    if(player) player->eject();
 }

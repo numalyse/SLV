@@ -62,6 +62,7 @@ private:
 
     PlayerLayoutArrangement m_currentArrangement = ArrangementUnknown;
 
+    void handlePlaylistEject();
 
 signals:
     void updateContainerRequest(PlayerWidget*, QWidget*, Toolbar*);

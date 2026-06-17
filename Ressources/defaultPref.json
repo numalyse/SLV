@@ -1,10 +1,10 @@
 {
-    "Interface" : {
+    "General" : {
         "Lang" : {
             "code" : "en"
         },
         "Advanced_timeline_options":{
-            "interface_timeline_shot_image" : "shot_start_image" 
+            "general_timeline_shot_image" : "shot_start_image" 
         },
         "Exports" : {
             "sequence_extraction_audio_format" : "audio_format_mp3"

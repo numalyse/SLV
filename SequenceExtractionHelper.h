@@ -48,7 +48,7 @@ public:
 
         QString finalSavePath = savePath; 
     
-        QString prefAudioTypeString = PrefManager::instance().getPref("Interface", "Exports", "sequence_extraction_audio_format");
+        QString prefAudioTypeString = PrefManager::instance().getPref("General", "Exports", "sequence_extraction_audio_format");
 
         AudioFormat userAudioPreference = stringToAudioFormat(prefAudioTypeString);
 

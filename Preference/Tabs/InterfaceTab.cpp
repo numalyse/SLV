@@ -8,7 +8,7 @@
 #include <QFormLayout>
 #include <QMessageBox>
 
-InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", parent) 
+InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("General", parent) 
 {
     auto& prefManager = PrefManager::instance();
 
@@ -21,7 +21,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
     titleWidget->setLayout(titleLayout);
 
     QLabel* tabTitle = new QLabel;
-    tabTitle->setText(PrefManager::instance().getText("tab_param_general"));
+    tabTitle->setText(PrefManager::instance().getText("tab_param_interface"));
 
     QFont tabTitleFont = tabTitle->font();
     tabTitleFont.setPointSize(12);
@@ -38,11 +38,11 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
     m_containerLayout->insertWidget(0, line);
     m_containerLayout->insertWidget(0, titleWidget);
 
-    QString preferredLang = prefManager.getPref("Interface", "Lang", "code");
+    QString preferredLang = prefManager.getPref("General", "Lang", "code");
     QStringList availableLangs = prefManager.getAvailableLangs();
 
     FormComboBoxFrame* langFrame = new FormComboBoxFrame(
-        prefManager.getText("interface_lang_code"), 
+        prefManager.getText("general_lang_code"), 
         "Lang",
         "code",    
         preferredLang, 
@@ -55,11 +55,11 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
     QLabel* timelineOptionsLabel = new QLabel(prefManager.getText("Advanced_timeline_options"));
     m_containerLayout->addWidget(timelineOptionsLabel);
 
-    QString shotImageType = prefManager.getPref("Interface", "Advanced_timeline_options", "interface_timeline_shot_image");
+    QString shotImageType = prefManager.getPref("General", "Advanced_timeline_options", "general_timeline_shot_image");
     FormComboBoxFrame* timelineTagFrame = new FormComboBoxFrame(
-        prefManager.getText("interface_timeline_shot_image"),
+        prefManager.getText("general_timeline_shot_image"),
         "Advanced_timeline_options",
-        "interface_timeline_shot_image",
+        "general_timeline_shot_image",
         shotImageType,
         QStringList({"shot_start_image", "shot_tag_image"}),
         m_container
@@ -69,11 +69,19 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("Interface", par
 
     addPreferenceFrame(timelineTagFrame);
 
-    QString userAudioPreference = PrefManager::instance().getPref("Interface", "Exports", "sequence_extraction_audio_format");
+    QLabel* subTabTitle = new QLabel;
+    subTabTitle->setText(PrefManager::instance().getText("tab_param_export"));
+
+    subTabTitle->setFont(tabTitleFont);
+
+    m_containerLayout->addWidget(line);
+    m_containerLayout->addWidget(subTabTitle);
+
+    QString userAudioPreference = PrefManager::instance().getPref("General", "Exports", "sequence_extraction_audio_format");
 
     //Exports sequence_extraction_audio_format
     FormComboBoxFrame* audioFormatType = new FormComboBoxFrame(
-        prefManager.getText("blabla"),
+        prefManager.getText("sequence_extraction_audio_format"),
         "Exports",
         "sequence_extraction_audio_format",
         userAudioPreference,

@@ -219,7 +219,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_audioShotItems.insert(index + 1, newAudioShotItem);
 
     if(p_media->type() == MediaType::Video){
-        if(PrefManager::instance().getPref("Interface", "Advanced_timeline_options", "display_timeline_by_tagFrames") == "True") {
+        if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
             m_thumbnailWorker->requestThumbnail(index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
             m_thumbnailWorker->requestThumbnail(index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); 
         }else {
@@ -349,7 +349,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
     qDeleteAll(m_audioShotItems);
     m_audioShotItems.clear();
 
-    bool displayByTagFrames = PrefManager::instance().getPref("Interface", "Advanced_timeline_options", "display_timeline_by_tagFrames") == "True";
+    bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
 
     for ( auto& IShot : shots ){
 
@@ -398,7 +398,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
     QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
 
-    bool displayByTagFrames = PrefManager::instance().getPref("Interface", "Advanced_timeline_options", "display_timeline_by_tagFrames") == "True";
+    bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
 
     for(int i=0; i < cuts.size(); ++i ){
 

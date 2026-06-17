@@ -25,7 +25,7 @@ PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog
     m_tabWidget = new QTabWidget(this);
 
     InterfaceTab* interfaceTab = new InterfaceTab(m_tabWidget);
-    m_tabWidget->addTab(interfaceTab, prefManager.getText("dialog_preference_tab_interface"));
+    m_tabWidget->addTab(interfaceTab, prefManager.getText("dialog_preference_tab_general"));
     m_tabs.append(interfaceTab);
     connect(interfaceTab, &BasePreferenceTab::tabChanges, this, &PreferenceDialog::toggleButtons);
 

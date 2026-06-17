@@ -29,6 +29,14 @@ public:
                 AAC,       
         };
 
+        inline static AudioFormat stringToAudioFormat(const QString& audioFormatString){
+                if (audioFormatString == "audio_format_aac") {
+                        return AudioFormat::AAC;
+                }else {
+                        return AudioFormat::MP3; 
+                }
+        }
+
     /// @brief Extract sequence from a media path
     /// @param filePath : media path
     /// @param startTime : start of the sequence from media in ms
@@ -39,16 +47,9 @@ public:
 
         QString finalSavePath = savePath; 
     
-        QString prefString = PrefManager::instance().getPref("Interface", "Exports", "sequence_extraction_audio_format");
+        QString prefAudioTypeString = PrefManager::instance().getPref("Interface", "Exports", "sequence_extraction_audio_format");
 
-        AudioFormat userAudioPreference = AudioFormat::MP3; 
-
-
-        if (prefString == "audio_format_aac") {
-                userAudioPreference = AudioFormat::AAC;
-        } else if(prefString == "audio_format_mp3"){
-                userAudioPreference = AudioFormat::MP3;
-        }
+        AudioFormat userAudioPreference = stringToAudioFormat(prefAudioTypeString);
 
         if (exportType == ExtractionType::AudioOnly) {
                 QFileInfo fileInfo(savePath);

@@ -44,7 +44,11 @@ FormComboBoxFrame::FormComboBoxFrame(const QString &name, const QString &subCate
 void FormComboBoxFrame::setUIValue(const QString& value){
     if(m_comboBox){
         m_comboBox->blockSignals(true);
-        m_comboBox->setCurrentText(value); 
+        int index = m_comboBox->findData(value);
+        if ( index != -1 ) {
+            m_prevValue = value;
+            m_comboBox->setCurrentIndex(index);
+        }
         m_comboBox->blockSignals(false);
     }
 }

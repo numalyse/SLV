@@ -85,7 +85,7 @@ private:
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
     unsigned int m_rotationIndex = 0;
     int m_currentAudioTrack = 1;
-    int m_currentSubtitlesTrack = 0;
+    int m_currentSubtitlesTrack = -1;
     bool m_adjustmentsEnabled = false;
     int m_volume = 100;
     bool m_muted = false;

@@ -692,7 +692,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
             if (width > 0 && height > 0)
             {
-                mediaWidget->m_mediaSize = QSize(width, height); // Update size
+                double sar = mediaWidget->m_media->sar();
+                double safeSar = (sar > 0) ? sar : 1.0;
+                mediaWidget->m_mediaSize = QSize(width * safeSar, height); // Update size
+                mediaWidget->update();
                 //emit mediaWidget->mediaSizeChanged(mediaWidget->m_mediaSize);
                 //qDebug() << "media size OK:" << width << height;
             }

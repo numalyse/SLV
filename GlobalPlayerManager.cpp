@@ -354,6 +354,7 @@ void GlobalPlayerManager::createTimelineWidget()
 
     m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), *projMedia, proj->shots, this, width());
     m_timeline->setFixedHeight(160);
+    m_timeline->hide();
 
     projManager.setTimeline(m_timeline);
 
@@ -380,7 +381,17 @@ void GlobalPlayerManager::createTimelineWidget()
     layout->addWidget(m_timeline);
     if(m_wasTimelineVisible) toolbar->getExtendedToolbar()->getSegmBtn()->click();
 
-    else m_timeline->hide();
+
+    if (m_playersWidget) { 
+        // le média vlc dans le player ne prend pas toute la place disponible
+        // mise à jour de la taille en déclenchant un resizeEvent avec height - 1
+        QSize currentSize = m_playersWidget->size();
+        m_playersWidget->resize(currentSize.width(), currentSize.height() - 1);
+        
+        QTimer::singleShot(0, this, [this, currentSize]() { // on remet la taille initiale plus tard
+            m_playersWidget->resize(currentSize);
+        });
+    }
 }
 
 void GlobalPlayerManager::showAllToolbars(bool visible) {

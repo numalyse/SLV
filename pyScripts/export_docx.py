@@ -59,7 +59,7 @@ def main():
         titre_paragraphe = doc.add_paragraph()
         titre_paragraphe.alignment = WD_ALIGN_PARAGRAPH.CENTER
         
-        titre_run = titre_paragraphe.add_run("Étude cinématographique")
+        titre_run = titre_paragraphe.add_run(data["mediaName"].split(".")[0])
         titre_run.font.bold = True
         titre_run.font.size = Pt(24)
         titre_run.font.color.rgb = RGBColor.from_string("EB4034")

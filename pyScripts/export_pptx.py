@@ -78,7 +78,7 @@ def main():
         title_p.font.bold = True
         title_p.font.size = Pt(32)
         title_p.font.color.rgb = RGBColor.from_string("EB4034") # Rouge
-        title_p.text = "Étude cinématographique"
+        title_p.text = data["mediaName"].split(".")[0]
 
         # Slides des plans
         plan_box_top = Inches(0.5)

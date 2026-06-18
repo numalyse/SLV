@@ -621,6 +621,7 @@ namespace ProjectExportHelper {
         rootData["dstPath"] = dstPath;
         rootData["tempDir"] = tempPath;
         rootData["shots"] = jsonShots;
+        rootData["mediaName"] = QFileInfo(mediaPath).baseName();
 
         QJsonDocument doc(rootData);
         QFile jsonFile(tempPath + "/export_data.json");

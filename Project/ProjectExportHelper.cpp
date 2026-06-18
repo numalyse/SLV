@@ -705,15 +705,32 @@ namespace ProjectExportHelper {
         if (!tempDir.isValid()) return false;
         QString tempDirPath = tempDir.path();
         QString tempVideo = QDir(tempDirPath).filePath("temp_video." + extension);
-        
-        cv::VideoCapture cap(mediaPath.toStdString(), cv::CAP_FFMPEG);
+
+        qDebug() << "Chemin du média : " << mediaPath.toStdString();  
+        cv::VideoCapture cap(mediaPath.toUtf8().constData(), cv::CAP_FFMPEG);
 
         int currentFrame = 0;
         int totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+        bool opened = cap.isOpened();
 
-        if (!cap.isOpened()) {
+        if (!opened) {
             qCritical() << "Impossible de lire la video pour exporter";
-            return false;
+        }
+        if (!opened) {
+            qWarning() << "Export Video: cap.open(CAP_FFMPEG) failed, essayer CAP_ANY...";
+            opened = cap.open(mediaPath.toUtf8().constData(), cv::CAP_ANY);
+        }
+        if (!opened) {
+            qWarning() << "Export Video: cap.open(CAP_ANY) failed, essayer CAP_AVFOUNDATION...";
+            opened = cap.open(mediaPath.toUtf8().constData(), cv::CAP_AVFOUNDATION);
+        }
+
+        if (!opened) {
+            qCritical() << "Export Video: Impossible d'ouvrir la video pour exporter" << mediaPath.toUtf8().constData()
+                        << "(exists:" << QFile::exists(mediaPath) << ")";
+                        return false;
+        } else {
+            qDebug() << "Export Video: media opened with path:" << mediaPath;
         }
 
         // On force en mp4 si l'utilisateur veut un export mp4 sinon c'est le même que la source
@@ -748,10 +765,30 @@ namespace ProjectExportHelper {
                 fps, 
                 displaySize 
             );
-            if(!writer.isOpened()){
-                qDebug() << "Impossible d'écrire";
-                return false;
-            }else qDebug() << "mp4v Ok";
+            bool writerOpened = writer.isOpened();
+            if(!writerOpened){
+                qDebug() << "Impossible d'écrire en mp4v, écriture en avc1";
+                fallbackFourcc = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
+                writer.open(
+                    tempVideo.toLocal8Bit().constData(), 
+                    fallbackFourcc, 
+                    fps, 
+                    displaySize 
+                );
+                writerOpened = writer.isOpened();
+            }
+            if(!writerOpened){
+                qDebug() << "Impossible d'écrire en avc1, écriture en mjpg";
+                fallbackFourcc = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+                writer.open(
+                    tempVideo.toLocal8Bit().constData(), 
+                    fallbackFourcc, 
+                    fps, 
+                    displaySize 
+                );
+                writerOpened = writer.isOpened();
+            }
+            if(writerOpened) qDebug() << "écriture Ok";
         }
 
         int currentShot = -1;

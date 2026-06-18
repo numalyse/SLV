@@ -250,7 +250,16 @@ void MediaWidget::setSubtitleTrack(int trackId)
 {
     if (!m_player) return;
     m_currentSubtitlesTrack = trackId;
+
     libvlc_video_set_spu(m_player, trackId);
+
+    if (trackId >= 1) { // pas mis à jour direcement si track id != -1 sans setTime 
+        libvlc_media_player_set_time(
+            m_player, 
+            libvlc_media_player_get_time(m_player)  
+        );
+    }
+
     qDebug() << "[MEDIAWIDGET] changement sur : " << trackId;
 }
 
@@ -703,6 +712,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
                 mediaWidget->parseTracks();
                 if(!mediaWidget->m_media->audioTracks().isEmpty()){
+                    libvlc_video_set_spu(mediaWidget->m_player, -1); // désactive les sous titres
                     emit mediaWidget->setAudioTrackRequested(mediaWidget->m_currentAudioTrack);
                     emit mediaWidget->setSubtitlesTrackRequested(mediaWidget->m_currentSubtitlesTrack);
                 }

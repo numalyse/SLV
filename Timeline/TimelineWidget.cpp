@@ -26,7 +26,6 @@
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QDesktopServices>
-#include <Qdir>
 
 #include <algorithm>
 #include "TimelineWidget.h"
@@ -679,18 +678,13 @@ void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
     QMessageBox *msg = new QMessageBox();
     QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
     bool ok = connect(openDirBtn, &QPushButton::clicked, this, [outputPath](){
-        #if defined(Q_OS_MAC)
-            QProcess::startDetached("open", QStringList() << outputPath);
-        #else
-            QFileInfo fi(outputPath);
-            QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
-        #endif
+        QFileInfo fi(outputPath);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
     });
     msg->addButton(openDirBtn, QMessageBox::AcceptRole);
     msg->setStandardButtons(QMessageBox::StandardButton::Ok);
     msg->setInformativeText(text);
     msg->setIcon(QMessageBox::Information);
     msg->adjustSize();
-    msg->raise();
     msg->exec();
 }

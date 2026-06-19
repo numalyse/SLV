@@ -571,11 +571,11 @@ void PlayerWidget::dropEvent(QDropEvent *event)
 
         bool fileNotSupported = filePaths.size() < event->mimeData()->urls().size();
         if(fileNotSupported){
-            QMessageBox *msg = new QMessageBox();
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
-            msg->setIcon(QMessageBox::Information);
-            msg->exec();
+            QMessageBox msg;
+            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg.setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+            msg.setIcon(QMessageBox::Information);
+            msg.exec();
         }
 
         if(filePaths.empty()){

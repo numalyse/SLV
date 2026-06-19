@@ -95,6 +95,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     });
     connect(m_mediaWidget, &MediaWidget::showAudioLogo, this, [this](){
         m_audioLogoWidget->setDisplay(true);
+        updateSingleLogoGeom(m_audioLogoWidget, true);
         m_dragDropLogoWidget->setDisplay(false);
     });
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
@@ -484,14 +485,18 @@ bool PlayerWidget::event(QEvent *event)
     case QEvent::Hide:
         m_dragDropLogoWidget->setDisplay(false);
         break;
-    case QEvent::Show:
-        if(getMediaPath() == "")  m_dragDropLogoWidget->setDisplay(true);
+    case QEvent::Show:{
+        if(getMediaPath() == "")  {
+            m_dragDropLogoWidget->setDisplay(true);
+            updateSingleLogoGeom(m_dragDropLogoWidget, true);
+        }
         else m_dragDropLogoWidget->setDisplay(false);
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
         restoreOverlayStackOrder();
         QTimer::singleShot(0, this, SLOT(widgetSizeChange())); 
         break;
+    }
     case QEvent::WindowActivate:
     case QEvent::Resize:
     case QEvent::Move:
@@ -642,4 +647,13 @@ void PlayerWidget::updateSingleOverlayGeom(QWidget* widget, bool isVisible){
         
         restoreOverlayStackOrder();
     }  
+}
+
+void PlayerWidget::updateSingleLogoGeom(QWidget* widget, bool isVisible){
+      if (isVisible) {
+        QRect localRect(m_mediaWidget->mapTo(this, QPoint(0, 0)), m_mediaWidget->size());
+        widget->setGeometry(localRect);
+        
+        restoreOverlayStackOrder();
+    }    
 }

@@ -223,11 +223,11 @@ void Playlist::dropEvent(QDropEvent *event)
     } else if (mimeData->hasUrls()) {
         QStringList filePaths = dataHasValidUrls(event->mimeData());
         if(filePaths.size() < event->mimeData()->urls().size()){
-            QMessageBox *msg = new QMessageBox();
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
-            msg->setIcon(QMessageBox::Information);
-            msg->exec();
+            QMessageBox msg;
+            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg.setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
+            msg.setIcon(QMessageBox::Information);
+            msg.exec();
         }
         if (!filePaths.isEmpty()) {
             addItemsFromPaths(filePaths);

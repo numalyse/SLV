@@ -521,27 +521,27 @@ void ProjectManager::exportProject(){
         disconnect(progressDialog, &QProgressDialog::canceled, nullptr, nullptr);
         if (success) {
             qDebug() << "Export réussi";
-            QMessageBox *msg = new QMessageBox();
-            QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
-            bool ok = connect(openDirBtn, &QPushButton::clicked, this, [selectedPath](){
+            QMessageBox msg;
+            QPushButton *openDirBtn = msg.addButton(
+                PrefManager::instance().getText("open_file_directory"),
+                QMessageBox::AcceptRole);
+            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg.setInformativeText(PrefManager::instance().getText("project_exportation_finished"));
+            msg.setIcon(QMessageBox::Information);
+            msg.exec();
+
+            if (msg.clickedButton() == openDirBtn) {
                 QFileInfo fi(selectedPath);
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
-            });
-            qDebug() << "Connected ? " << ok;
-            msg->addButton(openDirBtn, QMessageBox::AcceptRole);
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("project_exportation_finished"));
-            msg->setIcon(QMessageBox::Information);
-            msg->adjustSize();
-            msg->exec();
+            }
         }else {
             qDebug() << "Export annulé ou erreur";
-            QMessageBox *msg = new QMessageBox();
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("project_exportation_error"));
-            msg->setIcon(QMessageBox::Information);
-            msg->adjustSize();
-            msg->exec();
+            QMessageBox msg;
+            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg.setInformativeText(PrefManager::instance().getText("project_exportation_error"));
+            msg.setIcon(QMessageBox::Information);
+            msg.adjustSize();
+            msg.exec();
         }
         progressDialog->close(); 
         progressDialog->deleteLater(); 

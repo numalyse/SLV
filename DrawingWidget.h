@@ -75,6 +75,8 @@ protected:
 
     void updateHistoryButtons();
 
+    void resizeEvent(QResizeEvent *event) override;
+    
 private:
     QRect m_mediaRect;
     bool m_isEnabled = false;

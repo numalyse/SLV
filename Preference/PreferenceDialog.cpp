@@ -59,7 +59,7 @@ void PreferenceDialog::closeEvent(QCloseEvent *event)
     auto& prefManager = PrefManager::instance();
     if(needSave()) {
         SLV::showGenericDialog(
-            nullptr, 
+            this, 
             prefManager.getText("dialog_preference_save_tilte"),
             prefManager.getText("dialog_preference_save_text"),
 

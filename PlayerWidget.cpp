@@ -412,18 +412,19 @@ void PlayerWidget::rotate()
 
 void PlayerWidget::setBlackOpacityMode(bool isShown, double opacity){
     m_blackOpacityWidget->setBlackOpacityMode(isShown, opacity);
-    restoreOverlayStackOrder();
+    updateSingleOverlayGeom(m_blackOpacityWidget, isShown);
 }
 
 void PlayerWidget::showDrawingMode(bool isEnabled){
     m_drawingWidget->showDrawingMode(isEnabled);
-    restoreOverlayStackOrder();
+    updateSingleOverlayGeom(m_drawingWidget, isEnabled);
+
 }
 
 void PlayerWidget::setOverlayMode(bool showOverlay, OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
     overlayMode = (showOverlay) ? overlayMode : OverlayMode::None;
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
-    restoreOverlayStackOrder();
+    updateSingleOverlayGeom(m_compositionWidget, showOverlay);
 }
 
 void PlayerWidget::openSequenceExtractionDialog()
@@ -457,19 +458,23 @@ void PlayerWidget::widgetSizeChange()
     if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget ||!m_audioLogoWidget)
         return; 
 
-    QPoint globalPos = m_mediaWidget->mapToGlobal(QPoint(0, 0));
+    if(!isVisible()) return;
 
-    QPoint localPos = m_mediaWidget->mapTo(this, QPoint(0, 0));
+    QRect globalRect(m_mediaWidget->mapToGlobal(QPoint(0, 0)), m_mediaWidget->size());
+    QRect localRect(m_mediaWidget->mapTo(this, QPoint(0, 0)), m_mediaWidget->size());
 
-    int w = m_mediaWidget->width();
-    int h = m_mediaWidget->height();
+    auto updateGeometryIfVisible = [](QWidget* widget, const QRect& rect) {
+        if (widget->isVisible()) {
+            widget->setGeometry(rect);
+        }
+    };
+    
+    updateGeometryIfVisible(m_dragDropLogoWidget, localRect);
+    updateGeometryIfVisible(m_audioLogoWidget, localRect);
 
-    m_dragDropLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h);
-    m_audioLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h); 
-
-    m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
-    m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
-    m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+    updateGeometryIfVisible(m_compositionWidget, globalRect);
+    updateGeometryIfVisible(m_blackOpacityWidget, globalRect);
+    updateGeometryIfVisible(m_drawingWidget, globalRect);
 }
 
 bool PlayerWidget::event(QEvent *event)
@@ -628,4 +633,13 @@ void PlayerWidget::restoreOverlayStackOrder()
     m_compositionWidget->raise();
     m_blackOpacityWidget->raise();
     m_drawingWidget->raise();   
+}
+
+void PlayerWidget::updateSingleOverlayGeom(QWidget* widget, bool isVisible){
+    if (isVisible) {
+        QRect globalRect(m_mediaWidget->mapToGlobal(QPoint(0, 0)), m_mediaWidget->size());
+        widget->setGeometry(globalRect);
+        
+        restoreOverlayStackOrder();
+    }  
 }

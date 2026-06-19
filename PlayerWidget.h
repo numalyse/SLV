@@ -118,6 +118,8 @@ protected:
 private:
     void restoreOverlayStackOrder();
 
+    void updateSingleOverlayGeom(QWidget *widget, bool isVisible);
+
     double m_media_fps {};
     bool m_playing = false;
     bool m_muted = false;

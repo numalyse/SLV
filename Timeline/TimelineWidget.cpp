@@ -675,16 +675,18 @@ void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {
-    QMessageBox *msg = new QMessageBox();
-    QPushButton *openDirBtn = new QPushButton(PrefManager::instance().getText("open_file_directory"));
-    bool ok = connect(openDirBtn, &QPushButton::clicked, this, [outputPath](){
+    QMessageBox msg;
+    QPushButton *openDirBtn = msg.addButton(
+        PrefManager::instance().getText("open_file_directory"),
+        QMessageBox::AcceptRole
+    );
+    msg.setStandardButtons(QMessageBox::Ok);
+    msg.setInformativeText(text);
+    msg.setIcon(QMessageBox::Information);
+    msg.exec(); 
+
+    if (msg.clickedButton() == openDirBtn) {
         QFileInfo fi(outputPath);
         QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
-    });
-    msg->addButton(openDirBtn, QMessageBox::AcceptRole);
-    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-    msg->setInformativeText(text);
-    msg->setIcon(QMessageBox::Information);
-    msg->adjustSize();
-    msg->exec();
+    }
 }

@@ -119,6 +119,7 @@ private:
     void restoreOverlayStackOrder();
 
     void updateSingleOverlayGeom(QWidget *widget, bool isVisible);
+    void updateSingleLogoGeom(QWidget* widget, bool isVisible);
 
     double m_media_fps {};
     bool m_playing = false;

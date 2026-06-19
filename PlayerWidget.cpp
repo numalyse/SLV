@@ -105,12 +105,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_mediaWidget);
 
+    m_dragDropLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/drag_drop_grey", 100);
+    m_dragDropLogoWidget->setDisplay(true);
+
     m_audioLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/music_note_grey", 200);
     m_audioLogoWidget->setDisplay(false);
     //stack->addWidget(m_audioLogoWidget);
-
-    m_dragDropLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/drag_drop_grey", 100);
-    m_audioLogoWidget->setDisplay(false);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
     //stack->addWidget(m_compositionWidget);
@@ -156,6 +156,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::setAudioTrackRequested, m_mediaWidget, &MediaWidget::setAudioTrack);
     connect(m_toolBar, &SimpleToolbar::setSubtitlesTrackRequested, m_mediaWidget, &MediaWidget::setSubtitleTrack);
 
+    restoreOverlayStackOrder();
 }
 
 // PlayerWidget::~PlayerWidget()
@@ -411,15 +412,18 @@ void PlayerWidget::rotate()
 
 void PlayerWidget::setBlackOpacityMode(bool isShown, double opacity){
     m_blackOpacityWidget->setBlackOpacityMode(isShown, opacity);
+    restoreOverlayStackOrder();
 }
 
 void PlayerWidget::showDrawingMode(bool isEnabled){
     m_drawingWidget->showDrawingMode(isEnabled);
+    restoreOverlayStackOrder();
 }
 
 void PlayerWidget::setOverlayMode(bool showOverlay, OverlayMode overlayMode, bool vFlipChecked, bool hFlipChecked){
     overlayMode = (showOverlay) ? overlayMode : OverlayMode::None;
     m_compositionWidget->setOverlayMode(overlayMode, vFlipChecked, hFlipChecked);
+    restoreOverlayStackOrder();
 }
 
 void PlayerWidget::openSequenceExtractionDialog()
@@ -460,18 +464,12 @@ void PlayerWidget::widgetSizeChange()
     int w = m_mediaWidget->width();
     int h = m_mediaWidget->height();
 
-    m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
-    m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
-    m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
-
-    m_audioLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h); 
     m_dragDropLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h);
+    m_audioLogoWidget->setGeometry(localPos.x(), localPos.y(), w, h); 
 
-    m_dragDropLogoWidget->raise(); 
-    m_audioLogoWidget->raise(); 
-    m_compositionWidget->raise();
-    m_blackOpacityWidget->raise();
-    m_drawingWidget->raise();
+    m_compositionWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+    m_blackOpacityWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
+    m_drawingWidget->setGeometry(globalPos.x(), globalPos.y(), w, h);
 }
 
 bool PlayerWidget::event(QEvent *event)
@@ -486,6 +484,7 @@ bool PlayerWidget::event(QEvent *event)
         else m_dragDropLogoWidget->setDisplay(false);
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
+        restoreOverlayStackOrder();
         QTimer::singleShot(0, this, SLOT(widgetSizeChange())); 
         break;
     case QEvent::WindowActivate:
@@ -538,6 +537,7 @@ void PlayerWidget::resetLayerWidgets()
     m_compositionWidget->setOverlayMode(OverlayMode::None, false, false);
     m_drawingWidget->showDrawingMode(false);
     m_blackOpacityWidget->setBlackOpacityMode(false, 0);
+    restoreOverlayStackOrder();
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){
@@ -618,4 +618,14 @@ void PlayerWidget::dropEvent(QDropEvent *event)
     } else {
         event->ignore();
     }
+}
+
+
+void PlayerWidget::restoreOverlayStackOrder()
+{
+    m_dragDropLogoWidget->raise();
+    m_audioLogoWidget->raise();
+    m_compositionWidget->raise();
+    m_blackOpacityWidget->raise();
+    m_drawingWidget->raise();   
 }

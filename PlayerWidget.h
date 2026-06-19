@@ -116,6 +116,8 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
+    void restoreOverlayStackOrder();
+
     double m_media_fps {};
     bool m_playing = false;
     bool m_muted = false;

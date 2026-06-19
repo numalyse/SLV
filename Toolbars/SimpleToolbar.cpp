@@ -458,6 +458,25 @@ void SimpleToolbar::duplicatePlayerAction()
     emit duplicatePlayerRequested();
 }
 
+void SimpleToolbar::subtitleTrackAdd(int trackId, const QString &label)
+{
+    m_subLangComboBox->blockSignals(true); // bloque activated
+
+    int itemCount = m_subLangComboBox->count();
+    if(itemCount == 3){ // suppression de l'item "Pas de sous-titre"
+        m_subLangComboBox->removeItem(itemCount-1);
+        m_subLangComboBox->addItem("Disable", -1); // en dur Disable comme vlc pour l'instant
+    }
+
+    int insertPos = m_subLangComboBox->count(); 
+    m_subLangComboBox->insertItem(insertPos, label, trackId);
+    m_subLangComboBox->setCurrentIndex(insertPos);
+    m_previousSubLang = trackId;
+    setSubtitlesTrack(insertPos);
+
+    m_subLangComboBox->blockSignals(false);
+}
+
 void SimpleToolbar::updateFullscreenPosition()
 {
     Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
@@ -626,12 +645,13 @@ void SimpleToolbar::updateDurationText()
     }
 }
 
+
 void SimpleToolbar::LangComboBoxActivated(int subTrackItemId){
     QVariant data = m_subLangComboBox->itemData(subTrackItemId);
 
     if ( !data.isValid() ) return;
 
-    if(data.typeId() == QMetaType::QString){
+    if(data.typeId() == QMetaType::QString){ // clique sur add subtitles
         m_subLangComboBox->setCurrentIndex(m_previousSubLang);
         
         QString filePath = QFileDialog::getOpenFileName(
@@ -645,7 +665,7 @@ void SimpleToolbar::LangComboBoxActivated(int subTrackItemId){
             emit addSubtitlesRequest(filePath);
         }
 
-    }else if(data.typeId() == QMetaType::Int){
+    }else if(data.typeId() == QMetaType::Int){ // clique sur une piste
         m_previousSubLang = subTrackItemId;
         setSubtitlesTrack(subTrackItemId);
     }

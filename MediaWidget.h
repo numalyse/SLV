@@ -153,6 +153,7 @@ signals:
     void zoomValueUpdated(const QString&);
     void rotationTooltipUpdateRequested(const int);
     void flipTooltipUpdateRequested(const bool, const bool);
+    void subtitleTrackAdded(int trackId, const QString& label); 
 
 };
 

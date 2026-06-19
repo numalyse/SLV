@@ -638,15 +638,22 @@ void MediaWidget::openMediaInfoDialog()
 
 void MediaWidget::addSubtitles(const QString& filePath)
 {
-    qDebug() << "Ajout des sous-titres sélectionné :" << filePath;
+    m_pendingSubtitleLabel = QFileInfo(filePath).fileName();
+
+    QUrl url = QUrl::fromLocalFile(filePath);
+    QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
 
     int succes = libvlc_media_player_add_slave(
         m_player,
         libvlc_media_slave_type_subtitle,
-        filePath.toUtf8().constData(),
+        urlBytes.constData(),
         true 
     );
 
+    if (succes != 0) {
+        qDebug() << "[MediaWidget] Erreur lors de la requête d'ajout des sous titres";
+        return;
+    }
 
 }
 
@@ -732,6 +739,20 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 }
             }
             
+        }, Qt::QueuedConnection);
+    }
+    else if (event->type == libvlc_MediaPlayerESAdded)
+    {
+        if (event->u.media_player_es_changed.i_type != libvlc_track_text)
+            return;
+
+        int trackId = event->u.media_player_es_changed.i_id;
+
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget, trackId]() {
+            if (mediaWidget->m_pendingSubtitleLabel.isEmpty()) return; // pour skip les pistes natives du fichier
+
+            emit mediaWidget->subtitleTrackAdded(trackId, mediaWidget->m_pendingSubtitleLabel);
+            mediaWidget->m_pendingSubtitleLabel.clear();
         }, Qt::QueuedConnection);
     }
 }
@@ -873,6 +894,7 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
@@ -886,6 +908,7 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";
     }

@@ -81,6 +81,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
     connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
     connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
+
     connect(m_mediaWidget, &MediaWidget::pauseUiUpdateRequested, this, &PlayerWidget::pauseUiUpdateRequested);
     connect(m_mediaWidget, &MediaWidget::volumeChanged, m_toolBar, &SimpleToolbar::volumeUiUpdate);
     connect(m_mediaWidget, &MediaWidget::speedChanged, m_toolBar, &SimpleToolbar::speedUiUpdate);
@@ -99,6 +100,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         updateSingleLogoGeom(m_audioLogoWidget, true);
         m_dragDropLogoWidget->setDisplay(false);
     });
+
+    connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
+
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);

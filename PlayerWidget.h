@@ -111,6 +111,9 @@ signals:
     void mediaDropped(const QStringList&);
     void mediaRectChanged(const QRect &rect);
 
+    void subtitleTrackAdded(int trackId, const QString& label); 
+
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;

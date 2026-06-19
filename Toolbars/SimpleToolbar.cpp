@@ -1,7 +1,9 @@
+#include "SimpleToolbar.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "PrefManager.h"
 #include "TimeFormatter.h"
 #include "SignalManager.h"
+#include "FileFormatManager.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -12,9 +14,11 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
-#include "SimpleToolbar.h"
 #include <QGraphicsDropShadowEffect>
 #include <QPushButton>
+#include <QVariant>
+#include <QMetaType>
+#include <QFileDialog>
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
@@ -136,7 +140,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_subLangComboBox = new QComboBox(this);
     subLangLayout->addWidget(subLangLabel);
     subLangLayout->addWidget(m_subLangComboBox);
-    connect(m_subLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SimpleToolbar::setSubtitlesTrack);
+    connect(m_subLangComboBox, &QComboBox::activated, this, &SimpleToolbar::LangComboBoxActivated);
 
     m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", PrefManager::instance().getText("tooltip_lang"));
 
@@ -480,6 +484,9 @@ void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& trac
     m_subLangComboBox->clear();
     qDebug() << "DEBUG" << tracks;
 
+    m_subLangComboBox->addItem(PrefManager::instance().getText("add_subtitles"), "add_subtitles");
+    m_subLangComboBox->insertSeparator(m_subLangComboBox->count());
+
     if (tracks.isEmpty()) {
         //qDebug() << "[SIMPLETOOLBAR] No subtitles available";
         m_subLangComboBox->addItem(PrefManager::instance().getText("no_subtitles"), -1);
@@ -527,7 +534,7 @@ void SimpleToolbar::setSubtitlesTrack(int index){
         return;
 
     int trackNumber = data.toInt();
-    //if(trackNumber < 0) trackNumber = 0;
+
     qDebug() << "[SimpleToolbar][Subtitles] changement demandé sur : " << trackNumber;
     emit setSubtitlesTrackRequested(trackNumber);
     
@@ -616,5 +623,30 @@ void SimpleToolbar::updateDurationText()
         m_durationBtn->setText("-" + TimeFormatter::msToHHMMSSFF(remaining, m_media_fps));
     } else {
         m_durationBtn->setText(TimeFormatter::msToHHMMSSFF(m_media_duration, m_media_fps));
+    }
+}
+
+void SimpleToolbar::LangComboBoxActivated(int subTrackItemId){
+    QVariant data = m_subLangComboBox->itemData(subTrackItemId);
+
+    if ( !data.isValid() ) return;
+
+    if(data.typeId() == QMetaType::QString){
+        m_subLangComboBox->setCurrentIndex(m_previousSubLang);
+        
+        QString filePath = QFileDialog::getOpenFileName(
+            this,
+            PrefManager::instance().getText("subtitles_path_selection"),
+            "",
+            FileFormatManager::instance().getFormats("subtitles")
+        );
+
+        if (!filePath.isEmpty()) {
+            emit addSubtitlesRequest(filePath);
+        }
+
+    }else if(data.typeId() == QMetaType::Int){
+        m_previousSubLang = subTrackItemId;
+        setSubtitlesTrack(subTrackItemId);
     }
 }

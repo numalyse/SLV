@@ -70,6 +70,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::mediaInformationRequest, m_mediaWidget, &MediaWidget::openMediaInfoDialog);
     connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
     connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
+    connect(m_toolBar, &SimpleToolbar::addSubtitlesRequest, m_mediaWidget, &MediaWidget::addSubtitles);
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);

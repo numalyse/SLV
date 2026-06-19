@@ -636,6 +636,20 @@ void MediaWidget::openMediaInfoDialog()
     // infoDialog.exec();
 }
 
+void MediaWidget::addSubtitles(const QString& filePath)
+{
+    qDebug() << "Ajout des sous-titres sélectionné :" << filePath;
+
+    int succes = libvlc_media_player_add_slave(
+        m_player,
+        libvlc_media_slave_type_subtitle,
+        filePath.toUtf8().constData(),
+        true 
+    );
+
+
+}
+
 QPoint MediaWidget::getMediaPosRect() const
 {
     return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());

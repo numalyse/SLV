@@ -92,6 +92,8 @@ protected:
 
     void updateDurationText();
 
+    void LangComboBoxActivated(int subTrackItemId);
+
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
     double m_media_fps {};
@@ -118,6 +120,7 @@ protected:
 
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;
+    int m_previousSubLang{2};
     ToolbarPopupButton* m_langBtn = nullptr;
     ToolbarButton* m_mediaInfoBtn = nullptr;
 
@@ -142,6 +145,7 @@ signals:
     void setCursorPositionRequested(int64_t);
     void extractSequenceRequest();
     void mediaInformationRequest();
+    void addSubtitlesRequest(const QString& path);
     
 };
 

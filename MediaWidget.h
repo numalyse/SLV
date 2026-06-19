@@ -68,6 +68,7 @@ public slots:
     void adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value);
     void resetAdjustments();
     void openMediaInfoDialog();
+    void addSubtitles(const QString& filePath);
 
     QPoint getMediaPosRect() const;
     QRect getMediaDisplayRect() const;
@@ -86,6 +87,7 @@ private:
     unsigned int m_rotationIndex = 0;
     int m_currentAudioTrack = 1;
     int m_currentSubtitlesTrack = -1;
+    QString m_pendingSubtitleLabel;
     bool m_adjustmentsEnabled = false;
     int m_volume = 100;
     bool m_muted = false;

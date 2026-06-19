@@ -524,7 +524,12 @@ void PlayerWidget::mediaPlayerEjectedHandler()
 {
     m_playing = false;
     m_audioLogoWidget->setDisplay(false);
-    m_dragDropLogoWidget->setDisplay(isVisible() ? true : false);
+    if(isVisible()){
+        m_dragDropLogoWidget->setDisplay(true);
+        updateSingleLogoGeom(m_dragDropLogoWidget, true);
+    }else {
+        m_dragDropLogoWidget->setDisplay(false);
+    }
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();

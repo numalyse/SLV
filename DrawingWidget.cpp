@@ -127,6 +127,7 @@ void DrawingWidget::updatePen(){
 
 void DrawingWidget::initDrawingToolbar(){
     m_drawingToolbar = new QWidget(this);
+    m_drawingToolbar->setGeometry(rect());
     m_drawingToolbar->setContentsMargins(0,0,0,0);
     containerBackground = new QFrame(m_drawingToolbar);
     containerBackground->setContentsMargins(0,0,0,0);
@@ -474,6 +475,13 @@ void DrawingWidget::updateHistoryButtons()
     m_undoToolBtn->setEnabled(m_currentHistoryIndex >= 0);
     // Si l'index est strictement inférieur à la taille de la liste
     m_redoToolBtn->setEnabled(m_currentHistoryIndex < m_historyPathlist.size() - 1);
+}
+
+void DrawingWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    if (m_drawingToolbar) m_drawingToolbar->setGeometry(rect());
 }
 
 void DrawingWidget::undoDrawing()

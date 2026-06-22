@@ -37,9 +37,11 @@
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots
 /// @param parent
-TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
+TimelineWidget::TimelineWidget(Media* projectMedia, PlayerWidget* player, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
-    p_media = &projectMedia;
+    p_media = projectMedia;
+    p_playerWidget = player;
+    m_wasPlayingBeforeDrag = player->playing();
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -55,7 +57,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     m_scene = new QGraphicsScene(this);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
 
-    m_mathManager = new TimelineMath(fps, duration, this);
+    m_mathManager = new TimelineMath(p_media->fps(), p_media->duration(), this);
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
@@ -140,14 +142,22 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
+        if(dragState) {
+            m_wasPlayingBeforeDrag = p_playerWidget->playing();
+            p_playerWidget->pause();
+        }
+        else {
+            if (m_wasPlayingBeforeDrag) p_playerWidget->play();
+        }
+
         m_isDraggingCursor = dragState;
     });
     connect(m_view, &TimelineView::abMarkerDragged, this, &TimelineWidget::dragABMarker);
 
     layout->addWidget(m_view);
 
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, &projectMedia, projectShots, this);
-    computeMediaAmplitudes(projectMedia.filePath());
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMedia, projectShots, this);
+    computeMediaAmplitudes(projectMedia->filePath());
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
@@ -159,7 +169,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
     });
 
-    m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), duration, fps);
+    m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), projectMedia->duration(), projectMedia->fps());
     m_ruler->setPos(0, 0);
     m_scene->addItem(m_ruler);
 
@@ -170,8 +180,7 @@ TimelineWidget::TimelineWidget(double fps, int64_t duration, Media& projectMedia
     if(timelineWidth != 0){
 
         double minPixelsPerMs =
-        double(timelineWidth) /
-        duration;
+        double(timelineWidth) / projectMedia->duration();
 
         m_mathManager->setPixelsPerMs(minPixelsPerMs);
 
@@ -302,12 +311,21 @@ void TimelineWidget::updateTimelineGeometry()
 
 /// @brief déplace le curseur si l'ab loop est active, clamp au min et max, met à jour le temps et et envoie à la toolbar le nouveau temps
 /// @param cursorPosX
-void TimelineWidget::moveCursor(double newCursorPosX){
+void TimelineWidget::moveCursor(double newCursorPosX)
+{
     int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
-
     auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
-    bool timeClamped = clampedTime.has_value() && clampedTime != m_vlcTime;
-    m_vlcTime = clampedTime.value_or(newCursorTime);
+
+    int64_t targetTime = clampedTime.value_or(newCursorTime);
+
+    if (targetTime == m_vlcTime) {
+        qDebug() << "skip movecursor";
+        return; 
+    }
+
+    bool timeClamped = clampedTime.has_value() && (clampedTime.value() != newCursorTime);
+
+    m_vlcTime = targetTime;
 
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
 
@@ -319,7 +337,6 @@ void TimelineWidget::moveCursor(double newCursorPosX){
 
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
-
 
 void TimelineWidget::itemLeftClick(QGraphicsItem * item)
 {

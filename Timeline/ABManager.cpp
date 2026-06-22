@@ -4,6 +4,8 @@
 #include "SequenceExtractionHelper.h"
 #include "Project/ProjectManager.h"
 
+#include <algorithm> 
+
 ABManager::ABManager(QGraphicsScene *scene, TimelineMath *mathManager, QObject *parent)
 : BaseRangeManager(scene, mathManager, parent)
 {
@@ -78,4 +80,68 @@ void ABManager::extractLoop()
         ffmpegProcess->deleteLater();
     });
 
+}
+
+void ABManager::cycleMarkers(int64_t time, int markerHeight)
+{
+    if (m_markers.size() != 1) {
+        BaseRangeManager::cycleMarkers(time, markerHeight);
+    } else {
+        int64_t maxDuration = p_mathManager->duration(); 
+
+        int64_t markerDiff = time - m_markers[0]->time();
+        
+        int64_t newTime = time;
+        if (std::abs(markerDiff) < c_minInterval) {
+            newTime = (markerDiff < 0) ? m_markers[0]->time() - c_minInterval : m_markers[0]->time() + c_minInterval;
+        }
+
+        newTime = std::clamp(newTime, static_cast<int64_t>(0), maxDuration);
+
+        if (std::abs(newTime - m_markers[0]->time()) < c_minInterval) {
+            if (newTime == 0) {
+                newTime = m_markers[0]->time() + c_minInterval;
+            } else if (newTime == maxDuration) {
+                newTime = m_markers[0]->time() - c_minInterval;
+            }
+        }
+
+        ABMarkerItem* newMarker = new ABMarkerItem(markerHeight, newTime);
+
+        if (newMarker->time() >= m_markers[0]->time()) {
+            m_markers.append(newMarker); 
+        } else {
+            m_markers.insert(0, newMarker);
+        }
+        
+        newMarker->setX(p_mathManager->timeToPos(newTime));
+        p_scene->addItem(newMarker);
+        emit onPairCompleted();
+    }
+}
+
+void ABManager::changeMarkerTime(ABMarkerItem *marker, const int64_t time){
+    int grabbedMarkerId = m_markers.indexOf(marker);
+
+    if (m_markers.size() == 2) {
+        ABMarkerItem* otherMarker = m_markers[m_markers.size() - 1 - grabbedMarkerId];
+        int64_t maxDuration = p_mathManager->duration(); 
+        
+        int64_t newTime = time;
+
+        if (grabbedMarkerId == 0) {
+            int64_t upperBound = otherMarker->time() - c_minInterval;  
+            upperBound = std::max(static_cast<int64_t>(0), upperBound);
+            newTime = std::clamp(time, static_cast<int64_t>(0), upperBound);
+            
+        } else if (grabbedMarkerId == 1) {
+            int64_t lowerBound = otherMarker->time() + c_minInterval;
+            lowerBound = std::min(maxDuration, lowerBound);
+            newTime = std::clamp(time, lowerBound, maxDuration);
+        }
+
+        BaseRangeManager::changeMarkerTime(marker, newTime);
+    } else {
+        BaseRangeManager::changeMarkerTime(marker, time);
+    }
 }

@@ -352,7 +352,7 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia->fps(), projMedia->duration(), *projMedia, proj->shots, this, width());
+    m_timeline = new TimelineWidget(projMedia, m_player, proj->shots, this, width());
     m_timeline->setFixedHeight(160);
     m_timeline->hide();
 

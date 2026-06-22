@@ -56,7 +56,9 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                 }
 
             }
-            if(!m_draggedABMarker && m_draggedCursor){
+            if(m_draggedABMarker) return;
+
+            if(m_draggedCursor){
                 m_isDragging = true;
                 emit isDragging(true);
                 double clickPosition = static_cast<double>(mapToScene(event->pos()).x());

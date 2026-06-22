@@ -103,8 +103,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     //connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
     connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, this, [this](int trackId, const QString &label){
-        emit m_toolBar->subtitleTrackAdd(trackId, label);
-        QMessageBox::information(this, "", PrefManager::instance().getText("added_subtitles"));
+        auto success = m_toolBar->subtitleTrackAdd(trackId, label);
+        if (success) QMessageBox::information(nullptr, "", PrefManager::instance().getText("added_subtitles"));
+        else QMessageBox::warning(nullptr, "", PrefManager::instance().getText("conflict_subtitles"));
     });
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);

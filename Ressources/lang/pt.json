@@ -148,6 +148,7 @@
     "add_subtitles" : "Adicionar legendas",
     "added_subtitles" : "Legendas adicionadas",
     "fail_subtitles" : "Não foi possível adicionar as legendas",
+    "conflict_subtitles" : "Esta faixa de legendas já existe",
 
     "extract_start_label" : "Início",
     "extract_end_label" : "Fim",

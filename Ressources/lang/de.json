@@ -147,6 +147,7 @@
     "add_subtitles" : "Untertitel hinzufügen",
     "added_subtitles" : "Untertitel hinzugefügt",
     "fail_subtitles" : "Untertitel konnten nicht hinzugefügt werden",
+    "conflict_subtitles" : "Diese Untertitelspur existiert bereits",
 
     "extract_start_label" : "Start",
     "extract_end_label" : "Ende",

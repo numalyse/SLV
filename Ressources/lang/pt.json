@@ -145,6 +145,9 @@
     "subtitles" : "Legendas",
     "no_audio" : "Sem faixa de áudio",
     "no_subtitles" : "Sem faixa de legendas",
+    "add_subtitles" : "Adicionar legendas",
+    "added_subtitles" : "Legendas adicionadas",
+    "fail_subtitles" : "Não foi possível adicionar as legendas",
 
     "extract_start_label" : "Início",
     "extract_end_label" : "Fim",

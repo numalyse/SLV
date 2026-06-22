@@ -148,6 +148,7 @@
     "add_subtitles" : "Add subtitles",
     "added_subtitles" : "Subtitles added",
     "fail_subtitles" : "Unable to add subtitles",
+    "conflict_subtitles" : "This subtitle track already exists",
 
     "extract_start_label" : "Start",
     "extract_end_label" : "End",

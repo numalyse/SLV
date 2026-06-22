@@ -82,7 +82,7 @@ public slots:
 
     virtual void updateFullscreenPosition() override;
 
-    void subtitleTrackAdd(int trackId, const QString& label);
+    bool subtitleTrackAdd(int trackId, const QString& label);
 
 private:
     static constexpr int s_bottomMarginFullscreen = 60;

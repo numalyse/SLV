@@ -458,8 +458,13 @@ void SimpleToolbar::duplicatePlayerAction()
     emit duplicatePlayerRequested();
 }
 
-void SimpleToolbar::subtitleTrackAdd(int trackId, const QString &label)
+bool SimpleToolbar::subtitleTrackAdd(int trackId, const QString &label)
 {
+
+    if (m_subLangComboBox->findText(label) != -1) {
+        return false;
+    }
+
     m_subLangComboBox->blockSignals(true); // bloque activated
 
     int itemCount = m_subLangComboBox->count();
@@ -475,6 +480,8 @@ void SimpleToolbar::subtitleTrackAdd(int trackId, const QString &label)
     setSubtitlesTrack(insertPos);
 
     m_subLangComboBox->blockSignals(false);
+
+    return true;
 }
 
 void SimpleToolbar::updateFullscreenPosition()

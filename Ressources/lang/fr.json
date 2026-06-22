@@ -147,6 +147,7 @@
     "add_subtitles" : "Ajouter des sous-titres",
     "added_subtitles" : "Sous-titres ajoutés",
     "fail_subtitles" : "Impossible d'ajouter les sous-titres",
+    "conflict_subtitles" : "Cette piste de sous-titres existe déjà",
 
     "extract_start_label" : "Début",
     "extract_end_label" : "Fin",

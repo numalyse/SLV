@@ -148,6 +148,7 @@
     "add_subtitles" : "Añadir subtítulos",
     "added_subtitles" : "Subtítulos añadidos",
     "fail_subtitles" : "No se pudieron añadir los subtítulos",
+    "conflict_subtitles" : "Esta pista de subtítulos ya existe",
 
     "extract_start_label" : "Inicio",
     "extract_end_label" : "Fin",

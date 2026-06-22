@@ -1,7 +1,9 @@
+#include "SimpleToolbar.h"
 #include "Toolbars/SimpleToolbar.h"
 #include "PrefManager.h"
 #include "TimeFormatter.h"
 #include "SignalManager.h"
+#include "FileFormatManager.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
@@ -12,9 +14,11 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
-#include "SimpleToolbar.h"
 #include <QGraphicsDropShadowEffect>
 #include <QPushButton>
+#include <QVariant>
+#include <QMetaType>
+#include <QFileDialog>
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
@@ -136,7 +140,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     m_subLangComboBox = new QComboBox(this);
     subLangLayout->addWidget(subLangLabel);
     subLangLayout->addWidget(m_subLangComboBox);
-    connect(m_subLangComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SimpleToolbar::setSubtitlesTrack);
+    connect(m_subLangComboBox, &QComboBox::activated, this, &SimpleToolbar::LangComboBoxActivated);
 
     m_langBtn = new ToolbarPopupButton(this, langLayout, "lang_white", PrefManager::instance().getText("tooltip_lang"));
 
@@ -454,6 +458,25 @@ void SimpleToolbar::duplicatePlayerAction()
     emit duplicatePlayerRequested();
 }
 
+void SimpleToolbar::subtitleTrackAdd(int trackId, const QString &label)
+{
+    m_subLangComboBox->blockSignals(true); // bloque activated
+
+    int itemCount = m_subLangComboBox->count();
+    if(itemCount == 3){ // suppression de l'item "Pas de sous-titre"
+        m_subLangComboBox->removeItem(itemCount-1);
+        m_subLangComboBox->addItem("Disable", -1); // en dur Disable comme vlc pour l'instant
+    }
+
+    int insertPos = m_subLangComboBox->count(); 
+    m_subLangComboBox->insertItem(insertPos, label, trackId);
+    m_subLangComboBox->setCurrentIndex(insertPos);
+    m_previousSubLang = trackId;
+    setSubtitlesTrack(insertPos);
+
+    m_subLangComboBox->blockSignals(false);
+}
+
 void SimpleToolbar::updateFullscreenPosition()
 {
     Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
@@ -480,6 +503,9 @@ void SimpleToolbar::updateSubtitlesTracks(const QList<QPair<int, QString>>& trac
     m_subLangComboBox->clear();
     qDebug() << "DEBUG" << tracks;
 
+    m_subLangComboBox->addItem(PrefManager::instance().getText("add_subtitles"), "add_subtitles");
+    m_subLangComboBox->insertSeparator(m_subLangComboBox->count());
+
     if (tracks.isEmpty()) {
         //qDebug() << "[SIMPLETOOLBAR] No subtitles available";
         m_subLangComboBox->addItem(PrefManager::instance().getText("no_subtitles"), -1);
@@ -500,9 +526,9 @@ void SimpleToolbar::setAudioTrackDefault(const int trackId){
 
 void SimpleToolbar::setSubtitlesTrackDefault(const int trackId){
     // m_subLangComboBox->blockSignals(true);
-    int trackIndex = m_subLangComboBox->findData(trackId);
+    int trackItemIndex = m_subLangComboBox->findData(trackId);
     //if(trackIndex < 0) trackIndex = 0;
-    m_subLangComboBox->setCurrentIndex(trackIndex);
+    m_subLangComboBox->setCurrentIndex(trackItemIndex);
     // m_subLangComboBox->blockSignals(false);
 }
 
@@ -527,7 +553,7 @@ void SimpleToolbar::setSubtitlesTrack(int index){
         return;
 
     int trackNumber = data.toInt();
-    //if(trackNumber < 0) trackNumber = 0;
+
     qDebug() << "[SimpleToolbar][Subtitles] changement demandé sur : " << trackNumber;
     emit setSubtitlesTrackRequested(trackNumber);
     
@@ -616,5 +642,20 @@ void SimpleToolbar::updateDurationText()
         m_durationBtn->setText("-" + TimeFormatter::msToHHMMSSFF(remaining, m_media_fps));
     } else {
         m_durationBtn->setText(TimeFormatter::msToHHMMSSFF(m_media_duration, m_media_fps));
+    }
+}
+
+
+void SimpleToolbar::LangComboBoxActivated(int subTrackItemId){
+    QVariant data = m_subLangComboBox->itemData(subTrackItemId);
+
+    if ( !data.isValid() ) return;
+
+    if(data.typeId() == QMetaType::QString){ // clique sur l'item avec "add_subtitles"
+        m_subLangComboBox->setCurrentIndex(m_previousSubLang);
+        emit subtitlesFileDialogRequested();
+    }else if(data.typeId() == QMetaType::Int){ // clique sur une piste
+        m_previousSubLang = subTrackItemId;
+        setSubtitlesTrack(subTrackItemId);
     }
 }

@@ -352,11 +352,7 @@ void MainWindow::selectAndLoadMediaFiles()
             formatNotAccepted = true;
     }
     if(formatNotAccepted){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_format_not_accepted"));
-        msg->setIcon(QMessageBox::Information);
-        msg->exec();
+        QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_format_not_accepted"));
     }
     
     m_globalPlayerManager->setPlayersFromPaths(files_paths);

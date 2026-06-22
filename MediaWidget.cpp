@@ -6,6 +6,7 @@
 #include "MediaTransformHelper.h"
 #include "PrefManager.h"
 #include "MediaInfoDialog.h"
+#include "GenericDialog.h"
 
 #include <QFile>
 #include <QUrl>
@@ -206,6 +207,7 @@ bool MediaWidget::eject()
 
     m_hflipped = false;
     m_vflipped = false;
+    m_currentSubtitlesTrack = -1;
     m_rotationIndex = 0;
 
     QThreadPool::globalInstance()->start([this]() {
@@ -364,19 +366,19 @@ void MediaWidget::takeScreenshot()
                             libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma) != 1;
 
     if(isMediaAdjusted){
-        QMessageBox *msg = new QMessageBox(this);
+        QMessageBox msg(this);
         QPushButton *cancelBtn = new QPushButton(PrefManager::instance().getText("cancel_action"));
-        msg->addButton(cancelBtn, QMessageBox::RejectRole);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_screenshot_with_adjustment"));
-        msg->setIcon(QMessageBox::Information);
+        msg.addButton(cancelBtn, QMessageBox::RejectRole);
+        msg.setInformativeText(PrefManager::instance().getText("messagebox_screenshot_with_adjustment"));
+        msg.setIcon(QMessageBox::Information);
         QPushButton *screenshotWithoutAdjustments = new QPushButton(PrefManager::instance().getText("screenshot_without_adjustment_button"));
-        msg->addButton(screenshotWithoutAdjustments, QMessageBox::AcceptRole);
-        msg->adjustSize();
+        msg.addButton(screenshotWithoutAdjustments, QMessageBox::AcceptRole);
+        msg.adjustSize();
 
-        connect(msg, &QMessageBox::accepted, this, [this, &cancelScreenShot](){ libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0); cancelScreenShot = false;});
-        connect(msg, &QMessageBox::rejected, this, [this, &cancelScreenShot](){ cancelScreenShot = true; });
+        connect(&msg, &QMessageBox::accepted, this, [this, &cancelScreenShot](){ libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0); cancelScreenShot = false;});
+        connect(&msg, &QMessageBox::rejected, this, [this, &cancelScreenShot](){ cancelScreenShot = true; });
 
-        msg->exec();
+        msg.exec();
         if(cancelScreenShot) return;
     }
     
@@ -487,11 +489,7 @@ void MediaWidget::endRecord()
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
 
-    QMessageBox *msg = new QMessageBox(this);
-    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
-    msg->setIcon(QMessageBox::Information);
-    msg->exec();
+    QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_record_completed"));
 
     m_startRecordTime = -1;
 }
@@ -636,6 +634,30 @@ void MediaWidget::openMediaInfoDialog()
     // infoDialog.exec();
 }
 
+void MediaWidget::addSubtitles(const QString& filePath)
+{
+    m_pendingSubtitleLabel = QFileInfo(filePath).fileName();
+
+    QUrl url = QUrl::fromLocalFile(filePath);
+    QByteArray urlBytes = url.toString(QUrl::FullyEncoded).toUtf8();
+
+    int succes = libvlc_media_player_add_slave(
+        m_player,
+        libvlc_media_slave_type_subtitle,
+        urlBytes.constData(),
+        true 
+    );
+
+    if (succes != 0) { // erreur de requete 
+        m_pendingSubtitleLabel.clear();
+        PrefManager& prefManager = PrefManager::instance();
+        QMessageBox::warning(this, prefManager.getText("messagebox_error"), prefManager.getText("fail_subtitles"));
+        return;
+    }
+
+    // si vlc n'arrive pas a ajouter le fichier, pas d'erreur 
+}
+
 QPoint MediaWidget::getMediaPosRect() const
 {
     return m_mediaSurface->mapToGlobal(m_mediaSurface->pos());
@@ -692,6 +714,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
     else if (event->type == libvlc_MediaPlayerPlaying)
     {
+        // Contournement de l'auto-détection de VLC, au démarrage, VLC force l'affichage des sous-titres externes.
+        // On s'assure de les désactiver (spu = -1) si l'utilisateur n'en veut pas (m_currentSubtitlesTrack == -1).
+        if(mediaWidget->m_currentSubtitlesTrack == -1) libvlc_video_set_spu(mediaWidget->m_player, -1);
+
         QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
 
             unsigned width = 0;
@@ -712,12 +738,25 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
                 mediaWidget->parseTracks();
                 if(!mediaWidget->m_media->audioTracks().isEmpty()){
-                    libvlc_video_set_spu(mediaWidget->m_player, -1); // désactive les sous titres
                     emit mediaWidget->setAudioTrackRequested(mediaWidget->m_currentAudioTrack);
                     emit mediaWidget->setSubtitlesTrackRequested(mediaWidget->m_currentSubtitlesTrack);
                 }
             }
             
+        }, Qt::QueuedConnection);
+    }
+    else if (event->type == libvlc_MediaPlayerESAdded)
+    {
+        if (event->u.media_player_es_changed.i_type != libvlc_track_text)
+            return;
+
+        int trackId = event->u.media_player_es_changed.i_id;
+
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget, trackId]() {
+            if (mediaWidget->m_pendingSubtitleLabel.isEmpty()) return; // pour skip les pistes natives du fichier
+
+            emit mediaWidget->subtitleTrackAdded(trackId, mediaWidget->m_pendingSubtitleLabel);
+            mediaWidget->m_pendingSubtitleLabel.clear();
         }, Qt::QueuedConnection);
     }
 }
@@ -859,6 +898,7 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
@@ -872,6 +912,7 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";
     }

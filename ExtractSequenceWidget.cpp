@@ -43,11 +43,7 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
     createButtons();
     initUiLayout();
     connect(this, &QDialog::finished, this, [this, parent](int res){ if(res == QDialog::Accepted){
-            QMessageBox *msg = new QMessageBox(parent);
-            msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg->setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
-            msg->setIcon(QMessageBox::Information);
-            msg->exec();
+            QMessageBox::information(parent, "", PrefManager::instance().getText("messagebox_extract_sequence_completed"));
         }
     });
 }

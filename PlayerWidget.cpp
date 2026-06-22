@@ -70,6 +70,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::mediaInformationRequest, m_mediaWidget, &MediaWidget::openMediaInfoDialog);
     connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
     connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
+    connect(m_toolBar, &SimpleToolbar::subtitlesFileDialogRequested, this, &PlayerWidget::openSubtitlesFileDialog);
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -80,6 +81,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::enableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::enableLoopUiUpdate);
     connect(this, &PlayerWidget::disableLoopUiUpdateRequested, m_toolBar, &SimpleToolbar::disableLoopUiUpdate);
     connect(this, &PlayerWidget::nameUiUpdateRequest, m_toolBar, &SimpleToolbar::nameUiUpdate);
+
     connect(m_mediaWidget, &MediaWidget::pauseUiUpdateRequested, this, &PlayerWidget::pauseUiUpdateRequested);
     connect(m_mediaWidget, &MediaWidget::volumeChanged, m_toolBar, &SimpleToolbar::volumeUiUpdate);
     connect(m_mediaWidget, &MediaWidget::speedChanged, m_toolBar, &SimpleToolbar::speedUiUpdate);
@@ -98,6 +100,13 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         updateSingleLogoGeom(m_audioLogoWidget, true);
         m_dragDropLogoWidget->setDisplay(false);
     });
+
+    //connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
+    connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, this, [this](int trackId, const QString &label){
+        emit m_toolBar->subtitleTrackAdd(trackId, label);
+        QMessageBox::information(this, "", PrefManager::instance().getText("added_subtitles"));
+    });
+
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);
@@ -431,12 +440,7 @@ void PlayerWidget::setOverlayMode(bool showOverlay, OverlayMode overlayMode, boo
 void PlayerWidget::openSequenceExtractionDialog()
 {
     if(m_mediaWidget->media()->type() != MediaType::Video){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_not_a_video"));
-        msg->setIcon(QMessageBox::Warning);
-        msg->adjustSize();
-        msg->exec();
+        QMessageBox::warning(this, "", PrefManager::instance().getText("messagebox_not_a_video"));
         return;
     }
     pause();
@@ -529,7 +533,7 @@ void PlayerWidget::mediaPlayerEjectedHandler()
         updateSingleLogoGeom(m_dragDropLogoWidget, true);
     }else {
         m_dragDropLogoWidget->setDisplay(false);
-    }
+    }    
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();
@@ -553,6 +557,20 @@ void PlayerWidget::resetLayerWidgets()
     m_drawingWidget->showDrawingMode(false);
     m_blackOpacityWidget->setBlackOpacityMode(false, 0);
     restoreOverlayStackOrder();
+}
+
+void PlayerWidget::openSubtitlesFileDialog()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        PrefManager::instance().getText("subtitles_path_selection"),
+        getMediaPath(),
+        FileFormatManager::instance().getFormats("subtitles")
+    );
+
+    if(filePath.isEmpty()) return;
+
+    m_mediaWidget->addSubtitles(filePath);
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){

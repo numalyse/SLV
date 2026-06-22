@@ -144,6 +144,9 @@
     "subtitles" : "Untertitel",
     "no_audio" : "Keine Audiospur",
     "no_subtitles" : "Keine Untertitelspur",
+    "add_subtitles" : "Untertitel hinzufügen",
+    "added_subtitles" : "Untertitel hinzugefügt",
+    "fail_subtitles" : "Untertitel konnten nicht hinzugefügt werden",
 
     "extract_start_label" : "Start",
     "extract_end_label" : "Ende",

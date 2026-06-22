@@ -69,6 +69,7 @@ public slots:
     void widgetSizeChange();
     bool event(QEvent *event) override;
     void openSequenceExtractionDialog();
+    void openSubtitlesFileDialog();
 
     void enableButtons();
     void disableButtons();
@@ -110,6 +111,9 @@ signals:
 
     void mediaDropped(const QStringList&);
     void mediaRectChanged(const QRect &rect);
+
+    void subtitleTrackAdded(int trackId, const QString& label); 
+
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;

@@ -82,6 +82,8 @@ public slots:
 
     virtual void updateFullscreenPosition() override;
 
+    void subtitleTrackAdd(int trackId, const QString& label);
+
 private:
     static constexpr int s_bottomMarginFullscreen = 60;
 
@@ -91,6 +93,8 @@ protected:
     void createTimeEdit();
 
     void updateDurationText();
+
+    void LangComboBoxActivated(int subTrackItemId);
 
     QSlider* m_slider = nullptr;
     bool m_draggingSlider = false;
@@ -118,6 +122,7 @@ protected:
 
     QComboBox* m_audioLangComboBox = nullptr;
     QComboBox* m_subLangComboBox = nullptr;
+    int m_previousSubLang{2};
     ToolbarPopupButton* m_langBtn = nullptr;
     ToolbarButton* m_mediaInfoBtn = nullptr;
 
@@ -142,6 +147,7 @@ signals:
     void setCursorPositionRequested(int64_t);
     void extractSequenceRequest();
     void mediaInformationRequest();
+    void subtitlesFileDialogRequested();
     
 };
 

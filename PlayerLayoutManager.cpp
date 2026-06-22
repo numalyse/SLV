@@ -4,6 +4,7 @@
 #include "Toolbars/GlobalToolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
 #include "Project/ProjectManager.h"
+#include "GenericDialog.h"
 
 #include <QObject>
 #include <QWidget>
@@ -419,6 +420,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::mediaInformationRequest, activePlayer->mediaWidget(), &MediaWidget::openMediaInfoDialog);
     connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
+    connect(advancedToolbar, &AdvancedToolbar::subtitlesFileDialogRequested, activePlayer, &PlayerWidget::openSubtitlesFileDialog);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
@@ -434,6 +436,8 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     connect(activePlayer->mediaWidget(), &MediaWidget::setAudioTrackRequested, advancedToolbar, &SimpleToolbar::setAudioTrackDefault);
     connect(activePlayer->mediaWidget(), &MediaWidget::setSubtitlesTrackRequested, advancedToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
+
+    connect(activePlayer->mediaWidget(), &MediaWidget::subtitleTrackAdded, advancedToolbar, &SimpleToolbar::subtitleTrackAdd);
 
     // Connecte choix audio/sous-titres au mediawidget
     connect(advancedToolbar, &SimpleToolbar::setAudioTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setAudioTrack);
@@ -739,18 +743,10 @@ void PlayerLayoutManager::takeGlobalScreenshot()
 
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_completed"));
-        msg->setIcon(QMessageBox::Information);
-        msg->exec();
+        QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_global_screenshot_completed"));
     });
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedError, this, [this](){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_error"));
-        msg->setIcon(QMessageBox::Information);
-        msg->exec();
+        QMessageBox::critical(this, "", PrefManager::instance().getText("messagebox_global_screenshot_error"));
     });
 
     globalScreenshot->start();

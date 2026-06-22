@@ -650,11 +650,14 @@ void MediaWidget::addSubtitles(const QString& filePath)
         true 
     );
 
-    if (succes != 0) {
-        qDebug() << "[MediaWidget] Erreur lors de la requête d'ajout des sous titres";
+    if (succes != 0) { // erreur de requete 
+        m_pendingSubtitleLabel.clear();
+        PrefManager& prefManager = PrefManager::instance();
+        QMessageBox::warning(this, prefManager.getText("messagebox_error"), prefManager.getText("fail_subtitles"));
         return;
     }
 
+    // si vlc n'arrive pas a ajouter le fichier, pas d'erreur 
 }
 
 QPoint MediaWidget::getMediaPosRect() const

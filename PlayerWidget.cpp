@@ -101,7 +101,11 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         m_dragDropLogoWidget->setDisplay(false);
     });
 
-    connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
+    //connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
+    connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, this, [this](int trackId, const QString &label){
+        emit m_toolBar->subtitleTrackAdd(trackId, label);
+        SLV::showMessageBox(QMessageBox::Information, this, "added_subtitles");
+    });
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 

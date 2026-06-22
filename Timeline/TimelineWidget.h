@@ -17,6 +17,8 @@
 #include "Timeline/Items/ShotItem.h"
 #include "Timeline/Items/AudioVisualizerItem.h"
 
+#include "PlayerWidget.h"
+
 #include "ToolbarButtons/ToolbarButton.h"
 
 #include <QWidget>
@@ -34,7 +36,7 @@ Q_OBJECT
 
 public:
 
-explicit TimelineWidget(double fps, int64_t duration, Media &projectMediaPath, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+explicit TimelineWidget(Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
@@ -111,6 +113,7 @@ private:
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
     bool m_isDraggingCursor = false;
+    bool m_wasPlayingBeforeDrag = false;
 
     int64_t m_vlcTime{};
 
@@ -124,6 +127,8 @@ private:
     QProcess *m_audioComputeProcess = nullptr;
     QByteArray m_audioBuffer;
     QVector<double> m_amplitudeList;
+
+    PlayerWidget* p_playerWidget = nullptr;
 
 };
 

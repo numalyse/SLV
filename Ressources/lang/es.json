@@ -544,6 +544,17 @@
     "help_menu_export_label" : "Exportar",
     "help_menu_export_description" : "Abre un diálogo para elegir el formato de exportación del proyecto.",
     "help_menu_shot_infos_content_1" : "La información del plano actual está disponible con el botón del panel lateral arriba a la derecha o con el botón correspondiente en la timeline. Muestra numeración, título, inicio, fin y duración en timecode, notas y la imagen representativa del plano. Los campos de título y notas son editables.",
-    "help_menu_exportation_content_1" : "El proyecto en curso puede guardarse desde el menú 'Archivo' → 'Guardar'. Los proyectos se pueden exportar en formato texto (.txt y .docx), PDF, PowerPoint, en vídeo anotado (títulos y notas por plano) y en imágenes de referencia (todas las imágenes se guardan en la carpeta indicada)."
+    "help_menu_exportation_content_1" : "El proyecto en curso puede guardarse desde el menú 'Archivo' → 'Guardar'. Los proyectos se pueden exportar en formato texto (.txt y .docx), PDF, PowerPoint, en vídeo anotado (títulos y notas por plano) y en imágenes de referencia (todas las imágenes se guardan en la carpeta indicada).",
+
+    "project_manager_error_folder_not_found": "No se puede encontrar la carpeta del proyecto.",
+    "project_manager_error_json_file_not_found": "No se encuentra el archivo de guardado del proyecto.",
+    "project_manager_error_cannot_open_json_file": "No se puede abrir el proyecto. El archivo podría estar bloqueado o dañado.",
+    "project_manager_error_json_parsing_error": "El archivo del proyecto está dañado y no se puede leer.",
+    "project_manager_error_media_file_not_found": "No se encuentra el medio asociado a este proyecto.",
+    "project_manager_error_media_key_missing": "El archivo de guardado del proyecto está dañado: falta la información del medio.",
+    "project_manager_error_media_mismatch_fps": "El medio actual es diferente al del proyecto (los fotogramas por segundo son diferentes).",
+    "project_manager_error_media_mismatch_duration": "El medio actual es diferente al del proyecto (la duración ha cambiado).",
+    "project_manager_error_unexpected_error": "Ha ocurrido un error desconocido.",
+    "project_error_copy_failed": "Error al copiar el archivo. Por favor, inténtelo de nuevo o compruebe el espacio en su disco."
 
 }

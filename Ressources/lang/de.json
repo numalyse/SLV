@@ -543,6 +543,17 @@
     "help_menu_export_label" : "Exportieren",
     "help_menu_export_description" : "Öffnet einen Dialog zur Auswahl des Exportformats für das Projekt.",
     "help_menu_shot_infos_content_1" : "Die Informationen zum aktuellen Schnitt sind über den Seitenpanel-Button oben rechts oder über den entsprechenden Button in der Timeline verfügbar. Sie zeigen Nummer, Titel, Start, Ende und Dauer als Timecode, Notizen und das Tag-Bild des Schnitts. Titel- und Notizfelder sind editierbar.",
-    "help_menu_exportation_content_1" : "Das aktuelle Projekt kann über das Menü 'Datei' → 'Speichern' gesichert werden. Projekte sind exportierbar als Text (.txt, .docx), PDF, PowerPoint, als annotiertes Video (Titel und Notizen pro Schnitt) und als Referenzbilder (alle Tag-Bilder werden im angegebenen Ordner gespeichert)."
+    "help_menu_exportation_content_1" : "Das aktuelle Projekt kann über das Menü 'Datei' → 'Speichern' gesichert werden. Projekte sind exportierbar als Text (.txt, .docx), PDF, PowerPoint, als annotiertes Video (Titel und Notizen pro Schnitt) und als Referenzbilder (alle Tag-Bilder werden im angegebenen Ordner gespeichert).",
+
+    "project_manager_error_folder_not_found": "Der Projektordner kann nicht gefunden werden.",
+    "project_manager_error_json_file_not_found": "Die Projekt-Speicherdatei konnte nicht gefunden werden.",
+    "project_manager_error_cannot_open_json_file": "Das Projekt kann nicht geöffnet werden. Die Datei ist möglicherweise gesperrt oder beschädigt.",
+    "project_manager_error_json_parsing_error": "Die Projektdatei ist beschädigt und kann nicht gelesen werden.",
+    "project_manager_error_media_file_not_found": "Das mit diesem Projekt verknüpfte Medium konnte nicht gefunden werden.",
+    "project_manager_error_media_key_missing": "Die Projekt-Speicherdatei ist beschädigt: Die Medieninformationen fehlen.",
+    "project_manager_error_media_mismatch_fps": "Das aktuelle Medium unterscheidet sich vom Projekt (die Bildrate ist unterschiedlich).",
+    "project_manager_error_media_mismatch_duration": "Das aktuelle Medium unterscheidet sich vom Projekt (die Dauer hat sich geändert).",
+    "project_manager_error_unexpected_error": "Ein unbekannter Fehler ist aufgetreten.",
+    "project_error_copy_failed": "Fehler beim Kopieren der Datei. Bitte versuchen Sie es erneut oder überprüfen Sie Ihren Speicherplatz."
 
 }

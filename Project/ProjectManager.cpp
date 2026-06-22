@@ -318,7 +318,7 @@ bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPat
         } else {
             if ( ! canceled ) {
                 auto& prefManager = PrefManager::instance(); 
-                QMessageBox::critical(nullptr, prefManager.getText("dialog_error_text"), prefManager.getText("project_error_copy_failed"));
+                QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), prefManager.getText("project_error_copy_failed"));
             }
             m_project->path = "";
             m_project->name = "";
@@ -375,7 +375,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
-        QMessageBox::critical(nullptr, prefManager.getText("dialog_error_text"), errorMsg);
+        QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), errorMsg);
         return;
     }
 
@@ -405,7 +405,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
             checkMediaFullyLoaded();
         } else {
             QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchDuration);
-            QMessageBox::critical(nullptr, PrefManager::instance().getText("dialog_error_text"), errorMsg);
+            QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errorMsg);
         }
 
     });
@@ -417,7 +417,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
             checkMediaFullyLoaded();
         }else {
             QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchFPS);
-            QMessageBox::critical(nullptr, PrefManager::instance().getText("dialog_error_text"), errorMsg);
+            QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errorMsg);
         }
 
     });

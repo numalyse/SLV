@@ -541,6 +541,17 @@
     "help_menu_export_label" : "Exportar",
     "help_menu_export_description" : "Abre uma janela de diálogo para escolher o formato de exportação do projeto.",
     "help_menu_shot_infos_content_1" : "As informações do plano na posição atual são exibidas com o botão do painel lateral no canto superior direito ou através do botão correspondente na linha do tempo. Nesta visualização aparecem a numeração do plano, o título, o início, o fim e a duração em timecode, as notas e a imagem de referência do plano. Os campos de título e notas podem ser editados.",
-    "help_menu_exportation_content_1" : "O projeto atual pode ser salvo através do menu 'Arquivo' → 'Salvar'. Os projetos podem ser exportados em formato de texto (.txt e .docx), PDF, PowerPoint, no formato de vídeo anotado (títulos e notas por plano) e em imagens de referência (todas as imagens de referência são guardadas na pasta indicada)."
+    "help_menu_exportation_content_1" : "O projeto atual pode ser salvo através do menu 'Arquivo' → 'Salvar'. Os projetos podem ser exportados em formato de texto (.txt e .docx), PDF, PowerPoint, no formato de vídeo anotado (títulos e notas por plano) e em imagens de referência (todas as imagens de referência são guardadas na pasta indicada).",
+
+    "project_manager_error_folder_not_found": "Não é possível encontrar a pasta do projeto.",
+    "project_manager_error_json_file_not_found": "O arquivo de salvamento do projeto não foi encontrado.",
+    "project_manager_error_cannot_open_json_file": "Não é possível abrir o projeto. O arquivo pode estar bloqueado ou danificado.",
+    "project_manager_error_json_parsing_error": "O arquivo do projeto está corrompido e não pode ser lido.",
+    "project_manager_error_media_file_not_found": "A mídia associada a este projeto não foi encontrada.",
+    "project_manager_error_media_key_missing": "O arquivo de salvamento do projeto está danificado: faltam as informações da mídia.",
+    "project_manager_error_media_mismatch_fps": "A mídia atual é diferente da do projeto (a taxa de quadros é diferente).",
+    "project_manager_error_media_mismatch_duration": "A mídia atual é diferente da do projeto (a duração mudou).",
+    "project_manager_error_unexpected_error": "Ocorreu um erro desconhecido.",
+    "project_error_copy_failed": "Falha ao copiar o arquivo. Tente novamente ou verifique o espaço no seu disco."
 
 }

@@ -59,7 +59,7 @@ public:
         emit onMarkersCleared();
     }
 
-    void cycleMarkers(int64_t time, int markerHeight)
+    virtual void cycleMarkers(int64_t time, int markerHeight)
     {
         switch (m_markers.size())
         {
@@ -72,7 +72,7 @@ public:
 
                 if (newMarker->time() >= m_markers[0]->time()) {
                     m_markers.append(newMarker); 
-                } else if (newMarker->time() < m_markers[0]->time()) {
+                } else {
                     m_markers.insert(0, newMarker);
                 }
 
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    void changeMarkerTime(MARKERTYPE *marker, const int64_t time)
+    virtual void changeMarkerTime(MARKERTYPE *marker, const int64_t time)
     {
         marker->setTime(time);
         int markerIndex = m_markers.indexOf(marker); 

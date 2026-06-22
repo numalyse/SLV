@@ -14,7 +14,12 @@ class ABManager : public BaseRangeManager<ABMarkerItem>
 Q_OBJECT
 
 public:
+    static constexpr uint64_t c_minInterval = 1000;
+
     explicit ABManager(QGraphicsScene* scene, TimelineMath* mathManager, QObject* parent = nullptr);
+
+    void cycleMarkers(int64_t time, int markerHeight) override;
+    void changeMarkerTime(ABMarkerItem *marker, const int64_t time) override;
 
     std::optional<int64_t> getLoopRestartTime(int64_t currentTime);
     std::optional<int64_t> clampToLoopRange(int64_t time);

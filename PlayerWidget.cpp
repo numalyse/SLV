@@ -70,7 +70,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::mediaInformationRequest, m_mediaWidget, &MediaWidget::openMediaInfoDialog);
     connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
     connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
-    connect(m_toolBar, &SimpleToolbar::addSubtitlesRequest, m_mediaWidget, &MediaWidget::addSubtitles);
+    connect(m_toolBar, &SimpleToolbar::subtitlesFileDialogRequested, this, &PlayerWidget::openSubtitlesFileDialog);
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -558,6 +558,20 @@ void PlayerWidget::resetLayerWidgets()
     m_drawingWidget->showDrawingMode(false);
     m_blackOpacityWidget->setBlackOpacityMode(false, 0);
     restoreOverlayStackOrder();
+}
+
+void PlayerWidget::openSubtitlesFileDialog()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        PrefManager::instance().getText("subtitles_path_selection"),
+        getMediaPath(),
+        FileFormatManager::instance().getFormats("subtitles")
+    );
+
+    if(filePath.isEmpty()) return;
+
+    m_mediaWidget->addSubtitles(filePath);
 }
 
 void PlayerWidget::dragEnterEvent(QDragEnterEvent *event){

@@ -69,6 +69,7 @@ public slots:
     void widgetSizeChange();
     bool event(QEvent *event) override;
     void openSequenceExtractionDialog();
+    void openSubtitlesFileDialog();
 
     void enableButtons();
     void disableButtons();

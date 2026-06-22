@@ -651,20 +651,9 @@ void SimpleToolbar::LangComboBoxActivated(int subTrackItemId){
 
     if ( !data.isValid() ) return;
 
-    if(data.typeId() == QMetaType::QString){ // clique sur add subtitles
+    if(data.typeId() == QMetaType::QString){ // clique sur l'item avec "add_subtitles"
         m_subLangComboBox->setCurrentIndex(m_previousSubLang);
-        
-        QString filePath = QFileDialog::getOpenFileName(
-            this,
-            PrefManager::instance().getText("subtitles_path_selection"),
-            "",
-            FileFormatManager::instance().getFormats("subtitles")
-        );
-
-        if (!filePath.isEmpty()) {
-            emit addSubtitlesRequest(filePath);
-        }
-
+        emit subtitlesFileDialogRequested();
     }else if(data.typeId() == QMetaType::Int){ // clique sur une piste
         m_previousSubLang = subTrackItemId;
         setSubtitlesTrack(subTrackItemId);

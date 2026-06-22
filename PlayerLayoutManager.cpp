@@ -420,7 +420,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::mediaInformationRequest, activePlayer->mediaWidget(), &MediaWidget::openMediaInfoDialog);
     connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
-    connect(advancedToolbar, &AdvancedToolbar::addSubtitlesRequest, activePlayer->mediaWidget(), &MediaWidget::addSubtitles);
+    connect(advancedToolbar, &AdvancedToolbar::subtitlesFileDialogRequested, activePlayer, &PlayerWidget::openSubtitlesFileDialog);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);

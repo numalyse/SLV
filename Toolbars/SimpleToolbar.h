@@ -147,7 +147,7 @@ signals:
     void setCursorPositionRequested(int64_t);
     void extractSequenceRequest();
     void mediaInformationRequest();
-    void addSubtitlesRequest(const QString& path);
+    void subtitlesFileDialogRequested();
     
 };
 

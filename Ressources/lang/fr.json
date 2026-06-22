@@ -545,5 +545,20 @@
     "help_menu_export_label" : "Exporter",
     "help_menu_export_description" : "Ouvre une fenêtre de dialogue pour choisir le format d'exportation du projet.",
     "help_menu_shot_infos_content_1" : "Les informations du plan à la position actuelle sont affichables avec le bouton de panneau latéral situé en haut à droite de l'écran ou via le bouton correspondant dans la timeline. Dans cet affichage les informations de numérotation de plan, le titre, le début, la fin et la durée du plan sous forme de timecode, les notes et l'image repère du plan apparaissent. Les champs de titre et de notes sont modifiables.",
-    "help_menu_exportation_content_1" : "Le projet en cours peut être sauvegardé via le menu \"Fichier\" puis \"Enregistrer\". Les projets sont exportables en format texte (.txt et .docx), PDF, Powerpoint, au format de vidéo annotée (les titres et notes des plans sont affichés à chaque plan) et en images repères (l'ensemble des images repères des plans sont sauvegardés dans le dossier indiqué."
+    "help_menu_exportation_content_1" : "Le projet en cours peut être sauvegardé via le menu \"Fichier\" puis \"Enregistrer\". Les projets sont exportables en format texte (.txt et .docx), PDF, Powerpoint, au format de vidéo annotée (les titres et notes des plans sont affichés à chaque plan) et en images repères (l'ensemble des images repères des plans sont sauvegardés dans le dossier indiqué.",
+    
+
+    "project_manager_error_folder_not_found": "Impossible de trouver le dossier du projet.",
+    "project_manager_error_json_file_not_found": "Le fichier de sauvegarde du projet est introuvable.",
+    "project_manager_error_cannot_open_json_file": "Impossible d'ouvrir le projet. Le fichier est peut-être bloqué ou endommagé.",
+    "project_manager_error_json_parsing_error": "Le fichier du projet est corrompu et ne peut pas être lu.",
+    "project_manager_error_media_file_not_found": "Le média associé à ce projet est introuvable.",
+    "project_manager_error_media_key_missing": "Le fichier de sauvegarde du projet est endommagé : les informations sur le média sont manquantes.",
+    "project_manager_error_media_mismatch_fps": "Le média actuel est différent de celui du projet (le nombre d'images par seconde est différent).",
+    "project_manager_error_media_mismatch_duration": "Le média actuel est différent de celui du projet (la durée a changé).",
+    "project_manager_error_unexpected_error": "Une erreur inconnue s'est produite.",
+    "project_error_copy_failed": "La copie du fichier a échoué. Veuillez réessayer ou vérifier l'espace sur votre disque."
+
+
+
 }

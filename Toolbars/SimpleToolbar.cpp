@@ -526,9 +526,9 @@ void SimpleToolbar::setAudioTrackDefault(const int trackId){
 
 void SimpleToolbar::setSubtitlesTrackDefault(const int trackId){
     // m_subLangComboBox->blockSignals(true);
-    int trackIndex = m_subLangComboBox->findData(trackId);
+    int trackItemIndex = m_subLangComboBox->findData(trackId);
     //if(trackIndex < 0) trackIndex = 0;
-    m_subLangComboBox->setCurrentIndex(trackIndex);
+    m_subLangComboBox->setCurrentIndex(trackItemIndex);
     // m_subLangComboBox->blockSignals(false);
 }
 

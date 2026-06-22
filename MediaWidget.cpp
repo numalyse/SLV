@@ -207,6 +207,7 @@ bool MediaWidget::eject()
 
     m_hflipped = false;
     m_vflipped = false;
+    m_currentSubtitlesTrack = -1;
     m_rotationIndex = 0;
 
     QThreadPool::globalInstance()->start([this]() {
@@ -713,6 +714,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
     else if (event->type == libvlc_MediaPlayerPlaying)
     {
+        // Contournement de l'auto-détection de VLC, au démarrage, VLC force l'affichage des sous-titres externes.
+        // On s'assure de les désactiver (spu = -1) si l'utilisateur n'en veut pas (m_currentSubtitlesTrack == -1).
+        if(mediaWidget->m_currentSubtitlesTrack == -1) libvlc_video_set_spu(mediaWidget->m_player, -1);
+
         QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
 
             unsigned width = 0;
@@ -733,7 +738,6 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
                 mediaWidget->parseTracks();
                 if(!mediaWidget->m_media->audioTracks().isEmpty()){
-                    libvlc_video_set_spu(mediaWidget->m_player, -1); // désactive les sous titres
                     emit mediaWidget->setAudioTrackRequested(mediaWidget->m_currentAudioTrack);
                     emit mediaWidget->setSubtitlesTrackRequested(mediaWidget->m_currentSubtitlesTrack);
                 }

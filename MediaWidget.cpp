@@ -6,6 +6,7 @@
 #include "MediaTransformHelper.h"
 #include "PrefManager.h"
 #include "MediaInfoDialog.h"
+#include "GenericDialog.h"
 
 #include <QFile>
 #include <QUrl>
@@ -364,19 +365,19 @@ void MediaWidget::takeScreenshot()
                             libvlc_video_get_adjust_float(m_player, libvlc_adjust_Gamma) != 1;
 
     if(isMediaAdjusted){
-        QMessageBox *msg = new QMessageBox(this);
+        QMessageBox msg(this);
         QPushButton *cancelBtn = new QPushButton(PrefManager::instance().getText("cancel_action"));
-        msg->addButton(cancelBtn, QMessageBox::RejectRole);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_screenshot_with_adjustment"));
-        msg->setIcon(QMessageBox::Information);
+        msg.addButton(cancelBtn, QMessageBox::RejectRole);
+        msg.setInformativeText(PrefManager::instance().getText("messagebox_screenshot_with_adjustment"));
+        msg.setIcon(QMessageBox::Information);
         QPushButton *screenshotWithoutAdjustments = new QPushButton(PrefManager::instance().getText("screenshot_without_adjustment_button"));
-        msg->addButton(screenshotWithoutAdjustments, QMessageBox::AcceptRole);
-        msg->adjustSize();
+        msg.addButton(screenshotWithoutAdjustments, QMessageBox::AcceptRole);
+        msg.adjustSize();
 
-        connect(msg, &QMessageBox::accepted, this, [this, &cancelScreenShot](){ libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0); cancelScreenShot = false;});
-        connect(msg, &QMessageBox::rejected, this, [this, &cancelScreenShot](){ cancelScreenShot = true; });
+        connect(&msg, &QMessageBox::accepted, this, [this, &cancelScreenShot](){ libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 0); cancelScreenShot = false;});
+        connect(&msg, &QMessageBox::rejected, this, [this, &cancelScreenShot](){ cancelScreenShot = true; });
 
-        msg->exec();
+        msg.exec();
         if(cancelScreenShot) return;
     }
     
@@ -487,11 +488,7 @@ void MediaWidget::endRecord()
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
 
-    QMessageBox *msg = new QMessageBox(this);
-    msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-    msg->setInformativeText(PrefManager::instance().getText("messagebox_record_completed"));
-    msg->setIcon(QMessageBox::Information);
-    msg->exec();
+    QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_record_completed"));
 
     m_startRecordTime = -1;
 }

@@ -4,6 +4,7 @@
 #include "Toolbars/GlobalToolbar.h"
 #include "Toolbars/AdvancedToolbar.h"
 #include "Project/ProjectManager.h"
+#include "GenericDialog.h"
 
 #include <QObject>
 #include <QWidget>
@@ -742,18 +743,10 @@ void PlayerLayoutManager::takeGlobalScreenshot()
 
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_completed"));
-        msg->setIcon(QMessageBox::Information);
-        msg->exec();
+        QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_global_screenshot_completed"));
     });
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedError, this, [this](){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_global_screenshot_error"));
-        msg->setIcon(QMessageBox::Information);
-        msg->exec();
+        QMessageBox::critical(this, "", PrefManager::instance().getText("messagebox_global_screenshot_error"));
     });
 
     globalScreenshot->start();

@@ -104,7 +104,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     //connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
     connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, this, [this](int trackId, const QString &label){
         emit m_toolBar->subtitleTrackAdd(trackId, label);
-        SLV::showMessageBox(QMessageBox::Information, this, "added_subtitles");
+        QMessageBox::information(this, "", PrefManager::instance().getText("added_subtitles"));
     });
 
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
@@ -440,12 +440,7 @@ void PlayerWidget::setOverlayMode(bool showOverlay, OverlayMode overlayMode, boo
 void PlayerWidget::openSequenceExtractionDialog()
 {
     if(m_mediaWidget->media()->type() != MediaType::Video){
-        QMessageBox *msg = new QMessageBox(this);
-        msg->setStandardButtons(QMessageBox::StandardButton::Ok);
-        msg->setInformativeText(PrefManager::instance().getText("messagebox_not_a_video"));
-        msg->setIcon(QMessageBox::Warning);
-        msg->adjustSize();
-        msg->exec();
+        QMessageBox::warning(this, "", PrefManager::instance().getText("messagebox_not_a_video"));
         return;
     }
     pause();

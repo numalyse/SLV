@@ -533,8 +533,7 @@ void PlayerWidget::mediaPlayerEjectedHandler()
         updateSingleLogoGeom(m_dragDropLogoWidget, true);
     }else {
         m_dragDropLogoWidget->setDisplay(false);
-    }
-    
+    }    
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();

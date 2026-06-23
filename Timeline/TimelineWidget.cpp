@@ -165,7 +165,7 @@ TimelineWidget::TimelineWidget(Media* projectMedia, PlayerWidget* player, QVecto
 
         m_isDraggingCursor = dragState;
     });
-    connect(m_view, &TimelineView::abMarkerDragged, this, &TimelineWidget::dragABMarker);
+    connect(m_view, &TimelineView::markerDragged, this, &TimelineWidget::dragMarker);
 
     layout->addWidget(m_view);
 
@@ -703,11 +703,19 @@ void TimelineWidget::initAudioVisualizer()
     m_scene->addItem(m_audioVisualizer);
 }
 
-void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
+void TimelineWidget::dragMarker(QGraphicsItem* marker, const int pos)
 {
     int64_t newTime = m_mathManager->posToTimeSnapped(pos);
-    ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
-    m_abManager->changeMarkerTime(abm, newTime);
+    ABMarkerItem* abm = qgraphicsitem_cast<ABMarkerItem*>(marker);
+    if(marker->type() == SLV::TypeABMarkerItem && abm){
+        m_abManager->changeMarkerTime(abm, newTime);
+        return;
+    }
+    TransitionMarkerItem* tm = qgraphicsitem_cast<TransitionMarkerItem*>(marker);
+    if(marker->type() == SLV::TypeTransitionMarkerItem && tm) {
+        m_transitionManager->changeMarkerTime(tm, newTime);
+    }
+
 }
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)

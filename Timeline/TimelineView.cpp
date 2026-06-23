@@ -40,9 +40,9 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             QGraphicsItem* shotItem = nullptr;
             QGraphicsItem* audioShotItem = nullptr;
             for (auto* item : itemsAtCursor){
-                if( item->type() == SLV::TypeABMarkerItem ){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
+                if( item->type() == SLV::TypeABMarkerItem || item->type() == SLV::TypeTransitionMarkerItem ){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
                     setCursor(Qt::ClosedHandCursor);
-                    m_draggedABMarker = item;
+                    m_draggedMarker = item;
                 }
                 if( item->type() == SLV::TypeCursorItem || item->type() == SLV::TypeRulerItem ){
                     m_draggedCursor = item;
@@ -56,7 +56,7 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                 }
 
             }
-            if(m_draggedABMarker) return;
+            if(m_draggedMarker) return;
 
             if(m_draggedCursor){
                 m_isDragging = true;
@@ -96,8 +96,8 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - deltaX);
         m_lastPanPos = event->pos();
     }
-    if(m_draggedABMarker){
-        emit abMarkerDragged(m_draggedABMarker, mapToScene(event->pos()).x());
+    if(m_draggedMarker){
+        emit markerDragged(m_draggedMarker, mapToScene(event->pos()).x());
     }
     else{
         unsetCursor();
@@ -113,6 +113,6 @@ void TimelineView::mouseReleaseEvent(QMouseEvent *event)
         m_isPanning = false;
         setCursor(Qt::ArrowCursor); 
     }
-    m_draggedABMarker = nullptr;
+    m_draggedMarker = nullptr;
     m_draggedCursor = nullptr;
 }

@@ -77,7 +77,7 @@ private slots:
     void updateShowMergeWithPreviousShot(bool);
     void updateTimelineGeometry();
     void autoSegmentation();
-    void dragABMarker(QGraphicsItem*, const int);
+    void dragMarker(QGraphicsItem*, const int);
     void exportDone(const QString& text, const QString& outputPath);
     void fitSceneToViewport();
 

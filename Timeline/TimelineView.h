@@ -20,7 +20,7 @@ signals:
     void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void isDragging(bool);
-    void abMarkerDragged(QGraphicsItem*, const int);
+    void markerDragged(QGraphicsItem*, const int);
     
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -34,7 +34,7 @@ private:
 
     bool m_isPanning = false;
     QPoint m_lastPanPos;
-    QGraphicsItem* m_draggedABMarker = nullptr;
+    QGraphicsItem* m_draggedMarker = nullptr;
     QGraphicsItem* m_draggedCursor = nullptr;
 
 };

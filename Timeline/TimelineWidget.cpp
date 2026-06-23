@@ -70,12 +70,25 @@ TimelineWidget::TimelineWidget(Media* projectMedia, PlayerWidget* player, QVecto
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_ab_loop_failed"));
     });
 
+    m_transitionManager = new TransitionManager(m_scene, m_mathManager, this);
+    connect(m_abManager, &TransitionManager::onPairCompleted, this, [](){
+        qDebug() << "[Timeline][TransitionManager] 2 markers";
+    });
+    connect(m_abManager, &TransitionManager::onMarkersCleared, this, [](){
+        qDebug() << "[Timeline][TransitionManager] markers supprimés";
+    });
+
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);
 
     m_abLoopBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_ab_loop"));
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
+
+    m_transitionBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_transition_btn"));
+    connect(m_transitionBtn, &ToolbarButton::pressed, this, &TimelineWidget::TransitionAction);
+
     ButtonLayout->addWidget(m_abLoopBtn);
+    ButtonLayout->addWidget(m_transitionBtn);
 
     QFrame *btnSeparator = new QFrame();
     btnSeparator->setFrameShape(QFrame::VLine);
@@ -299,6 +312,7 @@ void TimelineWidget::updateTimelineGeometry()
         );
 
     m_abManager->updateMarkersPosition();
+    m_transitionManager->updateMarkersPosition();
 
     if (m_audioVisualizer)
         m_audioVisualizer->setWidth(m_sceneWidth);
@@ -523,6 +537,12 @@ void TimelineWidget::initShotDetail(){
 void TimelineWidget::ABAction() {
     int64_t markerTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
     m_abManager->cycleMarkers(markerTime, m_sceneHeight);
+}
+
+void TimelineWidget::TransitionAction()
+{
+    int64_t markerTime = m_mathManager->posToTimeSnapped(m_cursor->pos().x());
+    m_transitionManager->cycleMarkers(markerTime, m_sceneHeight);
 }
 
 void TimelineWidget::splitShotAtCursor()

@@ -68,6 +68,7 @@ protected:
 private slots:
     void splitShotAtCursor();
     void ABAction();
+    void TransitionAction();
     void moveCursor(double cursorPosX);
     void itemLeftClick(QGraphicsItem*);
     void itemShiftLeftClick(QGraphicsItem*);
@@ -98,9 +99,12 @@ private:
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
 
+    TransitionManager* m_transitionManager = nullptr;
+
     ToolbarButton* m_autoSegmentationBtn = nullptr;
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
+    ToolbarButton* m_transitionBtn = nullptr;
     ToolbarButton* m_mergeWithPrevShotBtn = nullptr;
     bool m_showMergeWithPrevShotBtn = false;
     ToolbarButton* m_mergeWithNextShotBtn = nullptr;

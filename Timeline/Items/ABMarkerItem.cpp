@@ -7,6 +7,7 @@ ABMarkerItem::ABMarkerItem(int height, int64_t vlcTime, QGraphicsItem *parent)
 : RangeMarkerItem(height, vlcTime, parent)
 {
     setZValue(10);
+    setColor({255,140,56});
     setAcceptHoverEvents(true);
 }
 

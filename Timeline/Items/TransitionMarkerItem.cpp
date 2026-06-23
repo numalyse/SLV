@@ -4,4 +4,6 @@ TransitionMarkerItem::TransitionMarkerItem(int height, int64_t vlcTime, QGraphic
     : RangeMarkerItem(height, vlcTime, parent)
 {
     setZValue(9);
+    setColor({0,255,0});
+    setAcceptHoverEvents(true);
 }

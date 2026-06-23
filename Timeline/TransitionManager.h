@@ -17,14 +17,6 @@ Q_OBJECT
 public:
     explicit TransitionManager(QGraphicsScene* scene, TimelineMath* mathManager, QObject* parent = nullptr);
 
-private:
-
-    QVector<TransitionMarkerItem*> m_markers;
-    //QVector<TransitionItem*> m_transitions;
-
-    TimelineView* p_view = nullptr;
-    TimelineMath* p_mathManager = nullptr;
-
 };
 
 

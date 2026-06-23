@@ -12,6 +12,7 @@
 #include <QString>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QJsonObject>
 
 #include <QCoreApplication>
 #include <QFile>
@@ -151,7 +152,7 @@ void SegmentationThread::run()
         return;
     }
 
-    std::vector<int> finalCuts;
+    std::vector<SceneFrames> finalScenes;
 
     while (pythonProcess.waitForReadyRead(-1)) {
 
@@ -181,7 +182,11 @@ void SegmentationThread::run()
                 QJsonArray arr = doc.array();
 
                 for (const QJsonValue& val : arr) {
-                    finalCuts.push_back(val.toInt());
+                    QJsonObject obj = val.toObject();
+                    finalScenes.push_back({
+                        obj["start_frame"].toInt(),
+                        obj["end_frame"].toInt()
+                    });
                 }
             }
             else {
@@ -202,5 +207,5 @@ void SegmentationThread::run()
         qWarning() << "Le script Python s'est terminé avec une erreur.";
     }
 
-    emit segmentationFinished(finalCuts);
+    emit segmentationFinished(finalScenes);
 }

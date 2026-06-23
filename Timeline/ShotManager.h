@@ -8,6 +8,7 @@
 #include "Timeline/ThumbnailWorker.h"
 #include "VideoCaptureManager.h"
 #include "Media.h"
+#include "SegmentationThread.h"
 
 #include "Shot.h"
 
@@ -44,7 +45,7 @@ public:
     void extracted(int &shotHeight, const Shot &IShot, double &width);
     void setShotItemsData(const QVector<Shot> &shots);
 
-    void createShotItemsFromCuts(const std::vector<int>& cuts);
+    void createShotItemsFromScenes(const std::vector<SegmentationThread::SceneFrames> &scenes);
 
     void initShotDetail();
 

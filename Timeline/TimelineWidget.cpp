@@ -609,10 +609,10 @@ void TimelineWidget::autoSegmentation(){
 
             connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
 
-            connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<int> cuts) {
+            connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<SegmentationThread::SceneFrames> scenes) {
 
-                if( ! cuts.empty()){
-                    this->m_shotManager->createShotItemsFromCuts(cuts);
+                if( ! scenes.empty()){
+                    this->m_shotManager->createShotItemsFromScenes(scenes);
                     emit this->saveNeeded();
                 }
                 progressDialog->close();

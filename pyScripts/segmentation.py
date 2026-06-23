@@ -30,13 +30,15 @@ def segment_video(video_path, use_color=True):
     scene_manager.detect_scenes(video, callback=progress_callback)
     scene_list = scene_manager.get_scene_list()
 
-    cuts = [
-        scene[0].frame_num
+    scenes_data = [
+        {
+            "start_frame": scene[0].frame_num,
+            "end_frame": scene[1].frame_num
+        }
         for scene in scene_list
-        if scene[0].frame_num > 0
     ]
 
-    print(f"RESULT:{json.dumps(cuts)}", flush=True)
+    print(f"RESULT:{json.dumps(scenes_data)}", flush=True)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

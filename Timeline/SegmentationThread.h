@@ -15,12 +15,18 @@ class SegmentationThread : public QThread
 Q_OBJECT
 
 public:
+
+    struct SceneFrames {
+        int startFrame;
+        int endFrame;
+    };
+
     explicit SegmentationThread(const QString& mediaPath, QObject* parent = nullptr);
     void run() override;
 
 signals:
     void progress(int);
-    void segmentationFinished( const std::vector<int> cuts );
+    void segmentationFinished( const std::vector<SceneFrames> finalScenes );
     void errorOccured(const QString& errorMsg);
 
 private:

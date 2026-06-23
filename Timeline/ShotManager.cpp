@@ -383,7 +383,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
 }
 
-void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
+void ShotManager::createShotItemsFromScenes(const std::vector<SegmentationThread::SceneFrames> &scenes)
 {
 
     int shotHeight {40};
@@ -393,20 +393,18 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     qDeleteAll(m_audioShotItems);
     m_audioShotItems.clear();
 
-    int64_t startShot = 0;
-    int64_t lengthShot = 0;
-
     QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
-
     bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
 
-    for(int i=0; i < cuts.size(); ++i ){
+    // On boucle directement sur chaque plan
+    for(const auto& scene : scenes){
 
-        int64_t nextStartShot = p_mathManager->frameToTime(cuts[i]);
-        int64_t endShot = nextStartShot - 1; // la fin du plan = cut - 1 ms
-        lengthShot = endShot - startShot;
+        int64_t startShot = p_mathManager->frameToTime(scene.startFrame);
+        // Si l'endFrame de PySceneDetect marque le début de la scène suivante, on retire 1 ms pour ne pas déborder
+        int64_t endShot = p_mathManager->frameToTime(scene.endFrame) - 1; 
+        int64_t lengthShot = endShot - startShot;
 
-        double xPos =  p_mathManager->timeToPos(startShot);
+        double xPos = p_mathManager->timeToPos(startShot);
         double width = p_mathManager->timeToPos(lengthShot);
         
         Shot shot{baseTitle, startShot, endShot};
@@ -428,38 +426,9 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         if(p_media->type() == MediaType::Video){
             if(displayByTagFrames) {
                 m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-            }else {
+            } else {
                 m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
-        }
-
-        startShot = nextStartShot;
-    }
-
-    lengthShot = p_mathManager->duration() - startShot;
-
-    double xPos =  p_mathManager->timeToPos(startShot);
-    double width = p_mathManager->timeToPos(lengthShot);
-    
-    Shot shot{baseTitle, startShot, p_mathManager->duration()};
-    shot.tagImageTime = shot.middle();
-    AudioShot audioShot{};
-    audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
-
-    ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
-    AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
-    p_scene->addItem(shotItem);
-    p_scene->addItem(audioShotItem);
-    shotItem->setX(xPos);
-    audioShotItem->setX(xPos);
-    m_shotItems.push_back(shotItem);
-    m_audioShotItems.push_back(audioShotItem);
-
-    if(p_media->type() == MediaType::Video){
-        if(displayByTagFrames) {
-            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-        }else {
-            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }
     }
 

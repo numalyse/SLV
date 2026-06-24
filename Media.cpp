@@ -155,6 +155,7 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                         hasVideo = true;
                         trackInfo._bitrate = tracks[i]->i_bitrate;
                         trackInfo._codec = tracks[i]->i_codec;
+                        trackInfo._originalFourcc = tracks[i]->i_original_fourcc;
                         trackInfo._sarNum = tracks[i]->video->i_sar_num;
                         trackInfo._sarDen = tracks[i]->video->i_sar_den;
                         if(trackInfo._sarNum != trackInfo._sarDen && trackInfo._sarNum > 0 && trackInfo._sarDen > 0){
@@ -166,6 +167,7 @@ void Media::onVlcEvent(const libvlc_event_t *event, void *userData)
                         hasAudio = true;
                         trackInfo._bitrate = tracks[i]->i_bitrate;
                         trackInfo._codec = tracks[i]->i_codec;
+                        trackInfo._originalFourcc = tracks[i]->i_original_fourcc;
                         trackInfo._channels = tracks[i]->audio->i_channels;
                         trackInfo._rate = tracks[i]->audio->i_rate;
                         trackInfo._language = tracks[i]->psz_language;

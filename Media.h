@@ -15,6 +15,7 @@ enum MediaType{
 struct MediaTrackInfo{
     libvlc_track_type_t _type;
     unsigned int _codec; // video + audio
+    unsigned int _originalFourcc{0}; // video + audio
     unsigned int _bitrate; // video + audio
     char* _description;
     char* _language; // audio + subtitles

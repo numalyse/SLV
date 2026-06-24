@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QStyleHints>
 #include <QGuiApplication>
+#include <QLocale>
+
 
 MediaInfoDialog::MediaInfoDialog(const Media& media)
 {
@@ -27,6 +29,7 @@ MediaInfoDialog::MediaInfoDialog(const Media& media)
     mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_info_path"), media.filePath()));
     mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_info_format"), media.fileExtension()));
     mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_info_type"), mediaTypeToString(media.type())));
+    if(media.fileSize() > 0) mediaInfoLayout->addWidget(createFrame("Taille", QLocale().formattedDataSize(media.fileSize())));
 
     if(media.type() != Image){
 
@@ -53,8 +56,12 @@ MediaInfoDialog::MediaInfoDialog(const Media& media)
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_description"), track._description));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_language"), track._language));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_codec"), libvlc_media_get_codec_description(track._type, track._codec)));
+                if(!fourccToString(track._originalFourcc).isEmpty())
+                    mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_fourcc"), fourccToString(track._originalFourcc)));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_channels"), QString::number(track._channels)));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_rate"), QString::number(track._rate)));
+                if(track._bitrate > 0)
+                    mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_bitrate"), QString::number(track._bitrate / 1000) + " kb/s"));
                 break;
 
             case libvlc_track_video:
@@ -63,7 +70,11 @@ MediaInfoDialog::MediaInfoDialog(const Media& media)
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_dimensions"), QString::number(media.width()) + "x" + QString::number(media.height())));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_fps"), QString::number(media.fps())));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_codec"), libvlc_media_get_codec_description(track._type, track._codec)));
+                if(!fourccToString(track._originalFourcc).isEmpty())
+                    mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_fourcc"), fourccToString(track._originalFourcc)));
                 mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_sar"), QString::number(track._sarNum) + "x" + QString::number(track._sarDen)));
+                if(track._bitrate > 0)
+                    mediaInfoLayout->addWidget(createFrame(PrefManager::instance().getText("media_track_info_bitrate"), QString::number(track._bitrate / 1000) + " kb/s"));
                 break;
 
             case libvlc_track_text:
@@ -152,6 +163,18 @@ QString MediaInfoDialog::mediaTypeToString(const MediaType type) const
     case Audio:
         return PrefManager::instance().getText("media_type_audio");
     case Unknown:
+    default:
         return PrefManager::instance().getText("media_type_unknown");
     }
+}
+
+QString MediaInfoDialog::fourccToString(unsigned int fourcc)
+{
+    QString res;
+    for(int i = 0; i < 4; ++i){
+        // décale de 8 bits * i puis on garde les 8 premiers bits avec masque 1111 1111
+        char c = static_cast<char>((fourcc >> (i * 8)) & 0xFF); 
+        if(c >= 32 && c < 127) res.append(QChar(c));
+    }
+    return res.trimmed();
 }

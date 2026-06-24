@@ -360,6 +360,8 @@
     "media_track_info_sar" : "Relación de aspecto de píxel",
     "media_track_info_fps" : "Fotogramas por segundo",
     "media_track_info_encoding" : "Codificación",
+    "media_track_info_bitrate" : "Tasa de bits",
+    "media_track_info_fourcc" : "FourCC",
 
     "media_type_video" : "Vídeo",
     "media_type_image" : "Imagen",

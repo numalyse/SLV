@@ -193,7 +193,6 @@ void PlayerWidget::setActive(bool active)
 bool PlayerWidget::setMediaFromPath(const QString& filePath)
 {
     if (m_mediaWidget->setMediaFromPath(filePath)){
-        m_playing = true;
         m_muted = false;
         emit playUiUpdateRequested();
         emit unmuteUiUpdateRequested();
@@ -244,7 +243,6 @@ void PlayerWidget::disablePlayerFullscreen()
 void PlayerWidget::play()
 {
     if (m_mediaWidget->play()){
-        m_playing = true;
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
@@ -269,7 +267,6 @@ void PlayerWidget::play()
 void PlayerWidget::playFromAdvanced()
 {
     if (m_mediaWidget->play()){
-        m_playing = true;
         emit playUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }else {
@@ -297,7 +294,6 @@ void PlayerWidget::playFromAdvanced()
 void PlayerWidget::pause()
 {
     if (m_mediaWidget->pause()){
-        m_playing = false;
         emit pauseUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     }
@@ -314,7 +310,6 @@ void PlayerWidget::togglePlayPause(bool isPlaying)
 void PlayerWidget::stop()
 {
     if(m_mediaWidget->stop()){
-        m_playing = false;
         emit stopUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
     };
@@ -527,7 +522,6 @@ void PlayerWidget::disableButtons()
 
 void PlayerWidget::mediaPlayerEjectedHandler()
 {
-    m_playing = false;
     m_audioLogoWidget->setDisplay(false);
     if(isVisible()){
         m_dragDropLogoWidget->setDisplay(true);

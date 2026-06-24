@@ -33,7 +33,10 @@ public:
     int getCurrentTime();
     double getSar();
     double mediaFps() { return m_media_fps; };
-    bool playing(){ return m_playing; };
+    bool playing(){ 
+        if(m_mediaWidget) return m_mediaWidget->isPlaying();
+        else return false;
+    };
     bool muted() { return m_muted; };
     bool zoomed() { return m_toolBar->zoomBtn()->isChecked(); }
 
@@ -126,7 +129,6 @@ private:
     void updateSingleLogoGeom(QWidget* widget, bool isVisible);
 
     double m_media_fps {};
-    bool m_playing = false;
     bool m_muted = false;
     SimpleToolbar* m_toolBar = nullptr;
     QAction* m_actionPlayPause;

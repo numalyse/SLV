@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QCursor>
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -475,6 +476,32 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     }
         
     return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    
+    if (projManager.needSave()) { 
+        PrefManager& prefManager = PrefManager::instance();
+        
+        SLV::showGenericDialog(
+            this, 
+            prefManager.getText("dialog_save_project_dialog_title"),
+            prefManager.getText("dialog_save_project_dialog_text"),
+            [event]() { 
+                ProjectManager& projManager = ProjectManager::instance();
+                projManager.saveProject(false); 
+                event->accept();
+            },
+            [event]() { 
+                event->accept();
+            },
+            [event](){
+                event->ignore();
+            }
+        );
+    }
 }
 
 void MainWindow::enableMouseTrackingRecursive(QWidget* widget)

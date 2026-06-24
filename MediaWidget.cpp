@@ -539,6 +539,15 @@ void MediaWidget::transformMedia()
 
     managePlayerSystem();
     createMedia(m_media->filePath(), true);
+
+    // démarre le décodage directement à la position voulue  pour
+    // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
+    // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
+    if (m_pendingTransformTime > 0) {
+        QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
+        libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
+    }
+
     libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
     libvlc_media_player_play(m_player);

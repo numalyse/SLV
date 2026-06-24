@@ -736,7 +736,9 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                     QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
                         mediaWidget->pause();
                         libvlc_media_player_next_frame(mediaWidget->m_player);
-                        mediaWidget->m_transformPending = false;
+                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() { // on met à jour la fin de la transformation apres un certain temps car les opérations vlc prennent du temps
+                            mediaWidget->m_transformPending = false;
+                        });
                     });
                 } else {
                     mediaWidget->m_transformPending = false;

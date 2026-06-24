@@ -112,7 +112,6 @@ private:
 
     bool m_transformPending = false;
     bool m_transformDirty = false;
-    bool m_pendingTransformSeek = false;
     int64_t m_pendingTransformTime = 0;
     bool m_pendingTransformPause = false;
 

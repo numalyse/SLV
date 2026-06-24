@@ -505,7 +505,6 @@ void MediaWidget::transformMedia()
     // si on est en pause, on se base sur m_vlcTime, get time peut return un temps incohérent  
     m_pendingTransformTime = (wasPlaying && currentTime > 0) ? currentTime : m_vlcTime;
     m_pendingTransformPause = !wasPlaying;
-    m_pendingTransformSeek = true;
 
     float brightnessValue, contrastValue, saturationValue, hueValue;
     if(m_adjustmentsEnabled){
@@ -767,8 +766,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
             libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
 
-            if (mediaWidget->m_pendingTransformSeek) {
-                mediaWidget->m_pendingTransformSeek = false;
+            if (mediaWidget->m_transformPending) {
 
                 if (mediaWidget->m_pendingTransformPause) {
                     // singleshot pour décaler le pause afin que vlc "démarre" et produise une frame, sinon rien ne s'affiche.

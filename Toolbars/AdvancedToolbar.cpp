@@ -183,6 +183,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     if (!toolbar) return;
 
     m_media_fps = toolbar->mediaFps();
+    m_media_duration = toolbar->mediaDuration();
 
     QSlider* oldSlider = toolbar->slider();
     if (oldSlider && m_slider) {
@@ -193,14 +194,12 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     TimeEdit* oldTimeLE = toolbar->currentTimeLE();
     if (oldTimeLE && m_timeEdit) {
         m_timeEdit->setText(oldTimeLE->text());
-        // TODO : set le temps du timecode modifiable
     }
 
     QPushButton* oldDurationBtn = toolbar->durationBtn();
     if (oldDurationBtn && m_durationBtn) {
-        m_durationBtn->setText(oldDurationBtn->text());
-        m_showRemainingTime = toolbar->showRemainingTime();
-
+        m_durationBtn->setChecked(oldDurationBtn->isChecked());
+        updateDurationText(); 
     }
 
     ToolbarToggleButton* oldPlayPause = toolbar->playPauseBtn();
@@ -223,13 +222,28 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
         m_muteBtn->setButtonState(oldMute->isChecked());
     }
 
+    QSlider* oldVolumeSlider = toolbar->volumeSlider();
+    if (oldVolumeSlider && m_volumeSlider) {
+        m_volumeSlider->setValue(oldVolumeSlider->value());
+    }
+    QLabel* oldVolumeLabel = toolbar->volumeLabel();
+    if (oldVolumeLabel && m_volumeLabel) {
+        m_volumeLabel->setText(oldVolumeLabel->text());
+    }
+
+    QSlider* oldSpeedSlider = toolbar->speedSlider();
+    if (oldSpeedSlider && m_speedSlider) {
+        m_speedSlider->setValue(oldSpeedSlider->value());
+    }
+    QLabel* oldSpeedLabel = toolbar->speedLabel();
+    if (oldSpeedLabel && m_speedLabel) {
+        m_speedLabel->setText(oldSpeedLabel->text());
+    }
+
     QLabel* oldNameLabel = toolbar->nameLabel();
     if (oldNameLabel && m_nameLabel) {
         m_nameLabel->setText(oldNameLabel->text());
     }
-
-    // TODO : voir pour copier les états des sliders dans muteBtn et speedBtn
-    //addShortcuts();
 }
 
 AdvancedToolbar::~AdvancedToolbar()

@@ -162,8 +162,12 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
         + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
     if(saveSequencePath != ""){
         // On garde seulement la base du nom sans l'extension avec un split
-        QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
-        connect(sequenceExtractor, &QProcess::finished, this, &QDialog::accept);
+        SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper();
+        connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this](const int exitCode){
+            if(exitCode == 1)
+                this->accept();
+        });
+        sequenceExtractor->preciseExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
         QFileInfo fileInfo (saveSequencePath);
         prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());
     }

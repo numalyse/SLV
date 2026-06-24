@@ -445,9 +445,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
             PrefManager::instance().getPref("Paths", "lp_extract_sequence")
                 + '/' + p_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, p_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, p_media->fps()));
         if(saveSequencePath != ""){
-            QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
-            connect(sequenceExtractor, &QProcess::finished, this, [this, sequenceExtractor, saveSequencePath](){
-                if (sequenceExtractor->exitStatus() == QProcess::NormalExit && sequenceExtractor->exitCode() == 0){
+            SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper();
+            sequenceExtractor->preciseExtractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
+            connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, sequenceExtractor, saveSequencePath](const int exitCode){
+                if (exitCode == 1){
                     exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
                 } else {
                     QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shot_failed"));

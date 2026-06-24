@@ -30,6 +30,8 @@ public:
     Media* media(){ return m_media;};
     int getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
 
+    bool isPlaying() { return libvlc_media_player_is_playing(m_player); };
+
     QList<QPair<int, QString>> audioTracks() const;
     QList<QPair<int, QString>> subtitlesTracks() const;
 
@@ -108,10 +110,21 @@ private:
     QPoint m_lastPanPos;
     bool m_isPanning = false;
 
+    bool m_transformPending = false;
+    bool m_transformDirty = false;
+    int64_t m_pendingTransformTime = 0;
+    bool m_pendingTransformPause = false;
+
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
 
     /// @brief Recreates a vlc instance to apply transformation on media
     void transformMedia();
+
+    /// @brief Lance un transform, ou le marque à appliquer plus tard si un est déjà en cours 
+    void requestTransform();
+    
+    /// @brief Termine le transform courant et applique l'état final accumulé si besoin
+    void finishTransform();
 
     void createEventManager();
     void createMedia(const QString& filePath, const bool fromTransform = false);

@@ -51,6 +51,7 @@ protected:
     void moveEvent(QMoveEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void closeEvent(QCloseEvent *event);
 
 private:
     void changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement);

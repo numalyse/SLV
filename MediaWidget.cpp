@@ -496,10 +496,16 @@ void MediaWidget::endRecord()
 
 void MediaWidget::transformMedia()
 {
-    if(!m_player || !m_media) return;
+    if(!m_player || !m_media ) return; 
+    m_transformPending = true;
 
-    float pos = libvlc_media_player_get_position(m_player);
+    int64_t currentTime = libvlc_media_player_get_time(m_player);
     bool wasPlaying = libvlc_media_player_is_playing(m_player);
+
+    // si on est en pause, on se base sur m_vlcTime, get time peut return un temps incohérent  
+    m_pendingTransformTime = (wasPlaying && currentTime > 0) ? currentTime : m_vlcTime;
+    m_pendingTransformPause = !wasPlaying;
+
     float brightnessValue, contrastValue, saturationValue, hueValue;
     if(m_adjustmentsEnabled){
         brightnessValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
@@ -532,10 +538,18 @@ void MediaWidget::transformMedia()
 
     managePlayerSystem();
     createMedia(m_media->filePath(), true);
+
+    // démarre le décodage directement à la position voulue  pour
+    // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
+    // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
+    if (m_pendingTransformTime > 0) {
+        QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
+        libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
+    }
+
     libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
     libvlc_media_player_play(m_player);
-    libvlc_media_player_set_position(m_player, pos);
 
     setAudioTrack(m_currentAudioTrack);
     setSubtitleTrack(m_currentSubtitlesTrack);
@@ -556,29 +570,56 @@ void MediaWidget::transformMedia()
     emit rotationTooltipUpdateRequested(m_rotationIndex);
     emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
 
-    // shows a black screen when rotating but playing again shows the media back
-    if(!wasPlaying)
-        pause();
 }
 
 void MediaWidget::rotate()
 {
+    if(!m_player || !m_media) return;
     m_rotationIndex = (m_rotationIndex-1) % 4;
-    transformMedia();
+    emit rotationTooltipUpdateRequested(m_rotationIndex);
+    requestTransform();
 }
 
 void MediaWidget::hFlip()
 {
+    if(!m_player || !m_media) return;
     m_hflipped = !m_hflipped;
-    transformMedia();
     emit hFlipUiUpdateRequested();
+    requestTransform();
 }
 
 void MediaWidget::vFlip()
 {
+    if(!m_player || !m_media) return;
     m_vflipped = !m_vflipped;
+    emit vFlipUiUpdateRequested();
+    requestTransform();
+}
+
+/// @brief Lance un transform si aucun n'est en cours, sinon marque l'état comme dirty
+void MediaWidget::requestTransform()
+{
+    if(m_transformPending){
+        m_transformDirty = true;
+        return;
+    }
     transformMedia();
-    vFlipUiUpdateRequested();
+}
+
+/// @brief Fin du transform courant : si des clics ont eu lieu entre-temps (état dirty), on relance un transform pour appliquer le bon état final.
+void MediaWidget::finishTransform()
+{
+    m_transformPending = false;
+    if(m_transformDirty){
+        m_transformDirty = false;
+        transformMedia();
+        return;
+    }
+
+    // on a fini de transform, comme on a add option :start-time, il faut le réinitialiser à 0, sinon quand on va loop, cela repartira de :start-time.
+    if(m_media && m_media->vlcMedia()){
+        libvlc_media_add_option(m_media->vlcMedia(), ":start-time=0");
+    }
 }
 
 void MediaWidget::nextFrame()
@@ -717,13 +758,36 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
         // Contournement de l'auto-détection de VLC, au démarrage, VLC force l'affichage des sous-titres externes.
         // On s'assure de les désactiver (spu = -1) si l'utilisateur n'en veut pas (m_currentSubtitlesTrack == -1).
         if(mediaWidget->m_currentSubtitlesTrack == -1) libvlc_video_set_spu(mediaWidget->m_player, -1);
-
+        
         QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
 
             unsigned width = 0;
             unsigned height = 0;
 
             libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+
+            if (mediaWidget->m_transformPending) {
+
+                if (mediaWidget->m_pendingTransformPause) {
+                    // singleshot pour décaler le pause afin que vlc "démarre" et produise une frame, sinon rien ne s'affiche.
+                    QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
+                        mediaWidget->pause();
+                        // on utilise pas la méthode setTime à cause de mediaCutAndConcat
+                        if(mediaWidget->m_player){
+                            libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                            mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
+                            emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
+                        }
+                        // on signale la fin de la transformation encore plus tard car les opérations vlc précédentes prennent du temps, évite les bugs de spam
+                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
+                            mediaWidget->finishTransform();
+                        });
+                    });
+                } else {
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                    mediaWidget->finishTransform();
+                }
+            }
 
             if (width > 0 && height > 0)
             {

@@ -30,6 +30,7 @@ public:
 
     QSlider* slider() const { return m_slider; }
     double mediaFps() const { return m_media_fps; }
+    int64_t mediaDuration() const { return m_media_duration; }
     TimeEdit* currentTimeLE() const { return m_timeEdit; }
     QPushButton* durationBtn() const { return m_durationBtn; }
     bool showRemainingTime() const { return m_showRemainingTime; }
@@ -40,6 +41,13 @@ public:
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
     ToolbarButton* extractSequenceBtn() const {return m_extractSequenceBtn;}
+    QSlider* volumeSlider() const { return m_volumeSlider; }
+    QLabel* volumeLabel() const { return m_volumeLabel; }
+    QSlider* speedSlider() const { return m_speedSlider; }
+    QLabel* speedLabel() const { return m_speedLabel; }
+    
+    int currentAudioTrackIndex() const { return m_audioLangComboBox->currentIndex(); }
+    int currentSubtitlesTrackId() const { return m_subLangComboBox->currentData().toInt(); }
     
     void resetSlider();
     void stopSlider();

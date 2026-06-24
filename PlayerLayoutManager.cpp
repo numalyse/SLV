@@ -397,6 +397,20 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::disableMuteRequest, activePlayer, &PlayerWidget::unmute);
     connect(advancedToolbar, &AdvancedToolbar::volumeChanged, activePlayer, &PlayerWidget::setVolume);
     connect(advancedToolbar, &AdvancedToolbar::speedChanged, activePlayer, &PlayerWidget::setSpeed);
+
+    // garde les slider de la toolbar simple du player synchronisé
+    auto syncSlider = [](QSlider* slider, int value){
+        slider->blockSignals(true);
+        slider->setValue(value);
+        slider->blockSignals(false);
+    };
+    connect(advancedToolbar, &AdvancedToolbar::volumeChanged, activePlayerToolbar, [activePlayerToolbar, syncSlider](int v){ 
+        syncSlider(activePlayerToolbar->volumeSlider(), v); 
+    });
+    connect(advancedToolbar, &AdvancedToolbar::speedChanged, activePlayerToolbar, [activePlayerToolbar, syncSlider](int v){ 
+        syncSlider(activePlayerToolbar->speedSlider(), v); 
+    });
+
     connect(advancedToolbar, &AdvancedToolbar::enableFullscreenRequest, this, &PlayerLayoutManager::enableFullscreenGlobalRequested);
     connect(advancedToolbar, &AdvancedToolbar::enableFullscreenRequest, advancedToolbar, &SimpleToolbar::enableFullscreenUiUpdate);
     connect(advancedToolbar, &AdvancedToolbar::disableFullscreenRequest, this, &PlayerLayoutManager::disableFullscreenGlobalRequested);
@@ -443,10 +457,18 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &SimpleToolbar::setAudioTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setAudioTrack);
     connect(advancedToolbar, &SimpleToolbar::setSubtitlesTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setSubtitleTrack);
 
+    // garde la piste de sous-titres de la toolbar simple du player synchronisée avec l'advanced
+    connect(advancedToolbar, &SimpleToolbar::setSubtitlesTrackRequested, activePlayerToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
+
+    // garde le mode "temps restant" (durationBtn) de la toolbar simple synchronisé avec l'advanced
+    connect(advancedToolbar->durationBtn(), &QPushButton::toggled, activePlayerToolbar->durationBtn(), &QPushButton::setChecked);
+
     // Synchro piste actuelle à l'advanced toolbar si le média est déjà chargé
     if (activePlayer->mediaWidget()->media()) {
         advancedToolbar->updateAudioTracks(activePlayer->mediaWidget()->audioTracks());
         advancedToolbar->updateSubtitlesTracks(activePlayer->mediaWidget()->subtitlesTracks());
+        advancedToolbar->setAudioTrackDefault(activePlayerToolbar->currentAudioTrackIndex());
+        advancedToolbar->setSubtitlesTrackDefault(activePlayerToolbar->currentSubtitlesTrackId());
     }
 
     connect(advancedToolbar, &AdvancedToolbar::showBlackOpacityModeRequested, activePlayer, &PlayerWidget::setBlackOpacityMode);
@@ -512,16 +534,28 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
 
         bool wasMuted = toBeDuplicated->muted();
         int64_t currentTime = libvlc_media_player_get_time(toBeDuplicated->mediaWidget()->m_player);
-        
+
         bool wasLooping = false;
         if (toBeDuplicated->toolbar() && toBeDuplicated->toolbar()->loopBtn()) {
             wasLooping = toBeDuplicated->toolbar()->loopBtn()->isChecked();
         }
 
+        int oldVolume = toBeDuplicated->toolbar()->volumeSlider()->value();
+        int oldSpeed = toBeDuplicated->toolbar()->speedSlider()->value();
+        int oldAudioTrackIndex = toBeDuplicated->toolbar()->currentAudioTrackIndex();
+        int oldSubtitlesTrackId = toBeDuplicated->toolbar()->currentSubtitlesTrackId();
+        bool oldShowRemainingTime = toBeDuplicated->toolbar()->durationBtn()->isChecked();
+
         connect(player->mediaWidget(), &MediaWidget::mediaPlayerLoaded, player, [=]() {// quand le media player est chargé pret a être utilisé :
-            
+
             wasMuted ? player->mute() : player->unmute();
             wasLooping ? player->enableLoopMode() : player->disableLoopMode();
+
+            player->toolbar()->volumeSlider()->setValue(oldVolume);
+            player->toolbar()->speedSlider()->setValue(oldSpeed);
+            player->toolbar()->setAudioTrackDefault(oldAudioTrackIndex);
+            player->toolbar()->setSubtitlesTrackDefault(oldSubtitlesTrackId);
+            player->toolbar()->durationBtn()->setChecked(oldShowRemainingTime);
 
             // on lance puis set time pour trouver la frame
             player->play();

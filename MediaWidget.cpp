@@ -496,10 +496,16 @@ void MediaWidget::endRecord()
 
 void MediaWidget::transformMedia()
 {
-    if(!m_player || !m_media) return;
+    if(!m_player || !m_media || m_transformPending) return; // ← guard anti-spam
+    m_transformPending = true;
 
     float pos = libvlc_media_player_get_position(m_player);
     bool wasPlaying = libvlc_media_player_is_playing(m_player);
+
+    m_pendingTransformPosition = pos;
+    m_pendingTransformPause = !wasPlaying;
+    m_pendingTransformSeek = true;
+
     float brightnessValue, contrastValue, saturationValue, hueValue;
     if(m_adjustmentsEnabled){
         brightnessValue = libvlc_video_get_adjust_float(m_player, libvlc_adjust_Brightness);
@@ -535,7 +541,6 @@ void MediaWidget::transformMedia()
     libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
     libvlc_media_player_play(m_player);
-    libvlc_media_player_set_position(m_player, pos);
 
     setAudioTrack(m_currentAudioTrack);
     setSubtitleTrack(m_currentSubtitlesTrack);
@@ -556,9 +561,6 @@ void MediaWidget::transformMedia()
     emit rotationTooltipUpdateRequested(m_rotationIndex);
     emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
 
-    // shows a black screen when rotating but playing again shows the media back
-    if(!wasPlaying)
-        pause();
 }
 
 void MediaWidget::rotate()
@@ -717,13 +719,29 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
         // Contournement de l'auto-détection de VLC, au démarrage, VLC force l'affichage des sous-titres externes.
         // On s'assure de les désactiver (spu = -1) si l'utilisateur n'en veut pas (m_currentSubtitlesTrack == -1).
         if(mediaWidget->m_currentSubtitlesTrack == -1) libvlc_video_set_spu(mediaWidget->m_player, -1);
-
+        
         QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
 
             unsigned width = 0;
             unsigned height = 0;
 
             libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+
+            if (mediaWidget->m_pendingTransformSeek) {
+                mediaWidget->m_pendingTransformSeek = false;
+
+                libvlc_media_player_set_position(mediaWidget->m_player, mediaWidget->m_pendingTransformPosition);
+
+                if (mediaWidget->m_pendingTransformPause) {
+                    QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
+                        mediaWidget->pause();
+                        libvlc_media_player_next_frame(mediaWidget->m_player);
+                        mediaWidget->m_transformPending = false;
+                    });
+                } else {
+                    mediaWidget->m_transformPending = false;
+                }
+            }
 
             if (width > 0 && height > 0)
             {

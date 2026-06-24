@@ -110,6 +110,11 @@ private:
     QPoint m_lastPanPos;
     bool m_isPanning = false;
 
+    bool m_transformPending = false;
+    bool m_pendingTransformSeek = false;
+    float m_pendingTransformPosition = 0.0f;
+    bool m_pendingTransformPause = false;
+
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
 
     /// @brief Recreates a vlc instance to apply transformation on media

@@ -112,7 +112,7 @@ private:
 
     bool m_transformPending = false;
     bool m_pendingTransformSeek = false;
-    float m_pendingTransformPosition = 0.0f;
+    int64_t m_pendingTransformTime = 0;
     bool m_pendingTransformPause = false;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);

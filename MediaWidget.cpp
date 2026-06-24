@@ -496,13 +496,14 @@ void MediaWidget::endRecord()
 
 void MediaWidget::transformMedia()
 {
-    if(!m_player || !m_media || m_transformPending) return; // ← guard anti-spam
+    if(!m_player || !m_media ) return; 
     m_transformPending = true;
 
-    float pos = libvlc_media_player_get_position(m_player);
+    int64_t currentTime = libvlc_media_player_get_time(m_player);
     bool wasPlaying = libvlc_media_player_is_playing(m_player);
 
-    m_pendingTransformPosition = pos;
+    // si on est en pause, on se base sur m_vlcTime, get time peut return un temps incohérent  
+    m_pendingTransformTime = (wasPlaying && currentTime > 0) ? currentTime : m_vlcTime;
     m_pendingTransformPause = !wasPlaying;
     m_pendingTransformSeek = true;
 
@@ -565,12 +566,14 @@ void MediaWidget::transformMedia()
 
 void MediaWidget::rotate()
 {
+    if(m_transformPending) return;
     m_rotationIndex = (m_rotationIndex-1) % 4;
     transformMedia();
 }
 
 void MediaWidget::hFlip()
 {
+    if(m_transformPending) return;
     m_hflipped = !m_hflipped;
     transformMedia();
     emit hFlipUiUpdateRequested();
@@ -578,6 +581,7 @@ void MediaWidget::hFlip()
 
 void MediaWidget::vFlip()
 {
+    if(m_transformPending) return;
     m_vflipped = !m_vflipped;
     transformMedia();
     vFlipUiUpdateRequested();
@@ -730,17 +734,24 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             if (mediaWidget->m_pendingTransformSeek) {
                 mediaWidget->m_pendingTransformSeek = false;
 
-                libvlc_media_player_set_position(mediaWidget->m_player, mediaWidget->m_pendingTransformPosition);
-
                 if (mediaWidget->m_pendingTransformPause) {
+                    // singleshot pour que vlc démarre et produise une frame, sinon rien ne s'affiche.
                     QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
                         mediaWidget->pause();
-                        libvlc_media_player_next_frame(mediaWidget->m_player);
-                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() { // on met à jour la fin de la transformation apres un certain temps car les opérations vlc prennent du temps
+                        // on utilise pas la méthode setTime à cause de mediaCutAndConcat
+                        if(mediaWidget->m_player){
+                            libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                            mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
+                            emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
+                            libvlc_media_player_next_frame(mediaWidget->m_player);
+                        }
+                        // on signale la fin de la transformation encore plus tard car les opérations vlc précédentes prennent du temps, évite les bugs de spam
+                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() { 
                             mediaWidget->m_transformPending = false;
                         });
                     });
                 } else {
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
                     mediaWidget->m_transformPending = false;
                 }
             }

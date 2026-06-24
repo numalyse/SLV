@@ -91,13 +91,16 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_isDragging){
         emit cursorPositionRequested(static_cast<double>(mapToScene(event->pos()).x()));
+        return;
     }else if( m_isPanning){
         int deltaX = event->pos().x() - m_lastPanPos.x();
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - deltaX);
         m_lastPanPos = event->pos();
+        return;
     }
     if(m_draggedABMarker){
         emit abMarkerDragged(m_draggedABMarker, mapToScene(event->pos()).x());
+        return;
     }
     else{
         unsetCursor();

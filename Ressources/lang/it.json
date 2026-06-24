@@ -359,6 +359,8 @@
     "media_track_info_sar" : "Aspect ratio pixel",
     "media_track_info_fps" : "Fotogrammi al secondo",
     "media_track_info_encoding" : "Codifica",
+    "media_track_info_bitrate" : "Bitrate",
+    "media_track_info_fourcc" : "FourCC",
 
     "media_type_video" : "Video",
     "media_type_image" : "Immagine",

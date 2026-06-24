@@ -18,6 +18,7 @@ public:
     QFrame* createFrame(const QString& key, const QString& value);
     QHBoxLayout* createSeparator(const QString& separatorName);
     QString mediaTypeToString(const MediaType type) const;
+    QString fourccToString(unsigned int fourcc);
 
 };
 

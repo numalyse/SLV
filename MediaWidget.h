@@ -111,6 +111,7 @@ private:
     bool m_isPanning = false;
 
     bool m_transformPending = false;
+    bool m_transformDirty = false;
     bool m_pendingTransformSeek = false;
     int64_t m_pendingTransformTime = 0;
     bool m_pendingTransformPause = false;
@@ -119,6 +120,12 @@ private:
 
     /// @brief Recreates a vlc instance to apply transformation on media
     void transformMedia();
+
+    /// @brief Lance un transform, ou le marque à appliquer plus tard si un est déjà en cours 
+    void requestTransform();
+    
+    /// @brief Termine le transform courant et applique l'état final accumulé si besoin
+    void finishTransform();
 
     void createEventManager();
     void createMedia(const QString& filePath, const bool fromTransform = false);

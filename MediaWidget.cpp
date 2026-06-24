@@ -575,25 +575,52 @@ void MediaWidget::transformMedia()
 
 void MediaWidget::rotate()
 {
-    if(m_transformPending) return;
+    if(!m_player || !m_media) return;
     m_rotationIndex = (m_rotationIndex-1) % 4;
-    transformMedia();
+    emit rotationTooltipUpdateRequested(m_rotationIndex);
+    requestTransform();
 }
 
 void MediaWidget::hFlip()
 {
-    if(m_transformPending) return;
+    if(!m_player || !m_media) return;
     m_hflipped = !m_hflipped;
-    transformMedia();
     emit hFlipUiUpdateRequested();
+    requestTransform();
 }
 
 void MediaWidget::vFlip()
 {
-    if(m_transformPending) return;
+    if(!m_player || !m_media) return;
     m_vflipped = !m_vflipped;
+    emit vFlipUiUpdateRequested();
+    requestTransform();
+}
+
+/// @brief Lance un transform si aucun n'est en cours, sinon marque l'état comme dirty
+void MediaWidget::requestTransform()
+{
+    if(m_transformPending){
+        m_transformDirty = true;
+        return;
+    }
     transformMedia();
-    vFlipUiUpdateRequested();
+}
+
+/// @brief Fin du transform courant : si des clics ont eu lieu entre-temps (état dirty), on relance un transform pour appliquer le bon état final.
+void MediaWidget::finishTransform()
+{
+    m_transformPending = false;
+    if(m_transformDirty){
+        m_transformDirty = false;
+        transformMedia();
+        return;
+    }
+
+    // on a fini de transform, comme on a add option :start-time, il faut le réinitialiser à 0, sinon quand on va loop, cela repartira de :start-time.
+    if(m_media && m_media->vlcMedia()){
+        libvlc_media_add_option(m_media->vlcMedia(), ":start-time=0");
+    }
 }
 
 void MediaWidget::nextFrame()
@@ -744,7 +771,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 mediaWidget->m_pendingTransformSeek = false;
 
                 if (mediaWidget->m_pendingTransformPause) {
-                    // singleshot pour que vlc démarre et produise une frame, sinon rien ne s'affiche.
+                    // singleshot pour décaler le pause afin que vlc "démarre" et produise une frame, sinon rien ne s'affiche.
                     QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
                         mediaWidget->pause();
                         // on utilise pas la méthode setTime à cause de mediaCutAndConcat
@@ -752,16 +779,15 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                             libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
                             mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
                             emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
-                            libvlc_media_player_next_frame(mediaWidget->m_player);
                         }
                         // on signale la fin de la transformation encore plus tard car les opérations vlc précédentes prennent du temps, évite les bugs de spam
-                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() { 
-                            mediaWidget->m_transformPending = false;
+                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
+                            mediaWidget->finishTransform();
                         });
                     });
                 } else {
                     libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
-                    mediaWidget->m_transformPending = false;
+                    mediaWidget->finishTransform();
                 }
             }
 

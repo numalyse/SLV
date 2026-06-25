@@ -140,11 +140,7 @@ void MediaWidget::managePlayerSystem()
 /// @brief Destructeur qui détache les event managers vlc
 MediaWidget::~MediaWidget()
 {
-    if(m_eventManager){
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
-    }
+    releaseEventManager();
 
     m_videoCaptureManager.deleteMediaTempDirectory();
     releaseMedia();

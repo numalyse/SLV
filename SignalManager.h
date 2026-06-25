@@ -55,7 +55,6 @@ signals:
     void activateMediaChangeBtn(const bool);
     void requestPlaylistSize();
     void playlistSizeResponse();
-    void requestThumbnailWorkerReleaseCap();
 };
 
 

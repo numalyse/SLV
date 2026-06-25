@@ -4,8 +4,8 @@
 #include <QLabel>
 #include <QScrollArea>
 
-NavPanel::NavPanel(QWidget *parent)
-    : QWidget{parent}
+NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
+    : QWidget{parent}, m_thumbnailWorker{thumbnailWorker}
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_mainLayout = new QHBoxLayout(this);
@@ -43,17 +43,12 @@ NavPanel::NavPanel(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail, this, &NavPanel::displayShotDetail);
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
 
-    m_thumbnailWorker = new ThumbnailWorker(this);
-    connect(&SignalManager::instance(), &SignalManager::requestThumbnailWorkerReleaseCap, m_thumbnailWorker, &ThumbnailWorker::requestReleaseCap);
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
 
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
     connect(m_shotDetail, &ShotDetail::clearThumbnailQueueRequested, this, [this](){
         m_thumbnailWorker->clearQueueForId(-1); // évite d'accumuler les anciennes demandes de tagImage du shotDetail (id == -1) sans toucher aux miniatures en attente pour la timeline
     });
-
-    m_thumbnailWorker->start();
-    
 }
 
 void NavPanel::resizeEvent(QResizeEvent *event) {

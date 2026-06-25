@@ -18,9 +18,8 @@ class NavPanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NavPanel(QWidget *parent = nullptr);
+    explicit NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent = nullptr);
     const bool isOpen(){return m_isOpen;}
-    ThumbnailWorker* thumbnailWorker() const { return m_thumbnailWorker; }
 private:
 
     bool m_isOpen = false;
@@ -29,7 +28,7 @@ private:
     QLayout *m_mainLayout = nullptr;
     Playlist *m_playlistWidget = nullptr;
     ShotDetail *m_shotDetail = nullptr;
-    ThumbnailWorker* m_thumbnailWorker = nullptr;
+    ThumbnailWorker* m_thumbnailWorker = nullptr; // non owner, créé et possédé par GlobalPlayerManager
 
 public slots:
     void showPanel();

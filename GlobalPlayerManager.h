@@ -6,6 +6,7 @@
 #include "NavPanel.h"
 #include "Media.h"
 #include "Timeline/TimelineWidget.h"
+#include "Timeline/ThumbnailWorker.h"
 #include "PlayerWidget.h"
 
 #include <QWidget>
@@ -28,6 +29,7 @@ private:
     Toolbar* m_toolbarWidget = nullptr;
     NavPanel* m_navPanel = nullptr;
     TimelineWidget* m_timeline = nullptr;
+    ThumbnailWorker* m_thumbnailWorker = nullptr;
     PlayerWidget* m_player = nullptr;
     QVBoxLayout* layout;
     QFrame* m_separationLine = nullptr;

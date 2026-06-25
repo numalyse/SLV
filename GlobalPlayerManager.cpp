@@ -14,6 +14,9 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     : QWidget{parent}
 
 {
+    m_thumbnailWorker = new ThumbnailWorker(this);
+    m_thumbnailWorker->start();
+
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
@@ -22,7 +25,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     layout->setSpacing(1);
     mainLayout->addLayout(layout);
     //m_navPanel = new NavPanel(this, m_shotInfoController);
-    m_navPanel = new NavPanel(this);
+    m_navPanel = new NavPanel(m_thumbnailWorker, this);
     mainLayout->addWidget(m_navPanel);
 
     m_separationLine = new QFrame();
@@ -168,8 +171,9 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         connect(m_navPanel, &NavPanel::ejectCurrentMedia, m_player, &PlayerWidget::eject);
         connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
         connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
+        connect(advancedToolbar, &AdvancedToolbar::ejectRequest, m_thumbnailWorker, &ThumbnailWorker::requestReleaseCap);
     }else {
-        emit SignalManager::instance().requestThumbnailWorkerReleaseCap(); // si on est en mode "multiple", vide les opencv captures
+        m_thumbnailWorker->requestReleaseCap(); // si on est en mode "multiple", vide les opencv captures
     }
 
     // maintient la fenetre dans l'écran actuel
@@ -335,7 +339,7 @@ void GlobalPlayerManager::createTimelineWidget()
         m_timeline = nullptr;
     }
 
-    m_navPanel->thumbnailWorker()->clearQueue(); // évite que les requêtes de l'ancien projet (ancien ShotManager pas encore détruit) soient livrées au nouveau
+    m_thumbnailWorker->clearQueue(); // évite que les requêtes de l'ancien projet (ancien ShotManager pas encore détruit) soient livrées au nouveau
 
     ProjectManager& projManager = ProjectManager::instance();
     Project* proj = projManager.projet();
@@ -357,7 +361,7 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia, m_player, proj->shots, m_navPanel->thumbnailWorker(), this, width());
+    m_timeline = new TimelineWidget(projMedia, m_player, proj->shots, m_thumbnailWorker, this, width());
     m_timeline->setFixedHeight(160);
     m_timeline->hide();
 

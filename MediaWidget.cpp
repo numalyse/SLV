@@ -514,59 +514,67 @@ void MediaWidget::transformMedia()
 
     releaseEventManager();
 
-    libvlc_media_player_stop(m_player);
-    libvlc_media_player_release(m_player);
+    QThreadPool::globalInstance()->start([this, brightnessValue, contrastValue, saturationValue, hueValue]() {
 
-    if (m_vlcInstance) {
-        libvlc_release(m_vlcInstance);
-    }
+        if(m_player){
+            libvlc_media_player_stop(m_player);
+            libvlc_media_player_release(m_player);
+        }
 
-#ifdef Q_OS_MAC
-    setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
-#endif
+        if (m_vlcInstance) {
+            libvlc_release(m_vlcInstance);
+        }
 
-    auto args = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
+        #ifdef Q_OS_MAC
+            setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
+        #endif
 
-    m_vlcInstance = libvlc_new(args.size(), args.data());
-    m_player = libvlc_media_player_new(m_vlcInstance);
-    libvlc_video_set_mouse_input(m_player, 0);
-    libvlc_video_set_key_input(m_player, 0);
+        auto args = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
 
-    createEventManager();
+        m_vlcInstance = libvlc_new(args.size(), args.data());
+        m_player = libvlc_media_player_new(m_vlcInstance);
+        libvlc_video_set_mouse_input(m_player, 0);
+        libvlc_video_set_key_input(m_player, 0);
 
-    managePlayerSystem();
-    createMedia(m_media->filePath(), true);
+        QMetaObject::invokeMethod(this, [this, brightnessValue, contrastValue, saturationValue, hueValue]() {
 
-    // démarre le décodage directement à la position voulue  pour
-    // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
-    // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
-    if (m_pendingTransformTime > 0) {
-        QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
-        libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
-    }
+            createEventManager();
 
-    libvlc_media_player_set_media(m_player, m_media->vlcMedia());
+            managePlayerSystem();
+            createMedia(m_media->filePath(), true);
 
-    libvlc_media_player_play(m_player);
+            // démarre le décodage directement à la position voulue  pour
+            // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
+            // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
+            if (m_pendingTransformTime > 0) {
+                QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
+                libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
+            }
 
-    setAudioTrack(m_currentAudioTrack);
-    setSubtitleTrack(m_currentSubtitlesTrack);
+            libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
-    if(m_adjustmentsEnabled){
-        libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Brightness, brightnessValue);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Contrast, contrastValue);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Saturation, saturationValue);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Hue, hueValue);
-    }
+            libvlc_media_player_play(m_player);
 
-    if(m_zoomActivated) libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+            setAudioTrack(m_currentAudioTrack);
+            setSubtitleTrack(m_currentSubtitlesTrack);
 
-    libvlc_audio_set_mute(m_player, m_muted);
-    libvlc_audio_set_volume(m_player, m_volume);
+            if(m_adjustmentsEnabled){
+                libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Brightness, brightnessValue);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Contrast, contrastValue);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Saturation, saturationValue);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Hue, hueValue);
+            }
 
-    emit rotationTooltipUpdateRequested(m_rotationIndex);
-    emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
+            if(m_zoomActivated) libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+
+            libvlc_audio_set_mute(m_player, m_muted);
+            libvlc_audio_set_volume(m_player, m_volume);
+
+            emit rotationTooltipUpdateRequested(m_rotationIndex);
+            emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
+        });
+    });
 
 }
 

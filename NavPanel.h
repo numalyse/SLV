@@ -20,6 +20,7 @@ class NavPanel : public QWidget
 public:
     explicit NavPanel(QWidget *parent = nullptr);
     const bool isOpen(){return m_isOpen;}
+    ThumbnailWorker* thumbnailWorker() const { return m_thumbnailWorker; }
 private:
 
     bool m_isOpen = false;

@@ -8,14 +8,12 @@
 #include <QFileDialog>
 
 
-ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, Media* media, QVector<Shot> &projectShots, QObject *parent) 
-: QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, p_media{media}
+ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath* mathManager, Media* media, QVector<Shot> &projectShots, ThumbnailWorker* thumbnailWorker, QObject *parent)
+: QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, p_media{media}, p_thumbnailWorker{thumbnailWorker}
 {
-    m_thumbnailWorker = new ThumbnailWorker(this);
-    connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
+    connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
     connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentDone, this, &ShotManager::shotsExtractionFinished);
     connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentFailed, this, &ShotManager::shotsExtractionFailed);
-    m_thumbnailWorker->start();
 
     setShotItemsData(projectShots);
 }
@@ -220,11 +218,11 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     if(p_media->type() == MediaType::Video){
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
-            m_thumbnailWorker->requestThumbnail(index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-            m_thumbnailWorker->requestThumbnail(index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); 
+            p_thumbnailWorker->requestThumbnail(index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); 
         }else {
-            m_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-            m_thumbnailWorker->requestThumbnail(index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
+            p_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
         }
     }
 
@@ -373,9 +371,9 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
         if(p_media->type() == MediaType::Video){
             if(displayByTagFrames) {
-                m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
-                m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
         }
 
@@ -427,9 +425,9 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
         if(p_media->type() == MediaType::Video){
             if(displayByTagFrames) {
-                m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
-                m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
         }
 
@@ -457,16 +455,18 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
     if(p_media->type() == MediaType::Video){
         if(displayByTagFrames) {
-            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }else {
-            m_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }
     }
 
 }
 
 void ShotManager::updateThumbnail(int requestId, QImage image){
-    if(requestId < 0 || requestId >= m_shotItems.size()){
+    if(requestId < 0) return; // id == -1 : destiné au tagImage du shotDetail, géré par NavPanel
+
+    if(requestId >= m_shotItems.size()){
         qDebug() << "[ShotManager] Tentative de mise a jour d'un shot out of range";
         return;
     }

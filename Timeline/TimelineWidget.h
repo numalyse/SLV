@@ -36,7 +36,7 @@ Q_OBJECT
 
 public:
 
-explicit TimelineWidget(Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+explicit TimelineWidget(Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, ThumbnailWorker* thumbnailWorker, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);

@@ -37,7 +37,11 @@ public:
     void requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize = {100, 75}, double sar = 1.0);
     void stop();
     void clearQueue();
+    void clearQueueForId(int requestId);
     void keepNQueue(const int n);
+
+public slots:
+    void requestReleaseCap();
 
 signals:
     void thumbnailReady(int requestId, const QImage& image);
@@ -50,6 +54,7 @@ private:
     QMutex m_mutex;
     QWaitCondition m_condition;
     bool m_stop = false;
+    bool m_releaseCap = false;
     int m_frameOffset = 100;
 };
 

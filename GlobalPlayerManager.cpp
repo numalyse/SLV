@@ -168,6 +168,8 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         connect(m_navPanel, &NavPanel::ejectCurrentMedia, m_player, &PlayerWidget::eject);
         connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
         connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
+    }else {
+        emit SignalManager::instance().requestThumbnailWorkerReleaseCap(); // si on est en mode "multiple", vide les opencv captures
     }
 
     // maintient la fenetre dans l'écran actuel
@@ -332,6 +334,9 @@ void GlobalPlayerManager::createTimelineWidget()
         m_timeline->deleteLater();
         m_timeline = nullptr;
     }
+
+    m_navPanel->thumbnailWorker()->clearQueue(); // évite que les requêtes de l'ancien projet (ancien ShotManager pas encore détruit) soient livrées au nouveau
+
     ProjectManager& projManager = ProjectManager::instance();
     Project* proj = projManager.projet();
     Media* projMedia = proj->media;
@@ -352,7 +357,7 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia, m_player, proj->shots, this, width());
+    m_timeline = new TimelineWidget(projMedia, m_player, proj->shots, m_navPanel->thumbnailWorker(), this, width());
     m_timeline->setFixedHeight(160);
     m_timeline->hide();
 

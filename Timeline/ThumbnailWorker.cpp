@@ -32,12 +32,28 @@ void ThumbnailWorker::clearQueue()
     m_queue.clear();
 }
 
+void ThumbnailWorker::clearQueueForId(int requestId)
+{
+    QMutexLocker locker(&m_mutex);
+    QQueue<ThumbnailRequest> filtered;
+    for (const auto& request : m_queue) {
+        if (request.requestId != requestId) filtered.enqueue(request);
+    }
+    m_queue = filtered;
+}
+
 void ThumbnailWorker::keepNQueue(const int n)
 {
     QMutexLocker locker(&m_mutex);
     while (m_queue.size() > n) {
         m_queue.dequeue();
     }
+}
+
+void ThumbnailWorker::requestReleaseCap(){
+    QMutexLocker locker(&m_mutex);
+    m_releaseCap = true;
+    m_condition.wakeOne();
 }
 
 void ThumbnailWorker::run()
@@ -52,12 +68,21 @@ void ThumbnailWorker::run()
         { // scope du mutex, on veut verrrouiller que quand on retire un element de la queue 
             QMutexLocker locker(&m_mutex);
 
-            while (m_queue.isEmpty() && !m_stop) {
+            while (m_queue.isEmpty() && !m_stop && !m_releaseCap) {
                 m_condition.wait(&m_mutex); // attend qu'on ajoute un élément
             }
             
             if (m_stop) break; // si on a été réveillé pour arrêter le thread
             
+            if (m_releaseCap) { // on a demandé de release la capture
+                // on release + clear la queue et on wait à nouveau
+                m_releaseCap = false;
+                cap.release();
+                previousMediaPath = "";
+                m_queue.clear();
+                continue;            
+            }
+
             req = m_queue.dequeue();
         }
 

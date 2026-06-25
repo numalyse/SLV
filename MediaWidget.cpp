@@ -189,6 +189,8 @@ bool MediaWidget::stop()
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
     libvlc_media_player_next_frame(m_player);
+    int64_t currentTime = libvlc_media_player_get_time(m_player);
+    emit vlcTimeChanged(currentTime);
     return true;
 }
 
@@ -728,6 +730,11 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     {
         mediaWidget->m_vlcTime = event->u.media_player_time_changed.new_time;
         emit mediaWidget->vlcTimeChanged(event->u.media_player_time_changed.new_time);
+    }
+    else if(event->type == libvlc_MediaPlayerPaused){
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+            emit mediaWidget->playbackPaused();
+        });
     }
     else if(event->type == libvlc_MediaPlayerEndReached){
 

@@ -51,6 +51,7 @@ protected:
 
 private:
     QQueue<ThumbnailRequest> m_queue;
+    QQueue<ThumbnailRequest> m_priorityQueue; // requestId < 0 (tagImage du shotDetail), traitée avant m_queue pour rester réactif dans le panneau shotDetail
     QMutex m_mutex;
     QWaitCondition m_condition;
     bool m_stop = false;

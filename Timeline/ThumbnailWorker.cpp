@@ -15,7 +15,13 @@ void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t l
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
+    ThumbnailRequest request{requestId, msStart, lengthMs, mediaPath, targetSize, sar};
+    // requestId < 0 (tagImage du shotDetail), traitée avant m_queue pour rester réactif dans le panneau shotDetail
+    if (requestId < 0) {
+        m_priorityQueue.enqueue(request);
+    } else {
+        m_queue.enqueue(request);
+    }
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
 
@@ -30,16 +36,18 @@ void ThumbnailWorker::clearQueue()
 {
     QMutexLocker locker(&m_mutex);
     m_queue.clear();
+    m_priorityQueue.clear();
 }
 
 void ThumbnailWorker::clearQueueForId(int requestId)
 {
     QMutexLocker locker(&m_mutex);
+    QQueue<ThumbnailRequest>& target = (requestId < 0) ? m_priorityQueue : m_queue;
     QQueue<ThumbnailRequest> filtered;
-    for (const auto& request : m_queue) {
+    for (const auto& request : target) {
         if (request.requestId != requestId) filtered.enqueue(request);
     }
-    m_queue = filtered;
+    target = filtered;
 }
 
 void ThumbnailWorker::keepNQueue(const int n)
@@ -61,29 +69,33 @@ void ThumbnailWorker::run()
     cv::VideoCapture cap;
     QString previousMediaPath = "";
     double fps {};
+    int origWidth = 0;
+    int origHeight = 0;
 
     while(!m_stop){
         ThumbnailRequest req;
 
-        { // scope du mutex, on veut verrrouiller que quand on retire un element de la queue 
+        { // scope du mutex, on veut verrrouiller que quand on retire un element de la queue
             QMutexLocker locker(&m_mutex);
 
-            while (m_queue.isEmpty() && !m_stop && !m_releaseCap) {
+            while (m_queue.isEmpty() && m_priorityQueue.isEmpty() && !m_stop && !m_releaseCap) {
                 m_condition.wait(&m_mutex); // attend qu'on ajoute un élément
             }
-            
+
             if (m_stop) break; // si on a été réveillé pour arrêter le thread
-            
+
             if (m_releaseCap) { // on a demandé de release la capture
                 // on release + clear la queue et on wait à nouveau
                 m_releaseCap = false;
                 cap.release();
                 previousMediaPath = "";
                 m_queue.clear();
-                continue;            
+                m_priorityQueue.clear();
+                continue;
             }
 
-            req = m_queue.dequeue();
+            // traite en priorité les demandes du shotDetail (id < 0)
+            req = m_priorityQueue.isEmpty() ? m_queue.dequeue() : m_priorityQueue.dequeue();
         }
 
         if (req.videoPath != previousMediaPath){
@@ -118,6 +130,8 @@ void ThumbnailWorker::run()
             //qDebug() << "Thumbnail : changement de média";
             previousMediaPath = req.videoPath;
             fps = cap.get(cv::CAP_PROP_FPS);
+            origWidth = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
+            origHeight = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
         }
 
 
@@ -127,35 +141,43 @@ void ThumbnailWorker::run()
             msThumbnail = req.msStart + offsetMs;
         }
 
+        // calcule la taille cible (KeepAspectRatio + correction du sar) avant la lecture, pour demander au decoder de scale+convertir directement à cette taille
+        // (évite d'allouer/convertir une frame pleine résolution -ex 4k- juste pour la resize ensuite, sur les backends qui permettent de resize directement)
+        cv::Size newSize{};
+        if (origWidth > 0 && origHeight > 0) {
+            double adjustedWidth = (req.sar > 0) ? static_cast<double>(origWidth) * req.sar : origWidth; // prend en compte le pixel aspect ratio pour compenser les pixels rectangulaires
+
+            double scaleWidth = static_cast<double>(req.targetSize.width()) / adjustedWidth;
+            double scaleHeight = static_cast<double>(req.targetSize.height()) / origHeight;
+
+            // On prend la plus petite échelle pour que l'image rentre entièrement (KeepAspectRatio)
+            double scale = std::min(scaleWidth, scaleHeight);
+
+            newSize = cv::Size(
+                static_cast<int>(adjustedWidth * scale),
+                static_cast<int>(origHeight * scale)
+            );
+
+            cap.set(cv::CAP_PROP_FRAME_WIDTH, newSize.width);
+            cap.set(cv::CAP_PROP_FRAME_HEIGHT, newSize.height);
+        }
+
         cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(msThumbnail));
-        
+
         cv::Mat frame;
 
         if (!cap.read(frame) || frame.empty()) {
             qWarning() << "[ThumbnailWorker] Impossible de lire la frame au timestamp :" << msThumbnail;
-            continue; 
+            continue;
         }
 
-        int origWidth = frame.cols;
-        int origHeight = frame.rows;
-
-        double adjustedWidth = (req.sar > 0) ? static_cast<double>(origWidth) * req.sar : origWidth; // prend en compte le pixel aspect ratio pour compenser les pixels rectangulaires
-
-        cv::Size cvTargetSize(req.targetSize.width(), req.targetSize.height());
-
-        double scaleWidth = static_cast<double>(cvTargetSize.width) / adjustedWidth;
-        double scaleHeight = static_cast<double>(cvTargetSize.height) / origHeight;
-
-        // On prend la plus petite échelle pour que l'image rentre entièrement (KeepAspectRatio)
-        double scale = std::min(scaleWidth, scaleHeight);
-
-        cv::Size newSize(
-            static_cast<int>(adjustedWidth * scale),
-            static_cast<int>(origHeight * scale)
-        );
-
         cv::Mat resized;
-        cv::resize(frame, resized, newSize, 0, 0, cv::INTER_NEAREST);
+        if (newSize.width > 0 && newSize.height > 0 && (frame.cols != newSize.width || frame.rows != newSize.height)) {
+            // le backend n'a pas respecté la taille demandée au decode, fallback sur un resize manuel
+            cv::resize(frame, resized, newSize, 0, 0, cv::INTER_NEAREST);
+        } else {
+            resized = frame;
+        }
 
         QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
 

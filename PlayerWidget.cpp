@@ -108,6 +108,16 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         else QMessageBox::warning(nullptr, "", PrefManager::instance().getText("conflict_subtitles"));
     });
 
+    connect(m_mediaWidget, &MediaWidget::playbackStarted, this, [this](){
+        emit playUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    });
+
+    connect(m_mediaWidget, &MediaWidget::playbackPaused, this, [this](){
+        emit pauseUiUpdateRequested();
+        emit checkPlayersPlayStatusRequested();
+    });
+
     connect(this, &PlayerWidget::mediaDropped, &SignalManager::instance(), &SignalManager::playerWidgetMediaDropped);
 
     QWidget* containerWidget = new QWidget(this);
@@ -293,11 +303,7 @@ void PlayerWidget::playFromAdvanced()
 
 void PlayerWidget::pause()
 {
-    if (m_mediaWidget->pause()){
-        emit pauseUiUpdateRequested();
-        emit checkPlayersPlayStatusRequested();
-    }
-
+    m_mediaWidget->pause();
 }
 
 void PlayerWidget::togglePlayPause(bool isPlaying)
@@ -309,11 +315,7 @@ void PlayerWidget::togglePlayPause(bool isPlaying)
 
 void PlayerWidget::stop()
 {
-    if(m_mediaWidget->stop()){
-        emit stopUiUpdateRequested();
-        emit checkPlayersPlayStatusRequested();
-    };
-
+    m_mediaWidget->stop();
 }
 
 void PlayerWidget::eject()

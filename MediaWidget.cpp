@@ -140,11 +140,7 @@ void MediaWidget::managePlayerSystem()
 /// @brief Destructeur qui détache les event managers vlc
 MediaWidget::~MediaWidget()
 {
-    if(m_eventManager){
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
-        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
-    }
+    releaseEventManager();
 
     m_videoCaptureManager.deleteMediaTempDirectory();
     releaseMedia();
@@ -193,6 +189,8 @@ bool MediaWidget::stop()
     pause();
     libvlc_media_player_set_position(m_player, 0.0);
     libvlc_media_player_next_frame(m_player);
+    int64_t currentTime = libvlc_media_player_get_time(m_player);
+    emit vlcTimeChanged(currentTime);
     return true;
 }
 
@@ -516,59 +514,67 @@ void MediaWidget::transformMedia()
 
     releaseEventManager();
 
-    libvlc_media_player_stop(m_player);
-    libvlc_media_player_release(m_player);
+    QThreadPool::globalInstance()->start([this, brightnessValue, contrastValue, saturationValue, hueValue]() {
 
-    if (m_vlcInstance) {
-        libvlc_release(m_vlcInstance);
-    }
+        if(m_player){
+            libvlc_media_player_stop(m_player);
+            libvlc_media_player_release(m_player);
+        }
 
-#ifdef Q_OS_MAC
-    setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
-#endif
+        if (m_vlcInstance) {
+            libvlc_release(m_vlcInstance);
+        }
 
-    auto args = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
+        #ifdef Q_OS_MAC
+            setenv("VLC_PLUGIN_PATH", "/Applications/VLC.app/Contents/MacOS/plugins", 0);
+        #endif
 
-    m_vlcInstance = libvlc_new(args.size(), args.data());
-    m_player = libvlc_media_player_new(m_vlcInstance);
-    libvlc_video_set_mouse_input(m_player, 0);
-    libvlc_video_set_key_input(m_player, 0);
+        auto args = getArgsFromTransform(m_rotationIndex, m_hflipped, m_vflipped);
 
-    createEventManager();
+        m_vlcInstance = libvlc_new(args.size(), args.data());
+        m_player = libvlc_media_player_new(m_vlcInstance);
+        libvlc_video_set_mouse_input(m_player, 0);
+        libvlc_video_set_key_input(m_player, 0);
 
-    managePlayerSystem();
-    createMedia(m_media->filePath(), true);
+        QMetaObject::invokeMethod(this, [this, brightnessValue, contrastValue, saturationValue, hueValue]() {
 
-    // démarre le décodage directement à la position voulue  pour
-    // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
-    // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
-    if (m_pendingTransformTime > 0) {
-        QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
-        libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
-    }
+            createEventManager();
 
-    libvlc_media_player_set_media(m_player, m_media->vlcMedia());
+            managePlayerSystem();
+            createMedia(m_media->filePath(), true);
 
-    libvlc_media_player_play(m_player);
+            // démarre le décodage directement à la position voulue  pour
+            // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
+            // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
+            if (m_pendingTransformTime > 0) {
+                QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
+                libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
+            }
 
-    setAudioTrack(m_currentAudioTrack);
-    setSubtitleTrack(m_currentSubtitlesTrack);
+            libvlc_media_player_set_media(m_player, m_media->vlcMedia());
 
-    if(m_adjustmentsEnabled){
-        libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Brightness, brightnessValue);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Contrast, contrastValue);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Saturation, saturationValue);
-        libvlc_video_set_adjust_float(m_player, libvlc_adjust_Hue, hueValue);
-    }
+            libvlc_media_player_play(m_player);
 
-    if(m_zoomActivated) libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+            setAudioTrack(m_currentAudioTrack);
+            setSubtitleTrack(m_currentSubtitlesTrack);
 
-    libvlc_audio_set_mute(m_player, m_muted);
-    libvlc_audio_set_volume(m_player, m_volume);
+            if(m_adjustmentsEnabled){
+                libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Brightness, brightnessValue);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Contrast, contrastValue);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Saturation, saturationValue);
+                libvlc_video_set_adjust_float(m_player, libvlc_adjust_Hue, hueValue);
+            }
 
-    emit rotationTooltipUpdateRequested(m_rotationIndex);
-    emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
+            if(m_zoomActivated) libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+
+            libvlc_audio_set_mute(m_player, m_muted);
+            libvlc_audio_set_volume(m_player, m_volume);
+
+            emit rotationTooltipUpdateRequested(m_rotationIndex);
+            emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);
+        });
+    });
 
 }
 
@@ -610,6 +616,7 @@ void MediaWidget::requestTransform()
 void MediaWidget::finishTransform()
 {
     m_transformPending = false;
+    m_transformSeekStarted = false;
     if(m_transformDirty){
         m_transformDirty = false;
         transformMedia();
@@ -730,8 +737,43 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {
+        // En déplacant ici le setTime après une transformation, 
+        // on s'assure que vlc ait produit des frames (plutot qu'avec un single shot dans mediaplaying)
+        if (mediaWidget->m_transformPending && !mediaWidget->m_transformSeekStarted) {
+            mediaWidget->m_transformSeekStarted = true;
+
+            QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+                if (mediaWidget->m_pendingTransformPause) {
+
+                    mediaWidget->pause();
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                    mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
+                    emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
+                    emit mediaWidget->playbackPaused();
+                    // on signale la fin de la transformation plus tard car les opérations vlc précédentes prennent du temps, évite le spam
+                    QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
+                        mediaWidget->finishTransform();
+                    });
+
+                } else {
+
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                    emit mediaWidget->playbackStarted();
+                    mediaWidget->finishTransform();
+
+                }
+            }, Qt::QueuedConnection);
+
+            return;
+        }
+    
         mediaWidget->m_vlcTime = event->u.media_player_time_changed.new_time;
         emit mediaWidget->vlcTimeChanged(event->u.media_player_time_changed.new_time);
+    }
+    else if(event->type == libvlc_MediaPlayerPaused){
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+            emit mediaWidget->playbackPaused();
+        });
     }
     else if(event->type == libvlc_MediaPlayerEndReached){
 
@@ -765,28 +807,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             unsigned height = 0;
 
             libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+            
 
-            if (mediaWidget->m_transformPending) {
-
-                if (mediaWidget->m_pendingTransformPause) {
-                    // singleshot pour décaler le pause afin que vlc "démarre" et produise une frame, sinon rien ne s'affiche.
-                    QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
-                        mediaWidget->pause();
-                        // on utilise pas la méthode setTime à cause de mediaCutAndConcat
-                        if(mediaWidget->m_player){
-                            libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
-                            mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
-                            emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
-                        }
-                        // on signale la fin de la transformation encore plus tard car les opérations vlc précédentes prennent du temps, évite les bugs de spam
-                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
-                            mediaWidget->finishTransform();
-                        });
-                    });
-                } else {
-                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
-                    mediaWidget->finishTransform();
-                }
+            if (!mediaWidget->m_transformPending) {
+                emit mediaWidget->playbackStarted();  
             }
 
             if (width > 0 && height > 0)
@@ -962,6 +986,7 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
@@ -976,6 +1001,7 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";

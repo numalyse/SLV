@@ -3,9 +3,11 @@ bin/
 ffmpeg/
 vlc-sdk/
 .vscode/
+.vs/
 .qtcreator/*
 .qtcreator/CMakeLists.txt.user
 /.qtcreator
 .DS_Store
 installer/Output/
 python_embedded/
+CMakeSettings.json

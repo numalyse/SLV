@@ -112,6 +112,7 @@ private:
 
     bool m_transformPending = false;
     bool m_transformDirty = false;
+    bool m_transformSeekStarted = false;
     int64_t m_pendingTransformTime = 0;
     bool m_pendingTransformPause = false;
 
@@ -167,7 +168,8 @@ signals:
     void rotationTooltipUpdateRequested(const int);
     void flipTooltipUpdateRequested(const bool, const bool);
     void subtitleTrackAdded(int trackId, const QString& label); 
-
+    void playbackPaused();
+    void playbackStarted();
 };
 
 #endif // MEDIAWIDGET_H

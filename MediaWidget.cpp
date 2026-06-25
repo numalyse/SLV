@@ -608,6 +608,7 @@ void MediaWidget::requestTransform()
 void MediaWidget::finishTransform()
 {
     m_transformPending = false;
+    m_transformSeekStarted = false;
     if(m_transformDirty){
         m_transformDirty = false;
         transformMedia();
@@ -728,6 +729,36 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
     if (event->type == libvlc_MediaPlayerTimeChanged)
     {
+        // En déplacant ici le setTime après une transformation, 
+        // on s'assure que vlc ait produit des frames (plutot qu'avec un single shot dans mediaplaying)
+        if (mediaWidget->m_transformPending && !mediaWidget->m_transformSeekStarted) {
+            mediaWidget->m_transformSeekStarted = true;
+
+            QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+                if (mediaWidget->m_pendingTransformPause) {
+
+                    mediaWidget->pause();
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                    mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
+                    emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
+                    emit mediaWidget->playbackPaused();
+                    // on signale la fin de la transformation plus tard car les opérations vlc précédentes prennent du temps, évite le spam
+                    QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
+                        mediaWidget->finishTransform();
+                    });
+
+                } else {
+
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
+                    emit mediaWidget->playbackStarted();
+                    mediaWidget->finishTransform();
+
+                }
+            }, Qt::QueuedConnection);
+
+            return;
+        }
+    
         mediaWidget->m_vlcTime = event->u.media_player_time_changed.new_time;
         emit mediaWidget->vlcTimeChanged(event->u.media_player_time_changed.new_time);
     }
@@ -768,28 +799,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             unsigned height = 0;
 
             libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
+            
 
-            if (mediaWidget->m_transformPending) {
-
-                if (mediaWidget->m_pendingTransformPause) {
-                    // singleshot pour décaler le pause afin que vlc "démarre" et produise une frame, sinon rien ne s'affiche.
-                    QTimer::singleShot(0, mediaWidget, [mediaWidget]() {
-                        mediaWidget->pause();
-                        // on utilise pas la méthode setTime à cause de mediaCutAndConcat
-                        if(mediaWidget->m_player){
-                            libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
-                            mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
-                            emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
-                        }
-                        // on signale la fin de la transformation encore plus tard car les opérations vlc précédentes prennent du temps, évite les bugs de spam
-                        QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
-                            mediaWidget->finishTransform();
-                        });
-                    });
-                } else {
-                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
-                    mediaWidget->finishTransform();
-                }
+            if (!mediaWidget->m_transformPending) {
+                emit mediaWidget->playbackStarted();  
             }
 
             if (width > 0 && height > 0)
@@ -965,6 +978,7 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
@@ -979,6 +993,7 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerEndReached, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";

@@ -3,8 +3,8 @@
 #include "SignalManager.h"
 #include <QScrollArea>
 
-NavPanel::NavPanel(QWidget *parent)
-    : QWidget{parent}
+NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
+    : QWidget{parent}, p_thumbnailWorker{thumbnailWorker}
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_mainLayout = new QHBoxLayout(this);
@@ -42,15 +42,12 @@ NavPanel::NavPanel(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail, this, &NavPanel::displayShotDetail);
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
 
-    m_thumbnailWorker = new ThumbnailWorker(this);
-    connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
+    connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
 
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
     connect(m_shotDetail, &ShotDetail::clearThumbnailQueueRequested, this, [this](){
-        m_thumbnailWorker->clearQueue(); // prevent having many images inside the queue since m_thumbnailWorker now only used by m_shotDetail
+        p_thumbnailWorker->clearPriotityQueue(); // prevent having many images inside the priority queue
     });
-
-    m_thumbnailWorker->start();
     
 }
 
@@ -115,7 +112,7 @@ void NavPanel::enableShotControlButtons()
 }
 
 void NavPanel::updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize){
-    if(media->type() == MediaType::Video) m_thumbnailWorker->requestThumbnail(requestId, time, length, media->filePath(), targetSize, media->sar());
+    if(media->type() == MediaType::Video) p_thumbnailWorker->requestThumbnail(requestId, time, length, media->filePath(), targetSize, media->sar());
 }
 
 void NavPanel::updateThumbnail(int imageId, QImage image){

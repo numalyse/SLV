@@ -18,7 +18,7 @@ class NavPanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NavPanel(QWidget *parent = nullptr);
+    explicit NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent = nullptr);
     const bool isOpen(){return m_isOpen;}
 private:
 
@@ -28,7 +28,9 @@ private:
     QLayout *m_mainLayout = nullptr;
     Playlist *m_playlistWidget = nullptr;
     ShotDetail *m_shotDetail = nullptr;
-    ThumbnailWorker* m_thumbnailWorker = nullptr;
+
+    // non owner
+    ThumbnailWorker* p_thumbnailWorker = nullptr;
 
 public slots:
     void showPanel();

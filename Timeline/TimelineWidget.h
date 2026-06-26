@@ -10,6 +10,7 @@
 #include "Timeline/ABManager.h"
 #include "Timeline/SegmentationThread.h"
 #include "Timeline/TransitionManager.h"
+#include "Timeline/ThumbnailWorker.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -36,7 +37,7 @@ Q_OBJECT
 
 public:
 
-explicit TimelineWidget(Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);

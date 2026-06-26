@@ -15,7 +15,12 @@ void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t l
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
+    if(requestId >= 0){ 
+        m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
+    }else { // id < 0, priorité sur les autres
+        m_priorityQueue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
+    }
+
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
 
@@ -40,6 +45,19 @@ void ThumbnailWorker::keepNQueue(const int n)
     }
 }
 
+void ThumbnailWorker::clearPriotityQueue()
+{
+    QMutexLocker locker(&m_mutex);
+    m_priorityQueue.clear();
+}
+
+void ThumbnailWorker::releaseOpenCvCap()
+{
+    QMutexLocker locker(&m_mutex);
+    m_releaseCap = true;
+    m_condition.wakeOne(); 
+}
+
 void ThumbnailWorker::run()
 {
     cv::VideoCapture cap;
@@ -52,13 +70,22 @@ void ThumbnailWorker::run()
         { // scope du mutex, on veut verrrouiller que quand on retire un element de la queue 
             QMutexLocker locker(&m_mutex);
 
-            while (m_queue.isEmpty() && !m_stop) {
-                m_condition.wait(&m_mutex); // attend qu'on ajoute un élément
+            while (m_queue.isEmpty() && m_priorityQueue.isEmpty() && !m_stop && !m_releaseCap) {
+                m_condition.wait(&m_mutex); // attend qu'on ajoute un élément / qu'on stop / qu'on release
             }
             
             if (m_stop) break; // si on a été réveillé pour arrêter le thread
             
-            req = m_queue.dequeue();
+            if(m_releaseCap){ // release la capture opencv puis attend une requete
+                m_queue.clear();
+                m_priorityQueue.clear();
+                cap.release();
+                previousMediaPath = "";
+                m_releaseCap = false;
+                continue;
+            }
+
+            req = (m_priorityQueue.empty()) ? m_queue.dequeue() : m_priorityQueue.dequeue();
         }
 
         if (req.videoPath != previousMediaPath){

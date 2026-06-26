@@ -22,7 +22,7 @@ Q_OBJECT
 
 public:
 
-    explicit ShotManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, Media* media, QVector<Shot> &projectShots, QObject *parent);
+    explicit ShotManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, ThumbnailWorker* thumbnailWorker, Media* media, QVector<Shot> &projectShots, QObject *parent);
 
     void updateCurrentShot(int64_t time);
 
@@ -83,7 +83,7 @@ private:
     TimelineMath* p_mathManager = nullptr;
     Media* p_media = nullptr;
 
-    ThumbnailWorker* m_thumbnailWorker = nullptr;
+    ThumbnailWorker* p_thumbnailWorker = nullptr;
     int m_thumbnailWidth{100};
     int m_thumbnailHeight{75};
 

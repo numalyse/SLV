@@ -21,8 +21,11 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
     mainLayout->addLayout(layout);
-    //m_navPanel = new NavPanel(this, m_shotInfoController);
-    m_navPanel = new NavPanel(this);
+
+    m_thumbnailWorker = new ThumbnailWorker(this);
+    m_thumbnailWorker->start();
+
+    m_navPanel = new NavPanel(m_thumbnailWorker, this);
     mainLayout->addWidget(m_navPanel);
 
     m_separationLine = new QFrame();
@@ -95,8 +98,6 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         disableSegmentation();
     });
 
-
-
     m_layoutManager->createLayout(1);
     qDebug() << "GlobalPlayerManager height : " << this->height();
     //m_navPanel->
@@ -109,7 +110,7 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 }
 
 /// @brief Met à jour le widget qui contient les playerWidgets et la toolbar avancée ou globale.
-/// @param videoPlayersCount Nombre de PlayerWidgets dans le container
+/// @param player Si != nullptr, alors 1 player dans newPlayersWidget
 /// @param newPlayersWidget Le widget à ajouter au layout
 /// @param newToolbar La GlobalToolbar si videoPlayersCount != 1, AdvancedToolbar sinon
 void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPlayersWidget, Toolbar* newToolbar)
@@ -133,41 +134,48 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
         m_timeline = nullptr;
     }
 
+    m_player = player;
+
     // ajout du nouveau playerWidget et toolbar 
     if (newPlayersWidget){
         m_playersWidget = newPlayersWidget;
         layout->addWidget(m_playersWidget);
     }
+
     if (newToolbar){
         m_toolbarWidget = newToolbar;
         auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(m_toolbarWidget);
-        if(!advancedToolbar){
-            layout->addWidget(m_separationLine);
-            m_separationLine->show();
+        auto *globalToolbar = qobject_cast<GlobalToolbar*>(m_toolbarWidget);
+        if(globalToolbar){
+            if(m_separationLine){
+                layout->addWidget(m_separationLine);
+                m_separationLine->show();
+            }
+            m_thumbnailWorker->releaseOpenCvCap(); // plus besoin de thumbnail worker quand plus de 1 player, on release pour economiser de la mémoire
         }
-        else if(m_separationLine){
-            layout->removeWidget(m_separationLine);
-            m_separationLine->hide();
+        else if(advancedToolbar){
+            if(m_separationLine){
+                layout->removeWidget(m_separationLine);
+                m_separationLine->hide();
+            }
+
+            connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
+
+            connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
+            connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
+            disconnect(m_navPanel, &NavPanel::ejectCurrentMedia, nullptr, nullptr);
+            connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
+            connect(m_navPanel, &NavPanel::ejectCurrentMedia, this, [this](){ // eject le media et release la cap opencv
+                m_player->eject();
+                m_thumbnailWorker->releaseOpenCvCap();
+            });
+            connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
+            connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
+
         }
+
         layout->addWidget(m_toolbarWidget);
         m_toolbarWidget->setTBParent(this); // since toolbar was created in playerlayoutmanager, need to update its internal m_parent 
-    }
-
-
-    m_player = player;
-
-    auto *advancedToolbar = qobject_cast<AdvancedToolbar*>(newToolbar);
-
-    if(advancedToolbar){
-        connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
-
-        connect(advancedToolbar, &AdvancedToolbar::previousMediaRequested, this, &GlobalPlayerManager::playPreviousMedia);
-        connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
-        disconnect(m_navPanel, &NavPanel::ejectCurrentMedia, nullptr, nullptr);
-        connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
-        connect(m_navPanel, &NavPanel::ejectCurrentMedia, m_player, &PlayerWidget::eject);
-        connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
-        connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
     }
 
     // maintient la fenetre dans l'écran actuel
@@ -352,7 +360,7 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(projMedia, m_player, proj->shots, this, width());
+    m_timeline = new TimelineWidget(m_thumbnailWorker, projMedia, m_player, proj->shots, this, width());
     m_timeline->setFixedHeight(160);
     m_timeline->hide();
 

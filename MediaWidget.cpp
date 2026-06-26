@@ -88,7 +88,10 @@ MediaWidget::MediaWidget(QWidget *parent)
         pluginArg.c_str(),
         "--verbose=2"
     };
-    m_vlcInstance = libvlc_new(4, vlc_args_win);
+
+    int winArgc = sizeof(vlc_args_win) / sizeof(vlc_args_win[0]);
+
+    m_vlcInstance = libvlc_new(winArgc, vlc_args_win);
 #else
     m_vlcInstance = libvlc_new(argc, vlc_args);
 #endif
@@ -110,6 +113,13 @@ MediaWidget::MediaWidget(QWidget *parent)
     connect(this, &MediaWidget::mediaFinished,
             &SignalManager::instance(),
             &SignalManager::mediaWidgetMediaFinished);
+
+    m_transformDebounceTimer = new QTimer(this);
+    m_transformDebounceTimer->setSingleShot(true);
+    m_transformDebounceTimer->setInterval(m_transformDebounceMs);
+    connect(m_transformDebounceTimer, &QTimer::timeout, this, [this](){
+        if(!m_transformPending) transformMedia();
+    });
 
     libvlc_media_player_play(m_player);
 }
@@ -148,10 +158,12 @@ MediaWidget::~MediaWidget()
     if (m_player) {
         libvlc_media_player_stop(m_player);
         libvlc_media_player_release(m_player);
+        m_player = nullptr;
     }
 
     if (m_vlcInstance) {
         libvlc_release(m_vlcInstance);
+        m_vlcInstance = nullptr;
     }
 }
 
@@ -213,6 +225,7 @@ bool MediaWidget::eject()
         if(m_player){
             libvlc_media_player_stop(m_player);
             libvlc_media_player_release(m_player);
+            m_player = nullptr;
         }
 
         m_player = libvlc_media_player_new(m_vlcInstance);
@@ -519,10 +532,12 @@ void MediaWidget::transformMedia()
         if(m_player){
             libvlc_media_player_stop(m_player);
             libvlc_media_player_release(m_player);
+            m_player = nullptr;
         }
 
         if (m_vlcInstance) {
             libvlc_release(m_vlcInstance);
+            m_vlcInstance = nullptr;
         }
 
         #ifdef Q_OS_MAC
@@ -602,24 +617,27 @@ void MediaWidget::vFlip()
     requestTransform();
 }
 
-/// @brief Lance un transform si aucun n'est en cours, sinon marque l'état comme dirty
+/// @brief tant que les appuis s'enchaînent, on repousse le lancement.
+/// La transformation ne part qu'une fois les appuis ont stop depuis m_transformDebounceMs. 
+/// Si un transform est déjà en cours, on marque dirty pour ré-appliquer après.
 void MediaWidget::requestTransform()
 {
     if(m_transformPending){
         m_transformDirty = true;
         return;
     }
-    transformMedia();
+    m_transformDebounceTimer->start(); 
 }
 
-/// @brief Fin du transform courant : si des clics ont eu lieu entre-temps (état dirty), on relance un transform pour appliquer le bon état final.
+/// @brief Fin du transform courant : si des appuis ont eu lieu entre-temps (état dirty), on relance le
+/// debounce (et pas directemnt une transformation au cas ou appuie sur boutons de rotate/flip).
 void MediaWidget::finishTransform()
 {
     m_transformPending = false;
     m_transformSeekStarted = false;
     if(m_transformDirty){
         m_transformDirty = false;
-        transformMedia();
+        m_transformDebounceTimer->start();
         return;
     }
 
@@ -750,14 +768,9 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                     mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
                     emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
                     emit mediaWidget->playbackPaused();
-                    // on signale la fin de la transformation plus tard car les opérations vlc précédentes prennent du temps, évite le spam
-                    QTimer::singleShot(200, mediaWidget, [mediaWidget]() {
-                        mediaWidget->finishTransform();
-                    });
-
+                    mediaWidget->finishTransform();
                 } else {
 
-                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
                     emit mediaWidget->playbackStarted();
                     mediaWidget->finishTransform();
 

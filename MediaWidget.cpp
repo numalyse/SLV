@@ -88,7 +88,10 @@ MediaWidget::MediaWidget(QWidget *parent)
         pluginArg.c_str(),
         "--verbose=2"
     };
-    m_vlcInstance = libvlc_new(4, vlc_args_win);
+
+    int winArgc = sizeof(vlc_args_win) / sizeof(vlc_args_win[0]);
+
+    m_vlcInstance = libvlc_new(winArgc, vlc_args_win);
 #else
     m_vlcInstance = libvlc_new(argc, vlc_args);
 #endif
@@ -148,10 +151,12 @@ MediaWidget::~MediaWidget()
     if (m_player) {
         libvlc_media_player_stop(m_player);
         libvlc_media_player_release(m_player);
+        m_player = nullptr;
     }
 
     if (m_vlcInstance) {
         libvlc_release(m_vlcInstance);
+        m_vlcInstance = nullptr;
     }
 }
 
@@ -213,6 +218,7 @@ bool MediaWidget::eject()
         if(m_player){
             libvlc_media_player_stop(m_player);
             libvlc_media_player_release(m_player);
+            m_player = nullptr;
         }
 
         m_player = libvlc_media_player_new(m_vlcInstance);
@@ -519,10 +525,12 @@ void MediaWidget::transformMedia()
         if(m_player){
             libvlc_media_player_stop(m_player);
             libvlc_media_player_release(m_player);
+            m_player = nullptr;
         }
 
         if (m_vlcInstance) {
             libvlc_release(m_vlcInstance);
+            m_vlcInstance = nullptr;
         }
 
         #ifdef Q_OS_MAC

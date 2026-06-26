@@ -165,10 +165,9 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
             connect(advancedToolbar, &AdvancedToolbar::nextMediaRequested, this, &GlobalPlayerManager::playNextMedia);
             disconnect(m_navPanel, &NavPanel::ejectCurrentMedia, nullptr, nullptr);
             connect(m_navPanel, &NavPanel::disableToolbarLoopRequested, advancedToolbar, &AdvancedToolbar::disableLoopMode);
-            connect(m_navPanel, &NavPanel::ejectCurrentMedia, this, [this](){ // eject le media et release la cap opencv
-                m_player->eject();
-                m_thumbnailWorker->releaseOpenCvCap();
-            });
+            connect(m_navPanel, &NavPanel::ejectCurrentMedia, m_player, &PlayerWidget::eject);
+            connect(advancedToolbar, &AdvancedToolbar::ejectUiUpdateDone, m_thumbnailWorker, &ThumbnailWorker::releaseOpenCvCap); // release la cap opencv après avoir fini d'ejecter 
+
             connect(advancedToolbar, &AdvancedToolbar::enableSegmentationRequest, this, &GlobalPlayerManager::enableSegmentation);
             connect(advancedToolbar, &AdvancedToolbar::disableSegmentationRequest, this, &GlobalPlayerManager::disableSegmentation);
 

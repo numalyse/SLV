@@ -156,6 +156,7 @@ signals:
     void extractSequenceRequest();
     void mediaInformationRequest();
     void subtitlesFileDialogRequested();
+    void ejectUiUpdateDone();
     
 };
 

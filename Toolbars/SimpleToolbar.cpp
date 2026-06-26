@@ -339,6 +339,7 @@ void SimpleToolbar::ejectUiUpdate()
     updateDurationText();
     resetSlider();
     pauseUiUpdate();
+    emit ejectUiUpdateDone();
 }
 
 void SimpleToolbar::stopUiUpdate()

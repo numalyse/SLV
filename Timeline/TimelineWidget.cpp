@@ -37,7 +37,7 @@
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots
 /// @param parent
-TimelineWidget::TimelineWidget(Media* projectMedia, PlayerWidget* player, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
+TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
     p_media = projectMedia;
     p_playerWidget = player;
@@ -156,7 +156,7 @@ TimelineWidget::TimelineWidget(Media* projectMedia, PlayerWidget* player, QVecto
 
     layout->addWidget(m_view);
 
-    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, projectMedia, projectShots, this);
+    m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, thumbnailWorker, projectMedia, projectShots, this);
     computeMediaAmplitudes(projectMedia->filePath());
 
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );

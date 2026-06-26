@@ -7,6 +7,7 @@
 #include "Media.h"
 #include "Timeline/TimelineWidget.h"
 #include "PlayerWidget.h"
+#include "Timeline/ThumbnailWorker.h"
 
 #include <QWidget>
 
@@ -32,6 +33,7 @@ private:
     QVBoxLayout* layout;
     QFrame* m_separationLine = nullptr;
     bool m_wasTimelineVisible = false;
+    ThumbnailWorker* m_thumbnailWorker = nullptr;
 
 public slots:
 

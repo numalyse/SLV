@@ -38,6 +38,10 @@ public:
     void stop();
     void clearQueue();
     void keepNQueue(const int n);
+    void clearPriotityQueue();
+
+public slots:
+    void releaseOpenCvCap();
 
 signals:
     void thumbnailReady(int requestId, const QImage& image);
@@ -47,9 +51,12 @@ protected:
 
 private:
     QQueue<ThumbnailRequest> m_queue;
+    // queue pour les requetes id < 0, dans shot detail, même si on a beaucoup d'images à charger, l'image du plan sera update meme apres une segmentation
+    QQueue<ThumbnailRequest> m_priorityQueue; 
     QMutex m_mutex;
     QWaitCondition m_condition;
     bool m_stop = false;
+    bool m_releaseCap = false;
     int m_frameOffset = 100;
 };
 

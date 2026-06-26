@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QComboBox>
 #include <QLabel>
+#include <QTimer>
 
 class MediaWidget : public QWidget
 {
@@ -95,12 +96,6 @@ private:
     bool m_adjustmentsEnabled = false;
     int m_volume = 100;
     bool m_muted = false;
-    std::vector<const char*> m_vlcArgs ={"--quiet",
-        "--aout=directsound",
-        "--no-video-title-show",
-        "--no-input-fast-seek"};
-    inline static const char* m_rotationSteps[4] = {"--rotate-angle=0", "--rotate-angle=90", "--rotate-angle=180", "--rotate-angle=270"};
-    inline static const char* m_flipSteps[2] = {"--transform-type=hflip", "-transform-type=vflip"};
     libvlc_event_manager_t* m_eventManager = nullptr;
     libvlc_event_manager_t* m_parseEventManager = nullptr;
     Media* m_media = nullptr;
@@ -117,6 +112,10 @@ private:
     bool m_transformSeekStarted = false;
     int64_t m_pendingTransformTime = 0;
     bool m_pendingTransformPause = false;
+
+    // A la fin du timer effectue la transformation, 
+    QTimer* m_transformDebounceTimer = nullptr;
+    static constexpr int m_transformDebounceMs = 250;
 
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
 

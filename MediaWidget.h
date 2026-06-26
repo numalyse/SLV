@@ -30,7 +30,9 @@ public:
     Media* media(){ return m_media;};
     int getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
 
-    bool isPlaying() { return libvlc_media_player_is_playing(m_player); };
+    bool isPlaying() { 
+        return (m_player) ? libvlc_media_player_is_playing(m_player) : false; 
+    };
 
     QList<QPair<int, QString>> audioTracks() const;
     QList<QPair<int, QString>> subtitlesTracks() const;

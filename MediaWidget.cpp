@@ -394,7 +394,9 @@ void MediaWidget::takeScreenshot()
     }
     
     auto& prefManager = PrefManager::instance();
-    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) +".png";
+
+    QString zoomStr = (m_zoomActivated) ? m_zoomHelper.getZoomStr() : "";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) + zoomStr +".png";
     if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
 
     QByteArray capturePathBytes = capturePath.toUtf8();

@@ -33,6 +33,16 @@ public:
         return QString("%1x%2+%3+%4").arg(x1).arg(y1).arg(x2).arg(y2);
     }
 
+    /// @brief 16 bits pour chaque coord du zoom dans un entier 64 bits (pas de vidéo avec un résolution > 2^16 donc safe)
+    QString getZoomStr(){
+        const quint64 key = (quint64(quint16(x1)) << 48)
+                           | (quint64(quint16(y1)) << 32)
+                           | (quint64(quint16(x2)) << 16)
+                           | quint64(quint16(y2));
+        return QString("_z_%1").arg(key, 0, 36);
+    }
+
+
     void clampValues(){
         x1 = std::clamp(x1, 0, maxWidth);
         y1 = std::clamp(y1, 0, maxHeight);

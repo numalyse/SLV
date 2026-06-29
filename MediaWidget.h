@@ -107,11 +107,18 @@ private:
     QPoint m_lastPanPos;
     bool m_isPanning = false;
 
-    bool m_transformPending = false;
-    bool m_transformDirty = false;
-    bool m_transformSeekStarted = false;
-    int64_t m_pendingTransformTime = 0;
-    bool m_pendingTransformPause = false;
+
+    enum class TransformState {
+        Idle,      // aucun transform en cours
+        Loading,   // instance/player recréés, on attend la 1ère frame décodée
+        Applying   // 1ère frame reçue, seek/pause en cours d'application
+    };
+    TransformState m_transformState = TransformState::Idle;
+    bool m_transformDirty = false; // si besoin de relancer une transformation une fois celle en cours terminé
+
+    // État à restaurer une fois le transform appliqué
+    int64_t m_restoreTime = 0;
+    bool m_restorePause = false;
 
     // A la fin du timer effectue la transformation, 
     QTimer* m_transformDebounceTimer = nullptr;

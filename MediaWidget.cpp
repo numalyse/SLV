@@ -118,7 +118,7 @@ MediaWidget::MediaWidget(QWidget *parent)
     m_transformDebounceTimer->setSingleShot(true);
     m_transformDebounceTimer->setInterval(m_transformDebounceMs);
     connect(m_transformDebounceTimer, &QTimer::timeout, this, [this](){
-        if(!m_transformPending) transformMedia();
+        if(m_transformState == TransformState::Idle) transformMedia();
     });
 
     libvlc_media_player_play(m_player);
@@ -509,15 +509,15 @@ void MediaWidget::endRecord()
 
 void MediaWidget::transformMedia()
 {
-    if(!m_player || !m_media ) return; 
-    m_transformPending = true;
+    if(!m_player || !m_media ) return;
+    m_transformState = TransformState::Loading;
 
     int64_t currentTime = libvlc_media_player_get_time(m_player);
     bool wasPlaying = libvlc_media_player_is_playing(m_player);
 
-    // si on est en pause, on se base sur m_vlcTime, get time peut return un temps incohérent  
-    m_pendingTransformTime = (wasPlaying && currentTime > 0) ? currentTime : m_vlcTime;
-    m_pendingTransformPause = !wasPlaying;
+    // si on est en pause, on se base sur m_vlcTime, get time peut return un temps incohérent
+    m_restoreTime = (wasPlaying && currentTime > 0) ? currentTime : m_vlcTime;
+    m_restorePause = !wasPlaying;
 
     float brightnessValue, contrastValue, saturationValue, hueValue;
     if(m_adjustmentsEnabled){
@@ -563,8 +563,8 @@ void MediaWidget::transformMedia()
             // démarre le décodage directement à la position voulue  pour
             // éviter d'afficher brièvement la frame de début avant le seek de l'event Playing
             // artefact : affiche "frame X" puis saut avec setTime, maintenant c'est au bon moment direct
-            if (m_pendingTransformTime > 0) {
-                QByteArray startOpt = ":start-time=" + QByteArray::number(m_pendingTransformTime / 1000.0, 'f', 3); // temps en secondes
+            if (m_restoreTime > 0) {
+                QByteArray startOpt = ":start-time=" + QByteArray::number(m_restoreTime / 1000.0, 'f', 3); // temps en secondes
                 libvlc_media_add_option(m_media->vlcMedia(), startOpt.constData());
             }
 
@@ -624,7 +624,7 @@ void MediaWidget::vFlip()
 /// Si un transform est déjà en cours, on marque dirty pour ré-appliquer après.
 void MediaWidget::requestTransform()
 {
-    if(m_transformPending){
+    if(m_transformState != TransformState::Idle){
         m_transformDirty = true;
         return;
     }
@@ -635,8 +635,7 @@ void MediaWidget::requestTransform()
 /// debounce (et pas directemnt une transformation au cas ou appuie sur boutons de rotate/flip).
 void MediaWidget::finishTransform()
 {
-    m_transformPending = false;
-    m_transformSeekStarted = false;
+    m_transformState = TransformState::Idle;
     if(m_transformDirty){
         m_transformDirty = false;
         m_transformDebounceTimer->start();
@@ -759,24 +758,21 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     {
         // En déplacant ici le setTime après une transformation, 
         // on s'assure que vlc ait produit des frames (plutot qu'avec un single shot dans mediaplaying)
-        if (mediaWidget->m_transformPending && !mediaWidget->m_transformSeekStarted) {
-            mediaWidget->m_transformSeekStarted = true;
+        if (mediaWidget->m_transformState == TransformState::Loading) {
+            // passage en "Applying" pour ne pas rentrer dans le if aux prochains libvlc_MediaPlayerTimeChanged pendant que le transform n'est pas terminé
+            mediaWidget->m_transformState = TransformState::Applying;
 
             QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
-                if (mediaWidget->m_pendingTransformPause) {
-
+                if (mediaWidget->m_restorePause) {
                     mediaWidget->pause();
-                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_pendingTransformTime);
-                    mediaWidget->m_vlcTime = mediaWidget->m_pendingTransformTime;
+                    libvlc_media_player_set_time(mediaWidget->m_player, mediaWidget->m_restoreTime);
+                    mediaWidget->m_vlcTime = mediaWidget->m_restoreTime;
                     emit mediaWidget->vlcTimeChanged(mediaWidget->m_vlcTime);
                     emit mediaWidget->playbackPaused();
-                    mediaWidget->finishTransform();
                 } else {
-
                     emit mediaWidget->playbackStarted();
-                    mediaWidget->finishTransform();
-
                 }
+                mediaWidget->finishTransform();
             }, Qt::QueuedConnection);
 
             return;
@@ -824,8 +820,8 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
             libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
             
 
-            if (!mediaWidget->m_transformPending) {
-                emit mediaWidget->playbackStarted();  
+            if (mediaWidget->m_transformState == TransformState::Idle) {
+                emit mediaWidget->playbackStarted();
             }
 
             if (width > 0 && height > 0)

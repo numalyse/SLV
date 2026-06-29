@@ -10,10 +10,48 @@
 #include <QWidget>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QTimer>
 #include <QDebug>
 #include <QtAssert>
 
 // #include <iostream>
+
+namespace {
+
+// Valeur utilisée tant que le splitter n'a pas encore de géométrie réelle.
+constexpr int c_splitterFallbackSize = 100000;
+
+// Répartit également les panneaux d'un splitter, en pixels réels si possible.
+void equalizeSplitter(QSplitter* splitter)
+{
+    const int splitterCount = splitter->count(); // nombre de widgets dans le splitter
+    if (splitterCount <= 0) return;
+
+    const int size = (splitter->orientation() == Qt::Horizontal) ? splitter->width() : splitter->height();
+    const int splitterHandlesSize = splitter->handleWidth() * (splitterCount - 1);
+
+    int singleWidgetSize = (size > splitterHandlesSize) ? (size - splitterHandlesSize) / splitterCount : 0;
+    if (singleWidgetSize <= 0) singleWidgetSize = c_splitterFallbackSize; // pas encore de géométrie
+
+    QList<int> sizes;
+    sizes.reserve(splitterCount);
+    for (int IWidget = 0; IWidget < splitterCount; ++IWidget) {
+        splitter->setStretchFactor(IWidget, 1); 
+        sizes.append(singleWidgetSize);
+    }
+    splitter->setSizes(sizes);
+}
+
+// égalise tous les splitters (imbriqués compris) d'un widget.
+void equalizeAllSplitters(QWidget* root)
+{
+    if (!root) return;
+    if (auto* s = qobject_cast<QSplitter*>(root)) equalizeSplitter(s);
+    const auto splitters = root->findChildren<QSplitter*>();
+    for (QSplitter* s : splitters) equalizeSplitter(s);
+}
+
+} // namespace
 
 PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     : QWidget{}
@@ -109,6 +147,9 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
     ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
     updateActivePlayersMediaState();
     emit updateContainerRequest(player, container, toolbar);
+
+    // une fois le container affiché (donc dimensionné), répartit les panneaux à parts égales
+    if (container) QTimer::singleShot(0, container, [container]{ equalizeAllSplitters(container); });
 }
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
@@ -146,6 +187,7 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
     updateActivePlayersMediaState();
     emit updateContainerRequest(player, container, toolbar);
 
+    if (container) QTimer::singleShot(0, container, [container]{ equalizeAllSplitters(container); });
 }
 
 /// @brief Fonction appelé par le project manager quand on charge un projet.
@@ -159,6 +201,8 @@ void PlayerLayoutManager::createLayoutFromProject(const QStringList& filesPaths)
     auto* toolbar = createLayoutToolbar();
     updateActivePlayersMediaState();
     emit updateContainerRequest(player, container, toolbar);
+
+    if (container) QTimer::singleShot(0, container, [container]{ equalizeAllSplitters(container); });
 }
 
 void PlayerLayoutManager::detachAllPlayers()
@@ -201,7 +245,7 @@ QWidget* PlayerLayoutManager::create2(const QStringList& filesPaths, const Qt::O
             }
         splitter->addWidget(m_activePlayers[0]);
         splitter->addWidget(m_activePlayers[1]);
-        splitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
+        splitter->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
 
     }
 
@@ -236,10 +280,7 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
         mainSplitter->addWidget(m_activePlayers[1]);
         mainSplitter->addWidget(m_activePlayers[2]);
 
-        int minPlayerWidth = m_activePlayers[0]->minimumSizeHint().width(); 
-        if (minPlayerWidth <= 0) minPlayerWidth = 1000; 
-
-        mainSplitter->setSizes(QList<int>({minPlayerWidth, minPlayerWidth, minPlayerWidth})); // mettre INT_MAX, ne fonctionne pas
+        mainSplitter->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize, c_splitterFallbackSize})); // mettre INT_MAX, ne fonctionne pas
 
         mainSplitter->setStretchFactor(0, 1);
         mainSplitter->setStretchFactor(1, 1);
@@ -265,7 +306,7 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
                 mainSplitter->addWidget(adjacentPlayers);
             }
 
-            adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+            adjacentPlayers->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
 
         }
         else{
@@ -288,9 +329,9 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
                 // m_currentArrangement = Arrangement3Left;
             }
 
-            adjacentPlayers->setSizes(QList<int>({INT_MAX, INT_MAX}));
+            adjacentPlayers->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
         }
-        mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
+        mainSplitter->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
     }
 
     auto *container = new QWidget;
@@ -321,15 +362,15 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
 
     top->addWidget(m_activePlayers[0]);
     top->addWidget(m_activePlayers[1]);
-    top->setSizes(QList<int>({INT_MAX, INT_MAX}));
+    top->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
 
     bottom->addWidget(m_activePlayers[2]);
     bottom->addWidget(m_activePlayers[3]);
-    bottom->setSizes(QList<int>({INT_MAX, INT_MAX}));
+    bottom->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
 
     mainSplitter->addWidget(top);
     mainSplitter->addWidget(bottom);
-    mainSplitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
+    mainSplitter->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));
 
     auto *container = new QWidget;
     auto *layout = new QVBoxLayout(container);

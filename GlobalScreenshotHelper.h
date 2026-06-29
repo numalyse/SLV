@@ -4,6 +4,7 @@
 #include "TimeFormatter.h"
 #include "PlayerLayoutManager.h"
 #include "PrefManager.h"
+#include "VideoCaptureHelper.h"
 
 #include <QObject>
 #include <opencv2/opencv.hpp>
@@ -52,10 +53,9 @@ private:
         for(size_t IPlayerData = 0; IPlayerData < m_playersData.size(); ++IPlayerData){
             cap.release();
             currPlayerData = m_playersData[IPlayerData];
-            cap.open(currPlayerData.mediaPath.toStdString(), cv::CAP_FFMPEG);
 
-            if (!cap.isOpened()) {
-                qDebug() << "Impossible d'ouvrir le média";
+            if (!SLV::openVideoCapture(cap, currPlayerData.mediaPath, "Global Screenshot")) {
+                qCritical() << "Opencv : Impossible de d'ouvrir la video pour extraire les une image " << currPlayerData.mediaPath;
                 emit finishedError();
                 return;
             }

@@ -125,6 +125,7 @@ set(ADDITIONAL_SOURCES
 
     GenericDialog.h
     GlobalScreenshotHelper.h
+    VideoCaptureHelper.h
     ErrorsHelper.h
     ExtractSequenceWidget.cpp ExtractSequenceWidget.h
     AdjustmentsWidget.cpp AdjustmentsWidget.h

@@ -27,7 +27,7 @@ inline bool openVideoCapture(cv::VideoCapture& cap, const QString& mediaPath, co
 }
 
 /// @brief Seeks a VideoCapture to the given position in milliseconds.
-/// FFmpeg supports CAP_PROP_POS_MSEC reliably; other backends use frame number
+/// FFmpeg and AvFoundation supports CAP_PROP_POS_MSEC reliably; other backends use frame number
 /// (rounded up to avoid landing on the frame before the requested position).
 inline void seekToMs(cv::VideoCapture& cap, double ms, double fps)
 {

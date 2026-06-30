@@ -117,7 +117,7 @@ void ThumbnailWorker::run()
             msThumbnail = req.msStart + offsetMs;
         }
 
-        cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(msThumbnail));
+        SLV::seekToMs(cap, static_cast<double>(msThumbnail), fps);
         
         cv::Mat frame;
 

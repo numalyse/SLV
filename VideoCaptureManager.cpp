@@ -8,43 +8,33 @@ void VideoCaptureManager::setMediaPath(const QString& filePath)
 void VideoCaptureManager::initMediaTempDirectory()
 {
     if(!m_mediaFile.exists()) return;
-    QString newDirPath = m_tempDirectoryPath + '/' + m_mediaFile.baseName();
-    if(!QDir(newDirPath).exists()){
-        QDir().mkpath(newDirPath);
-        m_concatMediaPath = newDirPath;
+
+    deleteMediaTempDirectory();
+
+    m_tempDir = new QTemporaryDir(QDir::tempPath() + "/SLV_" + m_mediaFile.baseName() + "_XXXXXX");
+    if(!m_tempDir->isValid()){
+        qWarning() << "initMediaTempDirectory: failed to create temp directory:" << m_tempDir->errorString();
+        delete m_tempDir;
+        m_tempDir = nullptr;
+        return;
     }
-    else{
-        unsigned int ITempDirIndex = 2;
-        while(QDir(newDirPath + '_' + QString::number(ITempDirIndex)).exists()){
-            ITempDirIndex++;
-        }
-        m_concatMediaPath = newDirPath + '_' + QString::number(ITempDirIndex);
-        QDir().mkpath(m_concatMediaPath);
-        m_dirIndex = ITempDirIndex;
-    }
+
+    m_concatMediaPath = m_tempDir->path();
     m_concatFile = new QFile(m_concatMediaPath + '/' + m_mediaFile.baseName() + ".txt");
     qDebug() << "TEMP DIRECTORY PATH : " << m_concatMediaPath;
 }
 
 void VideoCaptureManager::deleteMediaTempDirectory()
 {
-    if(!m_mediaFile.exists()) return;
-    // Protect against empty paths which would target the current working directory
-    if (!m_concatMediaPath.isEmpty()) {
-        QDir tempDir(m_concatMediaPath);
-        if(tempDir.exists())
-            tempDir.removeRecursively();
-    } else {
-        qWarning() << "deleteMediaTempDirectory: m_concatMediaPath is empty, skipping removal.";
+    if(m_concatFile){
+        delete m_concatFile;
+        m_concatFile = nullptr;
     }
-
-    if (!m_tempDirectoryPath.isEmpty()) {
-        QDir concatDir(m_tempDirectoryPath);
-        if(concatDir.exists() && concatDir.isEmpty())
-            QDir(m_tempDirectoryPath).removeRecursively();
-    } else {
-        qWarning() << "deleteMediaTempDirectory: m_tempDirectoryPath is empty, skipping removal.";
+    if(m_tempDir){
+        delete m_tempDir;
+        m_tempDir = nullptr;
     }
+    m_concatMediaPath.clear();
 }
 
 void VideoCaptureManager::startMediaRecording(const int startTime)

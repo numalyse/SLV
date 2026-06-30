@@ -1,4 +1,5 @@
 #include "ThumbnailWorker.h"
+#include "VideoCaptureHelper.h"
 
 #include <QDebug>
 #include <QFile>
@@ -95,20 +96,7 @@ void ThumbnailWorker::run()
                 qCritical() << "Thumbnail: fichier introuvable:" << req.videoPath;
             }
 
-            // try opening with a portable path encoding and try macOS AVFoundation first,
-            // then let OpenCV pick the backend, finally fallback to FFmpeg
-            std::string pathUtf8 = req.videoPath.toUtf8().constData();
-            bool opened = false;
-
-            opened = cap.open(pathUtf8, cv::CAP_AVFOUNDATION);
-            if (!opened) {
-                qWarning() << "Thumbnail: cap.open(CAP_AVFOUNDATION) failed, essayer CAP_ANY...";
-                opened = cap.open(pathUtf8, cv::CAP_ANY);
-            }
-            if (!opened) {
-                qWarning() << "Thumbnail: cap.open(CAP_ANY) failed, essayer CAP_FFMPEG...";
-                opened = cap.open(pathUtf8, cv::CAP_FFMPEG);
-            }
+            bool opened = SLV::openVideoCapture(cap, req.videoPath, "Thumbnail");
 
             if (!opened) {
                 qCritical() << "Thumbnail: Impossible d'ouvrir la video pour charger des thumbnails:" << req.videoPath

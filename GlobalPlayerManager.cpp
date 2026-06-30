@@ -45,6 +45,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, [this](){
         if(m_toolbarWidget){
+            layout->removeWidget(m_separationLine);
             m_separationLine->hide();
             // cast pour appeler la setFullscreenUI avec la bonne marge
             if (auto *globalToolbar = qobject_cast<GlobalToolbar*>(m_toolbarWidget)) {
@@ -269,9 +270,11 @@ void GlobalPlayerManager::enableFullscreenPlayer()
 {
     if(m_toolbarWidget)
         m_toolbarWidget->hide();
-    if(m_separationLine) 
+    if(m_separationLine){
+        layout->removeWidget(m_separationLine);
         m_separationLine->hide();
-        
+    }
+
     emit enableFullscreenMainRequested();
 }
 

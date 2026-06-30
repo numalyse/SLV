@@ -35,6 +35,8 @@ private:
     bool m_wasTimelineVisible = false;
     ThumbnailWorker* m_thumbnailWorker = nullptr;
 
+    void updateSplittersStyle(bool fullscreen);
+
 public slots:
 
 

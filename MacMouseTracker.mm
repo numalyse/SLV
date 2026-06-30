@@ -17,3 +17,11 @@ void MacMouseTracker::uninstall() {
         s_monitor = nil;
     }
 }
+
+void MacMouseTracker::hideCursor() {
+    [NSCursor hide];
+}
+
+void MacMouseTracker::showCursor() {
+    [NSCursor unhide];
+}

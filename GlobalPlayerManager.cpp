@@ -7,7 +7,7 @@
 #include "Project/ProjectManager.h"
 
 #include <QLayout>
-
+#include <QSplitter>
 #include <QDebug>
 
 GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
@@ -45,6 +45,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
 
     connect(m_layoutManager, &PlayerLayoutManager::enableFullscreenGlobalRequested, this, [this](){
         if(m_toolbarWidget){
+            layout->removeWidget(m_separationLine);
             m_separationLine->hide();
             // cast pour appeler la setFullscreenUI avec la bonne marge
             if (auto *globalToolbar = qobject_cast<GlobalToolbar*>(m_toolbarWidget)) {
@@ -57,6 +58,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
                 m_toolbarWidget->setFullscreenUI();
             }
         }
+        updateSplittersStyle(true);
         enableFullscreenMainRequested();
     });
 
@@ -64,7 +66,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         if(m_toolbarWidget){
             m_toolbarWidget->setParent(this);
             m_toolbarWidget->setDefaultUI();
-            
+
             layout->removeWidget(m_separationLine);
             layout->removeWidget(m_toolbarWidget);
 
@@ -76,6 +78,7 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
                 m_separationLine->show();
             }
         }
+        updateSplittersStyle(false);
         disableFullscreenMainRequested();
     });
 
@@ -264,14 +267,30 @@ void GlobalPlayerManager::setGlobalZoomState(bool state)
     }
 }
 
+void GlobalPlayerManager::updateSplittersStyle(bool fullscreen)
+{
+    if (!m_playersWidget) return;
+    const auto splitters = m_playersWidget->findChildren<QSplitter*>();
+    for (QSplitter* s : splitters) {
+        if (fullscreen) {
+            s->setStyleSheet("QSplitter::handle { background: black; }");
+        } else {
+            s->setStyleSheet("");
+        }
+    }
+}
+
 /// @brief Cache la toolbar si elle est présente et envoie un signal à la mainWindow
 void GlobalPlayerManager::enableFullscreenPlayer()
 {
     if(m_toolbarWidget)
         m_toolbarWidget->hide();
-    if(m_separationLine) 
+    if(m_separationLine){
+        layout->removeWidget(m_separationLine);
         m_separationLine->hide();
-        
+    }
+
+    updateSplittersStyle(true);
     emit enableFullscreenMainRequested();
 }
 
@@ -296,6 +315,7 @@ void GlobalPlayerManager::disableFullscreenPlayer()
         m_toolbarWidget->fullscreenBtn()->setButtonState(false);
     }
 
+    updateSplittersStyle(false);
     emit disableFullscreenMainRequested();
 }
 

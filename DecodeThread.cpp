@@ -1,4 +1,5 @@
 #include "DecodeThread.h"
+#include "VideoCaptureHelper.h"
 
 #include <opencv2/opencv.hpp>
 
@@ -48,26 +49,11 @@ void DecodeThread::convertImage(cv::Mat& src)
 
 
 
-static bool openVideoCapture(cv::VideoCapture &cap, const QString &mediaPath)
-{
-    std::string pathUtf8 = mediaPath.toUtf8().constData();
-    bool opened = cap.open(pathUtf8, cv::CAP_AVFOUNDATION);
-    if (!opened) {
-        qWarning() << "DecodeThread: cap.open(CAP_AVFOUNDATION) failed, essayer CAP_ANY...";
-        opened = cap.open(pathUtf8, cv::CAP_ANY);
-    }
-    if (!opened) {
-        qWarning() << "DecodeThread: cap.open(CAP_ANY) failed, essayer CAP_FFMPEG...";
-        opened = cap.open(pathUtf8, cv::CAP_FFMPEG);
-    }
-    return opened;
-}
-
 void DecodeThread::decodeTagImages(){
 
     cv::VideoCapture cap;
-    if (!openVideoCapture(cap, m_mediaPath)) {
-        qCritical() << "Impossible de lire la video pour segmenter";
+    if (!SLV::openVideoCapture(cap, m_mediaPath, "DecodeThread")) {
+        qCritical() << "Opencv : Impossible de d'ouvrir la video " << m_mediaPath;
         p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
         return;
     }
@@ -116,8 +102,8 @@ void DecodeThread::decodeTagImages(){
 void DecodeThread::decodeMedia(){
 
     cv::VideoCapture cap;
-    if (!openVideoCapture(cap, m_mediaPath)) {
-        qCritical() << "Impossible de lire la video pour segmenter";
+    if (!SLV::openVideoCapture(cap, m_mediaPath, "DecodeThread")) {
+        qCritical() << "Opencv : Impossible de d'ouvrir la video " << m_mediaPath;
         p_imageQueue->waitPush({{}, -1, true}); // envoie un stop pour que debloquer le thread qui lit
         return;
     }

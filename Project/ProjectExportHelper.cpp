@@ -1,5 +1,6 @@
 #include "Project/ProjectExportHelper.h"
 #include "ProjectExportHelper.h"
+#include "VideoCaptureHelper.h"
 #include "PrefManager.h"
 #include "TimeFormatter.h"
 #include "TSQueue.h"
@@ -708,23 +709,8 @@ namespace ProjectExportHelper {
         QString tempVideo = QDir(tempDirPath).filePath("temp_video." + extension);
 
         qDebug() << "Chemin du média : " << mediaPath.toStdString();  
-        cv::VideoCapture cap(mediaPath.toUtf8().constData(), cv::CAP_FFMPEG);
-
-        int currentFrame = 0;
-        int totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
-        bool opened = cap.isOpened();
-
-        if (!opened) {
-            qCritical() << "Impossible de lire la video pour exporter";
-        }
-        if (!opened) {
-            qWarning() << "Export Video: cap.open(CAP_FFMPEG) failed, essayer CAP_ANY...";
-            opened = cap.open(mediaPath.toUtf8().constData(), cv::CAP_ANY);
-        }
-        if (!opened) {
-            qWarning() << "Export Video: cap.open(CAP_ANY) failed, essayer CAP_AVFOUNDATION...";
-            opened = cap.open(mediaPath.toUtf8().constData(), cv::CAP_AVFOUNDATION);
-        }
+        cv::VideoCapture cap;
+        bool opened = SLV::openVideoCapture(cap, mediaPath, "Export Video");
 
         if (!opened) {
             qCritical() << "Export Video: Impossible d'ouvrir la video pour exporter" << mediaPath.toUtf8().constData()
@@ -733,6 +719,9 @@ namespace ProjectExportHelper {
         } else {
             qDebug() << "Export Video: media opened with path:" << mediaPath;
         }
+
+        int currentFrame = 0;
+        int totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
 
         // On force en mp4 si l'utilisateur veut un export mp4 sinon c'est le même que la source
         int fourcc = (type == ExportType::MP4) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : static_cast<int>(cap.get(cv::CAP_PROP_FOURCC));

@@ -598,14 +598,17 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
             player->toolbar()->setSubtitlesTrackDefault(oldSubtitlesTrackId);
             player->toolbar()->durationBtn()->setChecked(oldShowRemainingTime);
 
-            // on lance puis set time pour trouver la frame
+            // on lance la lecture et le seek
             player->play();
             player->setTime(currentTime);
 
-            // dès que le slider bouge (le chargement est de setTime est fini car vlc a detecté timeChanged), on met en pause 
-            connect(player, &PlayerWidget::vlcTimeChanged, player, [player](int64_t) {
-                player->pause(); 
-            }, Qt::SingleShotConnection); 
+            // quand timechanged recu par le nouveau player, on pause (on est au temps demandé)
+            auto conn = std::make_shared<QMetaObject::Connection>();
+            *conn = connect(player, &PlayerWidget::vlcTimeChanged, player, [player, currentTime, conn](int64_t ) {
+                    QObject::disconnect(*conn);
+                    player->pause();
+                    emit player->vlcTimeChanged(currentTime); // sur mac le timeedit pas mis à jour, force la mise à jour ici
+                });
 
         }, Qt::SingleShotConnection); 
 

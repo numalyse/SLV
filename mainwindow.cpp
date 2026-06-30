@@ -121,6 +121,22 @@ MainWindow::MainWindow(QWidget *parent)
     m_fullscreenToolbarHideTimer->setInterval(m_fullscreenToolbarHideDelayMs);
     connect(m_fullscreenToolbarHideTimer, &QTimer::timeout, this, &MainWindow::hideFullscreenToolbars);
 
+#ifdef Q_OS_MAC
+    // Sur Mac, VLC crée une NSView native qui intercepte les events souris avant Qt —
+    // qApp->installEventFilter ne les voit jamais. On utilise un NSEvent local monitor
+    // pour capturer NSEventMaskMouseMoved au niveau AppKit, avant toute NSView.
+    MacMouseTracker::install([this]() {
+         // QGuiApplication::restoreOverrideCursor() n'a pas d'effet sur les NSViews natives, il faut le faire avec NSCursor
+        MacMouseTracker::showCursor(); 
+        if (isFullScreen() && m_globalPlayerManager) {
+            m_globalPlayerManager->showAllToolbars(true);
+            restartFullscreenToolbarHideTimer();
+        } else {
+            stopFullscreenToolbarHideTimer();
+        }
+    });
+#endif
+
 }
 
 void MainWindow::createMenuBar()
@@ -361,6 +377,10 @@ void MainWindow::selectAndLoadMediaFiles()
 
 MainWindow::~MainWindow()
 {
+#ifdef Q_OS_MAC
+    MacMouseTracker::showCursor();
+    MacMouseTracker::uninstall();
+#endif
     delete ui;
 
 }
@@ -378,6 +398,11 @@ void MainWindow::enableFullscreenMain()
 
 void MainWindow::disableFullscreenMain()
 {
+#ifdef Q_OS_MAC
+    MacMouseTracker::showCursor();
+#else
+    QGuiApplication::restoreOverrideCursor();
+#endif
     ui->menubar->show();
     m_toolbarQt->show();
     if(!wasMaximized)
@@ -538,7 +563,11 @@ void MainWindow::hideFullscreenToolbars()
             restartFullscreenToolbarHideTimer();
         } else {
             m_globalPlayerManager->showAllToolbars(false);
+#ifdef Q_OS_MAC
+            MacMouseTracker::hideCursor();
+#else
             QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+#endif
         }
     }
 

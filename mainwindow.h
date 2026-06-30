@@ -4,6 +4,10 @@
 #include "GlobalPlayerManager.h"
 #include <vlc/vlc.h>
 
+#ifdef Q_OS_MAC
+#include "MacMouseTracker.h"
+#endif
+
 #include <QMainWindow>
 #include <QSplitter>
 

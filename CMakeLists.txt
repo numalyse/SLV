@@ -174,6 +174,13 @@ set(ADDITIONAL_SOURCES
 
 )
 
+if(APPLE)
+    list(APPEND PROJECT_SOURCES
+        MacMouseTracker.h
+        MacMouseTracker.mm
+    )
+endif()
+
 # =========================================================
 # Fusion sans doublons
 # =========================================================
@@ -419,6 +426,7 @@ elseif(APPLE)
     target_link_libraries(SLV PRIVATE
         ${VLC_LIB}
         ${VLCCORE_LIB}
+        "-framework AppKit"
     )
 
     # =====================================================

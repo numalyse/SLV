@@ -58,12 +58,13 @@ void DecodeThread::decodeTagImages(){
         return;
     }
 
+    const double fps = cap.get(cv::CAP_PROP_FPS);
     cv::Mat frame;
     cv::Mat processedFrame;
     cv::Mat tempResized;
 
     for(auto& shot : m_shots){
-        cap.set(cv::CAP_PROP_POS_MSEC, static_cast<double>(shot.tagImageTime));
+        SLV::seekToMs(cap, static_cast<double>(shot.tagImageTime), fps);
 
         if (!cap.read(frame) || frame.empty()) {
             qWarning() << "Impossible de lire la frame au timestamp :" << shot.tagImageTime;

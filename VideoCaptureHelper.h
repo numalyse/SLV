@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <QString>
 #include <QDebug>
+#include <cmath>
 
 namespace SLV {
 
@@ -23,6 +24,19 @@ inline bool openVideoCapture(cv::VideoCapture& cap, const QString& mediaPath, co
 
     qWarning() << context << ": impossible d'ouvrir le média " << mediaPath << ", aucun backend OpenCV trouvé" ;
     return false;
+}
+
+/// @brief Seeks a VideoCapture to the given position in milliseconds.
+/// FFmpeg supports CAP_PROP_POS_MSEC reliably; other backends use frame number
+/// (rounded up to avoid landing on the frame before the requested position).
+inline void seekToMs(cv::VideoCapture& cap, double ms, double fps)
+{
+    if (cap.getBackendName() == "FFMPEG") {
+        cap.set(cv::CAP_PROP_POS_MSEC, ms);
+    } else {
+        const double frame = std::ceil((ms / 1000.0) * fps);
+        cap.set(cv::CAP_PROP_POS_FRAMES, frame);
+    }
 }
 
 } // namespace SLV

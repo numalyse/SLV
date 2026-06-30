@@ -29,7 +29,9 @@ public:
     libvlc_media_player_t *m_player = nullptr;
 
     Media* media(){ return m_media;};
-    int getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
+    uint64_t getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
+    /// @brief N'utilise pas libvlc, update seulement le temps interne m_vlcTime
+    void setVlcTime(uint64_t newTime){ m_vlcTime = newTime; }
 
     bool isPlaying() { 
         return (m_player) ? libvlc_media_player_is_playing(m_player) : false; 

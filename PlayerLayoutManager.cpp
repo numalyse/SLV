@@ -574,7 +574,7 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
         auto* player = m_activePlayers.last();
 
         bool wasMuted = toBeDuplicated->muted();
-        int64_t currentTime = libvlc_media_player_get_time(toBeDuplicated->mediaWidget()->m_player);
+        int64_t currentTime = toBeDuplicated->getCurrentTime();
 
         bool wasLooping = false;
         if (toBeDuplicated->toolbar() && toBeDuplicated->toolbar()->loopBtn()) {
@@ -607,8 +607,18 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
             *conn = connect(player, &PlayerWidget::vlcTimeChanged, player, [player, currentTime, conn](int64_t ) {
                     QObject::disconnect(*conn);
                     player->pause();
-                    emit player->vlcTimeChanged(currentTime); // sur mac le timeedit pas mis à jour, force la mise à jour ici
                 });
+
+            // apres avoir effectué la pause, on met à jour le temps interne au media widget / l'ui
+            auto pauseConn = std::make_shared<QMetaObject::Connection>();
+            *pauseConn = connect(player->mediaWidget(), &MediaWidget::playbackPaused, player,
+                [player, currentTime, pauseConn]() {
+                    QObject::disconnect(*pauseConn);
+                    player->setVlcTime(currentTime);          
+                    emit player->vlcTimeChanged(currentTime); 
+                });
+
+
 
         }, Qt::SingleShotConnection); 
 
@@ -810,7 +820,12 @@ QList<int> PlayerLayoutManager::getActivePlayersCurrentTimes()
 QList<GlobalScreenshotPlayerData> PlayerLayoutManager::getActivePlayersData(){
     QList<GlobalScreenshotPlayerData> activePlayersData;
     for(auto& IActivePlayer : m_activePlayers){
-        activePlayersData.append({IActivePlayer->getMediaPath(), IActivePlayer->getCurrentTime(), IActivePlayer->getSar()});
+        GlobalScreenshotPlayerData currentData{
+            IActivePlayer->getMediaPath(),
+            IActivePlayer->getCurrentTime(), 
+            IActivePlayer->getSar()
+        };
+        activePlayersData.append(currentData);
     }
     return activePlayersData;
 }

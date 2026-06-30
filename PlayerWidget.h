@@ -31,6 +31,13 @@ public:
     MediaWidget* mediaWidget() { return m_mediaWidget; };
     QString getMediaPath();
     int getCurrentTime();
+
+    /// @brief N'utilise pas libvlc, update seulement le temps interne m_vlcTime du mediaWidget associé au player
+    void setVlcTime(uint64_t newTime) {
+        if(m_mediaWidget){
+            m_mediaWidget->setVlcTime(newTime);
+        }
+    };
     double getSar();
     double mediaFps() { return m_media_fps; };
     bool playing(){ 

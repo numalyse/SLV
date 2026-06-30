@@ -121,6 +121,18 @@ MainWindow::MainWindow(QWidget *parent)
     m_fullscreenToolbarHideTimer->setInterval(m_fullscreenToolbarHideDelayMs);
     connect(m_fullscreenToolbarHideTimer, &QTimer::timeout, this, &MainWindow::hideFullscreenToolbars);
 
+#ifdef Q_OS_MAC
+    MacMouseTracker::install([this]() {
+        QGuiApplication::restoreOverrideCursor();
+        if (isFullScreen() && m_globalPlayerManager) {
+            m_globalPlayerManager->showAllToolbars(true);
+            restartFullscreenToolbarHideTimer();
+        } else {
+            stopFullscreenToolbarHideTimer();
+        }
+    });
+#endif
+
 }
 
 void MainWindow::createMenuBar()
@@ -361,6 +373,9 @@ void MainWindow::selectAndLoadMediaFiles()
 
 MainWindow::~MainWindow()
 {
+#ifdef Q_OS_MAC
+    MacMouseTracker::uninstall();
+#endif
     delete ui;
 
 }

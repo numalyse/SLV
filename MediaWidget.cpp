@@ -357,6 +357,7 @@ void MediaWidget::setSpeed(const unsigned int &speedIndex)
     if (!m_player) return;
     int err = libvlc_media_player_set_rate(m_player, m_speedSteps[speedIndex]);
     if(err != -1){
+        m_currentRate = m_speedSteps[speedIndex];
         const QString & speedStr = QString::number(m_speedSteps[speedIndex]);
         emit speedChanged(speedStr);
         emit SignalManager::instance().mediaSpeedChanged(speedStr);
@@ -587,6 +588,8 @@ void MediaWidget::transformMedia()
 
             libvlc_audio_set_mute(m_player, m_muted);
             libvlc_audio_set_volume(m_player, m_volume);
+
+            libvlc_media_player_set_rate(m_player, m_currentRate);
 
             emit rotationTooltipUpdateRequested(m_rotationIndex);
             emit flipTooltipUpdateRequested(m_hflipped, m_vflipped);

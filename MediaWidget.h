@@ -91,6 +91,7 @@ private:
     bool m_hflipped = false;
     int64_t m_vlcTime;
     const float m_speedSteps[7] = {0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0};
+    float m_currentRate = 1.0f;
     unsigned int m_rotationIndex = 0;
     int m_currentAudioTrack = 1;
     int m_currentSubtitlesTrack = -1;

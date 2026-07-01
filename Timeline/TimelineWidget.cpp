@@ -61,8 +61,19 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_mathManager->fitToWidth(m_scene->width());
 
     m_abManager = new ABManager(m_scene, m_mathManager, this);
-    connect(m_abManager, &ABManager::onPairCompleted, this, &TimelineWidget::disableTimeRelatedUI);
-    connect(m_abManager, &ABManager::onMarkersCleared, this, &TimelineWidget::enableTimeRelatedUI);
+    connect(m_abManager, &ABManager::onPairCompleted, this, [this](){
+        m_toPrevShotBtn->setEnabled(false);
+        m_toNextShotBtn->setEnabled(false);
+        emit disableTimeRelatedUI();
+    });
+
+    connect(m_abManager, &ABManager::onMarkersCleared, this,  [this](){
+        m_toPrevShotBtn->setEnabled(true);
+        m_toNextShotBtn->setEnabled(true);
+        emit enableTimeRelatedUI();
+    });
+
+
     connect(m_abManager, &ABManager::loopExtracted, this, [this](const QString& outputPath){
         exportDone(PrefManager::instance().getText("messagebox_extract_ab_loop_done"), outputPath);
     });
@@ -493,7 +504,9 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
         m_shotManager->updateCurrentShot(m_vlcTime);
         emit timelineSetPosition(m_vlcTime);
     }else {
-        m_vlcTime = vlcTime;
+        // Pendant le chargement du restart, on garde le curseur sur A au lieu de
+        // l'afficher sur l'undershoot (temps sous A rapporté par libvlc à vitesse lente).
+        m_vlcTime = m_abManager->getDisplayHoldTime(vlcTime).value_or(vlcTime);
     }
 
     m_cursor->setX(m_mathManager->timeToPos(m_vlcTime));
@@ -507,6 +520,8 @@ void TimelineWidget::updateCursorVisually(int sliderValue) {
 }
 
 void TimelineWidget::goToShot(int idShot){
+    if(m_abManager->getMarkerCount() == 2) return;
+
     auto timeStart = m_shotManager->getStartTimeOf(idShot);
     if(timeStart.has_value()){
         emit timelineSetPosition(timeStart.value());

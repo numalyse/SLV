@@ -137,6 +137,35 @@ MainWindow::MainWindow(QWidget *parent)
     });
 #endif
 
+    m_tuto = new Tutorial(this);
+    connect(this, &MainWindow::windowMovedOrResizedRequested, m_tuto->getTutoOpacityWidget(), &TutoOpacityWidget::followParentGeometry);
+    connect(this, &MainWindow::windowMovedOrResizedRequested, m_tuto, [this](){ 
+        m_tuto->moveTutorialWidgetNextToTarget();
+     });
+    m_tuto->getTutoOpacityWidget()->followParentGeometry();
+
+    m_tuto->addStep(m_navPanelBtn, prefManager.getText("tutorial_step_nav_panel"), [this]{
+        m_globalPlayerManager->openNavPanel();
+        m_navPanelBtn->setButtonState(true);
+    }, [this]{
+        m_globalPlayerManager->closeNavPanel();
+        m_navPanelBtn->setButtonState(false);
+    });
+
+    m_tuto->addStep(m_playlistBtn, prefManager.getText("tutorial_step_playlist"), [this]{
+        m_globalPlayerManager->openNavPanel();
+    }, [this]{
+        m_globalPlayerManager->closeNavPanel();
+    });
+
+    m_tuto->addStep(m_shotDetailBtn, prefManager.getText("tutorial_step_shot_detail"), [this]{
+        m_globalPlayerManager->openNavPanel();
+    }, [this]{
+        m_globalPlayerManager->closeNavPanel();
+    });
+    m_tuto->startTutorial();
+
+
 }
 
 void MainWindow::createMenuBar()

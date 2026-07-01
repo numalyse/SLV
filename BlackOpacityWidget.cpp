@@ -17,7 +17,7 @@ BlackOpacityWidget::BlackOpacityWidget(QWidget *parent)
 void BlackOpacityWidget::initSurface(){
     if (!m_surface) {
         m_surface = new QWidget(this);
-        m_surface->setGeometry(m_mediaRect);
+        m_surface->setGeometry(m_targetRect);
         m_surface->setAttribute(Qt::WA_TranslucentBackground);
         m_surface->setAttribute(Qt::WA_NoSystemBackground);
         m_surface->setAttribute(Qt::WA_OpaquePaintEvent, false);
@@ -54,16 +54,16 @@ void BlackOpacityWidget::paintEvent(QPaintEvent *event)
 
     m_blackColor.setAlphaF(m_opacityBlackFrame);
 
-    p.fillRect(m_mediaRect, m_blackColor);
+    p.fillRect(m_targetRect, m_blackColor);
 
 }
 
 void BlackOpacityWidget::onMediaRectChanged(const QRect &rect)
 {
-    m_mediaRect = rect;
+    m_targetRect = rect;
     qDebug() << "position : " << this->pos();
-    qDebug() << "BlackOpacityWidget m_mediaRect : " << m_mediaRect;
+    qDebug() << "BlackOpacityWidget m_mediaRect : " << m_targetRect;
     if(m_surface)
-        m_surface->setGeometry(m_mediaRect);
+        m_surface->setGeometry(m_targetRect);
     update();
 }

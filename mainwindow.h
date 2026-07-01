@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include "GlobalPlayerManager.h"
+#include "Tutorial.h"
+
 #include <vlc/vlc.h>
 
 #ifdef Q_OS_MAC
@@ -98,5 +100,7 @@ private:
     QTimer* m_fullscreenToolbarHideTimer = nullptr;
     int m_fullscreenToolbarHideDelayMs = 1000;
     // QVector<PlayerWidget*> m_players;
+
+    Tutorial* m_tuto = nullptr;
 };
 #endif // MAINWINDOW_H

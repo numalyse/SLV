@@ -24,9 +24,8 @@ protected:
     QWidget *m_surface = nullptr;
     QColor m_blackColor = Qt::black;
     double m_opacityBlackFrame = 1.0;
+    QRect m_targetRect;
 
-private:
-    QRect m_mediaRect;
 
 };
 

@@ -22,8 +22,17 @@ public:
     void changeMarkerTime(ABMarkerItem *marker, const int64_t time) override;
 
     std::optional<int64_t> getLoopRestartTime(int64_t currentTime);
+    std::optional<int64_t> getDisplayHoldTime(int64_t currentTime) const;
     std::optional<int64_t> clampToLoopRange(int64_t time);
     void extractLoop();
+
+private:
+    enum class LoopState {
+        Idle,   // jamais entré dans al loop
+        InLoop  // lecture bouclée entre A et B
+    };
+
+    LoopState m_loopState = LoopState::Idle;
 
 signals:
     void loopExtracted(const QString& outputPath);

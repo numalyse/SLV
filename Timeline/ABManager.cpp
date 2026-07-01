@@ -14,16 +14,47 @@ ABManager::ABManager(QGraphicsScene *scene, TimelineMath *mathManager, QObject *
 
 std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 {
-    if(m_markers.size() < 2) return {};
+    if(m_markers.size() < 2) {
+        m_loopState = LoopState::Idle;
+        return {};
+    }
 
     int64_t aTime = m_markers[0]->time();
     int64_t bTime = m_markers[1]->time();
 
-    // marge, apres avoir restart la loop, currentTime peut etre legerement inférieur à aTime, on ajoute une frame de marge pour ne pas restart en boucle
-    int64_t margin = 1000.0 / p_mathManager->fps();
+    // on est dans la loop, on met à jour l'état seulement
+    if (currentTime >= aTime && currentTime < bTime) {
+        m_loopState = LoopState::InLoop;
+        return {};
+    }
 
-    if (currentTime >= bTime || currentTime < aTime - margin) {
-        return aTime; 
+    // undershoot après un restart (InLoop, currentTime < A) : on attend de re-rentrer
+    // sans re-seek (sinon set_time(A) re-undershoot -> boucle infinie de seeks)
+    if (m_loopState == LoopState::InLoop && currentTime < aTime) {
+        return {};
+    }
+
+    // on a été dans le loop et on en est sorti (currentTime > B time), on doit restart sur A
+    // on ne reset pas l'état à Idle pour le cas ou la vitesse de lecture < 1, pour forcer l'affichage du curseur sur A au lieu de l'undershoot.
+    if (m_loopState == LoopState::InLoop && currentTime >= bTime) {
+        return aTime;
+    }
+
+    // 2 markers mais jamais entré dans la loop (Idle) : on force l'utilisateur dedans.
+    m_loopState = LoopState::InLoop;
+    return aTime;
+}
+
+std::optional<int64_t> ABManager::getDisplayHoldTime(int64_t currentTime) const
+{
+    if(m_markers.size() < 2) return {};
+
+    int64_t aTime = m_markers[0]->time();
+
+    // quand la vitesse de lecture < 1, libvlc peut renvoyer un temps inférieur à A (undershoot) après un restart.
+    // dans ce cas, on veut forcer l'affichage du curseur sur A au lieu de l'undershoot.
+    if (m_loopState == LoopState::InLoop && currentTime < aTime) {
+        return aTime;
     }
 
     return {};

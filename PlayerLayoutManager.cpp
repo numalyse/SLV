@@ -603,20 +603,16 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
             player->setTime(currentTime);
 
             // quand timechanged recu par le nouveau player, on pause (on est au temps demandé)
-            auto conn = std::make_shared<QMetaObject::Connection>();
-            *conn = connect(player, &PlayerWidget::vlcTimeChanged, player, [player, currentTime, conn](int64_t ) {
-                    QObject::disconnect(*conn);
-                    player->pause();
-                });
+            connect(player, &PlayerWidget::vlcTimeChanged, player, [player](int64_t) {
+                player->pause();
+            }, Qt::SingleShotConnection);
 
             // apres avoir effectué la pause, on met à jour le temps interne au media widget / l'ui
-            auto pauseConn = std::make_shared<QMetaObject::Connection>();
-            *pauseConn = connect(player->mediaWidget(), &MediaWidget::playbackPaused, player,
-                [player, currentTime, pauseConn]() {
-                    QObject::disconnect(*pauseConn);
-                    player->setVlcTime(currentTime);          
-                    emit player->vlcTimeChanged(currentTime); 
-                });
+            connect(player->mediaWidget(), &MediaWidget::playbackPaused, player,
+                [player, currentTime]() {
+                    player->setVlcTime(currentTime);
+                    emit player->vlcTimeChanged(currentTime);
+                }, Qt::SingleShotConnection);
 
 
 

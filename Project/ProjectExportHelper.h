@@ -60,12 +60,12 @@ namespace SLV {
 
 namespace ProjectExportHelper {
 
-    bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
-    bool exportToTagImage( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
-    bool exportToPDF( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
-    bool exportToCSV( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
-    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback);
-    bool exportVideo(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar,const QString &dstPath, std::function<bool(int)> progressCallback);
+    bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
+    bool exportToTagImage( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
+    bool exportToPDF( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
+    bool exportToCSV( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
+    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback);
+    bool exportVideo(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar,const QString &dstPath, const std::function<bool(int)>& progressCallback);
 
     std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString& extension);
 }

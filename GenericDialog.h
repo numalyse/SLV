@@ -15,9 +15,9 @@ namespace SLV
         const QString& title,
         const QString& text,
         const QString& textInfo,
-        std::function<void()> onYes,        
-        std::function<void()> onNo = nullptr,        
-        std::function<void()> onCancel = nullptr 
+        const std::function<void()>& onYes,        
+        const std::function<void()>& onNo = nullptr,        
+        const std::function<void()>& onCancel = nullptr 
     ) {
         PrefManager& prefManager = PrefManager::instance();
 
@@ -53,9 +53,9 @@ namespace SLV
         QWidget* parent,
         const QString& title,
         const QString& text,
-        std::function<void()> onYes,        
-        std::function<void()> onNo = nullptr,        
-        std::function<void()> onCancel = nullptr 
+        const std::function<void()>& onYes,
+        const std::function<void()>& onNo = nullptr,
+        const std::function<void()>& onCancel = nullptr
     ) {
         showGenericDialog(parent, title, text, QString(), onYes, onNo, onCancel);
     }

@@ -250,7 +250,7 @@ namespace  {
 namespace ProjectExportHelper {
     
 
-    bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, const std::function<bool(int)>& progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -301,7 +301,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -360,7 +360,7 @@ namespace ProjectExportHelper {
 
     }
 
-   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback)
     {
         if(progressCallback) progressCallback(0);
         
@@ -482,7 +482,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToCSV(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToCSV(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, const std::function<bool(int)>& progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -541,7 +541,7 @@ namespace ProjectExportHelper {
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
     /// @return 
-    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback)
     {
         if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
         
@@ -695,7 +695,7 @@ namespace ProjectExportHelper {
     }
 
 
-    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback)
     {
         if(progressCallback) progressCallback(0);
 

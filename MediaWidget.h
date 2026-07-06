@@ -5,6 +5,7 @@
 #include "VideoCaptureManager.h"
 #include "SignalManager.h"
 #include "ZoomHelper.h"
+#include "SnapshotPopup.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
@@ -13,6 +14,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QTimer>
+#include <QPointer>
 
 class MediaWidget : public QWidget
 {
@@ -127,7 +129,19 @@ private:
     QTimer* m_transformDebounceTimer = nullptr;
     static constexpr int m_transformDebounceMs = 250;
 
+    // sets itself to nullptr when destroyed, so we don't have to worry about dangling pointers
+    // used because m_snapshotPopup deletes itself after its timer expires
+    QPointer<SnapshotPopup> m_snapshotPopup;
+
+    // snapshot time captured when takeScreenshot is called
+    // because libvlc_media_player_get_time() cannot be used in the snapshotTaken event,
+    // since VLC time-changed events may have arrived in the meantime, and we need the exact snapshot time
+    int64_t m_lastSnapshotTime = 0;
+
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
+    static void onVlcSnapshot(const libvlc_event_t *event, void *userData);
+
+    void createSnapshotPopup(const QString &filePath, int64_t vlcTime);
 
     /// @brief Recreates a vlc instance to apply transformation on media
     void transformMedia();
@@ -151,6 +165,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+    bool event(QEvent *event) override;
 
 signals:
     void vlcTimeChanged(int64_t newTime);

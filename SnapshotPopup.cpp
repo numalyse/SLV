@@ -153,10 +153,14 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
     subtitleLabel->setStyleSheet(QString(
         "QLabel { color: %1; font-size: 11px; background: transparent; }").arg(dimColorString));
     subtitleLabel->setMaximumWidth(maxTextWidth);
-    const QString subtitleText = QString("%1 • %2")
-        .arg(QFileInfo(filePath).completeBaseName())
-        .arg(TimeFormatter::msToHHMMSSFF(vlcTime, fps));
-    subtitleLabel->setText(subtitleLabel->fontMetrics().elidedText(subtitleText, Qt::ElideRight, maxTextWidth));
+    // only the file name is elided so the timecode stays visible even for long file names
+    const QString baseName = QFileInfo(filePath).completeBaseName();
+    const QString timecode = TimeFormatter::msToHHMMSSFF(vlcTime, fps);
+    const QString separator = QStringLiteral(" • ");
+    const QFontMetrics subtitleFm = subtitleLabel->fontMetrics();
+    const int reservedWidth = subtitleFm.horizontalAdvance(separator + timecode);
+    const QString elidedName = subtitleFm.elidedText(baseName, Qt::ElideRight, qMax(0, maxTextWidth - reservedWidth));
+    subtitleLabel->setText(elidedName + separator + timecode);
     textLayout->addWidget(subtitleLabel);
 
     QLabel* folderLabel = new QLabel(card);

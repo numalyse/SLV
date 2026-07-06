@@ -524,7 +524,7 @@
     "help_menu_enter_multiview_content_2" : "To enter multi-view mode, hover the media layout button at the top-right. You can then choose the number of players and their layout. Players are resizable by dragging the splitters between them. You can also use the duplicate button.",
     "help_menu_simplified_content_1" : "The simplified toolbar available in multi-view players includes most buttons from the classic toolbar but without extensions. There is also a button to remove the player from the view.",
     "help_menu_global_toolbar_content_1" : "In addition to per-player simplified toolbars, a global toolbar is shown in multi-view to perform operations on the medias present.",
-    "help_menu_global_toolbar_content_2" : "Combined screenshot captures an image of each present media and combines them into a single image preserving the players layout. Screenshots are saved to the folder set in preferences (default SLV_Content).",
+    "help_menu_global_toolbar_content_2" : "Combined screenshot captures an image of each present media and combines them into a single image preserving the players layout. Screenshots are saved to the folder set in preferences (default NumalysePlayer_Content).",
     "help_menu_access_playlist_content_1" : "A playlist can be created by adding the desired medias. To access the playlist click the side panel button at the top-right (playlist is not available in multi-view mode).",
     "help_menu_manage_items_content_1" : "Playlist items consist of the media title, its duration, type, thumbnail and position in the list. Click + to add media and the trash icon to remove them. Items can also be reordered with drag & drop.",
     "help_menu_playlist_loop_label" : "Loop",

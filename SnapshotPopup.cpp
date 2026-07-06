@@ -133,15 +133,25 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
     textLayout->setContentsMargins(0, 0, 0, 0);
     textLayout->setSpacing(1);
 
+    // text colors from the palette
+    const QColor textColor = palette().color(QPalette::WindowText);
+    QColor dimColor = textColor;
+    dimColor.setAlphaF(0.6);
+    const QString dimColorString = QString("rgba(%1, %2, %3, %4)")
+        .arg(dimColor.red()).arg(dimColor.green()).arg(dimColor.blue()).arg(dimColor.alphaF());
+
     QLabel* titleLabel = new QLabel(PrefManager::instance().getText("snapshot_saved_title"), card);
-    titleLabel->setStyleSheet("color: white; font-weight: 600; font-size: 13px; background: transparent;");
+    titleLabel->setStyleSheet(QString(
+        "QLabel { color: %1; font-weight: 600; font-size: 13px; background: transparent; }")
+        .arg(textColor.name()));
     textLayout->addWidget(titleLabel);
 
     // if the text is too long, we elide it with "..." at the start
     const int maxTextWidth = 200;
 
     QLabel* subtitleLabel = new QLabel(card);
-    subtitleLabel->setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 11px; background: transparent;");
+    subtitleLabel->setStyleSheet(QString(
+        "QLabel { color: %1; font-size: 11px; background: transparent; }").arg(dimColorString));
     subtitleLabel->setMaximumWidth(maxTextWidth);
     const QString subtitleText = QString("%1 • %2")
         .arg(QFileInfo(filePath).completeBaseName())
@@ -150,7 +160,8 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
     textLayout->addWidget(subtitleLabel);
 
     QLabel* folderLabel = new QLabel(card);
-    folderLabel->setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 11px; background: transparent;");
+    folderLabel->setStyleSheet(QString(
+        "QLabel { color: %1; font-size: 11px; background: transparent; }").arg(dimColorString));
     folderLabel->setMaximumWidth(maxTextWidth);
 
     const QString folderText = QFileInfo(filePath).absolutePath();

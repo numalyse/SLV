@@ -65,7 +65,7 @@ def segment_video(video_path, use_color=True):
 
     if use_color and is_video_grayscale(video_path):
         use_color = False
-        print("[SegmentationPy] Film detecte en noir et blanc", flush=True)
+        print("[SegmentationPy] Video detecte en noir et blanc", flush=True)
 
     video = open_video(video_path)
 

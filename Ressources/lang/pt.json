@@ -400,6 +400,8 @@
 
     "messagebox_global_screenshot_completed" : "A captura de tela foi feita com sucesso.",
     "messagebox_global_screenshot_error" : "Ocorreu um problema durante o processo de captura de tela.",
+    "snapshot_saved_title" : "Captura guardada",
+    "open_screenshot_button" : "Abrir a captura",
 
     "dialog_save_project_dialog_title" : "Salvando o projeto",
     "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. Deseja salvar o projeto?",

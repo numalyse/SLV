@@ -184,5 +184,7 @@
         <file alias="image_preview_white">icons/image_preview_white.png</file>
         <file alias="drag_drop_grey">icons/drag_drop_grey.png</file>
         <file alias="music_note_grey">icons/music_note_grey.png</file>
+        <file alias="open_in_new">icons/open_in_new.png</file>
+        <file alias="open_in_new_white">icons/open_in_new_white.png</file>
     </qresource>
 </RCC>

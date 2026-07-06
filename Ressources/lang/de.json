@@ -398,6 +398,8 @@
 
     "messagebox_global_screenshot_completed" : "Der Screenshot wurde erfolgreich aufgenommen.",
     "messagebox_global_screenshot_error" : "Beim Erstellen des Screenshots ist ein Problem aufgetreten.",
+    "snapshot_saved_title" : "Screenshot gespeichert",
+    "open_screenshot_button" : "Screenshot öffnen",
 
     "dialog_save_project_dialog_title" : "Speichern des Projekts",
     "dialog_save_project_dialog_text" : "Die Timeline enthält nicht gespeicherte Änderungen. Möchten Sie das Projekt speichern?",

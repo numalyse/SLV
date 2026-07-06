@@ -25,7 +25,6 @@
 #include <QPushButton>
 #include <QThreadPool>
 
-
 // Fonction helper pour appliquer les transformations VLC correctes au média
 void applyTransformOptions(libvlc_media_t* vlcMedia, unsigned int rotation, bool hflip, bool vflip) {
     auto transformArgs = getArgsFromTransform(rotation, hflip, vflip);
@@ -58,6 +57,10 @@ MediaWidget::MediaWidget(QWidget *parent)
     pal.setColor(QPalette::Window, Qt::black);
     setPalette(pal);
 
+    connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, [this]() {
+        if (m_snapshotPopup) m_snapshotPopup->reposition();
+    });
+
     setAttribute(Qt::WA_NativeWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -68,7 +71,9 @@ MediaWidget::MediaWidget(QWidget *parent)
     const char* const vlc_args[] = {
         "--quiet",
         "--no-video-title-show",
-        "--no-input-fast-seek"
+        "--no-input-fast-seek",
+        "--no-osd",
+        "--no-snapshot-preview",
     };
 
     int argc = sizeof(vlc_args) / sizeof(vlc_args[0]);
@@ -85,6 +90,8 @@ MediaWidget::MediaWidget(QWidget *parent)
         "--no-video-title-show",
         "--no-input-fast-seek",
         "--aout=directsound",
+        "--no-osd",
+        "--no-snapshot-preview",
         pluginArg.c_str(),
         "--verbose=2"
     };
@@ -396,8 +403,10 @@ void MediaWidget::takeScreenshot()
     
     auto& prefManager = PrefManager::instance();
 
+    m_lastSnapshotTime = getCurrentTime();
+
     QString zoomStr = (m_zoomActivated) ? m_zoomHelper.getZoomStr() : "";
-    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) + zoomStr +".png";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(m_lastSnapshotTime, m_media->fps()) + zoomStr +".png";
     if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
 
     QByteArray capturePathBytes = capturePath.toUtf8();
@@ -868,6 +877,32 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
 }
 
+void MediaWidget::onVlcSnapshot(const libvlc_event_t *event, void *userData){
+    MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);
+    
+    if (!mediaWidget) return;
+
+    if (event->type == libvlc_MediaPlayerSnapshotTaken){
+        QString filePath = event->u.media_player_snapshot_taken.psz_filename;
+
+        qDebug() << "[MediaWidget] Snapshot taken :" << filePath;
+
+        // on the top right corner of the widget, display popup with filename, vlc time, thumbnail, button to open path
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget, filePath]() {
+            mediaWidget->createSnapshotPopup(filePath, mediaWidget->m_lastSnapshotTime);
+        }, Qt::QueuedConnection);
+
+    }    
+}
+
+void MediaWidget::createSnapshotPopup(const QString& filePath, int64_t vlcTime)
+{
+    if (m_snapshotPopup)
+        delete m_snapshotPopup; // QPointer automatically set to nullptr
+
+    m_snapshotPopup = new SnapshotPopup(this, filePath, vlcTime, (m_media) ? m_media->fps() : 0.0);
+    m_snapshotPopup->showWithFade();
+}
 
 // ===== Event ===== //
 
@@ -922,6 +957,17 @@ void MediaWidget::resizeEvent(QResizeEvent *event)
     QRect mediaRect = getMediaDisplayRect();
     m_mediaSurface->setGeometry(mediaRect);
     emit mediaRectChanged(mediaRect);
+
+    if (m_snapshotPopup) m_snapshotPopup->reposition();
+}
+
+bool MediaWidget::event(QEvent *event)
+{
+    // when the window is activated, raise the snapshot popup if it exists
+    if (event->type() == QEvent::WindowActivate && m_snapshotPopup) {
+        m_snapshotPopup->raise();
+    }
+    return QWidget::event(event);
 }
 
 void MediaWidget::wheelEvent(QWheelEvent *event)
@@ -990,7 +1036,7 @@ void MediaWidget::typeParsed(const MediaType type)
     }
 }
 
-/// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
+/// @brief release the media instance, if the media is null, does nothing
 void MediaWidget::releaseMedia(){
     if(m_media){
         delete m_media;
@@ -999,7 +1045,7 @@ void MediaWidget::releaseMedia(){
 }
 
 
-/// @brief detach les event et free l'event manager
+/// @brief detach and release the event manager, if the media player is null, log a warning
 void MediaWidget::releaseEventManager(){
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
@@ -1007,13 +1053,14 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerSnapshotTaken, onVlcSnapshot, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
     }
 }
 
-/// @brief initialise m_eventManager et attach les events
+/// @brief Initialize the event manager and attach the events to the media player
 void MediaWidget::createEventManager(){
     if(m_player){
         m_eventManager = libvlc_media_player_event_manager(m_player);
@@ -1022,13 +1069,14 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerSnapshotTaken, onVlcSnapshot, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";
     }
 
 }
 
-/// @brief Helper pour recréer une classe média et connecter ses signaux
+/// @brief Helper to recreate a Media instance from a file path, and connect its signals to the MediaWidget slots
 /// @param filePath 
 void MediaWidget::createMedia(const QString& filePath, const bool fromTransform){
     releaseMedia();

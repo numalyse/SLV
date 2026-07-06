@@ -214,7 +214,7 @@ void Playlist::dropEvent(QDropEvent *event)
                 m_sortButtons->checkedButton()->setChecked(false);
             }
             if(m_currentMediaIndex == draggedIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(dropIndex);
-            m_itemsSortOrder.swapItemsAt(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
+            m_itemsSortOrder.move(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
             updateItemIndices();
             updateLayout();
         }
@@ -227,8 +227,6 @@ void Playlist::dropEvent(QDropEvent *event)
         }
         if (!filePaths.isEmpty()) {
             addItemsFromPaths(filePaths);
-            // updateItemIndices();
-            // updateLayout();
         }
 
         event->acceptProposedAction();
@@ -599,7 +597,7 @@ void Playlist::enableShuffle(){
     std::mt19937 g(rd());
     std::shuffle(m_itemsShuffleOrder.begin(), m_itemsShuffleOrder.end(), g);
     if(!m_itemsShuffleOrder.empty())
-        m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
+        m_itemsShuffleOrder.move(m_currentMediaIndex, 0);
     m_currentMediaIndex = 0;
 }
 

@@ -68,7 +68,9 @@ MediaWidget::MediaWidget(QWidget *parent)
     const char* const vlc_args[] = {
         "--quiet",
         "--no-video-title-show",
-        "--no-input-fast-seek"
+        "--no-input-fast-seek",
+        "--no-osd",
+        "--no-snapshot-preview",
     };
 
     int argc = sizeof(vlc_args) / sizeof(vlc_args[0]);
@@ -85,6 +87,8 @@ MediaWidget::MediaWidget(QWidget *parent)
         "--no-video-title-show",
         "--no-input-fast-seek",
         "--aout=directsound",
+        "--no-osd",
+        "--no-snapshot-preview",
         pluginArg.c_str(),
         "--verbose=2"
     };

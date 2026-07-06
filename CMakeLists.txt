@@ -91,6 +91,7 @@ set(PROJECT_SOURCES
     Project/ProjectExportThread.h Project/ProjectExportThread.cpp
 
     MediaWidget.h MediaWidget.cpp
+    SnapshotPopup.h SnapshotPopup.cpp
     NavPanel.h NavPanel.cpp
     PlaylistItem.h PlaylistItem.cpp
     Playlist.h Playlist.cpp

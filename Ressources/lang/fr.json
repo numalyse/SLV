@@ -399,6 +399,8 @@
 
     "messagebox_global_screenshot_completed" : "La capture a été effectuée avec succès.",
     "messagebox_global_screenshot_error" : "Un problème est survenu lors de la capture.",
+    "snapshot_saved_title" : "Capture enregistrée",
+    "open_screenshot_button" : "Ouvrir la capture",
 
     "dialog_save_project_dialog_title" : "Sauvegarde du projet",
     "dialog_save_project_dialog_text" : "La timeline contient des modifications non enregistrées. Voulez-vous sauvegarder le projet ?",

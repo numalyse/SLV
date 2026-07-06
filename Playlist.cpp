@@ -198,23 +198,25 @@ void Playlist::dropEvent(QDropEvent *event)
         int draggedIndex = mimeData->data("move-PlaylistItem").toInt();
 
         int dropIndex = -1;
-        for (int i = 0; i < m_items.size(); ++i) {
-            QRect itemRect = m_items[i]->geometry();
-            if (itemRect.contains(event->pos())) {
-                dropIndex = i;
+        for (int visual = 0; visual < m_items.size(); ++visual) {
+            QWidget *w = m_items[m_itemsSortOrder[visual]];
+            QRect itemRect = w->geometry();
+            int midY = itemRect.top() + itemRect.height() / 2;
+            if (event->pos().y() < midY) {
+                dropIndex = m_itemsSortOrder[visual];
                 break;
             }
         }
+        if (dropIndex == -1 && !m_items.isEmpty())
+            dropIndex = m_itemsSortOrder[m_items.size() - 1];
 
         if (dropIndex != -1 && dropIndex != draggedIndex) {
-            // PlaylistItem *draggedItem = m_items.takeAt(draggedIndex);
-            // m_items.insert(dropIndex, draggedItem);
             if(m_sortButtons->checkedButton()){
                 m_sortButtons->setExclusive(false);
                 m_sortButtons->checkedButton()->setChecked(false);
             }
             if(m_currentMediaIndex == draggedIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(dropIndex);
-            m_itemsSortOrder.swapItemsAt(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
+            m_itemsSortOrder.move(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
             updateItemIndices();
             updateLayout();
         }
@@ -227,8 +229,6 @@ void Playlist::dropEvent(QDropEvent *event)
         }
         if (!filePaths.isEmpty()) {
             addItemsFromPaths(filePaths);
-            // updateItemIndices();
-            // updateLayout();
         }
 
         event->acceptProposedAction();
@@ -599,7 +599,7 @@ void Playlist::enableShuffle(){
     std::mt19937 g(rd());
     std::shuffle(m_itemsShuffleOrder.begin(), m_itemsShuffleOrder.end(), g);
     if(!m_itemsShuffleOrder.empty())
-        m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
+        m_itemsShuffleOrder.move(m_currentMediaIndex, 0);
     m_currentMediaIndex = 0;
 }
 

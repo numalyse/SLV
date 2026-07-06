@@ -188,6 +188,9 @@ void SnapshotPopup::showWithFade()
     setWindowOpacity(0.0);
     show();
 
+    if (m_anim)
+        m_anim->deleteLater();
+
     m_anim = new QPropertyAnimation(this, "windowOpacity", this);
     m_anim->setDuration(m_fadeMs);
     m_anim->setStartValue(0.0);
@@ -200,6 +203,9 @@ void SnapshotPopup::showWithFade()
 
 void SnapshotPopup::fadeOutAndClose()
 {
+    if (m_anim)
+        m_anim->deleteLater();
+        
     m_anim = new QPropertyAnimation(this, "windowOpacity", this);
     m_anim->setDuration(m_fadeMs);
     m_anim->setStartValue(windowOpacity());

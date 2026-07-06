@@ -80,7 +80,7 @@ void PrefManager::loadDefaultPrefs(){
 
 void PrefManager::loadUserPrefs(){
 
-    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
+    QString filePath = QDir(QDir::homePath()).filePath("NumalysePlayer_Content/pref.json");
     QFile file(filePath);
 
     if ( ! file.exists() ){
@@ -245,7 +245,7 @@ bool PrefManager::setCategory(const QString &category, const QJsonObject &catego
 }
 
 bool PrefManager::writeUserJson(){
-    QString filePath = QDir(QDir::homePath()).filePath("SLV_Content/pref.json");
+    QString filePath = QDir(QDir::homePath()).filePath("NumalysePlayer_Content/pref.json");
     QFile file(filePath);
 
     if (!file.exists() && !createPreferenceFile(filePath)) {
@@ -304,7 +304,7 @@ void PrefManager::syncUserPrefs()
         pathModified = true;
     }
     if(pathCategory.value("screenshot").toString().isEmpty()){
-        pathCategory.insert("screenshot", QDir::homePath() + "/SLV_Content/Captures_Images");
+        pathCategory.insert("screenshot", QDir::homePath() + "/NumalysePlayer_Content/Captures_Images");
         pathModified = true;
     }
     

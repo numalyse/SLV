@@ -67,15 +67,19 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
     m_layout = new QVBoxLayout(this);
     m_layout->addWidget(m_shotIdForm);
-    m_layout->addWidget(m_shotTitle);
     m_layout->addWidget(m_startTime);
     m_layout->addWidget(m_endTime);
     m_layout->addWidget(m_duration);
-    m_layout->addWidget(m_notes);
+
     m_layout->addWidget(m_tagImage);
     m_tagImage->adjustSize();
     m_tagImage->setAlignment(Qt::AlignCenter);
+    m_tagImage->setFixedHeight(m_imageSize.height());
     m_layout->addWidget(frameButtonsActions);
+
+    m_layout->addWidget(m_shotTitle);
+    m_layout->addWidget(m_notes);
+
     m_layout->addStretch();
 
 }

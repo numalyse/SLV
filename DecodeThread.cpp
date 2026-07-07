@@ -64,6 +64,8 @@ void DecodeThread::decodeTagImages(){
     cv::Mat tempResized;
 
     for(auto& shot : m_shots){
+        if (isInterruptionRequested()) break;
+
         SLV::seekToMs(cap, static_cast<double>(shot.tagImageTime), fps);
 
         if (!cap.read(frame) || frame.empty()) {
@@ -93,7 +95,8 @@ void DecodeThread::decodeTagImages(){
             convertImage(processedFrame);
         }
 
-        p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false});
+        if (!p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false})) 
+            return; // detect queue stopped by consumer
     }
 
     p_imageQueue->waitPush({{}, -1, true});
@@ -115,6 +118,8 @@ void DecodeThread::decodeMedia(){
 
     while( cap.read(frame) ){
 
+        if (isInterruptionRequested()) break;
+
         if (frame.empty()) {
             qWarning() << "Impossible de lire la frame ";
             continue; 
@@ -131,9 +136,10 @@ void DecodeThread::decodeMedia(){
             convertImage(processedFrame);
         }
 
-        p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false});
+        if (!p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false})) 
+            return; // detect queue stopped by consumer
     }
-    
+
     p_imageQueue->waitPush({{}, -1, true});
     return;
 

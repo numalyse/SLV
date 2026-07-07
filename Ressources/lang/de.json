@@ -114,6 +114,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Automatische Segmentierung",
     "timeline_dialog_text_auto_segmentation": "Segmentierung läuft...",
+    "timeline_dialog_text_auto_segmentation_finished": "Automatische Segmentierung abgeschlossen, Gesamtzahl der Schnitte: ",
     "dialog_auto_segmentation_title": "Automatische Segmentierung",
     "dialog_auto_segmentation_text": "Möchten Sie die automatische Segmentierung starten?\nNach Abschluss wird die aktuelle Segmentierung überschrieben.",
 

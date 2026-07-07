@@ -115,6 +115,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Segmentación automática",
     "timeline_dialog_text_auto_segmentation": "Segmentando...",
+    "timeline_dialog_text_auto_segmentation_finished": "Segmentación automática finalizada, número total de planos: ",
     "dialog_auto_segmentation_title": "Segmentación automática",
     "dialog_auto_segmentation_text": "¿Desea iniciar la segmentación automática?\nUna vez finalizada, reemplazará la segmentación actual.",
 

@@ -51,6 +51,6 @@ void ProjectExportThread::run()
         break;
     }
 
-    emit exportFinished(success);
+    emit exportFinished(success, isInterruptionRequested());
     return;
 }

@@ -30,8 +30,10 @@ void TutoOpacityWidget::paintEvent(QPaintEvent *event)
     
     // trou pour le widget cible
     if(m_widgetToShow){
-        QRect hole = QRect(m_widgetToShow->mapTo(this, QPoint(0,0)), m_widgetToShow->size());
+        QPoint topLeftGlobal = m_widgetToShow->mapToGlobal(QPoint(0, 0));
+        QPoint topLeftLocal  = mapFromGlobal(topLeftGlobal);
+        QRect hole(topLeftLocal, m_widgetToShow->size());
         p.setCompositionMode(QPainter::CompositionMode_Clear);
-        p.fillRect(hole, Qt::transparent);   
+        p.fillRect(hole, Qt::transparent);
     }
 }

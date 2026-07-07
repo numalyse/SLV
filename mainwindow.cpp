@@ -10,6 +10,10 @@
 #include "Preference/PreferenceDialog.h"
 #include "FileFormatManager.h"
 
+#include "Toolbars/AdvancedToolbar.h"
+#include "Toolbars/ExtensionToolbar.h"
+#include "Timeline/TimelineWidget.h"
+
 #include <QToolBar>
 #include <vlc/vlc.h>
 
@@ -144,26 +148,85 @@ MainWindow::MainWindow(QWidget *parent)
      });
     m_tuto->getTutoOpacityWidget()->followParentGeometry();
 
-    m_tuto->addStep(m_navPanelBtn, prefManager.getText("tutorial_step_nav_panel"), [this]{
-        m_globalPlayerManager->openNavPanel();
-        m_navPanelBtn->setButtonState(true);
-    }, [this]{
-        m_globalPlayerManager->closeNavPanel();
-        m_navPanelBtn->setButtonState(false);
-    });
+    AdvancedToolbar* advancedToolbar = qobject_cast<AdvancedToolbar*>(m_globalPlayerManager->toolbar());
+    ExtensionToolbar* extensionToolbar = advancedToolbar ? advancedToolbar->getExtendedToolbar() : nullptr;
 
-    m_tuto->addStep(m_playlistBtn, prefManager.getText("tutorial_step_playlist"), [this]{
-        m_globalPlayerManager->openNavPanel();
-    }, [this]{
-        m_globalPlayerManager->closeNavPanel();
-    });
+    if(advancedToolbar) {
+        m_tuto->addStep(advancedToolbar->playPauseBtn(), "Charger un média", [this](){
+            m_tuto->trackConnect(connect(m_globalPlayerManager, &GlobalPlayerManager::activePlayersMediaStateChanged, this, [this](bool hasMedia){
+                if(hasMedia){
+                    m_tuto->nextStep();
+                }
+            }));
+        }, nullptr, false);
+        
 
-    m_tuto->addStep(m_shotDetailBtn, prefManager.getText("tutorial_step_shot_detail"), [this]{
-        m_globalPlayerManager->openNavPanel();
-    }, [this]{
-        m_globalPlayerManager->closeNavPanel();
+        m_tuto->addStep(advancedToolbar->extensionBtn(), "Activer l'extension",
+            [this, advancedToolbar, extensionToolbar](){
+                if(advancedToolbar->extensionBtn()->isChecked()){
+                    advancedToolbar->extensionBtn()->setButtonState(false);
+                    extensionToolbar->hide();
+                }
+                m_tuto->trackConnect(connect(advancedToolbar->extensionBtn(), &ToolbarToggleButton::stateActivated, this, [this](){ m_tuto->nextStep(); }));
+            },
+            nullptr, false);
+
+
+        auto* semgentationBtn = advancedToolbar->getExtendedToolbar()->m_segmBtn;
+        m_tuto->addStep(
+                semgentationBtn, 
+                "Ouvrir la timeline", 
+                [this, semgentationBtn](){
+                    if(semgentationBtn->isChecked()){
+                        semgentationBtn->setButtonState(false);
+                        if(m_globalPlayerManager->timeline()) m_globalPlayerManager->timeline()->hide();
+                    }
+                    m_tuto->trackConnect(connect(semgentationBtn, &ToolbarToggleButton::stateActivated, this, [this](){
+                        m_tuto->nextStep();
+                    }));
+                }, nullptr, false);
+
+        // pendant cette etape forcement un média chargé
+        m_tuto->addStep([this]() -> QWidget* {
+                            auto* tl = m_globalPlayerManager->timeline();
+                            Q_ASSERT(tl != nullptr);
+                            return tl;
+                        } , "Timeline :", nullptr, nullptr);
+
+        auto tl = [this]() -> TimelineWidget* { return m_globalPlayerManager->timeline(); };
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->abLoopBtn(); },
+            "Boucle A-B : placez un point A et un point B pour lire en boucle cette portion du média.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->autoSegmentationBtn(); },
+            "Segmentation automatique : détecte et découpe les plans automatiquement.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->splitShotBtn(); },
+            "Scinder le plan : coupe le plan courant à la position du curseur.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->mergeWithPrevShotBtn(); },
+            "Fusionner avec le plan précédent : fusionne le plan sélectionné avec celui qui le précède.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->toPrevShotBtn(); },
+            "Plan précédent : déplace le curseur au début du plan précédent.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->shotInfoBtn(); },
+            "Informations du plan : affiche les détails du plan sélectionné.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->toNextShotBtn(); },
+            "Plan suivant : déplace le curseur au début du plan suivant.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->mergeWithNextShotBtn(); },
+            "Fusionner avec le plan suivant : fusionne le plan sélectionné avec celui qui le suit.", nullptr, nullptr);
+
+        m_tuto->addStep([tl]() -> QWidget* { return tl()->exportBtn(); },
+            "Exporter : lance l'exportation du projet selon le découpage de la timeline.", nullptr, nullptr);
+
+    }
+
+    QTimer::singleShot(0, this, [this]() {
+        m_tuto->startTutorial();
     });
-    m_tuto->startTutorial();
 
 
 }

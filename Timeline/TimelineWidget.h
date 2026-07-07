@@ -55,6 +55,16 @@ public slots:
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
+    ToolbarButton* abLoopBtn()            const { return m_abLoopBtn; }
+    ToolbarButton* autoSegmentationBtn()  const { return m_autoSegmentationBtn; }
+    ToolbarButton* splitShotBtn()         const { return m_splitShotBtn; }
+    ToolbarButton* mergeWithPrevShotBtn() const { return m_mergeWithPrevShotBtn; }
+    ToolbarButton* toPrevShotBtn()        const { return m_toPrevShotBtn; }
+    ToolbarButton* shotInfoBtn()          const { return m_shotInfo; }
+    ToolbarButton* toNextShotBtn()        const { return m_toNextShotBtn; }
+    ToolbarButton* mergeWithNextShotBtn() const { return m_mergeWithNextShotBtn; }
+    ToolbarButton* exportBtn()            const { return m_exportBtn; }
+
 signals:
     void updateShotDetailRequest(int shotCount, int requestId, Shot*);
     void timelineSetPosition(int64_t);

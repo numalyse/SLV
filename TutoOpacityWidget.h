@@ -10,7 +10,7 @@ class TutoOpacityWidget : public BlackOpacityWidget
 public:
     explicit TutoOpacityWidget(QWidget *parent = nullptr, const QRect& windowRect = QRect());
     ~TutoOpacityWidget();
-    void setWidgetToShow(QWidget* widgetToShow) { m_widgetToShow = widgetToShow; };
+    void setWidgetToShow(QWidget* widgetToShow) { m_widgetToShow = widgetToShow; update(); };
 
 public slots:
     void paintEvent(QPaintEvent *event) override;

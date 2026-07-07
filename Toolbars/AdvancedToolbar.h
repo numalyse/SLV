@@ -31,6 +31,7 @@ public:
     void setFullscreenUI(int bottomMargin = AdvancedToolbar::s_bottomMarginFullscreen) override;
     void setDefaultUI() override;
     ExtensionToolbar* getExtendedToolbar(){ return m_extensionToolbar; }
+    ToolbarToggleButton* extensionBtn(){ return m_extensionBtn; }
 
 public slots:
     void enableButtons();

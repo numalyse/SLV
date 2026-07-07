@@ -121,24 +121,24 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 }
 
 
-/// @brief 
-/// @param ejectMediaAfterSave Si true, va supprimer le projet + éjecter le média
-/// @return 
+/// @brief Saves the current project, asks the user to input a foldername if project was never created, create and write to json, create a symbolic link to the media
+/// @param ejectMediaAfterSave If set to true will eject the media and empty the current project 
+/// @param isSaveAs Set to true if call to saveProject came from saveAs option, forces the creation of a new project folder and new media link
 void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
     if(!m_project){
-        qCritical() << "Trying to save on a null project"; 
+        qCritical() << "[ProjectManager] Trying to save on a null project"; 
         return;
     }
 
-    if( ! m_needSave){ // si pas besoin de save on return et éjecte si besoin
+    if( ! m_needSave){ // If no changes made doesn't write to json
         if(ejectMediaAfterSave){
             discardAndEject();
         }
         return;
     }
 
-    if( ! m_project->path.isEmpty() && ! isSaveAs ){ // si on est deja dans un projet avec un path,
-        // on écrit directement dans le json sans copier la vidéo
+    if( ! m_project->path.isEmpty() && ! isSaveAs ){ // If project path is not empty, the project folder as been created
+        // we can directly write to json without creating a folder and the media link
         ProjectFileHelper::writeJson(m_project, p_timeline);
         setSaveNotNeeded();
         if(ejectMediaAfterSave){
@@ -148,20 +148,46 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
     }
 
     if( mediaPath().isEmpty() ){
-        qCritical() << "Media path du project est vide";
-        if(ejectMediaAfterSave){
-            discardAndEject();
-        }
+        qCritical() << "[ProjectManager] Media path empty when saving";
         return;
     }
 
 
-    if ( ! createProjectFolder() ){ // on a cliqué sur annulé on return 
+    if ( ! createProjectFolder() ){ // clicked on "cancel" in filedialog returns
         return; 
-    }else { // copie du média dans le dossier du projet
+    }else { 
+/*         
+        // copies the media file to the project folder
+
         QString destMedia = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
-        copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave);
+        copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave); 
+*/
+
+        // create a symbolic link to the media, on windows must end by lnk, lighter since we won't copy the media file 
+        // and the user can still move the media where he needs to without breaking the project
+#ifdef Q_OS_WIN
+        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + ".lnk" );
+#else
+        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
+#endif
+
+        if(!QFile::link(m_project->media->filePath(), mediaLinkPath)){
+            qCritical() << "[ProjectManager] Failed to create a link to the media";
+            return;
+        }
+        m_project->mediaLinkPath = mediaLinkPath;
+
+        if(!ProjectFileHelper::writeJson(m_project, p_timeline)){
+            qCritical() << "[ProjectManager] Failed to write to json";
+            return;
+        }
+        
         setSaveNotNeeded();
+
+        if(ejectMediaAfterSave){
+            discardAndEject();
+        }
+
         return;
     }
 
@@ -237,7 +263,7 @@ bool ProjectManager::createProjectFolder(){
     );
 
     if(selectedPath.isEmpty()){
-        qDebug() << "Sauvegarde annulée";
+        qDebug() << "[ProjectManager] Project fodler creation aborted";
         return false; 
     }
     
@@ -248,14 +274,14 @@ bool ProjectManager::createProjectFolder(){
     
     if(!dir.exists(fileInfo.baseName())) {
         if(!dir.mkdir(fileInfo.baseName())) {
-            qCritical() << "Impossible de créer le dossier";
+            qCritical() << "[ProjectManager] Failed to create project folder";
             return false;
         }
     }
 
     m_project->path = QDir(fileInfo.absolutePath()).filePath(fileInfo.baseName());
     m_project->name = QDir(m_project->path).dirName();
-    qDebug() << "dossier créé";
+    qDebug() << "[ProjectManager] Project folder created";
     return true;
 }
 
@@ -278,69 +304,6 @@ void ProjectManager::deleteFolder(const QString& projectFolderPath) {
         qDebug() << "Le dossier n'existe pas :" << projectFolderPath;
     }
 }
-
-
-
-/// @brief Copie avec un thread dédié un média à l'endroit souhaité. Une fois terminé, créer le fichier JSON
-/// @param sourcePath Path du média a copier
-/// @param destPath Path de destination du média copié
-/// @param projectPath Path du dossier racine du projet (pour suppression si annulation)
-/// @param ejectMediaAfterSave Si true, ejecte la vidéo après la copie
-/// @return 
-bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave) { 
-
-    if (!QFile::exists(sourcePath)) {
-        qCritical() << "Erreur : Le fichier source est introuvable." << sourcePath;
-        return false;
-    }
-
-    PrefManager& prefManager = PrefManager::instance();
-
-    FileCopyThread* fileCpyThread = new FileCopyThread(sourcePath, destPath, this);
-    
-    QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("project_window_title_copy_video"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
-    progressDialog->setWindowTitle(prefManager.getText("project_window_title_copy_video"));
-    progressDialog->setWindowModality(Qt::WindowModal); 
-    progressDialog->show();
-
-
-    connect(progressDialog, &QProgressDialog::canceled, this, [fileCpyThread, progressDialog](){ 
-        fileCpyThread->requestInterruption();
-        disconnect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
-    });
-
-    connect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
-
-    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, projectPath](bool success, bool canceled) {
-        
-        if (success) {
-            ProjectFileHelper::writeJson(m_project, p_timeline);
-        } else {
-            if ( ! canceled ) {
-                auto& prefManager = PrefManager::instance(); 
-                QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), prefManager.getText("project_error_copy_failed"));
-            }
-            m_project->path = "";
-            m_project->name = "";
-            deleteFolder(projectPath);
-            setSaveNeeded(); 
-        }
-
-        if(ejectMediaAfterSave){
-            discardAndEject();
-        }
-
-        progressDialog->close(); 
-        progressDialog->deleteLater(); 
-    });
-
-    connect(fileCpyThread, &QThread::finished, fileCpyThread, &QObject::deleteLater);
-
-    fileCpyThread->start();
-
-    return true;
-}
-
 
 
 /// @brief Ouvre un dialogue pour choisir l'emplacement du dossier. Parcours le JSON, affiche une erreur dans une message box s'il y en eu, créer projet sinon.
@@ -381,11 +344,15 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     ProjectSaveData projectData = loaded.value();
 
+    QString mediaName;
+    QString mediaAbsolutePath;
+
     Project* project = new Project{
         projectData.shots,
         new Media(projectData.mediaAbsolutePath, this),
         QFileInfo(path).baseName(),
-        path
+        path,
+        projectData.mediaLinkAbsolutePath
     };
     qDebug() << "Project created with name:" << project->name << ", path:" << project->path << ", media path:" << project->media->filePath();
 

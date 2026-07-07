@@ -11,6 +11,7 @@
 struct ProjectSaveData {
     QString mediaName;
     QString mediaAbsolutePath;
+    QString mediaLinkAbsolutePath;
     int64_t duration = 0;
     double fps = 0.0;
     QVector<Shot> shots;

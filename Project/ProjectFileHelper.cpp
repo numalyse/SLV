@@ -31,7 +31,7 @@ namespace  {
         QJsonObject mediaData;
         auto projectMedia = project->media;
 
-        mediaData["filePath"] = projectMedia->filePath();
+        mediaData["mediaLinkPath"] = project->mediaLinkPath;
         QString filename = projectMedia->fileName() + "." + projectMedia->fileExtension();
         mediaData["name"] = filename;
         mediaData["duration"] = projectMedia->duration();
@@ -103,17 +103,19 @@ namespace ProjectFileHelper {
         if (projectData.contains("media") && projectData["media"].isObject()) {
             QJsonObject mediaJson = projectData["media"].toObject();
 
-            loadedData.mediaName = mediaJson.value("name").toString("");
+            loadedData.mediaLinkAbsolutePath = mediaJson.value("mediaLinkPath").toString("");
             loadedData.duration = mediaJson.value("duration").toInt(0);
             loadedData.fps = mediaJson.value("fps").toDouble(0.0);
 
-            loadedData.mediaAbsolutePath = QDir(projectAbsolutePath).filePath(loadedData.mediaName);
+            loadedData.mediaAbsolutePath = QFile::symLinkTarget(loadedData.mediaLinkAbsolutePath);
+
             QFileInfo mediaInfo(loadedData.mediaAbsolutePath);
             
-            if (!mediaInfo.exists() || !mediaInfo.isFile()) {
-                qCritical() << "Erreur : Le fichier vidéo n'est pas dans le dossier ";
+            if ( loadedData.mediaAbsolutePath == "" || !mediaInfo.exists() || !mediaInfo.isFile()) {
+                qCritical() << "[ProjectManager] load project : failed to retrieve the medialink target";
                 return std::unexpected(ProjectFileError::MediaFileNotFound);
             }
+            loadedData.mediaName = mediaInfo.fileName();
 
         } else {
             return std::unexpected(ProjectFileError::MediaKeyMissing);

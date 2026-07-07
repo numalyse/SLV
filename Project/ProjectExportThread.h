@@ -20,7 +20,7 @@ public:
 
 signals:
     void progress(int);
-    void exportFinished(bool);
+    void exportFinished(bool success, bool canceled);
 
 private:
     QVector<Shot> m_shots;

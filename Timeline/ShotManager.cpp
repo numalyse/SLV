@@ -282,30 +282,30 @@ void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
 
 
 
-/// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage
+/// @brief Updates items position and width, disable scene view updates while updating 
 void ShotManager::updateShotItemsPosition(){
     if(!p_scene || !p_view) return;
-
-    p_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    p_view->setUpdatesEnabled(false);
 
     double newXPos{};
     double newWidth{};
 
-    for(auto* shotItem : m_shotItems){
+    p_view->setUpdatesEnabled(false);
+
+    for (int IShot = 0; IShot < m_shotItems.size(); ++IShot)
+    {
+        ShotItem* shotItem = m_shotItems[IShot];
+        AudioShotItem* audioShotItem = m_audioShotItems[IShot];
 
         newXPos = shotItem->shot().start * p_mathManager->pixelsPerMs();
         shotItem->setX(newXPos);
-        AudioShotItem* audioShotItem = m_audioShotItems[m_shotItems.indexOf(shotItem)];
         audioShotItem->setX(newXPos);
 
         newWidth = (shotItem->shot().end - shotItem->shot().start) * p_mathManager->pixelsPerMs();
         shotItem->setWidth(newWidth);
         audioShotItem->setWidth(newWidth);
     }
-
+    
     p_view->setUpdatesEnabled(true);
-    p_scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
     p_scene->update();
 }
 

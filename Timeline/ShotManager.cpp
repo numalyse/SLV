@@ -229,6 +229,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     p_scene->addItem(newShotItem);
     p_scene->addItem(newAudioShotItem);
 
+    emit shotCountUpdated(shotCount());
+
     updateCurrentShot(cutTime);
 }
 
@@ -268,6 +270,7 @@ void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
     mergeCurrentInto(indexOfPrev);
     clearSelection();
     updateCurrentShot(cursorTime);
+    emit shotCountUpdated(shotCount());
 }
 
 void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
@@ -461,6 +464,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         }
     }
 
+    emit shotCountUpdated(shotCount());
 }
 
 void ShotManager::updateThumbnail(int requestId, QImage image){

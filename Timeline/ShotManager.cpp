@@ -159,7 +159,7 @@ void ShotManager::extractShotsSelected(const QString& outputPath)
 
 }
 
-/// @brief Raccourcis le plan courant et créer une nouveau plan avec comme début la position du curseur
+/// @brief Shortens the current shot to cursor time - 1ms, create a new shot with start time = cursor time 
 void ShotManager::splitShotAt( int64_t cutTime ) {
     qDebug() << "Ms where to cut " << cutTime;
     
@@ -212,19 +212,14 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     AudioShotItem* newAudioShotItem = new AudioShotItem(newAudioShotData, width2);
     newAudioShotItem->setPos(pos2, m_currentShotItem->y());
 
-    // on insère le plan juste apres le plan cut
+    // insert the shot right after the shot cut
     m_shotItems.insert(index + 1, newShotItem);
     m_audioShotItems.insert(index + 1, newAudioShotItem);
 
-    if(p_media->type() == MediaType::Video){
-        if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
-            p_thumbnailWorker->requestThumbnail(index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-            p_thumbnailWorker->requestThumbnail(index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); 
-        }else {
-            p_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-            p_thumbnailWorker->requestThumbnail(index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
-        }
-    }
+    requestShotThumbnail(index + 1, newShotData);
+    // need to update the previous too, if display thumbnails via tagFrames, thumbnail would be outdated 
+    // if the new shot duration now < offset, thumbnail would be outdated 
+    requestShotThumbnail(index, baseShot);
 
     p_scene->addItem(newShotItem);
     p_scene->addItem(newAudioShotItem);
@@ -257,31 +252,32 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     m_shotItems.removeOne(m_currentShotItem);
     m_audioShotItems.removeOne(currentAudioShotItem);
     m_currentShotItem = nullptr;
-    
+
+    requestShotThumbnail(m_shotItems.indexOf(item), item->shot());
+
     updateShotItemsPosition();
 }
 
-void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
+void ShotManager::mergeCurrentWithAdjacentShot(int indexOffset, int64_t cursorTime)
 {
     Q_ASSERT( m_currentShotItem );
 
-    int indexOfPrev = m_shotItems.indexOf(m_currentShotItem) - 1;
+    int targetIndex = m_shotItems.indexOf(m_currentShotItem) + indexOffset;
 
-    mergeCurrentInto(indexOfPrev);
+    mergeCurrentInto(targetIndex);
     clearSelection();
     updateCurrentShot(cursorTime);
     emit shotCountUpdated(shotCount());
 }
 
+void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
+{
+    mergeCurrentWithAdjacentShot(-1, cursorTime);
+}
+
 void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
 {
-    Q_ASSERT( m_currentShotItem );
-
-    int indexOfNext = m_shotItems.indexOf(m_currentShotItem) + 1;
-
-    mergeCurrentInto(indexOfNext);
-    clearSelection();
-    updateCurrentShot(cursorTime);
+    mergeCurrentWithAdjacentShot(1, cursorTime);
 }
 
 
@@ -350,8 +346,6 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
     qDeleteAll(m_audioShotItems);
     m_audioShotItems.clear();
 
-    bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
-
     for ( auto& IShot : shots ){
 
         double xPos =  p_mathManager->timeToPos(IShot.start);
@@ -372,13 +366,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         m_shotItems.push_back(shot);
         m_audioShotItems.push_back(audioShotItem);
 
-        if(p_media->type() == MediaType::Video){
-            if(displayByTagFrames) {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-            }else {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-            }
-        }
+        requestShotThumbnail(m_shotItems.size()-1, IShot);
 
     }
 
@@ -398,8 +386,6 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     int64_t lengthShot = 0;
 
     QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
-
-    bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
 
     for(int i=0; i < cuts.size(); ++i ){
 
@@ -426,13 +412,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         m_shotItems.push_back(shotItem);
         m_audioShotItems.push_back(audioShotItem);
 
-        if(p_media->type() == MediaType::Video){
-            if(displayByTagFrames) {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-            }else {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-            }
-        }
+        requestShotThumbnail(m_shotItems.size()-1, shot);
 
         startShot = nextStartShot;
     }
@@ -456,15 +436,21 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     m_shotItems.push_back(shotItem);
     m_audioShotItems.push_back(audioShotItem);
 
-    if(p_media->type() == MediaType::Video){
-        if(displayByTagFrames) {
-            p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-        }else {
-            p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
-        }
-    }
+    requestShotThumbnail(m_shotItems.size()-1, shot);
 
     emit shotCountUpdated(shotCount());
+}
+
+void ShotManager::requestShotThumbnail(int shotId, const Shot& shot){
+    if(p_media->type() != MediaType::Video) return;
+
+    bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
+
+    if(displayByTagFrames){
+        p_thumbnailWorker->requestThumbnail(shotId, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+    }else {
+        p_thumbnailWorker->requestThumbnail(shotId, shot.start, shot.end - shot.start, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+    }
 }
 
 void ShotManager::updateThumbnail(int requestId, QImage image){

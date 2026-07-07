@@ -72,6 +72,10 @@ signals:
 
 private:
     void mergeCurrentInto(int ShotItemId);
+    void mergeCurrentWithAdjacentShot(int indexOffset, int64_t cursorTime);
+
+    /// @brief Request thumbnail update of a shot (will do nothing if media is not a video)
+    void requestShotThumbnail(int shotId, const Shot& shot);
 
     QVector<ShotItem*> m_shotItems;
     QVector<AudioShotItem*> m_audioShotItems;

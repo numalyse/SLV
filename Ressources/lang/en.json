@@ -115,6 +115,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Auto segmentation",
     "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",
+    "timeline_dialog_text_auto_segmentation_finished": "Auto segmentation finished, total number of shots: ",
     "dialog_auto_segmentation_title": "Auto segmentation",
     "dialog_auto_segmentation_text": "Do you want to start automatic segmentation? Once completed, it will overwrite the current segmentation.",
 

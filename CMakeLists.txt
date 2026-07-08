@@ -113,6 +113,8 @@ set(PROJECT_SOURCES
 
     Ressources/supported_formats_resources.qrc
     FileFormatManager.h FileFormatManager.cpp
+
+    AnnotationManager.h AnnotationManager.cpp
 )
 
 # =========================================================

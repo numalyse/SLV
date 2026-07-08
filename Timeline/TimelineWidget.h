@@ -52,6 +52,7 @@ public slots:
     void initAudioVisualizer();
     void initShotDetail();
     bool event(QEvent *event) override;
+    void updateShotCount(int shotCount);
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
@@ -111,6 +112,8 @@ private:
     ToolbarButton* m_shotInfo = nullptr;
     ToolbarButton* m_toPrevShotBtn = nullptr;
     ToolbarButton* m_toNextShotBtn = nullptr;
+
+    QLabel* m_shotCountLabel = nullptr;
 
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;

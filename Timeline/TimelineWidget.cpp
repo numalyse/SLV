@@ -204,6 +204,11 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
 TimelineWidget::~TimelineWidget()
 {
+    if(m_segmThread && m_segmThread->isRunning()){
+        m_segmThread->requestInterruption();
+        m_segmThread->wait();
+    }
+
     if (m_audioComputeProcess) {
         m_audioComputeProcess->kill();
         m_audioComputeProcess->waitForFinished();
@@ -592,17 +597,17 @@ void TimelineWidget::autoSegmentation(){
 
         [this, mediaPath]() {
             auto& txtManager = PrefManager::instance();
-            SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
+            m_segmThread = new SegmentationThread(mediaPath, this);
 
             QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_dialog_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
             progressDialog->setWindowTitle(txtManager.getText("timeline_dialog_title_auto_segmentation"));
             progressDialog->setWindowModality(Qt::WindowModal);
 
-            connect(progressDialog, &QProgressDialog::canceled, segmentationThread, &QThread::requestInterruption);
+            connect(progressDialog, &QProgressDialog::canceled, m_segmThread, &QThread::requestInterruption);
 
-            connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
+            connect(m_segmThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
 
-            connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, progressDialog] (std::vector<int> cuts) {
+            connect(m_segmThread, &SegmentationThread::segmentationFinished, this, [this, progressDialog] (std::vector<int> cuts) {
 
                 progressDialog->close();
                 progressDialog->deleteLater();
@@ -621,11 +626,11 @@ void TimelineWidget::autoSegmentation(){
                 }
             });
 
-            connect(segmentationThread, &QThread::finished, segmentationThread, &QObject::deleteLater);
+            connect(m_segmThread, &QThread::finished, m_segmThread, &QObject::deleteLater);
 
             progressDialog->show();
-            segmentationThread->start();
-            segmentationThread->setPriority(QThread::HighPriority);
+            m_segmThread->start();
+            m_segmThread->setPriority(QThread::HighPriority);
         },
         nullptr,
         nullptr

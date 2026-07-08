@@ -6,12 +6,12 @@
 
 struct Annotation
 {
-    int id;
     QString title;
     int64_t start;
     int64_t end;
     QString note;
     QColor color = QColor(79, 134, 198, 255);
+    int id;
 };
 
 

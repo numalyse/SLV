@@ -21,12 +21,11 @@ public:
 
 public slots:
     void addAnnotation(Annotation& annotation);
-    void updateAnnotation(int annotationId, const Annotation& annotation);
+    void updateAnnotation(const Annotation& annotation);
     void removeAnnotation(int annotationId);
 
-
 signals:
-    void annotationAdded(const Annotation& annotation);
+    void annotationAdded(Annotation& annotation);
     void annotationUpdated(const Annotation& annotation);
     void annotationRemoved(int annotationId);
     void annotationsReset();

@@ -29,17 +29,27 @@ void AnnotationManager::clear()
 }
 
 void AnnotationManager::addAnnotation(Annotation& annotation){
+    if(!p_annotations){
+        qDebug() << "[AnnotationManager] Failed to add on a nullptr";
+        return;
+    }
     annotation.id = ++m_nextId;
     p_annotations->append(annotation);
 
     emit annotationAdded(annotation);
 }
 
-void AnnotationManager::updateAnnotation(int annotationId, const Annotation &annotation)
+void AnnotationManager::updateAnnotation(const Annotation &annotation)
 {
-    auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [annotationId](const Annotation& a){ return a.id == annotationId; });
+
+    if(!p_annotations){
+        qDebug() << "[AnnotationManager] Failed to update on a nullptr "<< annotation.id;
+        return;
+    }
+
+    auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [annotation](const Annotation& a){ return a.id == annotation.id; });
     if (it == p_annotations->end()) {
-        qDebug() << "[AnnotationManager] Failed to update, could not find annotation with id "<< annotationId;
+        qDebug() << "[AnnotationManager] Failed to update, could not find annotation with id "<< annotation.id;
         return;
     }
 
@@ -56,6 +66,11 @@ void AnnotationManager::updateAnnotation(int annotationId, const Annotation &ann
 
 void AnnotationManager::removeAnnotation(int annotationId)
 {
+    if(!p_annotations){
+        qDebug() << "[AnnotationManager] Failed to delete on a nullptr ";
+        return;
+    }
+
     auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [annotationId](const Annotation& a){ return a.id == annotationId; });
     if (it == p_annotations->end()) {
         qDebug() << "[AnnotationManager] Failed to remove, could not find annotation with id "<< annotationId;

@@ -99,6 +99,7 @@ private:
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
 
+    QPointer<SegmentationThread> m_segmThread;
     ToolbarButton* m_autoSegmentationBtn = nullptr;
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;

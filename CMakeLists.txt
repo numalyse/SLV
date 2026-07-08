@@ -115,6 +115,7 @@ set(PROJECT_SOURCES
     FileFormatManager.h FileFormatManager.cpp
 
     AnnotationManager.h AnnotationManager.cpp
+    AnnotationPanel.h AnnotationPanel.cpp
 )
 
 # =========================================================

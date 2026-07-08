@@ -5,6 +5,7 @@
 #include "ShotDetail.h"
 #include "Timeline/ThumbnailWorker.h"
 #include "Media.h"
+#include "AnnotationPanel.h"
 
 #include <QWidget>
 #include <QBoxLayout>
@@ -20,6 +21,7 @@ class NavPanel : public QWidget
 public:
     explicit NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent = nullptr);
     const bool isOpen(){return m_isOpen;}
+    AnnotationPanel* annotationPanel() {return m_annotationPanel; };
 private:
 
     bool m_isOpen = false;
@@ -28,6 +30,7 @@ private:
     QLayout *m_mainLayout = nullptr;
     Playlist *m_playlistWidget = nullptr;
     ShotDetail *m_shotDetail = nullptr;
+    AnnotationPanel *m_annotationPanel = nullptr;
 
     // non owner
     ThumbnailWorker* p_thumbnailWorker = nullptr;
@@ -42,6 +45,7 @@ public slots:
     void playNextMedia();
     void displayShotDetail();
     void displayPlaylist();
+    void displayAnnotationPanel();
     void timelineWidgetUpdateShotDetail(int, int, Shot*);
     void disableShotControlButtons();
     void enableShotControlButtons();

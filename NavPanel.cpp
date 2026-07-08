@@ -14,8 +14,10 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
 
     m_playlistWidget = new Playlist(this);
     m_shotDetail = new ShotDetail(this);
+    m_annotationPanel = new AnnotationPanel(this);
     m_sideWidget->addWidget(m_playlistWidget); 
     m_sideWidget->addWidget(m_shotDetail);
+    m_sideWidget->addWidget(m_annotationPanel);
     m_sideWidget->setCurrentWidget(m_playlistWidget);
     
     m_scrollArea = new QScrollArea(this);
@@ -41,6 +43,7 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
 
     connect(&SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail, this, &NavPanel::displayShotDetail);
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
+    connect(&SignalManager::instance(), &SignalManager::displayAnnotationPanel, this, &NavPanel::displayAnnotationPanel);
 
     connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
 
@@ -94,6 +97,11 @@ void NavPanel::displayShotDetail()
 void NavPanel::displayPlaylist()
 {
     m_sideWidget->setCurrentWidget(m_playlistWidget);
+}
+
+void NavPanel::displayAnnotationPanel()
+{
+    m_sideWidget->setCurrentWidget(m_annotationPanel);
 }
 
 void NavPanel::timelineWidgetUpdateShotDetail(int shotCount, int requestId, Shot * shot)

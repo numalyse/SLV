@@ -27,6 +27,7 @@
 
 ProjectManager::ProjectManager(QObject* parent) : QObject(parent)
 {
+    m_annotationManager = new AnnotationManager(this);
 }
 
 ProjectManager::~ProjectManager()
@@ -96,6 +97,7 @@ void ProjectManager::deleteProject() {
         m_project = nullptr;
         p_timeline = nullptr;
         setSaveNotNeeded();
+        m_annotationManager->clear();
         emit projectDeleted();
     }
 }
@@ -231,6 +233,8 @@ void ProjectManager::initProjectShot(){
 
     qDebug() << "project initialisé";
     emit projectInitialized();
+
+    m_annotationManager->setAnnotations(&m_project->annotations);
 
 }
 
@@ -393,6 +397,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     Project* project = new Project{
         projectData.shots,
+        {}, // TODO : set annotations from the loaded project
         new Media(projectData.mediaAbsolutePath, this),
         QFileInfo(path).baseName(),
         path

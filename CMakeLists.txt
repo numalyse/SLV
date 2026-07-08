@@ -116,6 +116,8 @@ set(PROJECT_SOURCES
 
     AnnotationManager.h AnnotationManager.cpp
     AnnotationPanel.h AnnotationPanel.cpp
+    AnnotationWidget.h AnnotationWidget.cpp
+    AnnotationDialog.h AnnotationDialog.cpp
 )
 
 # =========================================================

@@ -196,6 +196,8 @@
     "delete_all_items_confirm" : "Diese Aktion ist unwiderruflich.",
 
     "remove" : "Entfernen",
+    "edit" : "Bearbeiten",
+    "annotation" : "Anmerkung",
     "remove_all" : "Alle entfernen",
     "remove_all_items_playlist" : "Playlist entfernen",
     "tooltip_remove_all_items_playlist" : "Alle Elemente der Playlist entfernen",

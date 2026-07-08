@@ -196,6 +196,8 @@
     "delete_all_items_confirm" : "Cette action est irréversible.",
     
     "remove" : "Retirer",
+    "edit" : "Modifier",
+    "annotation" : "Annotation",
     "remove_all" : "Tout retirer",
     "remove_all_items_playlist" : "Réinitialiser la playlist",
     "tooltip_remove_all_items_playlist" : "Retirer tous les éléments de la playlist",

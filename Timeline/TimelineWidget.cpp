@@ -16,6 +16,7 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFont>
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QWheelEvent>
@@ -140,6 +141,9 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     m_shotCountLabel = new QLabel(this);
     m_shotCountLabel->setContentsMargins(0, 0, 10, 0);
+    QFont shotCountFont = m_shotCountLabel->font();
+    shotCountFont.setItalic(true);
+    m_shotCountLabel->setFont(shotCountFont);
     updateShotCount(static_cast<int>(projectShots.size()));
 
     ButtonLayout->addWidget(m_shotCountLabel);
@@ -253,7 +257,7 @@ bool TimelineWidget::event(QEvent *event)
 
 void TimelineWidget::updateShotCount(int shotCount)
 {
-    m_shotCountLabel->setText(PrefManager::instance().getText("timeline_shot_count_label") + " : " + QString::number(shotCount));
+    m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
 }
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items

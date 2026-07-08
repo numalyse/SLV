@@ -93,7 +93,7 @@
     "timeline_merge_with_previous_shot" : "Unisci piano corrente con il precedente",
     "timeline_merge_with_next_shot" : "Unisci piano corrente con il successivo",
     "timeline_extract_selected_shots" : "Estrai piani selezionati",
-    "timeline_shot_count_label" : "Numero totale di piani",
+    "timeline_shot_count_label" : "piano/i",
     "messagebox_extract_selected_shots_completed" : "Estrazione dei piani selezionati completata.",
     "messagebox_extract_selected_shots_failed" : "Si è verificato un errore durante l'estrazione dei piani selezionati.",
 

@@ -14,8 +14,10 @@ Q_OBJECT
 public:
     explicit AnnotationManager(QObject* parent);
 
-    void setAnnotations(QVector<Annotation>* annotations) { p_annotations = annotations; };
-    void clear() { p_annotations = nullptr; m_nextId = 0; }
+    const QVector<Annotation> &annotations() const;
+
+    void setAnnotations(QVector<Annotation>* annotations);
+    void clear();
 
 public slots:
     void addAnnotation(Annotation& annotation);
@@ -27,6 +29,7 @@ signals:
     void annotationAdded(const Annotation& annotation);
     void annotationUpdated(const Annotation& annotation);
     void annotationRemoved(int annotationId);
+    void annotationsReset();
 
 private:
     QVector<Annotation>* p_annotations = nullptr;

@@ -9,6 +9,24 @@ AnnotationManager::AnnotationManager(QObject *parent)
 {
 }
 
+const QVector<Annotation>& AnnotationManager::annotations() const
+{
+    static const QVector<Annotation> empty;
+    return p_annotations ? *p_annotations : empty;
+}
+
+void AnnotationManager::setAnnotations(QVector<Annotation> *annotations)
+{
+    p_annotations = annotations; 
+    emit annotationsReset();
+}
+
+void AnnotationManager::clear()
+{
+    p_annotations = nullptr; 
+    m_nextId = 0; 
+    emit annotationsReset();
+}
 
 void AnnotationManager::addAnnotation(Annotation& annotation){
     annotation.id = ++m_nextId;
@@ -25,12 +43,14 @@ void AnnotationManager::updateAnnotation(int annotationId, const Annotation &ann
         return;
     }
 
+    // updates the annotation with the new data
     it->title = annotation.title;
     it->start = annotation.start;
     it->end = annotation.end;
     it->note = annotation.note;
     it->color = annotation.color;
 
+    // sends it back to timeline and panel to update ui
     emit annotationUpdated(*it);
 }
 

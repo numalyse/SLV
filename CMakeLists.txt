@@ -82,6 +82,7 @@ set(PROJECT_SOURCES
     VlcParseHelper.h
     VlcInstance.h
     Shot.h
+    Annotation.h
     SignalManager.h
 
     Project/Project.h

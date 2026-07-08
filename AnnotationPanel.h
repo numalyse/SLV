@@ -2,11 +2,11 @@
 #define ANNOTATIONPANEL_H
 
 #include <QWidget>
-#include <QLabel>
 #include <QVector>
 #include <QVBoxLayout>
 
 #include "Annotation.h"
+#include "AnnotationWidget.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
 class AnnotationPanel : public QWidget
@@ -20,9 +20,12 @@ signals:
     void addAnottationRequested(Annotation& annotation);
     void updateAnottationRequested(const Annotation& annotation);
     void removeAnnotationRequested(int annotationId);
+    void annotationClicked(int annotationId);
 
 private:
-    QVector<QLabel*> m_labels;
+    AnnotationWidget* createItem(const Annotation& annotation);
+
+    QVector<AnnotationWidget*> m_items;
     QVBoxLayout* m_layout = nullptr;
     ToolbarButton* m_addAnnotationBtn = nullptr;
 
@@ -33,9 +36,10 @@ private slots:
     void rebuild();
 
     void annotationCreationDialog();
+    void annotationEditionDialog(int annotationId);
 
 };
 
 
 
-#endif ANNOTATIONPANEL_H
+#endif // ANNOTATIONPANEL_H

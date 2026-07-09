@@ -123,7 +123,10 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
         const qreal dpr = devicePixelRatioF();
         const int h = qRound(thumbHeight * dpr); // use devicePixelRatioF() to scale the thumbnail for high-DPI displays
         thumb = thumb.scaledToHeight(h, Qt::SmoothTransformation);
+        thumb.setDevicePixelRatio(dpr);
+
         const int w = thumb.width();
+        const int wLogical = qRound(w / dpr);
 
         // draw the thumbnail with rounded corners
         QPixmap rounded(w, h);

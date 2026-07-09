@@ -398,9 +398,11 @@ bool ProjectManager::relinkMedia(const QString& projectPath, ProjectSaveData& pr
 {
     auto& prefManager = PrefManager::instance();
 
-    QMessageBox::warning(nullptr,
+    QMessageBox warningBox(QMessageBox::Warning,
         prefManager.getText("messagebox_error"),
         prefManager.getText("project_manager_relink_media_message"));
+    warningBox.addButton(prefManager.getText("project_manager_relink_media_button"), QMessageBox::AcceptRole);
+    warningBox.exec();
 
     QString newMediaPath = QFileDialog::getOpenFileName(
         nullptr,

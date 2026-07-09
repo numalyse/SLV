@@ -563,6 +563,7 @@
     "project_manager_error_media_file_not_found": "The media associated with this project could not be found.",
     "project_manager_relink_media_message": "The media associated with this project could not be found. Please select its new location.",
     "project_manager_relink_media_dialog": "Locate the project media",
+    "project_manager_relink_media_button": "Select...",
     "project_manager_error_media_key_missing": "The project save file is damaged: media information is missing.",
     "project_manager_error_media_mismatch_fps": "The current media is different from the project (the frame rate is different).",
     "project_manager_error_media_mismatch_duration": "The current media is different from the project (the duration has changed).",

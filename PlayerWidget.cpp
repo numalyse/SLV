@@ -7,6 +7,10 @@
 #include "FileFormatManager.h"
 #include "GenericDialog.h"
 
+#ifdef __APPLE__
+#include "MacWindowHelper.h"
+#endif
+
 #include <QDebug>
 #include <QApplication>
 #include <QResizeEvent>
@@ -142,6 +146,15 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     m_drawingWidget = new DrawingWidget(containerWidget);
     //stack->addWidget(m_drawingWidget);
 
+#ifdef __APPLE__
+    // not attachable here since this has no window yet
+    // and attach would show the widget
+    // on widget show => attach / hide => detach
+    m_compositionWidget->installEventFilter(this);
+    m_blackOpacityWidget->installEventFilter(this);
+    m_drawingWidget->installEventFilter(this);
+#endif
+
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise();
 
@@ -180,17 +193,15 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     restoreOverlayStackOrder();
 }
 
-// PlayerWidget::~PlayerWidget()
-// {
-//     if (m_player) {
-//         libvlc_media_player_stop(m_player);
-//         libvlc_media_player_release(m_player);
-//     }
-
-//     if (m_vlc) {
-//         libvlc_release(m_vlc);
-//     }
-// }
+PlayerWidget::~PlayerWidget()
+{
+#ifdef __APPLE__
+    MacWindowHelper::detachFromParentWindow(m_compositionWidget);
+    MacWindowHelper::detachFromParentWindow(m_blackOpacityWidget);
+    MacWindowHelper::detachFromParentWindow(m_drawingWidget);
+#endif
+     
+}
 
 
 void PlayerWidget::setActive(bool active)
@@ -510,6 +521,21 @@ bool PlayerWidget::event(QEvent *event)
     }
 
     return QWidget::event(event);
+}
+
+bool PlayerWidget::eventFilter(QObject* watched, QEvent* event)
+{
+#ifdef __APPLE__
+    // attach watched overlay as child to prevent delay
+    if (watched == m_compositionWidget || watched == m_blackOpacityWidget || watched == m_drawingWidget) {
+        QWidget* overlay = static_cast<QWidget*>(watched);
+        if (event->type() == QEvent::Show)
+            MacWindowHelper::attachAsChildWindow(overlay, this);
+        else if (event->type() == QEvent::Hide)
+            MacWindowHelper::detachFromParentWindow(overlay);
+    }
+#endif
+    return QWidget::eventFilter(watched, event);
 }
 
 void PlayerWidget::enableButtons()

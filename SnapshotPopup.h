@@ -31,6 +31,7 @@ private:
     void fadeOutAndClose();
 
     QWidget* m_anchor = nullptr;
+    // when timer ends, check the cursor position
     QTimer* m_closeTimer = nullptr;
     QPropertyAnimation* m_anim = nullptr;
 

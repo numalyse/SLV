@@ -4,6 +4,10 @@
 #include "TimeFormatter.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
+#ifdef __APPLE__
+#include "MacWindowHelper.h"
+#endif
+
 #include <QLabel>
 #include <QFileInfo>
 #include <QPainter>
@@ -15,6 +19,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QEvent>
+#include <QCursor>
 
 
 /// @brief Elides a file path by removing leading segments until it fits within the specified width, using "..." to indicate omitted segments. 
@@ -56,7 +61,15 @@ SnapshotPopup::SnapshotPopup(QWidget* anchor, const QString& filePath, int64_t v
     m_closeTimer = new QTimer(this);
     m_closeTimer->setSingleShot(true);
     m_closeTimer->setInterval(m_durationMs);
-    connect(m_closeTimer, &QTimer::timeout, this, &SnapshotPopup::fadeOutAndClose);
+
+    // closeTimer timer : first check cursor position restart timer if mouse on the popup
+    // needed on macos, leave / enter events lost => popup never hides
+    connect(m_closeTimer, &QTimer::timeout, this, [this]() {
+        if (frameGeometry().contains(QCursor::pos()))
+            m_closeTimer->start(); // restart timer
+        else
+            fadeOutAndClose();
+    });
 
     buildUi(filePath, vlcTime, fps);
 
@@ -70,6 +83,9 @@ SnapshotPopup::SnapshotPopup(QWidget* anchor, const QString& filePath, int64_t v
 
 SnapshotPopup::~SnapshotPopup()
 {
+#ifdef __APPLE__
+    MacWindowHelper::detachFromParentWindow(this);
+#endif
     if (m_anchor)
         m_anchor->removeEventFilter(this);
 }
@@ -107,7 +123,10 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
         const qreal dpr = devicePixelRatioF();
         const int h = qRound(thumbHeight * dpr); // use devicePixelRatioF() to scale the thumbnail for high-DPI displays
         thumb = thumb.scaledToHeight(h, Qt::SmoothTransformation);
+        thumb.setDevicePixelRatio(dpr);
+
         const int w = thumb.width();
+        const int wLogical = qRound(w / dpr);
 
         // draw the thumbnail with rounded corners
         QPixmap rounded(w, h);
@@ -116,13 +135,14 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
         QPainter thumbPainter(&rounded);
         thumbPainter.setRenderHint(QPainter::Antialiasing, true);
         QPainterPath clipPath;
-        clipPath.addRoundedRect(0, 0, w, h, 6 * dpr, 6 * dpr);
+
+        clipPath.addRoundedRect(0, 0, wLogical, thumbHeight, 6, 6);
         thumbPainter.setClipPath(clipPath);
         thumbPainter.drawPixmap(0, 0, thumb);
         thumbPainter.end();
 
         thumbLabel->setPixmap(rounded);
-        thumbLabel->setFixedSize(qRound(w / dpr), thumbHeight);
+        thumbLabel->setFixedSize(wLogical, thumbHeight);
     } else {
         thumbLabel->setFixedSize(thumbHeight, thumbHeight);
     }
@@ -188,6 +208,10 @@ void SnapshotPopup::showWithFade()
     setWindowOpacity(0.0);
     show();
 
+#ifdef __APPLE__
+    MacWindowHelper::attachAsChildWindow(this, m_anchor);
+#endif
+
     if (m_anim)
         m_anim->deleteLater();
 
@@ -205,13 +229,17 @@ void SnapshotPopup::fadeOutAndClose()
 {
     if (m_anim)
         m_anim->deleteLater();
-        
+
     m_anim = new QPropertyAnimation(this, "windowOpacity", this);
     m_anim->setDuration(m_fadeMs);
     m_anim->setStartValue(windowOpacity());
     m_anim->setEndValue(0.0);
     m_anim->setEasingCurve(QEasingCurve::InCubic);
     connect(m_anim, &QPropertyAnimation::finished, this, [this]() {
+#ifdef __APPLE__
+        // detach when animation finished
+        MacWindowHelper::detachFromParentWindow(this);
+#endif
         hide();
         deleteLater();
     });
@@ -228,8 +256,8 @@ bool SnapshotPopup::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == this) {
         if (event->type() == QEvent::Enter) {
-            // mouse entered the popup: stop the auto-close timer and reset opacity to 1.0
-            m_closeTimer->stop();
+            // mouse entered, reset close timer and cancels fade out
+            m_closeTimer->start();
             if (m_anim) m_anim->stop();
             setWindowOpacity(1.0);
         } else if (event->type() == QEvent::Leave) {

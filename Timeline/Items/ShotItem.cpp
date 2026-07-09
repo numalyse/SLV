@@ -9,8 +9,10 @@ ShotItem::ShotItem(Shot shot, double width, double height, double topMargin , QG
 {
     setZValue(0);
 
-    // pour avoir le texte au dessus de l'audio visualiser
-    m_selectionBox = new QGraphicsRectItem();
+ 
+    // to keep the shotItem undearneath the audio visualizer but to have our "selected m_selectedNumber above the visualizer"
+    // we create an item that will follow shotItem but with a different z value 
+    m_selectionBox = new QGraphicsRectItem();     // it can't have this as parent, it would place it below the audio visualizer
     m_selectionBox->setZValue(4); 
 
     m_selectionBox->setPen(QPen(Qt::white, 2)); 
@@ -47,19 +49,18 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    //QPen borderPen(m_selected ? Qt::white : m_shot.borderColor);
+    // set border style
     QPen borderPen(m_shot.borderColor);
-    //borderPen.setWidth(m_selected ? 2 : 1);
     borderPen.setWidth(1);
     p->setPen(borderPen);
-
     QColor drawColor = m_selected ? m_shot.color.lighter(150) : m_shot.color;
-    p->setBrush(QBrush(drawColor));
 
+    // draw rect 
+    p->setBrush(QBrush(drawColor));
     p->drawRect(0, m_topMargin, m_width, m_height);
 
+    // draw thumbnail if set
     if(!m_pixmap.isNull() && m_width > s_minSizeForImage){
-
         double targetHeight = m_height - 4;
         double scaleRatio = targetHeight / m_pixmap.height();
         double scaledImgWidth = m_pixmap.width() * scaleRatio;

@@ -161,6 +161,7 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
     Timeline/Items/TransitionMarkerItem.cpp Timeline/Items/TransitionMarkerItem.h
     Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
+    Timeline/Items/AnnotationItem.h Timeline/Items/AnnotationItem.cpp
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h

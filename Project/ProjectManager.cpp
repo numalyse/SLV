@@ -6,7 +6,7 @@
 #include "Project/ProjectFileHelper.h"
 #include "Project/ProjectExportThread.h"
 #include "FileCopyThread.h"
-#include "MacSymLink.h"
+#include "FileFormatManager.h"
 
 #include <QString>
 #include <QDebug>
@@ -156,23 +156,17 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
 
     if ( ! createProjectFolder() ){ // clicked on "cancel" in filedialog returns
         return; 
-    }else { 
+    }else {
 
-        // on windows QFile::link creates a .lnk shortcut (tracks the target across moves),
-        // on macOS we create a Finder alias which does the same; a plain POSIX symlink
-        // (QFile::link on unix) breaks as soon as the target moves.
+        // on windows QFile::link creates a .lnk shortcut, to track media move see WinSymLink.h
+        // on macOS we create a Finder alias which does the same.
 #ifdef Q_OS_WIN
         QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + ".lnk" );
-        bool linkCreated = QFile::link(m_project->media->filePath(), mediaLinkPath);
-#elif defined(Q_OS_MACOS)
-        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
-        bool linkCreated = MacSymLink::create(m_project->media->filePath(), mediaLinkPath);
 #else
-        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
-        bool linkCreated = QFile::link(m_project->media->filePath(), mediaLinkPath);
+        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "_link." + m_project->media->fileExtension());
 #endif
 
-        if(!linkCreated){
+        if(!ProjectFileHelper::createMediaLink(m_project->media->filePath(), mediaLinkPath)){
             qCritical() << "[ProjectManager] Failed to create a link to the media";
             return;
         }
@@ -349,6 +343,12 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     ProjectSaveData projectData = loaded.value();
 
+    // the media link is broken
+    // ask the user to locate the media again and recreate the link
+    if (projectData.mediaAbsolutePath.isEmpty() && !relinkMedia(path, projectData)) {
+        return;
+    }
+
     QString mediaName;
     QString mediaAbsolutePath;
 
@@ -367,47 +367,104 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     setSaveNotNeeded();
     m_isDurationParsed = false;
+    m_durationError = false;
     m_isFpsParsed = false;
+    m_fpsError = false;
 
 
     connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
-
-        if(durationJson == durationFile){
-            m_isDurationParsed = true;
-            checkMediaFullyLoaded();
-        } else {
-            QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchDuration);
-            QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errorMsg);
+        m_isDurationParsed = true;
+        if(durationJson != durationFile){
+            m_durationError = true;
         }
+        checkMediaFullyLoaded();
 
     });
 
     connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
-
-        if(fpsJson == fpsFile){
-            m_isFpsParsed = true;
-            checkMediaFullyLoaded();
-        }else {
-            QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchFPS);
-            QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errorMsg);
+        m_isFpsParsed = true;
+        if(fpsJson != fpsFile){
+            m_fpsError = true;
         }
+        checkMediaFullyLoaded();
 
     });
 
     m_project->media->parse();
 }
 
+/// @brief Prévient l'utilisateur que le média du projet est introuvable, lui demande de le relocaliser puis recrée le lien dans le dossier projet.
+bool ProjectManager::relinkMedia(const QString& projectPath, ProjectSaveData& projectData)
+{
+    auto& prefManager = PrefManager::instance();
+
+    QMessageBox::warning(nullptr,
+        prefManager.getText("messagebox_error"),
+        prefManager.getText("project_manager_relink_media_message"));
+
+    QString newMediaPath = QFileDialog::getOpenFileName(
+        nullptr,
+        prefManager.getText("project_manager_relink_media_dialog"),
+        prefManager.getPref("Paths", "lp_open_media"),
+        FileFormatManager::instance().getOpenFileDialogFilters()
+    );
+
+    if (newMediaPath.isEmpty()) { // clicked on "cancel", abort the project load
+        return false;
+    }
+
+    // rebuild the link path inside the current project folder, in case the
+    // project folder itself was moved since the json was written
+    QString linkName = QFileInfo(projectData.mediaLinkAbsolutePath).fileName();
+    if (linkName.isEmpty()) {
+#ifdef Q_OS_WIN
+        linkName = QFileInfo(newMediaPath).completeBaseName() + ".lnk";
+#else
+        linkName = QFileInfo(newMediaPath).fileName();
+#endif
+    }
+    QString linkPath = QDir(projectPath).filePath(linkName);
+
+    if (!ProjectFileHelper::createMediaLink(newMediaPath, linkPath)) {
+        qCritical() << "[ProjectManager] relink media : failed to recreate the media link";
+        QMessageBox::critical(nullptr,
+            prefManager.getText("messagebox_error"),
+            getErrorMessage(ProjectFileError::UnexpectedError));
+        return false;
+    }
+
+    projectData.mediaAbsolutePath = newMediaPath;
+    projectData.mediaLinkAbsolutePath = linkPath;
+    projectData.mediaName = QFileInfo(newMediaPath).fileName();
+
+    return true;
+}
+
 ///@brief Quand les fps et la durée sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
 void ProjectManager::checkMediaFullyLoaded()
 {
-    if(m_isDurationParsed && m_isFpsParsed){
+    if (!m_project || !m_project->media) return;
+    
+    if(m_isDurationParsed && m_isFpsParsed && !m_fpsError && !m_durationError){
 
         const QStringList paths {m_project->media->filePath()};
 
         emit loadMediaProjectRequested(paths);
         emit projectInitialized();
+    } else if(m_isDurationParsed && m_isFpsParsed){
+        // if fps or duration mismatched occured, prompt the user
+        QStringList errors;
+        if(m_durationError) errors << getErrorMessage(ProjectManager::Error::MismatchDuration);
+        if(m_fpsError) errors << getErrorMessage(ProjectManager::Error::MismatchFPS);
+        QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errors.join('\n'));
+
+        // delete the link file, on next open a dialog to create a new link
+        QFile::remove(m_project->mediaLinkPath);
+
+        deleteProject();
     }
 }
+
 
 void ProjectManager::discardAndEject(){
     deleteProject();

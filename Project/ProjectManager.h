@@ -68,7 +68,9 @@ private:
     Project* m_project = nullptr;
     bool m_needSave = false;
     bool m_isDurationParsed = false;
+    bool m_durationError = false;
     bool m_isFpsParsed = false;
+    bool m_fpsError = false;    
     bool m_projectInitialized = false;
 
     TimelineWidget* p_timeline = nullptr;
@@ -77,6 +79,8 @@ private:
     bool createProjectFolder();
     void deleteFolder(const QString &projectFolderPath);
     bool copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave);
+
+    bool relinkMedia(const QString& projectPath, ProjectSaveData& projectData);
 
     QString getErrorMessage(ProjectFileError error) const;
     QString getErrorMessage(ProjectManager::Error error) const;

@@ -93,6 +93,7 @@
     "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
     "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
     "timeline_extract_selected_shots" : "Extraire les plans sélectionnés",
+    "timeline_shot_count_label" : "plan(s)",
     "messagebox_extract_selected_shots_completed" : "Extraction des plans sélectionnés terminée.",
     "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des plans sélectionnés.",
     
@@ -114,6 +115,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Segmentation automatique",
     "timeline_dialog_text_auto_segmentation": "Segmentation en cours...",
+    "timeline_dialog_text_auto_segmentation_finished": "Segmentation automatique terminée, nombre de plans total : ",
     "dialog_auto_segmentation_title": "Segmentation automatique",
     "dialog_auto_segmentation_text": "Voulez-vous lancer la segmentation automatique ?\n Une fois terminée, elle écrasera la segmentation actuelle.",
 

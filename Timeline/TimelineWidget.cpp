@@ -16,6 +16,7 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFont>
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QWheelEvent>
@@ -31,9 +32,6 @@
 #include "TimelineWidget.h"
 
 
-
-
-
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots
 /// @param parent
@@ -42,6 +40,8 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     p_media = projectMedia;
     p_playerWidget = player;
     m_wasPlayingBeforeDrag = player->playing();
+
+    PrefManager& pref = PrefManager::instance();
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -56,6 +56,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     m_scene = new QGraphicsScene(this);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
+    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex); 
 
     m_mathManager = new TimelineMath(p_media->fps(), p_media->duration(), this);
     m_mathManager->fitToWidth(m_scene->width());
@@ -84,7 +85,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);
 
-    m_abLoopBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_ab_loop"));
+    m_abLoopBtn = new ToolbarButton(this, "abloop_white", pref.getText("tooltip_ab_loop"));
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
     ButtonLayout->addWidget(m_abLoopBtn);
 
@@ -93,50 +94,60 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     btnSeparator->setFrameShadow(QFrame::Sunken);
     ButtonLayout->addWidget(btnSeparator);
 
-    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_segmentation_auto"));
+    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", pref.getText("tooltip_segmentation_auto"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
     ButtonLayout->addWidget(m_autoSegmentationBtn);
 
-    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", PrefManager::instance().getText("tooltip_split_shot"));
+    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", pref.getText("tooltip_split_shot"));
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitShotAtCursor);
     ButtonLayout->addWidget(m_splitShotBtn);
 
-    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", PrefManager::instance().getText("tooltip_merge_with_prev_shot"));
+    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", pref.getText("tooltip_merge_with_prev_shot"));
     connect(m_mergeWithPrevShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithPrevShotAction);
     ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
     m_mergeWithPrevShotBtn->setEnabled(false);
 
-    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", PrefManager::instance().getText("tooltip_to_prev_shot"));
+    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", pref.getText("tooltip_to_prev_shot"));
     connect(m_toPrevShotBtn, &ToolbarButton::pressed, this, [this](){
         goToShot(m_shotManager->getCurrentShotId()-1);
     });
     ButtonLayout->addWidget(m_toPrevShotBtn);
     m_toPrevShotBtn->setEnabled(false);
 
-    m_shotInfo = new ToolbarButton(this, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    m_shotInfo = new ToolbarButton(this, "shot_detail_white", pref.getText("tooltip_shot_detail_button"));
     connect(m_shotInfo, &ToolbarButton::pressed, this, [](){
         emit SignalManager::instance().extensionToolbarDisplayShotDetail();
         emit SignalManager::instance().toggleNavPanel();
     });
     ButtonLayout->addWidget(m_shotInfo);
 
-    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", PrefManager::instance().getText("tooltip_to_next_shot"));
+    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", pref.getText("tooltip_to_next_shot"));
     connect(m_toNextShotBtn, &ToolbarButton::pressed, this, [this](){
         goToShot(m_shotManager->getCurrentShotId()+1);
     });
     ButtonLayout->addWidget(m_toNextShotBtn);
     m_toNextShotBtn->setEnabled(false);
 
-    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", PrefManager::instance().getText("tooltip_merge_with_next_shot"));
+    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", pref.getText("tooltip_merge_with_next_shot"));
     connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
     m_mergeWithNextShotBtn->setEnabled(false);
 
-    m_exportBtn = new ToolbarButton(this, "export_white", PrefManager::instance().getText("tooltip_export"));
+    m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
     ButtonLayout->addStretch(1);
+
+    m_shotCountLabel = new QLabel(this);
+    m_shotCountLabel->setContentsMargins(0, 0, 10, 0);
+    QFont shotCountFont = m_shotCountLabel->font();
+    shotCountFont.setItalic(true);
+    m_shotCountLabel->setFont(shotCountFont);
+    updateShotCount(static_cast<int>(projectShots.size()));
+
+    ButtonLayout->addWidget(m_shotCountLabel);
+
     layout->addLayout(ButtonLayout);
 
     m_view = new TimelineView(m_scene, this);
@@ -173,6 +184,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
+    connect(m_shotManager, &ShotManager::shotCountUpdated, this, &TimelineWidget::updateShotCount);
     connect(m_shotManager, &ShotManager::shotsExtractionFinished, this, [this](const QString& outputPath){
         exportDone(PrefManager::instance().getText("messagebox_extract_selected_shots_completed"), outputPath);
     });
@@ -204,6 +216,11 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
 TimelineWidget::~TimelineWidget()
 {
+    if(m_segmThread && m_segmThread->isRunning()){
+        m_segmThread->requestInterruption();
+        m_segmThread->wait();
+    }
+
     if (m_audioComputeProcess) {
         m_audioComputeProcess->kill();
         m_audioComputeProcess->waitForFinished();
@@ -243,6 +260,10 @@ bool TimelineWidget::event(QEvent *event)
     return QWidget::event(event);
 }
 
+void TimelineWidget::updateShotCount(int shotCount)
+{
+    m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
+}
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
 /// @param zoomFactor
@@ -592,33 +613,40 @@ void TimelineWidget::autoSegmentation(){
 
         [this, mediaPath]() {
             auto& txtManager = PrefManager::instance();
-            SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
+            m_segmThread = new SegmentationThread(mediaPath, this);
 
             QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_dialog_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
             progressDialog->setWindowTitle(txtManager.getText("timeline_dialog_title_auto_segmentation"));
             progressDialog->setWindowModality(Qt::WindowModal);
 
-            connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){
-                segmentationThread->requestInterruption();
-            });
+            connect(progressDialog, &QProgressDialog::canceled, m_segmThread, &QThread::requestInterruption);
 
-            connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
+            connect(m_segmThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
 
-            connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<int> cuts) {
+            connect(m_segmThread, &SegmentationThread::segmentationFinished, this, [this, progressDialog] (std::vector<int> cuts) {
+
+                progressDialog->close();
+                progressDialog->deleteLater();
 
                 if( ! cuts.empty()){
                     this->m_shotManager->createShotItemsFromCuts(cuts);
                     emit this->saveNeeded();
+
+                    QString text = PrefManager::instance().getText("timeline_dialog_text_auto_segmentation_finished") + QString::number(cuts.size() + 1);
+                    QMessageBox msg(this);
+                    msg.setWindowTitle(PrefManager::instance().getText("timeline_dialog_title_auto_segmentation"));
+                    msg.setStandardButtons(QMessageBox::Ok);
+                    msg.setInformativeText(text);
+                    msg.setIcon(QMessageBox::Information);
+                    msg.exec();
                 }
-                progressDialog->close();
-                progressDialog->deleteLater();
             });
 
-            connect(segmentationThread, &QThread::finished, segmentationThread, &QObject::deleteLater);
+            connect(m_segmThread, &QThread::finished, m_segmThread, &QObject::deleteLater);
 
             progressDialog->show();
-            segmentationThread->start();
-            segmentationThread->setPriority(QThread::HighPriority);
+            m_segmThread->start();
+            m_segmThread->setPriority(QThread::HighPriority);
         },
         nullptr,
         nullptr

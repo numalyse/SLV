@@ -11,6 +11,9 @@
 
 #include <expected>
 
+#include <QPointer>
+#include <QThread>
+
 class ProjectManager : public QObject
 {
 Q_OBJECT
@@ -74,6 +77,11 @@ private:
     bool m_projectInitialized = false;
 
     TimelineWidget* p_timeline = nullptr;
+
+    // store thread as members, so when destructor is called we can wait for the threads to end
+    // QPointers so automatically set themselves to nullptr when destroyed
+    QPointer<QThread> m_exportThread;
+    QPointer<QThread> m_fileCpyThread;
 
     void initProjectShot();
     bool createProjectFolder();

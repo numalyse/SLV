@@ -32,6 +32,15 @@ ProjectManager::ProjectManager(QObject* parent) : QObject(parent)
 
 ProjectManager::~ProjectManager()
 {
+    // if threads are still running waits for them to end, 
+    // otherwise would crash as deleting a running QThread is undefined behavior
+    for (QThread* thread : {m_exportThread.data(), m_fileCpyThread.data()}) {
+        if (thread && thread->isRunning()) {
+            thread->requestInterruption();
+            thread->wait();
+        }
+    }
+
     if(m_project){
         delete m_project;
         m_project = nullptr;
@@ -537,6 +546,7 @@ void ProjectManager::exportProject(){
     QString mediaPath = m_project->media->filePath();
 
     ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
+    m_exportThread = exportThread;
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();
@@ -544,12 +554,9 @@ void ProjectManager::exportProject(){
 
     connect(exportThread, &ProjectExportThread::progress, progressDialog, &QProgressDialog::setValue);
     
-    connect(progressDialog, &QProgressDialog::canceled, this, [exportThread](){ 
-        exportThread->requestInterruption();
-    });
+    connect(progressDialog, &QProgressDialog::canceled, exportThread, &QThread::requestInterruption);
 
-    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog, selectedPath, this](bool success) {
-        disconnect(progressDialog, &QProgressDialog::canceled, nullptr, nullptr);
+    connect(exportThread, &ProjectExportThread::exportFinished, this, [progressDialog, selectedPath, this](bool success, bool canceled) {
         if (success) {
             qDebug() << "Export réussi";
             QMessageBox msg;
@@ -565,8 +572,8 @@ void ProjectManager::exportProject(){
                 QFileInfo fi(selectedPath);
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
             }
-        }else {
-            qDebug() << "Export annulé ou erreur";
+        }else if (!canceled) { // if user canceled doens't show error dialog
+            qDebug() << "Erreur lors de l'export";
             QMessageBox msg;
             msg.setStandardButtons(QMessageBox::StandardButton::Ok);
             msg.setInformativeText(PrefManager::instance().getText("project_exportation_error"));

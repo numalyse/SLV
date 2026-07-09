@@ -51,7 +51,13 @@ namespace  {
         return -1;
     }
 
-
+    /// @brief Stops a decode thread and its queue, waits for the thread to finish, then destroys it
+    void stopDecodeThread(DecodeThread* decodeThread, TSQueue<ImgData>* imageQueue) {
+        decodeThread->requestInterruption();
+        imageQueue->stop();
+        decodeThread->wait();
+        delete decodeThread;
+    }
 
     std::pair<int, int> computeFontSizeAndSpacing(int width, int height, double ratio = 0.02) {
         int calculatedSize = static_cast<int>(height * ratio);
@@ -327,7 +333,7 @@ namespace ProjectExportHelper {
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
 
         DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), shots);
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
+
         decodeThread->start();
 
         while(true) {
@@ -339,7 +345,8 @@ namespace ProjectExportHelper {
                 int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
                 if (!progressCallback(percent)) {
                     // folder.removeRecursively();
-                    return false;  
+                    stopDecodeThread(decodeThread, imageQueue.get());
+                    return false;
                 }
             }
             
@@ -356,6 +363,7 @@ namespace ProjectExportHelper {
             ++currentShot;
         }
 
+        stopDecodeThread(decodeThread, imageQueue.get());
         return true;
 
     }
@@ -423,7 +431,6 @@ namespace ProjectExportHelper {
             std::optional<cv::Size>({400, 400})
         );
 
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
         decodeThread->start();
 
         while(true) {
@@ -434,8 +441,8 @@ namespace ProjectExportHelper {
             if (progressCallback && totalShots > 0) {
                 int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
                 if (!progressCallback(percent)) {
-                    decodeThread->requestInterruption();
-                    return false;  
+                    stopDecodeThread(decodeThread, imageQueue.get());
+                    return false;
                 }
             }
 
@@ -477,6 +484,8 @@ namespace ProjectExportHelper {
 
             ++currentShot;
         }
+
+        stopDecodeThread(decodeThread, imageQueue.get());
 
         doc.print(&pdfWriter);
         return true;
@@ -574,7 +583,6 @@ namespace ProjectExportHelper {
             std::optional<int>(), std::optional<cv::Size>(imgSize)
         );
 
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
         decodeThread->start();
 
         ImgData imgData{};
@@ -595,13 +603,15 @@ namespace ProjectExportHelper {
                 if (progressCallback && totalShots > 0) { 
                     int percent = static_cast<int>(((currentShot + 1) * 95.0) / totalShots); // On va de 0 à 95% car c'est le plus long 
                     if (!progressCallback(percent)) {
-                        decodeThread->requestInterruption();
-                        return false;  
+                        stopDecodeThread(decodeThread, imageQueue.get());
+                        return false;
                     }
                 }
                 currentShot++;
             }
         }
+
+        stopDecodeThread(decodeThread, imageQueue.get());
 
         // Preparation json
         QJsonArray jsonShots;
@@ -797,7 +807,6 @@ namespace ProjectExportHelper {
             mediaPath, sar, imageQueue.get(), {}
         );
 
-        QObject::connect(decodeThread, &QThread::finished, decodeThread, &QObject::deleteLater);
         decodeThread->start();
 
         while ( true )
@@ -847,10 +856,8 @@ namespace ProjectExportHelper {
 
             if (progressCallback && totalFrames > 0) {
                 percent = static_cast<int>(((currentFrame + 1) * 100.0) / totalFrames);
-                if(percent == 0){
-                    qDebug() << "Ici ça va pas";
-                }
-                if(percent != 0 && !progressCallback(percent)){
+                if(!progressCallback(percent)){
+                    stopDecodeThread(decodeThread, imageQueue.get());
                     writer.release();
                     return false;
                 }
@@ -858,6 +865,8 @@ namespace ProjectExportHelper {
             
             ++currentFrame;
         }
+
+        stopDecodeThread(decodeThread, imageQueue.get());
 
         writer.release();
 

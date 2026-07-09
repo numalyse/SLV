@@ -93,6 +93,7 @@
     "timeline_merge_with_previous_shot" : "Unisci piano corrente con il precedente",
     "timeline_merge_with_next_shot" : "Unisci piano corrente con il successivo",
     "timeline_extract_selected_shots" : "Estrai piani selezionati",
+    "timeline_shot_count_label" : "piano/i",
     "messagebox_extract_selected_shots_completed" : "Estrazione dei piani selezionati completata.",
     "messagebox_extract_selected_shots_failed" : "Si è verificato un errore durante l'estrazione dei piani selezionati.",
 
@@ -114,6 +115,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Segmentazione automatica",
     "timeline_dialog_text_auto_segmentation": "Segmentazione in corso...",
+    "timeline_dialog_text_auto_segmentation_finished": "Segmentazione automatica completata, numero totale di piani: ",
     "dialog_auto_segmentation_title": "Segmentazione automatica",
     "dialog_auto_segmentation_text": "Vuoi avviare la segmentazione automatica?\nUna volta completata, sovrascriverà la segmentazione attuale.",
 

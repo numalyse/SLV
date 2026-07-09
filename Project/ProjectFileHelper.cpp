@@ -1,5 +1,6 @@
 #include "Project/ProjectFileHelper.h"
 #include "MacSymLink.h"
+#include "WinSymLink.h"
 
 #include <QFile>
 #include <QDir>
@@ -109,23 +110,25 @@ namespace ProjectFileHelper {
             loadedData.fps = mediaJson.value("fps").toDouble(0.0);
 
 #ifdef Q_OS_MACOS
-            // recent projects store a Finder alias; older ones a POSIX symlink
-            if (QFileInfo(loadedData.mediaLinkAbsolutePath).isSymLink()) {
-                loadedData.mediaAbsolutePath = QFile::symLinkTarget(loadedData.mediaLinkAbsolutePath);
-            } else {
-                loadedData.mediaAbsolutePath = MacSymLink::findTarget(loadedData.mediaLinkAbsolutePath);
-            }
+            loadedData.mediaAbsolutePath = MacSymLink::findTarget(loadedData.mediaLinkAbsolutePath);
+#elif defined(Q_OS_WIN)
+            // QFile::symLinkTarget only reads the path stored in the .lnk;
+            // WinSymLink calls IShellLink::Resolve so windows finds the target even if it moved
+            loadedData.mediaAbsolutePath = WinSymLink::findTarget(loadedData.mediaLinkAbsolutePath);
 #else
             loadedData.mediaAbsolutePath = QFile::symLinkTarget(loadedData.mediaLinkAbsolutePath);
 #endif
 
             QFileInfo mediaInfo(loadedData.mediaAbsolutePath);
-            
+
             if ( loadedData.mediaAbsolutePath == "" || !mediaInfo.exists() || !mediaInfo.isFile()) {
-                qCritical() << "[ProjectManager] load project : failed to retrieve the medialink target";
-                return std::unexpected(ProjectFileError::MediaFileNotFound);
+                // the link or its target is gone : leave the media path empty,
+                // the caller asks the user to locate the media again
+                qWarning() << "[ProjectFileHelper] load project : failed to retrieve the medialink target";
+                loadedData.mediaAbsolutePath.clear();
+            } else {
+                loadedData.mediaName = mediaInfo.fileName();
             }
-            loadedData.mediaName = mediaInfo.fileName();
 
         } else {
             return std::unexpected(ProjectFileError::MediaKeyMissing);
@@ -150,6 +153,16 @@ namespace ProjectFileHelper {
         }
 
         return loadedData;
+    }
+
+
+    bool createMediaLink(const QString& mediaAbsolutePath, const QString& linkAbsolutePath) {
+        QFile::remove(linkAbsolutePath);
+#ifdef Q_OS_MACOS
+        return MacSymLink::create(mediaAbsolutePath, linkAbsolutePath);
+#else
+        return QFile::link(mediaAbsolutePath, linkAbsolutePath);
+#endif
     }
 
 

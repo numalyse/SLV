@@ -184,6 +184,13 @@ if(APPLE)
     )
 endif()
 
+if(WIN32)
+    list(APPEND PROJECT_SOURCES
+        WinSymLink.h
+        WinSymLink.cpp
+    )
+endif()
+
 # =========================================================
 # Fusion sans doublons
 # =========================================================
@@ -269,6 +276,8 @@ endif()
 # target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
 if(WIN32)
     target_link_libraries(SLV PRIVATE Python3::Python)
+    # COM (IShellLink) used by WinSymLink to resolve .lnk shortcuts
+    target_link_libraries(SLV PRIVATE ole32 uuid)
 endif()
 
 # =========================================================

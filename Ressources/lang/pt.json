@@ -405,6 +405,8 @@
 
     "dialog_save_project_dialog_title" : "Salvando o projeto",
     "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. Deseja salvar o projeto?",
+    "project_saved_title" : "Salvamento do projeto",
+    "project_saved_text" : "O projeto foi salvo com sucesso.",
     "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
 
     "tooltip_access_folder" : "Abrir pasta de capturas",

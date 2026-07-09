@@ -403,6 +403,8 @@
 
     "dialog_save_project_dialog_title" : "Speichern des Projekts",
     "dialog_save_project_dialog_text" : "Die Timeline enthält nicht gespeicherte Änderungen. Möchten Sie das Projekt speichern?",
+    "project_saved_title" : "Speichern des Projekts",
+    "project_saved_text" : "Das Projekt wurde erfolgreich gespeichert.",
     "messagebox_record_completed" : "Die Medienaufzeichnung wurde erfolgreich abgeschlossen.",
 
     "tooltip_access_folder" : "Aufnahmeordner öffnen",

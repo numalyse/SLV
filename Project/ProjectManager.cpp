@@ -157,12 +157,6 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
     if ( ! createProjectFolder() ){ // clicked on "cancel" in filedialog returns
         return; 
     }else { 
-/*         
-        // copies the media file to the project folder
-
-        QString destMedia = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
-        copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave); 
-*/
 
         // on windows QFile::link creates a .lnk shortcut (tracks the target across moves),
         // on macOS we create a Finder alias which does the same; a plain POSIX symlink
@@ -190,6 +184,10 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
         }
         
         setSaveNotNeeded();
+
+        // information message box when project saved for the first time 
+        auto& prefManager = PrefManager::instance();
+        QMessageBox::information(nullptr, prefManager.getText("project_saved_title"), prefManager.getText("project_saved_text"));
 
         if(ejectMediaAfterSave){
             discardAndEject();

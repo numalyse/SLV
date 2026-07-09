@@ -22,7 +22,7 @@ class PlayerWidget : public QWidget
 
 public:
     explicit PlayerWidget(QWidget *parent = nullptr);
-    // ~PlayerWidget();
+    ~PlayerWidget();
 
     void setActive(bool active);
     bool setMediaFromPath(const QString& filePath);

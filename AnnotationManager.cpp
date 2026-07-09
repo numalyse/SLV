@@ -17,7 +17,16 @@ const QVector<Annotation>& AnnotationManager::annotations() const
 
 void AnnotationManager::setAnnotations(QVector<Annotation> *annotations)
 {
-    p_annotations = annotations; 
+    p_annotations = annotations;
+    if (!annotations || annotations->isEmpty()) {
+        m_nextId = 0;
+    } else {
+        auto result = std::max_element(annotations->begin(), annotations->end(), [](const Annotation& annotA, const Annotation& annotB)
+        {
+            return annotA.id < annotB.id;
+        });
+        m_nextId = result->id;
+    }
     emit annotationsReset();
 }
 
@@ -54,7 +63,6 @@ void AnnotationManager::updateAnnotation(const Annotation &annotation)
     }
 
     // updates the annotation with the new data
-    it->title = annotation.title;
     it->start = annotation.start;
     it->end = annotation.end;
     it->note = annotation.note;

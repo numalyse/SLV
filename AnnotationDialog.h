@@ -30,7 +30,6 @@ private:
 
     QLineEdit* m_startEdit = nullptr;
     QLineEdit* m_endEdit = nullptr;
-    QLineEdit* m_titleEdit = nullptr;
     QTextEdit* m_noteEdit = nullptr;
     QPushButton* m_colorBtn = nullptr;
     QPushButton* m_confirmBtn = nullptr;

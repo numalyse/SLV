@@ -6,7 +6,6 @@
 
 struct Annotation
 {
-    QString title;
     int64_t start;
     int64_t end;
     QString note;

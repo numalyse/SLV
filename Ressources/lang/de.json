@@ -93,6 +93,7 @@
     "timeline_merge_with_previous_shot" : "Aktuellen Schnitt mit vorherigem zusammenführen",
     "timeline_merge_with_next_shot" : "Aktuellen Schnitt mit nächstem zusammenführen",
     "timeline_extract_selected_shots" : "Ausgewählte Schnitte extrahieren",
+    "timeline_shot_count_label" : "Schnitt(e)",
     "messagebox_extract_selected_shots_completed" : "Extraction der ausgewählten Schnitte abgeschlossen.",
     "messagebox_extract_selected_shots_failed" : "Extraction der ausgewählten Schnitte fehlgeschlagen.",
 

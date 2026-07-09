@@ -560,6 +560,8 @@
     "project_manager_error_cannot_open_json_file": "Impossible d'ouvrir le projet. Le fichier est peut-être bloqué ou endommagé.",
     "project_manager_error_json_parsing_error": "Le fichier du projet est corrompu et ne peut pas être lu.",
     "project_manager_error_media_file_not_found": "Le média associé à ce projet est introuvable.",
+    "project_manager_relink_media_message": "Le média associé à ce projet est introuvable. Veuillez sélectionner son nouvel emplacement.",
+    "project_manager_relink_media_dialog": "Localiser le média du projet",
     "project_manager_error_media_key_missing": "Le fichier de sauvegarde du projet est endommagé : les informations sur le média sont manquantes.",
     "project_manager_error_media_mismatch_fps": "Le média actuel est différent de celui du projet (le nombre d'images par seconde est différent).",
     "project_manager_error_media_mismatch_duration": "Le média actuel est différent de celui du projet (la durée a changé).",

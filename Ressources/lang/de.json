@@ -560,6 +560,8 @@
     "project_manager_error_cannot_open_json_file": "Das Projekt kann nicht geöffnet werden. Die Datei ist möglicherweise gesperrt oder beschädigt.",
     "project_manager_error_json_parsing_error": "Die Projektdatei ist beschädigt und kann nicht gelesen werden.",
     "project_manager_error_media_file_not_found": "Das mit diesem Projekt verknüpfte Medium konnte nicht gefunden werden.",
+    "project_manager_relink_media_message": "Das mit diesem Projekt verknüpfte Medium konnte nicht gefunden werden. Bitte wählen Sie den neuen Speicherort aus.",
+    "project_manager_relink_media_dialog": "Projektmedium suchen",
     "project_manager_error_media_key_missing": "Die Projekt-Speicherdatei ist beschädigt: Die Medieninformationen fehlen.",
     "project_manager_error_media_mismatch_fps": "Das aktuelle Medium unterscheidet sich vom Projekt (die Bildrate ist unterschiedlich).",
     "project_manager_error_media_mismatch_duration": "Das aktuelle Medium unterscheidet sich vom Projekt (die Dauer hat sich geändert).",

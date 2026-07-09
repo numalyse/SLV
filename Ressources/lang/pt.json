@@ -558,6 +558,8 @@
     "project_manager_error_cannot_open_json_file": "Não é possível abrir o projeto. O arquivo pode estar bloqueado ou danificado.",
     "project_manager_error_json_parsing_error": "O arquivo do projeto está corrompido e não pode ser lido.",
     "project_manager_error_media_file_not_found": "A mídia associada a este projeto não foi encontrada.",
+    "project_manager_relink_media_message": "A mídia associada a este projeto não foi encontrada. Selecione sua nova localização.",
+    "project_manager_relink_media_dialog": "Localizar a mídia do projeto",
     "project_manager_error_media_key_missing": "O arquivo de salvamento do projeto está danificado: faltam as informações da mídia.",
     "project_manager_error_media_mismatch_fps": "A mídia atual é diferente da do projeto (a taxa de quadros é diferente).",
     "project_manager_error_media_mismatch_duration": "A mídia atual é diferente da do projeto (a duração mudou).",

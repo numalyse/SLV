@@ -561,6 +561,8 @@
     "project_manager_error_cannot_open_json_file": "No se puede abrir el proyecto. El archivo podría estar bloqueado o dañado.",
     "project_manager_error_json_parsing_error": "El archivo del proyecto está dañado y no se puede leer.",
     "project_manager_error_media_file_not_found": "No se encuentra el medio asociado a este proyecto.",
+    "project_manager_relink_media_message": "No se encuentra el medio asociado a este proyecto. Seleccione su nueva ubicación.",
+    "project_manager_relink_media_dialog": "Localizar el medio del proyecto",
     "project_manager_error_media_key_missing": "El archivo de guardado del proyecto está dañado: falta la información del medio.",
     "project_manager_error_media_mismatch_fps": "El medio actual es diferente al del proyecto (los fotogramas por segundo son diferentes).",
     "project_manager_error_media_mismatch_duration": "El medio actual es diferente al del proyecto (la duración ha cambiado).",

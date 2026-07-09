@@ -179,6 +179,8 @@ if(APPLE)
     list(APPEND PROJECT_SOURCES
         MacMouseTracker.h
         MacMouseTracker.mm
+        MacSymLink.h
+        MacSymLink.mm
     )
 endif()
 

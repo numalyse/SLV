@@ -1,4 +1,5 @@
 #include "Project/ProjectFileHelper.h"
+#include "MacSymLink.h"
 
 #include <QFile>
 #include <QDir>
@@ -107,7 +108,16 @@ namespace ProjectFileHelper {
             loadedData.duration = mediaJson.value("duration").toInt(0);
             loadedData.fps = mediaJson.value("fps").toDouble(0.0);
 
+#ifdef Q_OS_MACOS
+            // recent projects store a Finder alias; older ones a POSIX symlink
+            if (QFileInfo(loadedData.mediaLinkAbsolutePath).isSymLink()) {
+                loadedData.mediaAbsolutePath = QFile::symLinkTarget(loadedData.mediaLinkAbsolutePath);
+            } else {
+                loadedData.mediaAbsolutePath = MacSymLink::findTarget(loadedData.mediaLinkAbsolutePath);
+            }
+#else
             loadedData.mediaAbsolutePath = QFile::symLinkTarget(loadedData.mediaLinkAbsolutePath);
+#endif
 
             QFileInfo mediaInfo(loadedData.mediaAbsolutePath);
             

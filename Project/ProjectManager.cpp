@@ -6,6 +6,7 @@
 #include "Project/ProjectFileHelper.h"
 #include "Project/ProjectExportThread.h"
 #include "FileCopyThread.h"
+#include "MacSymLink.h"
 
 #include <QString>
 #include <QDebug>
@@ -163,15 +164,21 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
         copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave); 
 */
 
-        // create a symbolic link to the media, on windows must end by lnk, lighter since we won't copy the media file 
-        // and the user can still move the media where he needs to without breaking the project
+        // on windows QFile::link creates a .lnk shortcut (tracks the target across moves),
+        // on macOS we create a Finder alias which does the same; a plain POSIX symlink
+        // (QFile::link on unix) breaks as soon as the target moves.
 #ifdef Q_OS_WIN
         QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + ".lnk" );
+        bool linkCreated = QFile::link(m_project->media->filePath(), mediaLinkPath);
+#elif defined(Q_OS_MACOS)
+        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
+        bool linkCreated = MacSymLink::create(m_project->media->filePath(), mediaLinkPath);
 #else
         QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
+        bool linkCreated = QFile::link(m_project->media->filePath(), mediaLinkPath);
 #endif
 
-        if(!QFile::link(m_project->media->filePath(), mediaLinkPath)){
+        if(!linkCreated){
             qCritical() << "[ProjectManager] Failed to create a link to the media";
             return;
         }

@@ -4,6 +4,10 @@
 #include "TimeFormatter.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
+#ifdef __APPLE__
+#include "MacWindowHelper.h"
+#endif
+
 #include <QLabel>
 #include <QFileInfo>
 #include <QPainter>
@@ -70,6 +74,9 @@ SnapshotPopup::SnapshotPopup(QWidget* anchor, const QString& filePath, int64_t v
 
 SnapshotPopup::~SnapshotPopup()
 {
+#ifdef __APPLE__
+    MacWindowHelper::detachFromParentWindow(this);
+#endif
     if (m_anchor)
         m_anchor->removeEventFilter(this);
 }
@@ -188,6 +195,10 @@ void SnapshotPopup::showWithFade()
     setWindowOpacity(0.0);
     show();
 
+#ifdef __APPLE__
+    MacWindowHelper::attachAsChildWindow(this, m_anchor);
+#endif
+
     if (m_anim)
         m_anim->deleteLater();
 
@@ -212,6 +223,9 @@ void SnapshotPopup::fadeOutAndClose()
     m_anim->setEndValue(0.0);
     m_anim->setEasingCurve(QEasingCurve::InCubic);
     connect(m_anim, &QPropertyAnimation::finished, this, [this]() {
+#ifdef __APPLE__
+        MacWindowHelper::detachFromParentWindow(this);
+#endif
         hide();
         deleteLater();
     });

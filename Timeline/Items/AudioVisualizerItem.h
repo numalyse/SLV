@@ -11,15 +11,16 @@ class AudioVisualizerItem : public QGraphicsItem
 private:
     const QVector<double> m_amplitudes;
     double m_width;
-    double m_height;
-    double m_topMargin;
     const QColor m_color{QColor(108, 73, 184, 255)};
     double m_sizeCoeff{300};
     double m_columnWidth;
     double m_minAmplitude;
 
+    static constexpr double s_height = 40.0;
+    static constexpr double s_topMargin = 93.0;
+
 public:
-    AudioVisualizerItem(const QVector<double>& amplitudes, double width, double height = 40, double topMargin = 93, QGraphicsItem* parent = nullptr);
+    AudioVisualizerItem(const QVector<double>& amplitudes, double width, QGraphicsItem* parent = nullptr);
     void setWidth(const double width);
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

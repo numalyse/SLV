@@ -4,8 +4,8 @@
 #include <QGraphicsScene>
 #include <QPen>
 
-ShotItem::ShotItem(Shot shot, double width, double height, double topMargin , QGraphicsItem* parent) 
-: QGraphicsItem(parent), m_shot{shot}, m_width{width}, m_height{height}, m_topMargin{topMargin}
+ShotItem::ShotItem(Shot shot, double width, QGraphicsItem* parent)
+: QGraphicsItem(parent), m_shot{shot}, m_width{width}
 {
     setZValue(0);
 
@@ -39,7 +39,7 @@ void ShotItem::setThumbnail(const QPixmap& pixmap){
 
 QRectF ShotItem::boundingRect() const
 {
-    return QRectF(0, m_topMargin, m_width, m_height);
+    return QRectF(0, topMargin(), m_width, height());
 }
 
 void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -57,16 +57,16 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     // draw rect 
     p->setBrush(QBrush(drawColor));
-    p->drawRect(0, m_topMargin, m_width, m_height);
+    p->drawRect(0, topMargin(), m_width, height());
 
     // draw thumbnail if set
     if(!m_pixmap.isNull() && m_width > s_minSizeForImage){
-        double targetHeight = m_height - 4;
+        double targetHeight = height() - 4;
         double scaleRatio = targetHeight / m_pixmap.height();
         double scaledImgWidth = m_pixmap.width() * scaleRatio;
         double finalDrawWidth = qMin(scaledImgWidth, m_width);
 
-        QRectF target(2.0, m_topMargin+2.0, finalDrawWidth, targetHeight);
+        QRectF target(2.0, topMargin()+2.0, finalDrawWidth, targetHeight);
         double sourceCropWidth = finalDrawWidth / scaleRatio;
 
         QRectF srcRect(0, 0, sourceCropWidth, m_pixmap.height());
@@ -113,12 +113,12 @@ void ShotItem::setSelected(bool state) {
 }
 
 void ShotItem::updateTextPosition(){
-    m_selectionBox->setRect(0, 0, m_width, m_height);
-    m_selectionBox->setPos(this->mapToScene(0, m_topMargin));
+    m_selectionBox->setRect(0, 0, m_width, height());
+    m_selectionBox->setPos(this->mapToScene(0, topMargin()));
 
     QRectF textRect = m_selectionText->boundingRect();
     double xPos = (m_width - textRect.width()) / 2.0;
-    double yPos = (m_height - textRect.height()) / 2.0;
+    double yPos = (height() - textRect.height()) / 2.0;
     
     m_selectionText->setPos(xPos, yPos);
 }

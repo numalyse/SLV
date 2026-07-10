@@ -16,18 +16,25 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    int type() const override { return SLV::TypeAnnotationItem; }
 
     Annotation annotation() const { return m_annot; };
     int annotationId() const { return m_annot.id; };
     
     void setWidth(double newWidth);
-    void updateAnnotation(const Annotation& annot) {m_annot = annot;};
+    void updateAnnotation(const Annotation& annot) {m_annot = annot; updateTextItem();};
+
+    static constexpr double height() { return s_height; }
 
 private:
-    Annotation m_annot{};
+    void updateTextItem();
 
+    Annotation m_annot{};
     double m_width{};
-    double m_height{};
+
+    QGraphicsTextItem* m_annotTxtItem = nullptr;
+    AnnotationHandleItem* m_leftHandle = nullptr;
+    AnnotationHandleItem* m_rightHandle = nullptr;
 
     static constexpr double s_height = 17.0;
     static constexpr double s_topMargin = 30.0;

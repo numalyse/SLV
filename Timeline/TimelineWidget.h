@@ -73,14 +73,11 @@ private slots:
     void splitShotAtCursor();
     void ABAction();
     void moveCursor(double cursorPosX);
-    void itemLeftClick(QGraphicsItem*);
-    void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
     void updateTimelineGeometry();
     void autoSegmentation();
-    void dragABMarker(QGraphicsItem*, const int);
     void exportDone(const QString& text, const QString& outputPath);
     void fitSceneToViewport();
 

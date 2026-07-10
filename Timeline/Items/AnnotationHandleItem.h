@@ -14,12 +14,9 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    int type() const override { return SLV::TypeAnnotationHandleItem;};
 
-    int type() const override { 
-        if (m_isLeft) return SLV::TypeAnnotationHandleStartItem;
-        else return SLV::TypeAnnotationHandleEndItem ; 
-    }
-
+    bool isLeft() { return m_isLeft;}
     const QPointF* getPolygonPoints() const { return s_points; }
     int getPolygonPointCount() const { return 12; }
 

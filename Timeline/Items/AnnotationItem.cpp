@@ -11,7 +11,7 @@
 AnnotationItem::AnnotationItem(const Annotation& annot, double width, QGraphicsItem *parent)
 : QGraphicsItem(parent), m_annot{annot}, m_width{width}
 {
-    setZValue(2);
+    setZValue(6);
 
     m_annotTxtItem = new QGraphicsTextItem(this);
     QFont textFont;

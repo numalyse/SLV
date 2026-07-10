@@ -27,7 +27,7 @@ public:
     void extractLoop();
 
 public slots:
-    void dragMarker(ABMarkerItem* marker, const int pos);
+    void dragMarker(ABMarkerItem* marker, const double pos);
 
 private:
     enum class LoopState {

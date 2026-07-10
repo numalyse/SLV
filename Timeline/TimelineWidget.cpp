@@ -160,8 +160,6 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
-    connect(m_view, &TimelineView::itemShiftLeftClick, this, &TimelineWidget::itemShiftLeftClick);
-    connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
         if(dragState) {
@@ -181,6 +179,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, thumbnailWorker, projectMedia, projectShots, this);
     computeMediaAmplitudes(projectMedia->filePath());
 
+    connect(m_view, &TimelineView::shotSelectionRequested, m_shotManager, &ShotManager::toggleSelection);
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
@@ -369,40 +368,6 @@ void TimelineWidget::moveCursor(double newCursorPosX)
     }
 
     m_shotManager->updateCurrentShot(m_vlcTime);
-}
-
-void TimelineWidget::itemLeftClick(QGraphicsItem * item)
-{
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem:{
-            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
-            m_shotManager->toggleSelection(nullptr, audioShotItem, true);
-            break;
-        }
-        case SLV::TypeShotItem:{
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            m_shotManager->toggleSelection(shotItem, nullptr, true);
-            break;
-        }
-    }
-}
-
-/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
-/// @param item
-void TimelineWidget::itemShiftLeftClick(QGraphicsItem * item)
-{
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem:{
-            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
-            m_shotManager->toggleSelection(nullptr, audioShotItem, false);
-            break;
-        }
-        case SLV::TypeShotItem:{
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            m_shotManager->toggleSelection(shotItem, nullptr, false);
-            break;
-        }
-    }
 }
 
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)

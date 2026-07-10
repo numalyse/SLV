@@ -7,27 +7,26 @@
 
 class AnnotationItem : public QGraphicsItem
 {
-Q_OBJECT
 
 public:
-    explicit AnnotationItem(double position, double width, double height, double topMargin = 30, QGraphicsItem* parent = nullptr);
-    ~AnnotationItem();
+    explicit AnnotationItem(const Annotation& annot, double width, double height = 17, double topMargin = 30, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void setAnnotation(const Annotation& annot) {m_annot = annot;};
-    void setPosition(double newPos);
+    Annotation annotation() const { return m_annot; };
+    int annotationId() const { return m_annot.id; };
+    double height() const { return m_height; };
+    
     void setWidth(double newWidth);
+    void updateAnnotation(const Annotation& annot) {m_annot = annot;};
 
 private:
     Annotation m_annot{};
 
-    double m_position{};
     double m_width{};
     double m_height{};
     double m_topMargin{};
-
 };
 
 

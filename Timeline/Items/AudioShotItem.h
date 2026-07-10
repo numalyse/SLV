@@ -9,7 +9,7 @@ private:
     AudioShot m_shot;
 
 public:
-    explicit AudioShotItem(AudioShot shot, double width, double height = 40, double topMargin = 73, QGraphicsItem* parent = nullptr);
+    explicit AudioShotItem(AudioShot shot, double width, double height = 40, double topMargin = 93, QGraphicsItem* parent = nullptr);
 
     int type() const override { return SLV::TypeAudioShotItem; }
 };

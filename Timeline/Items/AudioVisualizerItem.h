@@ -19,7 +19,7 @@ private:
     double m_minAmplitude;
 
 public:
-    AudioVisualizerItem(const QVector<double>& amplitudes, double width, double height = 40, double topMargin = 73, QGraphicsItem* parent = nullptr);
+    AudioVisualizerItem(const QVector<double>& amplitudes, double width, double height = 40, double topMargin = 93, QGraphicsItem* parent = nullptr);
     void setWidth(const double width);
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

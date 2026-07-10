@@ -380,7 +380,7 @@ void GlobalPlayerManager::createTimelineWidget()
 
 
     m_timeline = new TimelineWidget(m_thumbnailWorker, projMedia, m_player, proj->shots, this, width());
-    m_timeline->setFixedHeight(160);
+    m_timeline->setFixedHeight(180);
     m_timeline->hide();
 
     projManager.setTimeline(m_timeline);

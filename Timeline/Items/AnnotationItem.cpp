@@ -4,8 +4,8 @@
 #include <QGraphicsScene>
 #include <QPen>
 
-AnnotationItem::AnnotationItem(double position, double width, double height, double topMargin, QGraphicsItem *parent)
-: QGraphicsItem(parent), m_position{position}, m_width{width}, m_height{height}, m_topMargin{topMargin}
+AnnotationItem::AnnotationItem(const Annotation& annot, double width, double height, double topMargin, QGraphicsItem *parent)
+: QGraphicsItem(parent), m_annot{annot}, m_width{width}, m_height{height}, m_topMargin{topMargin}
 {
     setZValue(2);
 }
@@ -28,10 +28,9 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     if (m_annot.note != "")
     {
-        
+        // draw start of text
     }
     
-
 }
 
 void AnnotationItem::setWidth(double newWidth)

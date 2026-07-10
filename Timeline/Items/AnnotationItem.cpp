@@ -4,15 +4,15 @@
 #include <QGraphicsScene>
 #include <QPen>
 
-AnnotationItem::AnnotationItem(const Annotation& annot, double width, double height, double topMargin, QGraphicsItem *parent)
-: QGraphicsItem(parent), m_annot{annot}, m_width{width}, m_height{height}, m_topMargin{topMargin}
+AnnotationItem::AnnotationItem(const Annotation& annot, double width, QGraphicsItem *parent)
+: QGraphicsItem(parent), m_annot{annot}, m_width{width}
 {
     setZValue(2);
 }
 
 QRectF AnnotationItem::boundingRect() const
 {
-    return QRectF(0, m_topMargin, m_width, m_height);
+    return QRectF(0, s_topMargin, m_width, s_height);
 }
 
 void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -24,13 +24,7 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     p->setBrush(QBrush(m_annot.color));
 
-    p->drawRect(0, m_topMargin, m_width, m_height);
-
-    if (m_annot.note != "")
-    {
-        // draw start of text
-    }
-    
+    p->drawRect(0, s_topMargin, m_width, s_height);
 }
 
 void AnnotationItem::setWidth(double newWidth)

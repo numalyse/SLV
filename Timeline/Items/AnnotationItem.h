@@ -9,14 +9,13 @@ class AnnotationItem : public QGraphicsItem
 {
 
 public:
-    explicit AnnotationItem(const Annotation& annot, double width, double height = 17, double topMargin = 30, QGraphicsItem* parent = nullptr);
+    explicit AnnotationItem(const Annotation& annot, double width, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     Annotation annotation() const { return m_annot; };
     int annotationId() const { return m_annot.id; };
-    double height() const { return m_height; };
     
     void setWidth(double newWidth);
     void updateAnnotation(const Annotation& annot) {m_annot = annot;};
@@ -26,7 +25,10 @@ private:
 
     double m_width{};
     double m_height{};
-    double m_topMargin{};
+
+    static constexpr double s_height = 17.0;
+    static constexpr double s_topMargin = 30.0;
+    static constexpr double s_textMargin = 4.0;
 };
 
 

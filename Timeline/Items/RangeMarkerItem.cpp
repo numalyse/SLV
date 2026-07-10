@@ -12,7 +12,7 @@ RangeMarkerItem::RangeMarkerItem(int height, int64_t vlcTime, QGraphicsItem *par
 
 QRectF RangeMarkerItem::boundingRect() const
 {
-    return QRectF(-4.5, 0, 10, m_height);
+    return QRectF(-5, 0, 10, m_height);
 }
 
 void RangeMarkerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)

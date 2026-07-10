@@ -19,9 +19,6 @@ protected:
     virtual int getPolygonPointCount() const override { return 5; }
 
 private:
-    int64_t m_vlcTime;
-    int m_height;
-    QColor m_color = {255,140,56};
 
     static constexpr QPointF s_points[5] {
         QPointF(1.5*-3.0, 0.0),

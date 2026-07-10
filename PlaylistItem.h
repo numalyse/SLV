@@ -27,6 +27,7 @@ public:
     MediaType getType() const { return m_mediaData->type(); }
     QSize thumbnailSize() const  {return m_thumbnailSize; }
     QString setThumbnailTime();
+    qint64 getDuration() const { return m_mediaData->duration(); };
 
 private:
     bool m_isDarkMode = true;
@@ -64,6 +65,7 @@ signals:
     void deleteItemRequested(const unsigned int index);
     void playPlaylistItemRequested(const QString &filePath, const bool isClicked);
     void updatePlaylistCurrentIndex(unsigned int index);
+    void durationParsed();
 };
 
 #endif // PLAYLISTITEM_H

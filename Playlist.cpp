@@ -141,15 +141,25 @@ Playlist::Playlist(QWidget *parent)
     m_itemsLayout = new QVBoxLayout();
     m_mainLayout->addLayout(m_itemsLayout);
     m_mainLayout->addWidget(m_addItemBtn);
+
+    QHBoxLayout *playlistLabelBottomLayout = new QHBoxLayout();
+    playlistLabelBottomLayout->addStretch();
+    m_playlistTotalDurationLabel = new QLabel();
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : 00:00:00");
+    playlistLabelBottomLayout->addWidget(m_playlistTotalDurationLabel);
+
+    m_mainLayout->addLayout(playlistLabelBottomLayout);
+
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
-    connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsFromPaths);
+    connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsViaButton);
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
         if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
     });
+    connect(this, &Playlist::playlistItemCountChanged, this, &Playlist::updateDurationPlaylist);
 
 }
 
@@ -190,36 +200,80 @@ void Playlist::dragEnterEvent(QDragEnterEvent *event){
     }
 }
 
+int Playlist::visualDroppedIndex(const QPoint &dropPos) const
+{
+    // On itère sur les éléments de la playlist pour déterminer l'index visuel où l'élément a été déposé
+    for (int i = 0; i < m_itemsSortOrder.size(); ++i) {
+        QWidget *playlistItemWidget = m_items[m_itemsSortOrder[i]];
+        QRect itemRect = playlistItemWidget->geometry();
+        int midY = itemRect.top() + itemRect.height() / 2;
+
+        // Si la position de dépôt est au-dessus du milieu de cet élément, on retourne l'index visuel actuel
+        if (dropPos.toPointF().y() < midY) {
+            return i;
+        } 
+    }
+
+    return m_itemsSortOrder.isEmpty() ? 0 : m_itemsSortOrder.size()-1;
+}
+
 void Playlist::dropEvent(QDropEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
 
+    qDebug() << "Old sort order: " << m_itemsSortOrder;
+
+    // Cas où un élément de la playlist est déplacé
     if (mimeData->hasFormat("move-PlaylistItem")) {
-        int draggedIndex = mimeData->data("move-PlaylistItem").toInt();
+        // Récupération de l'index de l'élément déplacé à partir des données MIME
+        int oldItemIndex = mimeData->data("move-PlaylistItem").toInt();
+        qDebug() << "Dragged item index: " << oldItemIndex;
 
-        int dropIndex = -1;
-        for (int visual = 0; visual < m_items.size(); ++visual) {
-            QWidget *w = m_items[m_itemsSortOrder[visual]];
-            QRect itemRect = w->geometry();
-            int midY = itemRect.top() + itemRect.height() / 2;
-            if (event->pos().y() < midY) {
-                dropIndex = m_itemsSortOrder[visual];
-                break;
+        int newItemIndex = -1; // Initialisation de l'index de l'élément déplacé à -1 (invalide)
+        const int visualDropIndex = visualDroppedIndex(event->pos()); // Récupération de l'index visuel où l'élément a été déposé
+        qDebug() << "Visual drop index: " << visualDropIndex;
+
+        // If the playlist is not empty, determine the drop index based on the visual drop index
+        if (!m_items.isEmpty()) {
+            if (visualDropIndex < m_items.size()) {
+                newItemIndex = m_itemsSortOrder[visualDropIndex];
+            } else {
+                newItemIndex = m_itemsSortOrder[m_items.size() - 1];
+            }
+            qDebug() << "Dropped item index: " << newItemIndex;
+        }
+
+        // Move the dragged item to the new position in the sort order
+        if (newItemIndex != -1) {
+            const int targetVisibleIndex = m_itemsSortOrder.indexOf(newItemIndex);
+            if (targetVisibleIndex != oldItemIndex && targetVisibleIndex >= 0) {
+                if(m_sortButtons->checkedButton()){
+                    m_sortButtons->setExclusive(false);
+                    m_sortButtons->checkedButton()->setChecked(false);
+                }
+
+                const unsigned int movedItemId = m_itemsSortOrder[oldItemIndex];
+                int insertIndex = targetVisibleIndex;
+                if (oldItemIndex < targetVisibleIndex) {
+                    insertIndex = targetVisibleIndex - 1;
+                }
+                insertIndex = qBound(0, insertIndex, m_itemsSortOrder.size() - 1);
+
+                qDebug() << "Moving item from index: " << oldItemIndex << " to index: " << insertIndex;
+
+                m_itemsSortOrder.removeAt(oldItemIndex);
+                m_itemsSortOrder.insert(insertIndex, movedItemId);
+
+                if(m_currentMediaIndex == oldItemIndex) {
+                    m_currentMediaIndex = m_itemsSortOrder.indexOf(movedItemId);
+                }
+
+                qDebug() << "Updated sort order: " << m_itemsSortOrder;
             }
         }
-        if (dropIndex == -1 && !m_items.isEmpty())
-            dropIndex = m_itemsSortOrder[m_items.size() - 1];
 
-        if (dropIndex != -1 && dropIndex != draggedIndex) {
-            if(m_sortButtons->checkedButton()){
-                m_sortButtons->setExclusive(false);
-                m_sortButtons->checkedButton()->setChecked(false);
-            }
-            if(m_currentMediaIndex == draggedIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(dropIndex);
-            m_itemsSortOrder.move(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
-            updateItemIndices();
-            updateLayout();
-        }
+        updateItemIndices();
+        updateLayout();
 
         event->acceptProposedAction();
     } else if (mimeData->hasUrls()) {
@@ -228,7 +282,22 @@ void Playlist::dropEvent(QDropEvent *event)
             QMessageBox::warning(this, "", PrefManager::instance().getText("messagebox_format_not_accepted"));
         }
         if (!filePaths.isEmpty()) {
-            addItemsFromPaths(filePaths);
+            const int insertionIndex = visualDroppedIndex(event->pos());
+
+            const bool wasEmpty = m_items.empty();
+
+            insertItemsFromPaths(filePaths, insertionIndex);
+
+            if (wasEmpty && !filePaths.empty()) {
+                m_items[m_itemsSortOrder[0]]->playMedia();
+            }
+
+            updateItemIndices();
+            updateLayout();
+            emit disableToolbarLoopRequested();
+            if (m_items.size() > 1) {
+                emit SignalManager::instance().activateMediaChangeBtn(true);
+            }
         }
 
         event->acceptProposedAction();
@@ -257,30 +326,47 @@ void Playlist::addItemDialog()
     prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
 
 
-    addItemsFromPaths(filesPaths);
-
+    addItemsViaButton(filesPaths);
+    
 }
 
-void Playlist::addItemsFromPaths(const QStringList &filesPaths)
+void Playlist::insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex)
 {
-    qDebug() << "PLAYLIST - Fichiers sélectionnés : " << filesPaths;
-    const bool wasEmpty = m_items.empty();
-    for(size_t IFilePath = 0; IFilePath < filesPaths.size(); ++IFilePath){
-        PlaylistItem *newItem = new PlaylistItem(nullptr, filesPaths.at(IFilePath));
+    const int targetIndex = insertionIndex < 0 ? m_items.size() : insertionIndex;
+
+    for (int i = 0; i < filesPaths.size(); ++i) {
+        PlaylistItem *newItem = new PlaylistItem(nullptr, filesPaths.at(i));
         newItem->setIndex(m_items.size());
         m_items.append(newItem);
-        m_itemsLayout->addWidget(newItem);
-        m_itemsShuffleOrder.append(m_items.size()-1);
-        m_itemsSortOrder.append(m_items.size()-1);
-        this->adjustSize();
-        this->updateGeometry();
-        
+
+        const int orderIndex = targetIndex + i;
+        const unsigned int itemIndex = static_cast<unsigned int>(m_items.size() - 1);
+        if (orderIndex >= 0 && orderIndex < m_itemsSortOrder.size()) {
+            m_itemsSortOrder.insert(orderIndex, itemIndex);
+            m_itemsShuffleOrder.insert(orderIndex, itemIndex);
+        } else {
+            m_itemsSortOrder.append(itemIndex);
+            m_itemsShuffleOrder.append(itemIndex);
+        }
+
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [this](unsigned int index){
             m_currentMediaIndex = index;
         });
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
+        connect(newItem, &PlaylistItem::durationParsed, this, &Playlist::updateDurationPlaylist);
     }
+
+    emit playlistItemCountChanged();
+}
+
+void Playlist::addItemsViaButton(const QStringList &filesPaths)
+{
+    qDebug() << "PLAYLIST - Fichiers sélectionnés : " << filesPaths;
+    const bool wasEmpty = m_items.empty();
+
+    insertItemsFromPaths(filesPaths, m_items.size());
+
     if(wasEmpty && !filesPaths.empty()){
         m_items[m_itemsSortOrder[0]]->playMedia();
     }
@@ -294,9 +380,17 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
             m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
         m_currentMediaIndex = 0;
     }
+
+    updateItemIndices();
+    updateLayout();
+
     emit disableToolbarLoopRequested();
     if(m_items.size() > 1)
         emit SignalManager::instance().activateMediaChangeBtn(true);
+
+    // qDebug() << "PLAYLIST - Liste m_items : " << m_items;
+    // qDebug() << "PLAYLIST - Liste m_itemsSortOrder : " << m_itemsSortOrder;
+    // qDebug() << "PLAYLIST - Liste m_itemsShuffleOrder : " << m_itemsShuffleOrder;
 }
 
 void Playlist::deleteAllItemsDialog()
@@ -422,6 +516,7 @@ void Playlist::deleteAllItems()
     m_itemsShuffleOrder.clear();
     m_itemsSortOrder.clear();
     emit SignalManager::instance().activateMediaChangeBtn(false);
+    emit playlistItemCountChanged();
 }
 
 void Playlist::deleteItem(const unsigned int index)
@@ -447,6 +542,7 @@ void Playlist::deleteItem(const unsigned int index)
     }
     if(m_items.size() <= 1)
         emit SignalManager::instance().activateMediaChangeBtn(false);
+    emit playlistItemCountChanged();
 }
 
 void Playlist::playMedia(const QString& filePath, const bool isClicked)
@@ -676,4 +772,17 @@ void Playlist::sortPlaylist(int id, bool checked)
         updateItemIndices();
         updateLayout();
     }
+}
+
+void Playlist::updateDurationPlaylist()
+{
+    qint64 totalDuration = 0;
+    for (const auto& item : m_items) {
+        totalDuration += item->getDuration();
+    }
+
+    QString time = TimeFormatter::msToHHMMSSFF(totalDuration, 1);
+    QString timeChopped = time.left(qMax(0, time.length() - 3));
+
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : " + timeChopped);
 }

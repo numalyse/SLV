@@ -28,6 +28,8 @@ protected:
 
 private:
     bool m_isDarkMode = true;
+    QLabel *m_playlistTotalDurationLabel = nullptr;
+    qint64 m_playlistDuration = 0;
     QColor m_palbtnColor;
     QString m_palbtnColorStr;
     bool m_playlistLooping = false;
@@ -45,16 +47,19 @@ private:
     QVBoxLayout *m_itemsLayout = nullptr;
     QButtonGroup *m_sortButtons;
     void createSortBtn();
+    int visualDroppedIndex(const QPoint &dropPos) const;
 
 signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
     void ejectCurrentMedia();
+    void playlistItemCountChanged();
 
 public slots:
     void addItemDialog();
     void deleteAllItemsDialog();
-    void addItemsFromPaths(const QStringList &filesPaths);
+    void insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex);
+    void addItemsViaButton(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);
     void deleteAllItems();
     void playMedia(const QString &filePath, const bool isClicked);
@@ -65,6 +70,8 @@ public slots:
     void enableShuffle();
     void disableShuffle();
     void sortPlaylist(int id, bool checked);
+
+    void updateDurationPlaylist();
 
 private slots:
     void updateItemIndices();

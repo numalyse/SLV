@@ -31,7 +31,7 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
 
 }
 
-AnnotationWidget* AnnotationPanel::createItem(const Annotation& annotation)
+void AnnotationPanel::createItem(const Annotation& annotation)
 {
     AnnotationWidget* item = new AnnotationWidget(this, annotation);
 
@@ -39,13 +39,12 @@ AnnotationWidget* AnnotationPanel::createItem(const Annotation& annotation)
     connect(item, &AnnotationWidget::editAnnotationRequested, this, &AnnotationPanel::annotationEditionDialog);
     connect(item, &AnnotationWidget::annotationClicked, this, &AnnotationPanel::annotationClicked);
 
-    return item;
+    m_items.append(item);
+    m_layout->addWidget(item);
 }
 
 void AnnotationPanel::onAnnotationAdded(Annotation& annotation){
-    AnnotationWidget* item = createItem(annotation);
-    m_items.append(item);
-    m_layout->addWidget(item);
+    createItem(annotation);
 }
 
 void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
@@ -80,9 +79,7 @@ void AnnotationPanel::rebuild(){
     m_items.clear();
 
     for(auto&& annotation : annotations){
-        AnnotationWidget* item = createItem(annotation);
-        m_items.append(item);
-        m_layout->addWidget(item);
+        createItem(annotation);
     }
 }
 

@@ -23,7 +23,7 @@ signals:
     void annotationClicked(int annotationId);
 
 private:
-    AnnotationWidget* createItem(const Annotation& annotation);
+    void createItem(const Annotation& annotation);
 
     QVector<AnnotationWidget*> m_items;
     QVBoxLayout* m_layout = nullptr;

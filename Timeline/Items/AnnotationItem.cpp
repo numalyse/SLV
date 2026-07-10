@@ -1,5 +1,7 @@
 #include "Timeline/Items/AnnotationItem.h"
 
+#include "Timeline/Items/AnnotationHandleItem.h"
+
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QPen>

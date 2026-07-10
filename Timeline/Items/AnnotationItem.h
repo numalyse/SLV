@@ -2,8 +2,11 @@
 #define ANNOTATIONITEM_H
 
 #include "Annotation.h"
+#include "Timeline/ItemTypes.h"
 
 #include <QGraphicsItem>
+
+class AnnotationHandleItem;
 
 class AnnotationItem : public QGraphicsItem
 {

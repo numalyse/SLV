@@ -17,8 +17,8 @@ public:
     explicit AnnotationPanel(QWidget* parent);
 
 signals:
-    void addAnottationRequested(Annotation& annotation);
-    void updateAnottationRequested(const Annotation& annotation);
+    void addAnnotationRequested(Annotation& annotation);
+    void updateAnnotationRequested(const Annotation& annotation);
     void removeAnnotationRequested(int annotationId);
     void annotationClicked(int annotationId);
 

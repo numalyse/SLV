@@ -16,8 +16,8 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
     // once project fps are parsed, rebuild to update annotations fps
     connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &AnnotationPanel::rebuild);
 
-    connect(this, &AnnotationPanel::addAnottationRequested, annotations, &AnnotationManager::addAnnotation);
-    connect(this, &AnnotationPanel::updateAnottationRequested, annotations, &AnnotationManager::updateAnnotation);
+    connect(this, &AnnotationPanel::addAnnotationRequested, annotations, &AnnotationManager::addAnnotation);
+    connect(this, &AnnotationPanel::updateAnnotationRequested, annotations, &AnnotationManager::updateAnnotation);
     connect(this, &AnnotationPanel::removeAnnotationRequested, annotations, &AnnotationManager::removeAnnotation);
 
     m_layout = new QVBoxLayout(this);
@@ -49,22 +49,25 @@ void AnnotationPanel::onAnnotationAdded(Annotation& annotation){
 }
 
 void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
-    for(auto&& item : m_items){
-        if(item->annotationId() == annotation.id){
-            item->updateAnnotation(annotation);
-            return;
-        }
+    auto it = std::find_if(m_items.begin(), m_items.end(), [&annotation](const AnnotationWidget* a){ return a->annotationId() == annotation.id; });
+    if (it == m_items.end()) {
+        qDebug() << "[AnnotationPanel] onAnnotationUpdated : could not find annotation widget with id " << annotation.id;
+        return;
     }
+
+    (*it)->updateAnnotation(annotation);
 }
 
 void AnnotationPanel::onAnnotationRemoved(int annotationId){
-    for(int IAnnotItem = 0; IAnnotItem < m_items.size(); ++IAnnotItem){
-        if(m_items[IAnnotItem]->annotationId() == annotationId){
-            m_items[IAnnotItem]->deleteLater();
-            m_items.removeAt(IAnnotItem);
-            return;
-        }
+
+    auto it = std::find_if(m_items.begin(), m_items.end(), [annotationId](const AnnotationWidget* a){ return a->annotationId() == annotationId; });
+    if (it == m_items.end()) {
+        qDebug() << "[AnnotationPanel] onAnnotationRemoved : could not find annotation widget with id " << annotationId;
+        return;
     }
+
+    (*it)->deleteLater();
+    m_items.erase(it);
 }
 
 void AnnotationPanel::rebuild(){
@@ -88,7 +91,7 @@ void AnnotationPanel::annotationCreationDialog()
     AnnotationDialog dialog(this);
     if(dialog.exec() == QDialog::Accepted){
         Annotation annotation = dialog.annotation();
-        emit addAnottationRequested(annotation);
+        emit addAnnotationRequested(annotation);
     }
 }
 
@@ -96,16 +99,14 @@ void AnnotationPanel::annotationEditionDialog(int annotationId)
 {
     const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
 
-    for(auto&& annotation : annotations){
-        if(annotation.id != annotationId)
-            continue;
-
-        AnnotationDialog dialog(this, annotation);
-        if(dialog.exec() == QDialog::Accepted)
-            emit updateAnottationRequested(dialog.annotation());
-
+    auto it = std::find_if(annotations.begin(), annotations.end(), [annotationId](const Annotation& a){ return a.id == annotationId; });
+    if (it == annotations.end()) {
+        qDebug() << "[AnnotationPanel] edit requested, could not find annotation with id " << annotationId;
         return;
     }
 
-    qDebug() << "[AnnotationPanel] edit requested, could not find annotation with id " << annotationId;
+    AnnotationDialog dialog(this, *it);
+    if(dialog.exec() == QDialog::Accepted)
+        emit updateAnnotationRequested(dialog.annotation());
+
 }

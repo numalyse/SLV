@@ -55,7 +55,8 @@ signals:
 public slots:
     void addItemDialog();
     void deleteAllItemsDialog();
-    void addItemsFromPaths(const QStringList &filesPaths);
+    void insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex);
+    void addItemsViaButton(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);
     void deleteAllItems();
     void playMedia(const QString &filePath, const bool isClicked);

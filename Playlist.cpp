@@ -146,7 +146,7 @@ Playlist::Playlist(QWidget *parent)
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, &Playlist::playNextMedia);
-    connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsFromPaths);
+    connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsViaButton);
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
         if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
     });
@@ -265,19 +265,8 @@ void Playlist::dropEvent(QDropEvent *event)
             const int insertionIndex = visualDroppedIndex(event->pos());
 
             const bool wasEmpty = m_items.empty();
-            for (int i = 0; i < filePaths.size(); ++i) {
-                PlaylistItem *newItem = new PlaylistItem(nullptr, filePaths.at(i));
-                newItem->setIndex(m_items.size());
-                m_items.append(newItem);
-                m_itemsSortOrder.insert(insertionIndex + i, static_cast<unsigned int>(m_items.size() - 1));
-                m_itemsShuffleOrder.insert(insertionIndex + i, static_cast<unsigned int>(m_items.size() - 1));
 
-                connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
-                connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [this](unsigned int index){
-                    m_currentMediaIndex = index;
-                });
-                connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
-            }
+            insertItemsFromPaths(filePaths, insertionIndex);
 
             if (wasEmpty && !filePaths.empty()) {
                 m_items[m_itemsSortOrder[0]]->playMedia();
@@ -317,30 +306,46 @@ void Playlist::addItemDialog()
     prefManager.setPref("Paths", "lp_open_media", fileInfo.absolutePath());
 
 
-    addItemsFromPaths(filesPaths);
-
+    addItemsViaButton(filesPaths);
+    
 }
 
-void Playlist::addItemsFromPaths(const QStringList &filesPaths)
+void Playlist::insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex)
 {
-    qDebug() << "PLAYLIST - Fichiers sélectionnés : " << filesPaths;
-    const bool wasEmpty = m_items.empty();
-    for(size_t IFilePath = 0; IFilePath < filesPaths.size(); ++IFilePath){
-        PlaylistItem *newItem = new PlaylistItem(nullptr, filesPaths.at(IFilePath));
+    const int targetIndex = insertionIndex < 0 ? m_items.size() : insertionIndex;
+
+    for (int i = 0; i < filesPaths.size(); ++i) {
+        PlaylistItem *newItem = new PlaylistItem(nullptr, filesPaths.at(i));
         newItem->setIndex(m_items.size());
         m_items.append(newItem);
-        m_itemsLayout->addWidget(newItem);
-        m_itemsShuffleOrder.append(m_items.size()-1);
-        m_itemsSortOrder.append(m_items.size()-1);
-        this->adjustSize();
-        this->updateGeometry();
-        
+
+        const int orderIndex = targetIndex + i;
+        const unsigned int itemIndex = static_cast<unsigned int>(m_items.size() - 1);
+        if (orderIndex >= 0 && orderIndex < m_itemsSortOrder.size()) {
+            m_itemsSortOrder.insert(orderIndex, itemIndex);
+            m_itemsShuffleOrder.insert(orderIndex, itemIndex);
+        } else {
+            m_itemsSortOrder.append(itemIndex);
+            m_itemsShuffleOrder.append(itemIndex);
+        }
+
         connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
         connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [this](unsigned int index){
             m_currentMediaIndex = index;
         });
         connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
+        connect(newItem, &PlaylistItem::durationParsed, this, &Playlist::updateDurationPlaylist);
     }
+
+}
+
+void Playlist::addItemsViaButton(const QStringList &filesPaths)
+{
+    qDebug() << "PLAYLIST - Fichiers sélectionnés : " << filesPaths;
+    const bool wasEmpty = m_items.empty();
+
+    insertItemsFromPaths(filesPaths, m_items.size());
+
     if(wasEmpty && !filesPaths.empty()){
         m_items[m_itemsSortOrder[0]]->playMedia();
     }
@@ -354,6 +359,10 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
             m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
         m_currentMediaIndex = 0;
     }
+
+    updateItemIndices();
+    updateLayout();
+
     emit disableToolbarLoopRequested();
     if(m_items.size() > 1)
         emit SignalManager::instance().activateMediaChangeBtn(true);

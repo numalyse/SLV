@@ -244,22 +244,32 @@ void Playlist::dropEvent(QDropEvent *event)
         }
 
         // Move the dragged item to the new position in the sort order
-        if (newItemIndex != -1 && newItemIndex != oldItemIndex) {
-            if(m_sortButtons->checkedButton()){
-                m_sortButtons->setExclusive(false);
-                m_sortButtons->checkedButton()->setChecked(false);
+        if (newItemIndex != -1) {
+            const int targetVisibleIndex = m_itemsSortOrder.indexOf(newItemIndex);
+            if (targetVisibleIndex != oldItemIndex && targetVisibleIndex >= 0) {
+                if(m_sortButtons->checkedButton()){
+                    m_sortButtons->setExclusive(false);
+                    m_sortButtons->checkedButton()->setChecked(false);
+                }
+
+                const unsigned int movedItemId = m_itemsSortOrder[oldItemIndex];
+                int insertIndex = targetVisibleIndex;
+                if (oldItemIndex < targetVisibleIndex) {
+                    insertIndex = targetVisibleIndex - 1;
+                }
+                insertIndex = qBound(0, insertIndex, m_itemsSortOrder.size() - 1);
+
+                qDebug() << "Moving item from index: " << oldItemIndex << " to index: " << insertIndex;
+
+                m_itemsSortOrder.removeAt(oldItemIndex);
+                m_itemsSortOrder.insert(insertIndex, movedItemId);
+
+                if(m_currentMediaIndex == oldItemIndex) {
+                    m_currentMediaIndex = m_itemsSortOrder.indexOf(movedItemId);
+                }
+
+                qDebug() << "Updated sort order: " << m_itemsSortOrder;
             }
-
-            // Update the current media index if the dragged item was the current media
-            if(m_currentMediaIndex == oldItemIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(newItemIndex);
-            
-            int from = oldItemIndex;
-            int to = m_itemsSortOrder.indexOf(newItemIndex);
-            qDebug() << "Moving item from index: " << from << " to index: " << to;
-
-            m_itemsSortOrder.move(from, to);
-
-            qDebug() << "Updated sort order: " << m_itemsSortOrder;
         }
 
         updateItemIndices();

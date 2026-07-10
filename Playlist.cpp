@@ -141,6 +141,15 @@ Playlist::Playlist(QWidget *parent)
     m_itemsLayout = new QVBoxLayout();
     m_mainLayout->addLayout(m_itemsLayout);
     m_mainLayout->addWidget(m_addItemBtn);
+
+    QHBoxLayout *playlistLabelBottomLayout = new QHBoxLayout();
+    playlistLabelBottomLayout->addStretch();
+    m_playlistTotalDurationLabel = new QLabel();
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : 00:00:00");
+    playlistLabelBottomLayout->addWidget(m_playlistTotalDurationLabel);
+
+    m_mainLayout->addLayout(playlistLabelBottomLayout);
+
     m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
@@ -150,6 +159,7 @@ Playlist::Playlist(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
         if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
     });
+    connect(this, &Playlist::playlistItemCountChanged, this, &Playlist::updateDurationPlaylist);
 
 }
 
@@ -337,6 +347,7 @@ void Playlist::insertItemsFromPaths(const QStringList &filesPaths, int insertion
         connect(newItem, &PlaylistItem::durationParsed, this, &Playlist::updateDurationPlaylist);
     }
 
+    emit playlistItemCountChanged();
 }
 
 void Playlist::addItemsViaButton(const QStringList &filesPaths)
@@ -495,6 +506,7 @@ void Playlist::deleteAllItems()
     m_itemsShuffleOrder.clear();
     m_itemsSortOrder.clear();
     emit SignalManager::instance().activateMediaChangeBtn(false);
+    emit playlistItemCountChanged();
 }
 
 void Playlist::deleteItem(const unsigned int index)
@@ -520,6 +532,7 @@ void Playlist::deleteItem(const unsigned int index)
     }
     if(m_items.size() <= 1)
         emit SignalManager::instance().activateMediaChangeBtn(false);
+    emit playlistItemCountChanged();
 }
 
 void Playlist::playMedia(const QString& filePath, const bool isClicked)
@@ -749,4 +762,17 @@ void Playlist::sortPlaylist(int id, bool checked)
         updateItemIndices();
         updateLayout();
     }
+}
+
+void Playlist::updateDurationPlaylist()
+{
+    qint64 totalDuration = 0;
+    for (const auto& item : m_items) {
+        totalDuration += item->getDuration();
+    }
+
+    QString time = TimeFormatter::msToHHMMSSFF(totalDuration, 1);
+    QString timeChopped = time.left(qMax(0, time.length() - 3));
+
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : " + timeChopped);
 }

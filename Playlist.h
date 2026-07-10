@@ -28,6 +28,8 @@ protected:
 
 private:
     bool m_isDarkMode = true;
+    QLabel *m_playlistTotalDurationLabel = nullptr;
+    qint64 m_playlistDuration = 0;
     QColor m_palbtnColor;
     QString m_palbtnColorStr;
     bool m_playlistLooping = false;
@@ -51,6 +53,7 @@ signals:
     void openMediaFileRequested(const QString &filePath);
     void disableToolbarLoopRequested();
     void ejectCurrentMedia();
+    void playlistItemCountChanged();
 
 public slots:
     void addItemDialog();
@@ -67,6 +70,8 @@ public slots:
     void enableShuffle();
     void disableShuffle();
     void sortPlaylist(int id, bool checked);
+
+    void updateDurationPlaylist();
 
 private slots:
     void updateItemIndices();

@@ -1,4 +1,6 @@
 #include "Project/ProjectFileHelper.h"
+#include "MacSymLink.h"
+#include "WinSymLink.h"
 
 #include <QFile>
 #include <QDir>
@@ -31,7 +33,7 @@ namespace  {
         QJsonObject mediaData;
         auto projectMedia = project->media;
 
-        mediaData["filePath"] = projectMedia->filePath();
+        mediaData["mediaLinkPath"] = project->mediaLinkPath;
         QString filename = projectMedia->fileName() + "." + projectMedia->fileExtension();
         mediaData["name"] = filename;
         mediaData["duration"] = projectMedia->duration();
@@ -103,16 +105,29 @@ namespace ProjectFileHelper {
         if (projectData.contains("media") && projectData["media"].isObject()) {
             QJsonObject mediaJson = projectData["media"].toObject();
 
-            loadedData.mediaName = mediaJson.value("name").toString("");
+            loadedData.mediaLinkAbsolutePath = mediaJson.value("mediaLinkPath").toString("");
             loadedData.duration = mediaJson.value("duration").toInt(0);
             loadedData.fps = mediaJson.value("fps").toDouble(0.0);
 
-            loadedData.mediaAbsolutePath = QDir(projectAbsolutePath).filePath(loadedData.mediaName);
+#ifdef Q_OS_MACOS
+            loadedData.mediaAbsolutePath = MacSymLink::findTarget(loadedData.mediaLinkAbsolutePath);
+#elif defined(Q_OS_WIN)
+            // QFile::symLinkTarget only reads the path stored in the .lnk;
+            // WinSymLink calls IShellLink::Resolve so windows finds the target even if it moved
+            loadedData.mediaAbsolutePath = WinSymLink::findTarget(loadedData.mediaLinkAbsolutePath);
+#else
+            loadedData.mediaAbsolutePath = QFile::symLinkTarget(loadedData.mediaLinkAbsolutePath);
+#endif
+
             QFileInfo mediaInfo(loadedData.mediaAbsolutePath);
-            
-            if (!mediaInfo.exists() || !mediaInfo.isFile()) {
-                qCritical() << "Erreur : Le fichier vidéo n'est pas dans le dossier ";
-                return std::unexpected(ProjectFileError::MediaFileNotFound);
+
+            if ( loadedData.mediaAbsolutePath == "" || !mediaInfo.exists() || !mediaInfo.isFile()) {
+                // the link or its target is gone : leave the media path empty,
+                // the caller asks the user to locate the media again
+                qWarning() << "[ProjectFileHelper] load project : failed to retrieve the medialink target";
+                loadedData.mediaAbsolutePath.clear();
+            } else {
+                loadedData.mediaName = mediaInfo.fileName();
             }
 
         } else {
@@ -138,6 +153,16 @@ namespace ProjectFileHelper {
         }
 
         return loadedData;
+    }
+
+
+    bool createMediaLink(const QString& mediaAbsolutePath, const QString& linkAbsolutePath) {
+        QFile::remove(linkAbsolutePath);
+#ifdef Q_OS_MACOS
+        return MacSymLink::create(mediaAbsolutePath, linkAbsolutePath);
+#else
+        return QFile::link(mediaAbsolutePath, linkAbsolutePath);
+#endif
     }
 
 

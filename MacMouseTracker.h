@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MACMOUSETRACKER_H
+#define MACMOUSETRACKER_H
 
 #ifdef __APPLE__
 #include <functional>
@@ -9,4 +10,6 @@ namespace MacMouseTracker {
     void hideCursor();
     void showCursor();
 }
+#endif
+
 #endif

@@ -408,6 +408,8 @@
 
     "dialog_save_project_dialog_title" : "Save project",
     "dialog_save_project_dialog_text" : "The timeline contains unsaved changes. Do you want to save the project?",
+    "project_saved_title" : "Project save",
+    "project_saved_text" : "The project has been saved successfully.",
     "messagebox_record_completed" : "The media record was completed successfully.",
 
     "tooltip_access_folder" : "Open captures folder",
@@ -563,6 +565,9 @@
     "project_manager_error_cannot_open_json_file": "Cannot open the project. The file might be locked or damaged.",
     "project_manager_error_json_parsing_error": "The project file is corrupted and cannot be read.",
     "project_manager_error_media_file_not_found": "The media associated with this project could not be found.",
+    "project_manager_relink_media_message": "The media associated with this project could not be found. Please select its new location.",
+    "project_manager_relink_media_dialog": "Locate the project media",
+    "project_manager_relink_media_button": "Select...",
     "project_manager_error_media_key_missing": "The project save file is damaged: media information is missing.",
     "project_manager_error_media_mismatch_fps": "The current media is different from the project (the frame rate is different).",
     "project_manager_error_media_mismatch_duration": "The current media is different from the project (the duration has changed).",

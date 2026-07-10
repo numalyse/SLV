@@ -408,6 +408,8 @@
 
     "dialog_save_project_dialog_title" : "Salvataggio del progetto",
     "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. Vuoi salvare il progetto?",
+    "project_saved_title" : "Salvataggio del progetto",
+    "project_saved_text" : "Il progetto è stato salvato con successo.",
     "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
 
     "tooltip_access_folder" : "Apri la cartella delle catture",
@@ -562,6 +564,9 @@
     "project_manager_error_cannot_open_json_file": "Impossibile aprire il progetto. Il file potrebbe essere bloccato o danneggiato.",
     "project_manager_error_json_parsing_error": "Il file di progetto è corrotto e non può essere letto.",
     "project_manager_error_media_file_not_found": "Il media associato a questo progetto non è stato trovato.",
+    "project_manager_relink_media_message": "Il media associato a questo progetto non è stato trovato. Seleziona la sua nuova posizione.",
+    "project_manager_relink_media_dialog": "Individua il media del progetto",
+    "project_manager_relink_media_button": "Seleziona...",
     "project_manager_error_media_key_missing": "Il file di salvataggio del progetto è danneggiato: mancano le informazioni sul media.",
     "project_manager_error_media_mismatch_fps": "Il media attuale è diverso da quello del progetto (la frequenza dei fotogrammi è diversa).",
     "project_manager_error_media_mismatch_duration": "Il media attuale è diverso da quello del progetto (la durata è cambiata).",

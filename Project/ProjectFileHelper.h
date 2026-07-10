@@ -11,6 +11,7 @@
 struct ProjectSaveData {
     QString mediaName;
     QString mediaAbsolutePath;
+    QString mediaLinkAbsolutePath;
     int64_t duration = 0;
     double fps = 0.0;
     QVector<Shot> shots;
@@ -29,6 +30,10 @@ enum class ProjectFileError {
 namespace ProjectFileHelper {
     bool writeJson(const Project* project, TimelineWidget* timeline);
     std::expected<ProjectSaveData, ProjectFileError> loadProject(const QString& projectAbsolutePath);
+
+    // creates a link to the media at linkAbsolutePath, replacing any existing file there
+    // (.lnk shortcut on windows, Finder alias on macOS, symlink elsewhere)
+    bool createMediaLink(const QString& mediaAbsolutePath, const QString& linkAbsolutePath);
 }
 
 

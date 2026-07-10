@@ -199,9 +199,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     double pos2 = p_mathManager->timeToPos(newShotData.start);
     double width2 = p_mathManager->timeToPos(newShotData.end) - pos2;
-    int startShotHeight = 40;
 
-    ShotItem* newShotItem = new ShotItem(newShotData, width2, startShotHeight);
+    ShotItem* newShotItem = new ShotItem(newShotData, width2);
     newShotItem->setPos(pos2, m_currentShotItem->y());
 
     AudioShot newAudioShotData = AudioShot{};
@@ -343,8 +342,6 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
     clearSelection();
 
-    int shotHeight {40};
-
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
@@ -358,7 +355,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         int64_t shotLength = (IShot.end - IShot.start);
         double width = p_mathManager->timeToPos(shotLength);
 
-        ShotItem* shot = new ShotItem(IShot, width, shotHeight);
+        ShotItem* shot = new ShotItem(IShot, width);
         AudioShot audioShot{};
         audioShot.start = IShot.start;
         audioShot.end = IShot.end;
@@ -387,8 +384,6 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 {
 
-    int shotHeight {40};
-
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
@@ -416,7 +411,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         AudioShot audioShot{};
         audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = endShot;
 
-        ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+        ShotItem* shotItem = new ShotItem(shot, width);
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
 
         p_scene->addItem(shotItem);
@@ -447,7 +442,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     AudioShot audioShot{};
     audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
-    ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+    ShotItem* shotItem = new ShotItem(shot, width);
     AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
     p_scene->addItem(shotItem);
     p_scene->addItem(audioShotItem);

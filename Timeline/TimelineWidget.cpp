@@ -174,7 +174,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
         m_isDraggingCursor = dragState;
     });
-    connect(m_view, &TimelineView::abMarkerDragged, this, &TimelineWidget::dragABMarker);
+    connect(m_view, &TimelineView::abMarkerDragged, m_abManager, &ABManager::dragMarker);
 
     layout->addWidget(m_view);
 
@@ -727,12 +727,7 @@ void TimelineWidget::initAudioVisualizer()
     m_scene->addItem(m_audioVisualizer);
 }
 
-void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
-{
-    int64_t newTime = m_mathManager->posToTimeSnapped(pos);
-    ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
-    m_abManager->changeMarkerTime(abm, newTime);
-}
+
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {

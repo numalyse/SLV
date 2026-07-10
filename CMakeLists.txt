@@ -163,6 +163,7 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/TransitionMarkerItem.cpp Timeline/Items/TransitionMarkerItem.h
     Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
     Timeline/Items/AnnotationItem.h Timeline/Items/AnnotationItem.cpp
+    Timeline/Items/AnnotationHandleItem.h Timeline/Items/AnnotationHandleItem.cpp
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h

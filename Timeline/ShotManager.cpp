@@ -66,6 +66,11 @@ void ShotManager::initShotDetail(){
     emit updateShotDetailRequested(static_cast<int>(m_shotItems.size()), currentShotId, &m_shotItems[currentShotId]->shot());
 }
 
+// custom selection model, intentionally not using Qt ItemIsSelectable / scene selection:
+// - selection is ordered by click order and numbered (drives shot extraction),
+//   whereas QGraphicsScene::selectedItems() returns an unordered set;
+// - selecting a video shot must also select its paired audio shot (and vice versa),
+//   which with scene selection would require reentrancy guards around selectionChanged.
 void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* audioShotItemToSelect, bool exclusive)
 {
     int shotId = -1;

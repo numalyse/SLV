@@ -190,36 +190,70 @@ void Playlist::dragEnterEvent(QDragEnterEvent *event){
     }
 }
 
+int Playlist::visualDroppedIndex(const QPoint &dropPos) const
+{
+    // On itère sur les éléments de la playlist pour déterminer l'index visuel où l'élément a été déposé
+    for (int i = 0; i < m_itemsSortOrder.size(); ++i) {
+        QWidget *playlistItemWidget = m_items[m_itemsSortOrder[i]];
+        QRect itemRect = playlistItemWidget->geometry();
+        int midY = itemRect.top() + itemRect.height() / 2;
+
+        // Si la position de dépôt est au-dessus du milieu de cet élément, on retourne l'index visuel actuel
+        if (dropPos.toPointF().y() < midY) {
+            return i;
+        } 
+    }
+
+    return m_itemsSortOrder.isEmpty() ? 0 : m_itemsSortOrder.size()-1;
+}
+
 void Playlist::dropEvent(QDropEvent *event)
 {
     const QMimeData *mimeData = event->mimeData();
 
+    qDebug() << "Old sort order: " << m_itemsSortOrder;
+
+    // Cas où un élément de la playlist est déplacé
     if (mimeData->hasFormat("move-PlaylistItem")) {
-        int draggedIndex = mimeData->data("move-PlaylistItem").toInt();
+        // Récupération de l'index de l'élément déplacé à partir des données MIME
+        int oldItemIndex = mimeData->data("move-PlaylistItem").toInt();
+        qDebug() << "Dragged item index: " << oldItemIndex;
 
-        int dropIndex = -1;
-        for (int visual = 0; visual < m_items.size(); ++visual) {
-            QWidget *w = m_items[m_itemsSortOrder[visual]];
-            QRect itemRect = w->geometry();
-            int midY = itemRect.top() + itemRect.height() / 2;
-            if (event->pos().y() < midY) {
-                dropIndex = m_itemsSortOrder[visual];
-                break;
+        int newItemIndex = -1; // Initialisation de l'index de l'élément déplacé à -1 (invalide)
+        const int visualDropIndex = visualDroppedIndex(event->pos()); // Récupération de l'index visuel où l'élément a été déposé
+        qDebug() << "Visual drop index: " << visualDropIndex;
+
+        // If the playlist is not empty, determine the drop index based on the visual drop index
+        if (!m_items.isEmpty()) {
+            if (visualDropIndex < m_items.size()) {
+                newItemIndex = m_itemsSortOrder[visualDropIndex];
+            } else {
+                newItemIndex = m_itemsSortOrder[m_items.size() - 1];
             }
+            qDebug() << "Dropped item index: " << newItemIndex;
         }
-        if (dropIndex == -1 && !m_items.isEmpty())
-            dropIndex = m_itemsSortOrder[m_items.size() - 1];
 
-        if (dropIndex != -1 && dropIndex != draggedIndex) {
+        // Move the dragged item to the new position in the sort order
+        if (newItemIndex != -1 && newItemIndex != oldItemIndex) {
             if(m_sortButtons->checkedButton()){
                 m_sortButtons->setExclusive(false);
                 m_sortButtons->checkedButton()->setChecked(false);
             }
-            if(m_currentMediaIndex == draggedIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(dropIndex);
-            m_itemsSortOrder.move(draggedIndex, m_itemsSortOrder.indexOf(dropIndex));
-            updateItemIndices();
-            updateLayout();
+
+            // Update the current media index if the dragged item was the current media
+            if(m_currentMediaIndex == oldItemIndex) m_currentMediaIndex = m_itemsSortOrder.indexOf(newItemIndex);
+            
+            int from = oldItemIndex;
+            int to = m_itemsSortOrder.indexOf(newItemIndex);
+            qDebug() << "Moving item from index: " << from << " to index: " << to;
+
+            m_itemsSortOrder.move(from, to);
+
+            qDebug() << "Updated sort order: " << m_itemsSortOrder;
         }
+
+        updateItemIndices();
+        updateLayout();
 
         event->acceptProposedAction();
     } else if (mimeData->hasUrls()) {
@@ -228,7 +262,33 @@ void Playlist::dropEvent(QDropEvent *event)
             QMessageBox::warning(this, "", PrefManager::instance().getText("messagebox_format_not_accepted"));
         }
         if (!filePaths.isEmpty()) {
-            addItemsFromPaths(filePaths);
+            const int insertionIndex = visualDroppedIndex(event->pos());
+
+            const bool wasEmpty = m_items.empty();
+            for (int i = 0; i < filePaths.size(); ++i) {
+                PlaylistItem *newItem = new PlaylistItem(nullptr, filePaths.at(i));
+                newItem->setIndex(m_items.size());
+                m_items.append(newItem);
+                m_itemsSortOrder.insert(insertionIndex + i, static_cast<unsigned int>(m_items.size() - 1));
+                m_itemsShuffleOrder.insert(insertionIndex + i, static_cast<unsigned int>(m_items.size() - 1));
+
+                connect(newItem, &PlaylistItem::deleteItemRequested, this, &Playlist::deleteItem);
+                connect(newItem, &PlaylistItem::updatePlaylistCurrentIndex, this, [this](unsigned int index){
+                    m_currentMediaIndex = index;
+                });
+                connect(newItem, &PlaylistItem::playPlaylistItemRequested, this, &Playlist::playMedia);
+            }
+
+            if (wasEmpty && !filePaths.empty()) {
+                m_items[m_itemsSortOrder[0]]->playMedia();
+            }
+
+            updateItemIndices();
+            updateLayout();
+            emit disableToolbarLoopRequested();
+            if (m_items.size() > 1) {
+                emit SignalManager::instance().activateMediaChangeBtn(true);
+            }
         }
 
         event->acceptProposedAction();
@@ -297,6 +357,10 @@ void Playlist::addItemsFromPaths(const QStringList &filesPaths)
     emit disableToolbarLoopRequested();
     if(m_items.size() > 1)
         emit SignalManager::instance().activateMediaChangeBtn(true);
+
+    // qDebug() << "PLAYLIST - Liste m_items : " << m_items;
+    // qDebug() << "PLAYLIST - Liste m_itemsSortOrder : " << m_itemsSortOrder;
+    // qDebug() << "PLAYLIST - Liste m_itemsShuffleOrder : " << m_itemsShuffleOrder;
 }
 
 void Playlist::deleteAllItemsDialog()

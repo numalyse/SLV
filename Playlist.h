@@ -45,6 +45,7 @@ private:
     QVBoxLayout *m_itemsLayout = nullptr;
     QButtonGroup *m_sortButtons;
     void createSortBtn();
+    int visualDroppedIndex(const QPoint &dropPos) const;
 
 signals:
     void openMediaFileRequested(const QString &filePath);

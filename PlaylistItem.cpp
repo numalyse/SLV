@@ -172,6 +172,7 @@ QString PlaylistItem::setThumbnailTime(){
 void PlaylistItem::setIndex(int index)
 {
     m_itemIndex = index;
+    m_playlistCurrentIndex = index+1;
     m_indexLabel->setText(QString::number(m_itemIndex+1));
 }
 
@@ -216,7 +217,8 @@ void PlaylistItem::mouseMoveEvent(QMouseEvent *event)
 
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData;
-    mimeData->setData("move-PlaylistItem", QByteArray::number(m_itemIndex));
+    mimeData->setData("move-PlaylistItem", QByteArray::number(m_indexLabel->text().toInt()-1));
+    qDebug() << "[Drag] PlaylistItem index: " << m_itemIndex;
     drag->setMimeData(mimeData);
 
     // Créer une pixmap pour le drag feedback

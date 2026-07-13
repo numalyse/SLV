@@ -3,10 +3,13 @@
 #include <QPainter>
 #include <QPen>
 
-AnnotationHandleItem::AnnotationHandleItem(bool isLeftHandle, QGraphicsItem * parent)
+AnnotationHandleItem::AnnotationHandleItem(bool isLeftHandle, AnnotationItem * parent)
 : QGraphicsItem(parent), m_isLeft{isLeftHandle}
 {
-    if (parent) setZValue(parent->zValue() - 1);
+    if (parent){
+        setZValue(parent->zValue() - 1);
+        m_annotParent = parent;
+    } 
 }
 
 QRectF AnnotationHandleItem::boundingRect() const

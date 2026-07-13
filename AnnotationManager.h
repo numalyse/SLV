@@ -24,6 +24,8 @@ public slots:
     void updateAnnotation(const Annotation& annotation);
     void removeAnnotation(int annotationId);
 
+
+
 signals:
     void annotationAdded(Annotation& annotation);
     void annotationUpdated(const Annotation& annotation);
@@ -31,6 +33,9 @@ signals:
     void annotationsReset();
 
 private:
+    void validateAnnotation(Annotation& annotation, bool leftMoved = false);
+
+    const int64_t m_minAnnotDurationMs = 1000;
     QVector<Annotation>* p_annotations = nullptr;
     int m_nextId = 0;
 };

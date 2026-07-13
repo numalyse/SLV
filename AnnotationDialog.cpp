@@ -107,13 +107,5 @@ Annotation AnnotationDialog::annotation() const
     annotation.start = TimeFormatter::HHMMSSFFToMs(m_startEdit->text(), m_fps);
     annotation.end = TimeFormatter::HHMMSSFFToMs(m_endEdit->text(), m_fps);
 
-    // clamp times so they do not exceed the media duration
-    if(m_maxDuration > 0){
-        annotation.start = qMin(annotation.start, m_maxDuration);
-        annotation.end = qMin(annotation.end, m_maxDuration);
-    }
-    if(annotation.end < annotation.start)
-        annotation.end = annotation.start;
-
     return annotation;
 }

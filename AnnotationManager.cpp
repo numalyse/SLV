@@ -21,12 +21,16 @@ void AnnotationManager::setAnnotations(QVector<Annotation> *annotations)
     if (!annotations || annotations->isEmpty()) {
         m_nextId = 0;
     } else {
-        auto result = std::max_element(annotations->begin(), annotations->end(), [](const Annotation& annotA, const Annotation& annotB)
-        {
+        auto result = std::max_element(annotations->cbegin(), annotations->cend(), [](const Annotation& annotA, const Annotation& annotB){
             return annotA.id < annotB.id;
         });
         m_nextId = result->id;
+
+        std::sort(p_annotations->begin(), p_annotations->end(), [](const Annotation& a, const Annotation& b){ 
+            return a.start < b.start; 
+        });
     }
+
     emit annotationsReset();
 }
 
@@ -56,17 +60,21 @@ void AnnotationManager::updateAnnotation(const Annotation &annotation)
         return;
     }
 
-    auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [annotation](const Annotation& a){ return a.id == annotation.id; });
+    auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [&annotation](const Annotation& a){ return a.id == annotation.id; });
     if (it == p_annotations->end()) {
         qDebug() << "[AnnotationManager] Failed to update, could not find annotation with id "<< annotation.id;
         return;
     }
+
+    bool leftMoved = (it->end == annotation.end);
 
     // updates the annotation with the new data
     it->start = annotation.start;
     it->end = annotation.end;
     it->note = annotation.note;
     it->color = annotation.color;
+
+    validateAnnotation(*it, leftMoved);
 
     // sends it back to timeline and panel to update ui
     emit annotationUpdated(*it);
@@ -79,8 +87,8 @@ void AnnotationManager::removeAnnotation(int annotationId)
         return;
     }
 
-    auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [annotationId](const Annotation& a){ return a.id == annotationId; });
-    if (it == p_annotations->end()) {
+    auto it = std::find_if(p_annotations->cbegin(), p_annotations->cend(), [annotationId](const Annotation& a){ return a.id == annotationId; });
+    if (it == p_annotations->cend()) {
         qDebug() << "[AnnotationManager] Failed to remove, could not find annotation with id "<< annotationId;
         return;
     }
@@ -88,5 +96,37 @@ void AnnotationManager::removeAnnotation(int annotationId)
     p_annotations->erase(it);
 
     emit annotationRemoved(annotationId);
+}
+
+void AnnotationManager::validateAnnotation(Annotation& annotation, bool leftMoved)
+{
+    Media* media = ProjectManager::instance().media();
+    const int64_t duration = media ? media->duration() : 0;
+    const int64_t minAnnotDur = (duration > 0) ? qMin(m_minAnnotDurationMs, duration) : m_minAnnotDurationMs;
+
+    // check for value < 0
+    annotation.start = qMax(annotation.start, int64_t{0});
+    annotation.end = qMax(annotation.end, int64_t{0});
+
+    // duration is set, clamp to duration 
+    if (duration > 0) {
+        annotation.start = qMin(annotation.start, duration);
+        annotation.end = qMin(annotation.end, duration);
+    }
+
+    // check if duration < min duration
+    if (annotation.end - annotation.start < minAnnotDur ){
+        // grows the annotation
+        if(leftMoved) {
+            annotation.start = qMax(0, annotation.end - minAnnotDur);
+            annotation.end = annotation.start + minAnnotDur;
+        } else {
+            annotation.end = annotation.start + minAnnotDur;
+            if(duration > 0 && annotation.end > duration){
+                annotation.end = duration;
+                annotation.start = annotation.end - minAnnotDur;
+            }
+        }
+    }
 }
 

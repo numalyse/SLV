@@ -18,10 +18,11 @@ public:
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     int type() const override { return SLV::TypeAnnotationItem; }
 
-    Annotation annotation() const { return m_annot; };
+    Annotation& annotation() { return m_annot; };
     int annotationId() const { return m_annot.id; };
     
     void setWidth(double newWidth);
+    double width() { return m_width; };
     void updateAnnotation(const Annotation& annot) {m_annot = annot; updateTextItem();};
 
     static constexpr double height() { return s_height; }

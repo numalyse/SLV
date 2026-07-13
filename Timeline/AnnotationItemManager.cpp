@@ -26,9 +26,9 @@ void AnnotationItemManager::updateAnnotItemsPosition(){
     double newWidth{};
 
     for(auto* annotItem : m_items){
-
-        newXPos = annotItem->annotation().start * p_mathManager->pixelsPerMs();
-        newWidth = (annotItem->annotation().end - annotItem->annotation().start) * p_mathManager->pixelsPerMs();
+        const Annotation& annot = annotItem->annotation();
+        newXPos = annot.start * p_mathManager->pixelsPerMs();
+        newWidth = (annot.end - annot.start) * p_mathManager->pixelsPerMs();
 
         annotItem->setX(newXPos);
         annotItem->setWidth(newWidth);

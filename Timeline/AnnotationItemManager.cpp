@@ -1,6 +1,7 @@
 #include "AnnotationItemManager.h"
-#include "Project/ProjectManager.h"
 
+#include "Project/ProjectManager.h"
+#include "Timeline/Items/AnnotationHandleItem.h"
 
 AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, QObject *parent) 
 : QObject(parent), p_scene{scene}, p_view{view}, p_mathManager{mathManager}
@@ -11,6 +12,13 @@ AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView
     connect(annotations, &AnnotationManager::annotationUpdated, this, &AnnotationItemManager::onAnnotationUpdated);
     connect(annotations, &AnnotationManager::annotationRemoved, this, &AnnotationItemManager::onAnnotationRemoved);
     connect(annotations, &AnnotationManager::annotationsReset, this, &AnnotationItemManager::rebuild);
+
+    // once project fps are parsed, rebuild to update annotations fps
+    connect(&ProjectManager::instance(), &ProjectManager::projectInitialized, this, &AnnotationItemManager::rebuild);
+
+    connect(this, &AnnotationItemManager::addAnnotationRequested, annotations, &AnnotationManager::addAnnotation);
+    connect(this, &AnnotationItemManager::updateAnnotationRequested, annotations, &AnnotationManager::updateAnnotation);
+    connect(this, &AnnotationItemManager::removeAnnotationRequested, annotations, &AnnotationManager::removeAnnotation);
 
 }
 
@@ -93,6 +101,28 @@ void AnnotationItemManager::rebuild(){
         createAnnotItem(annotation);
     } 
 }
+
+void AnnotationItemManager::onAnnotationHandleDragged(AnnotationHandleItem *handle, double posX)
+{
+    const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
+    const int id = handle->annotParent()->annotationId();
+
+    auto it = std::find_if(annotations.cbegin(), annotations.cend(), [id](const Annotation& a){ return a.id == id; });
+    if (it == annotations.cend()) {
+        qDebug() << "[Timeline][AnnotationItemManager] handle dragged : could not find annotation with id " << id;
+        return;
+    }
+
+    Annotation annot = *it;
+    int64_t newTime = p_mathManager->posToTimeSnapped(posX);
+    if (handle->isLeft())
+        annot.start = newTime;
+    else
+        annot.end = newTime;
+
+    emit updateAnnotationRequested(annot);
+}
+
 
 void AnnotationItemManager::createAnnotItem(const Annotation& annotation)
 {

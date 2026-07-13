@@ -44,8 +44,8 @@ void AnnotationItemManager::onAnnotationAdded(Annotation& annotation){
 }
 
 void AnnotationItemManager::onAnnotationUpdated(const Annotation& annotation){
-    auto it = std::find_if(m_items.begin(), m_items.end(), [&annotation](const AnnotationItem* a){ return a->annotationId() == annotation.id; });
-    if (it == m_items.end()) {
+    auto it = std::find_if(m_items.cbegin(), m_items.cend(), [&annotation](const AnnotationItem* a){ return a->annotationId() == annotation.id; });
+    if (it == m_items.cend()) {
         qDebug() << "[Timeline][AnnotationItemManager] onAnnotationUpdated : could not find annotation widget with id " << annotation.id;
         return;
     }
@@ -67,8 +67,8 @@ void AnnotationItemManager::onAnnotationRemoved(int annotationId)
         return;
     }
 
-    auto it = std::find_if(m_items.begin(), m_items.end(), [annotationId](const AnnotationItem* a){ return a->annotationId() == annotationId; });
-    if (it == m_items.end()) {
+    auto it = std::find_if(m_items.cbegin(), m_items.cend(), [annotationId](const AnnotationItem* a){ return a->annotationId() == annotationId; });
+    if (it == m_items.cend()) {
         qDebug() << "[Timeline][AnnotationItemManager] onAnnotationRemoved : could not find annotation widget with id " << annotationId;
         return;
     }

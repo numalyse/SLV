@@ -48,8 +48,8 @@ void AnnotationPanel::onAnnotationAdded(Annotation& annotation){
 }
 
 void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
-    auto it = std::find_if(m_items.begin(), m_items.end(), [&annotation](const AnnotationWidget* a){ return a->annotationId() == annotation.id; });
-    if (it == m_items.end()) {
+    auto it = std::find_if(m_items.cbegin(), m_items.cend(), [&annotation](const AnnotationWidget* a){ return a->annotationId() == annotation.id; });
+    if (it == m_items.cend()) {
         qDebug() << "[AnnotationPanel] onAnnotationUpdated : could not find annotation widget with id " << annotation.id;
         return;
     }
@@ -59,8 +59,8 @@ void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
 
 void AnnotationPanel::onAnnotationRemoved(int annotationId){
 
-    auto it = std::find_if(m_items.begin(), m_items.end(), [annotationId](const AnnotationWidget* a){ return a->annotationId() == annotationId; });
-    if (it == m_items.end()) {
+    auto it = std::find_if(m_items.cbegin(), m_items.cend(), [annotationId](const AnnotationWidget* a){ return a->annotationId() == annotationId; });
+    if (it == m_items.cend()) {
         qDebug() << "[AnnotationPanel] onAnnotationRemoved : could not find annotation widget with id " << annotationId;
         return;
     }
@@ -96,8 +96,8 @@ void AnnotationPanel::annotationEditionDialog(int annotationId)
 {
     const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
 
-    auto it = std::find_if(annotations.begin(), annotations.end(), [annotationId](const Annotation& a){ return a.id == annotationId; });
-    if (it == annotations.end()) {
+    auto it = std::find_if(annotations.cbegin(), annotations.cend(), [annotationId](const Annotation& a){ return a.id == annotationId; });
+    if (it == annotations.cend()) {
         qDebug() << "[AnnotationPanel] edit requested, could not find annotation with id " << annotationId;
         return;
     }

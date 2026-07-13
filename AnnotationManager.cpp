@@ -1,5 +1,7 @@
 #include "AnnotationManager.h"
 
+#include "Project/ProjectManager.h"
+
 #include <QDebug>
 
 #include <algorithm>

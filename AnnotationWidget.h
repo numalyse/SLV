@@ -45,6 +45,7 @@ private:
     QFrame* m_colorBar = nullptr;
     QLabel* m_startLabel = nullptr;
     QLabel* m_endLabel = nullptr;
+    QLabel* m_nameLabel = nullptr;
     QLabel* m_noteLabel = nullptr;
     ToolbarButton* m_menuBtn = nullptr;
 };

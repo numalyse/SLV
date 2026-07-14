@@ -46,9 +46,13 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     QVBoxLayout *infoLayout = new QVBoxLayout();
     infoLayout->setSpacing(2);
 
+    m_nameLabel = new QLabel();
+    m_nameLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+
     m_noteLabel = new QLabel();
     m_noteLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     
+    infoLayout->addWidget(m_nameLabel);
     infoLayout->addWidget(m_noteLabel);
 
     mainLayout->addLayout(infoLayout, 1);
@@ -92,9 +96,8 @@ void AnnotationWidget::refreshContent()
     QString end = TimeFormatter::msToHHMMSSFF(m_annotation.end, fps);
     m_startLabel->setText(start);
     m_endLabel->setText(end);
-    setToolTip(PrefManager::instance().getText("shot_detail_start_time_name") + " : " + start + "\n"
-             + PrefManager::instance().getText("shot_detail_end_time_name") + " : " + end);
-
+    
+    m_nameLabel->setText(m_annotation.name);
     m_noteLabel->setText(m_annotation.note);
     m_noteLabel->setToolTip(m_annotation.note);
 }

@@ -60,7 +60,8 @@ void AnnotationItem::updateTextItem()
 
     // replaces \n with " " and elide the text fo fit in 
     QFontMetrics metrics(m_annotTxtItem->font());
-    const QString elidedText = metrics.elidedText(m_annot.note.replace('\n', " "), Qt::ElideRight, static_cast<int>(availableWidth));
+    const QString text = m_annot.name + " " + m_annot.note.replace('\n', " ");
+    const QString elidedText = metrics.elidedText(text, Qt::ElideRight, static_cast<int>(availableWidth));
     m_annotTxtItem->setPlainText(elidedText);
 
     // centers text on y 

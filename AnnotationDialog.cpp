@@ -24,9 +24,11 @@ AnnotationDialog::AnnotationDialog(QWidget* parent, const Annotation& annotation
         timeEdit->setFixedWidth(90);
     }
 
+    m_nameEdit = new QLineEdit(annotation.name);
+
     m_noteEdit = new QTextEdit();
     m_noteEdit->setPlainText(m_annotation.note);
-    m_noteEdit->setFixedHeight(80);
+    m_noteEdit->setFixedHeight(m_noteHeight);
 
     m_colorBtn = new QPushButton();
     m_colorBtn->setFixedSize(60, 24);
@@ -66,8 +68,10 @@ void AnnotationDialog::initUiLayout()
     formLayout->addWidget(m_colorBtn, 0, 5, Qt::AlignLeft);
 
     // note
-    formLayout->addWidget(makeLabel("shot_detail_note_name"), 2, 0, Qt::AlignRight | Qt::AlignTop);
-    formLayout->addWidget(m_noteEdit, 2, 1, 1, 5);
+    formLayout->addWidget(makeLabel("shot_detail_name"), 2, 0, Qt::AlignRight | Qt::AlignTop);
+    formLayout->addWidget(m_nameEdit, 2, 1, 1, 5);
+    formLayout->addWidget(makeLabel("shot_detail_note_name"), 3, 0, Qt::AlignRight | Qt::AlignTop);
+    formLayout->addWidget(m_noteEdit, 3, 1, 1, 5);
 
     formLayout->setColumnStretch(1, 1);
 
@@ -101,6 +105,7 @@ void AnnotationDialog::updateColorButton()
 Annotation AnnotationDialog::annotation() const
 {
     Annotation annotation = m_annotation;
+    annotation.name = m_nameEdit->text();
     annotation.note = m_noteEdit->toPlainText();
     annotation.color = m_color;
 

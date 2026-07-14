@@ -137,6 +137,7 @@ void AnnotationManager::resizeAnnotation(const Annotation &annotation)
     // updates the annotation with the new data
     it->start = annotation.start;
     it->end = annotation.end;
+    it->name = annotation.name;
     it->note = annotation.note;
     it->color = annotation.color;
 

@@ -35,7 +35,7 @@ signals:
 private:
     void validateAnnotation(Annotation& annotation, bool leftMoved = false);
 
-    const int64_t m_minAnnotDurationMs = 1000;
+    const int64_t m_minAnnotDurationMs = 0;
     QVector<Annotation>* p_annotations = nullptr;
     int m_nextId = 0;
 };

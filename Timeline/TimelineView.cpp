@@ -53,7 +53,7 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                     return;
                 case SLV::TypeAnnotationHandleItem:
                     m_dragMode = DragMode::AnnotationHandle;
-                    m_draggedItem = item;
+                    m_draggedItem = static_cast<AnnotationHandleItem*>(item)->annotParent()->closestHandle(mapToScene(event->pos()).x());
                     return;
                 case SLV::TypeCursorItem:
                 case SLV::TypeRulerItem:

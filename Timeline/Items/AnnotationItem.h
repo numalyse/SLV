@@ -23,6 +23,9 @@ public:
     
     void setWidth(double newWidth);
     double width() { return m_width; };
+
+    /// @brief returns handle closest to the item center
+    AnnotationHandleItem* closestHandle(double sceneX) { return (sceneX < scenePos().x() + m_width / 2.0) ? m_leftHandle : m_rightHandle; };
     void updateAnnotation(const Annotation& annot) {m_annot = annot; updateTextItem();};
 
     static constexpr double height() { return s_height; }

@@ -23,7 +23,7 @@ public slots:
     void addAnnotation(Annotation& annotation);
     void updateAnnotation(const Annotation& annotation);
     void removeAnnotation(int annotationId);
-
+    void resizeAnnotation(const Annotation& annotation);
 
 
 signals:

@@ -18,6 +18,7 @@ AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView
 
     connect(this, &AnnotationItemManager::addAnnotationRequested, annotations, &AnnotationManager::addAnnotation);
     connect(this, &AnnotationItemManager::updateAnnotationRequested, annotations, &AnnotationManager::updateAnnotation);
+    connect(this, &AnnotationItemManager::resizeAnnotationRequested, annotations, &AnnotationManager::resizeAnnotation);
     connect(this, &AnnotationItemManager::removeAnnotationRequested, annotations, &AnnotationManager::removeAnnotation);
 
 }
@@ -120,7 +121,7 @@ void AnnotationItemManager::onAnnotationHandleDragged(AnnotationHandleItem *hand
     else
         annot.end = newTime;
 
-    emit updateAnnotationRequested(annot);
+    emit resizeAnnotationRequested(annot);
 }
 
 

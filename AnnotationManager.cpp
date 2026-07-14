@@ -56,37 +56,19 @@ void AnnotationManager::addAnnotation(Annotation& annotation){
         return annotEnd < b.start;
     });
 
-    // new annot before every other annot => add at head
-    if(upperBound == p_annotations->cbegin()){
-        annotation.id = ++m_nextId;
-        p_annotations->insert(0, annotation);
-        emit annotationAdded(annotation);
-    } else if(upperBound == p_annotations->cend()){ // new annot after every other annot
-        auto lowerBound = std::prev(upperBound);
-        if(annotation.start > (*lowerBound).end){
-            annotation.id = ++m_nextId;
-            p_annotations->insert(upperBound, annotation); // insert at the end
-            emit annotationAdded(annotation);
-        }else {
-            qDebug() << "[AnnotationManager] Failed to add the annotation";
-            return;
-        }
-    }else { // new annot in the middle of the list
-        auto lowerBound = std::prev(upperBound);
-        if(annotation.start > (*lowerBound).end && annotation.end < (*upperBound).start){
-            annotation.id = ++m_nextId;
-            p_annotations->insert(upperBound, annotation); // insert before uperbound
-            emit annotationAdded(annotation);
-        }else {
-            qDebug() << "[AnnotationManager] Failed to add the annotation";
-            return;
-        }
+    // only need to check lowerbound since upperbound is the first element where start > annotation.end
+    if(upperBound != p_annotations->cbegin() && std::prev(upperBound)->end >= annotation.start){
+        qDebug() << "[AnnotationManager] Failed to add the annotation, overlap";
+        return;
     }
+
+    annotation.id = ++m_nextId;
+    p_annotations->insert(upperBound, annotation); 
+    emit annotationAdded(annotation);
 }
 
 void AnnotationManager::updateAnnotation(const Annotation &annotation)
 {
-
     if(!p_annotations){
         qDebug() << "[AnnotationManager] Failed to update on a nullptr "<< annotation.id;
         return;
@@ -95,6 +77,54 @@ void AnnotationManager::updateAnnotation(const Annotation &annotation)
     auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [&annotation](const Annotation& a){ return a.id == annotation.id; });
     if (it == p_annotations->end()) {
         qDebug() << "[AnnotationManager] Failed to update, could not find annotation with id "<< annotation.id;
+        return;
+    }
+
+    Annotation updated = annotation;
+    validateAnnotation(updated);
+
+    // find the upperbound of the updated annotation (where the annotation would end up) 
+    auto updatedUpperBound = std::upper_bound(p_annotations->begin(), p_annotations->end(), updated.end, [](int64_t annotEnd, const Annotation& b){
+        return annotEnd < b.start;
+    });
+
+    // find lowerBound
+    auto updatedLowerBound = updatedUpperBound;
+
+    if (updatedLowerBound != p_annotations->begin() && std::prev(updatedLowerBound) == it)
+        updatedLowerBound = std::prev(updatedLowerBound); // skip self
+
+    // check overlap with updated annot lowerbound
+    if (updatedLowerBound != p_annotations->begin() && std::prev(updatedLowerBound)->end >= updated.start) {
+        qDebug() << "[AnnotationManager] Failed to update, overlap at destination" << annotation.id;
+        return;
+    }
+
+    *it = updated;
+
+    // move the updated annot before updatedUpperBound, keeping the vector sorted
+    if (it < updatedUpperBound) { // if moved to right 
+        std::rotate(it, std::next(it), updatedUpperBound);
+        it = std::prev(updatedUpperBound);
+    } else if (updatedUpperBound < it) { // moved to left
+        std::rotate(updatedUpperBound, it, std::next(it)); 
+        it = updatedUpperBound;
+    }
+
+    emit annotationUpdated(*it);
+
+}
+
+void AnnotationManager::resizeAnnotation(const Annotation &annotation)
+{
+    if(!p_annotations){
+        qDebug() << "[AnnotationManager] Failed to resize on a nullptr "<< annotation.id;
+        return;
+    }
+
+    auto it = std::find_if(p_annotations->begin(), p_annotations->end(), [&annotation](const Annotation& a){ return a.id == annotation.id; });
+    if (it == p_annotations->end()) {
+        qDebug() << "[AnnotationManager] Failed to resize, could not find annotation with id "<< annotation.id;
         return;
     }
 
@@ -113,12 +143,12 @@ void AnnotationManager::updateAnnotation(const Annotation &annotation)
     validateAnnotation(*it, leftMoved);
 
     // clamp start and end to neighbour
-    if(hasNext && (*it).end > (*upperBound).start){
+    if(hasNext && (*it).end >= (*upperBound).start){
         it->end = (*upperBound).start - 1;
     }
     if(hasPrev){
         auto lowerBound = std::prev(it);
-        if( (*it).start < (*lowerBound).end )
+        if( (*it).start <= (*lowerBound).end )
             it->start = (*lowerBound).end + 1;
     }
 

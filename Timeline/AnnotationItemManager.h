@@ -30,6 +30,7 @@ public slots:
 signals:
     void addAnnotationRequested(Annotation& annotation);
     void updateAnnotationRequested(const Annotation& annotation);
+    void resizeAnnotationRequested(const Annotation& annotation);
     void removeAnnotationRequested(int annotationId);
     void annotationClicked(int annotationId);
 

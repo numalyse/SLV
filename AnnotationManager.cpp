@@ -111,6 +111,7 @@ void AnnotationManager::updateAnnotation(const Annotation &annotation)
 
     validateAnnotation(*it, leftMoved);
 
+    // clamp start and end to neighbour
     if(hasNext && (*it).end > (*upperBound).start){
         it->end = (*upperBound).start - 1;
     }

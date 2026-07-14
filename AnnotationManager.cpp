@@ -58,11 +58,13 @@ void AnnotationManager::addAnnotation(Annotation& annotation){
 
     // new annot before every other annot => add at head
     if(upperBound == p_annotations->cbegin()){
+        annotation.id = ++m_nextId;
         p_annotations->insert(0, annotation);
         emit annotationAdded(annotation);
     } else if(upperBound == p_annotations->cend()){ // new annot after every other annot
         auto lowerBound = std::prev(upperBound);
         if(annotation.start > (*lowerBound).end){
+            annotation.id = ++m_nextId;
             p_annotations->insert(upperBound, annotation); // insert at the end
             emit annotationAdded(annotation);
         }else {
@@ -72,6 +74,7 @@ void AnnotationManager::addAnnotation(Annotation& annotation){
     }else { // new annot in the middle of the list
         auto lowerBound = std::prev(upperBound);
         if(annotation.start > (*lowerBound).end && annotation.end < (*upperBound).start){
+            annotation.id = ++m_nextId;
             p_annotations->insert(upperBound, annotation); // insert before uperbound
             emit annotationAdded(annotation);
         }else {
@@ -79,8 +82,6 @@ void AnnotationManager::addAnnotation(Annotation& annotation){
             return;
         }
     }
-
-    annotation.id = ++m_nextId;
 }
 
 void AnnotationManager::updateAnnotation(const Annotation &annotation)

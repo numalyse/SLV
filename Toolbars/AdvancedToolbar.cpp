@@ -302,7 +302,8 @@ void AdvancedToolbar::setDefaultUI()
 
         buttonLayout->addWidget(m_speedBtn);
         buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_customStopBtn);
+        //buttonLayout->addWidget(m_stopBtn); MODIF
         buttonLayout->addWidget(m_playPauseBtn);
         buttonLayout->addWidget(m_ejectBtn);
         buttonLayout->addWidget(m_nextMediaBtn);

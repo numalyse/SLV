@@ -205,15 +205,18 @@ bool MediaWidget::stop()
 {
     if (!m_player || !m_media) return false;
 
+    int64_t newValueStop = 0;
     pause();
-    libvlc_media_player_set_position(m_player, 0.0);
+    if (newValueStop == 0) {
+        libvlc_media_player_set_position(m_player, 0.0);
+    } else {
+        setTime(newValueStop);
+    }
     libvlc_media_player_next_frame(m_player);
     int64_t currentTime = libvlc_media_player_get_time(m_player);
     emit vlcTimeChanged(currentTime);
     return true;
 }
-
-
 
 /// @brief Release the media player and create a new one from MediaWidget instance
 bool MediaWidget::eject()

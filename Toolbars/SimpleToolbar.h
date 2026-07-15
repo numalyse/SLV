@@ -38,6 +38,7 @@ public:
 
     ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
     ToolbarToggleHoverButton* speedBtn() const { return m_speedBtn; }
+    ToolbarToggleHoverButton* customStopBtn() const { return m_customStopBtn; }
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
     ToolbarButton* extractSequenceBtn() const {return m_extractSequenceBtn;}
@@ -100,6 +101,8 @@ protected:
     void createTimeTotBtn();
     void createTimeEdit();
 
+    void createStopTimeEdit();
+
     void updateDurationText();
 
     void LangComboBoxActivated(int subTrackItemId);
@@ -122,6 +125,9 @@ protected:
     ToolbarToggleHoverButton* m_speedBtn = nullptr;
     QSlider* m_speedSlider = nullptr;
     QLabel* m_speedLabel = nullptr;
+    TimeEdit* m_customStopTimeEdit = nullptr;
+    ToolbarToggleHoverButton* m_customStopBtn = nullptr;
+    QCheckBox* m_customStopCheckbox = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;

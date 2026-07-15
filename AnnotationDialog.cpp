@@ -87,7 +87,7 @@ void AnnotationDialog::initUiLayout()
 
 void AnnotationDialog::openColorPicker()
 {
-    IconHelper::execColorPickerMenu(this, m_colorBtn, false, [this](const QColor& color){
+    IconHelper::execColorPickerMenu(this, m_colorBtn, [this](const QColor& color){
         if(color.isValid()){
             m_color = color;
             updateColorButton();

@@ -46,9 +46,13 @@ public:
 
         m_parent = parent;
         
-        m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop") + "<br><i>("
+        m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop") 
+        + "<br>"
+        + PrefManager::instance().getText("tooltip_stop_info")
+        + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
         + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>");
+
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));
         m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white",
         PrefManager::instance().getText("tooltip_fullscreen") + "<br><i>("

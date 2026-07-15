@@ -18,6 +18,8 @@ public:
     /// @brief Create an annotation base on the dialog inputs
     Annotation annotation() const;
 
+    void accept() override;
+
 private:
     void initUiLayout();
     void openColorPicker();

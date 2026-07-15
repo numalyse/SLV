@@ -47,10 +47,11 @@ private:
     void refreshContent();
     void setMode(Mode mode);
     void applyEdits();
+    /// @brief Returns the annotation from the edit fields
+    Annotation editedAnnotation() const;
     void adjustNoteEditHeight();
     void openColorPicker();
     void updateColorButton();
-    void openMenu();
     double currentFps() const;
 
     Annotation m_annotation;

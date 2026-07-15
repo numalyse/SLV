@@ -17,6 +17,36 @@ const QVector<Annotation>& AnnotationManager::annotations() const
     return p_annotations ? *p_annotations : empty;
 }
 
+
+std::optional<QVector<Annotation>::iterator> AnnotationManager::findInsertPosition(const Annotation &annotation) const
+{
+    if (!p_annotations)
+        return std::nullopt;
+
+    // first element where start > annotation.end
+    auto upperBound = std::upper_bound(p_annotations->begin(), p_annotations->end(), annotation.end, [](int64_t annotEnd, const Annotation& b){
+        return annotEnd < b.start;
+    });
+
+    // only need to check overlap with the closest predecessor that is not the annotation itself
+    auto it = upperBound;
+    while (it != p_annotations->begin())
+    {
+        it = std::prev(it);
+        if (it->id == annotation.id)
+            continue; // skip self
+        if (it->end >= annotation.start)
+            return std::nullopt; // overlap
+        break; // exit loop no overlap
+    }
+    return upperBound;
+}
+
+bool AnnotationManager::hasConflict(const Annotation &annotation) const
+{
+    return p_annotations && !findInsertPosition(annotation).has_value();
+}
+
 void AnnotationManager::setAnnotations(QVector<Annotation> *annotations)
 {
     p_annotations = annotations;
@@ -51,19 +81,15 @@ void AnnotationManager::addAnnotation(Annotation& annotation){
 
     validateAnnotation(annotation);
 
-    // first element where start > annotation.end
-    auto upperBound = std::upper_bound(p_annotations->cbegin(), p_annotations->cend(), annotation.end, [](int64_t annotEnd, const Annotation& b){
-        return annotEnd < b.start;
-    });
-
-    // only need to check lowerbound since upperbound is the first element where start > annotation.end
-    if(upperBound != p_annotations->cbegin() && std::prev(upperBound)->end >= annotation.start){
+    // where the annotation would end up, nullopt if it overlaps another annotation
+    auto insertPos = findInsertPosition(annotation);
+    if (!insertPos) {
         qDebug() << "[AnnotationManager] Failed to add the annotation, overlap";
         return;
     }
 
     annotation.id = ++m_nextId;
-    p_annotations->insert(upperBound, annotation); 
+    p_annotations->insert(*insertPos, annotation);
     emit annotationAdded(annotation);
 }
 
@@ -83,22 +109,14 @@ void AnnotationManager::updateAnnotation(const Annotation &annotation)
     Annotation updated = annotation;
     validateAnnotation(updated);
 
-    // find the upperbound of the updated annotation (where the annotation would end up) 
-    auto updatedUpperBound = std::upper_bound(p_annotations->begin(), p_annotations->end(), updated.end, [](int64_t annotEnd, const Annotation& b){
-        return annotEnd < b.start;
-    });
-
-    // find lowerBound
-    auto updatedLowerBound = updatedUpperBound;
-
-    if (updatedLowerBound != p_annotations->begin() && std::prev(updatedLowerBound) == it)
-        updatedLowerBound = std::prev(updatedLowerBound); // skip self
-
-    // check overlap with updated annot lowerbound
-    if (updatedLowerBound != p_annotations->begin() && std::prev(updatedLowerBound)->end >= updated.start) {
-        qDebug() << "[AnnotationManager] Failed to update, overlap at destination" << annotation.id;
+    // where the annotation would end up, nullopt if it overlaps another annotation
+    auto insertPos = findInsertPosition(updated);
+    if (!insertPos) {
+        qDebug() << "[AnnotationManager] Failed to update, overlap";
         return;
     }
+
+    auto updatedUpperBound = *insertPos;
 
     *it = updated;
 

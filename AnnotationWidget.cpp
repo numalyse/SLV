@@ -142,7 +142,15 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     m_cancelBtn->hide();
     m_deleteBtn->hide();
 
-    connect(m_confirmBtn, &QPushButton::released, this, &AnnotationWidget::applyEdits);
+    connect(m_confirmBtn, &QPushButton::released, this, [this](){
+        auto* annotManager = ProjectManager::instance().annotationManager();
+        if( annotManager && annotManager->hasConflict(editedAnnotation()))
+        {
+            m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+            m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+        } else
+            applyEdits();
+    });
     connect(m_cancelBtn, &QPushButton::released, this, [this]{ setMode(Mode::Minimized); });
     connect(m_deleteBtn, &QPushButton::released, this, [this]{ emit removeAnnotationRequested(m_annotation.id); });
 
@@ -202,6 +210,19 @@ void AnnotationWidget::refreshContent()
     m_nameLabel->setText(m_annotation.name);
     m_noteLabel->setText(m_annotation.note);
     m_noteLabel->setToolTip(m_annotation.note);
+
+    // keep the edit fields in sync with the annotation
+    if (m_mode == Mode::Edited) {
+        m_startEdit->setText(start);
+        m_endEdit->setText(end);
+        m_nameEdit->setText(m_annotation.name);
+        m_noteEdit->setPlainText(m_annotation.note);
+        m_editColor = m_annotation.color;
+        // remove red borders (from when a conflict occurs)
+        m_startEdit->setStyleSheet(QString());
+        m_endEdit->setStyleSheet(QString());
+        updateColorButton();
+    }
 }
 
 void AnnotationWidget::setMode(Mode mode)
@@ -210,15 +231,8 @@ void AnnotationWidget::setMode(Mode mode)
     m_mode = mode;
     bool isEditMode = (m_mode == Mode::Edited);
     
-    if (isEditMode) {
-        double fps = currentFps();
-        m_startEdit->setText(TimeFormatter::msToHHMMSSFF(m_annotation.start, fps));
-        m_endEdit->setText(TimeFormatter::msToHHMMSSFF(m_annotation.end, fps));
-        m_nameEdit->setText(m_annotation.name);
-        m_noteEdit->setPlainText(m_annotation.note);
-        m_editColor = m_annotation.color;
-        updateColorButton();
-    }
+    if (isEditMode)
+        refreshContent(); // populates the edit fields since m_mode is already Edited
 
     m_startLabel->setVisible(!isEditMode);
     m_endLabel->setVisible(!isEditMode);
@@ -244,18 +258,22 @@ void AnnotationWidget::setMode(Mode mode)
     }
 }
 
+Annotation AnnotationWidget::editedAnnotation() const
+{
+    Annotation edited = m_annotation;
+    double fps = currentFps();
+    edited.start = TimeFormatter::HHMMSSFFToMs(m_startEdit->text(), fps);
+    edited.end = TimeFormatter::HHMMSSFFToMs(m_endEdit->text(), fps);
+    edited.name = m_nameEdit->text();
+    edited.note = m_noteEdit->toPlainText();
+    edited.color = m_editColor;
+    return edited;
+}
+
 void AnnotationWidget::applyEdits()
 {
-    Annotation updated = m_annotation;
-    double fps = currentFps();
-    updated.start = TimeFormatter::HHMMSSFFToMs(m_startEdit->text(), fps);
-    updated.end = TimeFormatter::HHMMSSFFToMs(m_endEdit->text(), fps);
-    updated.name = m_nameEdit->text();
-    updated.note = m_noteEdit->toPlainText();
-    updated.color = m_editColor;
-
+    Annotation updated = editedAnnotation();
     setMode(Mode::Minimized);
-
     emit updateAnnotationRequested(updated);
 }
 

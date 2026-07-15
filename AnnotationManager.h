@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QVector>
 
+#include <optional>
+
 
 class AnnotationManager : public QObject
 {
@@ -15,6 +17,8 @@ public:
     explicit AnnotationManager(QObject* parent);
 
     const QVector<Annotation> &annotations() const;
+
+    bool hasConflict(const Annotation& annotation) const;
 
     void setAnnotations(QVector<Annotation>* annotations);
     void clear();
@@ -34,6 +38,12 @@ signals:
 
 private:
     void validateAnnotation(Annotation& annotation, bool leftMoved = false);
+
+    /// @brief Returns where the annotation would be inserted to keep the vector sorted,
+    // or nullopt if it would overlap an existing annotation (itself excluded)
+    /// @param annotation 
+    /// @return 
+    std::optional<QVector<Annotation>::iterator> findInsertPosition(const Annotation& annotation) const;
 
     const int64_t m_minAnnotDurationMs = 0;
     QVector<Annotation>* p_annotations = nullptr;

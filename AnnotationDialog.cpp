@@ -116,3 +116,14 @@ Annotation AnnotationDialog::annotation() const
 
     return annotation;
 }
+
+void AnnotationDialog::accept()
+{
+    auto* annotManager = ProjectManager::instance().annotationManager();
+    if( annotManager && annotManager->hasConflict(annotation()))
+    {
+        m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+        m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+    } else 
+        QDialog::accept();
+}

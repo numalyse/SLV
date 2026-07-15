@@ -200,6 +200,8 @@
     "remove" : "Remove",
     "edit" : "Edit",
     "annotation" : "Annotation",
+    "annotation_name" : "Name",
+    "annotation_note" : "Note",
     "remove_all" : "Remove all",
     "remove_all_items_playlist" : "Remove playlist",
     "tooltip_remove_all_items_playlist" : "Remove all items in the playlist",
@@ -441,6 +443,7 @@
 
     "tooltip_playlist_button" : "Open playlist",
     "tooltip_shot_detail_button" : "Open shot information",
+    "tooltip_annotation_button" : "Open annotations",
 
     "messagebox_fullscreen_experimental" : "The software's fullscreen feature is currently under development.",
 

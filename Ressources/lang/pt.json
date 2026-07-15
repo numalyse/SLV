@@ -200,6 +200,8 @@
     "remove" : "Remover",
     "edit" : "Editar",
     "annotation" : "Anotação",
+    "annotation_name" : "Nome",
+    "annotation_note" : "Nota",
     "remove_all" : "Remover tudo",
     "remove_all_items_playlist" : "Remover playlist",
     "tooltip_remove_all_items_playlist" : "Remover todos os elementos da playlist",
@@ -441,6 +443,7 @@
 
     "tooltip_playlist_button" : "Abrir playlist",
     "tooltip_shot_detail_button" : "Abrir informações do plano",
+    "tooltip_annotation_button" : "Abrir anotações",
 
     "messagebox_fullscreen_experimental" : "O recurso de tela cheia do software está atualmente em desenvolvimento.",
 

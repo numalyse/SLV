@@ -68,10 +68,10 @@ void AnnotationDialog::initUiLayout()
     formLayout->addWidget(makeLabel("tooltip_color_tool"), 0, 4);
     formLayout->addWidget(m_colorBtn, 0, 5, Qt::AlignLeft);
 
-    // note
-    formLayout->addWidget(makeLabel("shot_detail_name"), 2, 0, Qt::AlignRight | Qt::AlignTop);
+    // name + note
+    formLayout->addWidget(makeLabel("annotation_name"), 2, 0, Qt::AlignRight | Qt::AlignTop);
     formLayout->addWidget(m_nameEdit, 2, 1, 1, 5);
-    formLayout->addWidget(makeLabel("shot_detail_note_name"), 3, 0, Qt::AlignRight | Qt::AlignTop);
+    formLayout->addWidget(makeLabel("annotation_note"), 3, 0, Qt::AlignRight | Qt::AlignTop);
     formLayout->addWidget(m_noteEdit, 3, 1, 1, 5);
 
     formLayout->setColumnStretch(1, 1);

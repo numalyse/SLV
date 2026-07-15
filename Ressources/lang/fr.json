@@ -199,6 +199,8 @@
     "remove" : "Retirer",
     "edit" : "Modifier",
     "annotation" : "Annotation",
+    "annotation_name" : "Nom",
+    "annotation_note" : "Note",
     "remove_all" : "Tout retirer",
     "remove_all_items_playlist" : "Réinitialiser la playlist",
     "tooltip_remove_all_items_playlist" : "Retirer tous les éléments de la playlist",
@@ -440,6 +442,7 @@
 
     "tooltip_playlist_button" : "Ouvrir la playlist",
     "tooltip_shot_detail_button" : "Ouvrir les informations du plan",
+    "tooltip_annotation_button" : "Ouvrir les annotations",
 
     "messagebox_fullscreen_experimental" : "La fonctionnalité de plein écran du logiciel est en cours de développement.",
 

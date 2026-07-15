@@ -199,6 +199,8 @@
     "remove" : "Rimuovi",
     "edit" : "Modifica",
     "annotation" : "Annotazione",
+    "annotation_name" : "Nome",
+    "annotation_note" : "Nota",
     "remove_all" : "Rimuovi tutto",
     "remove_all_items_playlist" : "Rimuovi playlist",
     "tooltip_remove_all_items_playlist" : "Rimuovi tutti gli elementi della playlist",
@@ -440,6 +442,7 @@
 
     "tooltip_playlist_button" : "Apri playlist",
     "tooltip_shot_detail_button" : "Apri informazioni dell'inquadratura",
+    "tooltip_annotation_button" : "Apri annotazioni",
 
     "messagebox_fullscreen_experimental" : "La funzionalità schermo intero del software è attualmente in fase di sviluppo.",
 

@@ -29,8 +29,11 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
     m_addAnnotationBtn = new ToolbarButton(this, "plus_white");
     connect(m_addAnnotationBtn, &QPushButton::clicked, this, &AnnotationPanel::annotationCreationDialog);
 
+    m_filterByColorBtn = new ToolbarButton(this, "filter_color_white");
+    connect(m_filterByColorBtn, &QPushButton::clicked, this, &AnnotationPanel::openColorPicker);
 
     buttonLayout->addWidget(m_addAnnotationBtn);
+    buttonLayout->addWidget(m_filterByColorBtn);
     buttonLayout->addStretch();
 
     m_layout->addLayout(buttonLayout);
@@ -149,4 +152,34 @@ void AnnotationPanel::annotationEditionDialog(int annotationId)
     if(dialog.exec() == QDialog::Accepted)
         emit updateAnnotationRequested(dialog.annotation());
 
+}
+
+void AnnotationPanel::filterBy(const QColor& color)
+{
+    m_filterColor = color;
+
+    if(!color.isValid()){ // none selected, show all
+        m_filterByColorBtn->setStyleSheet("");
+        for (auto &&item : m_items)
+        {
+            item->show();
+        }
+    }else {
+        // updates the border color of m_filterByColorBtn and hides non corresponding widgets
+        m_filterByColorBtn->setStyleSheet(
+            QString("border: 2px solid %1; border-radius: 4px;").arg(color.name()));
+        for (auto &&item : m_items)
+        {
+            const Annotation& annot = item->annot();
+            item->setVisible(annot.color == color);
+        }
+    }
+    
+}
+
+void AnnotationPanel::openColorPicker()
+{
+    IconHelper::execColorPickerMenu(this, m_filterByColorBtn, true, [this](const QColor& color){
+        filterBy(color);
+    });
 }

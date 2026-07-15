@@ -9,6 +9,7 @@
 #include "Annotation.h"
 #include "AnnotationWidget.h"
 #include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
 class AnnotationPanel : public QWidget
 {
@@ -31,7 +32,7 @@ private:
     QVBoxLayout* m_layout = nullptr;
     QVBoxLayout* m_itemsLayout = nullptr;
     ToolbarButton* m_addAnnotationBtn = nullptr;
-    ToolbarButton* m_filterByColorBtn = nullptr;
+    ToolbarToggleHoverButton* m_filterByColorBtn = nullptr;
     QColor m_filterColor = QColor();
 
 private slots:
@@ -42,8 +43,6 @@ private slots:
 
     void annotationCreationDialog();
     void annotationEditionDialog(int annotationId);
-
-    void openColorPicker();
 
 };
 

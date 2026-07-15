@@ -74,9 +74,8 @@ namespace IconHelper
     /// @brief Opens a color picker menu below anchor
     /// @param parent parent of the menu
     /// @param anchor widget under which the menu is shown
-    /// @param includeNone adds a "none" entry with an invalid color at the top
     /// @param onColorSelected called when the color is selected
-    inline void execColorPickerMenu(QWidget* parent, QWidget* anchor, bool includeNone,
+    inline void execColorPickerMenu(QWidget* parent, QWidget* anchor,
                                     const std::function<void(const QColor&)>& onColorSelected)
     {
         QMenu menu(parent);
@@ -88,9 +87,6 @@ namespace IconHelper
                 onColorSelected(color);
             });
         };
-
-        if (includeNone)
-            addColorAction(PrefManager::instance().getText("none"), QColor());
 
         for (const auto& [colorName, color] : colorPalette())
             addColorAction(colorName, color);

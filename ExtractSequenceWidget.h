@@ -48,6 +48,8 @@ private:
     QTimer* m_thumbnailEndTimer;
     int m_thumbnailPendingTime;
     QPushButton* m_okButton;
+    QPushButton* m_losslessButton;
+    QPushButton* m_reencodeButton;
     QPushButton* m_audioOnlyButton;
     QPushButton* m_cancelButton;
 

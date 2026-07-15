@@ -52,6 +52,8 @@ void ExtractSequenceWidget::createButtons()
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     m_okButton = new QPushButton(PrefManager::instance().getText("extract_sequence_action"));
+    m_losslessButton = new QPushButton(PrefManager::instance().getText("extract_sequence_lossless_action"));
+    m_reencodeButton = new QPushButton(PrefManager::instance().getText("extract_sequence_reencode_action"));
     m_audioOnlyButton = new QPushButton(PrefManager::instance().getText("extract_sequence_audio_only_action"));
     m_cancelButton = new QPushButton(PrefManager::instance().getText("cancel_action"));
     m_startFrameDisplay = new AspectRatioPixmapLabel();
@@ -62,7 +64,13 @@ void ExtractSequenceWidget::createButtons()
     m_thumbnailWorker->start();
     connect(m_okButton, &QPushButton::released, this, [this](){
         confirmExtraction(SequenceExtractionHelper::ExtractionType::Original);
-    });    
+    });
+    connect(m_losslessButton, &QPushButton::released, this, [this](){
+        confirmExtraction(SequenceExtractionHelper::ExtractionType::Lossless);
+    });
+    connect(m_reencodeButton, &QPushButton::released, this, [this](){
+        confirmExtraction(SequenceExtractionHelper::ExtractionType::Reencode);
+    });
     connect(m_audioOnlyButton, &QPushButton::released, this, [this](){
         confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
     });
@@ -102,6 +110,8 @@ void ExtractSequenceWidget::initUiLayout()
     QHBoxLayout *confirmLayout = new QHBoxLayout();
     confirmLayout->addStretch();
     confirmLayout->addWidget(m_okButton);
+    confirmLayout->addWidget(m_losslessButton);
+    confirmLayout->addWidget(m_reencodeButton);
     confirmLayout->addWidget(m_audioOnlyButton);
     confirmLayout->addWidget(m_cancelButton);
 
@@ -162,12 +172,23 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
         + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
     if(saveSequencePath != ""){
         // On garde seulement la base du nom sans l'extension avec un split
-        SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper();
+        SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_media.filePath(), m_startTime, m_endTime);
         connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this](const int exitCode){
             if(exitCode == 1)
                 this->accept();
         });
-        sequenceExtractor->preciseExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
+        switch(type){
+        case SequenceExtractionHelper::ExtractionType::Original:
+        case SequenceExtractionHelper::ExtractionType::AudioOnly:
+            sequenceExtractor->extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
+            break;
+        case SequenceExtractionHelper::ExtractionType::Lossless:
+            sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
+            break;
+        case SequenceExtractionHelper::ExtractionType::Reencode:
+            sequenceExtractor->reencodeExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
+            break;
+        }
         QFileInfo fileInfo (saveSequencePath);
         prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());
     }

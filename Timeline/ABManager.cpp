@@ -63,7 +63,7 @@ void ABManager::extractLoop()
 
     selectedPath += '.' + mediaFileInfo.suffix();
 
-    SequenceExtractionHelper *ffmpegProcess = new SequenceExtractionHelper();
+    SequenceExtractionHelper *ffmpegProcess = new SequenceExtractionHelper(mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time());
     connect(ffmpegProcess, &SequenceExtractionHelper::extractionFinished, this, [this, selectedPath, ffmpegProcess](const int exitCode) {
         if (exitCode < 1) {
             emit loopExtractionFailed();
@@ -72,10 +72,7 @@ void ABManager::extractLoop()
         }
         ffmpegProcess->deleteLater();
     });
-    ffmpegProcess->preciseExtractSequence(
-        mediaFileInfo.filePath(), 
-        m_markers[0]->time(), 
-        m_markers[1]->time(), 
+    ffmpegProcess->extractSequenceLossless(
         selectedPath
     );
 

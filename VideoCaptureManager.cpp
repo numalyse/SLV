@@ -76,8 +76,8 @@ void VideoCaptureManager::endMediaRecording(const int endTime, const QString& sa
     if(!m_mediaFile.exists() || m_startRecordTime == -1) return;
 
     QString concatVideoName = m_concatRecordNumber != 0 ? m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix() : savePath;
-    SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper();
-    sequenceExtractor->preciseExtractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, concatVideoName);
+    SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_mediaFile.filePath(), m_startRecordTime, endTime);
+    sequenceExtractor->extractSequenceLossless(concatVideoName);
     connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, concatVideoName, savePath](const int exitCode){
         if(exitCode != 1){
             deleteMediaTempDirectory();

@@ -445,8 +445,8 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
             PrefManager::instance().getPref("Paths", "lp_extract_sequence")
                 + '/' + p_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, p_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, p_media->fps()));
         if(saveSequencePath != ""){
-            SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper();
-            sequenceExtractor->preciseExtractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
+            SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(p_media->filePath(), item->shot().start, item->shot().end);
+            sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
             connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, sequenceExtractor, saveSequencePath](const int exitCode){
                 if (exitCode == 1){
                     exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);

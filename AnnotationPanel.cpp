@@ -61,8 +61,8 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
     });
 
     buttonLayout->addWidget(m_addAnnotationBtn);
-    buttonLayout->addWidget(m_filterByColorBtn);
     buttonLayout->addStretch();
+    buttonLayout->addWidget(m_filterByColorBtn);
 
     m_layout->addLayout(buttonLayout);
 
@@ -79,7 +79,6 @@ void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)
 
     connect(item, &AnnotationWidget::removeAnnotationRequested, this, &AnnotationPanel::removeAnnotationRequested);
     connect(item, &AnnotationWidget::updateAnnotationRequested, this, &AnnotationPanel::updateAnnotationRequested);
-    connect(item, &AnnotationWidget::editAnnotationRequested, this, &AnnotationPanel::annotationEditionDialog);
     connect(item, &AnnotationWidget::annotationClicked, this, &AnnotationPanel::annotationClicked);
 
     if(checkOrder){
@@ -174,21 +173,6 @@ void AnnotationPanel::annotationCreationDialog()
     }
 }
 
-void AnnotationPanel::annotationEditionDialog(int annotationId)
-{
-    const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
-
-    auto it = std::find_if(annotations.cbegin(), annotations.cend(), [annotationId](const Annotation& a){ return a.id == annotationId; });
-    if (it == annotations.cend()) {
-        qDebug() << "[AnnotationPanel] edit requested, could not find annotation with id " << annotationId;
-        return;
-    }
-
-    AnnotationDialog dialog(this, *it);
-    if(dialog.exec() == QDialog::Accepted)
-        emit updateAnnotationRequested(dialog.annotation());
-
-}
 
 void AnnotationPanel::filterBy(const QColor& color)
 {

@@ -42,8 +42,6 @@ private slots:
     void rebuild();
 
     void annotationCreationDialog();
-    void annotationEditionDialog(int annotationId);
-
 };
 
 

@@ -214,6 +214,8 @@
     "tooltip_drawing_mode" : "Modo de dibujo",
     "tooltip_pencil_tool" : "Lápiz",
     "tooltip_color_tool" : "Color",
+    "tooltip_filter_on" : "Desactivar el filtro por color",
+    "tooltip_filter_off" : "Filtrar anotaciones por color",
     "white" : "Blanco",
     "black" : "Negro",
     "red" : "Rojo",

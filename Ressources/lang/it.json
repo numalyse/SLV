@@ -213,6 +213,8 @@
     "tooltip_drawing_mode" : "Modalità disegno",
     "tooltip_pencil_tool" : "Matita",
     "tooltip_color_tool" : "Colore",
+    "tooltip_filter_on" : "Disattiva il filtro per colore",
+    "tooltip_filter_off" : "Filtra le annotazioni per colore",
     "white" : "Bianco",
     "black" : "Nero",
     "red" : "Rosso",

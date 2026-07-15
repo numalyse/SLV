@@ -214,6 +214,8 @@
     "tooltip_drawing_mode" : "Drawing Mode",
     "tooltip_pencil_tool" : "Pencil",
     "tooltip_color_tool" : "Color",
+    "tooltip_filter_on" : "Disable color filter",
+    "tooltip_filter_off" : "Filter annotations by color",
     "white" : "White",
     "black" : "Black",
     "red" : "Red",

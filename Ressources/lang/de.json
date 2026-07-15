@@ -213,6 +213,8 @@
     "tooltip_drawing_mode" : "Zeichenmodus",
     "tooltip_pencil_tool" : "Stift",
     "tooltip_color_tool" : "Farbe",
+    "tooltip_filter_on" : "Farbfilter deaktivieren",
+    "tooltip_filter_off" : "Anmerkungen nach Farbe filtern",
     "white" : "Weiß",
     "black" : "Schwarz",
     "red" : "Rot",

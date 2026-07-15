@@ -213,6 +213,8 @@
     "tooltip_drawing_mode" : "Mode Dessin",
     "tooltip_pencil_tool" : "Crayon",
     "tooltip_color_tool" : "Couleur",
+    "tooltip_filter_on" : "Désactiver le filtre par couleur",
+    "tooltip_filter_off" : "Filtrer les annotations par couleur",
     "white" : "Blanc",
     "black" : "Noir",
     "red" : "Rouge",

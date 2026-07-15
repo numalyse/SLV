@@ -8,6 +8,7 @@
     "tooltip_play": "Play",
     "tooltip_pause": "Pause",
     "tooltip_stop" : "Stop",
+    "tooltip_stop_info" : "Reset timecode to 0",
     "tooltip_eject" : "Eject media",
     "tooltip_mute": "Mute video",
     "tooltip_fullscreen": "Fullscreen",

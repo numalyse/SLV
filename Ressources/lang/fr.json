@@ -8,6 +8,7 @@
     "tooltip_play" : "Lecture",
     "tooltip_pause" : "Pause",
     "tooltip_stop" : "Stop",
+    "tooltip_stop_info" : "Remet le timecode à 0",
     "tooltip_eject" : "Éjecter",
     "tooltip_mute" : "Couper le son",
     "tooltip_fullscreen" : "Plein écran",

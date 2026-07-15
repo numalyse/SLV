@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVector>
 #include <QVBoxLayout>
+#include <QColor>
 
 #include "Annotation.h"
 #include "AnnotationWidget.h"
@@ -23,11 +24,15 @@ signals:
     void annotationClicked(int annotationId);
 
 private:
-    void createItem(const Annotation& annotation);
+    void createItem(const Annotation& annotation, bool checkOrder);
+    void filterBy(const QColor& color);
 
     QVector<AnnotationWidget*> m_items;
     QVBoxLayout* m_layout = nullptr;
+    QVBoxLayout* m_itemsLayout = nullptr;
     ToolbarButton* m_addAnnotationBtn = nullptr;
+    ToolbarButton* m_filterByColorBtn = nullptr;
+    QColor m_filterColor = QColor();
 
 private slots:
     void onAnnotationAdded(Annotation& annotation);
@@ -37,6 +42,8 @@ private slots:
 
     void annotationCreationDialog();
     void annotationEditionDialog(int annotationId);
+
+    void openColorPicker();
 
 };
 

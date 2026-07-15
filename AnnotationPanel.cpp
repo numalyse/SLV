@@ -1,11 +1,12 @@
 #include "AnnotationPanel.h"
 #include "AnnotationDialog.h"
-
+#include "IconHelper.h"
 #include "Project/ProjectManager.h"
+
+#include <algorithm>
 
 AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
 {
-
     auto* annotations = ProjectManager::instance().annotationManager();
 
     connect(annotations, &AnnotationManager::annotationAdded,   this, &AnnotationPanel::onAnnotationAdded);
@@ -22,29 +23,51 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
 
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(4);
-    m_layout->setAlignment(Qt::AlignTop);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
 
     m_addAnnotationBtn = new ToolbarButton(this, "plus_white");
     connect(m_addAnnotationBtn, &QPushButton::clicked, this, &AnnotationPanel::annotationCreationDialog);
 
-    m_layout->addWidget(m_addAnnotationBtn);
 
+    buttonLayout->addWidget(m_addAnnotationBtn);
+    buttonLayout->addStretch();
+
+    m_layout->addLayout(buttonLayout);
+
+    m_itemsLayout = new QVBoxLayout();
+    m_itemsLayout->setSpacing(4);
+    m_layout->addLayout(m_itemsLayout);
+
+    m_layout->addStretch();
 }
 
-void AnnotationPanel::createItem(const Annotation& annotation)
+void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)
 {
     AnnotationWidget* item = new AnnotationWidget(this, annotation);
 
     connect(item, &AnnotationWidget::removeAnnotationRequested, this, &AnnotationPanel::removeAnnotationRequested);
+    connect(item, &AnnotationWidget::updateAnnotationRequested, this, &AnnotationPanel::updateAnnotationRequested);
     connect(item, &AnnotationWidget::editAnnotationRequested, this, &AnnotationPanel::annotationEditionDialog);
     connect(item, &AnnotationWidget::annotationClicked, this, &AnnotationPanel::annotationClicked);
 
-    m_items.append(item);
-    m_layout->addWidget(item);
+    if(checkOrder){
+        // get first item where start > new annot end
+        auto upperBound = std::upper_bound(m_items.cbegin(), m_items.cend(), annotation.end, [](int64_t annotEnd, AnnotationWidget* annotItem){
+            return annotEnd < annotItem->annot().start;
+        });
+
+        int index = upperBound - m_items.cbegin();
+        m_items.insert(index, item);
+        m_itemsLayout->insertWidget(index, item);
+    }else {
+        m_items.append(item);
+        m_itemsLayout->addWidget(item);
+    }
 }
 
 void AnnotationPanel::onAnnotationAdded(Annotation& annotation){
-    createItem(annotation);
+    createItem(annotation, true);
 }
 
 void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
@@ -54,7 +77,25 @@ void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
         return;
     }
 
-    (*it)->updateAnnotation(annotation);
+    AnnotationWidget* item = *it;
+    item->updateAnnotation(annotation);
+
+    // reposition the item to keep the list chronologically ordered
+    int oldIndex = it - m_items.cbegin();
+    m_items.remove(oldIndex);
+
+    auto upperBound = std::upper_bound(m_items.cbegin(), m_items.cend(), annotation.end, [](int64_t annotEnd, AnnotationWidget* annotItem){
+        return annotEnd < annotItem->annot().start;
+    });
+
+    int newIndex = upperBound - m_items.cbegin();
+    m_items.insert(newIndex, item);
+
+    // only updates the widget when index changed after reposition
+    if(newIndex != oldIndex){
+        m_itemsLayout->removeWidget(item);
+        m_itemsLayout->insertWidget(newIndex, item);
+    }
 }
 
 void AnnotationPanel::onAnnotationRemoved(int annotationId){
@@ -78,14 +119,16 @@ void AnnotationPanel::rebuild(){
 
     m_items.clear();
 
+    // do not check chronological order while rebuilding as annotations should be ordered
     for(auto&& annotation : annotations){
-        createItem(annotation);
+        createItem(annotation, false);
     }
 }
 
 void AnnotationPanel::annotationCreationDialog()
 {
-    AnnotationDialog dialog(this);
+    //int64_t end = 
+    AnnotationDialog dialog(this, {});
     if(dialog.exec() == QDialog::Accepted){
         Annotation annotation = dialog.annotation();
         emit addAnnotationRequested(annotation);

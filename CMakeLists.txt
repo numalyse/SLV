@@ -79,6 +79,7 @@ set(PROJECT_SOURCES
 
     PrefManager.h PrefManager.cpp
     TimeFormatter.h
+    IconHelper.h
     VlcParseHelper.h
     VlcInstance.h
     Shot.h

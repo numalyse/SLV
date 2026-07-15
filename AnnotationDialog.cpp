@@ -2,6 +2,7 @@
 #include "PrefManager.h"
 #include "TimeFormatter.h"
 #include "Project/ProjectManager.h"
+#include "IconHelper.h"
 
 #include <QColorDialog>
 #include <QGridLayout>
@@ -86,11 +87,12 @@ void AnnotationDialog::initUiLayout()
 
 void AnnotationDialog::openColorPicker()
 {
-    QColor color = QColorDialog::getColor(m_color, this, PrefManager::instance().getText("tooltip_color_tool"));
-    if(color.isValid()){
-        m_color = color;
-        updateColorButton();
-    }
+    IconHelper::execColorPickerMenu(this, m_colorBtn, false, [this](const QColor& color){
+        if(color.isValid()){
+            m_color = color;
+            updateColorButton();
+        }
+    });
 }
 
 void AnnotationDialog::updateColorButton()

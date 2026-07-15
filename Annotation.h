@@ -10,7 +10,7 @@ struct Annotation
     int64_t end;
     QString name;
     QString note;
-    QColor color = QColor(79, 134, 198, 255);
+    QColor color = QColor{118, 1, 136, 255};
     int id;
 };
 

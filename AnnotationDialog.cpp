@@ -15,7 +15,7 @@ AnnotationDialog::AnnotationDialog(QWidget* parent, const Annotation& annotation
 
     Media* media = ProjectManager::instance().media();
     m_maxDuration = media ? media->duration() : 0;
-    m_fps = (media && media->fps() > 0.0) ? media->fps() : 25.0;
+    m_fps = (media && media->fps() > 0.0) ? media->fps() : 1.0;
 
     m_startEdit = new QLineEdit(TimeFormatter::msToHHMMSSFF(m_annotation.start, m_fps));
     m_endEdit = new QLineEdit(TimeFormatter::msToHHMMSSFF(m_annotation.end, m_fps));

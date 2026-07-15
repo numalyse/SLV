@@ -24,7 +24,7 @@ private:
     void updateColorButton();
 
     Annotation m_annotation;
-    double m_fps = 25.0;
+    double m_fps = 1.0;
     int64_t m_maxDuration = 0;
     QColor m_color;
 

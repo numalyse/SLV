@@ -93,8 +93,9 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>");
 
+    m_stopBtn->hide();
+
     QHBoxLayout* customStopBtnLayout = new QHBoxLayout();
-    QWidget* customStopBtnWidget = new QWidget(this);
 
     m_customStopCheckbox = new QCheckBox(this);
     createStopTimeEdit();
@@ -187,7 +188,8 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
     connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
     connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, m_zoomIndicator, [this]{ m_zoomIndicator->setText(""); });
-    
+    connect(m_customStopBtn, &ToolbarToggleHoverButton::released, this, [this] { emit customStopRequest(m_customStopTimeEdit->text()); });
+
     setDefaultUI();
     disableButtons();
 
@@ -227,7 +229,7 @@ void SimpleToolbar::setDefaultUI()
     m_removePlayerBtn->show();
     m_extractSequenceBtn->show();
     m_mediaInfoBtn->show();
-    m_stopBtn->show();
+    // m_stopBtn->show();
     m_ejectBtn->show();
     m_fullscreenBtn->show();
 
@@ -625,18 +627,18 @@ void SimpleToolbar::createTimeEdit(){
 }
 
 void SimpleToolbar::createStopTimeEdit(){
-    m_customStopTimeEdit = new TimeEdit("00:00:00.00", this);
+    m_customStopTimeEdit = new TimeEdit("00:00:00.00", this, false);
 
-    connect(m_customStopTimeEdit, &TimeEdit::focusIn, this, [this](){
+    // connect(m_customStopTimeEdit, &TimeEdit::focusIn, this, [this](){
 
-    });
+    // });
 
-    connect(m_customStopTimeEdit, &TimeEdit::focusOut, this, [this](){
+    // connect(m_customStopTimeEdit, &TimeEdit::focusOut, this, [this](){
 
-    });
+    // });
 
-    connect(m_customStopTimeEdit, &QLineEdit::textEdited, this, [this](){
-    });
+    // connect(m_customStopTimeEdit, &QLineEdit::textEdited, this, [this](){
+    // });
 
     connect(m_customStopTimeEdit, &QLineEdit::returnPressed, [this]() {
         m_customStopTimeEdit->clearFocus(); 

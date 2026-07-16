@@ -52,7 +52,7 @@ public slots:
     void playFromAdvanced();
     void pause();
     void togglePlayPause(bool isPlaying);
-    void stop();
+    void stop(const int64_t stopValue = 0);
     void eject();
     void enablePlayerFullscreen();
     void disablePlayerFullscreen();

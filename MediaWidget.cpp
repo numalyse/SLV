@@ -201,11 +201,10 @@ void MediaWidget::togglePlayPause()
 }
 
 /// @brief Set the media player position to 0 and pause
-bool MediaWidget::stop()
+bool MediaWidget::stop(const int64_t newValueStop)
 {
     if (!m_player || !m_media) return false;
 
-    int64_t newValueStop = 0;
     pause();
     if (newValueStop == 0) {
         libvlc_media_player_set_position(m_player, 0.0);

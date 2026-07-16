@@ -32,9 +32,20 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
     // color buttons shown in the popup when hovering the filter button
     QHBoxLayout* filterColorsLayout = new QHBoxLayout();
     for (const auto& [colorName, color] : IconHelper::colorPalette()) {
-        ToolbarButton* colorBtn = new ToolbarButton(this, " ", colorName);
+        ToolbarToggleButton* colorBtn = new ToolbarToggleButton(this, false, " ", colorName, " ", colorName);
         colorBtn->setIcon(IconHelper::genIconPreviewColor(color, color == QColor{255, 255, 255, 255}));
-        connect(colorBtn, &ToolbarButton::clicked, this, [this, color](){ filterBy(color); });
+        connect(colorBtn, &ToolbarButton::clicked, this, [this, colorBtn, color](){ 
+            if(colorBtn->isChecked()){
+                colorBtn->setStyleSheet(QString("border: 2px solid %1; border-radius: 4px;").arg(color.name()));
+                m_filterColors.append(color);
+            } 
+            else {
+                colorBtn->setStyleSheet("");
+                m_filterColors.removeAll(color);
+            }
+
+            filterBy(m_filterColors); 
+        });
         filterColorsLayout->addWidget(colorBtn);
     }
 
@@ -51,13 +62,13 @@ AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
 
     // clicking the button restores the last color filter or disables it
     connect(m_filterByColorBtn, &ToolbarToggleButton::stateActivated, this, [this](){
-        if (m_filterColor.isValid())
-            filterBy(m_filterColor);
+        if( !m_filterColors.isEmpty() )
+            filterBy(m_filterColors);
         else
             m_filterByColorBtn->setButtonState(false); // no color picked yet, nothing to filter
     });
     connect(m_filterByColorBtn, &ToolbarToggleButton::stateDeactivated, this, [this](){
-        filterBy(QColor());
+        filterBy({});
     });
 
     buttonLayout->addWidget(m_addAnnotationBtn);
@@ -97,7 +108,7 @@ void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)
 
     // if filter by color is on hide if necessary
     if(m_filterByColorBtn->isChecked())
-        item->setVisible(annotation.color == m_filterColor);
+        item->setVisible(m_filterColors.contains(annotation.color));
 }
 
 void AnnotationPanel::onAnnotationAdded(Annotation& annotation){
@@ -116,7 +127,7 @@ void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
 
     // if filter by color is on hide if necessary
     if(m_filterByColorBtn->isChecked())
-        item->setVisible(annotation.color == m_filterColor);
+        item->setVisible(m_filterColors.contains(annotation.color));
 
     // reposition the item to keep the list chronologically ordered
     int oldIndex = it - m_items.cbegin();
@@ -174,28 +185,23 @@ void AnnotationPanel::annotationCreationDialog()
 }
 
 
-void AnnotationPanel::filterBy(const QColor& color)
+void AnnotationPanel::filterBy(const QVector<QColor>& colors)
 {
-    bool active = color.isValid();
-    if(active) // remembered so the toggle button can restore the last filter
-        m_filterColor = color;
+    bool inactive = colors.isEmpty();
 
-    m_filterByColorBtn->setButtonState(active);
+    m_filterByColorBtn->setButtonState(!inactive);
 
-    if(!active){ // filter disabled, show all
-        m_filterByColorBtn->setStyleSheet("");
+    if(inactive){ // filter disabled, show all
         for (auto &&item : m_items)
         {
             item->show();
         }
     }else {
-        // updates the border color of m_filterByColorBtn and hides non corresponding widgets
-        m_filterByColorBtn->setStyleSheet(
-            QString("border: 2px solid %1; border-radius: 4px;").arg(color.name()));
+        // hides non corresponding widgets
         for (auto &&item : m_items)
         {
             const Annotation& annot = item->annot();
-            item->setVisible(annot.color == color);
+            item->setVisible( colors.contains(annot.color) );
         }
     }
 

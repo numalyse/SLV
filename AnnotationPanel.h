@@ -9,6 +9,7 @@
 #include "Annotation.h"
 #include "AnnotationWidget.h"
 #include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
 class AnnotationPanel : public QWidget
@@ -26,14 +27,14 @@ signals:
 
 private:
     void createItem(const Annotation& annotation, bool checkOrder);
-    void filterBy(const QColor& color);
+    void filterBy(const QVector<QColor>& color);
 
     QVector<AnnotationWidget*> m_items;
     QVBoxLayout* m_layout = nullptr;
     QVBoxLayout* m_itemsLayout = nullptr;
     ToolbarButton* m_addAnnotationBtn = nullptr;
     ToolbarToggleHoverButton* m_filterByColorBtn = nullptr;
-    QColor m_filterColor = QColor();
+    QVector<QColor> m_filterColors;
 
 private slots:
     void onAnnotationAdded(Annotation& annotation);

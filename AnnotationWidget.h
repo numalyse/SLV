@@ -8,6 +8,7 @@
 #include <QFrame>
 #include <QTextEdit>
 #include <QLineEdit>
+#include <QImage>
 
 #include "Annotation.h"
 #include "ToolbarButtons/ToolbarButton.h"
@@ -66,8 +67,14 @@ private:
 
     QHBoxLayout* m_topRowLayout = nullptr;
     QVBoxLayout* m_timeLayout = nullptr;
+    QVBoxLayout* m_contentLayout = nullptr;
+    QVBoxLayout* m_infoLayout = nullptr;
 
     QFrame* m_colorBar = nullptr;
+    QLabel* m_mediaThumbnailLabel = nullptr;
+    static constexpr QSize m_thumbnailSize {64, 36};
+    QPixmap *m_mediaThumbnailImage = nullptr;
+    qint64 m_thumbnailTimeMs = -1; // start time of the currently displayed thumbnail
     QLabel* m_startLabel = nullptr;
     QLabel* m_endLabel = nullptr;
     QLabel* m_nameLabel = nullptr;

@@ -28,19 +28,29 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
 #endif
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(6,4,6,4);
-    mainLayout->setSpacing(8);
+    mainLayout->setContentsMargins(3,4,3,4);
+    mainLayout->setSpacing(2);
 
     m_colorBar = new QFrame();
     m_colorBar->setFixedWidth(6);
     mainLayout->addWidget(m_colorBar);
 
+    m_mediaThumbnailLabel = new QLabel();
+    m_mediaThumbnailLabel->setFixedSize(m_thumbnailSize);
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        m_mediaThumbnailImage = new QPixmap(":/icons/image_preview_white");
+    } else {
+        m_mediaThumbnailImage = new QPixmap(":/icons/image_preview");
+    }
+    m_mediaThumbnailLabel->setPixmap(m_mediaThumbnailImage->scaled(20,20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    m_mediaThumbnailLabel->setAlignment(Qt::AlignCenter);
+
     // column holding the top row and the note editor below it
-    QVBoxLayout *contentLayout = new QVBoxLayout();
-    contentLayout->setSpacing(4);
+    m_contentLayout = new QVBoxLayout();
+    m_contentLayout->setSpacing(2);
 
     m_topRowLayout = new QHBoxLayout();
-    m_topRowLayout->setSpacing(8);
+    m_topRowLayout->setSpacing(2);
 
     // for start / end timecodes
     m_timeLayout = new QVBoxLayout();
@@ -52,7 +62,7 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     // fixed size so they stay in place when switching between display and edit mode
     for(QLabel* timeLabel : {m_startLabel, m_endLabel}){
         timeLabel->setAlignment(Qt::AlignCenter);
-        timeLabel->setFixedSize(90, 20);
+        timeLabel->setFixedSize(70, 20);
     }
 
     m_startEdit = new QLineEdit();
@@ -60,7 +70,7 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     for(QLineEdit* timeEdit : {m_startEdit, m_endEdit}){
         timeEdit->setInputMask("99:99:99.99");
         timeEdit->setAlignment(Qt::AlignCenter);
-        timeEdit->setFixedSize(90, 20);
+        timeEdit->setFixedSize(70, 20);
         timeEdit->hide();
     }
 
@@ -69,13 +79,14 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     m_timeLayout->addWidget(m_startEdit);
     m_timeLayout->addWidget(m_endEdit);
 
+    m_topRowLayout->addWidget(m_mediaThumbnailLabel);
     m_topRowLayout->addLayout(m_timeLayout);
-    // always pinned to the top so the timecodes don't move between modes
-    m_topRowLayout->setAlignment(m_timeLayout, Qt::AlignTop);
+    // the top row keeps the same height (42) in every mode, since the note lives below it,
+    // so the default vertical centering keeps the thumbnail aligned with the timecodes
 
     // bloc name / note
-    QVBoxLayout *infoLayout = new QVBoxLayout();
-    infoLayout->setSpacing(2);
+    m_infoLayout = new QVBoxLayout();
+    m_infoLayout->setSpacing(2);
 
     m_nameLabel = new QLabel();
     m_nameLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
@@ -86,11 +97,11 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     m_nameEdit = new QLineEdit();
     m_nameEdit->hide();
 
-    infoLayout->addWidget(m_nameLabel);
-    infoLayout->addWidget(m_noteLabel);
-    infoLayout->addWidget(m_nameEdit);
+    m_infoLayout->addWidget(m_nameLabel);
+    m_infoLayout->addWidget(m_noteLabel);
+    m_infoLayout->addWidget(m_nameEdit);
 
-    m_topRowLayout->addLayout(infoLayout, 1);
+    m_topRowLayout->addLayout(m_infoLayout, 1);
     m_topRowLayout->addSpacing(10);
 
     m_updateBtn = new ToolbarButton(this, "edit_white", PrefManager::instance().getText("edit"));
@@ -110,15 +121,14 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     updateBtnLayout->addStretch();
 
     m_topRowLayout->addWidget(updateBtnContainer);
-    m_topRowLayout->setAlignment(updateBtnContainer, Qt::AlignTop);
 
-    contentLayout->addLayout(m_topRowLayout);
+    m_contentLayout->addLayout(m_topRowLayout);
 
     m_noteEdit = new QTextEdit();
     m_noteEdit->setFixedHeight(80);
     m_noteEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_noteEdit->hide();
-    contentLayout->addWidget(m_noteEdit);
+    m_contentLayout->addWidget(m_noteEdit);
 
     // grow the note editor with its content, queued so the resize happens later once everything is set
     connect(m_noteEdit->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged,
@@ -160,9 +170,9 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     editActionsLayout->addWidget(m_cancelBtn);
     editActionsLayout->addWidget(m_deleteBtn);
 
-    contentLayout->addLayout(editActionsLayout);
+    m_contentLayout->addLayout(editActionsLayout);
 
-    mainLayout->addLayout(contentLayout, 1);
+    mainLayout->addLayout(m_contentLayout, 1);
 
     m_clickTimer = new QTimer(this);
     m_clickTimer->setSingleShot(true);
@@ -209,7 +219,8 @@ void AnnotationWidget::refreshContent()
     
     m_nameLabel->setText(m_annotation.name);
     m_noteLabel->setText(m_annotation.note);
-    m_noteLabel->setToolTip(m_annotation.note);
+    if (m_mode == Mode::Minimized)
+        m_noteLabel->setToolTip(m_annotation.note);
 
     // keep the edit fields in sync with the annotation
     if (m_mode == Mode::Edited) {
@@ -230,9 +241,30 @@ void AnnotationWidget::setMode(Mode mode)
 
     m_mode = mode;
     bool isEditMode = (m_mode == Mode::Edited);
-    
+
     if (isEditMode)
         refreshContent(); // populates the edit fields since m_mode is already Edited
+
+    // in extended mode the note moves under the top row, in the note editor slot,
+    // so display and edit mode are the same
+    if (m_mode == Mode::Extended) {
+        if (m_contentLayout->indexOf(m_noteLabel) == -1) {
+            m_infoLayout->removeWidget(m_noteLabel);
+            m_contentLayout->insertWidget(1, m_noteLabel);
+        }
+        m_noteLabel->setContentsMargins(5, 3, 5, 3);
+        m_noteLabel->setToolTip("");
+        m_noteLabel->setWordWrap(true);
+        // matches the note editor frame + document margins so the text lines up
+    } else {
+        if (m_infoLayout->indexOf(m_noteLabel) == -1) {
+            m_contentLayout->removeWidget(m_noteLabel);
+            m_infoLayout->insertWidget(1, m_noteLabel);
+        }
+        m_noteLabel->setContentsMargins(0, 0, 0, 0);
+        m_noteLabel->setToolTip(m_annotation.note);
+        m_noteLabel->setWordWrap(false);
+    }
 
     m_startLabel->setVisible(!isEditMode);
     m_endLabel->setVisible(!isEditMode);
@@ -296,16 +328,12 @@ void AnnotationWidget::updateColorButton()
 
 void AnnotationWidget::adjustNoteEditHeight()
 {
-    if (m_mode == Mode::Minimized)
-        m_noteLabel->setWordWrap(false);
-    else if (m_mode == Mode::Edited){
-        int chrome = m_noteEdit->height() - m_noteEdit->viewport()->height();
-        int docHeight = qCeil(m_noteEdit->document()->size().height());
-        m_noteEdit->setFixedHeight(qMax(80, docHeight + chrome));
-    }else {
-        m_noteLabel->setWordWrap(true);
-    }
+    if (m_mode != Mode::Edited)
+        return;
 
+    int chrome = m_noteEdit->height() - m_noteEdit->viewport()->height();
+    int docHeight = qCeil(m_noteEdit->document()->size().height());
+    m_noteEdit->setFixedHeight(qMax(80, docHeight + chrome));
 }
 
 void AnnotationWidget::updateAnnotation(const Annotation &annotation)
@@ -354,4 +382,3 @@ void AnnotationWidget::mouseDoubleClickEvent(QMouseEvent *event)
         setMode(Mode::Minimized);
     }
 }
-

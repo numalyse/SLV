@@ -119,6 +119,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         + PrefManager::instance().getText("tooltip_shortcut")
         + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>"
     );
+    m_customStopBtn->setIconSize(QSize(24, 24));
 
     m_loopBtn = new ToolbarToggleButton(
         this,
@@ -628,6 +629,7 @@ void SimpleToolbar::createTimeEdit(){
 
 void SimpleToolbar::createStopTimeEdit(){
     m_customStopTimeEdit = new TimeEdit("00:00:00.00", this, false);
+    m_customStopTimeEdit->setEnabled(false);
 
     // connect(m_customStopTimeEdit, &TimeEdit::focusIn, this, [this](){
 
@@ -642,6 +644,18 @@ void SimpleToolbar::createStopTimeEdit(){
 
     connect(m_customStopTimeEdit, &QLineEdit::returnPressed, [this]() {
         m_customStopTimeEdit->clearFocus(); 
+    });
+
+    connect(m_customStopCheckbox, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
+        QString userTheme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
+        if(state == Qt::Checked){
+            m_customStopTimeEdit->setEnabled(true);
+            m_customStopBtn->setIcon(QIcon(":/icons/custom_stop" + userTheme));
+        }
+        else{
+            m_customStopTimeEdit->setEnabled(false);
+            m_customStopBtn->setIcon(QIcon(":/icons/stop" + userTheme));
+        }
     });
 }
 

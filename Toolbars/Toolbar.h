@@ -48,7 +48,7 @@ public:
         
         m_stopBtn = new ToolbarButton(this, "stop_white", PrefManager::instance().getText("tooltip_stop") 
         + "<br>"
-        + PrefManager::instance().getText("tooltip_stop_info")
+        + PrefManager::instance().getText("tooltip_stop_info_global")
         + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
         + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>");

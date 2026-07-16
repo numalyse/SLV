@@ -186,5 +186,7 @@
         <file alias="music_note_grey">icons/music_note_grey.png</file>
         <file alias="open_in_new">icons/open_in_new.png</file>
         <file alias="open_in_new_white">icons/open_in_new_white.png</file>
+        <file alias="custom_stop">icons/custom_stop.png</file>
+        <file alias="custom_stop_white">icons/custom_stop_white.png</file>
     </qresource>
 </RCC>

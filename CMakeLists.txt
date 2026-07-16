@@ -181,6 +181,8 @@ if(APPLE)
         MacMouseTracker.mm
         MacSymLink.h
         MacSymLink.mm
+        MacWindowHelper.h
+        MacWindowHelper.mm
     )
 endif()
 

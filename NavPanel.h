@@ -60,7 +60,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    void updateThumbnail(int requestId, QImage image);
+    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image);
     void updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize);
     
 };

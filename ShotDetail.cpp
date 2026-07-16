@@ -112,7 +112,7 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     if(projMedia->filePath().isEmpty()){
         qDebug() << "[ShotDetail] Impossible de récuperer la tag image, le path du média du project est vide";
     }else {
-        emit updateImageRequested(-1, shotData->tagImageTime, 0, projMedia, m_imageSize);
+        emit updateImageRequested(0, shotData->tagImageTime, 0, projMedia, m_imageSize);
     }
 
 }

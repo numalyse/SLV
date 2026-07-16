@@ -49,7 +49,7 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
 
     connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
     connect(m_shotDetail, &ShotDetail::clearThumbnailQueueRequested, this, [this](){
-        p_thumbnailWorker->clearPriotityQueue(); // prevent having many images inside the priority queue
+        p_thumbnailWorker->clearPriorityQueue(); // prevent having many images inside the priority queue
     });
     
 }
@@ -120,11 +120,11 @@ void NavPanel::enableShotControlButtons()
 }
 
 void NavPanel::updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize){
-    if(media->type() == MediaType::Video) p_thumbnailWorker->requestThumbnail(requestId, time, length, media->filePath(), targetSize, media->sar());
+    if(media->type() == MediaType::Video) p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, requestId, time, length, media->filePath(), targetSize, media->sar());
 }
 
-void NavPanel::updateThumbnail(int imageId, QImage image){
-    if (imageId == -1){
+void NavPanel::updateThumbnail(ThumbnailWorker::Requester requester, int imageId, QImage image){
+    if (requester == ThumbnailWorker::Requester::ShotDetail){
         m_shotDetail->updateTagImage(image);
     }
 }

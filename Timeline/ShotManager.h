@@ -92,7 +92,7 @@ private:
     VideoCaptureManager m_videoCaptureManager;
 
 private slots:
-    void updateThumbnail(int requestId, QImage image);
+    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image);
 
 };
 

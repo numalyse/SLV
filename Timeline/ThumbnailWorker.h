@@ -10,49 +10,58 @@
 #include <QSize>
 #include <opencv2/opencv.hpp>
 
-struct ThumbnailRequest{
-    int requestId;
-    int64_t msStart;
-    int64_t shotLength;
-    QString videoPath;
-    QSize targetSize;
-    double sar{1.0}; 
-};
-
 class ThumbnailWorker : public QThread
 {
 Q_OBJECT
 
 public:
+    enum class Requester {
+        ShotDetail,   // requetes prioritaires : même si on a beaucoup d'images à charger, l'image du plan sera update meme apres une segmentation
+        TimelineShot,
+        ExtractSequence,
+        Annotation
+    };
+    Q_ENUM(Requester)
+
     explicit ThumbnailWorker(QObject* parent = nullptr);
     ~ThumbnailWorker();
 
     /// @brief will use opencv to read the frame, converts it to a QImage and then emits a signals so you can retrieve the image
+    /// @param requester Who is asking, re-emitted in thumbnailReady so listeners can filter; ShotDetail requests are prioritized
     /// @param requestId Id
     /// @param msStart Frame time in ms
     /// @param lenghtMs if == 0 will get the frame at msStart else if > 0 and > offset, will retrieve the frame at msStart + offset
     /// @param mediaPath Path of the media
     /// @param targetSize Target size of the thumnails, will use opencv to resize the frame
     /// @param sar Sample aspect ratio
-    void requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize = {100, 75}, double sar = 1.0);
+    void requestThumbnail(Requester requester, int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize = {100, 75}, double sar = 1.0);
     void stop();
     void clearQueue();
     void keepNQueue(const int n);
-    void clearPriotityQueue();
+    void clearPriorityQueue();
 
 public slots:
     void releaseOpenCvCap();
 
 signals:
-    void thumbnailReady(int requestId, const QImage& image);
+    void thumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
 
 protected:
     void run() override;
 
 private:
+    struct ThumbnailRequest{
+        Requester requester;
+        int requestId;
+        int64_t msStart;
+        int64_t shotLength;
+        QString videoPath;
+        QSize targetSize;
+        double sar{1.0};
+    };
+
     QQueue<ThumbnailRequest> m_queue;
-    // queue pour les requetes id < 0, dans shot detail, même si on a beaucoup d'images à charger, l'image du plan sera update meme apres une segmentation
-    QQueue<ThumbnailRequest> m_priorityQueue; 
+    QQueue<ThumbnailRequest> m_priorityQueue;
     QMutex m_mutex;
     QWaitCondition m_condition;
     bool m_stop = false;

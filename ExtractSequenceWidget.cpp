@@ -116,7 +116,7 @@ void ExtractSequenceWidget::requestStartFrameDisplay()
 {
     if(m_media.type() == MediaType::Video){
         m_thumbnailWorker->keepNQueue(2); // Pour clear la queue sauf 2 éléments (clearQueue empêche parfois d'afficher les frames sur un des deux)
-        m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
+        m_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ExtractSequence, 0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
     }
 }
 
@@ -124,12 +124,14 @@ void ExtractSequenceWidget::requestEndFrameDisplay()
 {
     if(m_media.type() == MediaType::Video){
         m_thumbnailWorker->keepNQueue(2);
-        m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
+        m_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ExtractSequence, 1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
     }
 }
 
-void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)
+void ExtractSequenceWidget::onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image)
 {
+    if(requester != ThumbnailWorker::Requester::ExtractSequence) return;
+
     QPixmap pixmap = QPixmap::fromImage(image);
     switch(requestId){
     case 0:

@@ -29,6 +29,10 @@
 ProjectManager::ProjectManager(QObject* parent) : QObject(parent)
 {
     m_annotationManager = new AnnotationManager(this);
+
+    connect(m_annotationManager, &AnnotationManager::annotationAdded, this, &ProjectManager::setSaveNeeded);
+    connect(m_annotationManager, &AnnotationManager::annotationUpdated, this, &ProjectManager::setSaveNeeded);
+    connect(m_annotationManager, &AnnotationManager::annotationRemoved, this, &ProjectManager::setSaveNeeded);
 }
 
 ProjectManager::~ProjectManager()
@@ -367,7 +371,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     Project* project = new Project{
         projectData.shots,
-        {}, // TODO : set annotations from the loaded project
+        projectData.annots,
         new Media(projectData.mediaAbsolutePath, this),
         QFileInfo(path).baseName(),
         path,
@@ -467,6 +471,9 @@ void ProjectManager::checkMediaFullyLoaded()
 
         emit loadMediaProjectRequested(paths);
         emit projectInitialized();
+        
+        m_annotationManager->setAnnotations(&m_project->annotations);
+
     } else if(m_isDurationParsed && m_isFpsParsed){
         // if fps or duration mismatched occured, prompt the user
         QStringList errors;

@@ -8,6 +8,7 @@
     "tooltip_play" : "Wiedergabe",
     "tooltip_pause" : "Pause",
     "tooltip_stop" : "Stopp",
+    "tooltip_stop_info" : "Setzt den Timecode auf 0 zurück",
     "tooltip_eject" : "Auswerfen",
     "tooltip_mute" : "Stummschalten",
     "tooltip_fullscreen" : "Vollbild",

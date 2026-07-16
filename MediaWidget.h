@@ -48,7 +48,7 @@ public:
 public slots:
     bool play();
     bool pause();
-    bool stop();
+    bool stop(const int64_t newValueStop = 0);
     bool eject();
     void parseTracks();
     void setAudioTrack(int trackId);

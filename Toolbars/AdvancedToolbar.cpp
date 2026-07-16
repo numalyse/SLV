@@ -244,6 +244,16 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     if (oldNameLabel && m_nameLabel) {
         m_nameLabel->setText(oldNameLabel->text());
     }
+
+    QString oldStopTimeEdit = toolbar->customStopTimeEdit()->text();
+    if (oldStopTimeEdit != "" && m_customStopTimeEdit) {
+        m_customStopTimeEdit->setText(oldStopTimeEdit);
+    }
+
+    bool oldStopCheckbox = toolbar->customStopCheckbox()->isChecked();
+    if (m_customStopCheckbox) {
+        m_customStopCheckbox->setChecked(oldStopCheckbox);
+    }
 }
 
 AdvancedToolbar::~AdvancedToolbar()
@@ -280,6 +290,7 @@ void AdvancedToolbar::setDefaultUI()
         mainLayout->setSpacing(1);
 
         m_nameLabel->hide();
+        m_stopBtn->hide();
 
         QHBoxLayout* timecodeLayout = new QHBoxLayout();
         timecodeLayout->addWidget(m_timeEdit);
@@ -302,7 +313,8 @@ void AdvancedToolbar::setDefaultUI()
 
         buttonLayout->addWidget(m_speedBtn);
         buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_customStopBtn);
+        //buttonLayout->addWidget(m_stopBtn); MODIF
         buttonLayout->addWidget(m_playPauseBtn);
         buttonLayout->addWidget(m_ejectBtn);
         buttonLayout->addWidget(m_nextMediaBtn);

@@ -58,7 +58,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
+    // connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
@@ -75,6 +75,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
     connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
     connect(m_toolBar, &SimpleToolbar::subtitlesFileDialogRequested, this, &PlayerWidget::openSubtitlesFileDialog);
+    connect(m_toolBar, &SimpleToolbar::customStopRequest, m_mediaWidget, [this](const QString& stopValue){
+        if(m_toolBar->customStopCheckbox()->isChecked())
+            this->mediaWidget()->stop(TimeFormatter::HHMMSSFFToMs(stopValue, m_media_fps, 0.05));
+        else
+            this->mediaWidget()->stop();
+    });
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -324,9 +330,9 @@ void PlayerWidget::togglePlayPause(bool isPlaying)
     else play();
 }
 
-void PlayerWidget::stop()
+void PlayerWidget::stop(const int64_t stopValue)
 {
-    m_mediaWidget->stop();
+    m_mediaWidget->stop(stopValue);
 }
 
 void PlayerWidget::eject()

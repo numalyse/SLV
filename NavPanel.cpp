@@ -4,7 +4,7 @@
 #include <QScrollArea>
 
 NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
-    : QWidget{parent}, p_thumbnailWorker{thumbnailWorker}
+    : QWidget{parent}
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_mainLayout = new QHBoxLayout(this);
@@ -13,8 +13,8 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
     m_sideWidget = new QStackedWidget(this);
 
     m_playlistWidget = new Playlist(this);
-    m_shotDetail = new ShotDetail(this);
-    m_annotationPanel = new AnnotationPanel(this);
+    m_shotDetail = new ShotDetail(thumbnailWorker, this);
+    m_annotationPanel = new AnnotationPanel(thumbnailWorker, this);
     m_sideWidget->addWidget(m_playlistWidget); 
     m_sideWidget->addWidget(m_shotDetail);
     m_sideWidget->addWidget(m_annotationPanel);
@@ -45,13 +45,6 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
     connect(&SignalManager::instance(), &SignalManager::displayAnnotationPanel, this, &NavPanel::displayAnnotationPanel);
 
-    connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &NavPanel::updateThumbnail);
-
-    connect(m_shotDetail, &ShotDetail::updateImageRequested, this, &NavPanel::updateImageRequest);
-    connect(m_shotDetail, &ShotDetail::clearThumbnailQueueRequested, this, [this](){
-        p_thumbnailWorker->clearPriorityQueue(); // prevent having many images inside the priority queue
-    });
-    
 }
 
 void NavPanel::resizeEvent(QResizeEvent *event) {
@@ -119,13 +112,4 @@ void NavPanel::enableShotControlButtons()
     m_shotDetail->toggleShotControlButtons(true);
 }
 
-void NavPanel::updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize){
-    if(media->type() == MediaType::Video) p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, requestId, time, length, media->filePath(), targetSize, media->sar());
-}
-
-void NavPanel::updateThumbnail(ThumbnailWorker::Requester requester, int imageId, QImage image){
-    if (requester == ThumbnailWorker::Requester::ShotDetail){
-        m_shotDetail->updateTagImage(image);
-    }
-}
 

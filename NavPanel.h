@@ -32,9 +32,6 @@ private:
     ShotDetail *m_shotDetail = nullptr;
     AnnotationPanel *m_annotationPanel = nullptr;
 
-    // non owner
-    ThumbnailWorker* p_thumbnailWorker = nullptr;
-
 public slots:
     void showPanel();
     void hidePanel();
@@ -59,10 +56,6 @@ signals:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
-private slots:
-    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image);
-    void updateImageRequest(int requestId, int64_t time, int64_t length, Media* media, const QSize& targetSize);
-    
 };
 
 #endif // NAVPANEL_H

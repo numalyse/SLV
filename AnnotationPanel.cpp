@@ -5,9 +5,11 @@
 
 #include <algorithm>
 
-AnnotationPanel::AnnotationPanel(QWidget *parent) : QWidget(parent)
+AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
 {
     auto* annotations = ProjectManager::instance().annotationManager();
+
+    connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &AnnotationPanel::onThumbnailReady);
 
     connect(annotations, &AnnotationManager::annotationAdded,   this, &AnnotationPanel::onAnnotationAdded);
     connect(annotations, &AnnotationManager::annotationUpdated, this, &AnnotationPanel::onAnnotationUpdated);
@@ -91,6 +93,9 @@ void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)
     connect(item, &AnnotationWidget::removeAnnotationRequested, this, &AnnotationPanel::removeAnnotationRequested);
     connect(item, &AnnotationWidget::updateAnnotationRequested, this, &AnnotationPanel::updateAnnotationRequested);
     connect(item, &AnnotationWidget::annotationClicked, this, &AnnotationPanel::annotationClicked);
+    connect(item, &AnnotationWidget::thumbnailRequested, this, &AnnotationPanel::onThumbnailRequested);
+
+    item->refreshThumbnail(); // demande initiale, apres le connect pour ne pas perdre le signal
 
     if(checkOrder){
         // get first item where start > new annot end
@@ -184,6 +189,25 @@ void AnnotationPanel::annotationCreationDialog()
     }
 }
 
+
+void AnnotationPanel::onThumbnailRequested(int annotationId, int64_t startMs, QSize targetSize)
+{
+    Media* media = ProjectManager::instance().media();
+    if (!p_thumbnailWorker || !media || media->type() != MediaType::Video)
+        return;
+
+    p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Annotation, annotationId, startMs, 0, media->filePath(), targetSize, media->sar());
+}
+
+void AnnotationPanel::onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image)
+{
+    if (requester != ThumbnailWorker::Requester::Annotation)
+        return;
+
+    auto it = std::find_if(m_items.cbegin(), m_items.cend(), [requestId](const AnnotationWidget* a){ return a->annotationId() == requestId; });
+    if (it != m_items.cend())
+        (*it)->setThumbnail(image);
+}
 
 void AnnotationPanel::filterBy(const QVector<QColor>& colors)
 {

@@ -340,6 +340,21 @@ void AnnotationWidget::updateAnnotation(const Annotation &annotation)
 {
     m_annotation = annotation;
     refreshContent();
+    refreshThumbnail();
+}
+
+void AnnotationWidget::refreshThumbnail()
+{
+    if (m_thumbnailTimeMs == m_annotation.start)
+        return; // start is not updated, do not request thumbnail
+
+    m_thumbnailTimeMs = m_annotation.start;
+    emit thumbnailRequested(m_annotation.id, m_annotation.start, m_thumbnailSize);
+}
+
+void AnnotationWidget::setThumbnail(const QImage &image)
+{
+    m_mediaThumbnailLabel->setPixmap(QPixmap::fromImage(image));
 }
 
 double AnnotationWidget::currentFps() const

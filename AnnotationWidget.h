@@ -22,7 +22,10 @@ public:
     void initStyle();
     int annotationId() const { return m_annotation.id; }
     const Annotation& annot() { return m_annotation; }
-    
+    /// @brief Emits thumbnailRequested if the displayed thumbnail is out of date (start time changed or never requested)
+    void refreshThumbnail();
+    void setThumbnail(const QImage &image);
+
 public slots:
     void updateAnnotation(const Annotation &annotation);
 
@@ -31,6 +34,7 @@ signals:
     void editAnnotationRequested(int annotationId);
     void removeAnnotationRequested(int annotationId);
     void updateAnnotationRequested(const Annotation &annotation);
+    void thumbnailRequested(int annotationId, int64_t startMs, QSize targetSize);
 
 protected:
     void enterEvent(QEnterEvent *event) override;

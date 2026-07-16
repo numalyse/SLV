@@ -8,6 +8,7 @@
 
 #include "Annotation.h"
 #include "AnnotationWidget.h"
+#include "Timeline/ThumbnailWorker.h"
 #include "ToolbarButtons/ToolbarButton.h"
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
@@ -17,7 +18,7 @@ class AnnotationPanel : public QWidget
 Q_OBJECT
 
 public:
-    explicit AnnotationPanel(QWidget* parent);
+    explicit AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget* parent);
 
 signals:
     void addAnnotationRequested(Annotation& annotation);
@@ -28,6 +29,9 @@ signals:
 private:
     void createItem(const Annotation& annotation, bool checkOrder);
     void filterBy(const QVector<QColor>& color);
+
+    // non owner
+    ThumbnailWorker* p_thumbnailWorker = nullptr;
 
     QVector<AnnotationWidget*> m_items;
     QVBoxLayout* m_layout = nullptr;
@@ -43,6 +47,9 @@ private slots:
     void rebuild();
 
     void annotationCreationDialog();
+
+    void onThumbnailRequested(int annotationId, int64_t startMs, QSize targetSize);
+    void onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
 };
 
 

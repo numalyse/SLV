@@ -282,7 +282,7 @@ void AnnotationWidget::setMode(Mode mode)
 
     if (isEditMode || m_mode == Mode::Extended) {
         // release the fixed height
-        setMinimumHeight(50);
+        setMinimumHeight(0);
         setMaximumHeight(QWIDGETSIZE_MAX);
         adjustNoteEditHeight();
     } else {

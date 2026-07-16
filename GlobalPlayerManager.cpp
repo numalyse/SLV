@@ -155,12 +155,17 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
                 m_separationLine->show();
             }
             m_thumbnailWorker->releaseOpenCvCap(); // plus besoin de thumbnail worker quand plus de 1 player, on release pour economiser de la mémoire
+            m_navPanel->annotationPanel()->setTimeProvider(nullptr); // removes timeProvider
         }
         else if(advancedToolbar){
             if(m_separationLine){
                 layout->removeWidget(m_separationLine);
                 m_separationLine->hide();
             }
+
+            m_navPanel->annotationPanel()->setTimeProvider([player]() -> int64_t{
+                return player ? player->getCurrentTime() : 0;
+            });
 
             connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
 

@@ -13,7 +13,7 @@ class AnnotationDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit AnnotationDialog(QWidget* parent = nullptr, const Annotation& annotation = {});
+    explicit AnnotationDialog( const int64_t startTime, QWidget* parent = nullptr);
 
     /// @brief Create an annotation base on the dialog inputs
     Annotation annotation() const;
@@ -25,10 +25,11 @@ private:
     void openColorPicker();
     void updateColorButton();
 
-    Annotation m_annotation;
+    Annotation m_annotation {};
     double m_fps = 1.0;
     int64_t m_maxDuration = 0;
-    QColor m_color;
+
+    static constexpr int64_t s_baseDurationMs = 10000;
 
     QLineEdit* m_startEdit = nullptr;
     QLineEdit* m_endEdit = nullptr;

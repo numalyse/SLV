@@ -181,8 +181,8 @@ void AnnotationPanel::rebuild(){
 
 void AnnotationPanel::annotationCreationDialog()
 {
-    //int64_t end = 
-    AnnotationDialog dialog(this, {});
+    int64_t start = m_timeProvider ? m_timeProvider() : 0;
+    AnnotationDialog dialog(start ,this);
     if(dialog.exec() == QDialog::Accepted){
         Annotation annotation = dialog.annotation();
         emit addAnnotationRequested(annotation);

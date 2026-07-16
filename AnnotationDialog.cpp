@@ -8,8 +8,8 @@
 #include <QGridLayout>
 #include <QLabel>
 
-AnnotationDialog::AnnotationDialog(QWidget* parent, const Annotation& annotation)
-    : QDialog{parent}, m_annotation(annotation), m_color(annotation.color)
+AnnotationDialog::AnnotationDialog(const int64_t startTime, QWidget* parent)
+    : QDialog{parent}
 {
     setWindowTitle(PrefManager::instance().getText("annotation"));
 
@@ -17,15 +17,17 @@ AnnotationDialog::AnnotationDialog(QWidget* parent, const Annotation& annotation
     m_maxDuration = media ? media->duration() : 0;
     m_fps = (media && media->fps() > 0.0) ? media->fps() : 1.0;
 
-    m_startEdit = new QLineEdit(TimeFormatter::msToHHMMSSFF(m_annotation.start, m_fps));
-    m_endEdit = new QLineEdit(TimeFormatter::msToHHMMSSFF(m_annotation.end, m_fps));
+    int64_t endTime = startTime + s_baseDurationMs;
+
+    m_startEdit = new QLineEdit(TimeFormatter::msToHHMMSSFF(startTime, m_fps));
+    m_endEdit = new QLineEdit(TimeFormatter::msToHHMMSSFF(endTime, m_fps));
     for(QLineEdit* timeEdit : {m_startEdit, m_endEdit}){
         timeEdit->setInputMask("99:99:99.99");
         timeEdit->setAlignment(Qt::AlignCenter);
         timeEdit->setFixedWidth(90);
     }
 
-    m_nameEdit = new QLineEdit(annotation.name);
+    m_nameEdit = new QLineEdit(m_annotation.name);
 
     m_noteEdit = new QTextEdit();
     m_noteEdit->setPlainText(m_annotation.note);
@@ -89,7 +91,7 @@ void AnnotationDialog::openColorPicker()
 {
     IconHelper::execColorPickerMenu(this, m_colorBtn, [this](const QColor& color){
         if(color.isValid()){
-            m_color = color;
+            m_annotation.color = color;
             updateColorButton();
         }
     });
@@ -98,7 +100,7 @@ void AnnotationDialog::openColorPicker()
 void AnnotationDialog::updateColorButton()
 {
     m_colorBtn->setStyleSheet("QPushButton{"
-        "   background-color: " + m_color.name() + ";"
+        "   background-color: " + m_annotation.color.name() + ";"
         "   border: 1px solid palette(mid);"
         "   border-radius: 4px;"
         "}");
@@ -109,7 +111,8 @@ Annotation AnnotationDialog::annotation() const
     Annotation annotation = m_annotation;
     annotation.name = m_nameEdit->text();
     annotation.note = m_noteEdit->toPlainText();
-    annotation.color = m_color;
+
+    // color updated in m_annotation when color changes
 
     annotation.start = TimeFormatter::HHMMSSFFToMs(m_startEdit->text(), m_fps);
     annotation.end = TimeFormatter::HHMMSSFFToMs(m_endEdit->text(), m_fps);

@@ -38,7 +38,6 @@ public:
     void stop();
     void clearQueue();
     void keepNQueue(const int n);
-    void clearPriorityQueue();
 
 public slots:
     void releaseOpenCvCap();

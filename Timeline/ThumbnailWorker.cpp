@@ -16,11 +16,14 @@ void ThumbnailWorker::requestThumbnail(Requester requester, int requestId, int64
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    if(requester == Requester::ShotDetail){ // priorité sur les requetes venant de shotDetail
-        m_priorityQueue.enqueue({requester, requestId, msStart, lengthMs, mediaPath, targetSize, sar});
-    }else {
-        m_queue.enqueue({requester, requestId, msStart, lengthMs, mediaPath, targetSize, sar});
-    }
+    QQueue<ThumbnailRequest>& queue = (requester == Requester::ShotDetail) ? m_priorityQueue : m_queue; // priorité sur les requetes venant de shotDetail
+
+    // une requete en attente avec le meme requester + id est obsolete (ex : temps modifié avant qu'elle soit traitée), on la remplace
+    queue.removeIf([requester, requestId](const ThumbnailRequest& pending){
+        return pending.requester == requester && pending.requestId == requestId;
+    });
+
+    queue.enqueue({requester, requestId, msStart, lengthMs, mediaPath, targetSize, sar});
 
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
@@ -44,12 +47,6 @@ void ThumbnailWorker::keepNQueue(const int n)
     while (m_queue.size() > n) {
         m_queue.dequeue();
     }
-}
-
-void ThumbnailWorker::clearPriorityQueue()
-{
-    QMutexLocker locker(&m_mutex);
-    m_priorityQueue.clear();
 }
 
 void ThumbnailWorker::releaseOpenCvCap()

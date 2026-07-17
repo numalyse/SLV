@@ -478,11 +478,13 @@ bool isDark(const QColor& color)
 }
 
 void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image){
+    //if(requester != ThumbnailWorker::Requester::TimelineShot){
     const int shotIndex = requestId < 0 ? -requestId - 1 : requestId;
     if(shotIndex < 0 || shotIndex >= m_shotItems.size()){
         return;
     }
 
+    //if(requestId < 0 || requestId >= m_shotItems.size()){
     ShotItem* shotItem = m_shotItems.at(shotIndex);
     QPixmap pixmap = QPixmap::fromImage(image);
 
@@ -490,6 +492,10 @@ void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requ
         shotItem->setThumbnail(pixmap);
         return;
     }
+
+    // ShotItem* shotItem = m_shotItems.at(requestId);
+    // QPixmap pixmap = QPixmap::fromImage(image);
+    // shotItem->setThumbnail(pixmap);
 
     if(requester == ThumbnailWorker::Requester::ShotDetail){
         QColor tagColor = shotItem->getTagImageColor(pixmap);

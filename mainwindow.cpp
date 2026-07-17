@@ -279,7 +279,6 @@ void MainWindow::createToolBar()
     connect(m_annotationPanelBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(&SignalManager::instance(), &SignalManager::toggleNavPanel, this, [this](){
         m_navPanelBtn->click();
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
     });
 
     m_toolbarQt->setMovable(false);

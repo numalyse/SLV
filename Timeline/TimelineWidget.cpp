@@ -13,6 +13,7 @@
 
 #include "GenericDialog.h"
 #include "ExtractSequenceWidget.h"
+#include "AnnotationDialog.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -134,6 +135,29 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
+
+    QFrame *annotSeparator = new QFrame();
+    annotSeparator->setFrameShape(QFrame::VLine);
+    annotSeparator->setFrameShadow(QFrame::Sunken);
+    ButtonLayout->addWidget(annotSeparator);
+
+    m_openAnnot = new ToolbarButton(this, "open_annot_white", pref.getText("tooltip_annotation_button"));
+    connect(m_openAnnot, &ToolbarButton::pressed, this, [](){
+        emit SignalManager::instance().toggleNavPanel();
+        emit SignalManager::instance().displayAnnotationPanel();
+    });
+    ButtonLayout->addWidget(m_openAnnot);
+
+    m_addAnnotBtn = new ToolbarButton(this, "plus_white", pref.getText("tooltip_add_annotation"));
+    connect(m_addAnnotBtn, &ToolbarButton::pressed, this, [this](){
+        AnnotationDialog dialog(m_vlcTime, this);
+        if(dialog.exec() == QDialog::Accepted){
+            Annotation annotation = dialog.annotation();
+            ProjectManager::instance().annotationManager()->addAnnotation(annotation);
+        }
+    });
+    ButtonLayout->addWidget(m_addAnnotBtn);
+
 
     ButtonLayout->addStretch(1);
 

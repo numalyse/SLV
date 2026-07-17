@@ -116,6 +116,9 @@ private:
     ToolbarButton* m_toPrevShotBtn = nullptr;
     ToolbarButton* m_toNextShotBtn = nullptr;
 
+    ToolbarButton* m_openAnnot = nullptr;
+    ToolbarButton* m_addAnnotBtn = nullptr;
+
     QLabel* m_shotCountLabel = nullptr;
 
     QTimer* m_seekTimer = nullptr;

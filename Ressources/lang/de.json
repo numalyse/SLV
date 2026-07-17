@@ -205,6 +205,7 @@
     "tooltip_add_annotation" : "Anmerkung hinzufügen",
     "annotation_name" : "Name",
     "annotation_note" : "Notiz",
+    "annotation_conflict" : "Konflikt mit einer anderen Anmerkung",
     "remove_all" : "Alle entfernen",
     "remove_all_items_playlist" : "Playlist entfernen",
     "tooltip_remove_all_items_playlist" : "Alle Elemente der Playlist entfernen",

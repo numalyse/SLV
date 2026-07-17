@@ -205,6 +205,7 @@
     "tooltip_add_annotation" : "Ajouter une annotation",
     "annotation_name" : "Nom",
     "annotation_note" : "Note",
+    "annotation_conflict" : "Conflit avec une autre annotation",
     "remove_all" : "Tout retirer",
     "remove_all_items_playlist" : "Réinitialiser la playlist",
     "tooltip_remove_all_items_playlist" : "Retirer tous les éléments de la playlist",

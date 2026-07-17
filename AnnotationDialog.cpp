@@ -13,6 +13,8 @@ AnnotationDialog::AnnotationDialog(const int64_t startTime, QWidget* parent)
 {
     setWindowTitle(PrefManager::instance().getText("annotation"));
 
+    m_errorLabel = new QLabel();
+
     Media* media = ProjectManager::instance().media();
     m_maxDuration = media ? media->duration() : 0;
     m_fps = (media && media->fps() > 0.0) ? media->fps() : 1.0;
@@ -25,6 +27,7 @@ AnnotationDialog::AnnotationDialog(const int64_t startTime, QWidget* parent)
         timeEdit->setInputMask("99:99:99.99");
         timeEdit->setAlignment(Qt::AlignCenter);
         timeEdit->setFixedWidth(90);
+        connect(timeEdit, &QLineEdit::textChanged, this, &AnnotationDialog::clearErrorUi);
     }
 
     m_nameEdit = new QLineEdit(m_annotation.name);
@@ -86,8 +89,12 @@ void AnnotationDialog::initUiLayout()
 
     formLayout->setColumnStretch(1, 1);
 
+    m_errorLabel->setStyleSheet("color: tomato;");
+    m_errorLabel->hide();
+
     QHBoxLayout* confirmLayout = new QHBoxLayout();
     confirmLayout->addStretch();
+    confirmLayout->addWidget(m_errorLabel);
     confirmLayout->addWidget(m_confirmBtn);
     confirmLayout->addWidget(m_cancelBtn);
 
@@ -114,6 +121,13 @@ void AnnotationDialog::updateColorButton()
         "}");
 }
 
+void AnnotationDialog::clearErrorUi()
+{
+    m_errorLabel->hide();
+    m_startEdit->setStyleSheet(QString());
+    m_endEdit->setStyleSheet(QString());
+}
+
 Annotation AnnotationDialog::annotation() const
 {
     Annotation annotation = m_annotation;
@@ -131,10 +145,17 @@ Annotation AnnotationDialog::annotation() const
 void AnnotationDialog::accept()
 {
     auto* annotManager = ProjectManager::instance().annotationManager();
-    if( annotManager && annotManager->hasConflict(annotation()))
+    if (!annotManager) return;
+
+    Annotation annot = annotation();
+    auto conflict = annotManager->findConflict(annot);
+
+    if(conflict.has_value())
     {
         m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
         m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+        m_errorLabel->setText(PrefManager::instance().getText("annotation_conflict"));
+        m_errorLabel->show();
     } else 
         QDialog::accept();
 }

@@ -55,6 +55,8 @@ private:
     /// @brief Returns the annotation from the edit fields
     Annotation editedAnnotation() const;
     void adjustNoteEditHeight();
+    /// @brief Removes the conflict icon and the red borders on the time edits
+    void clearErrorUi();
     void openColorPicker();
     void updateColorButton();
     double currentFps() const;
@@ -92,6 +94,7 @@ private:
     QLineEdit* m_nameEdit = nullptr;
     QTextEdit* m_noteEdit = nullptr;
     QPushButton* m_colorBtn = nullptr;
+    QLabel* m_conflictIcon = nullptr;
     ToolbarButton* m_colorPickerBtn = nullptr;
     ToolbarButton* m_confirmBtn = nullptr;
     ToolbarButton* m_cancelBtn = nullptr;

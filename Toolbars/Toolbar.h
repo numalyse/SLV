@@ -52,6 +52,7 @@ public:
         + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
         + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>");
+        m_stopBtn->setIconSize(QSize(24, 24));
 
         m_ejectBtn = new ToolbarButton(this, "eject_white", PrefManager::instance().getText("tooltip_eject"));
         m_fullscreenBtn = new ToolbarToggleButton(this, false, "fullscreen_off_white",

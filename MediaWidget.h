@@ -34,6 +34,7 @@ public:
     uint64_t getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
     /// @brief N'utilise pas libvlc, update seulement le temps interne m_vlcTime
     void setVlcTime(uint64_t newTime){ m_vlcTime = newTime; }
+    void setLoopValue(const int64_t val){ m_loopValue = val; }
 
     bool isPlaying() { 
         return (m_player) ? libvlc_media_player_is_playing(m_player) : false; 
@@ -88,6 +89,7 @@ private:
     QSize m_mediaSize;
 
     bool m_loopActivated = true;
+    int64_t m_loopValue = 0;
     bool m_zoomActivated = false;
     bool m_vflipped = false;
     bool m_hflipped = false;

@@ -43,13 +43,13 @@ Playlist::Playlist(QWidget *parent)
 
 #ifdef Q_OS_MAC
     QColor colorBtn = qApp->palette().color(QPalette::Button);
-    QColor enhancedColor = m_isDarkMode ? colorBtn.lighter(150) : colorBtn.darker(150);   
+    QColor enhancedColor = m_isDarkMode ? colorBtn.lighter(150) : colorBtn.darker(150);
     m_palbtnColor = m_isDarkMode ? enhancedColor : "palette(mid)";
     m_palbtnColorStr = m_isDarkMode ? QString(enhancedColor.name()) : "palette(mid)";
 #else
     m_palbtnColor = m_isDarkMode ? "palette(button)" : "palette(mid)";
     m_palbtnColorStr = m_isDarkMode ? "palette(button)" : "palette(mid)";
-    
+
 #endif
 
     setAcceptDrops(true);
@@ -68,7 +68,7 @@ Playlist::Playlist(QWidget *parent)
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
 
-    m_loopItemBtn = new ToolbarToggleButton(this, 
+    m_loopItemBtn = new ToolbarToggleButton(this,
         false,
         "playlist_loop_white",
         PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(activated)"),
@@ -80,11 +80,11 @@ Playlist::Playlist(QWidget *parent)
     connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
     playlistLabelLayout->addWidget(m_loopItemBtn);
 
-    m_shuffleItemBtn = new ToolbarToggleButton(this, 
-        false, 
-        "shuffle_white", 
+    m_shuffleItemBtn = new ToolbarToggleButton(this,
+        false,
+        "shuffle_white",
         PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(activated)"),
-        "shuffle_white", 
+        "shuffle_white",
         PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
     m_shuffleItemBtn->setFixedSize(24,24);
     m_shuffleItemBtn->setToggledIconFrame(true);
@@ -211,10 +211,10 @@ int Playlist::visualDroppedIndex(const QPoint &dropPos) const
         // Si la position de dépôt est au-dessus du milieu de cet élément, on retourne l'index visuel actuel
         if (dropPos.toPointF().y() < midY) {
             return i;
-        } 
+        }
     }
 
-    return m_itemsSortOrder.isEmpty() ? 0 : m_itemsSortOrder.size()-1;
+    return m_itemsSortOrder.isEmpty() ? 0 : m_itemsSortOrder.size();
 }
 
 void Playlist::dropEvent(QDropEvent *event)
@@ -233,39 +233,27 @@ void Playlist::dropEvent(QDropEvent *event)
         const int visualDropIndex = visualDroppedIndex(event->pos()); // Récupération de l'index visuel où l'élément a été déposé
         qDebug() << "Visual drop index: " << visualDropIndex;
 
-        // If the playlist is not empty, determine the drop index based on the visual drop index
-        if (!m_items.isEmpty()) {
-            if (visualDropIndex < m_items.size()) {
-                newItemIndex = m_itemsSortOrder[visualDropIndex];
-            } else {
-                newItemIndex = m_itemsSortOrder[m_items.size() - 1];
-            }
-            qDebug() << "Dropped item index: " << newItemIndex;
-        }
+        // Convert visualDropIndex to the new item position to use move()
+        newItemIndex = visualDropIndex == 0 ? 0 : visualDropIndex-1;
 
         // Move the dragged item to the new position in the sort order
         if (newItemIndex != -1) {
             const int targetVisibleIndex = m_itemsSortOrder.indexOf(newItemIndex);
             if (targetVisibleIndex != oldItemIndex && targetVisibleIndex >= 0) {
-                if(m_sortButtons->checkedButton()){
-                    m_sortButtons->setExclusive(false);
-                    m_sortButtons->checkedButton()->setChecked(false);
+
+                m_itemsSortOrder.move(oldItemIndex, newItemIndex);
+                m_itemsShuffleOrder.move(oldItemIndex, newItemIndex);
+
+                if(m_currentMediaIndex > oldItemIndex && m_currentMediaIndex <= newItemIndex) {
+                    m_currentMediaIndex--;
+                    qDebug() << "Current media - : " << m_currentMediaIndex;
                 }
-
-                const unsigned int movedItemId = m_itemsSortOrder[oldItemIndex];
-                int insertIndex = targetVisibleIndex;
-                if (oldItemIndex < targetVisibleIndex) {
-                    insertIndex = targetVisibleIndex - 1;
+                else if(m_currentMediaIndex < oldItemIndex && m_currentMediaIndex >= newItemIndex) {
+                    m_currentMediaIndex++;
+                    qDebug() << "Current media + : " << m_currentMediaIndex;
                 }
-                insertIndex = qBound(0, insertIndex, m_itemsSortOrder.size() - 1);
-
-                qDebug() << "Moving item from index: " << oldItemIndex << " to index: " << insertIndex;
-
-                m_itemsSortOrder.removeAt(oldItemIndex);
-                m_itemsSortOrder.insert(insertIndex, movedItemId);
-
-                if(m_currentMediaIndex == oldItemIndex) {
-                    m_currentMediaIndex = m_itemsSortOrder.indexOf(movedItemId);
+                else if(m_currentMediaIndex == oldItemIndex) {
+                    m_currentMediaIndex = newItemIndex;
                 }
 
                 qDebug() << "Updated sort order: " << m_itemsSortOrder;
@@ -311,11 +299,11 @@ void Playlist::addItemDialog()
 
     auto& prefManager = PrefManager::instance();
     QStringList filesPaths = QFileDialog::getOpenFileNames(
-        this, 
-        prefManager.getText("dialog_open_files"), 
+        this,
+        prefManager.getText("dialog_open_files"),
         prefManager.getPref("Paths", "lp_open_media"),
         FileFormatManager::instance().getOpenFileDialogFilters()
-    ); 
+    );
 
     if(filesPaths.empty()){
         qDebug() << "PLAYLIST - Pas de fichier sélectionné";
@@ -327,7 +315,7 @@ void Playlist::addItemDialog()
 
 
     addItemsViaButton(filesPaths);
-    
+
 }
 
 void Playlist::insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex)
@@ -376,9 +364,14 @@ void Playlist::addItemsViaButton(const QStringList &filesPaths)
         std::random_device rd;
         std::mt19937 g(rd());
         std::shuffle(m_itemsShuffleOrder.begin(), m_itemsShuffleOrder.end(), g);
-        if(!m_itemsShuffleOrder.empty())
-            m_itemsShuffleOrder.swapItemsAt(0, m_currentMediaIndex);
-        m_currentMediaIndex = 0;
+        
+        // Make current media the first item in the shuffle order
+        if(!m_itemsShuffleOrder.empty()){
+            unsigned int currentItemId = m_itemsSortOrder[m_currentMediaIndex];
+            int currentShufflePos = m_itemsShuffleOrder.indexOf(currentItemId);
+            if(currentShufflePos >= 0)
+                m_itemsShuffleOrder.swapItemsAt(0, currentShufflePos);
+        }
     }
 
     updateItemIndices();
@@ -407,7 +400,7 @@ void Playlist::deleteAllItemsDialog()
         "#dialogWindow {"
             "background-color: transparent;"
         "}"
-    );    
+    );
 
     QVBoxLayout outerLayout(&dialog);
     outerLayout.setContentsMargins(0,0,0,0);
@@ -431,7 +424,7 @@ void Playlist::deleteAllItemsDialog()
     QLabel* titleLabel = new QLabel;
     titleLabel->setAlignment(Qt::AlignCenter);
     titleLabel->setText(prefManager.getText("remove_all_items_playlist"));
-    
+
     QFont titleFont = titleLabel->font();
     titleFont.setPointSize(12);
     titleFont.setBold(true);
@@ -521,7 +514,7 @@ void Playlist::deleteAllItems()
 
 void Playlist::deleteItem(const unsigned int index)
 {
-    if(m_currentMediaIndex == index){
+    if(m_items.size() > 1 && m_currentMediaIndex == index){
         playPreviousMedia();
         if(m_currentMediaIndex == 0)
             playNextMedia();
@@ -534,7 +527,7 @@ void Playlist::deleteItem(const unsigned int index)
     m_itemsSortOrder.removeAll(index);
     if(m_items.empty())
         emit SignalManager::instance().playlistEjectPlayer();
-    for(size_t IPlaylistItem = index; IPlaylistItem < m_items.size(); ++IPlaylistItem)
+    for(size_t IPlaylistItem = 0; IPlaylistItem < m_items.size(); ++IPlaylistItem)
     {
         if(m_itemsSortOrder[IPlaylistItem] > index) m_itemsSortOrder[IPlaylistItem]--;
         if(m_itemsShuffleOrder[IPlaylistItem] > index) m_itemsShuffleOrder[IPlaylistItem]--;
@@ -566,8 +559,7 @@ void Playlist::playMedia(const QString& filePath, const bool isClicked)
     if(!changeMedia) return;
     emit openMediaFileRequested(filePath);
     for(size_t IMedia = 0; IMedia < m_items.size(); ++IMedia){
-        unsigned int index = m_playlistShuffled && !isClicked ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
-        if(IMedia != index)
+        if(IMedia != m_currentMediaIndex)
             m_items[m_itemsSortOrder[IMedia]]->setCurrentMedia(false);
         else
             m_items[m_itemsSortOrder[IMedia]]->setCurrentMedia(true);
@@ -576,57 +568,81 @@ void Playlist::playMedia(const QString& filePath, const bool isClicked)
 
 void Playlist::playPreviousMedia()
 {
-    if(m_currentMediaIndex > 0)
-    {
-        ProjectManager& projManager = ProjectManager::instance();
-        bool changeMedia = true;
-        if(projManager.needSave()){
-            SLV::showGenericDialog(
-                this,
-                PrefManager::instance().getText("dialog_save_project_dialog_title"),
-                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+    ProjectManager& projManager = ProjectManager::instance();
+    bool changeMedia = true;
+    if(projManager.needSave()){
+        SLV::showGenericDialog(
+            this,
+            PrefManager::instance().getText("dialog_save_project_dialog_title"),
+            PrefManager::instance().getText("dialog_save_project_dialog_text"),
 
-                [&projManager]() {
-                    projManager.saveProject(false);
-                },
+            [&projManager]() {
+                projManager.saveProject(false);
+            },
 
-                [](){},
-                [&changeMedia](){ changeMedia = false; }
-            );
-        }
-        if(!changeMedia) return;
-        m_currentMediaIndex--;
-        unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
-        m_items[m_itemsSortOrder[index]]->playMedia();
+            [](){},
+            [&changeMedia](){ changeMedia = false; }
+        );
     }
+    if(!changeMedia) return;
+    if(m_playlistShuffled){
+        unsigned int currentItemId = m_itemsSortOrder[m_currentMediaIndex];
+        int currentShufflePos = m_itemsShuffleOrder.indexOf(currentItemId);
+        if(currentShufflePos <= 0)
+            return;
+        m_currentMediaIndex = m_itemsSortOrder.indexOf(m_itemsShuffleOrder[currentShufflePos - 1]);
+    }
+    else{
+        if(m_currentMediaIndex == 0)
+            return;
+        m_currentMediaIndex--;
+    }
+    m_items[m_itemsSortOrder[m_currentMediaIndex]]->playMedia();
+    
 }
 
 void Playlist::playNextMedia()
 {
-    if(m_currentMediaIndex < m_items.size()-1)
-    {
-        ProjectManager& projManager = ProjectManager::instance();
-        bool changeMedia = true;
-        if(projManager.needSave()){
-            SLV::showGenericDialog(
-                this,
-                PrefManager::instance().getText("dialog_save_project_dialog_title"),
-                PrefManager::instance().getText("dialog_save_project_dialog_text"),
+    ProjectManager& projManager = ProjectManager::instance();
+    bool changeMedia = true;
+    if(projManager.needSave()){
+        SLV::showGenericDialog(
+            this,
+            PrefManager::instance().getText("dialog_save_project_dialog_title"),
+            PrefManager::instance().getText("dialog_save_project_dialog_text"),
 
-                [&projManager]() {
-                    projManager.saveProject(false);
-                },
+            [&projManager]() {
+                projManager.saveProject(false);
+            },
 
-                [](){},
-                [&changeMedia](){ changeMedia = false; }
-            );
-        }
-        if(!changeMedia) return;
-        m_currentMediaIndex++;
-        unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
-        m_items[m_itemsSortOrder[index]]->playMedia();
+            [](){},
+            [&changeMedia](){ changeMedia = false; }
+        );
     }
-    else if(m_playlistLooping){
+    if(!changeMedia) return;
+
+    bool hasNext = false;
+    if(m_playlistShuffled){
+        unsigned int currentItemId = m_itemsSortOrder[m_currentMediaIndex];
+        int currentShufflePos = m_itemsShuffleOrder.indexOf(currentItemId);
+        if(currentShufflePos >= 0 && currentShufflePos + 1 < m_itemsShuffleOrder.size()){
+            m_currentMediaIndex = m_itemsSortOrder.indexOf(m_itemsShuffleOrder[currentShufflePos + 1]);
+            hasNext = true;
+        }
+        else return;
+    } else {
+        if(m_currentMediaIndex < m_items.size()-1){
+            m_currentMediaIndex++;
+            hasNext = true;
+        }
+    }
+
+    if(hasNext){
+        m_items[m_itemsSortOrder[m_currentMediaIndex]]->playMedia();
+        return;
+    }
+    
+    if(m_playlistLooping){
         ProjectManager& projManager = ProjectManager::instance();
         bool changeMedia = true;
         if(projManager.needSave()){
@@ -644,9 +660,15 @@ void Playlist::playNextMedia()
             );
         }
         if(!changeMedia) return;
-        m_currentMediaIndex = 0;
-        unsigned int index = m_playlistShuffled ? m_itemsShuffleOrder[m_currentMediaIndex] : m_currentMediaIndex;
-        m_items[m_itemsSortOrder[index]]->playMedia();
+
+        if(m_playlistShuffled){
+            unsigned int firstItemId = m_itemsShuffleOrder.value(0, 0u);
+            m_currentMediaIndex = m_itemsSortOrder.indexOf(firstItemId); // If the shuffle order is empty, current media index is set to 0
+        } else {
+            m_currentMediaIndex = 0;
+        }
+        m_items[m_itemsSortOrder[m_currentMediaIndex]]->playMedia();
+
     }
 }
 
@@ -668,7 +690,7 @@ void Playlist::updateLayout()
 
     // for (auto *item : std::as_const(m_items)) {
     //     m_itemsLayout->addWidget(item);
-        
+
     // }
 
     for(size_t IItem = 0; IItem < m_items.size(); ++IItem){
@@ -694,17 +716,19 @@ void Playlist::enableShuffle(){
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(m_itemsShuffleOrder.begin(), m_itemsShuffleOrder.end(), g);
-    if(!m_itemsShuffleOrder.empty())
-        m_itemsShuffleOrder.move(m_currentMediaIndex, 0);
-    m_currentMediaIndex = 0;
+    if(!m_itemsShuffleOrder.isEmpty()){
+        // Make current media the first item in the shuffle list
+        unsigned int currentItemId = m_itemsSortOrder[m_currentMediaIndex];
+        int currentShufflePos = m_itemsShuffleOrder.indexOf(currentItemId);
+        if(currentShufflePos >= 0)
+            m_itemsShuffleOrder.move(currentShufflePos, 0);
+    }
 }
 
 void Playlist::disableShuffle(){
     m_shuffleItemBtn->setButtonState(false);
     m_playlistShuffled = false;
-    for(unsigned int IOrder = 0; IOrder < m_items.size(); IOrder++){
-        m_itemsShuffleOrder[IOrder] = IOrder;
-    }
+    m_itemsShuffleOrder = m_itemsSortOrder;
 }
 
 void Playlist::createSortBtn()
@@ -743,6 +767,7 @@ void Playlist::createSortBtn()
 
 void Playlist::sortPlaylist(int id, bool checked)
 {
+    int currentMedia = m_itemsSortOrder[m_currentMediaIndex];
     if(checked){
         m_sortButtons->setExclusive(true);
         switch(id){
@@ -763,9 +788,8 @@ void Playlist::sortPlaylist(int id, bool checked)
             });
             break;
         }
-
         if(m_currentMediaIndex < m_items.size())
-            m_currentMediaIndex = m_itemsSortOrder[m_currentMediaIndex];
+            m_currentMediaIndex = m_itemsSortOrder.indexOf(currentMedia);
         for(size_t IItem = 0 ; IItem < m_items.size(); ++IItem){
             m_itemsShuffleOrder[IItem] = m_itemsShuffleOrder[m_itemsSortOrder[IItem]];
         }

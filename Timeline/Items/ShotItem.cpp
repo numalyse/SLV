@@ -5,7 +5,7 @@
 #include <QPen>
 
 ShotItem::ShotItem(Shot shot, double width, QGraphicsItem* parent)
-: QGraphicsItem(parent), m_shot{shot}, m_width{width}
+: QGraphicsItem(parent), m_shot{shot}, m_width{width}, m_baseColor{m_shot.color}
 {
     setZValue(0);
 
@@ -31,6 +31,125 @@ ShotItem::~ShotItem()
 {
     delete m_selectionBox;
 }
+
+QColor ShotItem::getTagImageColor(const QPixmap &pixmap) const
+{
+if (pixmap.isNull())
+        return QColor();
+
+    QImage image = pixmap.toImage();
+
+    if (image.isNull())
+        return QColor();
+
+    const int width = image.width();
+    const int height = image.height();
+
+    const int stepX = qMax(1, width / 64);
+    const int stepY = qMax(1, height / 64);
+
+    QVector<QColor> samples;
+
+    for (int y = 0; y < height; y += stepY)
+    {
+        for (int x = 0; x < width; x += stepX)
+        {
+            QColor c = image.pixelColor(x, y);
+
+            int h,s,v;
+            c.getHsv(&h,&s,&v);
+
+            if (v < 5)
+                continue;
+
+            if (s < 15 && v > 220)
+                continue;
+
+            samples.push_back(c);
+        }
+    }
+
+    if (samples.isEmpty())
+        return QColor();
+
+    constexpr int K = 5;
+    constexpr int ITERATIONS = 10;
+
+    QVector<QColor> centers;
+
+    for (int i = 0; i < K; ++i)
+        centers.push_back(samples[i * samples.size() / K]);
+
+    QVector<int> assignment(samples.size());
+
+    for (int iter = 0; iter < ITERATIONS; ++iter)
+    {
+        for (int i = 0; i < samples.size(); ++i)
+        {
+            int bestCluster = 0;
+            int bestDistance = INT_MAX;
+
+            for (int c = 0; c < K; ++c)
+            {
+                int dr = samples[i].red()   - centers[c].red();
+                int dg = samples[i].green() - centers[c].green();
+                int db = samples[i].blue()  - centers[c].blue();
+
+                int dist = dr * dr + dg * dg + db * db;
+
+                if (dist < bestDistance)
+                {
+                    bestDistance = dist;
+                    bestCluster = c;
+                }
+            }
+
+            assignment[i] = bestCluster;
+        }
+
+        QVector<int> count(K, 0);
+        QVector<int> sumR(K, 0);
+        QVector<int> sumG(K, 0);
+        QVector<int> sumB(K, 0);
+
+        for (int i = 0; i < samples.size(); ++i)
+        {
+            int c = assignment[i];
+
+            count[c]++;
+            sumR[c] += samples[i].red();
+            sumG[c] += samples[i].green();
+            sumB[c] += samples[i].blue();
+        }
+
+        for (int c = 0; c < K; ++c)
+        {
+            if (count[c] == 0)
+                continue;
+
+            centers[c] = QColor(
+                sumR[c] / count[c],
+                sumG[c] / count[c],
+                sumB[c] / count[c]);
+        }
+    }
+
+    QVector<int> count(K, 0);
+
+    for (int c : assignment)
+        count[c]++;
+
+    int bestCluster = 0;
+
+    for (int c = 1; c < K; ++c)
+    {
+        if (count[c] > count[bestCluster])
+            bestCluster = c;
+    }
+
+   return centers[bestCluster];
+}
+
 
 void ShotItem::setThumbnail(const QPixmap& pixmap){
     m_pixmap = pixmap;

@@ -221,6 +221,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_audioShotItems.insert(index + 1, newAudioShotItem);
 
     if(p_media->type() == MediaType::Video){
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index + 1), newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index), baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
@@ -375,6 +377,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         m_audioShotItems.push_back(audioShotItem);
 
         if(p_media->type() == MediaType::Video){
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             if(displayByTagFrames) {
                 p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
@@ -427,6 +430,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         m_audioShotItems.push_back(audioShotItem);
 
         if(p_media->type() == MediaType::Video){
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             if(displayByTagFrames) {
                 p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
@@ -457,6 +461,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     m_audioShotItems.push_back(audioShotItem);
 
     if(p_media->type() == MediaType::Video){
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         if(displayByTagFrames) {
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }else {
@@ -467,16 +472,31 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     emit shotCountUpdated(shotCount());
 }
 
+bool isDark(const QColor& color)
+{
+    return color.toRgb().valueF() < 0.5;
+}
+
 void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image){
-    if(requester != ThumbnailWorker::Requester::TimelineShot){
+    const int shotIndex = requestId < 0 ? -requestId - 1 : requestId;
+    if(shotIndex < 0 || shotIndex >= m_shotItems.size()){
         return;
     }
 
-    if(requestId < 0 || requestId >= m_shotItems.size()){
-        return;
-    }
-
-    ShotItem* shotItem = m_shotItems.at(requestId);
+    ShotItem* shotItem = m_shotItems.at(shotIndex);
     QPixmap pixmap = QPixmap::fromImage(image);
-    shotItem->setThumbnail(pixmap);
+
+    if(requester == ThumbnailWorker::Requester::TimelineShot){
+        shotItem->setThumbnail(pixmap);
+        return;
+    }
+
+    if(requester == ThumbnailWorker::Requester::ShotDetail){
+        QColor tagColor = shotItem->getTagImageColor(pixmap);
+        if (tagColor.isValid()) {
+            shotItem->shot().color = tagColor;
+            shotItem->shot().borderColor = isDark(tagColor) ? tagColor.lighter(200) : tagColor.darker(200);
+            shotItem->update();
+        }
+    }
 }

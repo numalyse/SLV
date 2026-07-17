@@ -15,6 +15,7 @@ public:
     explicit ShotItem(Shot shot, double width, QGraphicsItem* parent = nullptr);
     ~ShotItem();
 
+    QColor getTagImageColor(const QPixmap &pixmap) const;
     void setThumbnail(const QPixmap &pixmap);
 
     QRectF boundingRect() const override;
@@ -55,6 +56,8 @@ private:
     static constexpr double s_height = 40.0;
     static constexpr double s_topMargin = 50.0;
     static constexpr int s_minSizeForImage = 100;
+
+    QColor m_baseColor;
 };
 
 

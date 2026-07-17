@@ -113,7 +113,7 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     if(projMedia->filePath().isEmpty()){
         qDebug() << "[ShotDetail] Impossible de récuperer la tag image, le path du média du project est vide";
     }else if(projMedia->type() == MediaType::Video){
-        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, 0, shotData->tagImageTime, 0, projMedia->filePath(), m_imageSize, projMedia->sar());
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(shotId + 1), shotData->tagImageTime, 0, projMedia->filePath(), m_imageSize, projMedia->sar());
     }
 
 }

@@ -8,8 +8,8 @@
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
     : QDialog{parent}, m_media(media)
 {
-    const int MIN_END_MARGIN = 100;       
-    const int DEFAULT_DURATION = 10000; 
+    const int MIN_END_MARGIN = 100;
+    const int DEFAULT_DURATION = 10000;
 
     int duration = media.duration();
 
@@ -26,7 +26,7 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
         if (defaultEndTime < duration) {
             m_endTime = defaultEndTime;
         } else {
-            m_endTime = duration; 
+            m_endTime = duration;
         }
     } else {
         m_endTime = endTime;
@@ -217,7 +217,7 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
             sequenceExtractor->extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
             break;
         case SequenceExtractionHelper::ExtractionType::Lossless:
-            sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
+            // sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
             break;
         case SequenceExtractionHelper::ExtractionType::Reencode:
             sequenceExtractor->reencodeExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);

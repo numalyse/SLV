@@ -108,8 +108,8 @@ void ABManager::extractLoop()
         }
         ffmpegProcess->deleteLater();
     });
-    ffmpegProcess->extractSequenceLossless(
-        selectedPath
+    ffmpegProcess->extractSequence(
+        mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time(), selectedPath
     );
 
 

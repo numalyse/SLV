@@ -59,11 +59,11 @@ if (pixmap.isNull())
             int h,s,v;
             c.getHsv(&h,&s,&v);
 
-            if (v < 5)
-                continue;
+            // if (v < 5)
+            //     continue;
 
-            if (s < 15 && v > 220)
-                continue;
+            // if (s < 15 && v > 220)
+            //     continue;
 
             samples.push_back(c);
         }

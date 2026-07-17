@@ -144,6 +144,10 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     m_colorBtn->hide();
     connect(m_colorBtn, &QPushButton::clicked, this, &AnnotationWidget::openColorPicker);
 
+    m_colorPickerBtn = new ToolbarButton(this, "color_picker_white", PrefManager::instance().getText("tooltip_color_tool"));
+    m_colorPickerBtn->hide();
+    connect(m_colorPickerBtn, &ToolbarButton::clicked, this, &AnnotationWidget::openColorPicker);
+
     m_confirmBtn = new ToolbarButton(this, "check_white", PrefManager::instance().getText("confirm"));
     m_cancelBtn = new ToolbarButton(this, "cancel_white", PrefManager::instance().getText("cancel_action"));
     m_deleteBtn = new ToolbarButton(this, "delete_white", PrefManager::instance().getText("delete"));
@@ -165,6 +169,7 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     connect(m_deleteBtn, &QPushButton::released, this, [this]{ emit removeAnnotationRequested(m_annotation.id); });
 
     editActionsLayout->addWidget(m_colorBtn);
+    editActionsLayout->addWidget(m_colorPickerBtn);
     editActionsLayout->addStretch();
     editActionsLayout->addWidget(m_confirmBtn);
     editActionsLayout->addWidget(m_cancelBtn);
@@ -276,6 +281,7 @@ void AnnotationWidget::setMode(Mode mode)
     m_nameEdit->setVisible(isEditMode);
     m_noteEdit->setVisible(isEditMode);
     m_colorBtn->setVisible(isEditMode);
+    m_colorPickerBtn->setVisible(isEditMode);
     m_confirmBtn->setVisible(isEditMode);
     m_cancelBtn->setVisible(isEditMode);
     m_deleteBtn->setVisible(isEditMode);

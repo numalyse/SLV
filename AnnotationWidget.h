@@ -92,6 +92,7 @@ private:
     QLineEdit* m_nameEdit = nullptr;
     QTextEdit* m_noteEdit = nullptr;
     QPushButton* m_colorBtn = nullptr;
+    ToolbarButton* m_colorPickerBtn = nullptr;
     ToolbarButton* m_confirmBtn = nullptr;
     ToolbarButton* m_cancelBtn = nullptr;
     ToolbarButton* m_deleteBtn = nullptr;

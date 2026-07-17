@@ -39,6 +39,9 @@ AnnotationDialog::AnnotationDialog(const int64_t startTime, QWidget* parent)
     updateColorButton();
     connect(m_colorBtn, &QPushButton::clicked, this, &AnnotationDialog::openColorPicker);
 
+    m_colorPickerBtn = new ToolbarButton(this, "color_picker_white", PrefManager::instance().getText("tooltip_color_tool"));
+    connect(m_colorPickerBtn, &ToolbarButton::clicked, this, &AnnotationDialog::openColorPicker);
+
     m_confirmBtn = new QPushButton(PrefManager::instance().getText("confirm"));
     m_cancelBtn = new QPushButton(PrefManager::instance().getText("cancel_action"));
     connect(m_confirmBtn, &QPushButton::released, this, &QDialog::accept);
@@ -68,7 +71,12 @@ void AnnotationDialog::initUiLayout()
     formLayout->addWidget(m_endEdit, 0, 3);
 
     formLayout->addWidget(makeLabel("tooltip_color_tool"), 0, 4);
-    formLayout->addWidget(m_colorBtn, 0, 5, Qt::AlignLeft);
+    QHBoxLayout* colorLayout = new QHBoxLayout();
+    colorLayout->setSpacing(8);
+    colorLayout->addWidget(m_colorBtn);
+    colorLayout->addWidget(m_colorPickerBtn);
+    colorLayout->addStretch();
+    formLayout->addLayout(colorLayout, 0, 5, Qt::AlignLeft);
 
     // name + note
     formLayout->addWidget(makeLabel("annotation_name"), 2, 0, Qt::AlignRight | Qt::AlignTop);

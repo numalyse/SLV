@@ -2,6 +2,7 @@
 #define ANNOTATIONDIALOG_H
 
 #include "Annotation.h"
+#include "ToolbarButtons/ToolbarButton.h"
 
 #include <QDialog>
 #include <QLineEdit>
@@ -37,6 +38,7 @@ private:
     QTextEdit* m_noteEdit = nullptr;
     int m_noteHeight = 80;
     QPushButton* m_colorBtn = nullptr;
+    ToolbarButton* m_colorPickerBtn = nullptr;
     QPushButton* m_confirmBtn = nullptr;
     QPushButton* m_cancelBtn = nullptr;
 };

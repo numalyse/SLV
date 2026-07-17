@@ -22,6 +22,8 @@
         <file alias="capture">icons/capture.png</file>
         <file alias="check_white">icons/check_white.png</file>
         <file alias="check">icons/check.png</file>
+        <file alias="color_picker_white">icons/color_picker_white.png</file>
+        <file alias="color_picker">icons/color_picker.png</file>
         <file alias="compo_rule_white">icons/compo_rule_white.png</file>
         <file alias="compo_rule">icons/compo_rule.png</file>
         <file alias="contrast_white">icons/contrast_white.png</file>

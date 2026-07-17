@@ -32,7 +32,7 @@ public:
     };
 
 signals:
-    void finishedSuccess();
+    void finishedSuccess(const QString& mergedPath);
     void finishedError();
 
 private:
@@ -199,7 +199,7 @@ private:
         mergedPath += ".png";
         qDebug() << "final mergedPath : " << mergedPath;
         cv::imwrite(mergedPath.toUtf8().constData(), mergedScreenshot);
-        emit finishedSuccess();
+        emit finishedSuccess(mergedPath);
     }
 
     /// @brief Adds black padding to the smaller images in matList.

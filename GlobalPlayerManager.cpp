@@ -82,6 +82,15 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         disableFullscreenMainRequested();
     });
 
+    connect(m_layoutManager, &PlayerLayoutManager::globalScreenshotSaved, this, [this](const QString& mergedPath){
+        if (m_snapshotPopup)
+            delete m_snapshotPopup;
+
+        // no timecode since all players can have varying timecode and fps
+        m_snapshotPopup = new SnapshotPopup(m_playersWidget ? m_playersWidget : this, mergedPath, -1, 0.0);
+        m_snapshotPopup->showWithFade();
+    });
+
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalZoomStateRequested, this, &GlobalPlayerManager::setGlobalZoomState);

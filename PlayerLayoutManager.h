@@ -89,6 +89,9 @@ signals:
     void activePlayersMediaStateChanged(bool hasMedia);
     void activePlayersCountChanged(bool isSingle);
 
+    /// @brief Emitted when on global screenshot success
+    void globalScreenshotSaved(const QString& mergedPath);
+
 public slots:
     void duplicatePlayer(PlayerWidget* toBeDuplicated);
 

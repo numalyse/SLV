@@ -867,9 +867,7 @@ void PlayerLayoutManager::takeGlobalScreenshot()
     GlobalScreenshotHelper* globalScreenshot = new GlobalScreenshotHelper(getActivePlayersData(), m_currentArrangement);
 
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
-    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
-        QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_global_screenshot_completed"));
-    });
+    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, &PlayerLayoutManager::globalScreenshotSaved);
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedError, this, [this](){
         QMessageBox::critical(this, "", PrefManager::instance().getText("messagebox_global_screenshot_error"));
     });

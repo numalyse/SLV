@@ -48,8 +48,9 @@ private:
     QTimer* m_thumbnailEndTimer;
     int m_thumbnailPendingTime;
     QPushButton* m_okButton;
-    QPushButton* m_audioOnlyButton;
+    QComboBox* m_methodChoice;
     QPushButton* m_cancelButton;
+    QLabel* m_warningMsg;
 
 signals:
 

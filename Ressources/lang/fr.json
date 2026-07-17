@@ -452,7 +452,11 @@
     "messagebox_fullscreen_experimental" : "La fonctionnalité de plein écran du logiciel est en cours de développement.",
 
     "extract_sequence_action" : "Extraire la séquence",
-    "extract_sequence_audio_only_action" : "Extraire l'audio",
+    "extract_sequence_audio_only_action" : "Audio uniquement",
+    "extract_sequence_default" : "Simple (par défaut)",
+    "extract_sequence_reencode" : "Avancée",
+    "extract_sequence_warning" : "La méthode avancée peut prendre plusieurs minutes selon la durée de la séquence.",
+    "extraction_method_choice" : "Méthode d'extraction",
 
     "help_menu_general_checkbox" : "Général",
     "help_menu_report_issues_label" : "Signaler un problème",

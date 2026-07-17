@@ -99,22 +99,20 @@ void ABManager::extractLoop()
 
     selectedPath += '.' + mediaFileInfo.suffix();
 
-    QProcess* ffmpegProcess = SequenceExtractionHelper::extractSequence(
-        mediaFileInfo.filePath(), 
-        m_markers[0]->time(), 
-        m_markers[1]->time(), 
-        selectedPath
-    );
-
-    connect(ffmpegProcess, &QProcess::finished, this, [this, selectedPath, ffmpegProcess](int exitCode, QProcess::ExitStatus exitStatus) {
-        if (exitCode != 0) {
+    SequenceExtractionHelper *ffmpegProcess = new SequenceExtractionHelper(mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time());
+    connect(ffmpegProcess, &SequenceExtractionHelper::extractionFinished, this, [this, selectedPath, ffmpegProcess](const int exitCode) {
+        if (exitCode < 1) {
             emit loopExtractionFailed();
         } else {
             emit loopExtracted(selectedPath);
         }
-
         ffmpegProcess->deleteLater();
     });
+    ffmpegProcess->extractSequenceLossless(
+        selectedPath
+    );
+
+
 
 }
 

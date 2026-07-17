@@ -470,8 +470,8 @@ void PlayerWidget::openSequenceExtractionDialog()
     }
     pause();
     ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
-
-    sequenceExtractor->open();
+    // sequenceExtractor->setModal(false);
+    sequenceExtractor->show();
 
 }
 

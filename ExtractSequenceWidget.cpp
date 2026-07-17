@@ -2,6 +2,8 @@
 #include <QMessageBox>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QComboBox>
+#include <QProgressDialog>
 
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
     : QDialog{parent}, m_media(media)
@@ -52,9 +54,12 @@ void ExtractSequenceWidget::createButtons()
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     m_okButton = new QPushButton(PrefManager::instance().getText("extract_sequence_action"));
-    m_losslessButton = new QPushButton(PrefManager::instance().getText("extract_sequence_lossless_action"));
-    m_reencodeButton = new QPushButton(PrefManager::instance().getText("extract_sequence_reencode_action"));
-    m_audioOnlyButton = new QPushButton(PrefManager::instance().getText("extract_sequence_audio_only_action"));
+    m_methodChoice = new QComboBox();
+    m_methodChoice->addItem(PrefManager::instance().getText("extract_sequence_default"));
+    m_methodChoice->addItem(PrefManager::instance().getText("extract_sequence_reencode"));
+    m_methodChoice->addItem(PrefManager::instance().getText("extract_sequence_audio_only_action"));
+    m_warningMsg = new QLabel("⚠ " + PrefManager::instance().getText("extract_sequence_warning"));
+    m_warningMsg->hide();
     m_cancelButton = new QPushButton(PrefManager::instance().getText("cancel_action"));
     m_startFrameDisplay = new AspectRatioPixmapLabel();
     m_startFrameDisplay->setAlignment(Qt::AlignCenter);
@@ -63,17 +68,31 @@ void ExtractSequenceWidget::createButtons()
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ExtractSequenceWidget::onThumbnailReady);
     m_thumbnailWorker->start();
     connect(m_okButton, &QPushButton::released, this, [this](){
-        confirmExtraction(SequenceExtractionHelper::ExtractionType::Original);
+        switch(m_methodChoice->currentIndex()){
+        default:
+        case 0:
+            confirmExtraction(SequenceExtractionHelper::ExtractionType::Original);
+            break;
+        case 1:
+            confirmExtraction(SequenceExtractionHelper::ExtractionType::Reencode);
+            break;
+        case 2:
+            confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
+        }
     });
-    connect(m_losslessButton, &QPushButton::released, this, [this](){
-        confirmExtraction(SequenceExtractionHelper::ExtractionType::Lossless);
+    connect(m_methodChoice, &QComboBox::currentIndexChanged, [this](int index){
+        if(index == 1) m_warningMsg->show();
+        else m_warningMsg->hide();
     });
-    connect(m_reencodeButton, &QPushButton::released, this, [this](){
-        confirmExtraction(SequenceExtractionHelper::ExtractionType::Reencode);
-    });
-    connect(m_audioOnlyButton, &QPushButton::released, this, [this](){
-        confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
-    });
+    // connect(m_losslessButton, &QPushButton::released, this, [this](){
+    //     confirmExtraction(SequenceExtractionHelper::ExtractionType::Lossless);
+    // });
+    // connect(m_reencodeButton, &QPushButton::released, this, [this](){
+    //     confirmExtraction(SequenceExtractionHelper::ExtractionType::Reencode);
+    // });
+    // connect(m_audioOnlyButton, &QPushButton::released, this, [this](){
+    //     confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
+    // });
     connect(m_cancelButton, &QPushButton::released, this, &QDialog::reject);
     connect(m_startTimeEditor, &TimeEditor::timeChanged, m_endTimeEditor, &TimeEditor::onMinTimeChanged);
     connect(m_startTimeEditor, &TimeEditor::timeChanged, this, &ExtractSequenceWidget::onStartTimeChanged);
@@ -108,11 +127,14 @@ void ExtractSequenceWidget::initUiLayout()
     timeSelectionLayout->addLayout(endTimeSelectionLayout);
 
     QHBoxLayout *confirmLayout = new QHBoxLayout();
+    m_warningMsg->setStyleSheet("color:gold;");
+    m_warningMsg->setTextInteractionFlags(Qt::NoTextInteraction);
+    m_warningMsg->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    confirmLayout->addWidget(m_warningMsg);
     confirmLayout->addStretch();
+    confirmLayout->addWidget(new QLabel(PrefManager::instance().getText("extraction_method_choice") + " :"));
+    confirmLayout->addWidget(m_methodChoice);
     confirmLayout->addWidget(m_okButton);
-    confirmLayout->addWidget(m_losslessButton);
-    confirmLayout->addWidget(m_reencodeButton);
-    confirmLayout->addWidget(m_audioOnlyButton);
     confirmLayout->addWidget(m_cancelButton);
 
     mainLayout->addLayout(timeSelectionLayout);
@@ -177,6 +199,16 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
             if(exitCode == 1)
                 this->accept();
         });
+        // QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("extract_sequence_progress_text"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+        // progressDialog->setWindowTitle(prefManager.getText("extract_sequence_progress_title"));
+        // progressDialog->setWindowModality(Qt::WindowModal);
+
+        // connect(progressDialog, &QProgressDialog::canceled, this, [this](){
+        //     close();
+        // });
+        // connect(sequenceExtractor, &SequenceExtractionHelper::progressStep, progressDialog, &QProgressDialog::setValue);
+        // progressDialog->show();
+
         switch(type){
         case SequenceExtractionHelper::ExtractionType::Original:
         case SequenceExtractionHelper::ExtractionType::AudioOnly:
@@ -189,6 +221,7 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
             sequenceExtractor->reencodeExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
             break;
         }
+
         QFileInfo fileInfo (saveSequencePath);
         prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());
     }

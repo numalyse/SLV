@@ -433,7 +433,11 @@
     "messagebox_fullscreen_experimental" : "La función de pantalla completa del software está actualmente en desarrollo.",
 
     "extract_sequence_action" : "Extraer la secuencia",
-    "extract_sequence_audio_only_action" : "Extraer el audio",
+    "extract_sequence_audio_only_action" : "Solo audio",
+    "extract_sequence_default" : "Simple (predeterminado)",
+    "extract_sequence_reencode" : "Avanzado",
+    "extract_sequence_warning" : "El método avanzado puede tardar varios minutos dependiendo de la duración de la secuencia.",
+    "extraction_method_choice" : "Método de extracción",
 
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Reportar un problema",

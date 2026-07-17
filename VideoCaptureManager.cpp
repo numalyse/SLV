@@ -61,7 +61,8 @@ void VideoCaptureManager::mediaCutAndConcat(const int cutTime, const int newTime
 
     QString concatVideoName = m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix();
     m_concatRecordNumber++;
-    SequenceExtractionHelper::extractSequence(m_mediaFile.filePath(), m_startRecordTime, cutTime, concatVideoName);
+    SequenceExtractionHelper* sequenceExtraction = new SequenceExtractionHelper(m_mediaFile.filePath(), m_startRecordTime, cutTime);
+    sequenceExtraction->extractSequence(m_mediaFile.filePath(), m_startRecordTime, cutTime, concatVideoName);
     if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
     {
         QTextStream stream( m_concatFile );

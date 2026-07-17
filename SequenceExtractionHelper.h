@@ -106,7 +106,7 @@ public:
     /// @param startTime : start of the sequence from media in ms
     /// @param endTime : end of the sequence from media in ms
     /// @param savePath : path in which the sequence will be saved
-    inline static QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original){
+    inline QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original){
         QProcess *ffmpeg = new QProcess();
 
         QString finalSavePath = savePath; 
@@ -132,10 +132,11 @@ public:
                 finalSavePath = QDir(fileInfo.absolutePath()).filePath(fileInfo.completeBaseName() + newExtension);
         }
 
+        int duration = endTime-startTime;
         QStringList args;
         args << "-ss" << QString::number(startTime)+"ms"
              << "-i" << filePath
-             << "-t" << QString::number(endTime-startTime)+"ms";
+             << "-t" << QString::number(duration)+"ms";
 
         switch (exportType)
         {
@@ -150,11 +151,34 @@ public:
         case ExtractionType::Original:
         default:
             args << "-c" << "copy";
+                 // << "-progress" << "pipe:1"
+                 // << "-nostats";
             break;
         }
 
         args << finalSavePath;
 
+        // connect(ffmpeg, &QProcess::readyReadStandardOutput, [this, ffmpeg, duration](){
+        //     QString txt = QString::fromUtf8(ffmpeg->readAllStandardOutput());
+
+        //     static QRegularExpression re(R"(out_time_ms=(\d+))");
+
+        //     auto match = re.match(txt);
+
+        //     if (!match.hasMatch())
+        //         return;
+
+        //     double currentMs = match.captured(1).toInt();
+
+        //     int progress = qBound(0, int(currentMs * 100.0 / float(duration)), 100);
+
+        //     emit progressStep(progress);
+        // });
+        connect(ffmpeg, &QProcess::finished, [this, ffmpeg](){
+            if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0)
+                emit extractionFinished(-1);
+            emit extractionFinished(1);
+        });
         ffmpeg->start(getFfmpegPath(), args);
         //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
         return ffmpeg;
@@ -384,11 +408,10 @@ public:
         reencodeTimecode(false, kb.BE, kb.AE);
     }
 
-    inline void reencodeExtractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original)
+    inline QProcess* reencodeExtractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original)
     {
         if(exportType == ExtractionType::AudioOnly){
-            extractSequence(filePath, startTime, endTime, savePath, exportType);
-            return;
+            return extractSequence(filePath, startTime, endTime, savePath, exportType);
         }
 
         QFileInfo fi(savePath);
@@ -436,6 +459,7 @@ public:
                 emit this->extractionFinished(-2);
             }
         });
+        return nullptr;
     }
 
 public slots:
@@ -461,6 +485,7 @@ public slots:
 signals:
     void extractionFinished(const int exitCode);
     void stepFinished();
+    void progressStep(const int);
 };
 
 #endif // SEQUENCEEXTRACTIONHELPER_H

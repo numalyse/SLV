@@ -432,6 +432,13 @@
 
     "messagebox_fullscreen_experimental" : "O recurso de tela cheia do software está atualmente em desenvolvimento.",
 
+    "extract_sequence_action" : "Extrair sequência",
+    "extract_sequence_audio_only_action" : "Somente áudio",
+    "extract_sequence_default" : "Simples (padrão)",
+    "extract_sequence_reencode" : "Avançado",
+    "extract_sequence_warning" : "O método avançado pode levar vários minutos, dependendo da duração da sequência.",
+    "extraction_method_choice" : "Método de extração",
+
     "help_menu_general_checkbox" : "Geral",
     "help_menu_report_issues_label" : "Reportar um problema",
     "help_menu_classic_checkbox" : "Exibição de visualização única",

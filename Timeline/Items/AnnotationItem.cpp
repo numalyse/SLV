@@ -38,6 +38,7 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
+    p->setPen(QPen(Qt::black));
     p->setBrush(QBrush(m_annot.color));
 
     p->drawRect(0, s_topMargin, m_width, s_height);
@@ -63,6 +64,9 @@ void AnnotationItem::updateTextItem()
     const QString text = m_annot.name + " " + m_annot.note.replace('\n', " ");
     const QString elidedText = metrics.elidedText(text, Qt::ElideRight, static_cast<int>(availableWidth));
     m_annotTxtItem->setPlainText(elidedText);
+
+    // dark text on light backgrounds, light text on dark backgrounds
+    m_annotTxtItem->setDefaultTextColor(qGray(m_annot.color.rgb()) > 128 ? Qt::black : Qt::white);
 
     // centers text on y 
     const double textHeight = m_annotTxtItem->boundingRect().height();

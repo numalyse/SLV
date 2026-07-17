@@ -24,6 +24,7 @@ void AnnotationHandleItem::paint(QPainter *p, const QStyleOptionGraphicsItem *op
 
     p->setRenderHint(QPainter::Antialiasing, true);
 
+    p->setPen(QPen(Qt::black));
     p->setBrush(Qt::white);
     p->drawPolygon(getPolygonPoints(), getPolygonPointCount());
 }

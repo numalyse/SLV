@@ -167,7 +167,6 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
-    bool event(QEvent *event) override;
 
 signals:
     void vlcTimeChanged(int64_t newTime);

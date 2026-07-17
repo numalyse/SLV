@@ -2,6 +2,7 @@
 
 #include "PrefManager.h"
 #include "TimeFormatter.h"
+#include "SignalManager.h"
 #include "ToolbarButtons/ToolbarButton.h"
 
 #ifdef __APPLE__
@@ -76,7 +77,11 @@ SnapshotPopup::SnapshotPopup(QWidget* anchor, const QString& filePath, int64_t v
     adjustSize();
     reposition();
 
-    // detect mouse enter/leave in the popup to restart the auto-close timer
+    // reposition itself when window is moved or resized
+    connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &SnapshotPopup::reposition);
+
+    // detect mouse enter/leave in the popup to restart the auto-close timer,
+    // and follow / raise with the anchor (move, resize, window activation)
     installEventFilter(this);
     m_anchor->installEventFilter(this);
 }
@@ -174,13 +179,18 @@ void SnapshotPopup::buildUi(const QString& filePath, int64_t vlcTime, double fps
         "QLabel { color: %1; font-size: 11px; background: transparent; }").arg(dimColorString));
     subtitleLabel->setMaximumWidth(maxTextWidth);
     // only the file name is elided so the timecode stays visible even for long file names
+    // no timecode if vlcTime < 0 or fps <= 0 ( this is the case for global screenshot when merging players at different fps)
     const QString baseName = QFileInfo(filePath).completeBaseName();
-    const QString timecode = TimeFormatter::msToHHMMSSFF(vlcTime, fps);
-    const QString separator = QStringLiteral(" • ");
     const QFontMetrics subtitleFm = subtitleLabel->fontMetrics();
-    const int reservedWidth = subtitleFm.horizontalAdvance(separator + timecode);
-    const QString elidedName = subtitleFm.elidedText(baseName, Qt::ElideRight, qMax(0, maxTextWidth - reservedWidth));
-    subtitleLabel->setText(elidedName + separator + timecode);
+    if (vlcTime >= 0 && fps > 0) {
+        const QString timecode = TimeFormatter::msToHHMMSSFF(vlcTime, fps);
+        const QString separator = QStringLiteral(" • ");
+        const int reservedWidth = subtitleFm.horizontalAdvance(separator + timecode);
+        const QString elidedName = subtitleFm.elidedText(baseName, Qt::ElideRight, qMax(0, maxTextWidth - reservedWidth));
+        subtitleLabel->setText(elidedName + separator + timecode);
+    } else {
+        subtitleLabel->setText(subtitleFm.elidedText(baseName, Qt::ElideRight, maxTextWidth));
+    }
     textLayout->addWidget(subtitleLabel);
 
     QLabel* folderLabel = new QLabel(card);
@@ -263,6 +273,12 @@ bool SnapshotPopup::eventFilter(QObject* watched, QEvent* event)
         } else if (event->type() == QEvent::Leave) {
             // mouse leaves the popup: restart the auto-close timer
             m_closeTimer->start();
+        }
+    } else if (watched == m_anchor) {
+        if (event->type() == QEvent::Move || event->type() == QEvent::Resize) {
+            reposition();
+        } else if (event->type() == QEvent::WindowActivate) {
+            raise();
         }
     }
     return QFrame::eventFilter(watched, event);

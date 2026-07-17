@@ -13,8 +13,8 @@ class SnapshotPopup : public QFrame
 public:
     /// @param anchor widget to anchor the popup to (top-right corner)
     /// @param filePath filepath of the snapshot image
-    /// @param vlcTime vlc time of the snapshot (in milliseconds)
-    /// @param fps fps of the media, used to format the timestamp
+    /// @param vlcTime vlc time of the snapshot (in milliseconds), pass -1 to hide the timecode
+    /// @param fps fps of the media, used to format the timestamp, pass 0 to hide the timecode
     explicit SnapshotPopup(QWidget* anchor, const QString& filePath, int64_t vlcTime, double fps);
     ~SnapshotPopup();
 

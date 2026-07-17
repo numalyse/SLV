@@ -199,6 +199,10 @@
     "delete_all_items_confirm" : "Cette action est irréversible.",
     
     "remove" : "Retirer",
+    "edit" : "Modifier",
+    "annotation" : "Annotation",
+    "annotation_name" : "Nom",
+    "annotation_note" : "Note",
     "remove_all" : "Tout retirer",
     "remove_all_items_playlist" : "Réinitialiser la playlist",
     "tooltip_remove_all_items_playlist" : "Retirer tous les éléments de la playlist",
@@ -213,6 +217,8 @@
     "tooltip_drawing_mode" : "Mode Dessin",
     "tooltip_pencil_tool" : "Crayon",
     "tooltip_color_tool" : "Couleur",
+    "tooltip_filter_on" : "Désactiver le filtre par couleur",
+    "tooltip_filter_off" : "Filtrer les annotations par couleur",
     "white" : "Blanc",
     "black" : "Noir",
     "red" : "Rouge",
@@ -438,6 +444,7 @@
 
     "tooltip_playlist_button" : "Ouvrir la playlist",
     "tooltip_shot_detail_button" : "Ouvrir les informations du plan",
+    "tooltip_annotation_button" : "Ouvrir les annotations",
 
     "messagebox_fullscreen_experimental" : "La fonctionnalité de plein écran du logiciel est en cours de développement.",
 

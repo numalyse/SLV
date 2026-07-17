@@ -6,6 +6,11 @@
 #include <QGraphicsItem>
 #include <QTimer>
 
+class ABMarkerItem;
+class AnnotationHandleItem;
+class ShotItem;
+class AudioShotItem;
+
 class TimelineView : public QGraphicsView
 {
 Q_OBJECT 
@@ -16,12 +21,12 @@ public:
 signals:
     void zoomRequested(double zoomFactor, int mouseX);
     void cursorPositionRequested(double);
-    void itemLeftClick(QGraphicsItem*);
-    void itemShiftLeftClick(QGraphicsItem*);
+    void shotSelectionRequested(ShotItem*, AudioShotItem*, const bool exclusive);
     void itemRightClick(QPoint, QGraphicsItem*);
     void isDragging(bool);
-    void abMarkerDragged(QGraphicsItem*, const int);
-    
+    void abMarkerDragged(ABMarkerItem*, const double);
+    void annotationHandleDragged(AnnotationHandleItem*, const double);
+
 protected:
     void wheelEvent(QWheelEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -30,13 +35,11 @@ protected:
 
 private: 
 
-    bool m_isDragging = false;
+    enum class DragMode { None, Pan, TimeCursor, ABMarker, AnnotationHandle };
+    DragMode m_dragMode = DragMode::None;
+    QGraphicsItem* m_draggedItem = nullptr;
 
-    bool m_isPanning = false;
     QPoint m_lastPanPos;
-    QGraphicsItem* m_draggedABMarker = nullptr;
-    QGraphicsItem* m_draggedCursor = nullptr;
-
 };
 
 #endif

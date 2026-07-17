@@ -11,6 +11,7 @@
 #include "Timeline/SegmentationThread.h"
 #include "Timeline/TransitionManager.h"
 #include "Timeline/ThumbnailWorker.h"
+#include "Timeline/AnnotationItemManager.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -37,10 +38,11 @@ Q_OBJECT
 
 public:
 
-explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+    explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
+    AnnotationItemManager* annotItemManager() { return m_annotItemManager; };
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
@@ -71,14 +73,11 @@ private slots:
     void splitShotAtCursor();
     void ABAction();
     void moveCursor(double cursorPosX);
-    void itemLeftClick(QGraphicsItem*);
-    void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
     void updateTimelineGeometry();
     void autoSegmentation();
-    void dragABMarker(QGraphicsItem*, const int);
     void exportDone(const QString& text, const QString& outputPath);
     void fitSceneToViewport();
 
@@ -99,6 +98,7 @@ private:
     TimelineMath* m_mathManager = nullptr;
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
+    AnnotationItemManager* m_annotItemManager = nullptr;
 
     QPointer<SegmentationThread> m_segmThread;
     ToolbarButton* m_autoSegmentationBtn = nullptr;

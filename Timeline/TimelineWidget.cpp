@@ -156,12 +156,10 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_view->setFrameShape(QFrame::NoFrame);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
+    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit completement effacé quand on scroll
 
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
-    connect(m_view, &TimelineView::itemShiftLeftClick, this, &TimelineWidget::itemShiftLeftClick);
-    connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
         if(dragState) {
@@ -174,13 +172,14 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
         m_isDraggingCursor = dragState;
     });
-    connect(m_view, &TimelineView::abMarkerDragged, this, &TimelineWidget::dragABMarker);
+    connect(m_view, &TimelineView::abMarkerDragged, m_abManager, &ABManager::dragMarker);
 
     layout->addWidget(m_view);
 
     m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, thumbnailWorker, projectMedia, projectShots, this);
     computeMediaAmplitudes(projectMedia->filePath());
 
+    connect(m_view, &TimelineView::shotSelectionRequested, m_shotManager, &ShotManager::toggleSelection);
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
@@ -191,6 +190,9 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
     });
+
+    m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
+    connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), projectMedia->duration(), projectMedia->fps());
     m_ruler->setPos(0, 0);
@@ -318,9 +320,7 @@ void TimelineWidget::fitSceneToViewport(){
 
 void TimelineWidget::updateTimelineGeometry()
 {
-    auto duration = m_mathManager->duration();
-
-    m_sceneWidth = duration * m_mathManager->pixelsPerMs();
+    m_sceneWidth = m_mathManager->duration() * m_mathManager->pixelsPerMs();
 
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
@@ -338,6 +338,7 @@ void TimelineWidget::updateTimelineGeometry()
     updateCursorPos(m_vlcTime);
 
     m_shotManager->updateShotItemsPosition();
+    m_annotItemManager->updateAnnotItemsPosition();
 }
 
 
@@ -368,40 +369,6 @@ void TimelineWidget::moveCursor(double newCursorPosX)
     }
 
     m_shotManager->updateCurrentShot(m_vlcTime);
-}
-
-void TimelineWidget::itemLeftClick(QGraphicsItem * item)
-{
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem:{
-            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
-            m_shotManager->toggleSelection(nullptr, audioShotItem, true);
-            break;
-        }
-        case SLV::TypeShotItem:{
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            m_shotManager->toggleSelection(shotItem, nullptr, true);
-            break;
-        }
-    }
-}
-
-/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
-/// @param item
-void TimelineWidget::itemShiftLeftClick(QGraphicsItem * item)
-{
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem:{
-            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
-            m_shotManager->toggleSelection(nullptr, audioShotItem, false);
-            break;
-        }
-        case SLV::TypeShotItem:{
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            m_shotManager->toggleSelection(shotItem, nullptr, false);
-            break;
-        }
-    }
 }
 
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
@@ -726,12 +693,7 @@ void TimelineWidget::initAudioVisualizer()
     m_scene->addItem(m_audioVisualizer);
 }
 
-void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
-{
-    int64_t newTime = m_mathManager->posToTimeSnapped(pos);
-    ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
-    m_abManager->changeMarkerTime(abm, newTime);
-}
+
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {

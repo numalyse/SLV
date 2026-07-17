@@ -29,7 +29,7 @@ public:
 public slots:
     void onStartTimeChanged(const int newTime);
     void onEndTimeChanged(const int newTime);
-    void onThumbnailReady(int requestId, const QImage& image);
+    void onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
     void confirmExtraction(SequenceExtractionHelper::ExtractionType type);
 
 private:

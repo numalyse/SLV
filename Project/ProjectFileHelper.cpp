@@ -29,6 +29,23 @@ namespace  {
         return shotArray;
     }
 
+    QJsonArray writeAnnotsData(const Project* project) {
+        const auto& annotations = project->annotations;
+        QJsonArray annotArray;
+
+        for(const auto& annotation : annotations) {
+            QJsonObject annotObject;
+            annotObject["id"] = annotation.id;
+            annotObject["start"] = annotation.start;
+            annotObject["end"] = annotation.end;
+            annotObject["name"] = annotation.name;
+            annotObject["note"] = annotation.note;
+            annotObject["color"] = annotation.color.name();
+            annotArray.append(annotObject);
+        }
+        return annotArray;
+    }
+
     QJsonObject writeMediaData(const Project* project) {
         QJsonObject mediaData;
         auto projectMedia = project->media;
@@ -152,6 +169,28 @@ namespace ProjectFileHelper {
             return std::unexpected(ProjectFileError::MediaKeyMissing); 
         }
 
+        if(projectData.contains("annots") && projectData["annots"].isArray()){
+            QJsonArray annotsArray = projectData["annots"].toArray();
+            for (const QJsonValue& value : annotsArray) {
+                QJsonObject annotJsonObj = value.toObject();
+                Annotation annot; 
+                
+                annot.id = annotJsonObj.value("id").toInteger();
+                annot.start = annotJsonObj.value("start").toInteger(0LL); 
+                annot.end = annotJsonObj.value("end").toInteger(0LL);
+                annot.name = annotJsonObj.value("name").toString("");
+                annot.note = annotJsonObj.value("note").toString("");
+                QColor color = QColor::fromString(annotJsonObj.value("color").toString(""));
+                if (color.isValid()) {
+                    annot.color = color;
+                }
+
+                loadedData.annots.append(annot);
+            }
+        }else {
+            loadedData.annots = {};
+        }
+
         return loadedData;
     }
 
@@ -181,6 +220,7 @@ namespace ProjectFileHelper {
         QJsonObject j;
         j["media"] = writeMediaData(project);
         j["shots"] = writeShotsData(timeline);
+        j["annots"] = writeAnnotsData(project);
 
         QJsonDocument doc(j);
         projectDataFile.write(doc.toJson(QJsonDocument::Indented)); 

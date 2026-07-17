@@ -62,9 +62,6 @@ protected:
 
     void initDrawingSurface();
 
-    QIcon genIconPreviewColor(QColor color, int sizePen = 30, bool outlineActivated = false);
-    QIcon genIconPreviewColor(QColor color, bool outlineActivated);
-
     void updatePen();
     void initDrawingToolbar();
 
@@ -113,7 +110,6 @@ private:
     QVector<double> m_opacityLevels = {0.25, 0.5, 1.0};
 
     QColor m_color = QColor(255, 255, 255, 255);
-    QVector<QPair<QString, QColor>> m_palette;
 
     QPixmap eraseColor();
     QPixmap m_eraseBrush = eraseColor();

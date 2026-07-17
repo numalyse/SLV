@@ -15,6 +15,7 @@ struct ProjectSaveData {
     int64_t duration = 0;
     double fps = 0.0;
     QVector<Shot> shots;
+    QVector<Annotation> annots;
 };
 
 enum class ProjectFileError {

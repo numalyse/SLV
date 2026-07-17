@@ -200,6 +200,10 @@
     "delete_all_items_confirm" : "This action is irreversible.",
 
     "remove" : "Remove",
+    "edit" : "Edit",
+    "annotation" : "Annotation",
+    "annotation_name" : "Name",
+    "annotation_note" : "Note",
     "remove_all" : "Remove all",
     "remove_all_items_playlist" : "Remove playlist",
     "tooltip_remove_all_items_playlist" : "Remove all items in the playlist",
@@ -214,6 +218,8 @@
     "tooltip_drawing_mode" : "Drawing Mode",
     "tooltip_pencil_tool" : "Pencil",
     "tooltip_color_tool" : "Color",
+    "tooltip_filter_on" : "Disable color filter",
+    "tooltip_filter_off" : "Filter annotations by color",
     "white" : "White",
     "black" : "Black",
     "red" : "Red",
@@ -439,6 +445,7 @@
 
     "tooltip_playlist_button" : "Open playlist",
     "tooltip_shot_detail_button" : "Open shot information",
+    "tooltip_annotation_button" : "Open annotations",
 
     "messagebox_fullscreen_experimental" : "The software's fullscreen feature is currently under development.",
 

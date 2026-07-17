@@ -16,10 +16,14 @@
         <file alias="invert_h">icons/BiSymmetryVertical.png</file>
         <file alias="brightness_white">icons/brightness_white.png</file>
         <file alias="brightness">icons/brightness.png</file>
+        <file alias="cancel_white">icons/cancel_white.png</file>
+        <file alias="cancel">icons/cancel.png</file>
         <file alias="capture_white">icons/capture_white.png</file>
         <file alias="capture">icons/capture.png</file>
         <file alias="check_white">icons/check_white.png</file>
         <file alias="check">icons/check.png</file>
+        <file alias="color_picker_white">icons/color_picker_white.png</file>
+        <file alias="color_picker">icons/color_picker.png</file>
         <file alias="compo_rule_white">icons/compo_rule_white.png</file>
         <file alias="compo_rule">icons/compo_rule.png</file>
         <file alias="contrast_white">icons/contrast_white.png</file>
@@ -34,6 +38,8 @@
         <file alias="draw">icons/draw.png</file>
         <file alias="duplicate_media_white">icons/duplicate_media_white.png</file>
         <file alias="duplicate_media">icons/duplicate_media.png</file>
+        <file alias="edit_white">icons/edit_white.png</file>
+        <file alias="edit">icons/edit.png</file>
         <file alias="eject_white">icons/eject_white.png</file>
         <file alias="eject">icons/eject.png</file>
         <file alias="eraser_white">icons/eraser_white.png</file>
@@ -42,6 +48,10 @@
         <file alias="export">icons/export.png</file>
         <file alias="extract_sequence_white">icons/extract_video_white.png</file>
         <file alias="extract_sequence">icons/extract_video.png</file>
+        <file alias="filter_off_white">icons/filter_off_white.png</file>
+        <file alias="filter_off">icons/filter_off.png</file>
+        <file alias="filter_on_white">icons/filter_on_white.png</file>
+        <file alias="filter_on">icons/filter_on.png</file>
         <file alias="folder_white">icons/folder_white.png</file>
         <file alias="folder">icons/folder.png</file>
         <file alias="forward_white">icons/forward_white.png</file>

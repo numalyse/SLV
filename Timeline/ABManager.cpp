@@ -11,6 +11,11 @@ ABManager::ABManager(QGraphicsScene *scene, TimelineMath *mathManager, QObject *
 {
 }
 
+void ABManager::dragMarker(ABMarkerItem* marker, const double pos)
+{
+    changeMarkerTime(marker, p_mathManager->posToTimeSnapped(pos));
+}
+
 
 std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 {

@@ -79,9 +79,11 @@ set(PROJECT_SOURCES
 
     PrefManager.h PrefManager.cpp
     TimeFormatter.h
+    IconHelper.h
     VlcParseHelper.h
     VlcInstance.h
     Shot.h
+    Annotation.h
     SignalManager.h
 
     Project/Project.h
@@ -106,12 +108,18 @@ set(PROJECT_SOURCES
     Timeline/ShotManager.h Timeline/ShotManager.cpp
     Timeline/TransitionManager.h Timeline/TransitionManager.cpp
     Timeline/BaseRangeManager.h
+    Timeline/AnnotationItemManager.h Timeline/AnnotationItemManager.cpp
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp
 
     Ressources/supported_formats_resources.qrc
     FileFormatManager.h FileFormatManager.cpp
+
+    AnnotationManager.h AnnotationManager.cpp
+    AnnotationPanel.h AnnotationPanel.cpp
+    AnnotationWidget.h AnnotationWidget.cpp
+    AnnotationDialog.h AnnotationDialog.cpp
 )
 
 # =========================================================
@@ -155,6 +163,8 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
     Timeline/Items/TransitionMarkerItem.cpp Timeline/Items/TransitionMarkerItem.h
     Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
+    Timeline/Items/AnnotationItem.h Timeline/Items/AnnotationItem.cpp
+    Timeline/Items/AnnotationHandleItem.h Timeline/Items/AnnotationHandleItem.cpp
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h

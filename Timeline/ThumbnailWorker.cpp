@@ -12,15 +12,18 @@ ThumbnailWorker::~ThumbnailWorker() {
     stop();
 }
 
-void ThumbnailWorker::requestThumbnail(int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize, double sar)
+void ThumbnailWorker::requestThumbnail(Requester requester, int requestId, int64_t msStart, int64_t lengthMs, const QString& mediaPath, QSize targetSize, double sar)
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    if(requestId >= 0){ 
-        m_queue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
-    }else { // id < 0, priorité sur les autres
-        m_priorityQueue.enqueue({requestId, msStart, lengthMs, mediaPath, targetSize, sar});
-    }
+    QQueue<ThumbnailRequest>& queue = (requester == Requester::ShotDetail) ? m_priorityQueue : m_queue; // priorité sur les requetes venant de shotDetail
+
+    // une requete en attente avec le meme requester + id est obsolete (ex : temps modifié avant qu'elle soit traitée), on la remplace
+    queue.removeIf([requester, requestId](const ThumbnailRequest& pending){
+        return pending.requester == requester && pending.requestId == requestId;
+    });
+
+    queue.enqueue({requester, requestId, msStart, lengthMs, mediaPath, targetSize, sar});
 
     m_condition.wakeOne(); // reveille si on est en train d'attendre que la queue se remplisse
 }
@@ -44,12 +47,6 @@ void ThumbnailWorker::keepNQueue(const int n)
     while (m_queue.size() > n) {
         m_queue.dequeue();
     }
-}
-
-void ThumbnailWorker::clearPriotityQueue()
-{
-    QMutexLocker locker(&m_mutex);
-    m_priorityQueue.clear();
 }
 
 void ThumbnailWorker::releaseOpenCvCap()
@@ -149,7 +146,7 @@ void ThumbnailWorker::run()
 
         QImage img(resized.data, resized.cols, resized.rows, resized.step, QImage::Format_BGR888);
 
-        emit thumbnailReady(req.requestId, img.copy()); // copy because img does a shallow copy of the cv::mat
+        emit thumbnailReady(req.requester, req.requestId, img.copy()); // copy because img does a shallow copy of the cv::mat
 
     }
 

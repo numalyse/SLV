@@ -9,6 +9,8 @@
 #include "Project/ProjectFileHelper.h"
 #include "Project/ProjectExportHelper.h"
 
+#include "AnnotationManager.h"
+
 #include <expected>
 
 #include <QPointer>
@@ -48,6 +50,8 @@ public:
     QString mediaPath();
     QString mediaPathExtension();
 
+    AnnotationManager* annotationManager() {return m_annotationManager; };
+
     bool needSave() {
         if(!m_project) return false;
         return m_needSave;
@@ -77,6 +81,8 @@ private:
     bool m_projectInitialized = false;
 
     TimelineWidget* p_timeline = nullptr;
+
+    AnnotationManager* m_annotationManager = nullptr;
 
     // store thread as members, so when destructor is called we can wait for the threads to end
     // QPointers so automatically set themselves to nullptr when destroyed

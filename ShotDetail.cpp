@@ -14,10 +14,12 @@
 #include <QSizePolicy>
 
 
-ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
+ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
 {
     //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+
+    connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotDetail::onThumbnailReady);
 
     PrefManager& PrefManager = PrefManager::instance();
 
@@ -82,7 +84,6 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
 void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
-    emit clearThumbnailQueueRequested();
     m_shotData = shotData;
     m_shotId = shotId;
 
@@ -111,8 +112,8 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     Media* projMedia = ProjectManager::instance().media();
     if(projMedia->filePath().isEmpty()){
         qDebug() << "[ShotDetail] Impossible de récuperer la tag image, le path du média du project est vide";
-    }else {
-        emit updateImageRequested(-1, shotData->tagImageTime, 0, projMedia, m_imageSize);
+    }else if(projMedia->type() == MediaType::Video){
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, 0, shotData->tagImageTime, 0, projMedia->filePath(), m_imageSize, projMedia->sar());
     }
 
 }
@@ -124,8 +125,11 @@ void ShotDetail::toggleShotControlButtons(bool state)
     m_toPrevShotBtn->setEnabled(state);
 }
 
-void ShotDetail::updateTagImage(QImage image)
+void ShotDetail::onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image)
 {
+    if(requester != ThumbnailWorker::Requester::ShotDetail)
+        return;
+
     m_tagImage->clear();
     QPixmap pixmap = QPixmap::fromImage(image);
     m_tagImage->setPixmap(pixmap);

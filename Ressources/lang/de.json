@@ -199,6 +199,10 @@
     "delete_all_items_confirm" : "Diese Aktion ist unwiderruflich.",
 
     "remove" : "Entfernen",
+    "edit" : "Bearbeiten",
+    "annotation" : "Anmerkung",
+    "annotation_name" : "Name",
+    "annotation_note" : "Notiz",
     "remove_all" : "Alle entfernen",
     "remove_all_items_playlist" : "Playlist entfernen",
     "tooltip_remove_all_items_playlist" : "Alle Elemente der Playlist entfernen",
@@ -213,6 +217,8 @@
     "tooltip_drawing_mode" : "Zeichenmodus",
     "tooltip_pencil_tool" : "Stift",
     "tooltip_color_tool" : "Farbe",
+    "tooltip_filter_on" : "Farbfilter deaktivieren",
+    "tooltip_filter_off" : "Anmerkungen nach Farbe filtern",
     "white" : "Weiß",
     "black" : "Schwarz",
     "red" : "Rot",
@@ -437,6 +443,7 @@
 
     "tooltip_playlist_button" : "Wiedergabeliste öffnen",
     "tooltip_shot_detail_button" : "Shot-Informationen öffnen",
+    "tooltip_annotation_button" : "Anmerkungen öffnen",
 
     "messagebox_fullscreen_experimental" : "Die Vollbildfunktion der Software befindet sich derzeit in Entwicklung.",
 

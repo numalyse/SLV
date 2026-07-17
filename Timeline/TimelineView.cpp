@@ -1,6 +1,9 @@
 #include "Timeline/TimelineView.h"
 
 #include "Timeline/ItemTypes.h"
+#include "Timeline/Items/ABMarkerItem.h"
+#include "Timeline/Items/AnnotationHandleItem.h"
+#include "Timeline/Items/AudioShotItem.h"
 
 #include <QDebug>
 #include <QScrollBar>
@@ -23,64 +26,56 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {   
         if (event->modifiers() & Qt::ShiftModifier) {
-            m_isPanning = true;
-            m_lastPanPos = event->pos(); 
+            m_dragMode = DragMode::Pan;
+            m_lastPanPos = event->pos();
             setCursor(Qt::ClosedHandCursor);
-            
+
         } else if (event->modifiers() & Qt::ControlModifier) {
             QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
             for (auto* item : itemsAtCursor){
-                if (item->type() == SLV::TypeAudioShotItem || item->type() == SLV::TypeShotItem){
-                    emit itemShiftLeftClick(item);
+                if (item->type() == SLV::TypeAudioShotItem){
+                    emit shotSelectionRequested(nullptr, static_cast<AudioShotItem*>(item), false);
+                } else if (item->type() == SLV::TypeShotItem){
+                    emit shotSelectionRequested(static_cast<ShotItem*>(item), nullptr, false);
                 }
             }
 
-        } else {
-            QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
-            QGraphicsItem* shotItem = nullptr;
-            QGraphicsItem* audioShotItem = nullptr;
-            for (auto* item : itemsAtCursor){
-                if( item->type() == SLV::TypeABMarkerItem ){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
+        } else { // click with no modifiers
+
+            // priority set by z value, other items like audio visualizer are ignored
+            for (auto* item : items(event->pos())) {
+                switch (item->type())
+                {
+                case SLV::TypeABMarkerItem:
+                    m_dragMode = DragMode::ABMarker;
+                    m_draggedItem = item;
                     setCursor(Qt::ClosedHandCursor);
-                    m_draggedABMarker = item;
+                    return;
+                case SLV::TypeAnnotationHandleItem:
+                    m_dragMode = DragMode::AnnotationHandle;
+                    m_draggedItem = static_cast<AnnotationHandleItem*>(item)->annotParent()->closestHandle(mapToScene(event->pos()).x());
+                    return;
+                case SLV::TypeCursorItem:
+                case SLV::TypeRulerItem:
+                    m_dragMode = DragMode::TimeCursor;
+                    emit isDragging(true);
+                    emit cursorPositionRequested(mapToScene(event->pos()).x());
+                    return;
+                case SLV::TypeShotItem:
+                    emit shotSelectionRequested(static_cast<ShotItem*>(item), nullptr, true);
+                    return;
+                case SLV::TypeAudioShotItem:
+                    emit shotSelectionRequested(nullptr, static_cast<AudioShotItem*>(item), true);
+                    return;
                 }
-                if( item->type() == SLV::TypeCursorItem || item->type() == SLV::TypeRulerItem ){
-                    m_draggedCursor = item;
-                }
-
-                if(item->type() == SLV::TypeShotItem){
-                    shotItem = item;
-                }
-                if(item->type() == SLV::TypeAudioShotItem){
-                    audioShotItem = item;
-                }
-
             }
-            if(m_draggedABMarker) return;
-
-            if(m_draggedCursor){
-                m_isDragging = true;
-                emit isDragging(true);
-                double clickPosition = static_cast<double>(mapToScene(event->pos()).x());
-                emit cursorPositionRequested(clickPosition);
-                return;
-            } // le click sur le curseur prend le dessus sur le reste
-
-            if(shotItem ){
-                emit itemLeftClick(shotItem);
-                return;
-            }
-            if(audioShotItem){
-                emit itemLeftClick(audioShotItem);
-                return;
-            }
-   
         }
     }else if (event->button() == Qt::RightButton) {
         QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
         for (auto* item : itemsAtCursor){ 
-            if(item->type() == SLV::TypeShotItem || item->type() == SLV::TypeAudioShotItem){ // si le curseur est devant un shot item, on va quand même pouvoir récuperer le shot item
-                emit itemRightClick( event->globalPos() , item);
+            // emit signal if cursor is on top of a shot item (even if underneath by other item)
+            if(item->type() == SLV::TypeShotItem || item->type() == SLV::TypeAudioShotItem){ 
+                emit itemRightClick( event->globalPos(), item);
                 break;
             }
         }
@@ -89,33 +84,39 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
 
 void TimelineView::mouseMoveEvent(QMouseEvent *event)
 {
-    if(m_isDragging){
-        emit cursorPositionRequested(static_cast<double>(mapToScene(event->pos()).x()));
-        return;
-    }else if( m_isPanning){
+    switch (m_dragMode)
+    {
+    case DragMode::Pan: {
         int deltaX = event->pos().x() - m_lastPanPos.x();
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - deltaX);
         m_lastPanPos = event->pos();
-        return;
+        break;
     }
-    if(m_draggedABMarker){
-        emit abMarkerDragged(m_draggedABMarker, mapToScene(event->pos()).x());
-        return;
-    }
-    else{
-        unsetCursor();
-    }
+    
+    case DragMode::TimeCursor:
+        emit cursorPositionRequested(mapToScene(event->pos()).x());
+        break;
 
+    case DragMode::ABMarker:
+        emit abMarkerDragged(static_cast<ABMarkerItem*>(m_draggedItem), mapToScene(event->pos()).x());
+        break;
+
+    case DragMode::AnnotationHandle:
+        emit annotationHandleDragged(static_cast<AnnotationHandleItem*>(m_draggedItem), mapToScene(event->pos()).x());
+        break;
+
+    case DragMode::None:
+    default:
+        break;
+    }
 }
 
 void TimelineView::mouseReleaseEvent(QMouseEvent *event)
 {
-    emit isDragging(false);
-    m_isDragging = false;
-    if (m_isPanning) {
-        m_isPanning = false;
-        setCursor(Qt::ArrowCursor); 
-    }
-    m_draggedABMarker = nullptr;
-    m_draggedCursor = nullptr;
+    if (m_dragMode == DragMode::TimeCursor)
+        emit isDragging(false);
+    
+    setCursor(Qt::ArrowCursor);
+    m_dragMode = DragMode::None;
+    m_draggedItem = nullptr;
 }

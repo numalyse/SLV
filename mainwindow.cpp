@@ -31,6 +31,8 @@
 #include <QCursor>
 #include <QCloseEvent>
 
+#include <algorithm>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -81,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_globalPlayerManager, &GlobalPlayerManager::activePlayersMediaStateChanged, this, [this](bool hasMedia){
         m_shotDetailBtn->setEnabled(hasMedia);
+        m_annotationPanelBtn->setEnabled(hasMedia);
     });
     
     connect(m_globalPlayerManager, &GlobalPlayerManager::activePlayersCountChanged, this, [this](bool isSingle){
@@ -205,34 +208,47 @@ void MainWindow::createToolBar()
     // QHBoxLayout *shotDetailOption = new QHBoxLayout();
     // QLabel *playlistLabel = new QLabel(PrefManager::instance().getText("tooltip_playlist_button"));
     // QLabel *shotDetailLabel = new QLabel(PrefManager::instance().getText("tooltip_shot_detail_button"));
+    m_annotationPanelBtn = new ToolbarButton(nullptr, "plus_white", PrefManager::instance().getText("tooltip_annotation_button"));
     m_playlistBtn = new ToolbarButton(nullptr, "playlist_white", PrefManager::instance().getText("tooltip_playlist_button"));
     m_shotDetailBtn = new ToolbarButton(nullptr, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
     m_shotDetailBtn->setEnabled(false);
+    m_annotationPanelBtn->setEnabled(false);
     // playlistOption->addWidget(playlistLabel);
     // playlistOption->addWidget(m_playlistBtn);
     // shotDetailOption->addWidget(shotDetailLabel);
     // shotDetailOption->addWidget(m_shotDetailBtn);
     m_playlistBtn->setText("  " + PrefManager::instance().getText("tooltip_playlist_button"));
     m_shotDetailBtn->setText("  " + PrefManager::instance().getText("tooltip_shot_detail_button"));
+    m_annotationPanelBtn->setText("  " + PrefManager::instance().getText("tooltip_annotation_button"));
     panelDisplayLayout->addWidget(m_playlistBtn, 0, Qt::AlignLeft);
+    panelDisplayLayout->addWidget(m_annotationPanelBtn, 0, Qt::AlignLeft);
     panelDisplayLayout->addWidget(m_shotDetailBtn, 0, Qt::AlignLeft);
 
     m_playlistBtn->setMinimumSize(QSize(0, 0));
     m_playlistBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
     m_shotDetailBtn->setMinimumSize(QSize(0, 0));
     m_shotDetailBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-    int maxWidth = qMax(
+    m_annotationPanelBtn->setMinimumSize(QSize(0, 0));
+    m_annotationPanelBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+
+    int maxWidth = std::max({
         m_playlistBtn->sizeHint().width(),
-        m_shotDetailBtn->sizeHint().width()
-    ) + 3;
+        m_shotDetailBtn->sizeHint().width(),
+        m_annotationPanelBtn->sizeHint().width()
+    }) + 3;
+
+
 
     m_playlistBtn->setFixedWidth(maxWidth);
     m_shotDetailBtn->setFixedWidth(maxWidth);
+    m_annotationPanelBtn->setFixedWidth(maxWidth);
     m_playlistBtn->setIconSize(QSize(18, 18));
     m_shotDetailBtn->setIconSize(QSize(18, 18));
+    m_annotationPanelBtn->setIconSize(QSize(18, 18));
 
     m_playlistBtn->setStyleSheet("text-align:left;");
     m_shotDetailBtn->setStyleSheet("text-align:left;");
+    m_annotationPanelBtn->setStyleSheet("text-align:left;");
 
     m_navPanelBtn = new ToolbarToggleHoverButton(
         m_toolbarQt,
@@ -259,6 +275,8 @@ void MainWindow::createToolBar()
     connect(m_playlistBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(m_shotDetailBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail);
     connect(m_shotDetailBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
+    connect(m_annotationPanelBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::displayAnnotationPanel);
+    connect(m_annotationPanelBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(&SignalManager::instance(), &SignalManager::toggleNavPanel, this, [this](){
         m_navPanelBtn->click();
         emit SignalManager::instance().extensionToolbarDisplayShotDetail();

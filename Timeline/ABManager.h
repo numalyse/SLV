@@ -26,6 +26,9 @@ public:
     std::optional<int64_t> clampToLoopRange(int64_t time);
     void extractLoop();
 
+public slots:
+    void dragMarker(ABMarkerItem* marker, const double pos);
+
 private:
     enum class LoopState {
         Idle,   // jamais entré dans al loop

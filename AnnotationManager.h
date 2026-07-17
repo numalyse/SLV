@@ -18,7 +18,8 @@ public:
 
     const QVector<Annotation> &annotations() const;
 
-    bool hasConflict(const Annotation& annotation) const;
+    /// @brief Returns the annotation that conflicts with the new/updated annotation, nullopt if no conflicts
+    std::optional<Annotation> findConflict(Annotation& annotation);
 
     void setAnnotations(QVector<Annotation>* annotations);
     void clear();

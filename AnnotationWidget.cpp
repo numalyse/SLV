@@ -158,7 +158,10 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
 
     connect(m_confirmBtn, &QPushButton::released, this, [this](){
         auto* annotManager = ProjectManager::instance().annotationManager();
-        if( annotManager && annotManager->hasConflict(editedAnnotation()))
+        if(!annotManager) return;
+        Annotation annot = editedAnnotation();
+        auto conflict = annotManager->findConflict(annot);
+        if(conflict.has_value())
         {
             m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
             m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));

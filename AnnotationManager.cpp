@@ -17,6 +17,30 @@ const QVector<Annotation>& AnnotationManager::annotations() const
     return p_annotations ? *p_annotations : empty;
 }
 
+std::optional<Annotation> AnnotationManager::findConflict(Annotation &annotation)
+{
+    if (!p_annotations)
+        return std::nullopt;
+
+    validateAnnotation(annotation);
+
+    // first element where start > annotation.end
+    auto upperBound = std::upper_bound(p_annotations->begin(), p_annotations->end(), annotation.end, [](int64_t annotEnd, const Annotation& b){
+        return annotEnd < b.start;
+    });
+
+    auto it = upperBound;
+    while (it != p_annotations->begin())
+    {
+        it = std::prev(it);
+        if (it->id == annotation.id)
+            continue; // skip self
+        if (it->end >= annotation.start)
+            return *it; // overlap
+        break; // exit loop no overlap
+    }
+    return std::nullopt;
+}
 
 std::optional<QVector<Annotation>::iterator> AnnotationManager::findInsertPosition(const Annotation &annotation) const
 {
@@ -40,11 +64,6 @@ std::optional<QVector<Annotation>::iterator> AnnotationManager::findInsertPositi
         break; // exit loop no overlap
     }
     return upperBound;
-}
-
-bool AnnotationManager::hasConflict(const Annotation &annotation) const
-{
-    return p_annotations && !findInsertPosition(annotation).has_value();
 }
 
 void AnnotationManager::setAnnotations(QVector<Annotation> *annotations)

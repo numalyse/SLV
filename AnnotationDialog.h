@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QLabel>
 
 class AnnotationDialog : public QDialog
 {
@@ -25,6 +26,7 @@ private:
     void initUiLayout();
     void openColorPicker();
     void updateColorButton();
+    void clearErrorUi();
 
     Annotation m_annotation {};
     double m_fps = 1.0;
@@ -32,6 +34,7 @@ private:
 
     static constexpr int64_t s_baseDurationMs = 10000;
 
+    QLabel* m_errorLabel = nullptr;
     QLineEdit* m_startEdit = nullptr;
     QLineEdit* m_endEdit = nullptr;
     QLineEdit* m_nameEdit = nullptr;

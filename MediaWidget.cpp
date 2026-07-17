@@ -57,10 +57,6 @@ MediaWidget::MediaWidget(QWidget *parent)
     pal.setColor(QPalette::Window, Qt::black);
     setPalette(pal);
 
-    connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, [this]() {
-        if (m_snapshotPopup) m_snapshotPopup->reposition();
-    });
-
     setAttribute(Qt::WA_NativeWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -960,17 +956,6 @@ void MediaWidget::resizeEvent(QResizeEvent *event)
     QRect mediaRect = getMediaDisplayRect();
     m_mediaSurface->setGeometry(mediaRect);
     emit mediaRectChanged(mediaRect);
-
-    if (m_snapshotPopup) m_snapshotPopup->reposition();
-}
-
-bool MediaWidget::event(QEvent *event)
-{
-    // when the window is activated, raise the snapshot popup if it exists
-    if (event->type() == QEvent::WindowActivate && m_snapshotPopup) {
-        m_snapshotPopup->raise();
-    }
-    return QWidget::event(event);
 }
 
 void MediaWidget::wheelEvent(QWheelEvent *event)

@@ -297,6 +297,7 @@
         <file alias="custom_stop">icons/custom_stop.png</file>
         <file alias="custom_stop_white">icons/custom_stop_white.png</file>
         <file alias="custom_stop_gray">icons/custom_stop_gray.png</file>
+        <file alias="warning_tomato">icons/warning_tomato.png</file>
         <file alias="open_annot">icons/open_annot.png</file>
         <file alias="open_annot_white">icons/open_annot_white.png</file>
         <file alias="open_annot_gray">icons/open_annot_gray.png</file>

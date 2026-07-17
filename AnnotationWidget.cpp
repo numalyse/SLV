@@ -72,6 +72,7 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
         timeEdit->setAlignment(Qt::AlignCenter);
         timeEdit->setFixedSize(70, 20);
         timeEdit->hide();
+        connect(timeEdit, &QLineEdit::textChanged, this, &AnnotationWidget::clearErrorUi);
     }
 
     m_timeLayout->addWidget(m_startLabel);
@@ -148,6 +149,11 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     m_colorPickerBtn->hide();
     connect(m_colorPickerBtn, &ToolbarButton::clicked, this, &AnnotationWidget::openColorPicker);
 
+    m_conflictIcon = new QLabel(this);
+    m_conflictIcon->setPixmap(QPixmap(":/icons/warning_tomato").scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    m_conflictIcon->setToolTip(PrefManager::instance().getText("annotation_conflict"));
+    m_conflictIcon->hide();
+
     m_confirmBtn = new ToolbarButton(this, "check_white", PrefManager::instance().getText("confirm"));
     m_cancelBtn = new ToolbarButton(this, "cancel_white", PrefManager::instance().getText("cancel_action"));
     m_deleteBtn = new ToolbarButton(this, "delete_white", PrefManager::instance().getText("delete"));
@@ -165,6 +171,7 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
         {
             m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
             m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+            m_conflictIcon->show();
         } else
             applyEdits();
     });
@@ -174,6 +181,7 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
     editActionsLayout->addWidget(m_colorBtn);
     editActionsLayout->addWidget(m_colorPickerBtn);
     editActionsLayout->addStretch();
+    editActionsLayout->addWidget(m_conflictIcon);
     editActionsLayout->addWidget(m_confirmBtn);
     editActionsLayout->addWidget(m_cancelBtn);
     editActionsLayout->addWidget(m_deleteBtn);
@@ -237,9 +245,7 @@ void AnnotationWidget::refreshContent()
         m_nameEdit->setText(m_annotation.name);
         m_noteEdit->setPlainText(m_annotation.note);
         m_editColor = m_annotation.color;
-        // remove red borders (from when a conflict occurs)
-        m_startEdit->setStyleSheet(QString());
-        m_endEdit->setStyleSheet(QString());
+        clearErrorUi();
         updateColorButton();
     }
 }
@@ -284,6 +290,7 @@ void AnnotationWidget::setMode(Mode mode)
     m_nameEdit->setVisible(isEditMode);
     m_noteEdit->setVisible(isEditMode);
     m_colorBtn->setVisible(isEditMode);
+    m_conflictIcon->setVisible(false); // only shown when confirming with a conflict
     m_colorPickerBtn->setVisible(isEditMode);
     m_confirmBtn->setVisible(isEditMode);
     m_cancelBtn->setVisible(isEditMode);
@@ -316,6 +323,13 @@ void AnnotationWidget::applyEdits()
     Annotation updated = editedAnnotation();
     setMode(Mode::Minimized);
     emit updateAnnotationRequested(updated);
+}
+
+void AnnotationWidget::clearErrorUi()
+{
+    m_conflictIcon->hide();
+    m_startEdit->setStyleSheet(QString());
+    m_endEdit->setStyleSheet(QString());
 }
 
 void AnnotationWidget::openColorPicker()

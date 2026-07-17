@@ -813,9 +813,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 emit mediaWidget->mediaFinished();
             }
             // cas où on loop le média
-            else{
+            else if(mediaWidget->m_loopValue != 1){
                 libvlc_media_player_stop(mediaWidget->m_player);
                 libvlc_media_player_play(mediaWidget->m_player);
+                mediaWidget->setTime(mediaWidget->m_loopValue);
             }
         }, Qt::QueuedConnection);
 

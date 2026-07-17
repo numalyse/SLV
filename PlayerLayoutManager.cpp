@@ -487,6 +487,16 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
         else
             activePlayer->mediaWidget()->stop();
     });
+    connect(advancedToolbar->customStopTimeEdit(), &QLineEdit::textChanged, this, [advancedToolbar, activePlayer](const QString& text){
+        if(advancedToolbar->customStopCheckbox()->isChecked())
+            activePlayer->mediaWidget()->setLoopValue(TimeFormatter::HHMMSSFFToMs(text, activePlayer->mediaFps(), 0.05));
+    });
+    connect(advancedToolbar->customStopCheckbox(), &QCheckBox::checkStateChanged, this, [advancedToolbar, activePlayer](Qt::CheckState state){
+        if(state == Qt::Checked)
+            activePlayer->mediaWidget()->setLoopValue(TimeFormatter::HHMMSSFFToMs(advancedToolbar->customStopTimeEdit()->text(), activePlayer->mediaFps(), 0.05));
+        else
+            activePlayer->mediaWidget()->setLoopValue(-1);
+    });
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);

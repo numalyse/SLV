@@ -81,6 +81,16 @@ PlayerWidget::PlayerWidget(QWidget *parent)
         else
             this->mediaWidget()->stop();
     });
+    connect(m_toolBar->customStopTimeEdit(), &QLineEdit::textChanged, this, [this](const QString& text){
+        if(m_toolBar->customStopCheckbox()->isChecked())
+            m_mediaWidget->setLoopValue(TimeFormatter::HHMMSSFFToMs(text, m_media_fps, 0.05));
+    });
+    connect(m_toolBar->customStopCheckbox(), &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state){
+        if(state == Qt::Checked)
+            m_mediaWidget->setLoopValue(TimeFormatter::HHMMSSFFToMs(m_toolBar->customStopTimeEdit()->text(), m_media_fps, 0.05));
+        else
+            m_mediaWidget->setLoopValue(-1);
+    });
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);

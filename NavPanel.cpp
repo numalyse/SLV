@@ -27,7 +27,7 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
     m_scrollArea->setWidget(m_sideWidget);
     m_mainLayout->addWidget(m_scrollArea);
 
-    m_sideWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+    m_sideWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
     m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

@@ -13,6 +13,7 @@
 
 #include "GenericDialog.h"
 #include "ExtractSequenceWidget.h"
+#include "AnnotationDialog.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -35,11 +36,9 @@
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots
 /// @param parent
-TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
+TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
     p_media = projectMedia;
-    p_playerWidget = player;
-    m_wasPlayingBeforeDrag = player->playing();
 
     PrefManager& pref = PrefManager::instance();
 
@@ -137,6 +136,29 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
+    QFrame *annotSeparator = new QFrame();
+    annotSeparator->setFrameShape(QFrame::VLine);
+    annotSeparator->setFrameShadow(QFrame::Sunken);
+    ButtonLayout->addWidget(annotSeparator);
+
+    m_openAnnot = new ToolbarButton(this, "open_annot_white", pref.getText("tooltip_annotation_button"));
+    connect(m_openAnnot, &ToolbarButton::pressed, this, [](){
+        emit SignalManager::instance().toggleNavPanel();
+        emit SignalManager::instance().displayAnnotationPanel();
+    });
+    ButtonLayout->addWidget(m_openAnnot);
+
+    m_addAnnotBtn = new ToolbarButton(this, "plus_white", pref.getText("tooltip_add_annotation"));
+    connect(m_addAnnotBtn, &ToolbarButton::pressed, this, [this](){
+        AnnotationDialog dialog(m_vlcTime, this);
+        if(dialog.exec() == QDialog::Accepted){
+            Annotation annotation = dialog.annotation();
+            ProjectManager::instance().annotationManager()->addAnnotation(annotation);
+        }
+    });
+    ButtonLayout->addWidget(m_addAnnotBtn);
+
+
     ButtonLayout->addStretch(1);
 
     m_shotCountLabel = new QLabel(this);
@@ -163,11 +185,11 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
         if(dragState) {
-            m_wasPlayingBeforeDrag = p_playerWidget->playing();
-            p_playerWidget->pause();
+            m_wasPlayingBeforeDrag = m_isPlayerPlaying;
+            emit playerPauseRequested();
         }
         else {
-            if (m_wasPlayingBeforeDrag) p_playerWidget->play();
+            if (m_wasPlayingBeforeDrag) emit playerPlayRequested();
         }
 
         m_isDraggingCursor = dragState;

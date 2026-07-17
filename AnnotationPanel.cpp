@@ -5,6 +5,10 @@
 
 #include <algorithm>
 
+#include <QScrollArea>
+#include <QLabel>
+#include <QStyle>
+
 AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
 {
     auto* annotations = ProjectManager::instance().annotationManager();
@@ -25,10 +29,25 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
 
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(4);
+    m_layout->setContentsMargins(0, 0, 0, 4);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout();
 
-    m_addAnnotationBtn = new ToolbarButton(this, "plus_white");
+    // keep the same default margins as the playlist panel to keep titles aligned without modifying 
+    // layout margins, so the annotationwidgets take the full width available
+    const int sideMargin = style()->pixelMetric(QStyle::PM_LayoutLeftMargin);
+    const int topMargin = qMax(0, style()->pixelMetric(QStyle::PM_LayoutTopMargin));
+    buttonLayout->setContentsMargins(sideMargin, topMargin, sideMargin, 0);
+
+    QLabel* titleLabel = new QLabel(this);
+    QFont titleFont = titleLabel->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    titleLabel->setFont(titleFont);
+    titleLabel->setText("<b>" + PrefManager::instance().getText("annotations") + "</b>");
+
+    m_addAnnotationBtn = new ToolbarButton(this, "plus_white", PrefManager::instance().getText("tooltip_add_annotation"));
+    m_addAnnotationBtn->setFixedSize(24,24);
     connect(m_addAnnotationBtn, &QPushButton::clicked, this, &AnnotationPanel::annotationCreationDialog);
 
     // color buttons shown in the popup when hovering the filter button
@@ -61,6 +80,7 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
         PrefManager::instance().getText("tooltip_filter_off")
     );
     m_filterByColorBtn->setOnTop(false);
+    m_filterByColorBtn->setFixedSize(24,24);
 
     // clicking the button restores the last color filter or disables it
     connect(m_filterByColorBtn, &ToolbarToggleButton::stateActivated, this, [this](){
@@ -73,17 +93,26 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
         filterBy({});
     });
 
-    buttonLayout->addWidget(m_addAnnotationBtn);
+    buttonLayout->addWidget(titleLabel);
     buttonLayout->addStretch();
+    buttonLayout->addWidget(m_addAnnotationBtn);
     buttonLayout->addWidget(m_filterByColorBtn);
 
     m_layout->addLayout(buttonLayout);
 
-    m_itemsLayout = new QVBoxLayout();
-    m_itemsLayout->setSpacing(4);
-    m_layout->addLayout(m_itemsLayout);
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    m_layout->addStretch();
+    QWidget* itemsContainer = new QWidget(scrollArea);
+    m_itemsLayout = new QVBoxLayout(itemsContainer);
+    m_itemsLayout->setSpacing(4);
+    m_itemsLayout->setContentsMargins(0, 0, 0, 0);
+    m_itemsLayout->setAlignment(Qt::AlignTop); 
+
+    scrollArea->setWidget(itemsContainer);
+    m_layout->addWidget(scrollArea, 1);
 }
 
 void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)

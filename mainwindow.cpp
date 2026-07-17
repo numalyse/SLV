@@ -208,7 +208,7 @@ void MainWindow::createToolBar()
     // QHBoxLayout *shotDetailOption = new QHBoxLayout();
     // QLabel *playlistLabel = new QLabel(PrefManager::instance().getText("tooltip_playlist_button"));
     // QLabel *shotDetailLabel = new QLabel(PrefManager::instance().getText("tooltip_shot_detail_button"));
-    m_annotationPanelBtn = new ToolbarButton(nullptr, "plus_white", PrefManager::instance().getText("tooltip_annotation_button"));
+    m_annotationPanelBtn = new ToolbarButton(nullptr, "open_annot_white", PrefManager::instance().getText("tooltip_annotation_button"));
     m_playlistBtn = new ToolbarButton(nullptr, "playlist_white", PrefManager::instance().getText("tooltip_playlist_button"));
     m_shotDetailBtn = new ToolbarButton(nullptr, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
     m_shotDetailBtn->setEnabled(false);
@@ -279,7 +279,6 @@ void MainWindow::createToolBar()
     connect(m_annotationPanelBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(&SignalManager::instance(), &SignalManager::toggleNavPanel, this, [this](){
         m_navPanelBtn->click();
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
     });
 
     m_toolbarQt->setMovable(false);

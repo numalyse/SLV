@@ -384,11 +384,20 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(m_thumbnailWorker, projMedia, m_player, proj->shots, this, width());
+    m_timeline = new TimelineWidget(m_thumbnailWorker, projMedia, proj->shots, this, width());
     m_timeline->setFixedHeight(180);
     m_timeline->hide();
 
     projManager.setTimeline(m_timeline);
+
+    // timeline follows player state via signals 
+    m_timeline->setPlayerPlaying(m_player->playing());
+    if(MediaWidget* mediaWidget = m_player->mediaWidget()){
+        connect(mediaWidget, &MediaWidget::playbackStarted, m_timeline, [timeline = m_timeline](){ timeline->setPlayerPlaying(true); });
+        connect(mediaWidget, &MediaWidget::playbackPaused, m_timeline, [timeline = m_timeline](){ timeline->setPlayerPlaying(false); });
+    }
+    connect(m_timeline, &TimelineWidget::playerPauseRequested, m_player, &PlayerWidget::pause);
+    connect(m_timeline, &TimelineWidget::playerPlayRequested, m_player, &PlayerWidget::play);
 
     connect(m_player, &PlayerWidget::vlcTimeChanged, m_timeline, &TimelineWidget::updateCursorPos);
 

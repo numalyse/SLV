@@ -201,6 +201,8 @@
     "remove" : "Entfernen",
     "edit" : "Bearbeiten",
     "annotation" : "Anmerkung",
+    "annotations" : "Anmerkungen",
+    "tooltip_add_annotation" : "Anmerkung hinzufügen",
     "annotation_name" : "Name",
     "annotation_note" : "Notiz",
     "remove_all" : "Alle entfernen",

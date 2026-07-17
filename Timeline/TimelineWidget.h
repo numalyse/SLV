@@ -19,8 +19,6 @@
 #include "Timeline/Items/ShotItem.h"
 #include "Timeline/Items/AudioVisualizerItem.h"
 
-#include "PlayerWidget.h"
-
 #include "ToolbarButtons/ToolbarButton.h"
 
 #include <QWidget>
@@ -31,6 +29,8 @@
 #include <QPoint>
 #include <QTimer>
 #include <QProcess>
+#include <QPointer>
+#include <QLabel>
 
 class TimelineWidget : public QWidget
 {
@@ -38,7 +38,7 @@ Q_OBJECT
 
 public:
 
-    explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+    explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
@@ -55,6 +55,7 @@ public slots:
     void initShotDetail();
     bool event(QEvent *event) override;
     void updateShotCount(int shotCount);
+    void setPlayerPlaying(bool playing) { m_isPlayerPlaying = playing; };
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
@@ -65,6 +66,8 @@ signals:
     void enableTimeRelatedUI();
     void disableTimeRelatedUI();
     void saveNeeded();
+    void playerPauseRequested();
+    void playerPlayRequested();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -133,7 +136,8 @@ private:
     QByteArray m_audioBuffer;
     QVector<double> m_amplitudeList;
 
-    PlayerWidget* p_playerWidget = nullptr;
+    // update via player signals 
+    bool m_isPlayerPlaying = false;
 
 };
 

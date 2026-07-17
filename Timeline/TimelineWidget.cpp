@@ -35,11 +35,9 @@
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots
 /// @param parent
-TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
+TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
     p_media = projectMedia;
-    p_playerWidget = player;
-    m_wasPlayingBeforeDrag = player->playing();
 
     PrefManager& pref = PrefManager::instance();
 
@@ -163,11 +161,11 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
         if(dragState) {
-            m_wasPlayingBeforeDrag = p_playerWidget->playing();
-            p_playerWidget->pause();
+            m_wasPlayingBeforeDrag = m_isPlayerPlaying;
+            emit playerPauseRequested();
         }
         else {
-            if (m_wasPlayingBeforeDrag) p_playerWidget->play();
+            if (m_wasPlayingBeforeDrag) emit playerPlayRequested();
         }
 
         m_isDraggingCursor = dragState;

@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include <QScrollArea>
+
 AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
 {
     auto* annotations = ProjectManager::instance().annotationManager();
@@ -25,6 +27,7 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
 
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(4);
+    m_layout->setContentsMargins(0, 4, 0, 4);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout();
 
@@ -79,11 +82,19 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
 
     m_layout->addLayout(buttonLayout);
 
-    m_itemsLayout = new QVBoxLayout();
-    m_itemsLayout->setSpacing(4);
-    m_layout->addLayout(m_itemsLayout);
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    m_layout->addStretch();
+    QWidget* itemsContainer = new QWidget(scrollArea);
+    m_itemsLayout = new QVBoxLayout(itemsContainer);
+    m_itemsLayout->setSpacing(4);
+    m_itemsLayout->setContentsMargins(0, 0, 0, 0);
+    m_itemsLayout->setAlignment(Qt::AlignTop); 
+
+    scrollArea->setWidget(itemsContainer);
+    m_layout->addWidget(scrollArea, 1);
 }
 
 void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)

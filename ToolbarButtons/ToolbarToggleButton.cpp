@@ -1,5 +1,6 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarToggleButton.h"
+#include "IconHelper.h"
 #include <QStyleHints>
 #include <QGuiApplication>
 
@@ -12,9 +13,7 @@ ToolbarToggleButton::ToolbarToggleButton(
     const QString &toolTipTextOff)  : QPushButton(parent)
 {
     setFocusPolicy(Qt::NoFocus);
-    m_iconPathOn = ICONS_PATH + iconNameOn;
     m_toolTipTextOn = toolTipTextOn;
-    m_iconPathOff = ICONS_PATH + iconNameOff;
     m_toolTipTextOff = toolTipTextOff;
 
     setCheckable(true);
@@ -27,68 +26,10 @@ ToolbarToggleButton::ToolbarToggleButton(
     }
     setFixedSize(30, 30);
 
-    QImage imgOn = QImage(m_iconPathOn);
-
-    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
-        for (int y = 0; y < imgOn.height(); ++y) {
-            for (int x = 0; x < imgOn.width(); ++x) {
-                QColor c = imgOn.pixelColor(x, y);
-
-                if (c.alpha() > 0) {
-                    c.setRgb(0, 0, 0);
-                    c.setAlpha(255);
-                    imgOn.setPixelColor(x, y, c);
-                }
-            }
-        }
-    }
-
-    QImage gray_imgOn = QImage(m_iconPathOn);
-
-    for (int y = 0; y < gray_imgOn.height(); ++y) {
-        for (int x = 0; x < gray_imgOn.width(); ++x) {
-            QColor c = gray_imgOn.pixelColor(x, y);
-
-            if (c.alpha() > 0) {
-                c.setRgb(64, 64, 64);
-                gray_imgOn.setPixelColor(x, y, c);
-            }
-        }
-    }
-
-    QImage imgOff = QImage(m_iconPathOff);
-
-    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
-        for (int y = 0; y < imgOff.height(); ++y) {
-            for (int x = 0; x < imgOff.width(); ++x) {
-                QColor c = imgOff.pixelColor(x, y);
-
-                if (c.alpha() > 0) {
-                    c.setRgb(0, 0, 0);
-                    c.setAlpha(255);
-                    imgOff.setPixelColor(x, y, c);
-                }
-            }
-        }
-    }
-
-    QImage gray_imgOff = QImage(m_iconPathOff);
-
-    for (int y = 0; y < gray_imgOff.height(); ++y) {
-        for (int x = 0; x < gray_imgOff.width(); ++x) {
-            QColor c = gray_imgOff.pixelColor(x, y);
-
-            if (c.alpha() > 0) {
-                c.setRgb(64, 64, 64);
-                gray_imgOff.setPixelColor(x, y, c);
-            }
-        }
-    }
-
-    QIcon normalIconOn((QPixmap::fromImage(imgOn)));
-    QIcon grayIconOn(QPixmap::fromImage(gray_imgOn));
-    QIcon normalIconOff((QPixmap::fromImage(imgOff)));
-    QIcon grayIconOff(QPixmap::fromImage(gray_imgOff));
+    QIcon normalIconOn(QPixmap(IconHelper::themedIconPath(iconNameOn)));
+    QIcon grayIconOn(QPixmap(IconHelper::grayIconPath(iconNameOn)));
+    QIcon normalIconOff(QPixmap(IconHelper::themedIconPath(iconNameOff)));
+    QIcon grayIconOff(QPixmap(IconHelper::grayIconPath(iconNameOff)));
 
     setProperty("normalIconOn", normalIconOn);
     setProperty("grayIconOn", grayIconOn);
@@ -99,33 +40,6 @@ ToolbarToggleButton::ToolbarToggleButton(
 
     connect(this, &QPushButton::clicked, this, &ToolbarToggleButton::onButtonToggled);
 }
-
-QIcon ToolbarToggleButton::updateIconColor(QString iconName){
-    QPixmap pix(iconName);
-
-    QImage img = pix.toImage();
-
-    if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark)
-    {
-        for (int y = 0; y < img.height(); ++y)
-        {
-            for (int x = 0; x < img.width(); ++x)
-            {
-                QColor c = img.pixelColor(x, y);
-
-                if (c.alpha() > 0)
-                {
-                    c.setRgb(0, 0, 0);
-                    c.setAlpha(255);
-                    img.setPixelColor(x, y, c);
-                }
-            }
-        }
-    }
-
-    return QIcon(QPixmap::fromImage(img));
-}
-
 
 void ToolbarToggleButton::updateIcons(bool checked, bool enabled)
 {

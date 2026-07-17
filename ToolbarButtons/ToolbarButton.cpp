@@ -1,4 +1,5 @@
 #include "ToolbarButtons/ToolbarButton.h"
+#include "IconHelper.h"
 #include <QEvent>
 #include <QStyleHints>
 #include <QGuiApplication>
@@ -9,50 +10,18 @@ ToolbarButton::ToolbarButton(QWidget *parent, const QString &iconName, const QSt
     if(iconName == ""){
         setText("Icon");
     }else {
-        QPixmap pix(ICONS_PATH + iconName);
+        QPixmap pix(IconHelper::themedIconPath(iconName));
 
-        QImage img = pix.toImage();
-
-        if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
-            for (int y = 0; y < img.height(); ++y) {
-                for (int x = 0; x < img.width(); ++x) {
-                    QColor c = img.pixelColor(x, y);
-
-                    if (c.alpha() > 0) {
-                        c.setRgb(0, 0, 0);
-                        c.setAlpha(255);
-                        img.setPixelColor(x, y, c);
-                    }
-                }
-            }
-        } 
-
-        QImage gray_img = pix.toImage();
-
-        for (int y = 0; y < gray_img.height(); ++y) {
-            for (int x = 0; x < gray_img.width(); ++x) {
-                QColor c = gray_img.pixelColor(x, y);
-
-                if (c.alpha() > 0) {
-                    c.setRgb(64, 64, 64);
-                    gray_img.setPixelColor(x, y, c);
-                }
-            }
-        }
-
-        //QIcon normalIcon(pix);
-        QIcon normalIcon(QPixmap::fromImage(img));
-        QIcon grayIcon(QPixmap::fromImage(gray_img));
+        QIcon normalIcon(pix);
+        QIcon grayIcon(QPixmap(IconHelper::grayIconPath(iconName)));
 
         setProperty("normalIcon", normalIcon);
         setProperty("grayIcon", grayIcon);
 
         setIcon(normalIcon);
 
-        //setIcon(QIcon(ICONS_PATH + iconName));
-
         // Par défaut redimension auto à QSize(16,16)
-        if(img.size() == QSize(512,512)){
+        if(pix.size() == QSize(512,512) || pix.size() == QSize(128,128)){
             setIconSize(QSize(16, 16));
         }
         // qDebug() << iconName << " - taille img : " << img.size();

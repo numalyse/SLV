@@ -11,6 +11,8 @@
 #include <QMenu>
 #include <QVector>
 #include <QPair>
+#include <QGuiApplication>
+#include <QStyleHints>
 
 #include <functional>
 
@@ -53,6 +55,23 @@ namespace IconHelper
     inline QIcon genIconPreviewColor(QColor color, bool outlineActivated = false)
     {
         return genIconPreviewColor(color, 30, outlineActivated);
+    }
+
+    /// @brief Resource path of a toolbar icon matching the color scheme ("edit_white" -> ":/icons/edit_white" in dark mode, ":/icons/edit" in light mode)
+    inline QString themedIconPath(QString iconName)
+    {
+        if (QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark
+            && iconName.endsWith("_white"))
+            iconName.chop(6);
+        return ":/icons/" + iconName;
+    }
+
+    /// @brief Resource path of the pre-generated gray variant of a toolbar icon ("edit_white" -> ":/icons/edit_gray")
+    inline QString grayIconPath(QString iconName)
+    {
+        if (iconName.endsWith("_white"))
+            iconName.chop(6);
+        return ":/icons/" + iconName + "_gray";
     }
 
     /// @brief Named colors shared by the color pickers

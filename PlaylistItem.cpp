@@ -172,6 +172,7 @@ QString PlaylistItem::setThumbnailTime(){
 
 void PlaylistItem::setIndex(int index)
 {
+    m_itemIndex = index;
     m_indexLabel->setText(QString::number(index+1));
 }
 

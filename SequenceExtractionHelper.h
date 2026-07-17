@@ -106,7 +106,7 @@ public:
     /// @param startTime : start of the sequence from media in ms
     /// @param endTime : end of the sequence from media in ms
     /// @param savePath : path in which the sequence will be saved
-    inline QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original){
+    inline QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original, bool finishSignal = true){
         QProcess *ffmpeg = new QProcess();
 
         QString finalSavePath = savePath; 
@@ -174,7 +174,8 @@ public:
 
         //     emit progressStep(progress);
         // });
-        connect(ffmpeg, &QProcess::finished, [this, ffmpeg](){
+        connect(ffmpeg, &QProcess::finished, [this, ffmpeg, finishSignal](){
+            if(!finishSignal) return;
             if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0)
                 emit extractionFinished(-1);
             emit extractionFinished(1);
@@ -341,7 +342,7 @@ public:
         QString extractionPath1 = m_tempDir.path() + "/extract1_" + (isStart ? "start" : "end") + "." + QFileInfo(m_videoPath).suffix();
 
         // First extraction, to avoid reencoding the entire video
-        QProcess *extract1 = extractSequence(m_videoPath, BT, AT, extractionPath1);
+        QProcess *extract1 = extractSequence(m_videoPath, BT, AT, extractionPath1, ExtractionType::Original, false);
         connect(extract1, &QProcess::finished, [this, extract1, isStart, extractionPath1, BT, AT](){
             if (extract1->exitStatus() != QProcess::NormalExit || extract1->exitCode() != 0)
                 qDebug() << "[Sequence extraction] Error in first extraction for " + QString(isStart ? "start" : "end");
@@ -363,7 +364,7 @@ public:
                 qDebug() << "AT =" << AT;
                 qDebug() << "intervalStart =" << intervalStart;
                 qDebug() << "intervalEnd =" << intervalEnd;
-                QProcess *extract2 = extractSequence(forceKFpath, intervalStart, intervalEnd, extractionPath2);
+                QProcess *extract2 = extractSequence(forceKFpath, intervalStart, intervalEnd, extractionPath2, ExtractionType::Original, false);
                 connect(extract2, &QProcess::finished, [this, extract2, isStart, extractionPath1, forceKFpath, BT, AT](){
                     if (extract2->exitStatus() != QProcess::NormalExit || extract2->exitCode() != 0)
                         qDebug() << "[Sequence extraction] Error in second extraction for " + QString(isStart ? "start" : "end");

@@ -115,8 +115,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     m_shotInfo = new ToolbarButton(this, "shot_detail_white", pref.getText("tooltip_shot_detail_button"));
     connect(m_shotInfo, &ToolbarButton::pressed, this, [](){
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
-        emit SignalManager::instance().toggleNavPanel();
+        emit SignalManager::instance().toggleNavPanel(PanelType::ShotDetail);
     });
     ButtonLayout->addWidget(m_shotInfo);
 
@@ -143,8 +142,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     m_openAnnot = new ToolbarButton(this, "open_annot_white", pref.getText("tooltip_annotation_button"));
     connect(m_openAnnot, &ToolbarButton::pressed, this, [](){
-        emit SignalManager::instance().toggleNavPanel();
-        emit SignalManager::instance().displayAnnotationPanel();
+        emit SignalManager::instance().toggleNavPanel(PanelType::Annotation);
     });
     ButtonLayout->addWidget(m_openAnnot);
 
@@ -478,8 +476,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         }
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
-        emit SignalManager::instance().toggleNavPanel();
+        emit SignalManager::instance().toggleNavPanel(PanelType::ShotDetail);
     }else if (selectedAction == actionExtractShotsSelected){
 
         QFileInfo fileInfo (p_media->filePath());

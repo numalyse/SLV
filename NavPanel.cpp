@@ -82,19 +82,35 @@ void NavPanel::playNextMedia()
     m_playlistWidget->playNextMedia();
 }
 
+void NavPanel::setPanel(PanelType type)
+{
+    switch (type) {
+    case PanelType::Playlist:
+        m_sideWidget->setCurrentWidget(m_playlistWidget);
+        break;
+    case PanelType::ShotDetail:
+        m_sideWidget->setCurrentWidget(m_shotDetail);
+        break;
+    case PanelType::Annotation:
+        m_sideWidget->setCurrentWidget(m_annotationPanel);
+        break;
+    }
+    m_currentPanel = type;
+}
+
 void NavPanel::displayShotDetail()
 {
-    m_sideWidget->setCurrentWidget(m_shotDetail);
+    setPanel(PanelType::ShotDetail);
 }
 
 void NavPanel::displayPlaylist()
 {
-    m_sideWidget->setCurrentWidget(m_playlistWidget);
+    setPanel(PanelType::Playlist);
 }
 
 void NavPanel::displayAnnotationPanel()
 {
-    m_sideWidget->setCurrentWidget(m_annotationPanel);
+    setPanel(PanelType::Annotation);
 }
 
 void NavPanel::timelineWidgetUpdateShotDetail(int shotCount, int requestId, Shot * shot)

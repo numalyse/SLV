@@ -221,6 +221,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_audioShotItems.insert(index + 1, newAudioShotItem);
 
     if(p_media->type() == MediaType::Video){
+        newShotItem->setColorDirty(true);
+        m_shotItems[index]->setColorDirty(true);
         p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index + 1), newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index), baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
@@ -517,9 +519,10 @@ void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requ
     // QPixmap pixmap = QPixmap::fromImage(image);
     // shotItem->setThumbnail(pixmap);
 
-    if(requester == ThumbnailWorker::Requester::ShotDetail && shotItem->shot().color == QColor(79, 134, 198, 255)){
+    if(requester == ThumbnailWorker::Requester::ShotDetail && shotItem->isColorDirty()){
         QColor tagColor = shotItem->getTagImageColor(pixmap);
         if (tagColor.isValid()) {
+            shotItem->setColorDirty(false);
             shotItem->shot().color = tagColor;
             shotItem->shot().borderColor = getNewBorderColor(tagColor);
             shotItem->update();

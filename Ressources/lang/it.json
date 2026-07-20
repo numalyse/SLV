@@ -445,9 +445,9 @@
 
     "messagebox_format_not_accepted" : "Uno dei file selezionati ha un formato non supportato.",
 
-    "tooltip_playlist_button" : "Apri playlist",
-    "tooltip_shot_detail_button" : "Apri informazioni dell'inquadratura",
-    "tooltip_annotation_button" : "Apri annotazioni",
+    "tooltip_playlist_button" : "Playlist",
+    "tooltip_shot_detail_button" : "Informazioni dell'inquadratura",
+    "tooltip_annotation_button" : "Anotazioni",
 
     "messagebox_fullscreen_experimental" : "La funzionalità schermo intero del software è attualmente in fase di sviluppo.",
 

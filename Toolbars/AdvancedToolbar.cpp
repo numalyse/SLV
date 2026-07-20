@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -71,8 +72,36 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
             
     });
 
-    connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
-    connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
+    connect(m_prevMediaBtn, &ToolbarButton::clicked, this, [this](){
+        // Disable buttons immediately to prevent rapid clicks from crashing
+        m_prevMediaBtn->setEnabled(false);
+        m_nextMediaBtn->setEnabled(false);
+        
+        // Delay signal emission + re-enable buttons after processing
+        QTimer::singleShot(50, this, [this](){
+            emit previousMediaRequested();
+            // Re-enable after signal is processed
+            QTimer::singleShot(200, this, [this](){
+                m_prevMediaBtn->setEnabled(true);
+                m_nextMediaBtn->setEnabled(true);
+            });
+        });
+    });
+    connect(m_nextMediaBtn, &ToolbarButton::clicked, this, [this](){
+        // Disable buttons immediately to prevent rapid clicks from crashing
+        m_prevMediaBtn->setEnabled(false);
+        m_nextMediaBtn->setEnabled(false);
+        
+        // Delay signal emission + re-enable buttons after processing
+        QTimer::singleShot(50, this, [this](){
+            emit nextMediaRequested();
+            // Re-enable after signal is processed
+            QTimer::singleShot(200, this, [this](){
+                m_prevMediaBtn->setEnabled(true);
+                m_nextMediaBtn->setEnabled(true);
+            });
+        });
+    });
 
     connect(m_extensionToolbar, &ExtensionToolbar::moveTimeBackwardRequested, this, &AdvancedToolbar::moveTimeBackwardRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::moveTimeForwardRequested, this, &AdvancedToolbar::moveTimeForwardRequested);

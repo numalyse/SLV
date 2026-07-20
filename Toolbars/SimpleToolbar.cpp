@@ -258,6 +258,8 @@ void SimpleToolbar::setDefaultUI()
         buttonLayout->addWidget(m_langBtn);
         buttonLayout->addWidget(m_mediaInfoBtn);
         buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
         buttonLayout->addSpacing(m_zoomIndicator->width()+1);
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_speedBtn);

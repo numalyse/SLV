@@ -14,6 +14,7 @@
 #include <QDialog>
 #include <QFileDialog>
 #include <QTimer>
+#include <QComboBox>
 
 class ExtractSequenceWidget : public QDialog
 {

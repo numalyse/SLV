@@ -570,6 +570,23 @@ if(WIN32)
     )
 
     # =====================================================
+    # FFmpeg (libav) runtime DLLs
+    # L'exe est lié directement à avcodec/avformat/avutil/swscale (.lib),
+    # donc ces DLLs doivent être à côté de l'exe sinon il ne se lance pas.
+    # (swresample est une dépendance d'avcodec)
+    # =====================================================
+    file(GLOB LIBAV_RUNTIME_DLLS
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/avcodec-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/avformat-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/avutil-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/swscale-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/swresample-*.dll"
+    )
+    if(NOT LIBAV_RUNTIME_DLLS)
+        message(FATAL_ERROR "Aucune DLL FFmpeg (libav) trouvée dans ${CMAKE_SOURCE_DIR}/ffmpeg/bin, l'application ne pourra pas se lancer.")
+    endif()
+
+    # =====================================================
     # POST BUILD (DEBUG + RELEASE + DIST)
     # =====================================================
     add_custom_command(TARGET SLV POST_BUILD
@@ -658,6 +675,16 @@ if(WIN32)
         # FFmpeg/OpenCV
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${FFMPEG_DLL_LIST}
+        "${DEPLOY_DIR}"
+
+        # FFmpeg (libav) DLLs (build dir)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${LIBAV_RUNTIME_DLLS}
+        "$<TARGET_FILE_DIR:SLV>"
+
+        # FFmpeg (libav) DLLs (dist)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${LIBAV_RUNTIME_DLLS}
         "${DEPLOY_DIR}"
 
         # OpenCV world DLL (build dir)

@@ -15,12 +15,6 @@
 #include <QTemporaryDir>
 #include <QThreadPool>
 
-// extern "C" {
-// #include <libavformat/avformat.h>
-// #include <libavcodec/avcodec.h>
-// #include <libavutil/avutil.h>
-// #include <libavutil/pixdesc.h>
-// }
 
 /// @brief Struct to store different keyframes of a video
 /// BS = first frame before the start timecode
@@ -433,16 +427,15 @@ public:
         // m_codecParams = getVideoCodecParams(filePath);
 
         // on découpe une séquence grossière pour pouvoir y placer des keyframes sans encoder toute la vidéo
-        QProcess *keyFrameCutProcess = extractSequence(filePath, startKeyFrameCut, endKeyFrameCut, savePathTemp);
+        QProcess *keyFrameCutProcess = extractSequence(filePath, startKeyFrameCut, endKeyFrameCut, savePathTemp, ExtractionType::Original, false);
         connect(keyFrameCutProcess, &QProcess::finished, [this, keyFrameCutProcess, startTime, endTime, cutStartTime, cutEndTime, savePath, savePathTemp, savePathTemp2](){
-            // qDebug() << "Exit Status : " << keyFrameCutProcess->exitStatus() << " exitCode : " << keyFrameCutProcess->exitCode() << "errors : " << keyFrameCutProcess->readAllStandardError();
+            qDebug() << "Exit Status : " << keyFrameCutProcess->exitStatus() << " exitCode : " << keyFrameCutProcess->exitCode() << "errors : " << keyFrameCutProcess->readAllStandardError();
             if (keyFrameCutProcess->exitStatus() == QProcess::NormalExit && keyFrameCutProcess->exitCode() == 0){
                 QProcess *addKeyFramesProcess = processForceKeyframes(savePathTemp, {cutStartTime, cutEndTime}, savePathTemp2, m_codecParams);
                 connect(addKeyFramesProcess, &QProcess::finished, [this, addKeyFramesProcess, startTime, endTime, cutStartTime, cutEndTime, savePath, savePathTemp, savePathTemp2](){
-                    // qDebug() << "Exit Status : " << addKeyFramesProcess->exitStatus() << " exitCode : " << addKeyFramesProcess->exitCode() << "errors : " << addKeyFramesProcess->readAllStandardError();
                     if (addKeyFramesProcess->exitStatus() == QProcess::NormalExit && addKeyFramesProcess->exitCode() == 0){
                         qDebug() << "start : " << cutStartTime << " end : " << cutEndTime;
-                        QProcess *ffmpeg = extractSequence(savePathTemp2, cutStartTime, cutEndTime, savePath);
+                        QProcess *ffmpeg = extractSequence(savePathTemp2, cutStartTime, cutEndTime, savePath, ExtractionType::Original, false);
                         connect(ffmpeg, &QProcess::finished, [this, ffmpeg, savePathTemp, savePathTemp2](){
                             qDebug() << "Exit Status : " << ffmpeg->exitStatus() << " exitCode : " << ffmpeg->exitCode() << "errors : " << ffmpeg->readAllStandardError();
                             QFile(savePathTemp).remove();
@@ -451,6 +444,7 @@ public:
                         });
                     }else{
                         qDebug() << "error when adding keyframes.";
+                        qDebug() << "Exit Status : " << addKeyFramesProcess->exitStatus() << " exitCode : " << addKeyFramesProcess->exitCode() << "errors : " << addKeyFramesProcess->readAllStandardError();
                         emit this->extractionFinished(-3);
                     }
                 });

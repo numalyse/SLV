@@ -279,7 +279,7 @@
         <file alias="view_4">icons/view_4.png</file>
         <file alias="zoom_white">icons/zoom_white.png</file>
         <file alias="zoom_gray">icons/zoom_gray.png</file>
-        <file alias="zoom_on">icons/zoom.png</file>
+        <file alias="zoom">icons/zoom.png</file>
         <file alias="playlist">icons/playlist.png</file>
         <file alias="playlist_white">icons/playlist_white.png</file>
         <file alias="playlist_gray">icons/playlist_gray.png</file>

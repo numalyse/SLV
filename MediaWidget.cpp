@@ -422,11 +422,21 @@ void MediaWidget::takeScreenshot()
          libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
 }
 
-void MediaWidget::setTime(int64_t time)
+void MediaWidget::setTime(int64_t time, bool frameSeekBias)
 {
     if(!m_player) return;
     m_videoCaptureManager.mediaCutAndConcat(getCurrentTime(), time);
-    libvlc_media_player_set_time(m_player, time);
+
+    // we insure that we show the correct frame when frameSeekBias is true, by adding a quarter of a frame to the requested frame
+    int64_t seekTime = time;
+    if(frameSeekBias && m_media && m_media->fps() > 0.0){
+        int64_t quarterFrame = static_cast<int64_t>((1000.0 / m_media->fps()) * 0.25); 
+        seekTime = time + quarterFrame;
+        if(m_media->duration() > 0 && seekTime > m_media->duration())
+            seekTime = m_media->duration();
+    }
+
+    libvlc_media_player_set_time(m_player, seekTime);
     m_vlcTime = time;
     emit vlcTimeChanged(time);
 }
@@ -663,29 +673,29 @@ void MediaWidget::nextFrame()
     if(!m_player || !m_media) return;
     pause();
     emit pauseUiUpdateRequested();
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+
     libvlc_media_player_next_frame(m_player);
-    const int mspf = int(1000.0/m_media->fps());
-    // const int newTime = getCurrentTime() + int(1000/m_media->fps());
-    // setTime(newTime);
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
-    m_vlcTime += mspf;
+
+    // sets vlc time to the exact time of the next frame 
+    double frameMs = 1000.0 / m_media->fps();
+    int64_t currentFrame = qRound64(m_vlcTime / frameMs);
+    m_vlcTime = qRound64((currentFrame + 1) * frameMs);
     if(m_media->duration() > 0 && m_vlcTime > m_media->duration()) {
         m_vlcTime = m_media->duration();
     }
     emit vlcTimeChanged(m_vlcTime);
-
 }
 
 void MediaWidget::prevFrame()
 {
     if(!m_player || !m_media) return;
     pause();
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime << "," << int(1000.0/m_media->fps());
-    const int mspf = int(1000.0/m_media->fps());
-    const int newTime = m_vlcTime - mspf;
 
-    setTime(std::max(newTime, 0));
+    double frameMs = 1000.0 / m_media->fps();
+    int64_t currentFrame = qRound64(m_vlcTime / frameMs);
+    int64_t newFrame = std::max<int64_t>(currentFrame - 1, 0);
+
+    setTime(qRound64(newFrame * frameMs), true);
 }
 
 void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value)

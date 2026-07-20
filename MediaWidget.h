@@ -61,7 +61,11 @@ public slots:
     void setVolume(const int &vol);
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
-    void setTime(int64_t);
+    /// @param frameSeekBias offsets the libvlc seek by a quarter frame (without touching
+    /// m_vlcTime nor the display) so the player shows the requested frame and not the previous
+    /// one. Enable it when user setTime (timeline, annotations, toolbar, prevFrame), 
+    // leave false for loops, stop, +5s ect.
+    void setTime(int64_t time, bool frameSeekBias = false);
     void moveTimeBackward();
     void moveTimeForward();
     void enableLoopMode();

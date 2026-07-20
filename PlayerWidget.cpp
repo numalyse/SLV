@@ -381,7 +381,9 @@ void PlayerWidget::setSpeed(const unsigned int &speed)
     m_mediaWidget->setSpeed(speed);
 }
 void PlayerWidget::setTime(int64_t time){
-    m_mediaWidget->setTime(time);
+    // User seeks (timeline, annotations, toolbar) -> quarter-frame bias on the seek to
+    // land on the right frame, without offsetting the display.
+    m_mediaWidget->setTime(time, true);
 }
 
 void PlayerWidget::moveTimeBackward(){

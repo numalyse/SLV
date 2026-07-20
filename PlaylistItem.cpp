@@ -140,9 +140,8 @@ void PlaylistItem::setDurationLabel()
         if(m_mediaData->type() != Image) return;
     }
 
-    QString time = TimeFormatter::msToHHMMSSFF(durationMs, 1);
-    QString timeChopped = time.left(qMax(0, time.length() - 3));
-    m_mediaDurationLabel->setText(timeChopped);
+    QString time = TimeFormatter::msToHHMMSS(durationMs);
+    m_mediaDurationLabel->setText(time);
     m_mediaDurationLabel->setToolTip(PrefManager::instance().getText("duration") + " : " + time);
 
     m_mediaThumbnailTime = setThumbnailTime();
@@ -159,15 +158,8 @@ QString PlaylistItem::setThumbnailTime(){
     }
 
     qint64 halfMs = durationMs / 2;
-    QString time = TimeFormatter::msToHHMMSSFF(halfMs, 1);
-    //qDebug() << "le temps en ms : " << durationMs << " => half : " << halfMs;
-    //qDebug() << "le temps en HMSF half : " << time;
-
-    // Conserve uniquement HH:MM:SS car on veut un format base pour ffmpeg.
-    QString timeCropped = time.left(qMax(0, time.length() - 3));
-    //qDebug() << "le temps cropped : " << timeCropped;
-
-    return timeCropped;
+    // HH:MM:SS car on veut un format de base pour ffmpeg.
+    return TimeFormatter::msToHHMMSS(halfMs);
 }
 
 void PlaylistItem::setIndex(int index)

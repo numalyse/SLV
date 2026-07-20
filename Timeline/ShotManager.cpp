@@ -472,9 +472,29 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     emit shotCountUpdated(shotCount());
 }
 
-bool isDark(const QColor& color)
+QColor getNewBorderColor(const QColor& color)
 {
-    return color.toRgb().valueF() < 0.5;
+    if (color.valueF() < 0.5) {
+        // If the color is too close to dark color, use grey-whitish color for the border
+        if (color.valueF() < 0.2) {
+            // Merge white color with the original color to get a lighter border color
+            QColor whiteColor(255, 255, 255); // White color
+            return QColor((color.red() * 0.80 + whiteColor.red() * 0.20),
+                          (color.green() * 0.80 + whiteColor.green() * 0.20),
+                          (color.blue() * 0.80 + whiteColor.blue() * 0.20));
+        }
+        return color.lighter(200); // Lighten the color for dark colors
+    } else {
+        // If the color is too close to light color, use grey-darkish color for the border
+        if (color.valueF() > 0.8) {
+            // Merge black color with the original color to get a darker border color
+            QColor blackColor(0, 0, 0); // Black color
+            return QColor((color.red() * 0.80 + blackColor.red() * 0.20),
+                          (color.green() * 0.80 + blackColor.green() * 0.20),
+                          (color.blue() * 0.80 + blackColor.blue() * 0.20));
+        }
+        return color.darker(200); // Darken the color for light colors
+    }
 }
 
 void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image){
@@ -497,11 +517,11 @@ void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requ
     // QPixmap pixmap = QPixmap::fromImage(image);
     // shotItem->setThumbnail(pixmap);
 
-    if(requester == ThumbnailWorker::Requester::ShotDetail){
+    if(requester == ThumbnailWorker::Requester::ShotDetail && shotItem->shot().color == QColor(79, 134, 198, 255)){
         QColor tagColor = shotItem->getTagImageColor(pixmap);
         if (tagColor.isValid()) {
             shotItem->shot().color = tagColor;
-            shotItem->shot().borderColor = isDark(tagColor) ? tagColor.lighter(200) : tagColor.darker(200);
+            shotItem->shot().borderColor = getNewBorderColor(tagColor);
             shotItem->update();
         }
     }

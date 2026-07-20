@@ -22,7 +22,7 @@ FormComboBoxFrame::FormComboBoxFrame(const QString &name, const QString &subCate
     }
 
     m_comboBox->model()->sort(0);
-    setRightWidget(m_comboBox);
+    addRightWidget(m_comboBox);
 
     connect(m_comboBox,
             &QComboBox::currentIndexChanged,

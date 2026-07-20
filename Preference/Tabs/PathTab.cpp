@@ -3,6 +3,8 @@
 #include "Preference/Frames/FormPathEditFrame.h"
 #include "PrefManager.h"
 
+#include <QDir>
+
 PathTab::PathTab(QWidget *parent) : BasePreferenceTab("Paths", parent)
 {
     auto& prefManager = PrefManager::instance();
@@ -53,6 +55,8 @@ PathTab::PathTab(QWidget *parent) : BasePreferenceTab("Paths", parent)
         true,                           
         this
     );
+
+    screenshotPath->addResetButton(QDir::homePath() + "/NumalysePlayer_Content/Captures_Images");
 
 
     defaultVideoPath->setToolTip( prefManager.getText("paths_screenshot_tooltip"));

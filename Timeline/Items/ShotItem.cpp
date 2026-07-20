@@ -34,7 +34,7 @@ ShotItem::~ShotItem()
 
 QColor ShotItem::getTagImageColor(const QPixmap &pixmap) const
 {
-if (pixmap.isNull())
+    if (pixmap.isNull())
         return QColor();
 
     QImage image = pixmap.toImage();
@@ -42,38 +42,109 @@ if (pixmap.isNull())
     if (image.isNull())
         return QColor();
 
+    // Parameters for the K-means algorithm
+    constexpr int BLACK_THRESHOLD = 25;
+    constexpr int NB_STEP = 32;
+    constexpr int K = 5;
+    constexpr int ITERATIONS = 10;
+
     const int width = image.width();
     const int height = image.height();
 
-    const int stepX = qMax(1, width / 64);
-    const int stepY = qMax(1, height / 64);
+    // Check for black borders (horizontal and vertical) and crop them
 
-    QVector<QColor> samples;
-
-    for (int y = 0; y < height; y += stepY)
+    auto isBlackRow = [&](int y)
     {
-        for (int x = 0; x < width; x += stepX)
+        int black = 0;
+        int samples = 0;
+
+        for (int x = 0; x < width; x += 4)
         {
             QColor c = image.pixelColor(x, y);
 
-            int h,s,v;
-            c.getHsv(&h,&s,&v);
+            if (c.red() < BLACK_THRESHOLD &&
+                c.green() < BLACK_THRESHOLD &&
+                c.blue() < BLACK_THRESHOLD)
+            {
+                black++;
+            }
 
-            // if (v < 5)
-            //     continue;
+            samples++;
+        }
 
-            // if (s < 15 && v > 220)
-            //     continue;
+        return black > samples * 0.8;
+    };
 
-            samples.push_back(c);
+    auto isBlackColumn = [&](int x)
+    {
+        int black = 0;
+        int samples = 0;
+
+        for (int y = 0; y < height; y += 4)
+        {
+            QColor c = image.pixelColor(x, y);
+
+            if (c.red() < BLACK_THRESHOLD &&
+                c.green() < BLACK_THRESHOLD &&
+                c.blue() < BLACK_THRESHOLD)
+            {
+                black++;
+            }
+
+            samples++;
+        }
+
+        return black > samples * 0.8;
+    };
+
+    int cropTop = 0;
+    while (cropTop < height / 4 && isBlackRow(cropTop))
+        cropTop++;
+
+    int cropBottom = height - 1;
+    while (cropBottom > height * 3 / 4 && isBlackRow(cropBottom))
+        cropBottom--;
+
+    if (cropBottom - cropTop < height / 2)
+    {
+        cropTop = 0;
+        cropBottom = height - 1;
+    }
+
+    int cropLeft = 0;
+    while (cropLeft < width / 4 && isBlackColumn(cropLeft))
+        cropLeft++;
+
+    int cropRight = width - 1;
+    while (cropRight > width * 3 / 4 && isBlackColumn(cropRight))
+        cropRight--;
+
+    if (cropRight - cropLeft < width / 2)
+    {
+        cropLeft = 0;
+        cropRight = width - 1;
+    }
+
+    const int usableWidth = cropRight - cropLeft + 1;
+    const int usableHeight = cropBottom - cropTop + 1;
+
+    const int stepX = qMax(1, usableWidth / NB_STEP);
+    const int stepY = qMax(1, usableHeight / NB_STEP);
+
+    QVector<QColor> samples;
+
+    for (int y = cropTop; y <= cropBottom; y += stepY)
+    {
+        for (int x = cropLeft; x <= cropRight; x += stepX)
+        {
+            samples.push_back(image.pixelColor(x, y));
         }
     }
 
     if (samples.isEmpty())
         return QColor();
 
-    constexpr int K = 5;
-    constexpr int ITERATIONS = 10;
+    // K-means clustering to find the dominant color
 
     QVector<QColor> centers;
 
@@ -91,9 +162,9 @@ if (pixmap.isNull())
 
             for (int c = 0; c < K; ++c)
             {
-                int dr = samples[i].red()   - centers[c].red();
+                int dr = samples[i].red() - centers[c].red();
                 int dg = samples[i].green() - centers[c].green();
-                int db = samples[i].blue()  - centers[c].blue();
+                int db = samples[i].blue() - centers[c].blue();
 
                 int dist = dr * dr + dg * dg + db * db;
 
@@ -134,6 +205,8 @@ if (pixmap.isNull())
         }
     }
 
+    // Find the cluster with the most samples
+
     QVector<int> count(K, 0);
 
     for (int c : assignment)
@@ -147,7 +220,7 @@ if (pixmap.isNull())
             bestCluster = c;
     }
 
-   return centers[bestCluster];
+    return centers[bestCluster];
 }
 
 

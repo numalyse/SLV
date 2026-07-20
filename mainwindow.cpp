@@ -277,8 +277,9 @@ void MainWindow::createToolBar()
     connect(m_shotDetailBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(m_annotationPanelBtn, &ToolbarButton::clicked, &SignalManager::instance(), &SignalManager::displayAnnotationPanel);
     connect(m_annotationPanelBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
-    connect(&SignalManager::instance(), &SignalManager::toggleNavPanel, this, [this](){
-        m_navPanelBtn->click();
+    connect(&SignalManager::instance(), &SignalManager::toggleNavPanel, this, [this](PanelType type){
+        m_globalPlayerManager->toggleNavPanel(type);
+        m_navPanelBtn->setButtonState(m_globalPlayerManager->isNavPanelOpen());
     });
 
     m_toolbarQt->setMovable(false);

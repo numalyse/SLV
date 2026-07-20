@@ -1,10 +1,13 @@
 #ifndef BASEPREFERENCEFRAME_H
 #define BASEPREFERENCEFRAME_H
 
+#include "ToolbarButtons/ToolbarButton.h"
+
 #include <QFrame>
 #include <QString>
 #include <QFormLayout>
 #include <QLabel>
+
 
 /// @brief Base for preferences frame widgets, has a label for the row and stores the subcategory key and value to revert changes if needed
 class BasePreferenceFrame : public QFrame
@@ -22,6 +25,8 @@ public:
     /// @param value
     virtual void setUIValue(const QString& value) = 0;
 
+    void addResetButton(const QString& defaultValue);
+
 signals:
     /// @brief signal emitted to the tab to update the jsonObject 
     void updateJsonObjRequested(const QString& subCategory, const QString& key, const QString& newValue);
@@ -34,17 +39,17 @@ protected:
     QString m_prevValue;
     QHBoxLayout* m_layoutHB;
 
-    /// @brief Use this if needing to set the right side of the row to a widget 
-    void setRightWidget(QWidget* rightWidget);
+    /// @brief Container holding every widget on the right side, used to control the spacing between them
+    QWidget* m_rightContainer = nullptr;
+    QHBoxLayout* m_rightLayout = nullptr;
 
-    /// @brief Use this if needing to set the right side of to a layout with multiple widgets
-    void setRightLayout(QLayout* rightLayout);
+    ToolbarButton* m_resetBtn = nullptr;
+    QString m_defaultValue;
 
-    /// @brief Sets the right widget in parameter with a label role
-    void setRightWidgetLabel(QWidget* rightWidget);
+    /// @brief Appends a widget to the right side of the frame (added to m_rightContainer, so call order determines the layout order)
+    void addRightWidget(QWidget* rightWidget);
 
-    protected:
-    /// @brief Applique le style du frame à un widget enfant
+    /// @brief Applies the frame style to the child
     void applyFrameStyleToChild(QWidget* child);
 };
 

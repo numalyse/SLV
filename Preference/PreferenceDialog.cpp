@@ -18,7 +18,7 @@
 
 PreferenceDialog::PreferenceDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
-    setFixedWidth(500);
+    setFixedWidth(600);
 
     auto& prefManager = PrefManager::instance();
     QVBoxLayout* mainLayout = new QVBoxLayout(this);

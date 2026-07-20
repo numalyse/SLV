@@ -5,6 +5,13 @@
 #include <QObject>
 #include <vlc/vlc.h>
 
+enum class PanelType
+{
+    Playlist,
+    ShotDetail,
+    Annotation
+};
+
 enum PlayerLayoutArrangement
 {
     Arrangement1,
@@ -35,7 +42,7 @@ private:
 
 signals:
     void mediaWidgetMediaFinished();
-    void toggleNavPanel();
+    void toggleNavPanel(PanelType type);
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void playlistEjectPlayer();

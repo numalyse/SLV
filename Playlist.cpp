@@ -805,8 +805,7 @@ void Playlist::updateDurationPlaylist()
         totalDuration += item->getDuration();
     }
 
-    QString time = TimeFormatter::msToHHMMSSFF(totalDuration, 1);
-    QString timeChopped = time.left(qMax(0, time.length() - 3));
+    QString time = TimeFormatter::msToHHMMSS(totalDuration);
 
-    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : " + timeChopped);
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : " + time);
 }

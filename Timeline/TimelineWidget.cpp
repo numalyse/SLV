@@ -517,7 +517,10 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
         m_vlcTime = m_abManager->getDisplayHoldTime(vlcTime).value_or(vlcTime);
     }
 
-    m_cursor->setX(m_mathManager->timeToPos(m_vlcTime));
+    // While paused (frame by frame stepping), snap the cursor to the frame boundary for a
+    // clean visual marker. While playing, follow the raw VLC time for smooth movement.
+    int64_t displayTime = m_isPlayerPlaying ? m_vlcTime : m_mathManager->snapTimeToFrame(m_vlcTime);
+    m_cursor->setX(m_mathManager->timeToPos(displayTime));
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
 

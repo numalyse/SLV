@@ -39,7 +39,7 @@ int64_t TimelineMath::posToTimeSnapped(double pos)
     if (m_fps > 0) {
         double frameMs = 1000.0 / m_fps;
         double nearestFrameIndex = std::round(rawMs / frameMs);
-        rawMs = nearestFrameIndex * frameMs; 
+        rawMs = nearestFrameIndex * frameMs;
     }
 
     int64_t finalMs = static_cast<int64_t>(rawMs);
@@ -49,5 +49,15 @@ int64_t TimelineMath::posToTimeSnapped(double pos)
 double TimelineMath::timeToPos(int64_t time)
 {
     if(time <= 0) return 0;
-    return static_cast<double>(time * m_pixelsPerMs); 
+    return static_cast<double>(time * m_pixelsPerMs);
+}
+
+int64_t TimelineMath::snapTimeToFrame(int64_t ms)
+{
+    if (m_fps <= 0.0) return ms;
+
+    double frameMs = 1000.0 / m_fps;
+    double nearestFrameIndex = std::round(static_cast<double>(ms) / frameMs);
+    int64_t snapped = static_cast<int64_t>(nearestFrameIndex * frameMs);
+    return std::clamp(snapped, static_cast<int64_t>(0), m_duration);
 }

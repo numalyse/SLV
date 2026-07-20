@@ -618,12 +618,12 @@ void SimpleToolbar::createTimeEdit(){
     });
 
     connect(m_timeEdit, &QLineEdit::textEdited, this, [this](){
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps));
     });
 
     connect(m_timeEdit, &QLineEdit::returnPressed, [this]() {
         m_timeEdit->clearFocus(); 
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps));
     });
 }
 

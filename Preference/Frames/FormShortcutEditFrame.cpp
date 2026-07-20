@@ -51,7 +51,7 @@ FormShortcutEditFrame::FormShortcutEditFrame(const QString &name, const QString 
         )");
     }
 
-    setRightWidget(m_keySequenceEdit);
+    addRightWidget(m_keySequenceEdit);
 
     connect(m_keySequenceEdit, &QKeySequenceEdit::editingFinished, this, [this](){
         if (!m_keySequenceEdit->hasFocus()) return;

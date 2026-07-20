@@ -178,6 +178,9 @@
         <file alias="reset_adjustments_white">icons/reset_adjustments_white.png</file>
         <file alias="reset_adjustments_gray">icons/reset_adjustments_gray.png</file>
         <file alias="reset_adjustments">icons/reset_adjustments.png</file>
+        <file alias="reset_setting_white">icons/reset_setting_white.png</file>
+        <file alias="reset_setting_gray">icons/reset_setting_gray.png</file>
+        <file alias="reset_setting">icons/reset_setting.png</file>
         <file alias="right_arrow_white">icons/right_arrow_white.png</file>
         <file alias="right_arrow_gray">icons/right_arrow_gray.png</file>
         <file alias="right_arrow">icons/right_arrow.png</file>

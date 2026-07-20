@@ -117,6 +117,7 @@ ShortcutTab::ShortcutTab(QWidget *parent) : BasePreferenceTab("Shortcuts", paren
                 m_container
             );
 
+            formShortcutEditFrame->addResetButton(defaultSection.value(internalKey).toString());
 
             connect(formShortcutEditFrame, &FormShortcutEditFrame::emptyShortcutUIRequested, this, &ShortcutTab::emptyShortcutUI);
             addPreferenceFrame(formShortcutEditFrame);

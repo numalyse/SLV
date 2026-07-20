@@ -223,8 +223,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     if(p_media->type() == MediaType::Video){
         newShotItem->setColorDirty(true);
         m_shotItems[index]->setColorDirty(true);
-        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index + 1), newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index), baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index + 2), newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, -(index + 1), baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());

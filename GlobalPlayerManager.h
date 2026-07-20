@@ -23,6 +23,7 @@ public:
     
     void showAllToolbars(bool visible);
     bool isMouseOverAnyToolbar() const;
+    bool isNavPanelOpen() { return m_navPanel->isOpen(); }
 
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
@@ -60,7 +61,7 @@ public slots:
     void setGlobalMuteState(bool);
     void setGlobalZoomState(bool);
 
-    void toggleNavPanel();
+    void toggleNavPanel(PanelType type);
 
 private slots:
     void createTimelineWidget();

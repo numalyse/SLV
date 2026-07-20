@@ -234,14 +234,17 @@ void GlobalPlayerManager::closeNavPanel()
     m_navPanel->hidePanel();
 }
 
-void GlobalPlayerManager::toggleNavPanel()
-{
-
-    if(m_navPanel->isOpen())
+/// @brief Closes the panel if the panel is open and the type matches the currently displayed panel,
+/// else opens and shows the selected panel
+void GlobalPlayerManager::toggleNavPanel(PanelType type){
+    if(m_navPanel->isOpen() && m_navPanel->currentPanel() == type){
         closeNavPanel();
-    else
+    }else{
+        m_navPanel->setPanel(type);
         openNavPanel();
+    }
 }
+
 // slots
 
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)

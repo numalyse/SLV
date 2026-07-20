@@ -2,6 +2,7 @@
 #define NAVPANEL_H
 
 #include "Shot.h"
+#include "SignalManager.h"
 #include "ShotDetail.h"
 #include "Timeline/ThumbnailWorker.h"
 #include "Media.h"
@@ -21,10 +22,13 @@ class NavPanel : public QWidget
 public:
     explicit NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent = nullptr);
     const bool isOpen(){return m_isOpen;}
+    PanelType currentPanel() const {return m_currentPanel;}
+    void setPanel(PanelType type);
     AnnotationPanel* annotationPanel() {return m_annotationPanel; };
 private:
 
     bool m_isOpen = false;
+    PanelType m_currentPanel = PanelType::Playlist;
     QStackedWidget *m_sideWidget = nullptr;
     QScrollArea *m_scrollArea = nullptr;
     QLayout *m_mainLayout = nullptr;

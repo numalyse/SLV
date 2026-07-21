@@ -140,13 +140,23 @@ def main():
             image_text = shot.get('imgTxt', "").strip()
             sound_text = shot.get('soundTxt', "").strip()
 
-            # On coupe la zone de note en deux : Image \u00E0 gauche, Son \u00E0 droite
+            # On coupe la zone de note en deux : Image \u00E0 gauche, Son \u00E0 droite.
+            # Un label vide (ex : export d'annotations, pas de champ son) masque sa colonne.
             gap_between_columns = Inches(0.3)
-            column_width = (textbox_width - gap_between_columns) / 2
+            visible_labels = [
+                (label, text)
+                for label, text in ((image_label, image_text), (sound_label, sound_text))
+                if label
+            ]
+
+            if len(visible_labels) > 1:
+                column_width = (textbox_width - gap_between_columns) / 2
+            else:
+                column_width = textbox_width
 
             columns = [
-                (textbox_left, image_label, image_text),
-                (textbox_left + column_width + gap_between_columns, sound_label, sound_text),
+                (textbox_left + i * (column_width + gap_between_columns), label, text)
+                for i, (label, text) in enumerate(visible_labels)
             ]
 
             for col_left, label, text in columns:

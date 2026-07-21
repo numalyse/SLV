@@ -256,7 +256,55 @@ namespace  {
 namespace ProjectExportHelper {
     
 
-    bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    ExportLabels makeExportLabels(ExportSource source)
+    {
+        auto& txtManager = PrefManager::instance();
+        ExportLabels labels;
+
+        if (source == ExportSource::Annotations) {
+            labels.item      = txtManager.getText("annotation");
+            labels.count     = txtManager.getText("number_of_annotations");
+            labels.title     = txtManager.getText("annotation_name");
+            labels.startTime = txtManager.getText("shot_detail_start_time_name");
+            labels.endTime   = txtManager.getText("shot_detail_end_time_name");
+            labels.duration  = txtManager.getText("shot_detail_duration_time_name");
+            labels.imgTxt    = txtManager.getText("annotation_note");
+            labels.soundTxt  = QString(); 
+        } else {
+            labels.item      = txtManager.getText("shot");
+            labels.count     = txtManager.getText("number_of_shots");
+            labels.title     = txtManager.getText("shot_detail_title_name");
+            labels.startTime = txtManager.getText("shot_detail_start_time_name");
+            labels.endTime   = txtManager.getText("shot_detail_end_time_name");
+            labels.duration  = txtManager.getText("shot_detail_duration_time_name");
+            labels.imgTxt    = txtManager.getText("shot_detail_img_txt_name");
+            labels.soundTxt  = txtManager.getText("shot_detail_sound_txt_name");
+        }
+
+        return labels;
+    }
+
+    QVector<ExportItem> fromShots(const QVector<Shot>& shots)
+    {
+        QVector<ExportItem> items;
+        items.reserve(shots.size());
+        for (const auto& shot : shots) {
+            items.push_back({shot.title, shot.start, shot.end, shot.tagImageTime, shot.imgTxt, shot.soundTxt});
+        }
+        return items;
+    }
+
+    QVector<ExportItem> fromAnnotations(const QVector<Annotation>& annotations)
+    {
+        QVector<ExportItem> items;
+        items.reserve(annotations.size());
+        for (const auto& annot : annotations) {
+            items.push_back({annot.name, annot.start, annot.end, annot.start, annot.note, QString()});
+        }
+        return items;
+    }
+
+    bool exportToTxt(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 

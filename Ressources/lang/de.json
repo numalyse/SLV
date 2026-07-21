@@ -137,6 +137,7 @@
     "shot_detail_id_text" : "Schnitt Nr.",
     "shot" : "Schnitt",
     "number_of_shots" : "Anzahl der Schnitte",
+    "number_of_annotations" : "Anzahl der Anmerkungen",
 
     "compo_rule_None" : "Keine",
     "compo_rule_RuleOfThirds" : "Drittelregel",

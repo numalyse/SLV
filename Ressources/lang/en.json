@@ -138,6 +138,7 @@
     "shot_detail_id_text" : "Shot n°",
     "shot" : "Shot",
     "number_of_shots" : "Total number of shots",
+    "number_of_annotations" : "Total number of annotations",
 
     "compo_rule_None" : "None",
     "compo_rule_RuleOfThirds" : "Thirds",

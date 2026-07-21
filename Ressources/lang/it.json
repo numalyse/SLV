@@ -137,6 +137,7 @@
     "shot_detail_id_text" : "Piano n°",
     "shot" : "Piano",
     "number_of_shots" : "Numero totale di piani",
+    "number_of_annotations" : "Numero totale di annotazioni",
 
     "compo_rule_None" : "Nessuno",
     "compo_rule_RuleOfThirds" : "Regola dei terzi",

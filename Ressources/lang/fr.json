@@ -137,6 +137,7 @@
     "shot_detail_id_text" : "Plan n°",
     "shot" : "Plan",
     "number_of_shots" : "Nombre total de plans",
+    "number_of_annotations" : "Nombre total d'annotations",
 
     "compo_rule_None" : "Aucun",
     "compo_rule_RuleOfThirds" : "Tiers",

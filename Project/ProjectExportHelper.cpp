@@ -566,7 +566,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToCSV(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToCSV(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -582,31 +582,34 @@ namespace ProjectExportHelper {
         
         out.setGenerateByteOrderMark(true); 
 
-        out << '"' << PrefManager::instance().getText("shot") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_title_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_start_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_end_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_duration_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_img_txt_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_sound_txt_name") << '"'
-            << "\n";
+        bool hasSoundColumn = !labels.soundTxt.isEmpty();
 
-        int totalShots = shots.size();
+        out << '"' << labels.item << '"' << ';'
+            << '"' << labels.title << '"' << ';'
+            << '"' << labels.startTime << '"' << ';'
+            << '"' << labels.endTime << '"' << ';'
+            << '"' << labels.duration << '"' << ';'
+            << '"' << labels.imgTxt << '"';
+        if (hasSoundColumn) {
+            out << ';' << '"' << labels.soundTxt << '"';
+        }
+        out << "\n";
 
-        for (int currentShot = 0; currentShot < totalShots; ++currentShot) {
-            
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+        int itemCount = items.size();
+
+        for (int currItemId = 0; currItemId < itemCount; ++currItemId) {
+
+            if (progressCallback && itemCount > 0) {
+                int percent = static_cast<int>(((currItemId + 1) * 100.0) / itemCount);
                 if (!progressCallback(percent)) {
                     file.close();
-                    return false; 
                 }
             }
 
-            auto& shot = shots[currentShot];
-            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString end = TimeFormatter::msToHHMMSSFF(shot.end, fps);
-            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+            auto& item = items[currItemId];
+            QString start = TimeFormatter::msToHHMMSSFF(item.start, fps);
+            QString end = TimeFormatter::msToHHMMSSFF(item.end, fps);
+            QString itemDuration = TimeFormatter::msToHHMMSSFF(item.end - item.start, fps);
 
             // Échappe les champs texte pour respecter le format CSV (guillemets, retours à la ligne, séparateur)
             auto csvField = [](QString text) -> QString {
@@ -614,13 +617,16 @@ namespace ProjectExportHelper {
                 return '"' + text + '"';
             };
 
-            out << (currentShot + 1) << ";"
-                << csvField(shot.title) << ";"
+            out << (currItemId + 1) << ";"
+                << csvField(item.title) << ";"
                 << csvField(start) << ";"
                 << csvField(end) << ";"
-                << csvField(shotDuration) << ";"
-                << csvField(shot.imgTxt) << ";"
-                << csvField(shot.soundTxt) << "\n";
+                << csvField(itemDuration) << ";"
+                << csvField(item.imgTxt);
+            if (hasSoundColumn) {
+                out << ";" << csvField(item.soundTxt);
+            }
+            out << "\n";
         }
 
         file.close();

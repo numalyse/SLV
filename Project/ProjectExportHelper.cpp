@@ -384,6 +384,8 @@ namespace ProjectExportHelper {
 
         ImgData imgData{};
 
+        int itemCount = items.size();
+        int currItemId = 0;
 
         std::vector<int> pngParams;
         pngParams.push_back(cv::IMWRITE_PNG_COMPRESSION);
@@ -394,7 +396,7 @@ namespace ProjectExportHelper {
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
 
-        DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), shots);
+        DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), toImageTimes(items));
 
         decodeThread->start();
 
@@ -403,6 +405,8 @@ namespace ProjectExportHelper {
 
             if(imgData.isFinished) break;
 
+            if (progressCallback && itemCount > 0) {
+                int percent = static_cast<int>(((currItemId + 1) * 100.0) / itemCount);
                 if (!progressCallback(percent)) {
                     // folder.removeRecursively();
                     stopDecodeThread(decodeThread, imageQueue.get());

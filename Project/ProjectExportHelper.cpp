@@ -790,7 +790,7 @@ namespace ProjectExportHelper {
     }
 
 
-    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportVideo(ExportType type, const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -876,8 +876,8 @@ namespace ProjectExportHelper {
             if(writerOpened) qDebug() << "écriture Ok";
         }
 
-        int currentShot = -1;
-        int64_t endShotTime = -1;
+        int currItemId = -1;
+        int64_t endItemItem = -1;
 
         ImgData imgData;
         QStringList wrappedText;
@@ -901,29 +901,27 @@ namespace ProjectExportHelper {
             if(imgData.isFinished) break;
             if(imgData.img.empty()) continue;
 
-            // Si endShotTime < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
-            if( endShotTime < imgData.timeMs || currentShot == -1){
-                 // Récupère le temps et l'id du plan comprenant imgData.timeMs
-                currentShot = findShotIndexAtTime(shots, imgData.timeMs);
-                if(currentShot == -1){ // Si pas de temps trouvé, le text devient vide
-                    qDebug() << "Impossible de trouver un plan qui comprend : " << imgData.timeMs << "garde le textPrecende";
+            // Si endItemItem < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
+            if( endItemItem < imgData.timeMs || currItemId == -1){
+                 // Récupère le temps et l'id de l'item comprenant imgData.timeMs
+                currItemId = findItemIndexAtTime(items, imgData.timeMs);
+                if(currItemId == -1){ // Si pas de temps trouvé, le text devient vide
+                    qDebug() << "Impossible de trouver un item qui comprend : " << imgData.timeMs << ", on garde le texte précédent";
                     wrappedText.clear();
                     textOverlay.fill(Qt::transparent); 
                 }else { // Le texte est mis à jour avec les infos du nouveau plan
-                    auto& s = shots[currentShot];
-                    endShotTime = s.end;
-                    QString shotTitleTxt = "["+ PrefManager::instance().getText("shot") + " " + QString::number(currentShot+1) + "] " + s.title;
-                    QString timecodeTxt = PrefManager::instance().getText("shot_detail_start_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps) 
+                    auto& s = items[currItemId];
+                    endItemItem = s.end;
+                    QString shotTitleTxt = "["+ labels.item + " " + QString::number(currItemId+1) + "] " + s.title;
+                    QString timecodeTxt = labels.startTime + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps)
                                         + " / "
-                                        + PrefManager::instance().getText("shot_detail_duration_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
-                    QString imgLabel = PrefManager::instance().getText("shot_detail_img_txt_name");
-                    QString soundLabel = PrefManager::instance().getText("shot_detail_sound_txt_name");
+                                        + labels.duration + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
                     QString noteTxt;
                     if (!s.imgTxt.isEmpty())
-                        noteTxt += imgLabel + " : " + s.imgTxt;
-                    if (!s.soundTxt.isEmpty()) {
+                        noteTxt += labels.imgTxt + " : " + s.imgTxt;
+                    if (!labels.soundTxt.isEmpty() && !s.soundTxt.isEmpty()) {
                         if (!noteTxt.isEmpty()) noteTxt += "\n";
-                        noteTxt += soundLabel + " : " + s.soundTxt;
+                        noteTxt += labels.soundTxt + " : " + s.soundTxt;
                     }
 
                     wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, displaySize.width, fontSize);

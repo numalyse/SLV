@@ -10,7 +10,8 @@ struct Shot
     int64_t start;
     int64_t end;
     int64_t tagImageTime;
-    QString note;
+    QString imgTxt;
+    QString soundTxt;
     QColor color = QColor(79, 134, 198, 255);
     QColor borderColor = QColor(33, 71, 115, 255);
 

@@ -44,9 +44,9 @@
 #include <algorithm>
 namespace  {
 
-    int findShotIndexAtTime(const QVector<Shot>& shots, int64_t timeMs) {
-        for (int IShot = 0; IShot < shots.size(); ++IShot) {
-            if(shots[IShot].start <= timeMs && shots[IShot].end >= timeMs) return IShot;
+    int findItemIndexAtTime(const QVector<ExportItem>& items, int64_t timeMs) {
+        for (int IItem = 0; IItem < items.size(); ++IItem) {
+            if(items[IItem].start <= timeMs && items[IItem].end >= timeMs) return IItem;
         }
         return -1;
     }

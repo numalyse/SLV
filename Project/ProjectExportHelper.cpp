@@ -432,7 +432,7 @@ namespace ProjectExportHelper {
 
     }
 
-   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+   bool exportToPDF(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
         
@@ -484,18 +484,18 @@ namespace ProjectExportHelper {
         cursor.insertText(QFileInfo(mediaPath).baseName(), titleFormat);
         
         ImgData imgData{};
-        int totalShots = shots.size();
-        int currentShot = 0;
+        int itemCount = items.size();
+        int currItemId = 0;
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
 
         DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, 
+            mediaPath,
             sar,
-            imageQueue.get(), 
-            shots, 
-            nullptr, 
-            std::optional<int>(), 
+            imageQueue.get(),
+            toImageTimes(items),
+            nullptr,
+            std::optional<int>(),
             std::optional<cv::Size>({400, 400})
         );
 
@@ -506,26 +506,26 @@ namespace ProjectExportHelper {
 
             if(imgData.isFinished) break;
 
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+            if (progressCallback && itemCount > 0) {
+                int percent = static_cast<int>(((currItemId + 1) * 100.0) / itemCount);
                 if (!progressCallback(percent)) {
                     stopDecodeThread(decodeThread, imageQueue.get());
                     return false;
                 }
             }
 
-            auto& shot = shots[currentShot];
-            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+            auto& item = items[currItemId];
+            QString start = TimeFormatter::msToHHMMSSFF(item.start, fps);
+            QString itemDuration = TimeFormatter::msToHHMMSSFF(item.end - item.start, fps);
 
             QString planHeader = QString("- [%1 %2] %3 -> %4 : %5 / %6 : %7")
-                                        .arg(PrefManager::instance().getText("shot"))
-                                        .arg(currentShot + 1)
-                                        .arg(shot.title)
-                                        .arg(PrefManager::instance().getText("shot_detail_start_time_name"))
+                                        .arg(labels.item)
+                                        .arg(currItemId + 1)
+                                        .arg(item.title)
+                                        .arg(labels.startTime)
                                         .arg(start)
-                                        .arg(PrefManager::instance().getText("shot_detail_duration_time_name"))
-                                        .arg(shotDuration);
+                                        .arg(labels.duration)
+                                        .arg(itemDuration);
             
             cursor.insertBlock(leftAlignment);
             cursor.insertText(planHeader, subtitleFormat);
@@ -535,7 +535,7 @@ namespace ProjectExportHelper {
                 QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
                 QImage safeImage = tempImage.copy();
 
-                QString imgName = QString("img_%1.png").arg(currentShot + 1);
+                QString imgName = QString("img_%1.png").arg(currItemId + 1);
                 doc.addResource(QTextDocument::ImageResource, QUrl(imgName), safeImage);
                 
                 cursor.insertBlock(imageAlignment);
@@ -545,19 +545,19 @@ namespace ProjectExportHelper {
                 cursor.insertImage(imgFormat);
             }
 
-            if (!shot.imgTxt.isEmpty()) {
+            if (!item.imgTxt.isEmpty()) {
                 cursor.insertBlock(noteAlignment);
-                cursor.insertText(PrefManager::instance().getText("shot_detail_img_txt_name") + " : ", labelFormat);
-                cursor.insertText(shot.imgTxt, normalFormat);
+                cursor.insertText(labels.imgTxt + " : ", labelFormat);
+                cursor.insertText(item.imgTxt, normalFormat);
             }
 
-            if (!shot.soundTxt.isEmpty()) {
+            if (!labels.soundTxt.isEmpty() && !item.soundTxt.isEmpty()) {
                 cursor.insertBlock(noteAlignment);
-                cursor.insertText(PrefManager::instance().getText("shot_detail_sound_txt_name") + " : ", labelFormat);
-                cursor.insertText(shot.soundTxt, normalFormat);
+                cursor.insertText(labels.soundTxt + " : ", labelFormat);
+                cursor.insertText(item.soundTxt, normalFormat);
             }
 
-            ++currentShot;
+            ++currItemId;
         }
 
         stopDecodeThread(decodeThread, imageQueue.get());

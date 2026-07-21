@@ -186,8 +186,6 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
         return;
     }
 
-    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
-
     Shot& baseShot = m_shotItems[index]->shot();
 
     auto oldEnd =  baseShot.end;
@@ -199,7 +197,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_currentShotItem->setWidth(newWidth1);
     m_audioShotItems[index]->setWidth(newWidth1);
 
-    Shot newShotData =  Shot{ baseTitle, cutTime, oldEnd};
+    Shot newShotData =  Shot{ "", cutTime, oldEnd};
     newShotData.tagImageTime = newShotData.middle();
 
     double pos2 = p_mathManager->timeToPos(newShotData.start);
@@ -209,7 +207,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     newShotItem->setPos(pos2, m_currentShotItem->y());
 
     AudioShot newAudioShotData = AudioShot{};
-    newAudioShotData.title = baseTitle;
+    newAudioShotData.title = "";
     newAudioShotData.start = cutTime;
     newAudioShotData.end = oldEnd;
 
@@ -250,14 +248,16 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     item->shot().start = (m_currentShotItem->shot().start > item->shot().start) ? item->shot().start: m_currentShotItem->shot().start ;
     item->shot().end = (m_currentShotItem->shot().end > item->shot().end) ? m_currentShotItem->shot().end : item->shot().end ;
 
-    item->shot().note += "\n" + m_currentShotItem->shot().note; // add the note of the current shot to the merged shot
+    item->shot().imgTxt += "\n" + m_currentShotItem->shot().imgTxt; // add the note of the current shot to the merged shot
+    item->shot().soundTxt += "\n" + m_currentShotItem->shot().soundTxt; // add the note of the current shot to the merged shot
 
     item->shot().tagImageTime = item->shot().middle(); // updates the tagimage to the middle of the merged shot
 
     AudioShotItem* audioItem = m_audioShotItems[ShotItemId];
     audioItem->shot().start = item->shot().start;
     audioItem->shot().end = item->shot().end;
-    audioItem->shot().note = item->shot().note;
+    audioItem->shot().imgTxt += "\n" + item->shot().imgTxt; // add the note of the current shot to the merged shot
+    audioItem->shot().soundTxt += "\n" + item->shot().soundTxt; // add the note of the current shot to the merged shot
 
     p_scene->removeItem(m_currentShotItem);
     ShotItem* currentAudioShotItem = m_audioShotItems[m_shotItems.indexOf(m_currentShotItem)];
@@ -402,8 +402,6 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     int64_t startShot = 0;
     int64_t lengthShot = 0;
 
-    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
-
     bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
 
     for(int i=0; i < cuts.size(); ++i ){
@@ -415,11 +413,11 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         double xPos =  p_mathManager->timeToPos(startShot);
         double width = p_mathManager->timeToPos(lengthShot);
         
-        Shot shot{baseTitle, startShot, endShot};
+        Shot shot{"", startShot, endShot};
         shot.tagImageTime = shot.middle();
 
         AudioShot audioShot{};
-        audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = endShot;
+        audioShot.title = ""; audioShot.start = startShot; audioShot.end = endShot;
 
         ShotItem* shotItem = new ShotItem(shot, width);
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
@@ -448,10 +446,10 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     double xPos =  p_mathManager->timeToPos(startShot);
     double width = p_mathManager->timeToPos(lengthShot);
     
-    Shot shot{baseTitle, startShot, p_mathManager->duration()};
+    Shot shot{"", startShot, p_mathManager->duration()};
     shot.tagImageTime = shot.middle();
     AudioShot audioShot{};
-    audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
+    audioShot.title = ""; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
     ShotItem* shotItem = new ShotItem(shot, width);
     AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);

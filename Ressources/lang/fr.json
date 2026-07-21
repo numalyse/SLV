@@ -163,10 +163,11 @@
 
     "main_window_menu_bar_file": "Fichier",
     "main_window_file_open_media_action": "Ouvrir un ou plusieurs médias",
-    "main_window_file_open_project_action": "Ouvrir un projet",
-    "main_window_file_save_project_action": "Enregistrer le projet",
+    "main_window_file_open_project_action": "Ouvrir un dossier de projet",
+    "main_window_file_save_project_action": "Enregistrer le dossier du projet",
     "main_window_file_save_as_project_action": "Enregistrer sous...",
-    "project_manager_open_project_dialog" : "Ouvrir un projet",
+    "project_manager_open_project_dialog" : "Ouvrir un dossier de projet",
+
 
     "main_window_menu_bar_option" : "Options",
     "main_window_option_open_pref" :  "Préférences",
@@ -421,7 +422,7 @@
     "project_saved_text" : "Le projet a été sauvegardé avec succès.",
     "messagebox_record_completed" : "L'enregistrement du média a été effectué.",
 
-    "tooltip_access_folder" : "Accéder au dossier de captures",
+    "tooltip_access_folder" : "Accéder au dossier des captures",
 
     "select_file" : "Sélectionner un fichier",
     "select_folder" : "Sélectionner un dossier",
@@ -542,8 +543,8 @@
     "help_menu_enter_multiview_content_2" : "Pour entrer en mode multi-vues, survolez le bouton de disposition des médias situé en haut à droite de la fenêtre. Vous pourrez alors choisir le nombre de lecteurs à afficher ainsi que leur disposition à l'écran. Les lecteurs sont redimensionnables en glissant les <i>splitters</i> situés entre les lecteurs. Vous pouvez également utiliser le bouton de duplication de média disponible dans les barres d'outils pour ajouter un lecteur copié.",
     "help_menu_simplified_content_1" : "La barre d'outils simplifiée disponible sur les lecteurs en mode multi-vues comprend la plupart des boutons présents dans la barre d'outils classique, mais ne possède pas d'extension de barre. Il y a également un bouton pour retirer le lecteur de l'affichage.",
     "help_menu_global_toolbar_content_1" : "En plus des barres d'outils simplifiées pour chaque lecteur, une barre d'outils globale est affichée en mode multi-vues pour effectuer les opérations sur chacun des médias présents.",
-    "help_menu_global_toolbar_content_2" : "La capture d'écran combinée prend une capture d'écran de chaque média présent, puis combine chacune des captures en une seule image en gardant la disposition des lecteurs. Les captures d'écrans sont enregistrées dans le dossier inscrit dans les préférences (modifiable, enregistré dans NumalysePlayer_Content par défaut).",
-    "help_menu_access_playlist_content_1" : "Une playlist peut être créer en ajoutant les médias voulus. Pour accéder à la playlist, cliquez sur le bouton de panneau latéral situé en haut à droite de la fenêtre (la playlist n'est pas disponible en mode multi-vues).",
+    "help_menu_global_toolbar_content_2" : "La capture d'écran combinée prend une capture d'écran de chaque média présent, puis combine chacune des captures en une seule image en gardant la disposition des lecteurs. Les captures d'écrans sont enregistrées dans le dossier indiqué dans les préférences (modifiable, enregistré dans NumalysePlayer_Content par défaut).",
+    "help_menu_access_playlist_content_1" : "Une playlist peut être créée en ajoutant les médias voulus. Pour accéder à la playlist, cliquez sur le bouton de panneau latéral situé en haut à droite de la fenêtre (la playlist n'est pas disponible en mode multi-vues).",
     "help_menu_manage_items_content_1" : "Les éléments de la playlist sont composés du titre du média correspondant, de sa durée, de son type, d'une miniature et de son numéro dans la liste. Cliquez sur le bouton + pour ajouter des médias à la playlist et sur l'icône de corbeille pour retirer le média de la playlist. Il est aussi possible de déplacer les éléments en les glissant pour changer l'ordre de lecture.",
     "help_menu_playlist_loop_label" : "Boucle",
     "help_menu_playlist_loop_description" : "Si activée, passe au média suivant lorsque le média actuel est terminé.",

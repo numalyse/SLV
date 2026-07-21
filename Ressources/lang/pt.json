@@ -164,10 +164,10 @@
 
     "main_window_menu_bar_file": "Ficheiro",
     "main_window_file_open_media_action": "Abra um ou mais dispositivos de mídia",
-    "main_window_file_open_project_action": "Abrir projeto",
-    "main_window_file_save_project_action": "Salve o projeto",
+    "main_window_file_open_project_action": "Abrir um diretório de projeto",
+    "main_window_file_save_project_action": "Salve o diretório do projeto",
     "main_window_file_save_as_project_action": "Salvar como...",
-    "project_manager_open_project_dialog" : "Abrir projeto",
+    "project_manager_open_project_dialog" : "Abrir um diretório de projeto",
 
     "main_window_menu_bar_option" : "Opções",
     "main_window_option_open_pref" :  "Preferências",

@@ -100,7 +100,7 @@ public:
     /// @param startTime : start of the sequence from media in ms
     /// @param endTime : end of the sequence from media in ms
     /// @param savePath : path in which the sequence will be saved
-    inline QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original, bool finishSignal = true){
+    inline QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original, bool finishSignal = true, unsigned int audioTrack = 0){
         QProcess *ffmpeg = new QProcess();
 
         QString finalSavePath = savePath; 
@@ -135,16 +135,20 @@ public:
         switch (exportType)
         {
         case ExtractionType::AudioOnly:
-                args << "-vn" << "-map" << "0:a"; 
-                if (userAudioPreference == AudioFormat::AAC) {
-                        args << "-c:a" << "aac" << "-b:a" << "320k";
-                }else {
-                        args << "-c:a" << "libmp3lame" << "-q:a" << "2";
-                }
-                break;
+            if (userAudioPreference == AudioFormat::AAC) {
+                args << "-vn" << "-map" << "0:a"
+                     << "-c:a" << "aac" << "-b:a" << "320k";
+            }else {
+                args << "-vn" << "-map" << "0:a:"+QString::number(audioTrack)
+                     << "-c:a" << "libmp3lame" << "-q:a" << "2";
+            }
+            break;
         case ExtractionType::Original:
         default:
-            args << "-c" << "copy";
+            args << "-map" << "0:v"
+                 << "-map" << "0:a?"
+                 << "-map" << "0:s?"
+                 << "-c" << "copy";
                  // << "-progress" << "pipe:1"
                  // << "-nostats";
             break;
@@ -152,27 +156,15 @@ public:
 
         args << finalSavePath;
 
-        // connect(ffmpeg, &QProcess::readyReadStandardOutput, [this, ffmpeg, duration](){
-        //     QString txt = QString::fromUtf8(ffmpeg->readAllStandardOutput());
-
-        //     static QRegularExpression re(R"(out_time_ms=(\d+))");
-
-        //     auto match = re.match(txt);
-
-        //     if (!match.hasMatch())
-        //         return;
-
-        //     double currentMs = match.captured(1).toInt();
-
-        //     int progress = qBound(0, int(currentMs * 100.0 / float(duration)), 100);
-
-        //     emit progressStep(progress);
-        // });
         connect(ffmpeg, &QProcess::finished, [this, ffmpeg, finishSignal](){
+            if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0){
+                qDebug() << "Exit Status : " << ffmpeg->exitStatus() << " exitCode : " << ffmpeg->exitCode() << "errors : " << ffmpeg->readAllStandardError();
+            }
             if(!finishSignal) return;
             if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0)
                 emit extractionFinished(-1);
             emit extractionFinished(1);
+
         });
         ffmpeg->start(getFfmpegPath(), args);
         //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
@@ -203,22 +195,32 @@ public:
         for(size_t Ikf = 0; Ikf < keyframesTimecode.size(); ++Ikf){
             keyframesString += QString::number(keyframesTimecode[Ikf]) + "ms" + (Ikf != keyframesTimecode.size()-1 ? "," : "");
         }
-        // ffmpeg -i a.mp4 -force_key_frames 00:00:09,00:00:12 out.mp4
-        args << "-i" << filePath
-             << "-force_key_frames" << keyframesString;
 
+        args << "-i" << filePath
+             << "-force_key_frames" << keyframesString
+             << "-map" << "0:v:0" // copy video tracks
+             << "-map" << "0:a?" // copy audio tracks if exist
+             << "-map" << "0:s?" // copy subtitles tracks if exist
+             << "-map" << "0:t?"; // copy ass subtitles if exist
+
+        // If codecParams are valid, keep them for extraction. This part should never be accessed
         if (codecParams.valid) {
             args << "-c:v" << codecParams.codecName
                  << "-profile:v" << codecParams.profile
                  << "-level:v" << codecParams.level
                  << "-pix_fmt" << codecParams.pixFmt
-                 << "-bf" << "0"            // pas de B-frames à cheval sur la coupe
-                 << "-flags" << "+cgop";    // force un GOP fermé
+                 << "-bf" << "0"
+                 << "-flags" << "+cgop";
+        } else {
+            args << "-c:v" << "libx264"; // Let ffmpeg chose the encoder
         }
 
         args << "-c:a" << "copy"
+             << "-c:s" << "copy"
+             << "-c:t" << "copy"
              << savePath;
 
+        qDebug() << args.join(" ");
         ffmpeg->start(getFfmpegPath(), args);
         return ffmpeg;
     }

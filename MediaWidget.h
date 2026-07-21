@@ -32,6 +32,7 @@ public:
 
     Media* media(){ return m_media;};
     uint64_t getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
+    int getCurrentAudioTrack(){ return m_currentAudioTrack; }
     /// @brief N'utilise pas libvlc, update seulement le temps interne m_vlcTime
     void setVlcTime(uint64_t newTime){ m_vlcTime = newTime; }
     void setLoopValue(const int64_t val){ m_loopValue = val; }

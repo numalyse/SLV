@@ -286,8 +286,14 @@ namespace ProjectExportHelper {
                 << " -> "<< PrefManager::instance().getText("shot_detail_start_time_name") <<" : " << timeStr 
                 << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << durStr << "\n";
 
-            if (!shot.note.trimmed().isEmpty()) {
-                out << shot.note.trimmed() << "\n"; 
+            if (!shot.imgTxt.trimmed().isEmpty()) {
+                out << PrefManager::instance().getText("shot_detail_img_txt_name") << " : " << shot.imgTxt.trimmed() << "\n";
+            }
+
+            out << "\n";
+
+            if (!shot.soundTxt.trimmed().isEmpty()) {
+                out << PrefManager::instance().getText("shot_detail_sound_txt_name") << " : " << shot.soundTxt.trimmed() << "\n";
             }
 
             out << "\n";
@@ -394,6 +400,10 @@ namespace ProjectExportHelper {
         normalFormat.setFontPointSize(12);
         normalFormat.setForeground(Qt::black);
 
+        QTextCharFormat labelFormat;
+        labelFormat.setFontPointSize(12);
+        labelFormat.setForeground(Qt::blue);
+
         QTextBlockFormat titleAlignment;
         titleAlignment.setAlignment(Qt::AlignCenter);
         titleAlignment.setTopMargin(40);
@@ -461,11 +471,6 @@ namespace ProjectExportHelper {
             
             cursor.insertBlock(leftAlignment);
             cursor.insertText(planHeader, subtitleFormat);
-
-            if (!shot.note.isEmpty()) {
-                cursor.insertBlock(noteAlignment);
-                cursor.insertText(shot.note, normalFormat);
-            }
             
             // insertion de l'image, déjà à la bonne taille et au bon format dans video decode
             if (!imgData.img.empty()) {
@@ -480,6 +485,18 @@ namespace ProjectExportHelper {
                 QTextImageFormat imgFormat;
                 imgFormat.setName(imgName);
                 cursor.insertImage(imgFormat);
+            }
+
+            if (!shot.imgTxt.isEmpty()) {
+                cursor.insertBlock(noteAlignment);
+                cursor.insertText(PrefManager::instance().getText("shot_detail_img_txt_name") + " : ", labelFormat);
+                cursor.insertText(shot.imgTxt, normalFormat);
+            }
+
+            if (!shot.soundTxt.isEmpty()) {
+                cursor.insertBlock(noteAlignment);
+                cursor.insertText(PrefManager::instance().getText("shot_detail_sound_txt_name") + " : ", labelFormat);
+                cursor.insertText(shot.soundTxt, normalFormat);
             }
 
             ++currentShot;
@@ -512,8 +529,9 @@ namespace ProjectExportHelper {
             << '"' << PrefManager::instance().getText("shot_detail_start_time_name") << '"' << ';'
             << '"' << PrefManager::instance().getText("shot_detail_end_time_name") << '"' << ';'
             << '"' << PrefManager::instance().getText("shot_detail_duration_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_note_name") << '"'
-            << "\n"; 
+            << '"' << PrefManager::instance().getText("shot_detail_img_txt_name") << '"' << ';'
+            << '"' << PrefManager::instance().getText("shot_detail_sound_txt_name") << '"'
+            << "\n";
 
         int totalShots = shots.size();
 
@@ -532,15 +550,19 @@ namespace ProjectExportHelper {
             QString end = TimeFormatter::msToHHMMSSFF(shot.end, fps);
             QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
 
-            QString cleanNote = shot.note;
-            cleanNote.replace("\n", " ").replace(";", ",");
+            // Échappe les champs texte pour respecter le format CSV (guillemets, retours à la ligne, séparateur)
+            auto csvField = [](QString text) -> QString {
+                text.replace("\"", "\"\"");
+                return '"' + text + '"';
+            };
 
             out << (currentShot + 1) << ";"
-                << shot.title << ";"
-                << start << ";"
-                << end << ";"
-                << shotDuration << ";"
-                << cleanNote << "\n";
+                << csvField(shot.title) << ";"
+                << csvField(start) << ";"
+                << csvField(end) << ";"
+                << csvField(shotDuration) << ";"
+                << csvField(shot.imgTxt) << ";"
+                << csvField(shot.soundTxt) << "\n";
         }
 
         file.close();
@@ -621,7 +643,8 @@ namespace ProjectExportHelper {
             shotObj["title"] = shots[i].title;
             shotObj["start"] = shots[i].start;
             shotObj["duration"] = shots[i].end - shots[i].start; 
-            shotObj["note"] = shots[i].note;
+            shotObj["imgTxt"] = shots[i].imgTxt;
+            shotObj["soundTxt"] = shots[i].soundTxt;
             shotObj["image"] = QString("image_shot_%1.png").arg(i);
             jsonShots.append(shotObj);
         }
@@ -675,9 +698,12 @@ namespace ProjectExportHelper {
         QString shot_name = PrefManager::instance().getText("shot");
         QString start_time_name = PrefManager::instance().getText("shot_detail_start_time_name");
         QString duration_time_name = PrefManager::instance().getText("shot_detail_duration_time_name");
+        QString image_txt_name = PrefManager::instance().getText("shot_detail_img_txt_name");
+        QString sound_txt_name = PrefManager::instance().getText("shot_detail_sound_txt_name");
 
         QStringList arguments;
-        arguments << scriptPath << jsonFile.fileName() << shot_name << start_time_name << duration_time_name;
+        arguments << scriptPath << jsonFile.fileName() << shot_name << start_time_name << duration_time_name
+                  << image_txt_name << sound_txt_name;
         pythonProcess.start(pythonExe, arguments);
 
         // Boucle d'attente active pour lire la progression en temps réel
@@ -831,8 +857,16 @@ namespace ProjectExportHelper {
                     QString timecodeTxt = PrefManager::instance().getText("shot_detail_start_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps) 
                                         + " / "
                                         + PrefManager::instance().getText("shot_detail_duration_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
-                    QString noteTxt = s.note;
-                    
+                    QString imgLabel = PrefManager::instance().getText("shot_detail_img_txt_name");
+                    QString soundLabel = PrefManager::instance().getText("shot_detail_sound_txt_name");
+                    QString noteTxt;
+                    if (!s.imgTxt.isEmpty())
+                        noteTxt += imgLabel + " : " + s.imgTxt;
+                    if (!s.soundTxt.isEmpty()) {
+                        if (!noteTxt.isEmpty()) noteTxt += "\n";
+                        noteTxt += soundLabel + " : " + s.soundTxt;
+                    }
+
                     wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, displaySize.width, fontSize);
                     
                     textOverlay.fill(Qt::transparent); 

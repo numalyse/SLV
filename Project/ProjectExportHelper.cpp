@@ -702,15 +702,15 @@ namespace ProjectExportHelper {
 
         // Preparation json
         QJsonArray jsonShots;
-        for (int i = 0; i < shots.size(); ++i) {
+        for (int itemId = 0; itemId < items.size(); ++itemId) {
             QJsonObject shotObj;
-            shotObj["id"] = i;
-            shotObj["title"] = shots[i].title;
-            shotObj["start"] = shots[i].start;
-            shotObj["duration"] = shots[i].end - shots[i].start; 
-            shotObj["imgTxt"] = shots[i].imgTxt;
-            shotObj["soundTxt"] = shots[i].soundTxt;
-            shotObj["image"] = QString("image_shot_%1.png").arg(i);
+            shotObj["id"] = itemId;
+            shotObj["title"] = items[itemId].title;
+            shotObj["start"] = items[itemId].start;
+            shotObj["duration"] = items[itemId].end - items[itemId].start;
+            shotObj["imgTxt"] = items[itemId].imgTxt;
+            shotObj["soundTxt"] = items[itemId].soundTxt;
+            shotObj["image"] = QString("image_shot_%1.png").arg(itemId);
             jsonShots.append(shotObj);
         }
 
@@ -760,15 +760,9 @@ namespace ProjectExportHelper {
             return false;
         }
 
-        QString shot_name = PrefManager::instance().getText("shot");
-        QString start_time_name = PrefManager::instance().getText("shot_detail_start_time_name");
-        QString duration_time_name = PrefManager::instance().getText("shot_detail_duration_time_name");
-        QString image_txt_name = PrefManager::instance().getText("shot_detail_img_txt_name");
-        QString sound_txt_name = PrefManager::instance().getText("shot_detail_sound_txt_name");
-
         QStringList arguments;
-        arguments << scriptPath << jsonFile.fileName() << shot_name << start_time_name << duration_time_name
-                  << image_txt_name << sound_txt_name;
+        arguments << scriptPath << jsonFile.fileName() << labels.item << labels.startTime << labels.duration
+                  << labels.imgTxt << labels.soundTxt;
         pythonProcess.start(pythonExe, arguments);
 
         // Boucle d'attente active pour lire la progression en temps réel

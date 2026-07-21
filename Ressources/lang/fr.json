@@ -75,7 +75,7 @@
     "preview" : "Aperçu",
 
     "tooltip_to_next_shot" : "Aller au plan suivant",
-    "tooltip_to_prev_shot" : "Aller plan précédent",
+    "tooltip_to_prev_shot" : "Aller au plan précédent",
 
     "tooltip_segmentation_auto" : "Segmenter automatiquement",
 
@@ -123,12 +123,16 @@
 
     "cancel_action" : "Annuler",
     
+    "shot_detail_informations_title" : "Informations",
+    "shot_detail_uneditable_tooltip" : "Informations non modifiables",
+    "shot_detail_analysis_title" : "Analyse utilisateur",
     "shot_detail_id_name" : "Numéro du plan",
     "shot_detail_title_name" : "Titre",
     "shot_detail_start_time_name" : "Début",
     "shot_detail_end_time_name" : "Fin",
     "shot_detail_duration_time_name" : "Durée",
-    "shot_detail_note_name" : "Note",
+    "shot_detail_img_txt_name" : "Image",
+    "shot_detail_sound_txt_name" : "Son",
     
     "shot_detail_id_text" : "Plan n°",
     "shot" : "Plan",

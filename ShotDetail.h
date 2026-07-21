@@ -43,12 +43,14 @@ private:
     int m_shotId = -1;
     bool m_buttonDisabled = false;
 
+    QFrame* m_uneditables = nullptr; 
     FormLineEditWidget* m_shotIdForm = nullptr;
     FormLineEditWidget* m_shotTitle = nullptr;
     FormLineEditWidget* m_startTime = nullptr;
     FormLineEditWidget* m_endTime = nullptr;
     FormLineEditWidget* m_duration = nullptr;
-    FormTextEditWidget* m_notes = nullptr;
+    FormTextEditWidget* m_imgTxtEdit = nullptr;
+    FormTextEditWidget* m_soundTxtEdit = nullptr;
 
     QLabel* m_tagImage = nullptr;
 

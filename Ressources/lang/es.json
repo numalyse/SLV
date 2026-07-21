@@ -124,12 +124,16 @@
 
     "cancel_action" : "Cancelar",
 
+    "shot_detail_informations_title" : "Información",
+    "shot_detail_uneditable_tooltip" : "Información no editable",
+    "shot_detail_analysis_title" : "Análisis del usuario",
     "shot_detail_id_name" : "Número de plano",
     "shot_detail_title_name" : "Título",
     "shot_detail_start_time_name" : "Inicio",
     "shot_detail_end_time_name" : "Fin",
     "shot_detail_duration_time_name" : "Duración",
-    "shot_detail_note_name" : "Nota",
+    "shot_detail_img_txt_name" : "Imagen",
+    "shot_detail_sound_txt_name" : "Sonido",
 
     "shot_detail_id_text" : "Plano n.º",
     "shot" : "Plano",

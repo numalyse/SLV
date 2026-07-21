@@ -124,12 +124,16 @@
 
     "cancel_action" : "Cancel",
 
+    "shot_detail_informations_title" : "Information",
+    "shot_detail_uneditable_tooltip" : "Non-editable information",
+    "shot_detail_analysis_title" : "User analysis",
     "shot_detail_id_name" : "Shot numbering",
     "shot_detail_title_name" : "Title",
     "shot_detail_start_time_name" : "Start",
     "shot_detail_end_time_name" : "End",
     "shot_detail_duration_time_name" : "Duration",
-    "shot_detail_note_name" : "Note",
+    "shot_detail_img_txt_name" : "Image",
+    "shot_detail_sound_txt_name" : "Sound",
 
     "shot_detail_id_text" : "Shot n°",
     "shot" : "Shot",

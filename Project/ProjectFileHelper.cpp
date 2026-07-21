@@ -23,7 +23,8 @@ namespace  {
             shotObject["start"] = shot.start;
             shotObject["end"] = shot.end;
             shotObject["tagImageTime"] = shot.tagImageTime;
-            shotObject["note"] = shot.note;
+            shotObject["imgTxt"] = shot.imgTxt;
+            shotObject["soundTxt"] = shot.soundTxt;
             shotArray.append(shotObject);
         }
         return shotArray;
@@ -161,7 +162,8 @@ namespace ProjectFileHelper {
                 currentShot.start = shotJson.value("start").toInteger(0LL); 
                 currentShot.end = shotJson.value("end").toInteger(0LL);
                 currentShot.tagImageTime = shotJson.value("tagImageTime").toInteger(0LL);
-                currentShot.note = shotJson.value("note").toString("");
+                currentShot.imgTxt = shotJson.value("imgTxt").toString("");
+                currentShot.soundTxt = shotJson.value("soundTxt").toString("");
 
                 loadedData.shots.append(currentShot);
             }

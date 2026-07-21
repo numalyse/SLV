@@ -32,6 +32,8 @@ def main():
     shot_name = sys.argv[2]
     start_time_name = sys.argv[3]
     duration_time_name = sys.argv[4]
+    image_label = sys.argv[5] if len(sys.argv) > 5 else "Image"
+    sound_label = sys.argv[6] if len(sys.argv) > 6 else "Son"
     
     with open(data_json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -83,7 +85,7 @@ def main():
         # Slides des plans
         plan_box_top = Inches(0.5)
         plan_box_height = Inches(0.5)
-        note_box_height = Inches(1)
+        note_box_height = Inches(1.5)
         offset_between_boxes = Inches(0.2)
 
         for idx, shot in enumerate(shots):
@@ -135,23 +137,37 @@ def main():
                     print(f"Erreur lors du traitement de l'image {idx} : {e}", file=sys.stderr)
 
 
-            note_text = shot.get('note', "").strip()
-            
-            note_box = slide.shapes.add_textbox(textbox_left, y_offset, textbox_width, note_box_height)
-            note_box.height = note_box_height
-            note_tf = note_box.text_frame
-            note_tf.word_wrap = True
+            image_text = shot.get('imgTxt', "").strip()
+            sound_text = shot.get('soundTxt', "").strip()
 
-            note_p = note_tf.paragraphs[0]
-            note_p.alignment = PP_ALIGN.LEFT
-            note_p.font.size = Pt(16)
+            # On coupe la zone de note en deux : Image \u00E0 gauche, Son \u00E0 droite
+            gap_between_columns = Inches(0.3)
+            column_width = (textbox_width - gap_between_columns) / 2
 
-            if note_text:
-                note_p.text = note_text
-            else:
-                note_tf.auto_size = MSO_AUTO_SIZE.NONE
-                note_p.text = "\u00A0"
+            columns = [
+                (textbox_left, image_label, image_text),
+                (textbox_left + column_width + gap_between_columns, sound_label, sound_text),
+            ]
+
+            for col_left, label, text in columns:
+                note_box = slide.shapes.add_textbox(col_left, y_offset, column_width, note_box_height)
                 note_box.height = note_box_height
+                note_tf = note_box.text_frame
+                note_tf.word_wrap = True
+                note_tf.auto_size = MSO_AUTO_SIZE.NONE
+
+                note_p = note_tf.paragraphs[0]
+                note_p.alignment = PP_ALIGN.LEFT
+
+                label_run = note_p.add_run()
+                label_run.text = f"{label} : "
+                label_run.font.size = Pt(16)
+                label_run.font.bold = True
+                label_run.font.color.rgb = RGBColor.from_string("1F497D")
+
+                text_run = note_p.add_run()
+                text_run.text = text if text else "\u00A0"
+                text_run.font.size = Pt(16)
 
             percent = int(((idx + 1) / total_shots) * 100)
             if percent != last_percent:

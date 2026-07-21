@@ -9,12 +9,12 @@ DecodeThread::DecodeThread(
     QString mediaPath, 
     double sar,
     TSQueue<ImgData>* imageQueue,
-    const QVector<Shot> &shots, 
+    const QVector<int64_t>& imageTimes,
     QObject *parent, 
     std::optional<int> colorCode, 
     std::optional<cv::Size> targetSize
 ) 
-: QThread(parent), m_mediaPath{mediaPath}, m_sar{sar}, p_imageQueue{imageQueue}, m_shots{shots}, m_colorCode{colorCode}, m_targetSize{targetSize}
+: QThread(parent), m_mediaPath{mediaPath}, m_sar{sar}, p_imageQueue{imageQueue}, m_imageTimes{imageTimes}, m_colorCode{colorCode}, m_targetSize{targetSize}
 {
 }
 
@@ -63,13 +63,13 @@ void DecodeThread::decodeTagImages(){
     cv::Mat processedFrame;
     cv::Mat tempResized;
 
-    for(auto& shot : m_shots){
+    for(auto& imgTime : m_imageTimes){
         if (isInterruptionRequested()) break;
 
-        SLV::seekToMs(cap, static_cast<double>(shot.tagImageTime), fps);
+        SLV::seekToMs(cap, static_cast<double>(imgTime), fps);
 
         if (!cap.read(frame) || frame.empty()) {
-            qWarning() << "Impossible de lire la frame au timestamp :" << shot.tagImageTime;
+            qWarning() << "Impossible de lire la frame au timestamp :" << imgTime;
             continue; 
         }
 
@@ -151,7 +151,7 @@ void DecodeThread::run()
         return;
     } 
 
-    if(m_shots.isEmpty()){
+    if(m_imageTimes.isEmpty()){
         decodeMedia();
     }else {
         decodeTagImages();

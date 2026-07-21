@@ -483,7 +483,7 @@ QColor getNewBorderColor(const QColor& color)
                           (color.green() * 0.80 + whiteColor.green() * 0.20),
                           (color.blue() * 0.80 + whiteColor.blue() * 0.20));
         }
-        return color.lighter(200); // Lighten the color for dark colors
+        return color.lighter(150); // Lighten the color for dark colors
     } else {
         // If the color is too close to light color, use grey-darkish color for the border
         if (color.valueF() > 0.8) {
@@ -493,7 +493,7 @@ QColor getNewBorderColor(const QColor& color)
                           (color.green() * 0.80 + blackColor.green() * 0.20),
                           (color.blue() * 0.80 + blackColor.blue() * 0.20));
         }
-        return color.darker(200); // Darken the color for light colors
+        return color.darker(150); // Darken the color for light colors
     }
 }
 

@@ -371,7 +371,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToTagImage(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -384,8 +384,6 @@ namespace ProjectExportHelper {
 
         ImgData imgData{};
 
-        int totalShots = shots.size();
-        int currentShot = 0;
 
         std::vector<int> pngParams;
         pngParams.push_back(cv::IMWRITE_PNG_COMPRESSION);
@@ -405,26 +403,24 @@ namespace ProjectExportHelper {
 
             if(imgData.isFinished) break;
 
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
                 if (!progressCallback(percent)) {
                     // folder.removeRecursively();
                     stopDecodeThread(decodeThread, imageQueue.get());
                     return false;
                 }
             }
-            
-            QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
+
+            QString timeString = TimeFormatter::msToHHMMSSFF(items[currItemId].imageTime, fps);
             timeString.replace(":", "-");
             timeString.replace(".", "-");
         
-            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currentShot+1) + '_' + timeString + ".png");
+            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + '_' + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
-                qDebug() << "Impossible de sauvegarder la tag image du plan : " << currentShot;
+                qDebug() << "Impossible de sauvegarder la tag image du plan : " << currItemId;
             }
-            ++currentShot;
+            ++currItemId;
         }
 
         stopDecodeThread(decodeThread, imageQueue.get());

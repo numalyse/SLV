@@ -99,7 +99,6 @@
     "messagebox_extract_selected_shots_completed" : "Extração dos planos selecionados concluída.",
     "messagebox_extract_selected_shots_failed" : "Falha na extração dos planos selecionados.",
     
-
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",
     "export_type_txt": "Ficheiro de texto (*.txt)",
@@ -168,6 +167,9 @@
     "main_window_file_save_project_action": "Salve o diretório do projeto",
     "main_window_file_save_as_project_action": "Salvar como...",
     "project_manager_open_project_dialog" : "Abrir um diretório de projeto",
+
+    "main_window_file_open_project_action_tooltip" : "Abra um projeto existente selecionando a pasta do projeto. A pasta contém um arquivo .json e um atalho para a mídia.",
+    "main_window_file_save_project_action_tooltip" : "Salve o projeto atual como uma pasta. A pasta conterá um arquivo .json e um atalho para a mídia.",
 
     "main_window_menu_bar_option" : "Opções",
     "main_window_option_open_pref" :  "Preferências",

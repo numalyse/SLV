@@ -99,7 +99,6 @@
     "messagebox_extract_selected_shots_completed" : "Extraction of the selected shots completed.",
     "messagebox_extract_selected_shots_failed" : "Extraction of the selected shots failed.",
 
-
     "export_running": "Exporting...",
     "export_directory_path_title": "Select export folder",
     "export_type_txt": "Text file (*.txt)",
@@ -168,6 +167,9 @@
     "main_window_file_save_project_action": "Save project directory",
     "main_window_file_save_as_project_action": "Save as...",
     "project_manager_open_project_dialog" : "Open a project directory",
+
+    "main_window_file_open_project_action_tooltip" : "Open an existing project by selecting the project folder. The folder contains a .json file and a shortcut to the media.",
+    "main_window_file_save_project_action_tooltip" : "Save the current project as a folder. The folder will contain a .json file and a shortcut to the media.",
 
     "main_window_menu_bar_option": "Options",
     "main_window_option_open_pref": "Preferences",

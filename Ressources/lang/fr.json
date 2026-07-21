@@ -168,6 +168,8 @@
     "main_window_file_save_as_project_action": "Enregistrer sous...",
     "project_manager_open_project_dialog" : "Ouvrir un dossier de projet",
 
+    "main_window_file_open_project_action_tooltip" : "Ouvrir un projet existant en sélectionnant le dossier du projet. Le dossier contient un fichier .json et un raccourci vers le média.",
+    "main_window_file_save_project_action_tooltip" : "Enregistrer le projet actuel sous la forme d'un dossier. Le dossier contiendra un fichier .json et un raccourci vers le média.",
 
     "main_window_menu_bar_option" : "Options",
     "main_window_option_open_pref" :  "Préférences",

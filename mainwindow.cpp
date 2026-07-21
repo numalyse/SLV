@@ -153,9 +153,11 @@ void MainWindow::createMenuBar()
 
     auto *openProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_open_project_action"));
     openProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "open_project")));
+    openProjectAction->setToolTip(prefManager.getText("main_window_file_open_project_action_tooltip"));
 
     auto *saveProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_project_action"));
     saveProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "save_project")));
+    saveProjectAction->setToolTip(prefManager.getText("main_window_file_save_project_action_tooltip"));
     saveProjectAction->setDisabled(true);
 
     auto *saveAsProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_as_project_action"));

@@ -20,7 +20,7 @@ class ExtractSequenceWidget : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int startTime = 0, int endTime = -1);
+    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int startTime = 0, int endTime = -1, int audioTrack = 0);
 
     void createButtons();
     void initUiLayout();
@@ -38,6 +38,7 @@ private:
     int m_startTime;
     int m_endTime;
     bool m_isExec;
+    int m_audioTrack;
     TimeEditor* m_startTimeEditor;
     TimeEditor* m_endTimeEditor;
     AspectRatioPixmapLabel* m_startFrameDisplay;

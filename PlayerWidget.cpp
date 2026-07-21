@@ -471,7 +471,7 @@ void PlayerWidget::openSequenceExtractionDialog()
         return;
     }
     pause();
-    ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
+    ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime(), -1, m_mediaWidget->getCurrentAudioTrack());
     // sequenceExtractor->setModal(false);
     sequenceExtractor->show();
 

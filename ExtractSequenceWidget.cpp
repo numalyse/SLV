@@ -5,7 +5,7 @@
 #include <QComboBox>
 #include <QProgressDialog>
 
-ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
+ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime, int audioTrack)
     : QDialog{parent}, m_media(media)
 {
     const int MIN_END_MARGIN = 100;
@@ -32,6 +32,7 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
         m_endTime = endTime;
     }
 
+    m_audioTrack = audioTrack;
     m_thumbnailPendingTime = 50;
     m_isExec = false;
     m_startTimeEditor = new TimeEditor(this, startTime, duration, 0, duration, media.fps());
@@ -214,7 +215,7 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
         switch(type){
         case SequenceExtractionHelper::ExtractionType::Original:
         case SequenceExtractionHelper::ExtractionType::AudioOnly:
-            sequenceExtractor->extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
+            sequenceExtractor->extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type, true, m_audioTrack-1);
             break;
         case SequenceExtractionHelper::ExtractionType::Lossless:
             // sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());

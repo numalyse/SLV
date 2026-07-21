@@ -327,37 +327,37 @@ namespace ProjectExportHelper {
         QTextStream out(&file);
         out.setEncoding(QStringConverter::Utf8);
 
+        int totalItems = items.size();
+
         out << "=== " << QFileInfo(mediaPath).baseName() << " ===\n\n";
-        out << PrefManager::instance().getText("number_of_shots") << " : " << shots.size() << "\n\n";
+        out << labels.count << " : " << totalItems << "\n\n";
 
-        int totalShots = shots.size();
+        for (int IItem = 0; IItem < totalItems; ++IItem) {
+            const ExportItem &item = items[IItem];
 
-        for (int IShot = 0; IShot < shots.size(); ++IShot) {
-            const Shot &shot = shots[IShot];
+            int64_t itemDuration = item.end - item.start;
 
-            int64_t shotDuration = shot.end - shot.start;
+            QString timeStr = TimeFormatter::msToHHMMSSFF(item.start, fps);
+            QString durStr = TimeFormatter::msToHHMMSSFF(itemDuration, fps);
 
-            QString timeStr = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString durStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
+            out << "- [" << labels.item << " " << (IItem + 1) << "] " << item.title
+                << " -> "<< labels.startTime <<" : " << timeStr
+                << " / " << labels.duration <<" : " << durStr << "\n";
 
-            out << "- [" << PrefManager::instance().getText("shot") << " " << (IShot + 1) << "] " << shot.title 
-                << " -> "<< PrefManager::instance().getText("shot_detail_start_time_name") <<" : " << timeStr 
-                << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << durStr << "\n";
-
-            if (!shot.imgTxt.trimmed().isEmpty()) {
-                out << PrefManager::instance().getText("shot_detail_img_txt_name") << " : " << shot.imgTxt.trimmed() << "\n";
+            if (!item.imgTxt.trimmed().isEmpty()) {
+                out << labels.imgTxt << " : " << item.imgTxt.trimmed() << "\n";
             }
 
             out << "\n";
 
-            if (!shot.soundTxt.trimmed().isEmpty()) {
-                out << PrefManager::instance().getText("shot_detail_sound_txt_name") << " : " << shot.soundTxt.trimmed() << "\n";
+            if (!labels.soundTxt.isEmpty() && !item.soundTxt.trimmed().isEmpty()) {
+                out << labels.soundTxt << " : " << item.soundTxt.trimmed() << "\n";
             }
 
             out << "\n";
 
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((IShot + 1) * 100.0) / totalShots);
+            if (progressCallback && totalItems > 0) {
+                int percent = static_cast<int>(((IItem + 1) * 100.0) / totalItems);
                 if (!progressCallback(percent)) {
                     file.close();
                     file.remove(); 

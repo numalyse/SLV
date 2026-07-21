@@ -51,6 +51,16 @@ namespace  {
         return -1;
     }
 
+    /// @brief Retrieve timecodes to decode from ExportItems 
+    QVector<int64_t> toImageTimes(const QVector<ExportItem>& items) {
+        QVector<int64_t> imageTimes;
+        imageTimes.reserve(items.size());
+        for (const auto& item : items) {
+            imageTimes.push_back(item.imageTime);
+        }
+        return imageTimes;
+    }
+
     /// @brief Stops a decode thread and its queue, waits for the thread to finish, then destroys it
     void stopDecodeThread(DecodeThread* decodeThread, TSQueue<ImgData>* imageQueue) {
         decodeThread->requestInterruption();

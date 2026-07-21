@@ -637,6 +637,7 @@ namespace ProjectExportHelper {
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
     /// @return 
+    bool exportPython(ExportType type ,const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
         
@@ -665,35 +666,35 @@ namespace ProjectExportHelper {
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, sar, imageQueue.get(), shots, nullptr, 
+            mediaPath, sar, imageQueue.get(), toImageTimes(items), nullptr,
             std::optional<int>(), std::optional<cv::Size>(imgSize)
         );
 
         decodeThread->start();
 
         ImgData imgData{};
-        int totalShots = shots.size();
-        int currentShot = 0;
+        int itemCount = items.size();
+        int currItemId = 0;
 
         while(true) {
             imageQueue->waitPop(imgData);
             if(imgData.isFinished) break;
 
-            if (currentShot < totalShots) {
+            if (currItemId < itemCount) {
                 // Sauvegarde de l'image
                 if (!imgData.img.empty()) {
                     QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
-                    tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currentShot), "PNG");
+                    tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currItemId), "PNG");
                 }
 
-                if (progressCallback && totalShots > 0) { 
-                    int percent = static_cast<int>(((currentShot + 1) * 95.0) / totalShots); // On va de 0 à 95% car c'est le plus long 
+                if (progressCallback && itemCount > 0) { 
+                    int percent = static_cast<int>(((currItemId + 1) * 95.0) / itemCount); // On va de 0 à 95% car c'est le plus long 
                     if (!progressCallback(percent)) {
                         stopDecodeThread(decodeThread, imageQueue.get());
                         return false;
                     }
                 }
-                currentShot++;
+                ++currItemId;
             }
         }
 

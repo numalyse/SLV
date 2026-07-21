@@ -117,26 +117,32 @@ def main():
             sound_text = shot.get('soundTxt', "").strip()
 
             # On coupe la zone de note en deux colonnes : Image à gauche, Son à droite.
+            # Un label vide (ex : export d'annotations, pas de champ son) masque sa colonne.
             # Largeur fixe pour que le texte long passe à la ligne DANS la cellule
             # au lieu d'élargir la colonne et de pousser la mise en page.
-            column_width = Inches(3.0)
-            table = doc.add_table(rows=1, cols=2)
-            table.autofit = False
-            table.allow_autofit = False
-            _set_table_fixed_layout(table)
-            for column in table.columns:
-                column.width = column_width
+            columns = [
+                (label, text)
+                for label, text in ((image_label, img_text), (sound_label, sound_text))
+                if label
+            ]
 
-            for cell, label, text in (
-                (table.cell(0, 0), image_label, img_text),
-                (table.cell(0, 1), sound_label, sound_text),
-            ):
-                cell.width = column_width
-                cell_p = cell.paragraphs[0]
-                label_run = cell_p.add_run(f"{label} : ")
-                label_run.font.bold = True
-                label_run.font.color.rgb = RGBColor.from_string("1F497D")
-                cell_p.add_run(text)
+            if columns:
+                column_width = Inches(6.0) if len(columns) == 1 else Inches(3.0)
+                table = doc.add_table(rows=1, cols=len(columns))
+                table.autofit = False
+                table.allow_autofit = False
+                _set_table_fixed_layout(table)
+                for column in table.columns:
+                    column.width = column_width
+
+                for col_idx, (label, text) in enumerate(columns):
+                    cell = table.cell(0, col_idx)
+                    cell.width = column_width
+                    cell_p = cell.paragraphs[0]
+                    label_run = cell_p.add_run(f"{label} : ")
+                    label_run.font.bold = True
+                    label_run.font.color.rgb = RGBColor.from_string("1F497D")
+                    cell_p.add_run(text)
 
             doc.add_paragraph()
 

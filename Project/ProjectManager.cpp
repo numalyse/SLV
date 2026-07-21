@@ -557,15 +557,7 @@ void ProjectManager::exportProject(){
     int64_t duration = m_project->media->duration();
     QString mediaPath = m_project->media->filePath();
 
-    // TODO : brancher ici la choice box plans / annotations
-    ExportSource source = ExportSource::Shots;
-
-    QVector<ExportItem> items = (source == ExportSource::Annotations)
-        ? ProjectExportHelper::fromAnnotations(m_annotationManager->annotations())
-        : ProjectExportHelper::fromShots(p_timeline->getTimelineData());
-    ExportLabels labels = ProjectExportHelper::makeExportLabels(source);
-
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, items, labels, fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
     m_exportThread = exportThread;
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);

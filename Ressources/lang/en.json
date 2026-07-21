@@ -112,9 +112,17 @@
     "export_type_unknown": "All files (*.*)",
     "export_file_path_title": "Save as...",
 
-    "export_format_selection_title" : "Export format",
+    "export_format_selection_title" : "Project export",
     "export_format_selection_txt" : "Select export format",
     "export_format_selection_txt_tagImage" : "Tag frames",
+
+    "export_format_txt" : "Text",
+    "export_format_pdf" : "PDF",
+    "export_format_pptx" : "Presentation",
+    "export_format_docx" : "Document",
+    "export_format_csv" : "Data table",
+    "export_format_mp4" : "MP4 video",
+    "export_format_src" : "Source video",
 
     "timeline_dialog_title_auto_segmentation": "Auto segmentation",
     "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",
@@ -139,6 +147,8 @@
     "shot" : "Shot",
     "number_of_shots" : "Total number of shots",
     "number_of_annotations" : "Total number of annotations",
+    "shots" : "Shots",
+    "export_source_selection_txt" : "Select the content to export",
 
     "compo_rule_None" : "None",
     "compo_rule_RuleOfThirds" : "Thirds",

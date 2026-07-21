@@ -515,11 +515,13 @@ void ProjectManager::exportProject(){
 
     if ( extension.isEmpty() ) return;
 
-    auto format = ProjectExportHelper::selectFormatWindow(m_project->media->type(), extension);
+    bool hasAnnotations = !m_annotationManager->annotations().isEmpty();
+    auto selection = ProjectExportHelper::selectFormatWindow(m_project->media->type(), extension, hasAnnotations);
 
-    if ( ! format.has_value() ) return;
-    
-    ExportType selectedFormat = format.value();
+    if ( ! selection.has_value() ) return;
+
+    ExportType selectedFormat = selection->type;
+    ExportSource source = selection->source;
 
     // si on est dans un project existant (avec un dossier), on enregistre par défaut dans le dossier du projet
     // sinon on recupère le path dans les preferences
@@ -537,10 +539,11 @@ void ProjectManager::exportProject(){
         QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
         if(selectedFormat == ExportType::SRC)
             dialogFilter.replace(".src", '.'+mediaPathExtension());
+        QString sourceSuffix = (source == ExportSource::Annotations) ? "_annotations" : "";
         selectedPath = QFileDialog::getSaveFileName(
-            nullptr, 
-            prefManager.getText("export_file_path_title"), 
-            dialogDir+'/'+m_project->media->fileName() + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
+            nullptr,
+            prefManager.getText("export_file_path_title"),
+            dialogDir+'/'+m_project->media->fileName() + sourceSuffix + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
             dialogFilter
         );
     }
@@ -557,7 +560,12 @@ void ProjectManager::exportProject(){
     int64_t duration = m_project->media->duration();
     QString mediaPath = m_project->media->filePath();
 
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
+    QVector<ExportItem> items = (source == ExportSource::Annotations)
+        ? ProjectExportHelper::fromAnnotations(m_annotationManager->annotations())
+        : ProjectExportHelper::fromShots(p_timeline->getTimelineData());
+    ExportLabels labels = ProjectExportHelper::makeExportLabels(source);
+
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, items, labels, fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
     m_exportThread = exportThread;
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);

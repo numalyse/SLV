@@ -27,6 +27,12 @@ enum class ExportSource {
     Annotations,
 };
 
+/// @brief User choices in the export selection window
+struct ExportSelection {
+    ExportType type;
+    ExportSource source;
+};
+
 /// @brief Element that can contain an annotation or a shot
 struct ExportItem {
     QString title;
@@ -103,7 +109,8 @@ namespace ProjectExportHelper {
     bool exportPython(ExportType type ,const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback);
     bool exportVideo(ExportType type ,const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar,const QString &dstPath, std::function<bool(int)> progressCallback);
 
-    std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString& extension);
+    /// @brief Opens a dialog to select format of export and the source to export shots or annotations, if no annotations in this project, cannot select annotations (disabled)
+    std::optional<ExportSelection> selectFormatWindow(const MediaType mediaType, const QString& extension, bool hasAnnotations);
 }
 
 

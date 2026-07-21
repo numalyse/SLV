@@ -9,8 +9,10 @@
 
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <QRadioButton>
 #include <QDialogButtonBox>
 #include <optional>
 #include <functional>
@@ -975,14 +977,27 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString &originalFormat)
+    std::optional<ExportSelection> selectFormatWindow(const MediaType mediaType, const QString &originalFormat, bool hasAnnotations)
     {
         QDialog dialog;
         auto& txtManager = PrefManager::instance();
-        dialog.setWindowTitle(txtManager.getText("export_format_selection_title")); 
+        dialog.setWindowTitle(txtManager.getText("export_format_selection_title"));
         dialog.setMinimumWidth(300);
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
+
+        QLabel* sourceLabel = new QLabel(txtManager.getText("export_source_selection_txt"), &dialog);
+        layout->addWidget(sourceLabel);
+
+        QRadioButton* shotsRadio = new QRadioButton(txtManager.getText("shots"), &dialog);
+        QRadioButton* annotationsRadio = new QRadioButton(txtManager.getText("annotations"), &dialog);
+        shotsRadio->setChecked(true);
+        annotationsRadio->setEnabled(hasAnnotations);
+
+        QHBoxLayout* sourceLayout = new QHBoxLayout();
+        sourceLayout->addWidget(shotsRadio);
+        sourceLayout->addWidget(annotationsRadio);
+        layout->addLayout(sourceLayout);
 
         QLabel* label = new QLabel(txtManager.getText("export_format_selection_txt"), &dialog);
         layout->addWidget(label);
@@ -990,20 +1005,30 @@ namespace ProjectExportHelper {
         QComboBox* comboBox = new QComboBox(&dialog);
         
         if(mediaType == MediaType::Video){
-            comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
-            comboBox->addItem(".pdf", static_cast<int>(ExportType::PDF));
-            comboBox->addItem(".pptx", static_cast<int>(ExportType::PPTX));
-            comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
-            comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
-            if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
-            comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
+            comboBox->addItem(txtManager.getText("export_format_txt") + " (.txt)", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(txtManager.getText("export_format_pdf") + " (.pdf)", static_cast<int>(ExportType::PDF));
+            comboBox->addItem(txtManager.getText("export_format_pptx") + " (.pptx)", static_cast<int>(ExportType::PPTX));
+            comboBox->addItem(txtManager.getText("export_format_docx") + " (.docx)", static_cast<int>(ExportType::DOCX));
+            comboBox->addItem(txtManager.getText("export_format_csv") + " (.csv)", static_cast<int>(ExportType::CSV));
+            if(originalFormat != ".mp4") comboBox->addItem(txtManager.getText("export_format_mp4") + " (.mp4)", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
+            comboBox->addItem(txtManager.getText("export_format_src") + " (" + originalFormat + ")", static_cast<int>(ExportType::SRC));
             comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
         }else {
-            comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
-            comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
+            comboBox->addItem(txtManager.getText("export_format_txt") + " (.txt)", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(txtManager.getText("export_format_csv") + " (.csv)", static_cast<int>(ExportType::CSV));
         }
         
         layout->addWidget(comboBox);
+
+        QObject::connect(annotationsRadio, &QRadioButton::toggled, &dialog, [comboBox, mediaType](bool checked){
+            if(mediaType != MediaType::Video) return;
+
+            if(checked) comboBox->removeItem(comboBox->count() - 1) ;
+            else {
+                auto& txtManager = PrefManager::instance();
+                comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+            }
+        });
 
         QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
         
@@ -1016,9 +1041,9 @@ namespace ProjectExportHelper {
         QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
         if (dialog.exec() == QDialog::Accepted) {
-            int selectedValue = comboBox->currentData().toInt();
-            qDebug() << "Format choisi : " << selectedValue;
-            return static_cast<ExportType>(selectedValue);
+            int selectedExportType = comboBox->currentData().toInt();
+            ExportSource source = annotationsRadio->isChecked() ? ExportSource::Annotations : ExportSource::Shots;
+            return ExportSelection{static_cast<ExportType>(selectedExportType), source};
         }
 
         return std::nullopt;

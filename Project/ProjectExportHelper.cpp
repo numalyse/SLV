@@ -9,8 +9,10 @@
 
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <QRadioButton>
 #include <QDialogButtonBox>
 #include <optional>
 #include <functional>
@@ -44,11 +46,21 @@
 #include <algorithm>
 namespace  {
 
-    int findShotIndexAtTime(const QVector<Shot>& shots, int64_t timeMs) {
-        for (int IShot = 0; IShot < shots.size(); ++IShot) {
-            if(shots[IShot].start <= timeMs && shots[IShot].end >= timeMs) return IShot;
+    int findItemIndexAtTime(const QVector<ExportItem>& items, int64_t timeMs) {
+        for (int IItem = 0; IItem < items.size(); ++IItem) {
+            if(items[IItem].start <= timeMs && items[IItem].end >= timeMs) return IItem;
         }
         return -1;
+    }
+
+    /// @brief Retrieve timecodes to decode from ExportItems 
+    QVector<int64_t> toImageTimes(const QVector<ExportItem>& items) {
+        QVector<int64_t> imageTimes;
+        imageTimes.reserve(items.size());
+        for (const auto& item : items) {
+            imageTimes.push_back(item.imageTime);
+        }
+        return imageTimes;
     }
 
     /// @brief Stops a decode thread and its queue, waits for the thread to finish, then destroys it
@@ -256,7 +268,55 @@ namespace  {
 namespace ProjectExportHelper {
     
 
-    bool exportToTxt(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    ExportLabels makeExportLabels(ExportSource source)
+    {
+        auto& txtManager = PrefManager::instance();
+        ExportLabels labels;
+
+        if (source == ExportSource::Annotations) {
+            labels.item      = txtManager.getText("annotation");
+            labels.count     = txtManager.getText("number_of_annotations");
+            labels.title     = txtManager.getText("annotation_name");
+            labels.startTime = txtManager.getText("shot_detail_start_time_name");
+            labels.endTime   = txtManager.getText("shot_detail_end_time_name");
+            labels.duration  = txtManager.getText("shot_detail_duration_time_name");
+            labels.imgTxt    = txtManager.getText("annotation_note");
+            labels.soundTxt  = QString(); 
+        } else {
+            labels.item      = txtManager.getText("shot");
+            labels.count     = txtManager.getText("number_of_shots");
+            labels.title     = txtManager.getText("shot_detail_title_name");
+            labels.startTime = txtManager.getText("shot_detail_start_time_name");
+            labels.endTime   = txtManager.getText("shot_detail_end_time_name");
+            labels.duration  = txtManager.getText("shot_detail_duration_time_name");
+            labels.imgTxt    = txtManager.getText("shot_detail_img_txt_name");
+            labels.soundTxt  = txtManager.getText("shot_detail_sound_txt_name");
+        }
+
+        return labels;
+    }
+
+    QVector<ExportItem> fromShots(const QVector<Shot>& shots)
+    {
+        QVector<ExportItem> items;
+        items.reserve(shots.size());
+        for (const auto& shot : shots) {
+            items.push_back({shot.title, shot.start, shot.end, shot.tagImageTime, shot.imgTxt, shot.soundTxt});
+        }
+        return items;
+    }
+
+    QVector<ExportItem> fromAnnotations(const QVector<Annotation>& annotations)
+    {
+        QVector<ExportItem> items;
+        items.reserve(annotations.size());
+        for (const auto& annot : annotations) {
+            items.push_back({annot.name, annot.start, annot.end, annot.start, annot.note, QString()});
+        }
+        return items;
+    }
+
+    bool exportToTxt(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -269,37 +329,37 @@ namespace ProjectExportHelper {
         QTextStream out(&file);
         out.setEncoding(QStringConverter::Utf8);
 
+        int totalItems = items.size();
+
         out << "=== " << QFileInfo(mediaPath).baseName() << " ===\n\n";
-        out << PrefManager::instance().getText("number_of_shots") << " : " << shots.size() << "\n\n";
+        out << labels.count << " : " << totalItems << "\n\n";
 
-        int totalShots = shots.size();
+        for (int IItem = 0; IItem < totalItems; ++IItem) {
+            const ExportItem &item = items[IItem];
 
-        for (int IShot = 0; IShot < shots.size(); ++IShot) {
-            const Shot &shot = shots[IShot];
+            int64_t itemDuration = item.end - item.start;
 
-            int64_t shotDuration = shot.end - shot.start;
+            QString timeStr = TimeFormatter::msToHHMMSSFF(item.start, fps);
+            QString durStr = TimeFormatter::msToHHMMSSFF(itemDuration, fps);
 
-            QString timeStr = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString durStr = TimeFormatter::msToHHMMSSFF(shotDuration, fps);
+            out << "- [" << labels.item << " " << (IItem + 1) << "] " << item.title
+                << " -> "<< labels.startTime <<" : " << timeStr
+                << " / " << labels.duration <<" : " << durStr << "\n";
 
-            out << "- [" << PrefManager::instance().getText("shot") << " " << (IShot + 1) << "] " << shot.title 
-                << " -> "<< PrefManager::instance().getText("shot_detail_start_time_name") <<" : " << timeStr 
-                << " / " << PrefManager::instance().getText("shot_detail_duration_time_name") <<" : " << durStr << "\n";
-
-            if (!shot.imgTxt.trimmed().isEmpty()) {
-                out << PrefManager::instance().getText("shot_detail_img_txt_name") << " : " << shot.imgTxt.trimmed() << "\n";
+            if (!item.imgTxt.trimmed().isEmpty()) {
+                out << labels.imgTxt << " : " << item.imgTxt.trimmed() << "\n";
             }
 
             out << "\n";
 
-            if (!shot.soundTxt.trimmed().isEmpty()) {
-                out << PrefManager::instance().getText("shot_detail_sound_txt_name") << " : " << shot.soundTxt.trimmed() << "\n";
+            if (!labels.soundTxt.isEmpty() && !item.soundTxt.trimmed().isEmpty()) {
+                out << labels.soundTxt << " : " << item.soundTxt.trimmed() << "\n";
             }
 
             out << "\n";
 
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((IShot + 1) * 100.0) / totalShots);
+            if (progressCallback && totalItems > 0) {
+                int percent = static_cast<int>(((IItem + 1) * 100.0) / totalItems);
                 if (!progressCallback(percent)) {
                     file.close();
                     file.remove(); 
@@ -313,7 +373,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToTagImage(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToTagImage(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -326,8 +386,8 @@ namespace ProjectExportHelper {
 
         ImgData imgData{};
 
-        int totalShots = shots.size();
-        int currentShot = 0;
+        int itemCount = items.size();
+        int currItemId = 0;
 
         std::vector<int> pngParams;
         pngParams.push_back(cv::IMWRITE_PNG_COMPRESSION);
@@ -338,7 +398,7 @@ namespace ProjectExportHelper {
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
 
-        DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), shots);
+        DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), toImageTimes(items));
 
         decodeThread->start();
 
@@ -347,26 +407,26 @@ namespace ProjectExportHelper {
 
             if(imgData.isFinished) break;
 
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+            if (progressCallback && itemCount > 0) {
+                int percent = static_cast<int>(((currItemId + 1) * 100.0) / itemCount);
                 if (!progressCallback(percent)) {
                     // folder.removeRecursively();
                     stopDecodeThread(decodeThread, imageQueue.get());
                     return false;
                 }
             }
-            
-            QString timeString = TimeFormatter::msToHHMMSSFF(shots[currentShot].tagImageTime, fps);
+
+            QString timeString = TimeFormatter::msToHHMMSSFF(items[currItemId].imageTime, fps);
             timeString.replace(":", "-");
             timeString.replace(".", "-");
         
-            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currentShot+1) + '_' + timeString + ".png");
+            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + '_' + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
-                qDebug() << "Impossible de sauvegarder la tag image du plan : " << currentShot;
+                qDebug() << "Impossible de sauvegarder la tag image du plan : " << currItemId;
             }
-            ++currentShot;
+            ++currItemId;
         }
 
         stopDecodeThread(decodeThread, imageQueue.get());
@@ -374,7 +434,7 @@ namespace ProjectExportHelper {
 
     }
 
-   bool exportToPDF(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+   bool exportToPDF(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
         
@@ -426,18 +486,18 @@ namespace ProjectExportHelper {
         cursor.insertText(QFileInfo(mediaPath).baseName(), titleFormat);
         
         ImgData imgData{};
-        int totalShots = shots.size();
-        int currentShot = 0;
+        int itemCount = items.size();
+        int currItemId = 0;
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
 
         DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, 
+            mediaPath,
             sar,
-            imageQueue.get(), 
-            shots, 
-            nullptr, 
-            std::optional<int>(), 
+            imageQueue.get(),
+            toImageTimes(items),
+            nullptr,
+            std::optional<int>(),
             std::optional<cv::Size>({400, 400})
         );
 
@@ -448,26 +508,26 @@ namespace ProjectExportHelper {
 
             if(imgData.isFinished) break;
 
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+            if (progressCallback && itemCount > 0) {
+                int percent = static_cast<int>(((currItemId + 1) * 100.0) / itemCount);
                 if (!progressCallback(percent)) {
                     stopDecodeThread(decodeThread, imageQueue.get());
                     return false;
                 }
             }
 
-            auto& shot = shots[currentShot];
-            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+            auto& item = items[currItemId];
+            QString start = TimeFormatter::msToHHMMSSFF(item.start, fps);
+            QString itemDuration = TimeFormatter::msToHHMMSSFF(item.end - item.start, fps);
 
             QString planHeader = QString("- [%1 %2] %3 -> %4 : %5 / %6 : %7")
-                                        .arg(PrefManager::instance().getText("shot"))
-                                        .arg(currentShot + 1)
-                                        .arg(shot.title)
-                                        .arg(PrefManager::instance().getText("shot_detail_start_time_name"))
+                                        .arg(labels.item)
+                                        .arg(currItemId + 1)
+                                        .arg(item.title)
+                                        .arg(labels.startTime)
                                         .arg(start)
-                                        .arg(PrefManager::instance().getText("shot_detail_duration_time_name"))
-                                        .arg(shotDuration);
+                                        .arg(labels.duration)
+                                        .arg(itemDuration);
             
             cursor.insertBlock(leftAlignment);
             cursor.insertText(planHeader, subtitleFormat);
@@ -477,7 +537,7 @@ namespace ProjectExportHelper {
                 QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
                 QImage safeImage = tempImage.copy();
 
-                QString imgName = QString("img_%1.png").arg(currentShot + 1);
+                QString imgName = QString("img_%1.png").arg(currItemId + 1);
                 doc.addResource(QTextDocument::ImageResource, QUrl(imgName), safeImage);
                 
                 cursor.insertBlock(imageAlignment);
@@ -487,19 +547,19 @@ namespace ProjectExportHelper {
                 cursor.insertImage(imgFormat);
             }
 
-            if (!shot.imgTxt.isEmpty()) {
+            if (!item.imgTxt.isEmpty()) {
                 cursor.insertBlock(noteAlignment);
-                cursor.insertText(PrefManager::instance().getText("shot_detail_img_txt_name") + " : ", labelFormat);
-                cursor.insertText(shot.imgTxt, normalFormat);
+                cursor.insertText(labels.imgTxt + " : ", labelFormat);
+                cursor.insertText(item.imgTxt, normalFormat);
             }
 
-            if (!shot.soundTxt.isEmpty()) {
+            if (!labels.soundTxt.isEmpty() && !item.soundTxt.isEmpty()) {
                 cursor.insertBlock(noteAlignment);
-                cursor.insertText(PrefManager::instance().getText("shot_detail_sound_txt_name") + " : ", labelFormat);
-                cursor.insertText(shot.soundTxt, normalFormat);
+                cursor.insertText(labels.soundTxt + " : ", labelFormat);
+                cursor.insertText(item.soundTxt, normalFormat);
             }
 
-            ++currentShot;
+            ++currItemId;
         }
 
         stopDecodeThread(decodeThread, imageQueue.get());
@@ -508,7 +568,7 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    bool exportToCSV(const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportToCSV(const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -524,31 +584,35 @@ namespace ProjectExportHelper {
         
         out.setGenerateByteOrderMark(true); 
 
-        out << '"' << PrefManager::instance().getText("shot") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_title_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_start_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_end_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_duration_time_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_img_txt_name") << '"' << ';'
-            << '"' << PrefManager::instance().getText("shot_detail_sound_txt_name") << '"'
-            << "\n";
+        bool hasSoundColumn = !labels.soundTxt.isEmpty();
 
-        int totalShots = shots.size();
+        out << '"' << labels.item << '"' << ';'
+            << '"' << labels.title << '"' << ';'
+            << '"' << labels.startTime << '"' << ';'
+            << '"' << labels.endTime << '"' << ';'
+            << '"' << labels.duration << '"' << ';'
+            << '"' << labels.imgTxt << '"';
+        if (hasSoundColumn) {
+            out << ';' << '"' << labels.soundTxt << '"';
+        }
+        out << "\n";
 
-        for (int currentShot = 0; currentShot < totalShots; ++currentShot) {
-            
-            if (progressCallback && totalShots > 0) {
-                int percent = static_cast<int>(((currentShot + 1) * 100.0) / totalShots);
+        int itemCount = items.size();
+
+        for (int currItemId = 0; currItemId < itemCount; ++currItemId) {
+
+            if (progressCallback && itemCount > 0) {
+                int percent = static_cast<int>(((currItemId + 1) * 100.0) / itemCount);
                 if (!progressCallback(percent)) {
                     file.close();
-                    return false; 
+                    return false;
                 }
             }
 
-            auto& shot = shots[currentShot];
-            QString start = TimeFormatter::msToHHMMSSFF(shot.start, fps);
-            QString end = TimeFormatter::msToHHMMSSFF(shot.end, fps);
-            QString shotDuration = TimeFormatter::msToHHMMSSFF(shot.end - shot.start, fps);
+            auto& item = items[currItemId];
+            QString start = TimeFormatter::msToHHMMSSFF(item.start, fps);
+            QString end = TimeFormatter::msToHHMMSSFF(item.end, fps);
+            QString itemDuration = TimeFormatter::msToHHMMSSFF(item.end - item.start, fps);
 
             // Échappe les champs texte pour respecter le format CSV (guillemets, retours à la ligne, séparateur)
             auto csvField = [](QString text) -> QString {
@@ -556,13 +620,16 @@ namespace ProjectExportHelper {
                 return '"' + text + '"';
             };
 
-            out << (currentShot + 1) << ";"
-                << csvField(shot.title) << ";"
+            out << (currItemId + 1) << ";"
+                << csvField(item.title) << ";"
                 << csvField(start) << ";"
                 << csvField(end) << ";"
-                << csvField(shotDuration) << ";"
-                << csvField(shot.imgTxt) << ";"
-                << csvField(shot.soundTxt) << "\n";
+                << csvField(itemDuration) << ";"
+                << csvField(item.imgTxt);
+            if (hasSoundColumn) {
+                out << ";" << csvField(item.soundTxt);
+            }
+            out << "\n";
         }
 
         file.close();
@@ -572,7 +639,7 @@ namespace ProjectExportHelper {
 
     /// @brief Utilise des scripts python pour exporter au format DOCX / PPTX, return false si le type est différent de ces deux
     /// @return 
-    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportPython(ExportType type ,const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if (type != ExportType::DOCX && type != ExportType::PPTX) return false;
         
@@ -601,35 +668,35 @@ namespace ProjectExportHelper {
 
         std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
         DecodeThread* decodeThread = new DecodeThread(
-            mediaPath, sar, imageQueue.get(), shots, nullptr, 
+            mediaPath, sar, imageQueue.get(), toImageTimes(items), nullptr,
             std::optional<int>(), std::optional<cv::Size>(imgSize)
         );
 
         decodeThread->start();
 
         ImgData imgData{};
-        int totalShots = shots.size();
-        int currentShot = 0;
+        int itemCount = items.size();
+        int currItemId = 0;
 
         while(true) {
             imageQueue->waitPop(imgData);
             if(imgData.isFinished) break;
 
-            if (currentShot < totalShots) {
+            if (currItemId < itemCount) {
                 // Sauvegarde de l'image
                 if (!imgData.img.empty()) {
                     QImage tempImage(imgData.img.data, imgData.img.cols, imgData.img.rows, imgData.img.step, QImage::Format_BGR888);
-                    tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currentShot), "PNG");
+                    tempImage.save(tempPath + QString("/image_shot_%1.png").arg(currItemId), "PNG");
                 }
 
-                if (progressCallback && totalShots > 0) { 
-                    int percent = static_cast<int>(((currentShot + 1) * 95.0) / totalShots); // On va de 0 à 95% car c'est le plus long 
+                if (progressCallback && itemCount > 0) { 
+                    int percent = static_cast<int>(((currItemId + 1) * 95.0) / itemCount); // On va de 0 à 95% car c'est le plus long 
                     if (!progressCallback(percent)) {
                         stopDecodeThread(decodeThread, imageQueue.get());
                         return false;
                     }
                 }
-                currentShot++;
+                ++currItemId;
             }
         }
 
@@ -637,15 +704,15 @@ namespace ProjectExportHelper {
 
         // Preparation json
         QJsonArray jsonShots;
-        for (int i = 0; i < shots.size(); ++i) {
+        for (int itemId = 0; itemId < items.size(); ++itemId) {
             QJsonObject shotObj;
-            shotObj["id"] = i;
-            shotObj["title"] = shots[i].title;
-            shotObj["start"] = shots[i].start;
-            shotObj["duration"] = shots[i].end - shots[i].start; 
-            shotObj["imgTxt"] = shots[i].imgTxt;
-            shotObj["soundTxt"] = shots[i].soundTxt;
-            shotObj["image"] = QString("image_shot_%1.png").arg(i);
+            shotObj["id"] = itemId;
+            shotObj["title"] = items[itemId].title;
+            shotObj["start"] = items[itemId].start;
+            shotObj["duration"] = items[itemId].end - items[itemId].start;
+            shotObj["imgTxt"] = items[itemId].imgTxt;
+            shotObj["soundTxt"] = items[itemId].soundTxt;
+            shotObj["image"] = QString("image_shot_%1.png").arg(itemId);
             jsonShots.append(shotObj);
         }
 
@@ -695,15 +762,9 @@ namespace ProjectExportHelper {
             return false;
         }
 
-        QString shot_name = PrefManager::instance().getText("shot");
-        QString start_time_name = PrefManager::instance().getText("shot_detail_start_time_name");
-        QString duration_time_name = PrefManager::instance().getText("shot_detail_duration_time_name");
-        QString image_txt_name = PrefManager::instance().getText("shot_detail_img_txt_name");
-        QString sound_txt_name = PrefManager::instance().getText("shot_detail_sound_txt_name");
-
         QStringList arguments;
-        arguments << scriptPath << jsonFile.fileName() << shot_name << start_time_name << duration_time_name
-                  << image_txt_name << sound_txt_name;
+        arguments << scriptPath << jsonFile.fileName() << labels.item << labels.startTime << labels.duration
+                  << labels.imgTxt << labels.soundTxt;
         pythonProcess.start(pythonExe, arguments);
 
         // Boucle d'attente active pour lire la progression en temps réel
@@ -731,7 +792,7 @@ namespace ProjectExportHelper {
     }
 
 
-    bool exportVideo(ExportType type, const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
+    bool exportVideo(ExportType type, const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback)
     {
         if(progressCallback) progressCallback(0);
 
@@ -817,8 +878,8 @@ namespace ProjectExportHelper {
             if(writerOpened) qDebug() << "écriture Ok";
         }
 
-        int currentShot = -1;
-        int64_t endShotTime = -1;
+        int currItemId = -1;
+        int64_t endItemItem = -1;
 
         ImgData imgData;
         QStringList wrappedText;
@@ -842,29 +903,27 @@ namespace ProjectExportHelper {
             if(imgData.isFinished) break;
             if(imgData.img.empty()) continue;
 
-            // Si endShotTime < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
-            if( endShotTime < imgData.timeMs || currentShot == -1){
-                 // Récupère le temps et l'id du plan comprenant imgData.timeMs
-                currentShot = findShotIndexAtTime(shots, imgData.timeMs);
-                if(currentShot == -1){ // Si pas de temps trouvé, le text devient vide
-                    qDebug() << "Impossible de trouver un plan qui comprend : " << imgData.timeMs << "garde le textPrecende";
+            // Si endItemItem < timeMs => opencv a dépassé la fin du plan, on met à jour le plan courant
+            if( endItemItem < imgData.timeMs || currItemId == -1){
+                 // Récupère le temps et l'id de l'item comprenant imgData.timeMs
+                currItemId = findItemIndexAtTime(items, imgData.timeMs);
+                if(currItemId == -1){ // Si pas de temps trouvé, le text devient vide
+                    qDebug() << "Impossible de trouver un item qui comprend : " << imgData.timeMs << ", on garde le texte précédent";
                     wrappedText.clear();
                     textOverlay.fill(Qt::transparent); 
                 }else { // Le texte est mis à jour avec les infos du nouveau plan
-                    auto& s = shots[currentShot];
-                    endShotTime = s.end;
-                    QString shotTitleTxt = "["+ PrefManager::instance().getText("shot") + " " + QString::number(currentShot+1) + "] " + s.title;
-                    QString timecodeTxt = PrefManager::instance().getText("shot_detail_start_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps) 
+                    auto& s = items[currItemId];
+                    endItemItem = s.end;
+                    QString shotTitleTxt = "["+ labels.item + " " + QString::number(currItemId+1) + "] " + s.title;
+                    QString timecodeTxt = labels.startTime + " : " + TimeFormatter::msToHHMMSSFF(s.start, fps)
                                         + " / "
-                                        + PrefManager::instance().getText("shot_detail_duration_time_name") + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
-                    QString imgLabel = PrefManager::instance().getText("shot_detail_img_txt_name");
-                    QString soundLabel = PrefManager::instance().getText("shot_detail_sound_txt_name");
+                                        + labels.duration + " : " + TimeFormatter::msToHHMMSSFF(s.end - s.start, fps);
                     QString noteTxt;
                     if (!s.imgTxt.isEmpty())
-                        noteTxt += imgLabel + " : " + s.imgTxt;
-                    if (!s.soundTxt.isEmpty()) {
+                        noteTxt += labels.imgTxt + " : " + s.imgTxt;
+                    if (!labels.soundTxt.isEmpty() && !s.soundTxt.isEmpty()) {
                         if (!noteTxt.isEmpty()) noteTxt += "\n";
-                        noteTxt += soundLabel + " : " + s.soundTxt;
+                        noteTxt += labels.soundTxt + " : " + s.soundTxt;
                     }
 
                     wrappedText = formatText(shotTitleTxt, timecodeTxt, noteTxt, displaySize.width, fontSize);
@@ -918,14 +977,27 @@ namespace ProjectExportHelper {
         return true;
     }
 
-    std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString &originalFormat)
+    std::optional<ExportSelection> selectFormatWindow(const MediaType mediaType, const QString &originalFormat, bool hasAnnotations)
     {
         QDialog dialog;
         auto& txtManager = PrefManager::instance();
-        dialog.setWindowTitle(txtManager.getText("export_format_selection_title")); 
+        dialog.setWindowTitle(txtManager.getText("export_format_selection_title"));
         dialog.setMinimumWidth(300);
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
+
+        QLabel* sourceLabel = new QLabel(txtManager.getText("export_source_selection_txt"), &dialog);
+        layout->addWidget(sourceLabel);
+
+        QRadioButton* shotsRadio = new QRadioButton(txtManager.getText("shots"), &dialog);
+        QRadioButton* annotationsRadio = new QRadioButton(txtManager.getText("annotations"), &dialog);
+        shotsRadio->setChecked(true);
+        annotationsRadio->setEnabled(hasAnnotations);
+
+        QHBoxLayout* sourceLayout = new QHBoxLayout();
+        sourceLayout->addWidget(shotsRadio);
+        sourceLayout->addWidget(annotationsRadio);
+        layout->addLayout(sourceLayout);
 
         QLabel* label = new QLabel(txtManager.getText("export_format_selection_txt"), &dialog);
         layout->addWidget(label);
@@ -933,20 +1005,35 @@ namespace ProjectExportHelper {
         QComboBox* comboBox = new QComboBox(&dialog);
         
         if(mediaType == MediaType::Video){
-            comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
-            comboBox->addItem(".pdf", static_cast<int>(ExportType::PDF));
-            comboBox->addItem(".pptx", static_cast<int>(ExportType::PPTX));
-            comboBox->addItem(".docx", static_cast<int>(ExportType::DOCX));
-            comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
-            if(originalFormat != ".mp4") comboBox->addItem(".mp4", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
-            comboBox->addItem(originalFormat, static_cast<int>(ExportType::SRC));
-            comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+            comboBox->addItem(txtManager.getText("export_format_txt") + " (.txt)", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(txtManager.getText("export_format_docx") + " (.docx)", static_cast<int>(ExportType::DOCX));
+            comboBox->addItem(txtManager.getText("export_format_pdf") + " (.pdf)", static_cast<int>(ExportType::PDF));
+            comboBox->addItem(txtManager.getText("export_format_pptx") + " (.pptx)", static_cast<int>(ExportType::PPTX));
+            comboBox->addItem(txtManager.getText("export_format_csv") + " (.csv)", static_cast<int>(ExportType::CSV));
+            comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage") + " (.png)", static_cast<int>(ExportType::TagImage));
+            comboBox->addItem(txtManager.getText("export_format_src") + " (" + originalFormat + ")", static_cast<int>(ExportType::SRC));
+            if(originalFormat != ".mp4") comboBox->addItem(txtManager.getText("export_format_mp4") + " (.mp4)", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4 
         }else {
-            comboBox->addItem(".txt", static_cast<int>(ExportType::TXT));
-            comboBox->addItem(".csv", static_cast<int>(ExportType::CSV));
+            comboBox->addItem(txtManager.getText("export_format_txt") + " (.txt)", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(txtManager.getText("export_format_csv") + " (.csv)", static_cast<int>(ExportType::CSV));
         }
         
         layout->addWidget(comboBox);
+
+        QObject::connect(annotationsRadio, &QRadioButton::toggled, &dialog, [comboBox, mediaType](bool checked){
+            if(mediaType != MediaType::Video) return;
+
+            int tagImageIndex = comboBox->findData(static_cast<int>(ExportType::TagImage));
+            if(checked) {
+                if(tagImageIndex != -1) comboBox->removeItem(tagImageIndex);
+            }
+            else if(tagImageIndex == -1) {
+                auto& txtManager = PrefManager::instance();
+                int csvIndex = comboBox->findData(static_cast<int>(ExportType::CSV));
+                int insertIndex = (csvIndex != -1) ? csvIndex + 1 : comboBox->count();
+                comboBox->insertItem(insertIndex, txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+            }
+        });
 
         QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
         
@@ -959,9 +1046,9 @@ namespace ProjectExportHelper {
         QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
         if (dialog.exec() == QDialog::Accepted) {
-            int selectedValue = comboBox->currentData().toInt();
-            qDebug() << "Format choisi : " << selectedValue;
-            return static_cast<ExportType>(selectedValue);
+            int selectedExportType = comboBox->currentData().toInt();
+            ExportSource source = annotationsRadio->isChecked() ? ExportSource::Annotations : ExportSource::Shots;
+            return ExportSelection{static_cast<ExportType>(selectedExportType), source};
         }
 
         return std::nullopt;

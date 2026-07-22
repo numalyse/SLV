@@ -111,9 +111,17 @@
     "export_type_unknown": "Alle Dateien (*.*)",
     "export_file_path_title": "Speichern unter...",
 
-    "export_format_selection_title" : "Exportformat",
+    "export_format_selection_title" : "Projektexport",
     "export_format_selection_txt" : "Exportformat auswählen",
-    "export_format_selection_txt_tagImage" : "Referenzbilder",
+    "export_format_selection_txt_tagImage" : "Ordner mit Referenzbildern",
+
+    "export_format_txt" : "Text",
+    "export_format_pdf" : "PDF",
+    "export_format_pptx" : "Präsentation",
+    "export_format_docx" : "Dokument",
+    "export_format_csv" : "Datentabelle",
+    "export_format_mp4" : "MP4-Video",
+    "export_format_src" : "Quellvideo",
 
     "timeline_dialog_title_auto_segmentation": "Automatische Segmentierung",
     "timeline_dialog_text_auto_segmentation": "Segmentierung läuft...",
@@ -137,6 +145,9 @@
     "shot_detail_id_text" : "Schnitt Nr.",
     "shot" : "Schnitt",
     "number_of_shots" : "Anzahl der Schnitte",
+    "number_of_annotations" : "Anzahl der Anmerkungen",
+    "shots" : "Schnitte",
+    "export_source_selection_txt" : "Zu exportierenden Inhalt auswählen",
 
     "compo_rule_None" : "Keine",
     "compo_rule_RuleOfThirds" : "Drittelregel",

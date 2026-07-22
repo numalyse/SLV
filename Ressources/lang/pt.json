@@ -112,9 +112,17 @@
     "export_type_unknown": "Todos os ficheiros (*.*)",
     "export_file_path_title": "Guardar como...",
 
-    "export_format_selection_title" : "Formato de exportação",
+    "export_format_selection_title" : "Exportação de projeto",
     "export_format_selection_txt" : "Selecionar formato de exportação",
-    "export_format_selection_txt_tagImage" : "Imagens de referência",
+    "export_format_selection_txt_tagImage" : "Pasta de Imagens de Referência",
+
+    "export_format_txt" : "Texto",
+    "export_format_pdf" : "PDF",
+    "export_format_pptx" : "Apresentação",
+    "export_format_docx" : "Documento",
+    "export_format_csv" : "Tabela de dados",
+    "export_format_mp4" : "Vídeo MP4",
+    "export_format_src" : "Vídeo fonte",
 
     "timeline_dialog_title_auto_segmentation": "Segmentação automática",
     "timeline_dialog_text_auto_segmentation": "A segmentar...",
@@ -138,6 +146,9 @@
     "shot_detail_id_text" : "Plano n.º",
     "shot" : "Plano",
     "number_of_shots" : "Número total de planos",
+    "number_of_annotations" : "Número total de anotações",
+    "shots" : "Planos",
+    "export_source_selection_txt" : "Selecionar o conteúdo a exportar",
 
     "compo_rule_None" : "Nenhum",
     "compo_rule_RuleOfThirds" : "Regra dos terços",

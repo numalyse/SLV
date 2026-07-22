@@ -84,14 +84,18 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);
 
+    auto makeSeparator = [this]() {
+        QFrame* sep = new QFrame(this);
+        sep->setFrameShape(QFrame::VLine);
+        sep->setFrameShadow(QFrame::Sunken);
+        return sep;
+    };
+
     m_abLoopBtn = new ToolbarButton(this, "abloop_white", pref.getText("tooltip_ab_loop"));
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
     ButtonLayout->addWidget(m_abLoopBtn);
 
-    QFrame *btnSeparator = new QFrame();
-    btnSeparator->setFrameShape(QFrame::VLine);
-    btnSeparator->setFrameShadow(QFrame::Sunken);
-    ButtonLayout->addWidget(btnSeparator);
+    ButtonLayout->addWidget(makeSeparator());
 
     m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", pref.getText("tooltip_segmentation_auto"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
@@ -131,14 +135,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
     m_mergeWithNextShotBtn->setEnabled(false);
 
-    m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export"));
-    connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
-    ButtonLayout->addWidget(m_exportBtn);
-
-    QFrame *annotSeparator = new QFrame();
-    annotSeparator->setFrameShape(QFrame::VLine);
-    annotSeparator->setFrameShadow(QFrame::Sunken);
-    ButtonLayout->addWidget(annotSeparator);
+    ButtonLayout->addWidget(makeSeparator());
 
     m_openAnnot = new ToolbarButton(this, "open_annot_white", pref.getText("tooltip_annotation_button"));
     connect(m_openAnnot, &ToolbarButton::pressed, this, [](){
@@ -156,6 +153,11 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     });
     ButtonLayout->addWidget(m_addAnnotBtn);
 
+    ButtonLayout->addWidget(makeSeparator());
+
+    m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export"));
+    connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
+    ButtonLayout->addWidget(m_exportBtn);
 
     ButtonLayout->addStretch(1);
 

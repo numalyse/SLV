@@ -466,6 +466,7 @@ void SimpleToolbar::disableButtons()
     m_extractSequenceBtn->setEnabled(false);
     m_mediaInfoBtn->setEnabled(false);
     m_langBtn->setEnabled(false);
+    m_speedSlider->setValue(3);
 }
 
 

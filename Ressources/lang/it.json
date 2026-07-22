@@ -113,7 +113,7 @@
 
     "export_format_selection_title" : "Esportazione del progetto",
     "export_format_selection_txt" : "Seleziona formato di esportazione",
-    "export_format_selection_txt_tagImage" : "Immagini di riferimento",
+    "export_format_selection_txt_tagImage" : "Cartella di Immagini di Riferimento",
 
     "export_format_txt" : "Testo",
     "export_format_pdf" : "PDF",

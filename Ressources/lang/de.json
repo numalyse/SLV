@@ -113,7 +113,7 @@
 
     "export_format_selection_title" : "Projektexport",
     "export_format_selection_txt" : "Exportformat auswählen",
-    "export_format_selection_txt_tagImage" : "Referenzbilder",
+    "export_format_selection_txt_tagImage" : "Ordner mit Referenzbildern",
 
     "export_format_txt" : "Text",
     "export_format_pdf" : "PDF",

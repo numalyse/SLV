@@ -113,15 +113,15 @@
 
     "export_format_selection_title" : "Exportation de projet",
     "export_format_selection_txt" : "Sélectionner un format d'exportation",
-    "export_format_selection_txt_tagImage" : "Images repères",
+    "export_format_selection_txt_tagImage" : "Dossier d'Images-Repères",
 
     "export_format_txt" : "Texte",
     "export_format_pdf" : "PDF",
     "export_format_pptx" : "Présentation",
     "export_format_docx" : "Document",
-    "export_format_csv" : "Tableau de données",
+    "export_format_csv" : "Tableau de Données",
     "export_format_mp4" : "Vidéo MP4",
-    "export_format_src" : "Vidéo source",
+    "export_format_src" : "Vidéo Source",
 
     "timeline_dialog_title_auto_segmentation": "Segmentation automatique",
     "timeline_dialog_text_auto_segmentation": "Segmentation en cours...",

@@ -9,6 +9,7 @@
 #include "GenericDialog.h"
 #include "Preference/PreferenceDialog.h"
 #include "FileFormatManager.h"
+#include "Help/HelpDialog.h"
 
 #include <QToolBar>
 #include <vlc/vlc.h>
@@ -188,7 +189,10 @@ void MainWindow::createMenuBar()
     auto *HelpMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_help"));
 
     auto *openHelperAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
-    connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);    
+    connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);
+    
+    auto *openHelpAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
+    connect(openHelpAction, &QAction::triggered, this, &MainWindow::openHelpDialog);
 
     auto *openAboutAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_about"));
     connect(openAboutAction, &QAction::triggered, this, &MainWindow::openAboutWidget);
@@ -625,6 +629,12 @@ void MainWindow::openPrefWidget()
 void MainWindow::openHelperWidget()
 {
     HelperWidget* helpDialog = new HelperWidget(this);
+    helpDialog->exec();
+}
+
+void MainWindow::openHelpDialog()
+{
+    HelpDialog* helpDialog = new HelpDialog(this);
     helpDialog->exec();
 }
 

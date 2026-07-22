@@ -61,6 +61,7 @@ private:
     void changeArrangementWithSaveCheck(PlayerLayoutArrangement arrangement);
     void openPrefWidget();
     void openHelperWidget();
+    void openHelpDialog();
     void openAboutWidget();
 
     void enableMouseTrackingRecursive(QWidget* widget);

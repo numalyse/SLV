@@ -16,7 +16,6 @@ HelperWidget::HelperWidget(QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle(PrefManager::instance().getText("help_dialog_title"));
-    // setFixedSize(500, 400);
     int fixedDialogWidth = double(QGuiApplication::primaryScreen()->size().width()) * 0.5;
     int fixedDialogHeight = double(QGuiApplication::primaryScreen()->size().height()) * 0.5;
     setFixedSize(fixedDialogWidth, fixedDialogHeight);
@@ -132,32 +131,20 @@ void HelperWidget::initLayout()
     });
     emit m_timelineTab->stateChanged(false);
 
-    // m_optionsTab = new CustomCheckbox("<b>" + pref.getText("help_menu_options_checkbox") + "</b>");
-
-    // QWidget *optionsSubTab = new QWidget();
-    // QVBoxLayout *optionsSubTabLayout = new QVBoxLayout();
-
-    // CustomHoverLabel *settingsLabel = new CustomHoverLabel(pref.getText("help_menu_settings_label"));
-    // CustomHoverLabel *shortcutsLabel = new CustomHoverLabel(pref.getText("help_menu_shortcuts_label"));
-    // CustomHoverLabel *pathsLabel = new CustomHoverLabel(pref.getText("help_menu_paths_label"));
-    // optionsSubTabLayout->addWidget(settingsLabel);
-    // optionsSubTabLayout->addWidget(shortcutsLabel);
-    // optionsSubTabLayout->addWidget(pathsLabel);
-    // optionsSubTab->setLayout(optionsSubTabLayout);
-    // connect(m_optionsTab, &CustomCheckbox::stateChanged, this, [this, optionsSubTab](const bool state){
-    //     animateWidget(optionsSubTab, state);
-    // });
-
     sideMenuLayout->addWidget(m_generalTab);
+
     sideMenuLayout->addWidget(generalSubTab);
     sideMenuLayout->addWidget(m_classicTab);
     sideMenuLayout->addWidget(classicSubTab);
+
     sideMenuLayout->addWidget(m_multiviewTab);
     sideMenuLayout->addWidget(multiviewSubTab);
     sideMenuLayout->addWidget(m_playlistTab);
+
     sideMenuLayout->addWidget(playlistSubTab);
     sideMenuLayout->addWidget(m_timelineTab);
     sideMenuLayout->addWidget(timelineSubTab);
+
     sideMenuLayout->addStretch();
 
     m_sideMenu->setLayout(sideMenuLayout);
@@ -174,15 +161,19 @@ void HelperWidget::initLayout()
     layout->addWidget(m_mainWidget);
 
     connect(reportIssuesLabel, &CustomHoverLabel::clicked, this, &HelperWidget::setGeneralContent);
+
     connect(openFilesLabel, &CustomHoverLabel::clicked, this, [this](){setClassicContent(0);});
     connect(classicToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setClassicContent(1);});
     connect(extendedToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setClassicContent(2);});
+
     connect(enterMultiviewLabel, &CustomHoverLabel::clicked, this, [this](){setMultiviewContent(0);});
     connect(simplifiedToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setMultiviewContent(1);});
     connect(globalToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setMultiviewContent(2);});
+
     connect(accessPlaylistLabel, &CustomHoverLabel::clicked, this, [this](){setPlaylistContent(0);});
     connect(addElementsPlaylistLabel, &CustomHoverLabel::clicked, this, [this](){setPlaylistContent(1);});
     connect(playlistButtonsLabel, &CustomHoverLabel::clicked, this, [this](){setPlaylistContent(2);});
+
     connect(timelineDisplayLabel, &CustomHoverLabel::clicked, this, [this](){setTimelineContent(0);});
     connect(timelineButtonsLabel, &CustomHoverLabel::clicked, this, [this](){setTimelineContent(1);});
     connect(shotInfosLabel, &CustomHoverLabel::clicked, this, [this](){setTimelineContent(2);});
@@ -192,6 +183,9 @@ void HelperWidget::initLayout()
 
 }
 
+// ------
+// ------ PANNEAU : GENERAL
+// ------
 void HelperWidget::setGeneralContent()
 {
     m_contentWidget = new QWidget();
@@ -237,7 +231,9 @@ void HelperWidget::setGeneralContent()
     m_scrollArea->setWidget(m_contentWidget);
 }
 
-
+// ------
+// ------ PANNEAU : MODE CLASSIQUE
+// ------
 void HelperWidget::setClassicContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -304,7 +300,7 @@ void HelperWidget::setClassicContent(int scrollLevel)
 
     QString theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
     QGridLayout* classicToolbarButtonsHelpLayout = new QGridLayout();
-    classicToolbarButtonsHelpLayout->setSpacing(30);
+    //classicToolbarButtonsHelpLayout->setSpacing(30);
     classicToolbarButtonsHelpLayout->setContentsMargins(30, 10, 30, 10);
     QLabel* playInfoIcon = new QLabel();
     playInfoIcon->setPixmap(QPixmap(":/icons/play" + theme).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -408,6 +404,9 @@ void HelperWidget::setClassicContent(int scrollLevel)
     }
 }
 
+// ------
+// ------ PANNEAU : MODE MULTIVUE
+// ------
 void HelperWidget::setMultiviewContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -526,6 +525,9 @@ void HelperWidget::setMultiviewContent(int scrollLevel)
     }
 }
 
+// ------
+// ------ PANNEAU : PLAYLIST
+// ------
 void HelperWidget::setPlaylistContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -606,6 +608,9 @@ void HelperWidget::setPlaylistContent(int scrollLevel)
     }
 }
 
+// ------
+// ------ PANNEAU : TIMELINE
+// ------
 void HelperWidget::setTimelineContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -768,10 +773,16 @@ void HelperWidget::addButtonDescription(QGridLayout* gridLayout, const QString& 
 {
     QLabel* extendedIcon = new QLabel();
     extendedIcon->setPixmap(QPixmap(iconName).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    extendedIcon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     QLabel* extendedLabel = new QLabel("<b>" + buttonLabel + "</b>");
+    extendedLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
     QLabel* extendedDescription = new QLabel(buttonDescription);
-    extendedDescription->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //extendedDescription->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     extendedDescription->setWordWrap(true);
+    extendedDescription->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
     gridLayout->addWidget(extendedIcon, lineIndex, 0, Qt::AlignCenter);
     gridLayout->addWidget(extendedLabel, lineIndex, 1, Qt::AlignCenter);
     gridLayout->addWidget(extendedDescription, lineIndex, 2, Qt::AlignLeft);

@@ -1006,13 +1006,13 @@ namespace ProjectExportHelper {
         
         if(mediaType == MediaType::Video){
             comboBox->addItem(txtManager.getText("export_format_txt") + " (.txt)", static_cast<int>(ExportType::TXT));
+            comboBox->addItem(txtManager.getText("export_format_docx") + " (.docx)", static_cast<int>(ExportType::DOCX));
             comboBox->addItem(txtManager.getText("export_format_pdf") + " (.pdf)", static_cast<int>(ExportType::PDF));
             comboBox->addItem(txtManager.getText("export_format_pptx") + " (.pptx)", static_cast<int>(ExportType::PPTX));
-            comboBox->addItem(txtManager.getText("export_format_docx") + " (.docx)", static_cast<int>(ExportType::DOCX));
             comboBox->addItem(txtManager.getText("export_format_csv") + " (.csv)", static_cast<int>(ExportType::CSV));
-            if(originalFormat != ".mp4") comboBox->addItem(txtManager.getText("export_format_mp4") + " (.mp4)", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4
+            comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage") + " (.png)", static_cast<int>(ExportType::TagImage));
             comboBox->addItem(txtManager.getText("export_format_src") + " (" + originalFormat + ")", static_cast<int>(ExportType::SRC));
-            comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+            if(originalFormat != ".mp4") comboBox->addItem(txtManager.getText("export_format_mp4") + " (.mp4)", static_cast<int>(ExportType::MP4)); // si on est deja en mp4, on n'affiche pas l'option mp4 
         }else {
             comboBox->addItem(txtManager.getText("export_format_txt") + " (.txt)", static_cast<int>(ExportType::TXT));
             comboBox->addItem(txtManager.getText("export_format_csv") + " (.csv)", static_cast<int>(ExportType::CSV));
@@ -1023,10 +1023,15 @@ namespace ProjectExportHelper {
         QObject::connect(annotationsRadio, &QRadioButton::toggled, &dialog, [comboBox, mediaType](bool checked){
             if(mediaType != MediaType::Video) return;
 
-            if(checked) comboBox->removeItem(comboBox->count() - 1) ;
-            else {
+            int tagImageIndex = comboBox->findData(static_cast<int>(ExportType::TagImage));
+            if(checked) {
+                if(tagImageIndex != -1) comboBox->removeItem(tagImageIndex);
+            }
+            else if(tagImageIndex == -1) {
                 auto& txtManager = PrefManager::instance();
-                comboBox->addItem(txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
+                int csvIndex = comboBox->findData(static_cast<int>(ExportType::CSV));
+                int insertIndex = (csvIndex != -1) ? csvIndex + 1 : comboBox->count();
+                comboBox->insertItem(insertIndex, txtManager.getText("export_format_selection_txt_tagImage"), static_cast<int>(ExportType::TagImage));
             }
         });
 

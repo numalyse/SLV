@@ -178,10 +178,13 @@
 
     "main_window_menu_bar_file": "Datei",
     "main_window_file_open_media_action": "Öffnen Sie ein oder mehrere Medien",
-    "main_window_file_open_project_action": "Projekt öffnen",
-    "main_window_file_save_project_action": "Speichern Sie das Projekt",
+    "main_window_file_open_project_action": "Öffnen Sie ein Projektverzeichnis",
+    "main_window_file_save_project_action": "Speichern Sie das Projektverzeichnis",
     "main_window_file_save_as_project_action": "Speichern unter...",
-    "project_manager_open_project_dialog" : "Projekt öffnen",
+    "project_manager_open_project_dialog" : "Projektverzeichnis öffnen",
+
+    "main_window_file_open_project_action_tooltip" : "Ein bestehendes Projekt öffnen, indem Sie den Projektordner auswählen. Der Ordner enthält eine .json-Datei und einen Verknüpfung zu den Medien.",
+    "main_window_file_save_project_action_tooltip" : "Das aktuelle Projekt als Ordner speichern. Der Ordner wird eine .json-Datei und eine Verknüpfung zu den Medien enthalten.",
 
     "main_window_menu_bar_option" : "Optionen",
     "main_window_option_open_pref" :  "Einstellungen",

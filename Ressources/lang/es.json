@@ -99,7 +99,6 @@
     "messagebox_extract_selected_shots_completed" : "Extracción de los planos seleccionados completada.",
     "messagebox_extract_selected_shots_failed" : "Falló la extracción de los planos seleccionados.",
 
-
     "export_running": "Exportación en curso...",
     "export_directory_path_title": "Seleccionar carpeta de exportación",
     "export_type_txt": "Archivo de texto (*.txt)",
@@ -179,10 +178,13 @@
 
     "main_window_menu_bar_file": "Archivo",
     "main_window_file_open_media_action": "Abra uno o más medios",
-    "main_window_file_open_project_action": "Abrir proyecto",
-    "main_window_file_save_project_action": "Guardar el proyecto",
+    "main_window_file_open_project_action": "Abrir un directorio de proyecto",
+    "main_window_file_save_project_action": "Guardar el directorio del proyecto",
     "main_window_file_save_as_project_action": "Guardar como...",
-    "project_manager_open_project_dialog" : "Abrir proyecto",
+    "project_manager_open_project_dialog" : "Abrir un directorio de proyecto",
+    
+    "main_window_file_open_project_action_tooltip" : "Abra un proyecto existente seleccionando la carpeta del proyecto. La carpeta contiene un archivo .json y un acceso directo al medio.",
+    "main_window_file_save_project_action_tooltip" : "Guarde el proyecto actual como una carpeta. La carpeta contendrá un archivo .json y un acceso directo al medio.",
 
     "main_window_menu_bar_option" : "Opciones",
     "main_window_option_open_pref" :  "Preferencias",

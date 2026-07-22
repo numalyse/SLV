@@ -178,10 +178,13 @@
 
     "main_window_menu_bar_file": "Fichier",
     "main_window_file_open_media_action": "Ouvrir un ou plusieurs médias",
-    "main_window_file_open_project_action": "Ouvrir un projet",
-    "main_window_file_save_project_action": "Enregistrer le projet",
+    "main_window_file_open_project_action": "Ouvrir un dossier de projet",
+    "main_window_file_save_project_action": "Enregistrer le dossier du projet",
     "main_window_file_save_as_project_action": "Enregistrer sous...",
-    "project_manager_open_project_dialog" : "Ouvrir un projet",
+    "project_manager_open_project_dialog" : "Ouvrir un dossier de projet",
+
+    "main_window_file_open_project_action_tooltip" : "Ouvrir un projet existant en sélectionnant le dossier du projet. Le dossier contient un fichier .json et un raccourci vers le média.",
+    "main_window_file_save_project_action_tooltip" : "Enregistrer le projet actuel sous la forme d'un dossier. Le dossier contiendra un fichier .json et un raccourci vers le média.",
 
     "main_window_menu_bar_option" : "Options",
     "main_window_option_open_pref" :  "Préférences",
@@ -436,7 +439,7 @@
     "project_saved_text" : "Le projet a été sauvegardé avec succès.",
     "messagebox_record_completed" : "L'enregistrement du média a été effectué.",
 
-    "tooltip_access_folder" : "Accéder au dossier de captures",
+    "tooltip_access_folder" : "Accéder au dossier des captures",
 
     "select_file" : "Sélectionner un fichier",
     "select_folder" : "Sélectionner un dossier",
@@ -557,8 +560,8 @@
     "help_menu_enter_multiview_content_2" : "Pour entrer en mode multi-vues, survolez le bouton de disposition des médias situé en haut à droite de la fenêtre. Vous pourrez alors choisir le nombre de lecteurs à afficher ainsi que leur disposition à l'écran. Les lecteurs sont redimensionnables en glissant les <i>splitters</i> situés entre les lecteurs. Vous pouvez également utiliser le bouton de duplication de média disponible dans les barres d'outils pour ajouter un lecteur copié.",
     "help_menu_simplified_content_1" : "La barre d'outils simplifiée disponible sur les lecteurs en mode multi-vues comprend la plupart des boutons présents dans la barre d'outils classique, mais ne possède pas d'extension de barre. Il y a également un bouton pour retirer le lecteur de l'affichage.",
     "help_menu_global_toolbar_content_1" : "En plus des barres d'outils simplifiées pour chaque lecteur, une barre d'outils globale est affichée en mode multi-vues pour effectuer les opérations sur chacun des médias présents.",
-    "help_menu_global_toolbar_content_2" : "La capture d'écran combinée prend une capture d'écran de chaque média présent, puis combine chacune des captures en une seule image en gardant la disposition des lecteurs. Les captures d'écrans sont enregistrées dans le dossier inscrit dans les préférences (modifiable, enregistré dans NumalysePlayer_Content par défaut).",
-    "help_menu_access_playlist_content_1" : "Une playlist peut être créer en ajoutant les médias voulus. Pour accéder à la playlist, cliquez sur le bouton de panneau latéral situé en haut à droite de la fenêtre (la playlist n'est pas disponible en mode multi-vues).",
+    "help_menu_global_toolbar_content_2" : "La capture d'écran combinée prend une capture d'écran de chaque média présent, puis combine chacune des captures en une seule image en gardant la disposition des lecteurs. Les captures d'écrans sont enregistrées dans le dossier indiqué dans les préférences (modifiable, enregistré dans NumalysePlayer_Content par défaut).",
+    "help_menu_access_playlist_content_1" : "Une playlist peut être créée en ajoutant les médias voulus. Pour accéder à la playlist, cliquez sur le bouton de panneau latéral situé en haut à droite de la fenêtre (la playlist n'est pas disponible en mode multi-vues).",
     "help_menu_manage_items_content_1" : "Les éléments de la playlist sont composés du titre du média correspondant, de sa durée, de son type, d'une miniature et de son numéro dans la liste. Cliquez sur le bouton + pour ajouter des médias à la playlist et sur l'icône de corbeille pour retirer le média de la playlist. Il est aussi possible de déplacer les éléments en les glissant pour changer l'ordre de lecture.",
     "help_menu_playlist_loop_label" : "Boucle",
     "help_menu_playlist_loop_description" : "Si activée, passe au média suivant lorsque le média actuel est terminé.",
@@ -569,7 +572,7 @@
     "help_menu_playlist_delete_label" : "Tout retirer",
     "help_menu_playlist_delete_description" : "Retire tous les éléments de la playlist. Un message de confirmation s'affiche.",
     "help_menu_timeline_display_content_1" : "La timeline détaillée offre une visualisation sur l'audio (barre violette) et sur les différents plans de la vidéo (barre bleue). Les plans sont annotables et peuvent être ajoutés manuellement ou automatiquement. Les vidéos segmentées sont enregistrables sous forme de projets et exportables en divers formats.",
-    "help_menu_timeline_display_content_2" : "La timeline comporte une échelle temporelle, un affichage de la vidéo en bleu avec une image de début de plan, un affichage de l'audio en violet avec l'onde sonore correspondante et de boutons pour modifier les plans. Par défaut, la timeline ne dispose que d'un seul plan. Il est possible de zoomer sur la timeline en utilisant la molette, sélectionner un plan avec un clic gauche (ctrl+clic gauche pour en sélectionner plusieurs), se déplacer horizontalement avec shift+clic gauche. Des actions supplémentaires sont disponibles en faisant clic droit sur les plans.",
+    "help_menu_timeline_display_content_2" : "La timeline comporte une échelle temporelle, un affichage de la vidéo avec une image de début de plan, un affichage de l'audio en violet avec l'onde sonore correspondante et des boutons pour modifier les plans. Par défaut, la timeline ne dispose que d'un seul plan. Il est possible de zoomer sur la timeline en utilisant la molette, sélectionner un plan avec un clic gauche (Ctrl + Clic Gauche pour en sélectionner plusieurs), se déplacer horizontalement avec shift + Clic Gauche. Des actions supplémentaires sont disponibles en faisant Clic Droit sur les plans.",
     "help_menu_ab_loop_label" : "Boucle AB",
     "help_menu_ab_loop_description" : "Cliquer : placer un marqueur AB à la position actuelle. Une fois les deux marqueurs placés, la vidéo boucle sur l'intervalle et la séquence peut être sauvegardée. Cliquer à nouveau pour retirer les marqueurs.",
     "help_menu_segmentation_label" : "Segmentation automatique",
@@ -585,7 +588,7 @@
     "help_menu_export_label" : "Exporter",
     "help_menu_export_description" : "Ouvre une fenêtre de dialogue pour choisir le format d'exportation du projet.",
     "help_menu_shot_infos_content_1" : "Les informations du plan à la position actuelle sont affichables avec le bouton de panneau latéral situé en haut à droite de l'écran ou via le bouton correspondant dans la timeline. Dans cet affichage les informations de numérotation de plan, le titre, le début, la fin et la durée du plan sous forme de timecode, les notes et l'image repère du plan apparaissent. Les champs de titre et de notes sont modifiables.",
-    "help_menu_exportation_content_1" : "Le projet en cours peut être sauvegardé via le menu \"Fichier\" puis \"Enregistrer\". Les projets sont exportables en format texte (.txt et .docx), PDF, Powerpoint, au format de vidéo annotée (les titres et notes des plans sont affichés à chaque plan) et en images repères (l'ensemble des images repères des plans sont sauvegardés dans le dossier indiqué.",
+    "help_menu_exportation_content_1" : "Le projet en cours peut être sauvegardé via le menu \"Fichier\" puis \"Enregistrer\". Les projets sont exportables en format texte (.txt et .docx), PDF, Powerpoint, au format de vidéo annotée (les titres et notes des plans sont affichés à chaque plan) et en images repères (l'ensemble des images repères des plans sont sauvegardés dans le dossier indiqué).",
     
 
     "project_manager_error_folder_not_found": "Impossible de trouver le dossier du projet.",

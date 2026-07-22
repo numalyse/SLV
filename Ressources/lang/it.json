@@ -178,10 +178,13 @@
 
     "main_window_menu_bar_file": "File",
     "main_window_file_open_media_action": "Apri uno o più media",
-    "main_window_file_open_project_action": "Apri progetto",
-    "main_window_file_save_project_action": "Salva il progetto",
+    "main_window_file_open_project_action": "Apri una cartella di progetto",
+    "main_window_file_save_project_action": "Salva la cartella di progetto",
     "main_window_file_save_as_project_action": "Salva con nome...",
-    "project_manager_open_project_dialog" : "Apri progetto",
+    "project_manager_open_project_dialog" : "Apri una cartella di progetto",
+
+    "main_window_file_open_project_action_tooltip" : "Apri un progetto esistente selezionando la cartella del progetto. La cartella contiene un file .json e un collegamento al media.",
+    "main_window_file_save_project_action_tooltip" : "Salva il progetto corrente come una cartella. La cartella conterrà un file .json e un collegamento al media.",
 
     "main_window_menu_bar_option" : "Opzioni",
     "main_window_option_open_pref" :  "Preferenze",

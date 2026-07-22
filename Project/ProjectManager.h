@@ -44,7 +44,7 @@ public:
 
     void setTimeline(TimelineWidget* tl) { p_timeline = tl;}
 
-    Project* projet(){ return m_project;}
+    Project* project(){ return m_project;}
 
     Media* media();
     QString mediaPath();

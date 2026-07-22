@@ -148,7 +148,7 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     m_tagImage->clear();
 
 
-    double fps = ProjectManager::instance().projet()->media->fps();
+    double fps = ProjectManager::instance().project()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
     m_shotIdForm->setText(QString::number(shotId + 1));

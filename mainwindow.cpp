@@ -329,7 +329,7 @@ void MainWindow::openMediaAction()
     ProjectManager& projManager = ProjectManager::instance();
     PrefManager& txtManager = PrefManager::instance();
 
-    if(projManager.projet() && projManager.needSave()){
+    if(projManager.project() && projManager.needSave()){
         SLV::showGenericDialog(
             this, 
             txtManager.getText("dialog_save_project_dialog_title"),

@@ -377,7 +377,7 @@ void GlobalPlayerManager::createTimelineWidget()
         m_timeline = nullptr;
     }
     ProjectManager& projManager = ProjectManager::instance();
-    Project* proj = projManager.projet();
+    Project* proj = projManager.project();
     Media* projMedia = proj->media;
 
     if( ! projMedia ){

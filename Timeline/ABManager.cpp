@@ -87,14 +87,14 @@ void ABManager::extractLoop()
     if( ! mediaFileInfo.exists() ) return;
 
     // if the project is saved in a folder, use it else use prefmanager export path
-    QString dialogDir = (projManager.projet()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.projet()->path;
+    QString dialogDir = (projManager.project()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.project()->path;
 
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr,
         prefManager.getText("export_file_path_title"),
         dialogDir + "/" + mediaFileInfo.baseName() + "_"
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[0]->time(), projManager.projet()->media->fps())
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[1]->time(), projManager.projet()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[0]->time(), projManager.project()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[1]->time(), projManager.project()->media->fps())
     );
 
     selectedPath += '.' + mediaFileInfo.suffix();

@@ -49,7 +49,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
         m_extensionToolbar->show();
         m_extensionBtn->setButtonState(true);
-        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr)
+        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().project() != nullptr)
             emit enableSegmentationRequest();
         else if (m_isFullscreen) {
             setFullscreenUI();

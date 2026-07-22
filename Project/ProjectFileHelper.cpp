@@ -51,7 +51,9 @@ namespace  {
         QJsonObject mediaData;
         auto projectMedia = project->media;
 
-        mediaData["mediaLinkPath"] = project->mediaLinkPath;
+        // in the json we only store the name of the link (the full path is reconstructed from the project path when loading)
+        // so a renamed/moved project folder still find and resolves the link
+        mediaData["mediaLinkPath"] = QFileInfo(project->mediaLinkPath).fileName();
         QString filename = projectMedia->fileName() + "." + projectMedia->fileExtension();
         mediaData["name"] = filename;
         mediaData["duration"] = projectMedia->duration();
@@ -122,8 +124,12 @@ namespace ProjectFileHelper {
 
         if (projectData.contains("media") && projectData["media"].isObject()) {
             QJsonObject mediaJson = projectData["media"].toObject();
-
-            loadedData.mediaLinkAbsolutePath = mediaJson.value("mediaLinkPath").toString("");
+            // in the json we only store the name of the link, the full path is reconstructed from the project path,
+            // so a renamed/moved project folder still find and resolves the link
+            QString storedLinkName = QFileInfo(mediaJson.value("mediaLinkPath").toString("")).fileName();
+            loadedData.mediaLinkAbsolutePath = storedLinkName.isEmpty()
+                ? QString()
+                : QDir(projectAbsolutePath).filePath(storedLinkName);
             loadedData.duration = mediaJson.value("duration").toInt(0);
             loadedData.fps = mediaJson.value("fps").toDouble(0.0);
 

@@ -623,6 +623,7 @@ void TimelineWidget::autoSegmentation(){
                 if( ! cuts.empty()){
                     this->m_shotManager->createShotItemsFromCuts(cuts);
                     emit this->saveNeeded();
+                    this->m_shotManager->updateCurrentShot(m_vlcTime);
 
                     QString text = PrefManager::instance().getText("timeline_dialog_text_auto_segmentation_finished") + QString::number(cuts.size() + 1);
                     QMessageBox msg(this);

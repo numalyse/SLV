@@ -16,7 +16,7 @@ void ThumbnailWorker::requestThumbnail(Requester requester, int requestId, int64
 {
     // verrouille le temps de mettre une image dans la queue
     QMutexLocker locker(&m_mutex);
-    QQueue<ThumbnailRequest>& queue = (requester == Requester::ShotDetail) ? m_priorityQueue : m_queue; // priorité sur les requetes venant de shotDetail
+    QQueue<ThumbnailRequest>& queue = (requester == Requester::ShotDetail || requester == Requester::Color ) ? m_priorityQueue : m_queue; // priorité sur les requetes venant de shotDetail
 
     // une requete en attente avec le meme requester + id est obsolete (ex : temps modifié avant qu'elle soit traitée), on la remplace
     queue.removeIf([requester, requestId](const ThumbnailRequest& pending){

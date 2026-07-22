@@ -19,7 +19,8 @@ public:
         ShotDetail,   // requetes prioritaires : même si on a beaucoup d'images à charger, l'image du plan sera update meme apres une segmentation
         TimelineShot,
         ExtractSequence,
-        Annotation
+        Annotation,
+        Color
     };
     Q_ENUM(Requester)
 

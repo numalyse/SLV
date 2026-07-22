@@ -13,6 +13,7 @@ public:
 private:
     QWidget* introduction();
     QWidget* player();
+    QWidget *classicBar();
 };
 
 #endif

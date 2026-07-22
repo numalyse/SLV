@@ -1,5 +1,6 @@
 #include "GeneralContent.h"
 
+#include "../Base/ContentBase.h"
 #include <QLabel>
 #include <QVBoxLayout>
 
@@ -19,10 +20,9 @@ GeneralContent::GeneralContent(QWidget* parent)
 
 QWidget* GeneralContent::introduction()
 {
-    QWidget* widget = new QWidget;
+    auto* widget = new ContentBase;
 
-    auto* layout = new QVBoxLayout(widget);
-    layout->addWidget(new QLabel("Bienvenue dans la documentation."));
+    widget->addContent(new QLabel("Bienvenue dans la documentation."));
 
     return widget;
 }

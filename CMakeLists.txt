@@ -181,6 +181,7 @@ set(ADDITIONAL_SOURCES
     # Aide
     Help/HelpDialog.h Help/HelpDialog.cpp
     Help/Base/CategoryBase.h Help/Base/CategoryBase.cpp
+    Help/Base/ContentBase.h Help/Base/ContentBase.cpp
     Help/Content/GeneralContent.h Help/Content/GeneralContent.cpp 
     Help/Content/MonoviewContent.h Help/Content/MonoviewContent.cpp 
     Help/Content/MultiviewContent.h Help/Content/MultiviewContent.cpp 

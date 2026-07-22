@@ -126,11 +126,13 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 
     connect(m_project->media, &Media::durationParsed, this, [this]() {
         m_isDurationParsed = true;
+        disconnect(m_project->media, &Media::durationParsed, this, nullptr); // disconnect to prevent multiple project initializations
         this->initProjectShot();
     });
 
     connect(m_project->media, &Media::fpsParsed, this, [this]() {
         m_isFpsParsed = true;
+        disconnect(m_project->media, &Media::fpsParsed, this, nullptr);
         this->initProjectShot();
     });
     m_project->media->parse();

@@ -514,28 +514,72 @@ void Playlist::deleteAllItems()
 
 void Playlist::deleteItem(const unsigned int index)
 {
-    if(m_items.size() > 1 && m_currentMediaIndex == index){
-        playPreviousMedia();
-        if(m_currentMediaIndex == 0)
-            playNextMedia();
-    }
-    if(m_currentMediaIndex >= index && m_currentMediaIndex > 0)
-        m_currentMediaIndex--;
-    m_items[m_itemsSortOrder[index]]->deleteLater();
-    m_items.remove(m_itemsSortOrder.indexOf(index));
-    m_itemsShuffleOrder.removeAll(index);
-    m_itemsSortOrder.removeAll(index);
-    if(m_items.empty())
-        emit SignalManager::instance().playlistEjectPlayer();
-    for(size_t IPlaylistItem = 0; IPlaylistItem < m_items.size(); ++IPlaylistItem)
-    {
-        if(m_itemsSortOrder[IPlaylistItem] > index) m_itemsSortOrder[IPlaylistItem]--;
-        if(m_itemsShuffleOrder[IPlaylistItem] > index) m_itemsShuffleOrder[IPlaylistItem]--;
-        m_items[m_itemsSortOrder[IPlaylistItem]]->setIndex(IPlaylistItem);
-    }
-    if(m_items.size() <= 1)
-        emit SignalManager::instance().activateMediaChangeBtn(false);
-    emit playlistItemCountChanged();
+    // qDebug() << "1 ---------------------";
+    // qDebug() << "current media :" << m_currentMediaIndex;
+    // qDebug() << "m_items :" << m_items;
+    // qDebug() << "m_itemsSortOrder :" << m_itemsSortOrder;
+    // qDebug() << "m_itemsShuffleOrder :" << m_itemsShuffleOrder;
+    // qDebug() << "Index :" << index;
+
+    if (index >= m_itemsSortOrder.size())
+        return;
+
+    PlaylistItem* itemPtr = nullptr;
+    int resolvedIndex = m_itemsSortOrder[index];
+    if (resolvedIndex >= 0 && resolvedIndex < m_items.size())
+        itemPtr = m_items[resolvedIndex];
+    else
+        return;
+
+    QTimer::singleShot(100, [this, itemPtr]() {
+        // If the item has already been removed
+        if (!m_items.contains(itemPtr))
+            return;
+
+        int itemIdx = m_items.indexOf(itemPtr); // current index in m_items
+        if (itemIdx < 0 || itemIdx >= m_items.size())
+            return;
+
+        int visualIndex = m_itemsSortOrder.indexOf(itemIdx);
+        if (visualIndex < 0)
+            return;
+
+        if (m_items.size() > 1 && m_currentMediaIndex == visualIndex) {
+            if (m_currentMediaIndex < m_items.size() - 1)
+                playNextMedia();
+            else
+                playPreviousMedia();
+        }
+
+        if (m_currentMediaIndex >= visualIndex && m_currentMediaIndex > 0)
+            m_currentMediaIndex--;
+
+        // Remove media from the list
+        itemPtr->deleteLater();
+        m_items.removeAt(itemIdx);
+
+        // Remove entries referring to this item index in orders lists
+        m_itemsShuffleOrder.removeAll(itemIdx);
+        m_itemsSortOrder.removeAll(itemIdx);
+
+        if (m_items.empty())
+            emit SignalManager::instance().playlistEjectPlayer();
+
+        // Decrement stored indices that pointed after the removed index
+        for (int IPlaylistItem = 0; IPlaylistItem < m_items.size(); ++IPlaylistItem) {
+            if (m_itemsSortOrder[IPlaylistItem] > itemIdx) m_itemsSortOrder[IPlaylistItem]--;
+            if (m_itemsShuffleOrder[IPlaylistItem] > itemIdx) m_itemsShuffleOrder[IPlaylistItem]--;
+            int idx = m_itemsSortOrder[IPlaylistItem];
+            if (idx >= 0 && idx < m_items.size())
+                m_items[idx]->setIndex(IPlaylistItem);
+        }
+
+        if (m_items.size() <= 1)
+            emit SignalManager::instance().activateMediaChangeBtn(false);
+
+        emit playlistItemCountChanged();
+    });
+    
 }
 
 void Playlist::playMedia(const QString& filePath, const bool isClicked)
@@ -767,6 +811,8 @@ void Playlist::createSortBtn()
 
 void Playlist::sortPlaylist(int id, bool checked)
 {
+    if(m_items.size() <= 1)
+        return;
     int currentMedia = m_itemsSortOrder[m_currentMediaIndex];
     if(checked){
         m_sortButtons->setExclusive(true);

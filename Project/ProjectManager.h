@@ -91,11 +91,10 @@ private:
 
     void initProjectShot();
     bool createProjectFolder();
-    void deleteFolder(const QString &projectFolderPath);
-    bool copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave);
 
     bool relinkMedia(const QString& projectPath, ProjectSaveData& projectData);
 
+    bool relinkJson(const QString &errorJson, const QString &projectPath);
     QString getErrorMessage(ProjectFileError error) const;
     QString getErrorMessage(ProjectManager::Error error) const;
 

@@ -334,6 +334,10 @@ void ProjectManager::openProject()
         prefManager.getPref("Paths", "lp_project")
     );
 
+    if(selectedPath.isEmpty()){
+        return;
+    }
+
     openProjectFromPath(selectedPath);
 
 }
@@ -341,10 +345,6 @@ void ProjectManager::openProject()
 void ProjectManager::openProjectFromPath(const QString& path)
 {
     auto& prefManager = PrefManager::instance();
-
-    if(path.isEmpty()){
-        return;
-    }
 
     QFileInfo fileInfo(path);
     prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
@@ -354,10 +354,22 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
-        QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), errorMsg);
-        return;
-    }
+        if(loaded.error() != ProjectFileError::JsonFileNotFound) {
 
+            QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), errorMsg);
+            return;
+        }
+        if (!relinkJson(errorMsg, path)) {
+            return;
+        }
+        // reload after relink json
+        loaded = ProjectFileHelper::loadProject(path);
+        if (!loaded.has_value()) {
+            QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"),
+                getErrorMessage(loaded.error()));
+            return;
+        }
+    }
     ProjectSaveData projectData = loaded.value();
 
     // the media link is broken
@@ -460,7 +472,44 @@ bool ProjectManager::relinkMedia(const QString& projectPath, ProjectSaveData& pr
     return true;
 }
 
-///@brief Quand les fps et la durée sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
+bool ProjectManager::relinkJson(const QString& errorJson, const QString& projectPath)
+{
+    auto& prefManager = PrefManager::instance();
+
+    QMessageBox warningBox(QMessageBox::Warning,
+        prefManager.getText("messagebox_error"),
+        errorJson + '\n' + prefManager.getText("project_manager_relink_json_txt"));
+    warningBox.addButton(prefManager.getText("project_manager_relink_media_button"), QMessageBox::AcceptRole);
+    warningBox.exec();
+
+    QString jsonPath = QFileDialog::getOpenFileName(
+        nullptr,
+        prefManager.getText("project_manager_relink_json_dialog"),
+        projectPath,
+        "JSON (*.json)"
+    );
+
+    if (jsonPath.isEmpty()) { // clicked on "cancel", abort the project load
+        return false;
+    }
+
+    QString projectName = QFileInfo(projectPath).baseName();
+
+    bool renamed = QFile::rename(jsonPath, projectPath + QDir::separator() + projectName + ".json" );
+
+    if(!renamed){
+        QMessageBox warningBox(QMessageBox::Warning,
+            prefManager.getText("messagebox_error"),
+            prefManager.getText("project_manager_relink_json_error_rename"));
+        warningBox.addButton(prefManager.getText("project_manager_relink_media_button"), QMessageBox::AcceptRole);
+        warningBox.exec();
+
+        return false;
+    }
+
+    return true;
+}
+
 void ProjectManager::checkMediaFullyLoaded()
 {
     if (!m_project || !m_project->media) return;

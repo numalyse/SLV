@@ -12,6 +12,7 @@
 #include <QMimeData>
 #include <QApplication>
 #include <QThreadPool>
+#include <QProcess>
 
 class PlaylistItem : public QWidget
 {
@@ -19,6 +20,7 @@ class PlaylistItem : public QWidget
 
 public:
     explicit PlaylistItem(QWidget *parent = nullptr, const QString &mediaFilePath = "");
+    ~PlaylistItem();
     void initStyle();
     void updateTypeIcon();
     QPixmap generateVideoThumbnail(const QString &videoPath);
@@ -47,6 +49,8 @@ private:
     QSize m_thumbnailSize {64, 36};
     bool m_isCurrentMedia = false;
     QPoint m_dragStartPosition;
+    QProcess *m_thumbnailGenerator;
+    bool m_itemDeleted = false;
 
 protected:
     void enterEvent(QEnterEvent *event) override;

@@ -30,6 +30,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
 
     m_mediaData = new Media(mediaFilePath);
+    m_thumbnailGenerator = new QProcess();
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(6,4,6,4);
@@ -103,6 +104,13 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     connect(m_deleteBtn, &QPushButton::clicked, this, [this]{ emit deleteItemRequested(m_itemIndex); });
 
     m_mediaData->parse();
+}
+
+PlaylistItem::~PlaylistItem()
+{
+    if(m_thumbnailGenerator->state() != QProcess::NotRunning)
+        m_thumbnailGenerator->terminate();
+    m_itemDeleted = true;
 }
 
 
@@ -275,7 +283,6 @@ void PlaylistItem::updateTypeIcon(){
 
 QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
 {
-    QProcess ffmpeg;
     QStringList args;
     args << "-ss" << m_mediaThumbnailTime  
          << "-i" << videoPath
@@ -294,12 +301,15 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
     ffmpegExe = appDir + "/bin/ffmpeg";
 #endif
 
-    ffmpeg.start(ffmpegExe, args);
+    m_thumbnailGenerator->start(ffmpegExe, args);
     //ffmpeg.start(QString(FFMPEG_EXECUTABLE), args);
-    ffmpeg.waitForFinished(-1);
+    m_thumbnailGenerator->waitForFinished(-1);
 
-    QByteArray imageData = ffmpeg.readAllStandardOutput();
     QPixmap pixmap;
+    if(m_itemDeleted)
+        return pixmap;
+    QByteArray imageData = m_thumbnailGenerator->readAllStandardOutput();
+
     pixmap.loadFromData(imageData, "PNG");
 
     if(m_mediaData->type() == Image)
@@ -317,7 +327,7 @@ void PlaylistItem::updateThumbnail()
     } else {
         m_mediaThumbnailLabel->setToolTip(PrefManager::instance().getText("no_preview"));
     }
-        
+
 
         //QPixmap pixmap = QPixmap::fromImage(image);
         //m_mediaThumbnailLabel->setPixmap(pixmap);
@@ -328,6 +338,9 @@ void PlaylistItem::updateThumbnail()
 
         if (m_mediaData->type() == MediaType::Video){
             QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
+            // Media can be removed from playlist before the thumbnail is generated
+            if(m_itemDeleted)
+                return;
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
 
@@ -335,10 +348,14 @@ void PlaylistItem::updateThumbnail()
         if (m_mediaData->type() == MediaType::Image){
 
             QPixmap pixmap = QPixmap::fromImage(QImage(m_mediaData->filePath()));
+            if(m_itemDeleted)
+                return;
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
 
         if (m_mediaData->type() == MediaType::Audio){
+            if(m_itemDeleted)
+                return;
             if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
                 m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
             } else {

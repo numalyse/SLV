@@ -28,6 +28,9 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
 
+    //m_imageWidth = (scrollArea->viewport()->width() - 30) * 0.85;
+    m_imageWidth = 800;
+
     QWidget* content = new QWidget();
     m_layout = new QVBoxLayout(content);
 
@@ -155,4 +158,38 @@ void ContentBase::createButtonDescriptionTable(const QString& tableName, std::in
     }
 
     addContent(createTable(tableName, rows));
+}
+
+void ContentBase::setImage(const QString& imageName)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QHBoxLayout(widget);
+
+    QLabel* illustrationLabel = new QLabel();
+    QPixmap illustration(":/help_dialog_illustrations/"+imageName);
+    illustrationLabel->setPixmap(illustration.scaled(
+        m_imageWidth,
+        10000,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+    ));
+
+    illustrationLabel->setAlignment(Qt::AlignCenter);
+    illustrationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    
+    layout->addWidget(illustrationLabel);
+
+    addContent(widget);
+}
+
+void ContentBase::setDescription(const QString& descriptionName)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QHBoxLayout(widget);
+
+    QLabel* descriptionLabel = new QLabel(pref.getText(descriptionName));
+    
+    layout->addWidget(descriptionLabel);
+
+    addContent(widget);
 }

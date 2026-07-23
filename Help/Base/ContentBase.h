@@ -33,11 +33,16 @@ public:
     QWidget *createButtonDescription(const QString &iconName, const QString &buttonLabel, const QString &buttonDescription);
     void createButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
 
+    void setImage(const QString &imageName);
+    void setDescription(const QString &descriptionName);
+
 protected:
     QVBoxLayout* m_layout;
     PrefManager& pref;
     QString theme;
     QString backgroundFillColor;
+
+    int m_imageWidth;
 
 
 };

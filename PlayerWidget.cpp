@@ -24,6 +24,19 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QStackedLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+
+#include "PrefManager.h"
+
+namespace {
+    // Icon + max width for each state of m_mediaLogoWidget.
+    const QString c_DragDropIcon = ":/icons/drag_drop_grey";
+    constexpr int c_DragDropWidth = 100;
+    const QString c_AudioIcon = ":/icons/music_note_grey";
+    constexpr int c_AudioWidth = 100;
+}
 
 PlayerWidget::PlayerWidget(QWidget *parent)
     : QWidget(parent)
@@ -111,15 +124,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_mediaWidget, &MediaWidget::mediaPlayerEjected, this, &PlayerWidget::mediaPlayerEjectedHandler);
     connect(m_mediaWidget, &MediaWidget::togglePlayPauseRequested, this, &PlayerWidget::togglePlayPause);
     connect(m_mediaWidget, &MediaWidget::zoomValueUpdated, m_toolBar, &SimpleToolbar::setZoomIndicatorText);
-    connect(m_mediaWidget, &MediaWidget::hideAudioLogo, this, [this](){
-        m_audioLogoWidget->setDisplay(false);
-        m_dragDropLogoWidget->setDisplay(false);
-    });
-    connect(m_mediaWidget, &MediaWidget::showAudioLogo, this, [this](){
-        m_audioLogoWidget->setDisplay(true);
-        updateSingleLogoGeom(m_audioLogoWidget, true);
-        m_dragDropLogoWidget->setDisplay(false);
-    });
+    
+    connect(m_mediaWidget, &MediaWidget::hideAudioLogo, this, &PlayerWidget::hideMediaLogo);
+    connect(m_mediaWidget, &MediaWidget::showAudioLogo, this, &PlayerWidget::showAudioLogo);
 
     //connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, m_toolBar, &SimpleToolbar::subtitleTrackAdd);
     connect(m_mediaWidget, &MediaWidget::subtitleTrackAdded, this, [this](int trackId, const QString &label){
@@ -146,12 +153,36 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     stack->setStackingMode(QStackedLayout::StackAll);
     stack->addWidget(m_mediaWidget);
 
-    m_dragDropLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/drag_drop_grey", 100);
-    m_dragDropLogoWidget->setDisplay(true);
+    m_mediaLogoWidget = new MediaLogoWidget(containerWidget, c_DragDropIcon, c_DragDropWidth); // base state to drag and drop
 
-    m_audioLogoWidget = new MediaLogoWidget(containerWidget, ":/icons/music_note_grey", 200);
-    m_audioLogoWidget->setDisplay(false);
-    //stack->addWidget(m_audioLogoWidget);
+    auto& prefManager = PrefManager::instance();
+    QLabel* dragDropHint = new QLabel(prefManager.getText("drag_drop_hint"), m_mediaLogoWidget);
+    dragDropHint->setAlignment(Qt::AlignCenter);
+    m_mediaLogoWidget->contentLayout()->addWidget(dragDropHint);
+
+    QLabel* orLabel = new QLabel(prefManager.getText("drag_drop_or"), m_mediaLogoWidget);
+    orLabel->setAlignment(Qt::AlignCenter);
+    m_mediaLogoWidget->contentLayout()->addWidget(orLabel);
+
+    // wrapped in a widget so setContentVisible() can toggle the whole row at once
+    QWidget* buttonRow = new QWidget(m_mediaLogoWidget);
+    QHBoxLayout* buttonRowLayout = new QHBoxLayout(buttonRow);
+    buttonRowLayout->setContentsMargins(0,0,0,0);
+
+    QPushButton* openMediaButton = new QPushButton(prefManager.getText("drag_drop_open_button"), buttonRow);
+    connect(openMediaButton, &QPushButton::clicked, this, &PlayerWidget::play); // use play since if no media loaded, will open a dialog to load
+    buttonRowLayout->addWidget(openMediaButton);
+
+    QPushButton* openProjectButton = new QPushButton(prefManager.getText("drag_drop_open_project_button"), buttonRow);
+    connect(openProjectButton, &QPushButton::clicked, this, [this](){
+        if(!confirmSaveCurrentProject()) return;
+        ProjectManager::instance().openProject();
+    });
+    buttonRowLayout->addWidget(openProjectButton);
+
+    m_mediaLogoWidget->contentLayout()->addWidget(buttonRow, 0, Qt::AlignCenter);
+
+    m_mediaLogoWidget->setDisplay(true);
 
     m_compositionWidget = new CompositionWidget(containerWidget);
     //stack->addWidget(m_compositionWidget);
@@ -195,7 +226,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(this, &PlayerWidget::mediaRectChanged, m_blackOpacityWidget, &BlackOpacityWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_compositionWidget, &CompositionWidget::onMediaRectChanged);
     connect(this, &PlayerWidget::mediaRectChanged, m_drawingWidget, &DrawingWidget::onMediaRectChanged);
-    connect(this, &PlayerWidget::mediaRectChanged, m_audioLogoWidget, &MediaLogoWidget::onMediaRectChanged);
+    connect(this, &PlayerWidget::mediaRectChanged, m_mediaLogoWidget, &MediaLogoWidget::onMediaRectChanged);
     connect(&SignalManager::instance(), &SignalManager::windowMovedOrResized, this, &PlayerWidget::widgetSizeChange);
 
     connect(m_mediaWidget, &MediaWidget::updateAudioTracksRequested, m_toolBar, &SimpleToolbar::updateAudioTracks);
@@ -487,8 +518,8 @@ void PlayerWidget::onMediaRectChanged(const QRect &rect)
 void PlayerWidget::widgetSizeChange()
 {
 
-    if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget ||!m_audioLogoWidget)
-        return; 
+    if (!m_blackOpacityWidget || !m_compositionWidget || !m_drawingWidget || !m_mediaWidget ||!m_mediaLogoWidget)
+        return;
 
     if(!isVisible()) return;
 
@@ -501,8 +532,7 @@ void PlayerWidget::widgetSizeChange()
         }
     };
     
-    updateGeometryIfVisible(m_dragDropLogoWidget, localRect);
-    updateGeometryIfVisible(m_audioLogoWidget, localRect);
+    updateGeometryIfVisible(m_mediaLogoWidget, localRect);
 
     updateGeometryIfVisible(m_compositionWidget, globalRect);
     updateGeometryIfVisible(m_blackOpacityWidget, globalRect);
@@ -514,14 +544,13 @@ bool PlayerWidget::event(QEvent *event)
     switch (event->type())
     {
     case QEvent::Hide:
-        m_dragDropLogoWidget->setDisplay(false);
+        hideMediaLogo();
         break;
     case QEvent::Show:{
         if(getMediaPath() == "")  {
-            m_dragDropLogoWidget->setDisplay(true);
-            updateSingleLogoGeom(m_dragDropLogoWidget, true);
+            showDragDropLogo();
         }
-        else m_dragDropLogoWidget->setDisplay(false);
+        else hideMediaLogo();
         m_blackOpacityWidget->show();
         m_compositionWidget->show();
         restoreOverlayStackOrder();
@@ -568,13 +597,11 @@ void PlayerWidget::disableButtons()
 
 void PlayerWidget::mediaPlayerEjectedHandler()
 {
-    m_audioLogoWidget->setDisplay(false);
     if(isVisible()){
-        m_dragDropLogoWidget->setDisplay(true);
-        updateSingleLogoGeom(m_dragDropLogoWidget, true);
+        showDragDropLogo();
     }else {
-        m_dragDropLogoWidget->setDisplay(false);
-    }    
+        hideMediaLogo();
+    }
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();
@@ -636,7 +663,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
             qDebug() << "Fichier droppé :" << filePath;
             if(FileFormatManager::instance().isFormatAccepted(info.suffix())) filePaths.append(filePath);
             else if(info.isDir()){
-                ProjectManager::instance().openProjectFromPath(filePath);
+                openProjectFromPath(filePath);
                 event->acceptProposedAction();
                 return;
             }
@@ -658,22 +685,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
         }
         else if (filePaths.size() == 1) {
             if(m_mediaWidget->media()){
-                if(ProjectManager::instance().needSave()){
-
-                    PrefManager& txtManager = PrefManager::instance();
-                    bool canceled = false;
-                    SLV::showGenericDialog(
-                        this,
-                        txtManager.getText("dialog_save_project_dialog_title"),
-                        txtManager.getText("dialog_save_project_dialog_text"),
-                        []() {
-                            ProjectManager::instance().saveProject(false);
-                        },
-                        [](){},
-                        [&canceled](){ canceled = true; }
-                    );
-                    if(canceled) return;
-                }
+                if(!confirmSaveCurrentProject()) return;
                 m_pendingFilePath = filePaths.first();
                 eject();
             }
@@ -697,8 +709,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
 
 void PlayerWidget::restoreOverlayStackOrder()
 {
-    m_dragDropLogoWidget->raise();
-    m_audioLogoWidget->raise();
+    m_mediaLogoWidget->raise();
     m_compositionWidget->raise();
     m_blackOpacityWidget->raise();
     m_drawingWidget->raise();   
@@ -711,6 +722,51 @@ void PlayerWidget::updateSingleOverlayGeom(QWidget* widget, bool isVisible){
         
         restoreOverlayStackOrder();
     }  
+}
+
+void PlayerWidget::showDragDropLogo()
+{
+    m_mediaLogoWidget->setIcon(c_DragDropIcon, c_DragDropWidth);
+    m_mediaLogoWidget->setContentVisible(true);
+    m_mediaLogoWidget->setDisplay(true);
+    updateSingleLogoGeom(m_mediaLogoWidget, true);
+}
+
+void PlayerWidget::showAudioLogo()
+{
+    m_mediaLogoWidget->setIcon(c_AudioIcon, c_AudioWidth);
+    m_mediaLogoWidget->setContentVisible(false);
+    m_mediaLogoWidget->setDisplay(true);
+    updateSingleLogoGeom(m_mediaLogoWidget, true);
+}
+
+void PlayerWidget::hideMediaLogo()
+{
+    m_mediaLogoWidget->setDisplay(false);
+}
+
+bool PlayerWidget::confirmSaveCurrentProject()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    if(!projManager.needSave()) return true;
+
+    PrefManager& txtManager = PrefManager::instance();
+    bool canceled = false;
+    SLV::showGenericDialog(
+        this,
+        txtManager.getText("dialog_save_project_dialog_title"),
+        txtManager.getText("dialog_save_project_dialog_text"),
+        [&projManager]() { projManager.saveProject(false); },
+        [](){},
+        [&canceled](){ canceled = true; }
+    );
+    return !canceled;
+}
+
+void PlayerWidget::openProjectFromPath(const QString& path)
+{
+    if(!confirmSaveCurrentProject()) return;
+    ProjectManager::instance().openProjectFromPath(path);
 }
 
 void PlayerWidget::updateSingleLogoGeom(QWidget* widget, bool isVisible){

@@ -335,6 +335,10 @@
 
     "dialog_open_files" : "Ouvrir des fichiers multimédia",
     "dialog_open_file" : "Ouvrir un fichier",
+    "drag_drop_hint" : "Glisser/déposer ici",
+    "drag_drop_or" : "ou",
+    "drag_drop_open_button" : "Ouvrir un fichier",
+    "drag_drop_open_project_button" : "Ouvrir un projet",
     "dialog_open_project" : "Ouvrir un projet",
   
     "project_window_title_copy_video": "Création du projet : copie de la vidéo en cours...",

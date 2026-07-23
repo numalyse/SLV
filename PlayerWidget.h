@@ -136,6 +136,11 @@ private:
     void updateSingleOverlayGeom(QWidget *widget, bool isVisible);
     void updateSingleLogoGeom(QWidget* widget, bool isVisible);
 
+    // Prompts to save the current project when needed.
+    // Returns false when the user canceled : the caller must abort.
+    bool confirmSaveCurrentProject();
+    void openProjectFromPath(const QString& path);
+
     double m_media_fps {};
     bool m_muted = false;
     SimpleToolbar* m_toolBar = nullptr;
@@ -147,13 +152,16 @@ private:
     BlackOpacityWidget* m_blackOpacityWidget = nullptr;
     CompositionWidget* m_compositionWidget = nullptr;
     DrawingWidget* m_drawingWidget = nullptr;
-    MediaLogoWidget* m_audioLogoWidget = nullptr;
-    // separate widget used for the drag and drop logo to prevent UI flickering 
-    // issues caused by having two labels inside a single widget.
-    MediaLogoWidget* m_dragDropLogoWidget = nullptr; 
+    // since drag and drop / audio logo are exclusive, share m_mediaLogoWidget for both
+    MediaLogoWidget* m_mediaLogoWidget = nullptr;
     QSize m_mediaSize;
     QRect m_mediaRect;
     QString m_pendingFilePath;
+
+private slots:
+    void showDragDropLogo();
+    void showAudioLogo();
+    void hideMediaLogo();
 };
 
 #endif // PLAYERWIDGET_H

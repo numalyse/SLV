@@ -335,6 +335,10 @@
 
     "dialog_open_files" : "Abrir archivos multimedia",
     "dialog_open_file" : "Abrir archivo",
+    "drag_drop_hint" : "Arrastra y suelta aquí",
+    "drag_drop_or" : "o",
+    "drag_drop_open_button" : "Abrir archivo",
+    "drag_drop_open_project_button" : "Abrir proyecto",
     "dialog_open_project" : "Abrir proyecto",
 
     "project_window_title_copy_video": "Creación del proyecto: copiando vídeo...",

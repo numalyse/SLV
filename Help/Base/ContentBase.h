@@ -21,18 +21,17 @@ class ContentBase : public QWidget
     Q_OBJECT
 
 public:
-    explicit ContentBase(QWidget *parent = nullptr);
+    explicit ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName);
 
     void addContent(QWidget* widget);
     void addLayout(QLayout *layout);
-    
-    QWidget *createTable(const QString& tableName, const QList<QWidget *> &rows);
-    QWidget* createButtonDescriptionTable(const QString& tableName, std::initializer_list<ButtonDescriptionData> buttons);
-    QWidget *createButtonDescription(const QString &iconName, const QString &buttonLabel, const QString &buttonDescription);
-    
-    void addTable(const QVector<TableRow>& rows);
-    TableRow addButtonDescription(const QString &iconName, const QString &buttonLabel, const QString buttonDescription);
 
+    void setCategoryName(const QString &categoryName);
+    void setsubcategoryName(const QString &subcategoryName);
+
+    QWidget *createTable(const QString& tableName, const QList<QWidget *> &rows);
+    QWidget *createButtonDescription(const QString &iconName, const QString &buttonLabel, const QString &buttonDescription);
+    void createButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
 
 protected:
     QVBoxLayout* m_layout;

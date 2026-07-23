@@ -5,8 +5,9 @@
 #include <QVector>
 #include <QHeaderView>
 #include <QLabel>
+#include <QScrollArea>
 
-ContentBase::ContentBase(QWidget *parent)
+ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName)
     : QWidget(parent) , pref(PrefManager::instance())
 {
     pref = PrefManager::instance();
@@ -22,22 +23,53 @@ ContentBase::ContentBase(QWidget *parent)
     backgroundFillColor = "palette(base)";
 #endif
 
-    m_layout = new QVBoxLayout(this);
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+
+    QWidget* content = new QWidget();
+    m_layout = new QVBoxLayout(content);
+
+    setsubcategoryName(subcategoryName);
+    setCategoryName(categoryName);
 
     m_layout->setContentsMargins(20, 20, 20, 20);
     m_layout->setSpacing(10);
+    m_layout->addStretch();
+
+    scrollArea->setWidget(content);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(scrollArea);
 
 }
 
 void ContentBase::addContent(QWidget* widget)
 {
-    if (widget)
-        m_layout->addWidget(widget);
+    if (!widget)
+        return;
+
+    const int nbWidget = m_layout->count();
+    const int index = (nbWidget > 0) ? nbWidget - 1 : 0;
+
+    m_layout->insertWidget(index, widget);
 }
 
 void ContentBase::addLayout(QLayout* layout)
 {
     m_layout->addLayout(layout);
+}
+
+void ContentBase::setCategoryName(const QString& categoryName){
+    auto* name = new QLabel(pref.getText(categoryName));
+    name->setStyleSheet("font-weight: bold;");
+    addContent(name);
+}
+
+void ContentBase::setsubcategoryName(const QString& subcategoryName){
+    auto* name = new QLabel(pref.getText(subcategoryName));
+    addContent(name);
 }
 
 QWidget* ContentBase::createTable(const QString& tableName, const QList<QWidget*>& rows)
@@ -57,52 +89,37 @@ QWidget* ContentBase::createTable(const QString& tableName, const QList<QWidget*
 
     for (QWidget* row : rows)
     {
-        row->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        //row->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         layout->addWidget(row);
     }
 
     return widget;
 }
 
-QWidget* ContentBase::createButtonDescriptionTable(const QString& tableName, std::initializer_list<ButtonDescriptionData> buttons)
-{
-    QList<QWidget*> rows;
-
-    for (const auto& button : buttons)
-    {
-        rows << createButtonDescription(
-            button.icon,
-            button.label,
-            button.description
-        );
-    }
-
-    return createTable(tableName, rows);
-}
-
 QWidget* ContentBase::createButtonDescription(const QString& iconName, const QString& buttonLabel, const QString& buttonDescription)
 {
     auto* widget = new QWidget(this);
-    widget->setMinimumHeight(20);
     widget->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
 
     auto* layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(20, 20, 20, 20);
+    //layout->setContentsMargins(20, 20, 20, 20);
 
     auto* icon = new QLabel();
-    icon->setPixmap(QPixmap(iconName + theme).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    icon->setPixmap(QPixmap(iconName + theme).scaled(25, 25, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    //icon->setStyleSheet("padding: 1px");
+    icon->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     auto* label = new QLabel("<b>" + pref.getText(buttonLabel) + "</b>");
+    label->setWordWrap(true);
     label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     auto* description = new QLabel(pref.getText(buttonDescription));
     description->setWordWrap(true);
     description->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    layout->addWidget(icon, 1);
+    layout->addWidget(icon, 1, Qt::AlignCenter);
     layout->addSpacing(20);
-    layout->addWidget(label, 1);
+    layout->addWidget(label, 2);
     layout->addSpacing(20);
     layout->addWidget(description, 6);
 
@@ -112,52 +129,18 @@ QWidget* ContentBase::createButtonDescription(const QString& iconName, const QSt
     return widget;
 }
 
-
-void ContentBase::addTable(const QVector<TableRow>& rows)
+void ContentBase::createButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> buttons)
 {
-    auto* table = new QTableWidget(this);
+    QList<QWidget*> rows;
 
-    if(rows.isEmpty())
-        return;
-
-    const int columnCount = rows.first().size();
-
-    table->setColumnCount(columnCount);
-    table->setRowCount(rows.size());
-
-    for(int row = 0; row < rows.size(); ++row)
+    for (const auto& button : buttons)
     {
-        const auto& columns = rows[row];
-
-        for(int col = 0; col < columns.size(); ++col)
-        {
-            table->setCellWidget(
-                row,
-                col,
-                columns[col]
-            );
-        }
+        rows << createButtonDescription(
+            ":/icons/" + button,
+            "help_menu_" + button + "_label",
+            "help_menu_" + button + "_description"
+        );
     }
 
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->horizontalHeader()->setVisible(false);
-    table->verticalHeader()->setVisible(false);
-
-    addContent(table);
+    addContent(createTable(tableName, rows));
 }
-
-TableRow ContentBase::addButtonDescription(const QString& iconName, const QString& buttonLabel, const QString buttonDescription)
-{
-    TableRow rowButton;
-
-    QLabel* extendedIcon = new QLabel();
-    QLabel* extendedLabel = new QLabel("<b>" + pref.getText(buttonLabel) + "</b>");
-    QLabel* extendedDescription = new QLabel(pref.getText(buttonDescription));
-
-    rowButton.append(extendedIcon);
-    rowButton.append(extendedLabel);
-    rowButton.append(extendedDescription);
-
-    return rowButton;
-}
-

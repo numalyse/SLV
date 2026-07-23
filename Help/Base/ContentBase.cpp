@@ -42,6 +42,7 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(scrollArea);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
 
 }
 

@@ -477,6 +477,7 @@
     "help_menu_report_issues_label" : "Signaler un problème",
     "help_menu_classic_checkbox" : "Affichage mono-vue",
     "help_menu_open_files_label" : "Ouvrir un média",
+    "help_menu_toolbars_label" : "Barres d'outils",
     "help_menu_classic_toolbar_label" : "Barre d'outil classique",
     "help_menu_extended_toolbar_label" : "Barre d'outils étendue",
     "help_menu_multiview_checkbox" : "Affichage multi-vues",

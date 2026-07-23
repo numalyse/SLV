@@ -23,6 +23,7 @@ public:
     void populateTree(QTreeWidget* tree);
 
     QString categoryName() const;
+
     const QString& currentTheme() const { return theme; }
 
 signals:

@@ -478,6 +478,7 @@
     "help_menu_report_issues_label" : "Report an issue",
     "help_menu_classic_checkbox" : "Mono-view interface",
     "help_menu_open_files_label" : "Open media files",
+    "help_menu_toolbars_label" : "Toolbars",
     "help_menu_classic_toolbar_label" : "Classic toolbar",
     "help_menu_extended_toolbar_label" : "Extended toolbar",
     "help_menu_multiview_checkbox" : "Multi-view display",

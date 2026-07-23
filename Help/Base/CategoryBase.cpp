@@ -14,8 +14,7 @@ CategoryBase::CategoryBase(const QString& categoryName, QWidget* parent)
     m_layout->setAlignment(Qt::AlignTop);
 }
 
-void CategoryBase::addSubcategory(const QString& name,
-                                  QWidget* content)
+void CategoryBase::addSubcategory(const QString& name, QWidget* content)
 {
     m_subcategories.append({
         pref.getText(name),
@@ -27,7 +26,7 @@ void CategoryBase::populateTree(QTreeWidget* tree)
 {
     auto* categoryItem = new QTreeWidgetItem(tree);
 
-    categoryItem->setText(0, m_categoryName);
+    categoryItem->setText(0, pref.getText(m_categoryName));
 
     for(auto subcategory : m_subcategories)
     {

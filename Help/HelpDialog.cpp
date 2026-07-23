@@ -3,6 +3,8 @@
 #include "Base/CategoryBase.h"
 #include "Content/GeneralContent.h"
 #include "Content/MonoviewContent.h"
+#include "Content/MultiviewContent.h"
+#include "Content/ToolbarsContent.h"
 
 #include "PrefManager.h"
 #include <QVBoxLayout>
@@ -54,6 +56,12 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
 
     auto* monoview = new MonoviewContent(this);
     monoview->populateTree(m_sideMenuTreeWidget);
+
+    auto* multiview = new MultiviewContent(this);
+    multiview->populateTree(m_sideMenuTreeWidget);
+
+    auto* tooltbars = new ToolbarsContent(this);
+    tooltbars->populateTree(m_sideMenuTreeWidget);
 
     m_sideMenuTreeWidget->topLevelItem(0)->setExpanded(true);
 

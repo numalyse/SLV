@@ -20,9 +20,9 @@ GeneralContent::GeneralContent(QWidget* parent)
 
 QWidget* GeneralContent::introduction()
 {
-    auto* widget = new ContentBase;
+    auto* widget = new QWidget;
 
-    widget->addContent(new QLabel("Bienvenue dans la documentation."));
+    //widget->addContent(new QLabel("Bienvenue dans la documentation."));
 
     return widget;
 }

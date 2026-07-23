@@ -12,6 +12,7 @@ ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath
 : QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, p_thumbnailWorker{thumbnailWorker}, p_media{media}
 {
     connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
+    connect(p_thumbnailWorker, &ThumbnailWorker::colorReady, this, &ShotManager::colorReady);
     connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentDone, this, &ShotManager::shotsExtractionFinished);
     connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentFailed, this, &ShotManager::shotsExtractionFailed);
 
@@ -219,16 +220,16 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_audioShotItems.insert(index + 1, newAudioShotItem);
 
     if(p_media->type() == MediaType::Video){
-        newShotItem->setColorDirty(true);
-        m_shotItems[index]->setColorDirty(true);
-        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
+            // Shot item with  tag img thumbnail : the worker derives the color from the thumbnail directly, so no separate Color request needed.
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         }else {
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
+            
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         }
     }
 
@@ -379,11 +380,13 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         m_audioShotItems.push_back(audioShotItem);
 
         if(p_media->type() == MediaType::Video){
-            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             if(displayByTagFrames) {
+                // Shot item with  tag img thumbnail : the worker derives the color from the thumbnail directly, so no separate Color request needed.
                 p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
                 p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
         }
 
@@ -430,11 +433,13 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         m_audioShotItems.push_back(audioShotItem);
 
         if(p_media->type() == MediaType::Video){
-            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             if(displayByTagFrames) {
+                // Shot item with  tag img thumbnail : the worker derives the color from the thumbnail directly, so no separate Color request needed.
                 p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
                 p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
         }
 
@@ -461,11 +466,15 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     m_audioShotItems.push_back(audioShotItem);
 
     if(p_media->type() == MediaType::Video){
-        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         if(displayByTagFrames) {
+            // For timeline shots, compute the color directly from the already-decoded thumbnail
+            // instead of pushing a separate request to the color queue, which would decode the
+            // image a second time (displayTagFrame mode).
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }else {
             p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+        
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }
     }
 
@@ -497,24 +506,32 @@ QColor getNewBorderColor(const QColor& color)
     }
 }
 
-void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image){
-    
+void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image){
+
+    if(requester != ThumbnailWorker::Requester::TimelineShot) return;
+
     if(requestId < 0 || requestId >= m_shotItems.size()){
         return;
     }
 
     ShotItem* shotItem = m_shotItems.at(requestId);
 
-    if(requester == ThumbnailWorker::Requester::TimelineShot){
+    if(requester == ThumbnailWorker::Requester::TimelineShot)
         shotItem->setThumbnail(QPixmap::fromImage(image));
+}
 
-    }else if(requester == ThumbnailWorker::Requester::Color && shotItem->isColorDirty()){
-        QColor tagColor = shotItem->getTagImageColor(QPixmap::fromImage(image));
-        if (tagColor.isValid()) {
-            shotItem->setColorDirty(false);
-            shotItem->shot().color = tagColor;
-            shotItem->shot().borderColor = getNewBorderColor(tagColor);
-            shotItem->update();
-        }
+
+void ShotManager::colorReady(ThumbnailWorker::Requester requester, int requestId, const QColor& color)
+{
+    if(!color.isValid()) return;
+
+    if(requestId < 0 || requestId >= m_shotItems.size()){
+        return;
     }
+
+    ShotItem* shotItem = m_shotItems.at(requestId);
+
+    shotItem->shot().color = color;
+    shotItem->shot().borderColor = getNewBorderColor(color);
+    shotItem->update();
 }

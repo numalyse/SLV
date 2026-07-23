@@ -12,7 +12,7 @@
 #include <QAbstractItemView>
 
 #include "ToolbarToggleHoverButton.h"
-
+#include "Toolbars/TimeEdit.h"
 
 ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *layoutToDisplay, bool state, const QString &iconNameOn, const QString &toolTipTextOn, const QString &iconNameOff, const QString &toolTipTextOff, int timerDuration)
 : ToolbarToggleButton(parent, state, iconNameOn, toolTipTextOn , iconNameOff, toolTipTextOff)
@@ -117,6 +117,7 @@ void ToolbarToggleHoverButton::moveWidget()
 
 void ToolbarToggleHoverButton::enterEvent(QEnterEvent *event)
 {
+    if(!isEnabled()) return;
     m_hideTimer->stop();
     moveWidget();
     m_widgetToDisplay->show();
@@ -166,6 +167,14 @@ void ToolbarToggleHoverButton::tryToHidePopup()
         }
     }
     
+    // si un enfant est un TimeEdit et qu'il a le focus, on relance le timer
+    QList<TimeEdit*> timeEdits = m_widgetToDisplay->findChildren<TimeEdit*>();
+    for(TimeEdit* te : timeEdits) {
+        if (te->hasFocus()) {
+            m_hideTimer->start();
+            return;
+        }
+    }
 
     QWidget *widgetUnderCursor = QApplication::widgetAt(QCursor::pos());
 

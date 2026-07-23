@@ -6,22 +6,31 @@
 FormLineEditWidget::FormLineEditWidget(const QString &name, const QString &text, bool editable, QWidget *parent) : QFrame(parent)
 {
     setAutoFillBackground(true);
-    QString backgroundFillColor;
+
+    if (editable) {
+        QString backgroundFillColor;
 
 #ifdef Q_OS_MAC
-    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
-        backgroundFillColor = "palette(mid)";
-    } else {
-        backgroundFillColor = "palette(base)";
-    }
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            backgroundFillColor = "palette(mid)";
+        } else {
+            backgroundFillColor = "palette(base)";
+        }
 #else
-    backgroundFillColor = "palette(base)";
+        backgroundFillColor = "palette(base)";
 #endif
 
-    setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+        setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+    } else {
+        setStyleSheet("border: none; background-color: transparent; padding: 1px;");
+    }
 
     //m_frameLayout = new QFormLayout(this);
     m_frameLayout = new QHBoxLayout(this);
+    if (!editable) {
+        m_frameLayout->setContentsMargins(0, 0, 0, 0);
+        m_frameLayout->setSpacing(4);
+    }
 
     m_nameLabel = new QLabel(this);
     m_nameLabel->setAlignment(Qt::AlignLeft);

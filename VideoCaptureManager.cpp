@@ -51,7 +51,8 @@ void VideoCaptureManager::mediaCutAndConcat(const int cutTime, const int newTime
 
     QString concatVideoName = m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix();
     m_concatRecordNumber++;
-    SequenceExtractionHelper::extractSequence(m_mediaFile.filePath(), m_startRecordTime, cutTime, concatVideoName);
+    SequenceExtractionHelper* sequenceExtraction = new SequenceExtractionHelper(m_mediaFile.filePath(), m_startRecordTime, cutTime);
+    sequenceExtraction->extractSequence(m_mediaFile.filePath(), m_startRecordTime, cutTime, concatVideoName);
     if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
     {
         QTextStream stream( m_concatFile );
@@ -66,9 +67,10 @@ void VideoCaptureManager::endMediaRecording(const int endTime, const QString& sa
     if(!m_mediaFile.exists() || m_startRecordTime == -1) return;
 
     QString concatVideoName = m_concatRecordNumber != 0 ? m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix() : savePath;
-    QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, concatVideoName);
-    connect(sequenceExtractor, &QProcess::finished, this, [this, concatVideoName, savePath](int exitCode){
-        if(exitCode != 0){
+    SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_mediaFile.filePath(), m_startRecordTime, endTime);
+    sequenceExtractor->extractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, concatVideoName);
+    connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, concatVideoName, savePath](const int exitCode){
+        if(exitCode != 1){
             deleteMediaTempDirectory();
             emit recordSegmentFailed();
             return;

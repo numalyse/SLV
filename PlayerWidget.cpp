@@ -7,6 +7,10 @@
 #include "FileFormatManager.h"
 #include "GenericDialog.h"
 
+#ifdef __APPLE__
+#include "MacWindowHelper.h"
+#endif
+
 #include <QDebug>
 #include <QApplication>
 #include <QResizeEvent>
@@ -54,7 +58,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
-    connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
+    // connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
@@ -71,6 +75,22 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &SimpleToolbar::enableZoomMode, this, &PlayerWidget::enableZoomMode);
     connect(m_toolBar, &SimpleToolbar::disableZoomMode, this, &PlayerWidget::disableZoomMode);
     connect(m_toolBar, &SimpleToolbar::subtitlesFileDialogRequested, this, &PlayerWidget::openSubtitlesFileDialog);
+    connect(m_toolBar, &SimpleToolbar::customStopRequest, m_mediaWidget, [this](const QString& stopValue){
+        if(m_toolBar->customStopCheckbox()->isChecked())
+            this->mediaWidget()->stop(TimeFormatter::HHMMSSFFToMs(stopValue, m_media_fps, 0.05));
+        else
+            this->mediaWidget()->stop();
+    });
+    connect(m_toolBar->customStopTimeEdit(), &QLineEdit::textChanged, this, [this](const QString& text){
+        if(m_toolBar->customStopCheckbox()->isChecked())
+            m_mediaWidget->setLoopValue(TimeFormatter::HHMMSSFFToMs(text, m_media_fps, 0.05));
+    });
+    connect(m_toolBar->customStopCheckbox(), &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state){
+        if(state == Qt::Checked)
+            m_mediaWidget->setLoopValue(TimeFormatter::HHMMSSFFToMs(m_toolBar->customStopTimeEdit()->text(), m_media_fps, 0.05));
+        else
+            m_mediaWidget->setLoopValue(-1);
+    });
 
     connect(this, &PlayerWidget::playUiUpdateRequested, m_toolBar, &SimpleToolbar::playUiUpdate);
     connect(this, &PlayerWidget::pauseUiUpdateRequested, m_toolBar, &SimpleToolbar::pauseUiUpdate);
@@ -142,6 +162,15 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     m_drawingWidget = new DrawingWidget(containerWidget);
     //stack->addWidget(m_drawingWidget);
 
+#ifdef __APPLE__
+    // not attachable here since this has no window yet
+    // and attach would show the widget
+    // on widget show => attach / hide => detach
+    m_compositionWidget->installEventFilter(this);
+    m_blackOpacityWidget->installEventFilter(this);
+    m_drawingWidget->installEventFilter(this);
+#endif
+
     //m_compositionWidget->setOverlayMode(CompositionWidget::GoldenRatio);
     //m_compositionWidget->raise();
 
@@ -180,17 +209,15 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     restoreOverlayStackOrder();
 }
 
-// PlayerWidget::~PlayerWidget()
-// {
-//     if (m_player) {
-//         libvlc_media_player_stop(m_player);
-//         libvlc_media_player_release(m_player);
-//     }
-
-//     if (m_vlc) {
-//         libvlc_release(m_vlc);
-//     }
-// }
+PlayerWidget::~PlayerWidget()
+{
+#ifdef __APPLE__
+    MacWindowHelper::detachFromParentWindow(m_compositionWidget);
+    MacWindowHelper::detachFromParentWindow(m_blackOpacityWidget);
+    MacWindowHelper::detachFromParentWindow(m_drawingWidget);
+#endif
+     
+}
 
 
 void PlayerWidget::setActive(bool active)
@@ -313,9 +340,9 @@ void PlayerWidget::togglePlayPause(bool isPlaying)
     else play();
 }
 
-void PlayerWidget::stop()
+void PlayerWidget::stop(const int64_t stopValue)
 {
-    m_mediaWidget->stop();
+    m_mediaWidget->stop(stopValue);
 }
 
 void PlayerWidget::eject()
@@ -354,7 +381,9 @@ void PlayerWidget::setSpeed(const unsigned int &speed)
     m_mediaWidget->setSpeed(speed);
 }
 void PlayerWidget::setTime(int64_t time){
-    m_mediaWidget->setTime(time);
+    // User seeks (timeline, annotations, toolbar) -> quarter-frame bias on the seek to
+    // land on the right frame, without offsetting the display.
+    m_mediaWidget->setTime(time, true);
 }
 
 void PlayerWidget::moveTimeBackward(){
@@ -442,9 +471,9 @@ void PlayerWidget::openSequenceExtractionDialog()
         return;
     }
     pause();
-    ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime());
-
-    sequenceExtractor->open();
+    ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*m_mediaWidget->media(), this, m_mediaWidget->getCurrentTime(), -1, m_mediaWidget->getCurrentAudioTrack());
+    // sequenceExtractor->setModal(false);
+    sequenceExtractor->show();
 
 }
 
@@ -510,6 +539,21 @@ bool PlayerWidget::event(QEvent *event)
     }
 
     return QWidget::event(event);
+}
+
+bool PlayerWidget::eventFilter(QObject* watched, QEvent* event)
+{
+#ifdef __APPLE__
+    // attach watched overlay as child to prevent delay
+    if (watched == m_compositionWidget || watched == m_blackOpacityWidget || watched == m_drawingWidget) {
+        QWidget* overlay = static_cast<QWidget*>(watched);
+        if (event->type() == QEvent::Show)
+            MacWindowHelper::attachAsChildWindow(overlay, this);
+        else if (event->type() == QEvent::Hide)
+            MacWindowHelper::detachFromParentWindow(overlay);
+    }
+#endif
+    return QWidget::eventFilter(watched, event);
 }
 
 void PlayerWidget::enableButtons()

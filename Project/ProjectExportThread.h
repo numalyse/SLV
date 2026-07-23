@@ -15,15 +15,16 @@ class ProjectExportThread : public QThread
 Q_OBJECT
 
 public:
-    explicit ProjectExportThread(ExportType type, const QVector<Shot>& shots, double fps, int64_t duration, const QString& mediaPath, double sar, const QString& dstPath, QObject* parent = nullptr);
+    explicit ProjectExportThread(ExportType type, const QVector<ExportItem>& items, const ExportLabels& labels, double fps, int64_t duration, const QString& mediaPath, double sar, const QString& dstPath, QObject* parent = nullptr);
     void run() override;
 
 signals:
     void progress(int);
-    void exportFinished(bool);
+    void exportFinished(bool success, bool canceled);
 
 private:
-    QVector<Shot> m_shots;
+    QVector<ExportItem> m_items;
+    ExportLabels m_labels;
     QString m_mediaPath;
     double m_sar{1.0};
     QString m_dst;

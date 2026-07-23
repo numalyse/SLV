@@ -29,7 +29,6 @@ public:
     inline static const QString ICONS_PATH = ":/icons/";
 
 protected:
-    QIcon updateIconColor(QString iconName);
     void updateIcons(bool checked, bool enabled);
     void updateIcons(bool checked);
     void changeEvent(QEvent *event) override;
@@ -40,9 +39,7 @@ signals:
     void stateDeactivated(); // Emis quand le bouton est "Off"
 
 private:
-    QString m_iconPathOn;
     QString m_toolTipTextOn;
-    QString m_iconPathOff;
     QString m_toolTipTextOff;
 
 public slots:

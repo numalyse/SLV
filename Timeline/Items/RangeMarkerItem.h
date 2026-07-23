@@ -23,20 +23,10 @@ protected:
 
     virtual const QPointF* getPolygonPoints() const = 0;
     virtual int getPolygonPointCount() const = 0;
-
-private:
+    
     int64_t m_vlcTime;
     int m_height;
     QColor m_color = {255,140,56};
-
-    static constexpr QPointF s_points[5] {
-        QPointF(1.5*-3.0, 0.0),
-        QPointF(1.5*-3.0, 1.5*5.0),
-        QPointF(0.0, 1.5*7.5),
-        QPointF(1.5*3.0, 1.5*5.0),
-        QPointF(1.5*3.0, 0.0),
-    }; 
-
 };
 
 

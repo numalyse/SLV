@@ -5,6 +5,22 @@ from PIL import Image
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+
+
+def _set_table_fixed_layout(table):
+    """
+    Force la disposition fixe du tableau : Word respecte alors les largeurs
+    de colonnes imposées au lieu de les élargir selon le contenu.
+    """
+    tblPr = table._tbl.tblPr
+
+    layout = tblPr.find(qn('w:tblLayout'))
+    if layout is None:
+        layout = OxmlElement('w:tblLayout')
+        tblPr.append(layout)
+    layout.set(qn('w:type'), 'fixed')
 
 def format_time(time_val):
     """
@@ -31,7 +47,9 @@ def main():
     shot_name = sys.argv[2]
     start_time_name = sys.argv[3]
     duration_time_name = sys.argv[4]
-    
+    image_label = sys.argv[5] if len(sys.argv) > 5 else "Image"
+    sound_label = sys.argv[6] if len(sys.argv) > 6 else "Son"
+
     with open(data_json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
@@ -95,9 +113,36 @@ def main():
                 except Exception as e:
                     print(f"Erreur lors du traitement de l'image {idx} : {e}", file=sys.stderr)
 
-            note_text = shot.get('note', "").strip()
-            if note_text:
-                p_note = doc.add_paragraph(note_text)
+            img_text = shot.get('imgTxt', "").strip()
+            sound_text = shot.get('soundTxt', "").strip()
+
+            # On coupe la zone de note en deux colonnes : Image à gauche, Son à droite.
+            # Un label vide (ex : export d'annotations, pas de champ son) masque sa colonne.
+            # Largeur fixe pour que le texte long passe à la ligne DANS la cellule
+            # au lieu d'élargir la colonne et de pousser la mise en page.
+            columns = [
+                (label, text)
+                for label, text in ((image_label, img_text), (sound_label, sound_text))
+                if label
+            ]
+
+            if columns:
+                column_width = Inches(6.0) if len(columns) == 1 else Inches(3.0)
+                table = doc.add_table(rows=1, cols=len(columns))
+                table.autofit = False
+                table.allow_autofit = False
+                _set_table_fixed_layout(table)
+                for column in table.columns:
+                    column.width = column_width
+
+                for col_idx, (label, text) in enumerate(columns):
+                    cell = table.cell(0, col_idx)
+                    cell.width = column_width
+                    cell_p = cell.paragraphs[0]
+                    label_run = cell_p.add_run(f"{label} : ")
+                    label_run.font.bold = True
+                    label_run.font.color.rgb = RGBColor.from_string("1F497D")
+                    cell_p.add_run(text)
 
             doc.add_paragraph()
 

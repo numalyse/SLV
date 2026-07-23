@@ -107,7 +107,7 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_adjustmentsBtn = new ToolbarPopupButton(this, m_adjustmentWidget, "adjustments_white", PrefManager::instance().getText("tooltip_adjust"));
 
     connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
-        if( ProjectManager::instance().projet()){
+        if( ProjectManager::instance().project()){
             qDebug() << "oui projet";
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();

@@ -82,6 +82,15 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         disableFullscreenMainRequested();
     });
 
+    connect(m_layoutManager, &PlayerLayoutManager::globalScreenshotSaved, this, [this](const QString& mergedPath){
+        if (m_snapshotPopup)
+            delete m_snapshotPopup;
+
+        // no timecode since all players can have varying timecode and fps
+        m_snapshotPopup = new SnapshotPopup(m_playersWidget ? m_playersWidget : this, mergedPath, -1, 0.0);
+        m_snapshotPopup->showWithFade();
+    });
+
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalZoomStateRequested, this, &GlobalPlayerManager::setGlobalZoomState);
@@ -155,12 +164,17 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
                 m_separationLine->show();
             }
             m_thumbnailWorker->releaseOpenCvCap(); // plus besoin de thumbnail worker quand plus de 1 player, on release pour economiser de la mémoire
+            m_navPanel->annotationPanel()->setTimeProvider(nullptr); // removes timeProvider
         }
         else if(advancedToolbar){
             if(m_separationLine){
                 layout->removeWidget(m_separationLine);
                 m_separationLine->hide();
             }
+
+            m_navPanel->annotationPanel()->setTimeProvider([player]() -> int64_t{
+                return player ? player->getCurrentTime() : 0;
+            });
 
             connect(&ProjectManager::instance(), &ProjectManager::ejectMedia, advancedToolbar, &AdvancedToolbar::ejectRequest);
 
@@ -220,14 +234,26 @@ void GlobalPlayerManager::closeNavPanel()
     m_navPanel->hidePanel();
 }
 
-void GlobalPlayerManager::toggleNavPanel()
-{
-
-    if(m_navPanel->isOpen())
+/// @brief Closes the panel if the panel is open and the type matches the currently displayed panel,
+/// else opens and shows the selected panel
+void GlobalPlayerManager::toggleNavPanel(PanelType type){
+    if(m_navPanel->isOpen() && m_navPanel->currentPanel() == type){
         closeNavPanel();
-    else
+    }else{
+        m_navPanel->setPanel(type);
         openNavPanel();
+    }
 }
+
+/// @brief Displays the selected panel. Does nothing if the panel is already open on that type.
+void GlobalPlayerManager::displayNavPanel(PanelType type){
+    if(m_navPanel->isOpen() && m_navPanel->currentPanel() == type){
+        return;
+    }
+    m_navPanel->setPanel(type);
+    openNavPanel();
+}
+
 // slots
 
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)
@@ -360,7 +386,7 @@ void GlobalPlayerManager::createTimelineWidget()
         m_timeline = nullptr;
     }
     ProjectManager& projManager = ProjectManager::instance();
-    Project* proj = projManager.projet();
+    Project* proj = projManager.project();
     Media* projMedia = proj->media;
 
     if( ! projMedia ){
@@ -379,11 +405,20 @@ void GlobalPlayerManager::createTimelineWidget()
     }
 
 
-    m_timeline = new TimelineWidget(m_thumbnailWorker, projMedia, m_player, proj->shots, this, width());
-    m_timeline->setFixedHeight(160);
+    m_timeline = new TimelineWidget(m_thumbnailWorker, projMedia, proj->shots, this, width());
+    m_timeline->setFixedHeight(180);
     m_timeline->hide();
 
     projManager.setTimeline(m_timeline);
+
+    // timeline follows player state via signals 
+    m_timeline->setPlayerPlaying(m_player->playing());
+    if(MediaWidget* mediaWidget = m_player->mediaWidget()){
+        connect(mediaWidget, &MediaWidget::playbackStarted, m_timeline, [timeline = m_timeline](){ timeline->setPlayerPlaying(true); });
+        connect(mediaWidget, &MediaWidget::playbackPaused, m_timeline, [timeline = m_timeline](){ timeline->setPlayerPlaying(false); });
+    }
+    connect(m_timeline, &TimelineWidget::playerPauseRequested, m_player, &PlayerWidget::pause);
+    connect(m_timeline, &TimelineWidget::playerPlayRequested, m_player, &PlayerWidget::play);
 
     connect(m_player, &PlayerWidget::vlcTimeChanged, m_timeline, &TimelineWidget::updateCursorPos);
 

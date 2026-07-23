@@ -2,7 +2,6 @@
 #define DECODETHREAD_H
 
 #include "TSQueue.h"
-#include "Shot.h"
 
 #include <opencv2/imgproc.hpp>
 
@@ -17,27 +16,19 @@ class DecodeThread : public QThread
 Q_OBJECT
 public:
     explicit DecodeThread(
-        QString mediaPath, 
+        QString mediaPath,
         double sar,
         TSQueue<ImgData>* imageQueue,
-        const QVector<Shot>& shots, 
-        QObject* parent = nullptr, 
-        std::optional<int> colorCode = std::nullopt, 
+        const QVector<int64_t>& imageTimes,
+        QObject* parent = nullptr,
+        std::optional<int> colorCode = std::nullopt,
         std::optional<cv::Size> targetSize = std::nullopt
     );
 
     void decodeTagImages();
     void decodeMedia();
 
-    /** 
-    @brief Starts to decode the provided media. 
-    \n
-    \n If shots int the constructor was empty, will decode every frame.
-    \n Otherwise will decode only the tag image of each shot.
-    \n
-    If a target size was specified in the constructor, images will be resized. Same for color code
-    
-    **/
+    /// @brief Starts to decode the provided media If imageTimes in the constructor was empty, will decode every frame.
     void run() override;
 
 private:
@@ -48,7 +39,7 @@ private:
 
     QString m_mediaPath{};
     double m_sar{1.0};
-    QVector<Shot> m_shots{};
+    QVector<int64_t> m_imageTimes{};
 
     std::optional<int> m_colorCode{std::nullopt};
     std::optional<cv::Size> m_targetSize{std::nullopt};

@@ -22,6 +22,12 @@ public:
     int64_t posToTimeSnapped(double pos);
     double timeToPos(int64_t time);
 
+    /// @brief Snaps a ms time to the nearest frame.
+    /// Used to display the cursor while paused so it lands exactly
+    /// on the frame, independently of the exact time reported by libvlc 
+    // when using next frame / setting vlc time with an offset.
+    int64_t snapTimeToFrame(int64_t ms);
+
 private:
     
     double m_fps{};

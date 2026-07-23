@@ -4,6 +4,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QStyleHints>
+#include <QGuiApplication>
 
 FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCategory, const QString &key, const QString &value, bool isEditable, bool isFolder, QWidget *parent)
 : BasePreferenceFrame(name, subCategory, key, value, parent)
@@ -27,6 +29,22 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
         m_browseBtn->setToolTip(PrefManager::instance().getText("change_saving_folder"));
         m_browseBtn->setCursor(Qt::PointingHandCursor);
         m_browseBtn->setFixedSize(30,30);
+
+        const bool dark = (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
+        // in light mode, frame and button share the same color so button background = palette(window) to contrast
+        const QString borderColor = dark ? "palette(midlight)" : "palette(mid)";
+        const QString bgColor     = dark ? "palette(button)"   : "palette(window)";
+
+        m_browseBtn->setStyleSheet(
+            "QPushButton {"
+            "   border: 1px solid " + borderColor + ";"
+            "   border-radius: 4px;"
+            "   background-color: " + bgColor + ";"
+            "}"
+            "QPushButton:hover {"
+            "   border: 1px solid " + borderColor + ";"
+            "   background-color: palette(midlight);"
+            "}");
         pathLayout->addWidget(m_browseBtn);
 
         connect(m_browseBtn, &QPushButton::clicked, this, [this, isFolder]() {
@@ -42,8 +60,7 @@ FormPathEditFrame::FormPathEditFrame(const QString &name, const QString &subCate
         });
     }
 
-    //setRightLayout(pathLayout);
-    setRightWidget(m_pathFrame);
+    addRightWidget(m_pathFrame);
 }
 
 void FormPathEditFrame::clearPathUI(){

@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -48,7 +49,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
         m_extensionToolbar->show();
         m_extensionBtn->setButtonState(true);
-        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().projet() != nullptr)
+        if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().project() != nullptr)
             emit enableSegmentationRequest();
         else if (m_isFullscreen) {
             setFullscreenUI();
@@ -71,8 +72,36 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
             
     });
 
-    connect(m_prevMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::previousMediaRequested);
-    connect(m_nextMediaBtn, &ToolbarButton::clicked, this, &AdvancedToolbar::nextMediaRequested);
+    connect(m_prevMediaBtn, &ToolbarButton::clicked, this, [this](){
+        // Disable buttons immediately to prevent rapid clicks from crashing
+        m_prevMediaBtn->setEnabled(false);
+        m_nextMediaBtn->setEnabled(false);
+        
+        // Delay signal emission + re-enable buttons after processing
+        QTimer::singleShot(50, this, [this](){
+            emit previousMediaRequested();
+            // Re-enable after signal is processed
+            QTimer::singleShot(200, this, [this](){
+                m_prevMediaBtn->setEnabled(true);
+                m_nextMediaBtn->setEnabled(true);
+            });
+        });
+    });
+    connect(m_nextMediaBtn, &ToolbarButton::clicked, this, [this](){
+        // Disable buttons immediately to prevent rapid clicks from crashing
+        m_prevMediaBtn->setEnabled(false);
+        m_nextMediaBtn->setEnabled(false);
+        
+        // Delay signal emission + re-enable buttons after processing
+        QTimer::singleShot(50, this, [this](){
+            emit nextMediaRequested();
+            // Re-enable after signal is processed
+            QTimer::singleShot(200, this, [this](){
+                m_prevMediaBtn->setEnabled(true);
+                m_nextMediaBtn->setEnabled(true);
+            });
+        });
+    });
 
     connect(m_extensionToolbar, &ExtensionToolbar::moveTimeBackwardRequested, this, &AdvancedToolbar::moveTimeBackwardRequested);
     connect(m_extensionToolbar, &ExtensionToolbar::moveTimeForwardRequested, this, &AdvancedToolbar::moveTimeForwardRequested);
@@ -244,6 +273,16 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent, SimpleToolbar *toolbar)
     if (oldNameLabel && m_nameLabel) {
         m_nameLabel->setText(oldNameLabel->text());
     }
+
+    QString oldStopTimeEdit = toolbar->customStopTimeEdit()->text();
+    if (oldStopTimeEdit != "" && m_customStopTimeEdit) {
+        m_customStopTimeEdit->setText(oldStopTimeEdit);
+    }
+
+    bool oldStopCheckbox = toolbar->customStopCheckbox()->isChecked();
+    if (m_customStopCheckbox) {
+        m_customStopCheckbox->setChecked(oldStopCheckbox);
+    }
 }
 
 AdvancedToolbar::~AdvancedToolbar()
@@ -280,6 +319,7 @@ void AdvancedToolbar::setDefaultUI()
         mainLayout->setSpacing(1);
 
         m_nameLabel->hide();
+        m_stopBtn->hide();
 
         QHBoxLayout* timecodeLayout = new QHBoxLayout();
         timecodeLayout->addWidget(m_timeEdit);
@@ -302,7 +342,8 @@ void AdvancedToolbar::setDefaultUI()
 
         buttonLayout->addWidget(m_speedBtn);
         buttonLayout->addWidget(m_prevMediaBtn);
-        buttonLayout->addWidget(m_stopBtn);
+        buttonLayout->addWidget(m_customStopBtn);
+        //buttonLayout->addWidget(m_stopBtn); MODIF
         buttonLayout->addWidget(m_playPauseBtn);
         buttonLayout->addWidget(m_ejectBtn);
         buttonLayout->addWidget(m_nextMediaBtn);

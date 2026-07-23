@@ -12,6 +12,7 @@ ShotManager::ShotManager(QGraphicsScene* scene, TimelineView* view, TimelineMath
 : QObject(parent) ,p_scene{scene}, p_view{view}, p_mathManager{mathManager}, p_thumbnailWorker{thumbnailWorker}, p_media{media}
 {
     connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotManager::updateThumbnail);
+    connect(p_thumbnailWorker, &ThumbnailWorker::colorReady, this, &ShotManager::colorReady);
     connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentDone, this, &ShotManager::shotsExtractionFinished);
     connect(&m_videoCaptureManager, &VideoCaptureManager::recordSegmentFailed, this, &ShotManager::shotsExtractionFailed);
 
@@ -66,6 +67,11 @@ void ShotManager::initShotDetail(){
     emit updateShotDetailRequested(static_cast<int>(m_shotItems.size()), currentShotId, &m_shotItems[currentShotId]->shot());
 }
 
+// custom selection model, intentionally not using Qt ItemIsSelectable / scene selection:
+// - selection is ordered by click order and numbered (drives shot extraction),
+//   whereas QGraphicsScene::selectedItems() returns an unordered set;
+// - selecting a video shot must also select its paired audio shot (and vice versa),
+//   which with scene selection would require reentrancy guards around selectionChanged.
 void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* audioShotItemToSelect, bool exclusive)
 {
     int shotId = -1;
@@ -181,8 +187,6 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
         return;
     }
 
-    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
-
     Shot& baseShot = m_shotItems[index]->shot();
 
     auto oldEnd =  baseShot.end;
@@ -194,18 +198,17 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     m_currentShotItem->setWidth(newWidth1);
     m_audioShotItems[index]->setWidth(newWidth1);
 
-    Shot newShotData =  Shot{ baseTitle, cutTime, oldEnd};
+    Shot newShotData =  Shot{ "", cutTime, oldEnd};
     newShotData.tagImageTime = newShotData.middle();
 
     double pos2 = p_mathManager->timeToPos(newShotData.start);
     double width2 = p_mathManager->timeToPos(newShotData.end) - pos2;
-    int startShotHeight = 40;
 
-    ShotItem* newShotItem = new ShotItem(newShotData, width2, startShotHeight);
+    ShotItem* newShotItem = new ShotItem(newShotData, width2);
     newShotItem->setPos(pos2, m_currentShotItem->y());
 
     AudioShot newAudioShotData = AudioShot{};
-    newAudioShotData.title = baseTitle;
+    newAudioShotData.title = "";
     newAudioShotData.start = cutTime;
     newAudioShotData.end = oldEnd;
 
@@ -218,16 +221,22 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     if(p_media->type() == MediaType::Video){
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
-            p_thumbnailWorker->requestThumbnail(index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-            p_thumbnailWorker->requestThumbnail(index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); 
+            // Shot item with  tag img thumbnail : the worker derives the color from the thumbnail directly, so no separate Color request needed.
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         }else {
-            p_thumbnailWorker->requestThumbnail(index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
-            p_thumbnailWorker->requestThumbnail(index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index + 1, newShotData.start, newShotData.end-newShotData.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, index, baseShot.start, baseShot.end - baseShot.start, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar()); // update ancienne thumbnail, car si la durée du plan < offset il faut modifier
+            
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, index + 1, newShotData.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, index, baseShot.tagImageTime, 0, p_media->filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, p_media->sar());
         }
     }
 
     p_scene->addItem(newShotItem);
     p_scene->addItem(newAudioShotItem);
+
+    emit shotCountUpdated(shotCount());
 
     updateCurrentShot(cutTime);
 }
@@ -240,14 +249,16 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     item->shot().start = (m_currentShotItem->shot().start > item->shot().start) ? item->shot().start: m_currentShotItem->shot().start ;
     item->shot().end = (m_currentShotItem->shot().end > item->shot().end) ? m_currentShotItem->shot().end : item->shot().end ;
 
-    item->shot().note += "\n" + m_currentShotItem->shot().note; // add the note of the current shot to the merged shot
+    item->shot().imgTxt += "\n" + m_currentShotItem->shot().imgTxt; // add the note of the current shot to the merged shot
+    item->shot().soundTxt += "\n" + m_currentShotItem->shot().soundTxt; // add the note of the current shot to the merged shot
 
     item->shot().tagImageTime = item->shot().middle(); // updates the tagimage to the middle of the merged shot
 
     AudioShotItem* audioItem = m_audioShotItems[ShotItemId];
     audioItem->shot().start = item->shot().start;
     audioItem->shot().end = item->shot().end;
-    audioItem->shot().note = item->shot().note;
+    audioItem->shot().imgTxt += "\n" + item->shot().imgTxt; // add the note of the current shot to the merged shot
+    audioItem->shot().soundTxt += "\n" + item->shot().soundTxt; // add the note of the current shot to the merged shot
 
     p_scene->removeItem(m_currentShotItem);
     ShotItem* currentAudioShotItem = m_audioShotItems[m_shotItems.indexOf(m_currentShotItem)];
@@ -268,6 +279,7 @@ void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
     mergeCurrentInto(indexOfPrev);
     clearSelection();
     updateCurrentShot(cursorTime);
+    emit shotCountUpdated(shotCount());
 }
 
 void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
@@ -340,8 +352,6 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
     clearSelection();
 
-    int shotHeight {40};
-
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
@@ -355,7 +365,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         int64_t shotLength = (IShot.end - IShot.start);
         double width = p_mathManager->timeToPos(shotLength);
 
-        ShotItem* shot = new ShotItem(IShot, width, shotHeight);
+        ShotItem* shot = new ShotItem(IShot, width);
         AudioShot audioShot{};
         audioShot.start = IShot.start;
         audioShot.end = IShot.end;
@@ -371,9 +381,12 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
         if(p_media->type() == MediaType::Video){
             if(displayByTagFrames) {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                // Shot item with  tag img thumbnail : the worker derives the color from the thumbnail directly, so no separate Color request needed.
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, IShot.start, shotLength, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, IShot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
         }
 
@@ -384,8 +397,6 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 {
 
-    int shotHeight {40};
-
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
@@ -393,8 +404,6 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
     int64_t startShot = 0;
     int64_t lengthShot = 0;
-
-    QString baseTitle = PrefManager::instance().getText("shot_detail_title_name");
 
     bool displayByTagFrames = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
 
@@ -407,13 +416,13 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         double xPos =  p_mathManager->timeToPos(startShot);
         double width = p_mathManager->timeToPos(lengthShot);
         
-        Shot shot{baseTitle, startShot, endShot};
+        Shot shot{"", startShot, endShot};
         shot.tagImageTime = shot.middle();
 
         AudioShot audioShot{};
-        audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = endShot;
+        audioShot.title = ""; audioShot.start = startShot; audioShot.end = endShot;
 
-        ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+        ShotItem* shotItem = new ShotItem(shot, width);
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
 
         p_scene->addItem(shotItem);
@@ -425,9 +434,12 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
         if(p_media->type() == MediaType::Video){
             if(displayByTagFrames) {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                // Shot item with  tag img thumbnail : the worker derives the color from the thumbnail directly, so no separate Color request needed.
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }else {
-                p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+
+                p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
             }
         }
 
@@ -439,12 +451,12 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     double xPos =  p_mathManager->timeToPos(startShot);
     double width = p_mathManager->timeToPos(lengthShot);
     
-    Shot shot{baseTitle, startShot, p_mathManager->duration()};
+    Shot shot{"", startShot, p_mathManager->duration()};
     shot.tagImageTime = shot.middle();
     AudioShot audioShot{};
-    audioShot.title = baseTitle; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
+    audioShot.title = ""; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
-    ShotItem* shotItem = new ShotItem(shot, width, shotHeight);
+    ShotItem* shotItem = new ShotItem(shot, width);
     AudioShotItem* audioShotItem = new AudioShotItem(audioShot, width);
     p_scene->addItem(shotItem);
     p_scene->addItem(audioShotItem);
@@ -455,20 +467,71 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
     if(p_media->type() == MediaType::Video){
         if(displayByTagFrames) {
-            p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+            // For timeline shots, compute the color directly from the already-decoded thumbnail
+            // instead of pushing a separate request to the color queue, which would decode the
+            // image a second time (displayTagFrame mode).
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }else {
-            p_thumbnailWorker->requestThumbnail(m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::TimelineShot, m_shotItems.size()-1, shot.start, lengthShot, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
+        
+            p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::Color, m_shotItems.size()-1, shot.tagImageTime, 0, p_media->filePath(), {m_thumbnailWidth, m_thumbnailHeight}, p_media->sar());
         }
     }
 
+    emit shotCountUpdated(shotCount());
 }
 
-void ShotManager::updateThumbnail(int requestId, QImage image){
+QColor getNewBorderColor(const QColor& color)
+{
+    if (color.valueF() < 0.5) {
+        // If the color is too close to dark color, use grey-whitish color for the border
+        if (color.valueF() < 0.2) {
+            // Merge white color with the original color to get a lighter border color
+            QColor whiteColor(255, 255, 255); // White color
+            return QColor((color.red() * 0.80 + whiteColor.red() * 0.20),
+                          (color.green() * 0.80 + whiteColor.green() * 0.20),
+                          (color.blue() * 0.80 + whiteColor.blue() * 0.20));
+        }
+        return color.lighter(150); // Lighten the color for dark colors
+    } else {
+        // If the color is too close to light color, use grey-darkish color for the border
+        if (color.valueF() > 0.8) {
+            // Merge black color with the original color to get a darker border color
+            QColor blackColor(0, 0, 0); // Black color
+            return QColor((color.red() * 0.80 + blackColor.red() * 0.20),
+                          (color.green() * 0.80 + blackColor.green() * 0.20),
+                          (color.blue() * 0.80 + blackColor.blue() * 0.20));
+        }
+        return color.darker(150); // Darken the color for light colors
+    }
+}
+
+void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image){
+
+    if(requester != ThumbnailWorker::Requester::TimelineShot) return;
+
     if(requestId < 0 || requestId >= m_shotItems.size()){
         return;
     }
 
     ShotItem* shotItem = m_shotItems.at(requestId);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    shotItem->setThumbnail(pixmap);
+
+    if(requester == ThumbnailWorker::Requester::TimelineShot)
+        shotItem->setThumbnail(QPixmap::fromImage(image));
+}
+
+
+void ShotManager::colorReady(ThumbnailWorker::Requester requester, int requestId, const QColor& color)
+{
+    if(!color.isValid()) return;
+
+    if(requestId < 0 || requestId >= m_shotItems.size()){
+        return;
+    }
+
+    ShotItem* shotItem = m_shotItems.at(requestId);
+
+    shotItem->shot().color = color;
+    shotItem->shot().borderColor = getNewBorderColor(color);
+    shotItem->update();
 }

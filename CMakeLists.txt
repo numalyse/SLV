@@ -19,7 +19,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(PYTHON_SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/pyScripts")
-if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+if(APPLE)
     option(ENABLE_MACDEPLOYQT "Run macdeployqt after building the app bundle on macOS" OFF)
 endif()
 
@@ -79,9 +79,11 @@ set(PROJECT_SOURCES
 
     PrefManager.h PrefManager.cpp
     TimeFormatter.h
+    IconHelper.h
     VlcParseHelper.h
     VlcInstance.h
     Shot.h
+    Annotation.h
     SignalManager.h
 
     Project/Project.h
@@ -91,6 +93,7 @@ set(PROJECT_SOURCES
     Project/ProjectExportThread.h Project/ProjectExportThread.cpp
 
     MediaWidget.h MediaWidget.cpp
+    SnapshotPopup.h SnapshotPopup.cpp
     NavPanel.h NavPanel.cpp
     PlaylistItem.h PlaylistItem.cpp
     Playlist.h Playlist.cpp
@@ -105,6 +108,7 @@ set(PROJECT_SOURCES
     Timeline/ShotManager.h Timeline/ShotManager.cpp
     Timeline/TransitionManager.h Timeline/TransitionManager.cpp
     Timeline/BaseRangeManager.h
+    Timeline/AnnotationItemManager.h Timeline/AnnotationItemManager.cpp
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp
@@ -114,6 +118,11 @@ set(PROJECT_SOURCES
 
     Tutorial.h Tutorial.cpp 
     TutoOpacityWidget.h TutoOpacityWidget.cpp
+
+    AnnotationManager.h AnnotationManager.cpp
+    AnnotationPanel.h AnnotationPanel.cpp
+    AnnotationWidget.h AnnotationWidget.cpp
+    AnnotationDialog.h AnnotationDialog.cpp
 )
 
 # =========================================================
@@ -157,6 +166,8 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/AudioVisualizerItem.h Timeline/Items/AudioVisualizerItem.cpp
     Timeline/Items/TransitionMarkerItem.cpp Timeline/Items/TransitionMarkerItem.h
     Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
+    Timeline/Items/AnnotationItem.h Timeline/Items/AnnotationItem.cpp
+    Timeline/Items/AnnotationHandleItem.h Timeline/Items/AnnotationHandleItem.cpp
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h
@@ -181,6 +192,17 @@ if(APPLE)
     list(APPEND PROJECT_SOURCES
         MacMouseTracker.h
         MacMouseTracker.mm
+        MacSymLink.h
+        MacSymLink.mm
+        MacWindowHelper.h
+        MacWindowHelper.mm
+    )
+endif()
+
+if(WIN32)
+    list(APPEND PROJECT_SOURCES
+        WinSymLink.h
+        WinSymLink.cpp
     )
 endif()
 
@@ -226,12 +248,12 @@ endif()
 # macOS → bundle .app
 if(APPLE)
     set_target_properties(SLV PROPERTIES MACOSX_BUNDLE TRUE)
-    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    #if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
         set_target_properties(SLV PROPERTIES
             BUILD_WITH_INSTALL_RPATH TRUE
             INSTALL_RPATH "@executable_path/../Frameworks"
         )
-    endif()
+    #endif()
 endif()
 
 # =========================================================
@@ -269,6 +291,8 @@ endif()
 # target_link_libraries(SLV PRIVATE ${Python3_LIBRARIES})
 if(WIN32)
     target_link_libraries(SLV PRIVATE Python3::Python)
+    # COM (IShellLink) used by WinSymLink to resolve .lnk shortcuts
+    target_link_libraries(SLV PRIVATE ole32 uuid)
 endif()
 
 # =========================================================
@@ -325,26 +349,26 @@ elseif(APPLE)
     # =====================================================
 
     if(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
-        set(HOMEBREW_PREFIX /opt/homebrew)
+        # set(HOMEBREW_PREFIX /opt/homebrew)
         
-        set(FFMPEG_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
-        set(FFMPEG_LIB_DIR ${HOMEBREW_PREFIX}/lib)
+        # set(FFMPEG_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
+        # set(FFMPEG_LIB_DIR ${HOMEBREW_PREFIX}/lib)
 
-        target_include_directories(SLV PRIVATE
-            ${FFMPEG_INCLUDE_DIR}
-        )
+        # target_include_directories(SLV PRIVATE
+        #     ${FFMPEG_INCLUDE_DIR}
+        # )
 
-        target_link_directories(SLV PRIVATE
-            ${FFMPEG_LIB_DIR}
-        )
+        # target_link_directories(SLV PRIVATE
+        #     ${FFMPEG_LIB_DIR}
+        # )
 
-        target_link_libraries(SLV PRIVATE
-            avcodec
-            avformat
-            avutil
-            swscale
-        )
-        
+        # target_link_libraries(SLV PRIVATE
+        #     avcodec
+        #     avformat
+        #     avutil
+        #     swscale
+        # )
+        set(HOMEBREW_PREFIX ${CMAKE_SOURCE_DIR}/ffmpeg/ffmpeg)
     else()
         #set(HOMEBREW_PREFIX /usr/local)
         set(HOMEBREW_PREFIX ${CMAKE_SOURCE_DIR}/ffmpeg/ffmpeg)
@@ -406,6 +430,8 @@ elseif(APPLE)
     else()
         set(HOMEBREW_PREFIX /usr/local)
     endif()
+
+    message("-- HOMEBREW_PREFIX : ${HOMEBREW_PREFIX}")
 
     target_include_directories(SLV PRIVATE
         "${VLC_APP}/Contents/MacOS/include"
@@ -547,6 +573,23 @@ if(WIN32)
     )
 
     # =====================================================
+    # FFmpeg (libav) runtime DLLs
+    # L'exe est lié directement à avcodec/avformat/avutil/swscale (.lib),
+    # donc ces DLLs doivent être à côté de l'exe sinon il ne se lance pas.
+    # (swresample est une dépendance d'avcodec)
+    # =====================================================
+    file(GLOB LIBAV_RUNTIME_DLLS
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/avcodec-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/avformat-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/avutil-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/swscale-*.dll"
+        "${CMAKE_SOURCE_DIR}/ffmpeg/bin/swresample-*.dll"
+    )
+    if(NOT LIBAV_RUNTIME_DLLS)
+        message(FATAL_ERROR "Aucune DLL FFmpeg (libav) trouvée dans ${CMAKE_SOURCE_DIR}/ffmpeg/bin, l'application ne pourra pas se lancer.")
+    endif()
+
+    # =====================================================
     # POST BUILD (DEBUG + RELEASE + DIST)
     # =====================================================
     add_custom_command(TARGET SLV POST_BUILD
@@ -637,6 +680,16 @@ if(WIN32)
         ${FFMPEG_DLL_LIST}
         "${DEPLOY_DIR}"
 
+        # FFmpeg (libav) DLLs (build dir)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${LIBAV_RUNTIME_DLLS}
+        "$<TARGET_FILE_DIR:SLV>"
+
+        # FFmpeg (libav) DLLs (dist)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${LIBAV_RUNTIME_DLLS}
+        "${DEPLOY_DIR}"
+
         # OpenCV world DLL (build dir)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${OPENCV_WORLD_DLL}
@@ -721,13 +774,15 @@ if(APPLE)
         message(STATUS "⚠️ pyScripts not found -> skip copy to bundle")
     endif()
 
-    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    #if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
         if(OpenCV_DIR)
             if(OpenCV_LIB_DIR)
                 set(OpenCV_LIBRARY_DIR "${OpenCV_LIB_DIR}")
             else()
                 get_filename_component(OpenCV_LIBRARY_DIR "${OpenCV_DIR}/../.." REALPATH)
             endif()
+
+            message("-- OpenCV_LIBRARY_DIR = ${OpenCV_LIBRARY_DIR}")
 
             if(OpenCV_VERSION_MAJOR AND OpenCV_VERSION_MINOR)
                 set(OpenCV_DYLIB_VERSION_SUFFIX "${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}")
@@ -757,14 +812,14 @@ if(APPLE)
                     )
                 endforeach()
 
-                # Clean up duplicate OpenCV dylibs (keep only .414.dylib versions)
+                # Clean up duplicate OpenCV dylibs (keep only .413.dylib (macOS ARM) or .414.dylib (macOS Intel)versions)
                 add_custom_command(TARGET SLV POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cleanup_opencv_bundle.cmake"
                     COMMENT "Clean up duplicate OpenCV dylibs from app bundle"
                 )
             endif()
         endif()
-    endif()
+    #endif()
 
     # Copy ffmpeg into Resources/ffmpeg
     if(EXISTS "${CMAKE_SOURCE_DIR}/ffmpeg")
@@ -793,11 +848,12 @@ endif()
 # =========================
 # QT DEPLOY TOOL
 # =========================
-if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+if(APPLE)
     find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS
         "${CMAKE_PREFIX_PATH}/bin"
         "${CMAKE_PREFIX_PATH}/../bin"
     )
+    message(STATUS "MACDEPLOYQT_EXECUTABLE path = ${MACDEPLOYQT_EXECUTABLE}")
 endif()
 
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_FUNCTIONAL_DIR}/../../../bin")
@@ -810,12 +866,26 @@ if(WIN32)
 endif()
 
 if(APPLE AND MACDEPLOYQT_EXECUTABLE AND ENABLE_MACDEPLOYQT)
+    # Run macdeployqt and then fix any absolute non-system library paths (python wheels, cv2, PIL, etc.)
     add_custom_command(TARGET SLV POST_BUILD
         COMMAND "${MACDEPLOYQT_EXECUTABLE}"
             "$<TARGET_BUNDLE_DIR:SLV>"
-        COMMENT "📦 Deploy Qt frameworks into the macOS app bundle"
+
+        # # After macdeployqt copies frameworks/plugins, run our fixup script to bundle python dylibs
+        # COMMAND ${CMAKE_COMMAND} -E echo "Running post-deploy path fixer..."
+        # COMMAND ${CMAKE_COMMAND} -E env bash "${CMAKE_SOURCE_DIR}/tools/fix_bundle_paths.sh" "$<TARGET_BUNDLE_DIR:SLV>"
+
+        COMMENT "📦 Deploy Qt frameworks into the macOS app bundle and fix python dylib paths"
     )
 endif()
+
+# if(APPLE AND MACDEPLOYQT_EXECUTABLE AND ENABLE_MACDEPLOYQT AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+#     add_custom_target(macdeployqt
+#         COMMAND "${MACDEPLOYQT_EXECUTABLE}" "$<TARGET_BUNDLE_DIR:SLV>" -verbose=1
+#         COMMENT "📦 Run macdeployqt on the built app bundle (ARM only)"
+#         DEPENDS SLV
+#     )
+# endif()
 
 # =========================
 # POST BUILD PACKAGING

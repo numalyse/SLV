@@ -2,12 +2,14 @@
 #include <QMessageBox>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QComboBox>
+#include <QProgressDialog>
 
-ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime)
+ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime, int audioTrack)
     : QDialog{parent}, m_media(media)
 {
-    const int MIN_END_MARGIN = 100;       
-    const int DEFAULT_DURATION = 10000; 
+    const int MIN_END_MARGIN = 100;
+    const int DEFAULT_DURATION = 10000;
 
     int duration = media.duration();
 
@@ -24,12 +26,13 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
         if (defaultEndTime < duration) {
             m_endTime = defaultEndTime;
         } else {
-            m_endTime = duration; 
+            m_endTime = duration;
         }
     } else {
         m_endTime = endTime;
     }
 
+    m_audioTrack = audioTrack;
     m_thumbnailPendingTime = 50;
     m_isExec = false;
     m_startTimeEditor = new TimeEditor(this, startTime, duration, 0, duration, media.fps());
@@ -52,7 +55,12 @@ void ExtractSequenceWidget::createButtons()
 {
     m_thumbnailWorker = new ThumbnailWorker(this);
     m_okButton = new QPushButton(PrefManager::instance().getText("extract_sequence_action"));
-    m_audioOnlyButton = new QPushButton(PrefManager::instance().getText("extract_sequence_audio_only_action"));
+    m_methodChoice = new QComboBox();
+    m_methodChoice->addItem(PrefManager::instance().getText("extract_sequence_default"));
+    m_methodChoice->addItem(PrefManager::instance().getText("extract_sequence_reencode"));
+    m_methodChoice->addItem(PrefManager::instance().getText("extract_sequence_audio_only_action"));
+    m_warningMsg = new QLabel("⚠ " + PrefManager::instance().getText("extract_sequence_warning"));
+    m_warningMsg->hide();
     m_cancelButton = new QPushButton(PrefManager::instance().getText("cancel_action"));
     m_startFrameDisplay = new AspectRatioPixmapLabel();
     m_startFrameDisplay->setAlignment(Qt::AlignCenter);
@@ -61,11 +69,31 @@ void ExtractSequenceWidget::createButtons()
     connect(m_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ExtractSequenceWidget::onThumbnailReady);
     m_thumbnailWorker->start();
     connect(m_okButton, &QPushButton::released, this, [this](){
-        confirmExtraction(SequenceExtractionHelper::ExtractionType::Original);
-    });    
-    connect(m_audioOnlyButton, &QPushButton::released, this, [this](){
-        confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
+        switch(m_methodChoice->currentIndex()){
+        default:
+        case 0:
+            confirmExtraction(SequenceExtractionHelper::ExtractionType::Original);
+            break;
+        case 1:
+            confirmExtraction(SequenceExtractionHelper::ExtractionType::Reencode);
+            break;
+        case 2:
+            confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
+        }
     });
+    connect(m_methodChoice, &QComboBox::currentIndexChanged, [this](int index){
+        if(index == 1) m_warningMsg->show();
+        else m_warningMsg->hide();
+    });
+    // connect(m_losslessButton, &QPushButton::released, this, [this](){
+    //     confirmExtraction(SequenceExtractionHelper::ExtractionType::Lossless);
+    // });
+    // connect(m_reencodeButton, &QPushButton::released, this, [this](){
+    //     confirmExtraction(SequenceExtractionHelper::ExtractionType::Reencode);
+    // });
+    // connect(m_audioOnlyButton, &QPushButton::released, this, [this](){
+    //     confirmExtraction(SequenceExtractionHelper::ExtractionType::AudioOnly);
+    // });
     connect(m_cancelButton, &QPushButton::released, this, &QDialog::reject);
     connect(m_startTimeEditor, &TimeEditor::timeChanged, m_endTimeEditor, &TimeEditor::onMinTimeChanged);
     connect(m_startTimeEditor, &TimeEditor::timeChanged, this, &ExtractSequenceWidget::onStartTimeChanged);
@@ -100,9 +128,14 @@ void ExtractSequenceWidget::initUiLayout()
     timeSelectionLayout->addLayout(endTimeSelectionLayout);
 
     QHBoxLayout *confirmLayout = new QHBoxLayout();
+    m_warningMsg->setStyleSheet("color:gold;");
+    m_warningMsg->setTextInteractionFlags(Qt::NoTextInteraction);
+    m_warningMsg->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    confirmLayout->addWidget(m_warningMsg);
     confirmLayout->addStretch();
+    confirmLayout->addWidget(new QLabel(PrefManager::instance().getText("extraction_method_choice") + " :"));
+    confirmLayout->addWidget(m_methodChoice);
     confirmLayout->addWidget(m_okButton);
-    confirmLayout->addWidget(m_audioOnlyButton);
     confirmLayout->addWidget(m_cancelButton);
 
     mainLayout->addLayout(timeSelectionLayout);
@@ -116,7 +149,7 @@ void ExtractSequenceWidget::requestStartFrameDisplay()
 {
     if(m_media.type() == MediaType::Video){
         m_thumbnailWorker->keepNQueue(2); // Pour clear la queue sauf 2 éléments (clearQueue empêche parfois d'afficher les frames sur un des deux)
-        m_thumbnailWorker->requestThumbnail(0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
+        m_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ExtractSequence, 0, m_startTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
     }
 }
 
@@ -124,12 +157,14 @@ void ExtractSequenceWidget::requestEndFrameDisplay()
 {
     if(m_media.type() == MediaType::Video){
         m_thumbnailWorker->keepNQueue(2);
-        m_thumbnailWorker->requestThumbnail(1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
+        m_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ExtractSequence, 1, m_endTime, 0, m_media.filePath(), {int(m_thumbnailWidth), int(m_thumbnailHeight)}, m_media.sar());
     }
 }
 
-void ExtractSequenceWidget::onThumbnailReady(int requestId, const QImage& image)
+void ExtractSequenceWidget::onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image)
 {
+    if(requester != ThumbnailWorker::Requester::ExtractSequence) return;
+
     QPixmap pixmap = QPixmap::fromImage(image);
     switch(requestId){
     case 0:
@@ -162,8 +197,34 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
         + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
     if(saveSequencePath != ""){
         // On garde seulement la base du nom sans l'extension avec un split
-        QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
-        connect(sequenceExtractor, &QProcess::finished, this, &QDialog::accept);
+        SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_media.filePath(), m_startTime, m_endTime);
+        connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this](const int exitCode){
+            if(exitCode == 1)
+                this->accept();
+        });
+        // QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("extract_sequence_progress_text"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+        // progressDialog->setWindowTitle(prefManager.getText("extract_sequence_progress_title"));
+        // progressDialog->setWindowModality(Qt::WindowModal);
+
+        // connect(progressDialog, &QProgressDialog::canceled, this, [this](){
+        //     close();
+        // });
+        // connect(sequenceExtractor, &SequenceExtractionHelper::progressStep, progressDialog, &QProgressDialog::setValue);
+        // progressDialog->show();
+
+        switch(type){
+        case SequenceExtractionHelper::ExtractionType::Original:
+        case SequenceExtractionHelper::ExtractionType::AudioOnly:
+            sequenceExtractor->extractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type, true, m_audioTrack-1);
+            break;
+        case SequenceExtractionHelper::ExtractionType::Lossless:
+            // sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
+            break;
+        case SequenceExtractionHelper::ExtractionType::Reencode:
+            sequenceExtractor->reencodeExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
+            break;
+        }
+
         QFileInfo fileInfo (saveSequencePath);
         prefManager.setPref("Paths", "lp_extract_sequence", fileInfo.absolutePath());
     }

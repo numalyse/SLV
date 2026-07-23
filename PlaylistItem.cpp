@@ -30,6 +30,7 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
 
 
     m_mediaData = new Media(mediaFilePath);
+    m_thumbnailGenerator = new QProcess();
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(6,4,6,4);
@@ -105,6 +106,13 @@ PlaylistItem::PlaylistItem(QWidget *parent, const QString &mediaFilePath)
     m_mediaData->parse();
 }
 
+PlaylistItem::~PlaylistItem()
+{
+    if(m_thumbnailGenerator->state() != QProcess::NotRunning)
+        m_thumbnailGenerator->terminate();
+    m_itemDeleted = true;
+}
+
 
 
 void PlaylistItem::initStyle()
@@ -140,14 +148,14 @@ void PlaylistItem::setDurationLabel()
         if(m_mediaData->type() != Image) return;
     }
 
-    QString time = TimeFormatter::msToHHMMSSFF(durationMs, 1);
-    QString timeChopped = time.left(qMax(0, time.length() - 3));
-    m_mediaDurationLabel->setText(timeChopped);
+    QString time = TimeFormatter::msToHHMMSS(durationMs);
+    m_mediaDurationLabel->setText(time);
     m_mediaDurationLabel->setToolTip(PrefManager::instance().getText("duration") + " : " + time);
 
     m_mediaThumbnailTime = setThumbnailTime();
     updateTypeIcon();
     updateThumbnail();
+    emit durationParsed();
 }
 
 QString PlaylistItem::setThumbnailTime(){
@@ -158,21 +166,14 @@ QString PlaylistItem::setThumbnailTime(){
     }
 
     qint64 halfMs = durationMs / 2;
-    QString time = TimeFormatter::msToHHMMSSFF(halfMs, 1);
-    //qDebug() << "le temps en ms : " << durationMs << " => half : " << halfMs;
-    //qDebug() << "le temps en HMSF half : " << time;
-
-    // Conserve uniquement HH:MM:SS car on veut un format base pour ffmpeg.
-    QString timeCropped = time.left(qMax(0, time.length() - 3));
-    //qDebug() << "le temps cropped : " << timeCropped;
-
-    return timeCropped;
+    // HH:MM:SS car on veut un format de base pour ffmpeg.
+    return TimeFormatter::msToHHMMSS(halfMs);
 }
 
 void PlaylistItem::setIndex(int index)
 {
     m_itemIndex = index;
-    m_indexLabel->setText(QString::number(m_itemIndex+1));
+    m_indexLabel->setText(QString::number(index+1));
 }
 
 // --- EVENTS --- //
@@ -216,7 +217,8 @@ void PlaylistItem::mouseMoveEvent(QMouseEvent *event)
 
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData;
-    mimeData->setData("move-PlaylistItem", QByteArray::number(m_itemIndex));
+    mimeData->setData("move-PlaylistItem", QByteArray::number(m_indexLabel->text().toInt()-1));
+    qDebug() << "[Drag] PlaylistItem index: " << m_itemIndex;
     drag->setMimeData(mimeData);
 
     // Créer une pixmap pour le drag feedback
@@ -281,7 +283,6 @@ void PlaylistItem::updateTypeIcon(){
 
 QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
 {
-    QProcess ffmpeg;
     QStringList args;
     args << "-ss" << m_mediaThumbnailTime  
          << "-i" << videoPath
@@ -300,12 +301,15 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
     ffmpegExe = appDir + "/bin/ffmpeg";
 #endif
 
-    ffmpeg.start(ffmpegExe, args);
+    m_thumbnailGenerator->start(ffmpegExe, args);
     //ffmpeg.start(QString(FFMPEG_EXECUTABLE), args);
-    ffmpeg.waitForFinished(-1);
+    m_thumbnailGenerator->waitForFinished(-1);
 
-    QByteArray imageData = ffmpeg.readAllStandardOutput();
     QPixmap pixmap;
+    if(m_itemDeleted)
+        return pixmap;
+    QByteArray imageData = m_thumbnailGenerator->readAllStandardOutput();
+
     pixmap.loadFromData(imageData, "PNG");
 
     if(m_mediaData->type() == Image)
@@ -323,7 +327,7 @@ void PlaylistItem::updateThumbnail()
     } else {
         m_mediaThumbnailLabel->setToolTip(PrefManager::instance().getText("no_preview"));
     }
-        
+
 
         //QPixmap pixmap = QPixmap::fromImage(image);
         //m_mediaThumbnailLabel->setPixmap(pixmap);
@@ -334,6 +338,9 @@ void PlaylistItem::updateThumbnail()
 
         if (m_mediaData->type() == MediaType::Video){
             QPixmap pixmap = generateVideoThumbnail(m_mediaData->filePath());
+            // Media can be removed from playlist before the thumbnail is generated
+            if(m_itemDeleted)
+                return;
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
 
@@ -341,10 +348,14 @@ void PlaylistItem::updateThumbnail()
         if (m_mediaData->type() == MediaType::Image){
 
             QPixmap pixmap = QPixmap::fromImage(QImage(m_mediaData->filePath()));
+            if(m_itemDeleted)
+                return;
             m_mediaThumbnailLabel->setPixmap(pixmap.scaled(thumbnailSize().width(), thumbnailSize().height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
 
         if (m_mediaData->type() == MediaType::Audio){
+            if(m_itemDeleted)
+                return;
             if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
                 m_mediaThumbnailImage = new QPixmap(":/icons/music_note_white");
             } else {

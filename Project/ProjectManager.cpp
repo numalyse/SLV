@@ -6,6 +6,7 @@
 #include "Project/ProjectFileHelper.h"
 #include "Project/ProjectExportThread.h"
 #include "FileCopyThread.h"
+#include "FileFormatManager.h"
 
 #include <QString>
 #include <QDebug>
@@ -27,19 +28,30 @@
 
 ProjectManager::ProjectManager(QObject* parent) : QObject(parent)
 {
+    m_annotationManager = new AnnotationManager(this);
+
+    connect(m_annotationManager, &AnnotationManager::annotationAdded, this, &ProjectManager::setSaveNeeded);
+    connect(m_annotationManager, &AnnotationManager::annotationUpdated, this, &ProjectManager::setSaveNeeded);
+    connect(m_annotationManager, &AnnotationManager::annotationRemoved, this, &ProjectManager::setSaveNeeded);
 }
 
 ProjectManager::~ProjectManager()
 {
+    // if threads are still running waits for them to end, 
+    // otherwise would crash as deleting a running QThread is undefined behavior
+    for (QThread* thread : {m_exportThread.data(), m_fileCpyThread.data()}) {
+        if (thread && thread->isRunning()) {
+            thread->requestInterruption();
+            thread->wait();
+        }
+    }
+
     if(m_project){
         delete m_project;
         m_project = nullptr;
     }
 }
 
-/// @brief A partir d'une erreur renvoie le message associé
-/// @param error 
-/// @return 
 QString ProjectManager::getErrorMessage(ProjectFileError error) const
 {
     PrefManager& prefManager = PrefManager::instance();
@@ -77,7 +89,6 @@ QString ProjectManager::getErrorMessage(ProjectManager::Error error) const {
 }
 
 
-/// @brief Supprime le projet et son média et envoie un signal pour desactiver l'ui de segmentation 
 void ProjectManager::deleteProject() {
     if (m_project) {
         if (m_project->media) {
@@ -87,12 +98,12 @@ void ProjectManager::deleteProject() {
         m_project = nullptr;
         p_timeline = nullptr;
         setSaveNotNeeded();
+        m_annotationManager->clear();
         emit projectDeleted();
     }
 }
 
-/// @brief Supprime le projet actuel. si 1 seul média reçus, créer un projet. Une fois que les fps et la durée ont été parse, init le projet avec 1 shot
-/// @param mediaPaths 
+
 void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 
     deleteProject();
@@ -110,35 +121,33 @@ void ProjectManager::requestProjectCreation(const QStringList &mediaPaths) {
 
     connect(m_project->media, &Media::durationParsed, this, [this]() {
         m_isDurationParsed = true;
+        disconnect(m_project->media, &Media::durationParsed, this, nullptr); // disconnect to prevent multiple project initializations
         this->initProjectShot();
     });
 
     connect(m_project->media, &Media::fpsParsed, this, [this]() {
         m_isFpsParsed = true;
+        disconnect(m_project->media, &Media::fpsParsed, this, nullptr);
         this->initProjectShot();
     });
     m_project->media->parse();
 }
 
-
-/// @brief 
-/// @param ejectMediaAfterSave Si true, va supprimer le projet + éjecter le média
-/// @return 
 void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
     if(!m_project){
-        qCritical() << "Trying to save on a null project"; 
+        qCritical() << "[ProjectManager] Trying to save on a null project"; 
         return;
     }
 
-    if( ! m_needSave){ // si pas besoin de save on return et éjecte si besoin
+    if( ! m_needSave){ // If no changes made doesn't write to json
         if(ejectMediaAfterSave){
             discardAndEject();
         }
         return;
     }
 
-    if( ! m_project->path.isEmpty() && ! isSaveAs ){ // si on est deja dans un projet avec un path,
-        // on écrit directement dans le json sans copier la vidéo
+    if( ! m_project->path.isEmpty() && ! isSaveAs ){ // If project path is not empty, the project folder as been created
+        // we can directly write to json without creating a folder and the media link
         ProjectFileHelper::writeJson(m_project, p_timeline);
         setSaveNotNeeded();
         if(ejectMediaAfterSave){
@@ -148,20 +157,44 @@ void ProjectManager::saveProject(bool ejectMediaAfterSave, bool isSaveAs){
     }
 
     if( mediaPath().isEmpty() ){
-        qCritical() << "Media path du project est vide";
-        if(ejectMediaAfterSave){
-            discardAndEject();
-        }
+        qCritical() << "[ProjectManager] Media path empty when saving";
         return;
     }
 
 
-    if ( ! createProjectFolder() ){ // on a cliqué sur annulé on return 
+    if ( ! createProjectFolder() ){ // clicked on "cancel" in filedialog returns
         return; 
-    }else { // copie du média dans le dossier du projet
-        QString destMedia = QDir(m_project->path).filePath(m_project->media->fileName() + "." + m_project->media->fileExtension());
-        copyMedia(m_project->media->filePath(), destMedia, m_project->path, ejectMediaAfterSave);
+    }else {
+
+        // on windows QFile::link creates a .lnk shortcut, to track media move see WinSymLink.h
+        // on macOS we create a Finder alias which does the same.
+#ifdef Q_OS_WIN
+        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + ".lnk" );
+#else
+        QString mediaLinkPath = QDir(m_project->path).filePath(m_project->media->fileName() + "_link." + m_project->media->fileExtension());
+#endif
+
+        if(!ProjectFileHelper::createMediaLink(m_project->media->filePath(), mediaLinkPath)){
+            qCritical() << "[ProjectManager] Failed to create a link to the media";
+            return;
+        }
+        m_project->mediaLinkPath = mediaLinkPath;
+
+        if(!ProjectFileHelper::writeJson(m_project, p_timeline)){
+            qCritical() << "[ProjectManager] Failed to write to json";
+            return;
+        }
+        
         setSaveNotNeeded();
+
+        // information message box when project saved for the first time 
+        auto& prefManager = PrefManager::instance();
+        QMessageBox::information(nullptr, prefManager.getText("project_saved_title"), prefManager.getText("project_saved_text"));
+
+        if(ejectMediaAfterSave){
+            discardAndEject();
+        }
+
         return;
     }
 
@@ -197,9 +230,9 @@ QString ProjectManager::mediaPathExtension()
 
 // slots
 
-/// @brief Une fois que les fps et la durée on été parsed, Créer un project avec un plan de la longueur de la vidéo
 void ProjectManager::initProjectShot(){
 
+    // if fps and duration are not parsed or already initialized do nothing
     if( ! m_isFpsParsed || ! m_isDurationParsed || m_projectInitialized ){
         return;
     }
@@ -212,23 +245,23 @@ void ProjectManager::initProjectShot(){
         return;
     }
 
-    Shot shot{PrefManager::instance().getText("shot_detail_title_name"), 0, m_project->media->duration()};
+    // shot spanning the whole media
+    Shot shot{"", 0, m_project->media->duration()};
     shot.tagImageTime = shot.middle();
     m_project->shots.append(shot);
-    
-    for (size_t i = 0; i < m_project->shots.size(); i++) {
-        qDebug() << m_project->shots[i].title << ", " <<  m_project->shots[i].start << ", " << shot.end;
-    }
 
     qDebug() << "project initialisé";
     emit projectInitialized();
 
+    m_annotationManager->setAnnotations(&m_project->annotations);
 }
 
 
 bool ProjectManager::createProjectFolder(){
     PrefManager& prefManager = PrefManager::instance();
+
     QString fileType = prefManager.getText("project_manager_create_project_dialog_file_type") + "(*)";
+
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr, 
         tr(prefManager.getText("project_manager_create_project_dialog").toStdString().c_str()), 
@@ -237,7 +270,7 @@ bool ProjectManager::createProjectFolder(){
     );
 
     if(selectedPath.isEmpty()){
-        qDebug() << "Sauvegarde annulée";
+        qDebug() << "[ProjectManager] Project folder creation aborted";
         return false; 
     }
     
@@ -248,103 +281,20 @@ bool ProjectManager::createProjectFolder(){
     
     if(!dir.exists(fileInfo.baseName())) {
         if(!dir.mkdir(fileInfo.baseName())) {
-            qCritical() << "Impossible de créer le dossier";
+            qCritical() << "[ProjectManager] Failed to create project folder";
             return false;
         }
     }
 
     m_project->path = QDir(fileInfo.absolutePath()).filePath(fileInfo.baseName());
     m_project->name = QDir(m_project->path).dirName();
-    qDebug() << "dossier créé";
-    return true;
-}
-
-void ProjectManager::deleteFolder(const QString& projectFolderPath) {
-
-    if (projectFolderPath.isEmpty()) {
-        qWarning() << "Impossible de supprimer : aucun chemin défini";
-        return;
-    }
-
-    QDir projectDir(projectFolderPath);
-
-    if (projectDir.exists()) {
-        if (projectDir.removeRecursively()) {
-            qDebug() << "Dossier du projet supprimé avec succès :" << projectFolderPath;
-        } else {
-            qCritical() << "Echec de la suppression du dossier :" << projectFolderPath;
-        }
-    } else {
-        qDebug() << "Le dossier n'existe pas :" << projectFolderPath;
-    }
-}
-
-
-
-/// @brief Copie avec un thread dédié un média à l'endroit souhaité. Une fois terminé, créer le fichier JSON
-/// @param sourcePath Path du média a copier
-/// @param destPath Path de destination du média copié
-/// @param projectPath Path du dossier racine du projet (pour suppression si annulation)
-/// @param ejectMediaAfterSave Si true, ejecte la vidéo après la copie
-/// @return 
-bool ProjectManager::copyMedia(const QString& sourcePath, const QString& destPath, const QString& projectPath, bool ejectMediaAfterSave) { 
-
-    if (!QFile::exists(sourcePath)) {
-        qCritical() << "Erreur : Le fichier source est introuvable." << sourcePath;
-        return false;
-    }
-
-    PrefManager& prefManager = PrefManager::instance();
-
-    FileCopyThread* fileCpyThread = new FileCopyThread(sourcePath, destPath, this);
-    
-    QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("project_window_title_copy_video"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
-    progressDialog->setWindowTitle(prefManager.getText("project_window_title_copy_video"));
-    progressDialog->setWindowModality(Qt::WindowModal); 
-    progressDialog->show();
-
-
-    connect(progressDialog, &QProgressDialog::canceled, this, [fileCpyThread, progressDialog](){ 
-        fileCpyThread->requestInterruption();
-        disconnect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
-    });
-
-    connect(fileCpyThread, &FileCopyThread::progress, progressDialog, &QProgressDialog::setValue);
-
-    connect(fileCpyThread, &FileCopyThread::copyFinished, this, [this, fileCpyThread, ejectMediaAfterSave, progressDialog, projectPath](bool success, bool canceled) {
-        
-        if (success) {
-            ProjectFileHelper::writeJson(m_project, p_timeline);
-        } else {
-            if ( ! canceled ) {
-                auto& prefManager = PrefManager::instance(); 
-                QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), prefManager.getText("project_error_copy_failed"));
-            }
-            m_project->path = "";
-            m_project->name = "";
-            deleteFolder(projectPath);
-            setSaveNeeded(); 
-        }
-
-        if(ejectMediaAfterSave){
-            discardAndEject();
-        }
-
-        progressDialog->close(); 
-        progressDialog->deleteLater(); 
-    });
-
-    connect(fileCpyThread, &QThread::finished, fileCpyThread, &QObject::deleteLater);
-
-    fileCpyThread->start();
-
+    qDebug() << "[ProjectManager] Project folder created";
     return true;
 }
 
 
 
-/// @brief Ouvre un dialogue pour choisir l'emplacement du dossier. Parcours le JSON, affiche une erreur dans une message box s'il y en eu, créer projet sinon.
-/// Puis parse le media
+
 void ProjectManager::openProject()
 {
     auto& prefManager = PrefManager::instance();
@@ -355,6 +305,10 @@ void ProjectManager::openProject()
         prefManager.getPref("Paths", "lp_project")
     );
 
+    if(selectedPath.isEmpty()){
+        return;
+    }
+
     openProjectFromPath(selectedPath);
 
 }
@@ -362,10 +316,6 @@ void ProjectManager::openProject()
 void ProjectManager::openProjectFromPath(const QString& path)
 {
     auto& prefManager = PrefManager::instance();
-
-    if(path.isEmpty()){
-        return;
-    }
 
     QFileInfo fileInfo(path);
     prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
@@ -375,17 +325,40 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     if (!loaded.has_value()) {
         QString errorMsg = getErrorMessage(loaded.error());
-        QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), errorMsg);
+        if(loaded.error() != ProjectFileError::JsonFileNotFound) {
+
+            QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"), errorMsg);
+            return;
+        }
+        if (!relinkJson(errorMsg, path)) { // ask to relink if error is JsonFileNotFound
+            return;
+        }
+        // reloads after relink json success
+        loaded = ProjectFileHelper::loadProject(path);
+        if (!loaded.has_value()) {
+            QMessageBox::critical(nullptr, prefManager.getText("messagebox_error"),
+                getErrorMessage(loaded.error()));
+            return;
+        }
+    }
+    ProjectSaveData projectData = loaded.value();
+
+    // the media link is broken
+    // ask the user to locate the media again and recreate the link
+    if (projectData.mediaAbsolutePath.isEmpty() && !relinkMedia(path, projectData)) {
         return;
     }
 
-    ProjectSaveData projectData = loaded.value();
+    QString mediaName;
+    QString mediaAbsolutePath;
 
     Project* project = new Project{
         projectData.shots,
+        projectData.annots,
         new Media(projectData.mediaAbsolutePath, this),
         QFileInfo(path).baseName(),
-        path
+        path,
+        projectData.mediaLinkAbsolutePath
     };
     qDebug() << "Project created with name:" << project->name << ", path:" << project->path << ", media path:" << project->media->filePath();
 
@@ -395,47 +368,145 @@ void ProjectManager::openProjectFromPath(const QString& path)
 
     setSaveNotNeeded();
     m_isDurationParsed = false;
+    m_durationError = false;
     m_isFpsParsed = false;
+    m_fpsError = false;
 
 
     connect(m_project->media, &Media::durationParsed, this, [this, durationJson = projectData.duration ](int64_t durationFile) {
-
-        if(durationJson == durationFile){
-            m_isDurationParsed = true;
-            checkMediaFullyLoaded();
-        } else {
-            QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchDuration);
-            QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errorMsg);
+        m_isDurationParsed = true;
+        if(durationJson != durationFile){
+            m_durationError = true;
         }
+        checkMediaFullyLoaded();
 
     });
 
     connect(m_project->media, &Media::fpsParsed, this, [this, fpsJson = projectData.fps](double fpsFile) {
-
-        if(fpsJson == fpsFile){
-            m_isFpsParsed = true;
-            checkMediaFullyLoaded();
-        }else {
-            QString errorMsg = getErrorMessage(ProjectManager::Error::MismatchFPS);
-            QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errorMsg);
+        m_isFpsParsed = true;
+        if(fpsJson != fpsFile){
+            m_fpsError = true;
         }
+        checkMediaFullyLoaded();
 
     });
 
     m_project->media->parse();
 }
 
-///@brief Quand les fps et la durée sont retrouvés, lance un signal pour créer un layout avec 1 player et lance un signal pour créer la timeline
+bool ProjectManager::relinkMedia(const QString& projectPath, ProjectSaveData& projectData)
+{
+    auto& prefManager = PrefManager::instance();
+
+    QMessageBox warningBox(QMessageBox::Warning,
+        prefManager.getText("messagebox_error"),
+        prefManager.getText("project_manager_relink_media_message"));
+    warningBox.addButton(prefManager.getText("project_manager_relink_media_button"), QMessageBox::AcceptRole);
+    warningBox.exec();
+
+    QString newMediaPath = QFileDialog::getOpenFileName(
+        nullptr,
+        prefManager.getText("project_manager_relink_media_dialog"),
+        prefManager.getPref("Paths", "lp_open_media"),
+        FileFormatManager::instance().getOpenFileDialogFilters()
+    );
+
+    if (newMediaPath.isEmpty()) { // clicked on "cancel", abort the project load
+        return false;
+    }
+
+    // rebuild the link path inside the current project folder, in case the
+    // project folder itself was moved since the json was written
+    QString linkName = QFileInfo(projectData.mediaLinkAbsolutePath).fileName();
+    if (linkName.isEmpty()) {
+#ifdef Q_OS_WIN
+        linkName = QFileInfo(newMediaPath).completeBaseName() + ".lnk";
+#else
+        linkName = QFileInfo(newMediaPath).fileName();
+#endif
+    }
+    QString linkPath = QDir(projectPath).filePath(linkName);
+
+    if (!ProjectFileHelper::createMediaLink(newMediaPath, linkPath)) {
+        qCritical() << "[ProjectManager] relink media : failed to recreate the media link";
+        QMessageBox::critical(nullptr,
+            prefManager.getText("messagebox_error"),
+            getErrorMessage(ProjectFileError::UnexpectedError));
+        return false;
+    }
+
+    projectData.mediaAbsolutePath = newMediaPath;
+    projectData.mediaLinkAbsolutePath = linkPath;
+    projectData.mediaName = QFileInfo(newMediaPath).fileName();
+
+    return true;
+}
+
+bool ProjectManager::relinkJson(const QString& errorJson, const QString& projectPath)
+{
+    auto& prefManager = PrefManager::instance();
+
+    QMessageBox warningBox(QMessageBox::Warning,
+        prefManager.getText("messagebox_error"),
+        errorJson + '\n' + prefManager.getText("project_manager_relink_json_txt"));
+    warningBox.addButton(prefManager.getText("project_manager_relink_media_button"), QMessageBox::AcceptRole);
+    warningBox.exec();
+
+    QString jsonPath = QFileDialog::getOpenFileName(
+        nullptr,
+        prefManager.getText("project_manager_relink_json_dialog"),
+        projectPath,
+        "JSON (*.json)"
+    );
+
+    if (jsonPath.isEmpty()) { // clicked on "cancel", abort the project load
+        return false;
+    }
+
+    QString projectName = QFileInfo(projectPath).baseName();
+
+    bool renamed = QFile::rename(jsonPath, projectPath + QDir::separator() + projectName + ".json" );
+
+    if(!renamed){
+        QMessageBox warningBox(QMessageBox::Warning,
+            prefManager.getText("messagebox_error"),
+            prefManager.getText("project_manager_relink_json_error_rename"));
+        warningBox.addButton(prefManager.getText("project_manager_relink_media_button"), QMessageBox::AcceptRole);
+        warningBox.exec();
+
+        return false;
+    }
+
+    return true;
+}
+
 void ProjectManager::checkMediaFullyLoaded()
 {
-    if(m_isDurationParsed && m_isFpsParsed){
+    if (!m_project || !m_project->media) return;
+    
+    if(m_isDurationParsed && m_isFpsParsed && !m_fpsError && !m_durationError){
 
         const QStringList paths {m_project->media->filePath()};
 
         emit loadMediaProjectRequested(paths);
         emit projectInitialized();
+        
+        m_annotationManager->setAnnotations(&m_project->annotations);
+
+    } else if(m_isDurationParsed && m_isFpsParsed){
+        // if fps or duration mismatched occured, prompt the user
+        QStringList errors;
+        if(m_durationError) errors << getErrorMessage(ProjectManager::Error::MismatchDuration);
+        if(m_fpsError) errors << getErrorMessage(ProjectManager::Error::MismatchFPS);
+        QMessageBox::critical(nullptr, PrefManager::instance().getText("messagebox_error"), errors.join('\n'));
+
+        // delete the link file, on next open a dialog to create a new link
+        QFile::remove(m_project->mediaLinkPath);
+
+        deleteProject();
     }
 }
+
 
 void ProjectManager::discardAndEject(){
     deleteProject();
@@ -463,14 +534,16 @@ void ProjectManager::exportProject(){
 
     if ( extension.isEmpty() ) return;
 
-    auto format = ProjectExportHelper::selectFormatWindow(m_project->media->type(), extension);
+    bool hasAnnotations = !m_annotationManager->annotations().isEmpty();
+    auto selection = ProjectExportHelper::selectFormatWindow(m_project->media->type(), extension, hasAnnotations);
 
-    if ( ! format.has_value() ) return;
-    
-    ExportType selectedFormat = format.value();
+    if ( ! selection.has_value() ) return;
 
-    // si on est dans un project existant (avec un dossier), on enregistre par défaut dans le dossier du projet
-    // sinon on recupère le path dans les preferences
+    ExportType selectedFormat = selection->type;
+    ExportSource source = selection->source;
+
+    // if the project as been created (a folder exists on disk), open the dialogDir inside the project folder
+    // else uses the lp_export from the preferences paths
     QString dialogDir = (m_project->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export"): m_project->path;
 
     QString selectedPath;
@@ -485,10 +558,11 @@ void ProjectManager::exportProject(){
         QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
         if(selectedFormat == ExportType::SRC)
             dialogFilter.replace(".src", '.'+mediaPathExtension());
+        QString sourceSuffix = (source == ExportSource::Annotations) ? "_annotations" : "";
         selectedPath = QFileDialog::getSaveFileName(
-            nullptr, 
-            prefManager.getText("export_file_path_title"), 
-            dialogDir+'/'+m_project->media->fileName() + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
+            nullptr,
+            prefManager.getText("export_file_path_title"),
+            dialogDir+'/'+m_project->media->fileName() + sourceSuffix + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
             dialogFilter
         );
     }
@@ -505,7 +579,13 @@ void ProjectManager::exportProject(){
     int64_t duration = m_project->media->duration();
     QString mediaPath = m_project->media->filePath();
 
-    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, p_timeline->getTimelineData(), fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
+    QVector<ExportItem> items = (source == ExportSource::Annotations)
+        ? ProjectExportHelper::fromAnnotations(m_annotationManager->annotations())
+        : ProjectExportHelper::fromShots(p_timeline->getTimelineData());
+    ExportLabels labels = ProjectExportHelper::makeExportLabels(source);
+
+    ProjectExportThread* exportThread = new ProjectExportThread(selectedFormat, items, labels, fps, duration, mediaPath, m_project->media->sar(), selectedPath.split(".")[0], this);
+    m_exportThread = exportThread;
 
     QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("export_running"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
     progressDialog->show();
@@ -513,12 +593,9 @@ void ProjectManager::exportProject(){
 
     connect(exportThread, &ProjectExportThread::progress, progressDialog, &QProgressDialog::setValue);
     
-    connect(progressDialog, &QProgressDialog::canceled, this, [exportThread](){ 
-        exportThread->requestInterruption();
-    });
+    connect(progressDialog, &QProgressDialog::canceled, exportThread, &QThread::requestInterruption);
 
-    connect(exportThread, &ProjectExportThread::exportFinished, this, [exportThread, progressDialog, selectedPath, this](bool success) {
-        disconnect(progressDialog, &QProgressDialog::canceled, nullptr, nullptr);
+    connect(exportThread, &ProjectExportThread::exportFinished, this, [progressDialog, selectedPath, this](bool success, bool canceled) {
         if (success) {
             qDebug() << "Export réussi";
             QMessageBox msg;
@@ -534,8 +611,8 @@ void ProjectManager::exportProject(){
                 QFileInfo fi(selectedPath);
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
             }
-        }else {
-            qDebug() << "Export annulé ou erreur";
+        }else if (!canceled) { // if user canceled doens't show error dialog
+            qDebug() << "Erreur lors de l'export";
             QMessageBox msg;
             msg.setStandardButtons(QMessageBox::StandardButton::Ok);
             msg.setInformativeText(PrefManager::instance().getText("project_exportation_error"));

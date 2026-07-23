@@ -5,6 +5,7 @@
 #include "VideoCaptureManager.h"
 #include "SignalManager.h"
 #include "ZoomHelper.h"
+#include "SnapshotPopup.h"
 
 #include <vlc/vlc.h>
 #include <QWidget>
@@ -13,6 +14,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QTimer>
+#include <QPointer>
 
 class MediaWidget : public QWidget
 {
@@ -30,8 +32,10 @@ public:
 
     Media* media(){ return m_media;};
     uint64_t getCurrentTime(){ return /*std::max(libvlc_media_player_get_time(m_player),*/ m_vlcTime/*)*/; }
+    int getCurrentAudioTrack(){ return m_currentAudioTrack; }
     /// @brief N'utilise pas libvlc, update seulement le temps interne m_vlcTime
     void setVlcTime(uint64_t newTime){ m_vlcTime = newTime; }
+    void setLoopValue(const int64_t val){ m_loopValue = val; }
 
     bool isPlaying() { 
         return (m_player) ? libvlc_media_player_is_playing(m_player) : false; 
@@ -46,7 +50,7 @@ public:
 public slots:
     bool play();
     bool pause();
-    bool stop();
+    bool stop(const int64_t newValueStop = 0);
     bool eject();
     void parseTracks();
     void setAudioTrack(int trackId);
@@ -58,7 +62,11 @@ public slots:
     void setVolume(const int &vol);
     void setSpeed(const unsigned int &speedIndex);
     void takeScreenshot();
-    void setTime(int64_t);
+    /// @param frameSeekBias offsets the libvlc seek by a quarter frame (without touching
+    /// m_vlcTime nor the display) so the player shows the requested frame and not the previous
+    /// one. Enable it when user setTime (timeline, annotations, toolbar, prevFrame), 
+    // leave false for loops, stop, +5s ect.
+    void setTime(int64_t time, bool frameSeekBias = false);
     void moveTimeBackward();
     void moveTimeForward();
     void enableLoopMode();
@@ -86,6 +94,7 @@ private:
     QSize m_mediaSize;
 
     bool m_loopActivated = true;
+    int64_t m_loopValue = 0;
     bool m_zoomActivated = false;
     bool m_vflipped = false;
     bool m_hflipped = false;
@@ -127,7 +136,19 @@ private:
     QTimer* m_transformDebounceTimer = nullptr;
     static constexpr int m_transformDebounceMs = 250;
 
+    // sets itself to nullptr when destroyed, so we don't have to worry about dangling pointers
+    // used because m_snapshotPopup deletes itself after its timer expires
+    QPointer<SnapshotPopup> m_snapshotPopup;
+
+    // snapshot time captured when takeScreenshot is called
+    // because libvlc_media_player_get_time() cannot be used in the snapshotTaken event,
+    // since VLC time-changed events may have arrived in the meantime, and we need the exact snapshot time
+    int64_t m_lastSnapshotTime = 0;
+
     static void onVlcEvent(const libvlc_event_t* event, void* userData);
+    static void onVlcSnapshot(const libvlc_event_t *event, void *userData);
+
+    void createSnapshotPopup(const QString &filePath, int64_t vlcTime);
 
     /// @brief Recreates a vlc instance to apply transformation on media
     void transformMedia();

@@ -9,12 +9,12 @@ DecodeThread::DecodeThread(
     QString mediaPath, 
     double sar,
     TSQueue<ImgData>* imageQueue,
-    const QVector<Shot> &shots, 
+    const QVector<int64_t>& imageTimes,
     QObject *parent, 
     std::optional<int> colorCode, 
     std::optional<cv::Size> targetSize
 ) 
-: QThread(parent), m_mediaPath{mediaPath}, m_sar{sar}, p_imageQueue{imageQueue}, m_shots{shots}, m_colorCode{colorCode}, m_targetSize{targetSize}
+: QThread(parent), m_mediaPath{mediaPath}, m_sar{sar}, p_imageQueue{imageQueue}, m_imageTimes{imageTimes}, m_colorCode{colorCode}, m_targetSize{targetSize}
 {
 }
 
@@ -63,11 +63,13 @@ void DecodeThread::decodeTagImages(){
     cv::Mat processedFrame;
     cv::Mat tempResized;
 
-    for(auto& shot : m_shots){
-        SLV::seekToMs(cap, static_cast<double>(shot.tagImageTime), fps);
+    for(auto& imgTime : m_imageTimes){
+        if (isInterruptionRequested()) break;
+
+        SLV::seekToMs(cap, static_cast<double>(imgTime), fps);
 
         if (!cap.read(frame) || frame.empty()) {
-            qWarning() << "Impossible de lire la frame au timestamp :" << shot.tagImageTime;
+            qWarning() << "Impossible de lire la frame au timestamp :" << imgTime;
             continue; 
         }
 
@@ -93,7 +95,8 @@ void DecodeThread::decodeTagImages(){
             convertImage(processedFrame);
         }
 
-        p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false});
+        if (!p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false})) 
+            return; // detect queue stopped by consumer
     }
 
     p_imageQueue->waitPush({{}, -1, true});
@@ -115,6 +118,8 @@ void DecodeThread::decodeMedia(){
 
     while( cap.read(frame) ){
 
+        if (isInterruptionRequested()) break;
+
         if (frame.empty()) {
             qWarning() << "Impossible de lire la frame ";
             continue; 
@@ -131,9 +136,10 @@ void DecodeThread::decodeMedia(){
             convertImage(processedFrame);
         }
 
-        p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false});
+        if (!p_imageQueue->waitPush({processedFrame.clone(), static_cast<int64_t>(cap.get(cv::CAP_PROP_POS_MSEC)), false})) 
+            return; // detect queue stopped by consumer
     }
-    
+
     p_imageQueue->waitPush({{}, -1, true});
     return;
 
@@ -145,7 +151,7 @@ void DecodeThread::run()
         return;
     } 
 
-    if(m_shots.isEmpty()){
+    if(m_imageTimes.isEmpty()){
         decodeMedia();
     }else {
         decodeTagImages();

@@ -1,4 +1,6 @@
 #include "BasePreferenceFrame.h"
+#include "PrefManager.h"
+
 #include <QStyleHints>
 #include <QGuiApplication>
 
@@ -35,11 +37,49 @@ BasePreferenceFrame::BasePreferenceFrame(const QString &name, const QString &sub
     m_layoutHB->addWidget(nameLabel);
     m_layoutHB->setAlignment(nameLabel, Qt::AlignLeft);
 
+    m_rightContainer = new QWidget(this);
+    m_rightLayout = new QHBoxLayout(m_rightContainer);
+    m_rightLayout->setContentsMargins(0, 0, 0, 0);
+    m_rightLayout->setSpacing(5);
+
+    m_layoutHB->addWidget(m_rightContainer);
+    m_layoutHB->setAlignment(m_rightContainer, Qt::AlignRight);
 }
 
-void BasePreferenceFrame::setRightWidget(QWidget* rightWidget) {
-    m_layoutHB->addWidget(rightWidget);
-    m_layoutHB->setAlignment(rightWidget, Qt::AlignRight);
+void BasePreferenceFrame::addResetButton(const QString& defaultValue){
+    m_defaultValue = defaultValue;
+    if (m_resetBtn) return;
+
+    m_resetBtn = new ToolbarButton(this, "reset_setting_white", PrefManager::instance().getText("restore_defaults"));
+    m_resetBtn->setCursor(Qt::PointingHandCursor);
+
+    
+    const bool dark = (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
+    const QString borderColor = dark ? "palette(midlight)" : "palette(mid)";
+    const QString bgColor     = dark ? "palette(button)"   : "palette(window)";
+
+    m_resetBtn->setStyleSheet(
+        "ToolbarButton {"
+        "   border: 1px solid " + borderColor + ";"
+        "   border-radius: 4px;"
+        "   background-color: " + bgColor + ";"
+        "}"
+        "ToolbarButton:hover {"
+        "   border: 1px solid " + borderColor + ";"
+        "   background-color: palette(midlight);"
+        "}");
+
+    m_rightLayout->addWidget(m_resetBtn);
+
+    connect(m_resetBtn, &QPushButton::clicked, this, [this]() {
+        if (m_prevValue == m_defaultValue) return;
+        setUIValue(m_defaultValue);
+        emit updateJsonObjRequested(m_subCategory, m_key, m_defaultValue);
+    });
+}
+
+void BasePreferenceFrame::addRightWidget(QWidget* rightWidget) {
+    m_rightLayout->addWidget(rightWidget);
 }
 
 

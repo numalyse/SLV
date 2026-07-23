@@ -8,6 +8,7 @@
 #include "Timeline/TimelineWidget.h"
 #include "PlayerWidget.h"
 #include "Timeline/ThumbnailWorker.h"
+#include "SnapshotPopup.h"
 
 #include <QWidget>
 
@@ -23,6 +24,7 @@ public:
     
     void showAllToolbars(bool visible);
     bool isMouseOverAnyToolbar() const;
+    bool isNavPanelOpen() { return m_navPanel->isOpen(); }
 
 private:
     PlayerLayoutManager* m_layoutManager = nullptr;
@@ -35,6 +37,8 @@ private:
     QFrame* m_separationLine = nullptr;
     bool m_wasTimelineVisible = false;
     ThumbnailWorker* m_thumbnailWorker = nullptr;
+
+    QPointer<SnapshotPopup> m_snapshotPopup = nullptr;
 
     void updateSplittersStyle(bool fullscreen);
 
@@ -58,7 +62,8 @@ public slots:
     void setGlobalMuteState(bool);
     void setGlobalZoomState(bool);
 
-    void toggleNavPanel();
+    void toggleNavPanel(PanelType type);
+    void displayNavPanel(PanelType type);
 
 private slots:
     void createTimelineWidget();

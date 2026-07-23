@@ -23,6 +23,8 @@ std::vector<const char*> getArgsFromTransform(const unsigned int rotation, const
         "--no-video-title-show",
         "--no-input-fast-seek",
         "--aout=directsound",
+        "--no-osd",
+        "--no-snapshot-preview",
         pluginArg.c_str(),
         "--verbose=2",
         "--video-filter=transform"
@@ -31,6 +33,8 @@ std::vector<const char*> getArgsFromTransform(const unsigned int rotation, const
         "--no-video-title-show",
         "--no-input-fast-seek",
         "--aout=directsound",
+        "--no-osd",
+        "--no-snapshot-preview",
         pluginArg.c_str(),
         "--verbose=2"
     };
@@ -39,12 +43,16 @@ std::vector<const char*> getArgsFromTransform(const unsigned int rotation, const
         "--aout=directsound",
         "--no-video-title-show",
         "--no-input-fast-seek",
+        "--no-osd",
+        "--no-snapshot-preview",
         "--video-filter=transform"
     };
     const std::vector<const char*> noTransformArgs = {"--quiet",
         "--aout=directsound",
         "--no-video-title-show",
-        "--no-input-fast-seek"
+        "--no-input-fast-seek",
+        "--no-osd",
+        "--no-snapshot-preview"
     };
 #endif
 

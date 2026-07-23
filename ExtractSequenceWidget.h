@@ -14,12 +14,13 @@
 #include <QDialog>
 #include <QFileDialog>
 #include <QTimer>
+#include <QComboBox>
 
 class ExtractSequenceWidget : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int startTime = 0, int endTime = -1);
+    explicit ExtractSequenceWidget(const Media& media, QWidget *parent = nullptr, int startTime = 0, int endTime = -1, int audioTrack = 0);
 
     void createButtons();
     void initUiLayout();
@@ -29,7 +30,7 @@ public:
 public slots:
     void onStartTimeChanged(const int newTime);
     void onEndTimeChanged(const int newTime);
-    void onThumbnailReady(int requestId, const QImage& image);
+    void onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
     void confirmExtraction(SequenceExtractionHelper::ExtractionType type);
 
 private:
@@ -37,6 +38,7 @@ private:
     int m_startTime;
     int m_endTime;
     bool m_isExec;
+    int m_audioTrack;
     TimeEditor* m_startTimeEditor;
     TimeEditor* m_endTimeEditor;
     AspectRatioPixmapLabel* m_startFrameDisplay;
@@ -48,8 +50,9 @@ private:
     QTimer* m_thumbnailEndTimer;
     int m_thumbnailPendingTime;
     QPushButton* m_okButton;
-    QPushButton* m_audioOnlyButton;
+    QComboBox* m_methodChoice;
     QPushButton* m_cancelButton;
+    QLabel* m_warningMsg;
 
 signals:
 

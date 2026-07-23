@@ -39,6 +39,7 @@ public:
     std::optional<int64_t> getStartTimeOf(int idShot);
 
     const QVector<ShotItem*>& shotItems() const {return m_shotItems;};
+    size_t shotCount() const {return m_shotItems.size();};
 
     const QVector<Shot> shotItemsData() const;
     void extracted(int &shotHeight, const Shot &IShot, double &width);
@@ -67,6 +68,7 @@ signals:
     void showMergeWithNextShotAction(bool);
     void shotsExtractionFinished(const QString& outputPath);
     void shotsExtractionFailed();
+    void shotCountUpdated(int newShotCount);
 
 private:
     void mergeCurrentInto(int ShotItemId);
@@ -90,8 +92,8 @@ private:
     VideoCaptureManager m_videoCaptureManager;
 
 private slots:
-    void updateThumbnail(int requestId, QImage image);
-
+    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
+    void colorReady(ThumbnailWorker::Requester requester, int requestId, const QColor& color);
 };
 
 

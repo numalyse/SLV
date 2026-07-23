@@ -22,7 +22,7 @@ class PlayerWidget : public QWidget
 
 public:
     explicit PlayerWidget(QWidget *parent = nullptr);
-    // ~PlayerWidget();
+    ~PlayerWidget();
 
     void setActive(bool active);
     bool setMediaFromPath(const QString& filePath);
@@ -52,7 +52,7 @@ public slots:
     void playFromAdvanced();
     void pause();
     void togglePlayPause(bool isPlaying);
-    void stop();
+    void stop(const int64_t stopValue = 0);
     void eject();
     void enablePlayerFullscreen();
     void disablePlayerFullscreen();
@@ -128,6 +128,7 @@ signals:
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     void restoreOverlayStackOrder();

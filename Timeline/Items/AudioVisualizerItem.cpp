@@ -3,8 +3,8 @@
 #include <QGraphicsWidget>
 #include <QGraphicsView>
 
-AudioVisualizerItem::AudioVisualizerItem(const QVector<double>& amplitudes, double width, double height, double topMargin, QGraphicsItem* parent)
-    : QGraphicsItem(parent), m_amplitudes{amplitudes}, m_width{width}, m_height{height}, m_topMargin{topMargin}
+AudioVisualizerItem::AudioVisualizerItem(const QVector<double>& amplitudes, double width, QGraphicsItem* parent)
+    : QGraphicsItem(parent), m_amplitudes{amplitudes}, m_width{width}
 {
     setZValue(1);
     if (!m_amplitudes.isEmpty())
@@ -32,7 +32,7 @@ AudioVisualizerItem::AudioVisualizerItem(const QVector<double>& amplitudes, doub
 
 QRectF AudioVisualizerItem::boundingRect() const
 {
-    return QRectF(0, m_topMargin, m_width, m_height);
+    return QRectF(0, s_topMargin, m_width, s_height);
 }
 
 void AudioVisualizerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -63,7 +63,7 @@ void AudioVisualizerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *opt
             if(x + m_columnWidth < visibleItemRect.left() || x > visibleItemRect.right())
                 continue;
             double normAmp = (m_amplitudes[IAmp] - m_minAmplitude) * m_sizeCoeff;
-            p->drawRect(IAmp * m_columnWidth, m_topMargin + m_height, m_columnWidth, -normAmp);
+            p->drawRect(IAmp * m_columnWidth, s_topMargin + s_height, m_columnWidth, -normAmp);
         }
     } else {
         // Downsampling : on regroupe les amplitudes par bloc
@@ -81,7 +81,7 @@ void AudioVisualizerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *opt
                 if (m_amplitudes[j] > maxAmp) maxAmp = m_amplitudes[j];
             }
             double normAmp = (maxAmp - m_minAmplitude) * m_sizeCoeff;
-            p->drawRect(x, m_topMargin + m_height, w, -normAmp);
+            p->drawRect(x, s_topMargin + s_height, w, -normAmp);
         }
     }
 

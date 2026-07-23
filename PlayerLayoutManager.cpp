@@ -391,7 +391,12 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
 
         connect(globalToolbar, &GlobalToolbar::playRequest, IActivePlayer, &PlayerWidget::play);
         connect(globalToolbar, &GlobalToolbar::pauseRequest, IActivePlayer, &PlayerWidget::pause);
-        connect(globalToolbar, &GlobalToolbar::stopRequest, IActivePlayer, &PlayerWidget::stop);
+        connect(globalToolbar, &GlobalToolbar::stopRequest, IActivePlayer, [IActivePlayer](){
+            if(IActivePlayer->toolbar()->customStopCheckbox()->isChecked())
+                IActivePlayer->stop(TimeFormatter::HHMMSSFFToMs(IActivePlayer->toolbar()->customStopTimeEdit()->text(), IActivePlayer->mediaFps(), 0.05));
+            else
+                IActivePlayer->stop();
+        });
         connect(globalToolbar, &GlobalToolbar::ejectRequest, IActivePlayer, &PlayerWidget::eject);
         connect(globalToolbar, &GlobalToolbar::enableMute, IActivePlayer, &PlayerWidget::mute);
         connect(globalToolbar, &GlobalToolbar::disableMute, IActivePlayer, &PlayerWidget::unmute);
@@ -432,7 +437,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     connect(advancedToolbar, &AdvancedToolbar::playRequest, activePlayer, &PlayerWidget::playFromAdvanced);
     connect(advancedToolbar, &AdvancedToolbar::pauseRequest, activePlayer, &PlayerWidget::pause);
-    connect(advancedToolbar, &AdvancedToolbar::stopRequest, activePlayer, &PlayerWidget::stop);
+    // connect(advancedToolbar, &AdvancedToolbar::stopRequest, activePlayer, &PlayerWidget::stop);
     connect(advancedToolbar, &AdvancedToolbar::ejectRequest, activePlayer, &PlayerWidget::eject);
     connect(advancedToolbar, &AdvancedToolbar::enableMuteRequest, activePlayer, &PlayerWidget::mute);
     connect(advancedToolbar, &AdvancedToolbar::disableMuteRequest, activePlayer, &PlayerWidget::unmute);
@@ -476,6 +481,22 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::subtitlesFileDialogRequested, activePlayer, &PlayerWidget::openSubtitlesFileDialog);
+    connect(advancedToolbar, &AdvancedToolbar::customStopRequest, activePlayer->mediaWidget(), [this, activePlayer, advancedToolbar](const QString& stopValue){
+        if(advancedToolbar->customStopCheckbox()->isChecked())
+            activePlayer->mediaWidget()->stop(TimeFormatter::HHMMSSFFToMs(stopValue, activePlayer->mediaFps(), 0.05));
+        else
+            activePlayer->mediaWidget()->stop();
+    });
+    connect(advancedToolbar->customStopTimeEdit(), &QLineEdit::textChanged, this, [advancedToolbar, activePlayer](const QString& text){
+        if(advancedToolbar->customStopCheckbox()->isChecked())
+            activePlayer->mediaWidget()->setLoopValue(TimeFormatter::HHMMSSFFToMs(text, activePlayer->mediaFps(), 0.05));
+    });
+    connect(advancedToolbar->customStopCheckbox(), &QCheckBox::checkStateChanged, this, [advancedToolbar, activePlayer](Qt::CheckState state){
+        if(state == Qt::Checked)
+            activePlayer->mediaWidget()->setLoopValue(TimeFormatter::HHMMSSFFToMs(advancedToolbar->customStopTimeEdit()->text(), activePlayer->mediaFps(), 0.05));
+        else
+            activePlayer->mediaWidget()->setLoopValue(-1);
+    });
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::adjustmentChangeRequested, activePlayer->mediaWidget(), &MediaWidget::adjustMedia);
     connect(advancedToolbar->getExtendedToolbar(), &ExtensionToolbar::resetAdjustmentsRequested, activePlayer->mediaWidget(), &MediaWidget::resetAdjustments);
     connect(activePlayer, &PlayerWidget::mediaPlayerLoaded, advancedToolbar, &AdvancedToolbar::enableButtons);
@@ -494,6 +515,9 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
 
     connect(activePlayer->mediaWidget(), &MediaWidget::subtitleTrackAdded, advancedToolbar, &SimpleToolbar::subtitleTrackAdd);
 
+    connect(activePlayerToolbar->customStopTimeEdit(), &QLineEdit::textChanged, advancedToolbar->customStopTimeEdit(), &QLineEdit::setText);
+    connect(activePlayerToolbar->customStopCheckbox(), &QCheckBox::checkStateChanged, advancedToolbar->customStopCheckbox(), &QCheckBox::setCheckState);
+
     // Connecte choix audio/sous-titres au mediawidget
     connect(advancedToolbar, &SimpleToolbar::setAudioTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setAudioTrack);
     connect(advancedToolbar, &SimpleToolbar::setSubtitlesTrackRequested, activePlayer->mediaWidget(), &MediaWidget::setSubtitleTrack);
@@ -501,8 +525,12 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     // garde la piste de sous-titres de la toolbar simple du player synchronisée avec l'advanced
     connect(advancedToolbar, &SimpleToolbar::setSubtitlesTrackRequested, activePlayerToolbar, &SimpleToolbar::setSubtitlesTrackDefault);
 
-    // garde le mode "temps restant" (durationBtn) de la toolbar simple synchronisé avec l'advanced
+    // garde le mode "temps restant" (durationBtn) de la toolbar simple synchronisée avec l'advanced
     connect(advancedToolbar->durationBtn(), &QPushButton::toggled, activePlayerToolbar->durationBtn(), &QPushButton::setChecked);
+
+    // garde la valeur de stop de la toolbar simple synchronisée avec l'advanced
+    connect(advancedToolbar->customStopTimeEdit(), &QLineEdit::textChanged, activePlayerToolbar->customStopTimeEdit(), &QLineEdit::setText);
+    connect(advancedToolbar->customStopCheckbox(), &QCheckBox::checkStateChanged, activePlayerToolbar->customStopCheckbox(), &QCheckBox::setCheckState);
 
     // Synchro piste actuelle à l'advanced toolbar si le média est déjà chargé
     if (activePlayer->mediaWidget()->media()) {
@@ -586,6 +614,8 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
         int oldAudioTrackIndex = toBeDuplicated->toolbar()->currentAudioTrackIndex();
         int oldSubtitlesTrackId = toBeDuplicated->toolbar()->currentSubtitlesTrackId();
         bool oldShowRemainingTime = toBeDuplicated->toolbar()->durationBtn()->isChecked();
+        QString oldStopTimeEdit = toBeDuplicated->toolbar()->customStopTimeEdit()->text();
+        bool oldStopEnabled = toBeDuplicated->toolbar()->customStopCheckbox()->isChecked();
 
         connect(player->mediaWidget(), &MediaWidget::mediaPlayerLoaded, player, [=]() {// quand le media player est chargé pret a être utilisé :
 
@@ -597,6 +627,8 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
             player->toolbar()->setAudioTrackDefault(oldAudioTrackIndex);
             player->toolbar()->setSubtitlesTrackDefault(oldSubtitlesTrackId);
             player->toolbar()->durationBtn()->setChecked(oldShowRemainingTime);
+            player->toolbar()->customStopTimeEdit()->setText(oldStopTimeEdit);
+            player->toolbar()->customStopCheckbox()->setChecked(oldStopEnabled);
 
             // on lance la lecture et le seek
             player->play();
@@ -831,9 +863,7 @@ void PlayerLayoutManager::takeGlobalScreenshot()
     GlobalScreenshotHelper* globalScreenshot = new GlobalScreenshotHelper(getActivePlayersData(), m_currentArrangement);
 
     QObject::connect(globalScreenshot, &QThread::finished, globalScreenshot, &QObject::deleteLater);
-    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, [this](){
-        QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_global_screenshot_completed"));
-    });
+    QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedSuccess, this, &PlayerLayoutManager::globalScreenshotSaved);
     QObject::connect(globalScreenshot, &GlobalScreenshotHelper::finishedError, this, [this](){
         QMessageBox::critical(this, "", PrefManager::instance().getText("messagebox_global_screenshot_error"));
     });

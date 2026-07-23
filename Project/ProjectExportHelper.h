@@ -4,6 +4,7 @@
 #include "Timeline/TimelineWidget.h"
 #include "Project/Project.h"
 #include "Shot.h"
+#include "Annotation.h"
 
 #include <QString>
 #include <optional>
@@ -20,6 +21,41 @@ enum class ExportType {
     SRC,
     TagImage,
 };
+
+enum class ExportSource {
+    Shots,
+    Annotations,
+};
+
+/// @brief User choices in the export selection window
+struct ExportSelection {
+    ExportType type;
+    ExportSource source;
+};
+
+/// @brief Element that can contain an annotation or a shot
+struct ExportItem {
+    QString title;
+    int64_t start;
+    int64_t end;
+    int64_t imageTime; // tag image for shot or start of an annotation
+    QString imgTxt; // will store imgTxt of a shot or the note of an annotation
+    QString soundTxt; // will store soundTxt of a shot or an empty string for an annotation 
+};
+
+/// @brief When starting to export, fills this struct, based on the export source.
+/// ex : imgTxt when source is shots = label imgTxt,  when source is annotations =  label for note
+struct ExportLabels {
+    QString item; 
+    QString count;       
+    QString title;      
+    QString startTime;
+    QString endTime;
+    QString duration;
+    QString imgTxt;      
+    QString soundTxt;  
+};
+
 
 
 namespace SLV {
@@ -60,14 +96,21 @@ namespace SLV {
 
 namespace ProjectExportHelper {
 
-    bool exportToTxt( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
-    bool exportToTagImage( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
-    bool exportToPDF( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
-    bool exportToCSV( const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, const std::function<bool(int)>& progressCallback = nullptr);
-    bool exportPython(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, const std::function<bool(int)>& progressCallback);
-    bool exportVideo(ExportType type ,const QVector<Shot> &shots, double fps, int64_t duration, const QString &mediaPath, double sar,const QString &dstPath, const std::function<bool(int)>& progressCallback);
+    /// @brief fills the struct ExportLabels based on the source
+    ExportLabels makeExportLabels(ExportSource source);
 
-    std::optional<ExportType> selectFormatWindow(const MediaType mediaType, const QString& extension);
+    QVector<ExportItem> fromShots(const QVector<Shot>& shots);
+    QVector<ExportItem> fromAnnotations(const QVector<Annotation>& annotations);
+
+    bool exportToTxt( const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
+    bool exportToTagImage( const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
+    bool exportToPDF( const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
+    bool exportToCSV( const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, const QString &dstPath, std::function<bool(int)> progressCallback = nullptr);
+    bool exportPython(ExportType type ,const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar, const QString &dstPath, std::function<bool(int)> progressCallback);
+    bool exportVideo(ExportType type ,const QVector<ExportItem> &items, const ExportLabels &labels, double fps, int64_t duration, const QString &mediaPath, double sar,const QString &dstPath, std::function<bool(int)> progressCallback);
+
+    /// @brief Opens a dialog to select format of export and the source to export shots or annotations, if no annotations in this project, cannot select annotations (disabled)
+    std::optional<ExportSelection> selectFormatWindow(const MediaType mediaType, const QString& extension, bool hasAnnotations);
 }
 
 

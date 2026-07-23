@@ -9,7 +9,7 @@ class TimeEdit : public QLineEdit
 Q_OBJECT
 
 public:
-    explicit TimeEdit( const QString& txt , QWidget* parent = nullptr);
+    explicit TimeEdit( const QString& txt, QWidget* parent = nullptr, const bool hasAnimations = true);
 
 private:
     static constexpr int s_widthMin = 90;
@@ -18,6 +18,7 @@ private:
     QAction* m_action = nullptr;
     QAction* m_copy = nullptr;
     QAction* m_paste = nullptr;
+    const bool m_hasAnimations;
 
 protected:
     void focusInEvent(QFocusEvent *e) override;

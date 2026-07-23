@@ -11,14 +11,13 @@
 #include "Timeline/SegmentationThread.h"
 #include "Timeline/TransitionManager.h"
 #include "Timeline/ThumbnailWorker.h"
+#include "Timeline/AnnotationItemManager.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
 #include "Timeline/Items/CursorItem.h"
 #include "Timeline/Items/ShotItem.h"
 #include "Timeline/Items/AudioVisualizerItem.h"
-
-#include "PlayerWidget.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
 
@@ -30,6 +29,8 @@
 #include <QPoint>
 #include <QTimer>
 #include <QProcess>
+#include <QPointer>
+#include <QLabel>
 
 class TimelineWidget : public QWidget
 {
@@ -37,10 +38,11 @@ Q_OBJECT
 
 public:
 
-explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
+    explicit TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, QVector<Shot> &projectShots, QWidget *parent, const int timelineWidth = 0);
     ~TimelineWidget();
     QVector<Shot> getTimelineData();
     void setTimelineData(QVector<Shot> shots);
+    AnnotationItemManager* annotItemManager() { return m_annotItemManager; };
 
 public slots:
     void updateCursorPos(int64_t vlcTime);
@@ -52,6 +54,8 @@ public slots:
     void initAudioVisualizer();
     void initShotDetail();
     bool event(QEvent *event) override;
+    void updateShotCount(int shotCount);
+    void setPlayerPlaying(bool playing) { m_isPlayerPlaying = playing; };
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
 
@@ -72,6 +76,8 @@ signals:
     void enableTimeRelatedUI();
     void disableTimeRelatedUI();
     void saveNeeded();
+    void playerPauseRequested();
+    void playerPlayRequested();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -80,14 +86,11 @@ private slots:
     void splitShotAtCursor();
     void ABAction();
     void moveCursor(double cursorPosX);
-    void itemLeftClick(QGraphicsItem*);
-    void itemShiftLeftClick(QGraphicsItem*);
     void itemRightClick(QPoint, QGraphicsItem*);
     void updateShowMergeWithNextShot(bool);
     void updateShowMergeWithPreviousShot(bool);
     void updateTimelineGeometry();
     void autoSegmentation();
-    void dragABMarker(QGraphicsItem*, const int);
     void exportDone(const QString& text, const QString& outputPath);
     void fitSceneToViewport();
 
@@ -108,7 +111,9 @@ private:
     TimelineMath* m_mathManager = nullptr;
     ShotManager* m_shotManager = nullptr;
     ABManager* m_abManager = nullptr;
+    AnnotationItemManager* m_annotItemManager = nullptr;
 
+    QPointer<SegmentationThread> m_segmThread;
     ToolbarButton* m_autoSegmentationBtn = nullptr;
     ToolbarButton* m_splitShotBtn = nullptr;
     ToolbarButton* m_abLoopBtn = nullptr;
@@ -120,6 +125,11 @@ private:
     ToolbarButton* m_shotInfo = nullptr;
     ToolbarButton* m_toPrevShotBtn = nullptr;
     ToolbarButton* m_toNextShotBtn = nullptr;
+
+    ToolbarButton* m_openAnnot = nullptr;
+    ToolbarButton* m_addAnnotBtn = nullptr;
+
+    QLabel* m_shotCountLabel = nullptr;
 
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
@@ -139,7 +149,8 @@ private:
     QByteArray m_audioBuffer;
     QVector<double> m_amplitudeList;
 
-    PlayerWidget* p_playerWidget = nullptr;
+    // update via player signals 
+    bool m_isPlayerPlaying = false;
 
 };
 

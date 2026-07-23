@@ -13,9 +13,11 @@
 
 #include "GenericDialog.h"
 #include "ExtractSequenceWidget.h"
+#include "AnnotationDialog.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFont>
 #include <QGraphicsView>
 #include <QResizeEvent>
 #include <QWheelEvent>
@@ -31,17 +33,14 @@
 #include "TimelineWidget.h"
 
 
-
-
-
 /// @brief Créer une timeline avec les plan du projet
 /// @param projectShots
 /// @param parent
-TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, PlayerWidget* player, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
+TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectMedia, QVector<Shot>& projectShots, QWidget *parent, const int timelineWidth) : QWidget(parent)
 {
     p_media = projectMedia;
-    p_playerWidget = player;
-    m_wasPlayingBeforeDrag = player->playing();
+
+    PrefManager& pref = PrefManager::instance();
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -56,6 +55,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     m_scene = new QGraphicsScene(this);
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_sceneHeight);
+    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex); 
 
     m_mathManager = new TimelineMath(p_media->fps(), p_media->duration(), this);
     m_mathManager->fitToWidth(m_scene->width());
@@ -84,59 +84,92 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     QHBoxLayout* ButtonLayout = new QHBoxLayout();
     ButtonLayout->setContentsMargins(5, 0, 0, 0);
 
-    m_abLoopBtn = new ToolbarButton(this, "abloop_white", PrefManager::instance().getText("tooltip_ab_loop"));
+    auto makeSeparator = [this]() {
+        QFrame* sep = new QFrame(this);
+        sep->setFrameShape(QFrame::VLine);
+        sep->setFrameShadow(QFrame::Sunken);
+        return sep;
+    };
+
+    m_abLoopBtn = new ToolbarButton(this, "abloop_white", pref.getText("tooltip_ab_loop"));
     connect(m_abLoopBtn, &ToolbarButton::pressed, this, &TimelineWidget::ABAction);
     ButtonLayout->addWidget(m_abLoopBtn);
 
-    QFrame *btnSeparator = new QFrame();
-    btnSeparator->setFrameShape(QFrame::VLine);
-    btnSeparator->setFrameShadow(QFrame::Sunken);
-    ButtonLayout->addWidget(btnSeparator);
+    ButtonLayout->addWidget(makeSeparator());
 
-    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", PrefManager::instance().getText("tooltip_segmentation_auto"));
+    m_autoSegmentationBtn = new ToolbarButton(this, "auto_segmentation_white", pref.getText("tooltip_segmentation_auto"));
     connect(m_autoSegmentationBtn, &ToolbarButton::pressed, this, &TimelineWidget::autoSegmentation);
     ButtonLayout->addWidget(m_autoSegmentationBtn);
 
-    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", PrefManager::instance().getText("tooltip_split_shot"));
+    m_splitShotBtn = new ToolbarButton(this, "split_shot_white", pref.getText("tooltip_split_shot"));
     connect(m_splitShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::splitShotAtCursor);
     ButtonLayout->addWidget(m_splitShotBtn);
 
-    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", PrefManager::instance().getText("tooltip_merge_with_prev_shot"));
+    m_mergeWithPrevShotBtn = new ToolbarButton(this, "merge_left_white", pref.getText("tooltip_merge_with_prev_shot"));
     connect(m_mergeWithPrevShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithPrevShotAction);
     ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
     m_mergeWithPrevShotBtn->setEnabled(false);
 
-    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", PrefManager::instance().getText("tooltip_to_prev_shot"));
+    m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", pref.getText("tooltip_to_prev_shot"));
     connect(m_toPrevShotBtn, &ToolbarButton::pressed, this, [this](){
         goToShot(m_shotManager->getCurrentShotId()-1);
     });
     ButtonLayout->addWidget(m_toPrevShotBtn);
     m_toPrevShotBtn->setEnabled(false);
 
-    m_shotInfo = new ToolbarButton(this, "shot_detail_white", PrefManager::instance().getText("tooltip_shot_detail_button"));
+    m_shotInfo = new ToolbarButton(this, "shot_detail_white", pref.getText("tooltip_shot_detail_button"));
     connect(m_shotInfo, &ToolbarButton::pressed, this, [](){
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
-        emit SignalManager::instance().toggleNavPanel();
+        emit SignalManager::instance().toggleNavPanel(PanelType::ShotDetail);
     });
     ButtonLayout->addWidget(m_shotInfo);
 
-    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", PrefManager::instance().getText("tooltip_to_next_shot"));
+    m_toNextShotBtn = new ToolbarButton(this, "to_next_shot_white", pref.getText("tooltip_to_next_shot"));
     connect(m_toNextShotBtn, &ToolbarButton::pressed, this, [this](){
         goToShot(m_shotManager->getCurrentShotId()+1);
     });
     ButtonLayout->addWidget(m_toNextShotBtn);
     m_toNextShotBtn->setEnabled(false);
 
-    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", PrefManager::instance().getText("tooltip_merge_with_next_shot"));
+    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", pref.getText("tooltip_merge_with_next_shot"));
     connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
     ButtonLayout->addWidget(m_mergeWithNextShotBtn);
     m_mergeWithNextShotBtn->setEnabled(false);
 
-    m_exportBtn = new ToolbarButton(this, "export_white", PrefManager::instance().getText("tooltip_export"));
+    ButtonLayout->addWidget(makeSeparator());
+
+    m_openAnnot = new ToolbarButton(this, "open_annot_white", pref.getText("tooltip_annotation_button"));
+    connect(m_openAnnot, &ToolbarButton::pressed, this, [](){
+        emit SignalManager::instance().toggleNavPanel(PanelType::Annotation);
+    });
+    ButtonLayout->addWidget(m_openAnnot);
+
+    m_addAnnotBtn = new ToolbarButton(this, "plus_white", pref.getText("tooltip_add_annotation"));
+    connect(m_addAnnotBtn, &ToolbarButton::pressed, this, [this](){
+        AnnotationDialog dialog(m_vlcTime, this);
+        if(dialog.exec() == QDialog::Accepted){
+            Annotation annotation = dialog.annotation();
+            ProjectManager::instance().annotationManager()->addAnnotation(annotation);
+        }
+    });
+    ButtonLayout->addWidget(m_addAnnotBtn);
+
+    ButtonLayout->addWidget(makeSeparator());
+
+    m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
     ButtonLayout->addStretch(1);
+
+    m_shotCountLabel = new QLabel(this);
+    m_shotCountLabel->setContentsMargins(0, 0, 10, 0);
+    QFont shotCountFont = m_shotCountLabel->font();
+    shotCountFont.setItalic(true);
+    m_shotCountLabel->setFont(shotCountFont);
+    updateShotCount(static_cast<int>(projectShots.size()));
+
+    ButtonLayout->addWidget(m_shotCountLabel);
+
     layout->addLayout(ButtonLayout);
 
     m_view = new TimelineView(m_scene, this);
@@ -145,40 +178,43 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_view->setFrameShape(QFrame::NoFrame);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit pas completement effacé quand on scroll
+    m_view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // évite que le curseur ne soit completement effacé quand on scroll
 
     connect(m_view, &TimelineView::zoomRequested, this, &TimelineWidget::applyZoom);
     connect(m_view, &TimelineView::cursorPositionRequested, this, &TimelineWidget::moveCursor);
-    connect(m_view, &TimelineView::itemShiftLeftClick, this, &TimelineWidget::itemShiftLeftClick);
-    connect(m_view, &TimelineView::itemLeftClick, this, &TimelineWidget::itemLeftClick);
     connect(m_view, &TimelineView::itemRightClick, this, &TimelineWidget::itemRightClick);
     connect(m_view, &TimelineView::isDragging, this, [this](bool dragState){
         if(dragState) {
-            m_wasPlayingBeforeDrag = p_playerWidget->playing();
-            p_playerWidget->pause();
+            m_wasPlayingBeforeDrag = m_isPlayerPlaying;
+            emit playerPauseRequested();
         }
         else {
-            if (m_wasPlayingBeforeDrag) p_playerWidget->play();
+            if (m_wasPlayingBeforeDrag) emit playerPlayRequested();
         }
 
         m_isDraggingCursor = dragState;
     });
-    connect(m_view, &TimelineView::abMarkerDragged, this, &TimelineWidget::dragABMarker);
+    connect(m_view, &TimelineView::abMarkerDragged, m_abManager, &ABManager::dragMarker);
 
     layout->addWidget(m_view);
 
     m_shotManager = new ShotManager(m_scene, m_view, m_mathManager, thumbnailWorker, projectMedia, projectShots, this);
     computeMediaAmplitudes(projectMedia->filePath());
 
+    connect(m_view, &TimelineView::shotSelectionRequested, m_shotManager, &ShotManager::toggleSelection);
     connect(m_shotManager, &ShotManager::updateShotDetailRequested, this, &TimelineWidget::updateShotDetailRequest );
     connect(m_shotManager, &ShotManager::showMergeWithPreviousShotAction, this, &TimelineWidget::updateShowMergeWithPreviousShot );
     connect(m_shotManager, &ShotManager::showMergeWithNextShotAction, this, &TimelineWidget::updateShowMergeWithNextShot  );
+    connect(m_shotManager, &ShotManager::shotCountUpdated, this, &TimelineWidget::updateShotCount);
     connect(m_shotManager, &ShotManager::shotsExtractionFinished, this, [this](const QString& outputPath){
         exportDone(PrefManager::instance().getText("messagebox_extract_selected_shots_completed"), outputPath);
     });
     connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
     });
+
+    m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
+    connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), projectMedia->duration(), projectMedia->fps());
     m_ruler->setPos(0, 0);
@@ -204,6 +240,11 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
 TimelineWidget::~TimelineWidget()
 {
+    if(m_segmThread && m_segmThread->isRunning()){
+        m_segmThread->requestInterruption();
+        m_segmThread->wait();
+    }
+
     if (m_audioComputeProcess) {
         m_audioComputeProcess->kill();
         m_audioComputeProcess->waitForFinished();
@@ -243,6 +284,10 @@ bool TimelineWidget::event(QEvent *event)
     return QWidget::event(event);
 }
 
+void TimelineWidget::updateShotCount(int shotCount)
+{
+    m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
+}
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
 /// @param zoomFactor
@@ -297,9 +342,7 @@ void TimelineWidget::fitSceneToViewport(){
 
 void TimelineWidget::updateTimelineGeometry()
 {
-    auto duration = m_mathManager->duration();
-
-    m_sceneWidth = duration * m_mathManager->pixelsPerMs();
+    m_sceneWidth = m_mathManager->duration() * m_mathManager->pixelsPerMs();
 
     m_scene->setSceneRect(0, 0, m_sceneWidth, m_scene->height());
 
@@ -317,6 +360,7 @@ void TimelineWidget::updateTimelineGeometry()
     updateCursorPos(m_vlcTime);
 
     m_shotManager->updateShotItemsPosition();
+    m_annotItemManager->updateAnnotItemsPosition();
 }
 
 
@@ -349,40 +393,6 @@ void TimelineWidget::moveCursor(double newCursorPosX)
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
-void TimelineWidget::itemLeftClick(QGraphicsItem * item)
-{
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem:{
-            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
-            m_shotManager->toggleSelection(nullptr, audioShotItem, true);
-            break;
-        }
-        case SLV::TypeShotItem:{
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            m_shotManager->toggleSelection(shotItem, nullptr, true);
-            break;
-        }
-    }
-}
-
-/// @brief retrouve le type d'object sur lequel on a cliqué, si c'est un plan, déplace le curseur au debut du plan
-/// @param item
-void TimelineWidget::itemShiftLeftClick(QGraphicsItem * item)
-{
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem:{
-            AudioShotItem* audioShotItem = static_cast<AudioShotItem*>(item);
-            m_shotManager->toggleSelection(nullptr, audioShotItem, false);
-            break;
-        }
-        case SLV::TypeShotItem:{
-            ShotItem* shotItem = static_cast<ShotItem*>(item);
-            m_shotManager->toggleSelection(shotItem, nullptr, false);
-            break;
-        }
-    }
-}
-
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 {
     switch( item->type() ) {
@@ -399,8 +409,8 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
-    QAction *actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
-    QAction *actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
+    QAction *actionSplit = nullptr;
+    QAction *actionExtractShot = nullptr;
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -408,32 +418,38 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionExtractAB = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
-    QAction* actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+    QAction* actionOpenShotInfo = nullptr;
 
-    if(m_showMergeWithPrevShotBtn){
-        mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
-    }
-    if(m_showMergeWithNextShotBtn){
-        mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
-    }
-
-    switch (m_abManager->getMarkerCount())
+    if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
-    case 0:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
-        break;
-    case 1:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
-        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        break;
-    case 2:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
-        break;
-    }
-
-    if ( m_shotManager->getNbShotsSelected() > 0 ) {
         actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
+    } else 
+    {
+        actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
+        actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+        actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
+
+        if(m_showMergeWithPrevShotBtn){
+            mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
+        }
+        if(m_showMergeWithNextShotBtn){
+            mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
+        }
+
+        switch (m_abManager->getMarkerCount())
+        {
+        case 0:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
+            break;
+        case 1:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
+            deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+            break;
+        case 2:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+            actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
+            break;
+        }
     }
 
     QAction *selectedAction = menu.exec(globalPos);
@@ -456,9 +472,10 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
             PrefManager::instance().getPref("Paths", "lp_extract_sequence")
                 + '/' + p_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, p_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, p_media->fps()));
         if(saveSequencePath != ""){
-            QProcess* sequenceExtractor = SequenceExtractionHelper::extractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
-            connect(sequenceExtractor, &QProcess::finished, this, [this, sequenceExtractor, saveSequencePath](){
-                if (sequenceExtractor->exitStatus() == QProcess::NormalExit && sequenceExtractor->exitCode() == 0){
+            SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(p_media->filePath(), item->shot().start, item->shot().end);
+            sequenceExtractor->extractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
+            connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, sequenceExtractor, saveSequencePath](const int exitCode){
+                if (exitCode == 1){
                     exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
                 } else {
                     QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shot_failed"));
@@ -467,8 +484,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         }
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
-        emit SignalManager::instance().extensionToolbarDisplayShotDetail();
-        emit SignalManager::instance().toggleNavPanel();
+        emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);
     }else if (selectedAction == actionExtractShotsSelected){
 
         QFileInfo fileInfo (p_media->filePath());
@@ -509,7 +525,10 @@ void TimelineWidget::updateCursorPos(int64_t vlcTime){
         m_vlcTime = m_abManager->getDisplayHoldTime(vlcTime).value_or(vlcTime);
     }
 
-    m_cursor->setX(m_mathManager->timeToPos(m_vlcTime));
+    // While paused (frame by frame stepping), snap the cursor to the frame boundary for a
+    // clean visual marker. While playing, follow the raw VLC time for smooth movement.
+    int64_t displayTime = m_isPlayerPlaying ? m_vlcTime : m_mathManager->snapTimeToFrame(m_vlcTime);
+    m_cursor->setX(m_mathManager->timeToPos(displayTime));
     m_shotManager->updateCurrentShot(m_vlcTime);
 }
 
@@ -592,33 +611,41 @@ void TimelineWidget::autoSegmentation(){
 
         [this, mediaPath]() {
             auto& txtManager = PrefManager::instance();
-            SegmentationThread* segmentationThread = new SegmentationThread(mediaPath, this);
+            m_segmThread = new SegmentationThread(mediaPath, this);
 
             QProgressDialog* progressDialog = new QProgressDialog(txtManager.getText("timeline_dialog_text_auto_segmentation"), txtManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
             progressDialog->setWindowTitle(txtManager.getText("timeline_dialog_title_auto_segmentation"));
             progressDialog->setWindowModality(Qt::WindowModal);
 
-            connect(progressDialog, &QProgressDialog::canceled, this, [segmentationThread](){
-                segmentationThread->requestInterruption();
-            });
+            connect(progressDialog, &QProgressDialog::canceled, m_segmThread, &QThread::requestInterruption);
 
-            connect(segmentationThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
+            connect(m_segmThread, &SegmentationThread::progress, progressDialog, &QProgressDialog::setValue);
 
-            connect(segmentationThread, &SegmentationThread::segmentationFinished, this, [this, segmentationThread, progressDialog] (std::vector<int> cuts) {
+            connect(m_segmThread, &SegmentationThread::segmentationFinished, this, [this, progressDialog] (std::vector<int> cuts) {
+
+                progressDialog->close();
+                progressDialog->deleteLater();
 
                 if( ! cuts.empty()){
                     this->m_shotManager->createShotItemsFromCuts(cuts);
                     emit this->saveNeeded();
+                    this->m_shotManager->updateCurrentShot(m_vlcTime);
+
+                    QString text = PrefManager::instance().getText("timeline_dialog_text_auto_segmentation_finished") + QString::number(cuts.size() + 1);
+                    QMessageBox msg(this);
+                    msg.setWindowTitle(PrefManager::instance().getText("timeline_dialog_title_auto_segmentation"));
+                    msg.setStandardButtons(QMessageBox::Ok);
+                    msg.setInformativeText(text);
+                    msg.setIcon(QMessageBox::Information);
+                    msg.exec();
                 }
-                progressDialog->close();
-                progressDialog->deleteLater();
             });
 
-            connect(segmentationThread, &QThread::finished, segmentationThread, &QObject::deleteLater);
+            connect(m_segmThread, &QThread::finished, m_segmThread, &QObject::deleteLater);
 
             progressDialog->show();
-            segmentationThread->start();
-            segmentationThread->setPriority(QThread::HighPriority);
+            m_segmThread->start();
+            m_segmThread->setPriority(QThread::HighPriority);
         },
         nullptr,
         nullptr
@@ -698,12 +725,7 @@ void TimelineWidget::initAudioVisualizer()
     m_scene->addItem(m_audioVisualizer);
 }
 
-void TimelineWidget::dragABMarker(QGraphicsItem* abMarker, const int pos)
-{
-    int64_t newTime = m_mathManager->posToTimeSnapped(pos);
-    ABMarkerItem* abm = static_cast<ABMarkerItem*>(abMarker);
-    m_abManager->changeMarkerTime(abm, newTime);
-}
+
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {

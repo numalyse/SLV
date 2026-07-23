@@ -14,6 +14,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QGraphicsDropShadowEffect>
 #include <QPushButton>
 #include <QVariant>
@@ -92,6 +93,34 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>");
 
+    m_stopBtn->hide();
+
+    QHBoxLayout* customStopBtnLayout = new QHBoxLayout();
+
+    m_customStopCheckbox = new QCheckBox(this);
+    createStopTimeEdit();
+    
+
+    customStopBtnLayout->addWidget(m_customStopCheckbox);
+    customStopBtnLayout->addWidget(m_customStopTimeEdit);
+    customStopBtnLayout->addStretch();
+    
+    m_customStopBtn = new ToolbarToggleHoverButton(this, customStopBtnLayout, false, "stop_white", PrefManager::instance().getText("tooltip_stop") 
+        + "<br>"
+        + PrefManager::instance().getText("tooltip_stop_info")
+        + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>",
+        "stop_white",
+        PrefManager::instance().getText("tooltip_stop") 
+        + "<br>"
+        + PrefManager::instance().getText("tooltip_stop_info")
+        + "<br><i>("
+        + PrefManager::instance().getText("tooltip_shortcut")
+        + PrefManager::instance().getPref("Shortcuts", "CommonToolbar", "stop") + ")</i>"
+    );
+    m_customStopBtn->setIconSize(QSize(24, 24));
+
     m_loopBtn = new ToolbarToggleButton(
         this,
         true,
@@ -160,7 +189,8 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_extractSequenceBtn, &ToolbarButton::clicked, this, &SimpleToolbar::extractSequenceRequest);
     connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
     connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, m_zoomIndicator, [this]{ m_zoomIndicator->setText(""); });
-    
+    connect(m_customStopBtn, &ToolbarToggleHoverButton::released, this, [this] { emit customStopRequest(m_customStopTimeEdit->text()); });
+
     setDefaultUI();
     disableButtons();
 
@@ -200,7 +230,7 @@ void SimpleToolbar::setDefaultUI()
     m_removePlayerBtn->show();
     m_extractSequenceBtn->show();
     m_mediaInfoBtn->show();
-    m_stopBtn->show();
+    // m_stopBtn->show();
     m_ejectBtn->show();
     m_fullscreenBtn->show();
 
@@ -228,10 +258,13 @@ void SimpleToolbar::setDefaultUI()
         buttonLayout->addWidget(m_langBtn);
         buttonLayout->addWidget(m_mediaInfoBtn);
         buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
+        buttonLayout->addSpacing(m_langBtn->width()+1);
         buttonLayout->addSpacing(m_zoomIndicator->width()+1);
         buttonLayout->addStretch();
         buttonLayout->addWidget(m_speedBtn);
-        buttonLayout->addWidget(m_stopBtn);
+        //buttonLayout->addWidget(m_stopBtn); MODIF
+        buttonLayout->addWidget(m_customStopBtn);
         // buttonLayout->addWidget(m_slowDownBtn);
         buttonLayout->addWidget(m_playPauseBtn);
         // buttonLayout->addWidget(m_speedUpBtn);
@@ -409,6 +442,7 @@ void SimpleToolbar::enableButtons()
     m_slider->setEnabled(true);
     m_durationBtn->setEnabled(true);
     m_langBtn->setEnabled(true);
+    m_customStopBtn->setEnabled(true);
     m_loopBtn->setEnabled(true);
     m_duplicatePlayerBtn->setEnabled(true);
     m_extractSequenceBtn->setEnabled(true);
@@ -425,12 +459,14 @@ void SimpleToolbar::disableButtons()
     m_timeEdit->setEnabled(false);
     m_slider->setEnabled(false);
     m_durationBtn->setEnabled(false);
+    m_customStopBtn->setEnabled(false);
     m_loopBtn->setButtonState(false);
     m_loopBtn->setEnabled(false);
     m_duplicatePlayerBtn->setEnabled(false);
     m_extractSequenceBtn->setEnabled(false);
     m_mediaInfoBtn->setEnabled(false);
     m_langBtn->setEnabled(false);
+    m_speedSlider->setValue(3);
 }
 
 
@@ -585,14 +621,47 @@ void SimpleToolbar::createTimeEdit(){
     });
 
     connect(m_timeEdit, &QLineEdit::textEdited, this, [this](){
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps));
     });
 
     connect(m_timeEdit, &QLineEdit::returnPressed, [this]() {
         m_timeEdit->clearFocus(); 
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps, 0.05));
+        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps));
     });
 }
+
+void SimpleToolbar::createStopTimeEdit(){
+    m_customStopTimeEdit = new TimeEdit("00:00:00.00", this, false);
+    m_customStopTimeEdit->setEnabled(false);
+
+    // connect(m_customStopTimeEdit, &TimeEdit::focusIn, this, [this](){
+
+    // });
+
+    // connect(m_customStopTimeEdit, &TimeEdit::focusOut, this, [this](){
+
+    // });
+
+    // connect(m_customStopTimeEdit, &QLineEdit::textEdited, this, [this](){
+    // });
+
+    connect(m_customStopTimeEdit, &QLineEdit::returnPressed, [this]() {
+        m_customStopTimeEdit->clearFocus(); 
+    });
+
+    connect(m_customStopCheckbox, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
+        QString userTheme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
+        if(state == Qt::Checked){
+            m_customStopTimeEdit->setEnabled(true);
+            m_customStopBtn->setIcon(QIcon(":/icons/custom_stop" + userTheme));
+        }
+        else{
+            m_customStopTimeEdit->setEnabled(false);
+            m_customStopBtn->setIcon(QIcon(":/icons/stop" + userTheme));
+        }
+    });
+}
+
 
 void SimpleToolbar::createSlider(){
     m_slider = new QSlider(Qt::Horizontal, this);

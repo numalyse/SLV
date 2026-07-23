@@ -15,6 +15,7 @@
 #include <QLabel>
 #include <QWidget>
 #include <QComboBox>
+#include <QCheckBox>
 
 /// @brief Toolbar simple, utilisé pour les lecteurs en mode synchronisé.
 class SimpleToolbar : public Toolbar
@@ -38,6 +39,9 @@ public:
 
     ToolbarToggleHoverButton* muteBtn() const { return static_cast<ToolbarToggleHoverButton*>(m_muteBtn); }
     ToolbarToggleHoverButton* speedBtn() const { return m_speedBtn; }
+    ToolbarToggleHoverButton* customStopBtn() const { return m_customStopBtn; }
+    TimeEdit* customStopTimeEdit() const { return m_customStopTimeEdit; }
+    QCheckBox* customStopCheckbox() const { return m_customStopCheckbox; }
     ToolbarToggleButton* loopBtn() const { return m_loopBtn; }
     ToolbarButton* removePlayerBtn() const { return m_removePlayerBtn; }
     ToolbarButton* extractSequenceBtn() const {return m_extractSequenceBtn;}
@@ -100,6 +104,8 @@ protected:
     void createTimeTotBtn();
     void createTimeEdit();
 
+    void createStopTimeEdit();
+
     void updateDurationText();
 
     void LangComboBoxActivated(int subTrackItemId);
@@ -122,6 +128,9 @@ protected:
     ToolbarToggleHoverButton* m_speedBtn = nullptr;
     QSlider* m_speedSlider = nullptr;
     QLabel* m_speedLabel = nullptr;
+    TimeEdit* m_customStopTimeEdit = nullptr;
+    ToolbarToggleHoverButton* m_customStopBtn = nullptr;
+    QCheckBox* m_customStopCheckbox = nullptr;
     ToolbarToggleButton* m_loopBtn = nullptr;
     ToolbarButton* m_removePlayerBtn = nullptr;
     ToolbarButton* m_duplicatePlayerBtn = nullptr;
@@ -155,6 +164,7 @@ signals:
     void setCursorPositionRequested(int64_t);
     void extractSequenceRequest();
     void mediaInformationRequest();
+    void customStopRequest(const QString&);
     void subtitlesFileDialogRequested();
     void ejectUiUpdateDone();
     

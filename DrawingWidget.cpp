@@ -1,5 +1,6 @@
 #include "DrawingWidget.h"
 
+#include "IconHelper.h"
 #include "PrefManager.h"
 #include <QPainter>
 #include <QPainterPath>
@@ -24,17 +25,6 @@ DrawingWidget::DrawingWidget(QWidget *parent)
     setMouseTracking(true);
 
     m_pen = QPen(m_color, m_lineWidth);
-
-    m_palette = {
-        {PrefManager::instance().getText("white"), QColor{255, 255, 255, 255}}, // Blanc
-        {PrefManager::instance().getText("black"), QColor{0, 0, 0, 255}},       // Noir
-        {PrefManager::instance().getText("red"), QColor{229, 0, 0, 255}},       // Rouge
-        {PrefManager::instance().getText("orange"), QColor{255, 141, 0, 255}},  // Orange
-        {PrefManager::instance().getText("yellow"), QColor{255, 238, 0, 255}},  // Jaune
-        {PrefManager::instance().getText("green"), QColor{0, 129, 33, 255}},    // Vert
-        {PrefManager::instance().getText("blue"), QColor{0, 76, 255, 255}},     // Bleu
-        {PrefManager::instance().getText("purple"), QColor{118, 1, 136, 255}},  // Violet
-    };
 
     initDrawingSurface();
     initDrawingToolbar();
@@ -91,35 +81,6 @@ void DrawingWidget::initDrawingSurface(){
     }
 }
 
-QIcon DrawingWidget::genIconPreviewColor(QColor color, int sizePen, bool outlineActivated){
-    QPixmap pixmap(30, 30);
-    pixmap.fill(Qt::transparent);
-
-    QPainter painter(&pixmap);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setBrush(color);
-
-    if (outlineActivated) {
-        sizePen = sizePen-2;
-        QPen pen(Qt::black);
-        pen.setWidth(2);
-        painter.setPen(pen);
-    } else {
-        painter.setPen(Qt::NoPen);
-    }
-
-    int x = (pixmap.width() - sizePen) / 2;
-    int y = (pixmap.height() - sizePen) / 2;
-    painter.drawEllipse(x, y, sizePen, sizePen);
-
-    QIcon m_previewColor(pixmap);
-    return m_previewColor;
-}
-
-QIcon DrawingWidget::genIconPreviewColor(QColor color, bool outlineActivated){
-    return genIconPreviewColor(color, 30, outlineActivated);
-}
-
 void DrawingWidget::updatePen(){
     m_pen.setColor(m_color);
     m_pen.setWidth(m_lineWidth);
@@ -159,28 +120,28 @@ void DrawingWidget::initDrawingToolbar(){
         PrefManager::instance().getText("tooltip_color_tool")
     );
     m_colorToolBtn->setOnRight(true);
-    m_colorToolBtn->setIcon(genIconPreviewColor(m_color, true));
+    m_colorToolBtn->setIcon(IconHelper::genIconPreviewColor(m_color, true));
     drawingToolbarLayout->addWidget(m_colorToolBtn);
 
     // CHOIX PALETTE COULEUR
-    for (const auto& [colorName, color] : m_palette) {
+    for (const auto& [colorName, color] : IconHelper::colorPalette()) {
         ToolbarButton* colorBtn = new ToolbarButton(
             m_drawingToolbar,
             " ",
             colorName
         );
         if(color == QColor{255, 255, 255, 255}){
-            colorBtn->setIcon(genIconPreviewColor(color, true));
+            colorBtn->setIcon(IconHelper::genIconPreviewColor(color, true));
         } else {
-            colorBtn->setIcon(genIconPreviewColor(color));
+            colorBtn->setIcon(IconHelper::genIconPreviewColor(color));
         }
         
         connect(colorBtn, &ToolbarButton::clicked, this, [this, color]() {
             setColor(color);
             if(color == QColor{255, 255, 255, 255}){
-                m_colorToolBtn->setIcon(genIconPreviewColor(color, true));
+                m_colorToolBtn->setIcon(IconHelper::genIconPreviewColor(color, true));
             } else {
-                m_colorToolBtn->setIcon(genIconPreviewColor(color));
+                m_colorToolBtn->setIcon(IconHelper::genIconPreviewColor(color));
             }
             updatePen();
         });    
@@ -219,9 +180,9 @@ void DrawingWidget::initDrawingToolbar(){
         if(lineWidth == m_lineWidth)
             lineWidthBtn->setChecked(true);
         if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
-            lineWidthBtn->setIcon(genIconPreviewColor(Qt::white, lineWidth*2));
+            lineWidthBtn->setIcon(IconHelper::genIconPreviewColor(Qt::white, lineWidth*2));
         } else {
-            lineWidthBtn->setIcon(genIconPreviewColor(Qt::darkGray, lineWidth*2));
+            lineWidthBtn->setIcon(IconHelper::genIconPreviewColor(Qt::darkGray, lineWidth*2));
         }
 
         connect(lineWidthBtn, &ToolbarToggleButton::clicked, this, [this, lineWidth]() {
@@ -263,7 +224,7 @@ void DrawingWidget::initDrawingToolbar(){
 
         previewColor.setAlphaF(opacity);
 
-        opacityBtn->setIcon(genIconPreviewColor(previewColor));
+        opacityBtn->setIcon(IconHelper::genIconPreviewColor(previewColor));
 
         connect(opacityBtn, &ToolbarToggleButton::clicked, this, [this, opacity]() {
             setOpacity(opacity);

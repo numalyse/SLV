@@ -11,6 +11,11 @@ ABManager::ABManager(QGraphicsScene *scene, TimelineMath *mathManager, QObject *
 {
 }
 
+void ABManager::dragMarker(ABMarkerItem* marker, const double pos)
+{
+    changeMarkerTime(marker, p_mathManager->posToTimeSnapped(pos));
+}
+
 
 std::optional<int64_t> ABManager::getLoopRestartTime(int64_t currentTime)
 {
@@ -82,34 +87,32 @@ void ABManager::extractLoop()
     if( ! mediaFileInfo.exists() ) return;
 
     // if the project is saved in a folder, use it else use prefmanager export path
-    QString dialogDir = (projManager.projet()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.projet()->path;
+    QString dialogDir = (projManager.project()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.project()->path;
 
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr,
         prefManager.getText("export_file_path_title"),
         dialogDir + "/" + mediaFileInfo.baseName() + "_"
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[0]->time(), projManager.projet()->media->fps())
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[1]->time(), projManager.projet()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[0]->time(), projManager.project()->media->fps())
+            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[1]->time(), projManager.project()->media->fps())
     );
 
     selectedPath += '.' + mediaFileInfo.suffix();
 
-    QProcess* ffmpegProcess = SequenceExtractionHelper::extractSequence(
-        mediaFileInfo.filePath(), 
-        m_markers[0]->time(), 
-        m_markers[1]->time(), 
-        selectedPath
-    );
-
-    connect(ffmpegProcess, &QProcess::finished, this, [this, selectedPath, ffmpegProcess](int exitCode, QProcess::ExitStatus exitStatus) {
-        if (exitCode != 0) {
+    SequenceExtractionHelper *ffmpegProcess = new SequenceExtractionHelper(mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time());
+    connect(ffmpegProcess, &SequenceExtractionHelper::extractionFinished, this, [this, selectedPath, ffmpegProcess](const int exitCode) {
+        if (exitCode < 1) {
             emit loopExtractionFailed();
         } else {
             emit loopExtracted(selectedPath);
         }
-
         ffmpegProcess->deleteLater();
     });
+    ffmpegProcess->extractSequence(
+        mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time(), selectedPath
+    );
+
+
 
 }
 

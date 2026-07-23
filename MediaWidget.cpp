@@ -25,7 +25,6 @@
 #include <QPushButton>
 #include <QThreadPool>
 
-
 // Fonction helper pour appliquer les transformations VLC correctes au média
 void applyTransformOptions(libvlc_media_t* vlcMedia, unsigned int rotation, bool hflip, bool vflip) {
     auto transformArgs = getArgsFromTransform(rotation, hflip, vflip);
@@ -68,7 +67,9 @@ MediaWidget::MediaWidget(QWidget *parent)
     const char* const vlc_args[] = {
         "--quiet",
         "--no-video-title-show",
-        "--no-input-fast-seek"
+        "--no-input-fast-seek",
+        "--no-osd",
+        "--no-snapshot-preview",
     };
 
     int argc = sizeof(vlc_args) / sizeof(vlc_args[0]);
@@ -85,6 +86,8 @@ MediaWidget::MediaWidget(QWidget *parent)
         "--no-video-title-show",
         "--no-input-fast-seek",
         "--aout=directsound",
+        "--no-osd",
+        "--no-snapshot-preview",
         pluginArg.c_str(),
         "--verbose=2"
     };
@@ -194,19 +197,21 @@ void MediaWidget::togglePlayPause()
 }
 
 /// @brief Set the media player position to 0 and pause
-bool MediaWidget::stop()
+bool MediaWidget::stop(const int64_t newValueStop)
 {
     if (!m_player || !m_media) return false;
 
     pause();
-    libvlc_media_player_set_position(m_player, 0.0);
+    if (newValueStop == 0) {
+        libvlc_media_player_set_position(m_player, 0.0);
+    } else {
+        setTime(newValueStop);
+    }
     libvlc_media_player_next_frame(m_player);
     int64_t currentTime = libvlc_media_player_get_time(m_player);
     emit vlcTimeChanged(currentTime);
     return true;
 }
-
-
 
 /// @brief Release the media player and create a new one from MediaWidget instance
 bool MediaWidget::eject()
@@ -396,8 +401,10 @@ void MediaWidget::takeScreenshot()
     
     auto& prefManager = PrefManager::instance();
 
+    m_lastSnapshotTime = getCurrentTime();
+
     QString zoomStr = (m_zoomActivated) ? m_zoomHelper.getZoomStr() : "";
-    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(getCurrentTime(), m_media->fps()) + zoomStr +".png";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(m_lastSnapshotTime, m_media->fps()) + zoomStr +".png";
     if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
 
     QByteArray capturePathBytes = capturePath.toUtf8();
@@ -415,11 +422,21 @@ void MediaWidget::takeScreenshot()
          libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
 }
 
-void MediaWidget::setTime(int64_t time)
+void MediaWidget::setTime(int64_t time, bool frameSeekBias)
 {
     if(!m_player) return;
     m_videoCaptureManager.mediaCutAndConcat(getCurrentTime(), time);
-    libvlc_media_player_set_time(m_player, time);
+
+    // we insure that we show the correct frame when frameSeekBias is true, by adding a quarter of a frame to the requested frame
+    int64_t seekTime = time;
+    if(frameSeekBias && m_media && m_media->fps() > 0.0){
+        int64_t quarterFrame = static_cast<int64_t>((1000.0 / m_media->fps()) * 0.25); 
+        seekTime = time + quarterFrame;
+        if(m_media->duration() > 0 && seekTime > m_media->duration())
+            seekTime = m_media->duration();
+    }
+
+    libvlc_media_player_set_time(m_player, seekTime);
     m_vlcTime = time;
     emit vlcTimeChanged(time);
 }
@@ -656,29 +673,29 @@ void MediaWidget::nextFrame()
     if(!m_player || !m_media) return;
     pause();
     emit pauseUiUpdateRequested();
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
+
     libvlc_media_player_next_frame(m_player);
-    const int mspf = int(1000.0/m_media->fps());
-    // const int newTime = getCurrentTime() + int(1000/m_media->fps());
-    // setTime(newTime);
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime;
-    m_vlcTime += mspf;
+
+    // sets vlc time to the exact time of the next frame 
+    double frameMs = 1000.0 / m_media->fps();
+    int64_t currentFrame = qRound64(m_vlcTime / frameMs);
+    m_vlcTime = qRound64((currentFrame + 1) * frameMs);
     if(m_media->duration() > 0 && m_vlcTime > m_media->duration()) {
         m_vlcTime = m_media->duration();
     }
     emit vlcTimeChanged(m_vlcTime);
-
 }
 
 void MediaWidget::prevFrame()
 {
     if(!m_player || !m_media) return;
     pause();
-    qDebug() << libvlc_media_player_get_time(m_player) << "," << m_vlcTime << "," << int(1000.0/m_media->fps());
-    const int mspf = int(1000.0/m_media->fps());
-    const int newTime = m_vlcTime - mspf;
 
-    setTime(std::max(newTime, 0));
+    double frameMs = 1000.0 / m_media->fps();
+    int64_t currentFrame = qRound64(m_vlcTime / frameMs);
+    int64_t newFrame = std::max<int64_t>(currentFrame - 1, 0);
+
+    setTime(qRound64(newFrame * frameMs), true);
 }
 
 void MediaWidget::adjustMedia(const libvlc_video_adjust_option_t adjustOption, const float value)
@@ -802,9 +819,10 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 emit mediaWidget->mediaFinished();
             }
             // cas où on loop le média
-            else{
+            else if(mediaWidget->m_loopValue != 1){
                 libvlc_media_player_stop(mediaWidget->m_player);
                 libvlc_media_player_play(mediaWidget->m_player);
+                mediaWidget->setTime(mediaWidget->m_loopValue);
             }
         }, Qt::QueuedConnection);
 
@@ -868,6 +886,32 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
 }
 
+void MediaWidget::onVlcSnapshot(const libvlc_event_t *event, void *userData){
+    MediaWidget* mediaWidget = reinterpret_cast<MediaWidget*>(userData);
+    
+    if (!mediaWidget) return;
+
+    if (event->type == libvlc_MediaPlayerSnapshotTaken){
+        QString filePath = event->u.media_player_snapshot_taken.psz_filename;
+
+        qDebug() << "[MediaWidget] Snapshot taken :" << filePath;
+
+        // on the top right corner of the widget, display popup with filename, vlc time, thumbnail, button to open path
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget, filePath]() {
+            mediaWidget->createSnapshotPopup(filePath, mediaWidget->m_lastSnapshotTime);
+        }, Qt::QueuedConnection);
+
+    }    
+}
+
+void MediaWidget::createSnapshotPopup(const QString& filePath, int64_t vlcTime)
+{
+    if (m_snapshotPopup)
+        delete m_snapshotPopup; // QPointer automatically set to nullptr
+
+    m_snapshotPopup = new SnapshotPopup(this, filePath, vlcTime, (m_media) ? m_media->fps() : 0.0);
+    m_snapshotPopup->showWithFade();
+}
 
 // ===== Event ===== //
 
@@ -990,7 +1034,7 @@ void MediaWidget::typeParsed(const MediaType type)
     }
 }
 
-/// @brief detach l'event manager avant de release le média, ne fait rien si déjà null
+/// @brief release the media instance, if the media is null, does nothing
 void MediaWidget::releaseMedia(){
     if(m_media){
         delete m_media;
@@ -999,7 +1043,7 @@ void MediaWidget::releaseMedia(){
 }
 
 
-/// @brief detach les event et free l'event manager
+/// @brief detach and release the event manager, if the media player is null, log a warning
 void MediaWidget::releaseEventManager(){
     if(m_eventManager){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerTimeChanged, onVlcEvent, this);
@@ -1007,13 +1051,14 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerSnapshotTaken, onVlcSnapshot, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
     }
 }
 
-/// @brief initialise m_eventManager et attach les events
+/// @brief Initialize the event manager and attach the events to the media player
 void MediaWidget::createEventManager(){
     if(m_player){
         m_eventManager = libvlc_media_player_event_manager(m_player);
@@ -1022,13 +1067,14 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPlaying, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerSnapshotTaken, onVlcSnapshot, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";
     }
 
 }
 
-/// @brief Helper pour recréer une classe média et connecter ses signaux
+/// @brief Helper to recreate a Media instance from a file path, and connect its signals to the MediaWidget slots
 /// @param filePath 
 void MediaWidget::createMedia(const QString& filePath, const bool fromTransform){
     releaseMedia();

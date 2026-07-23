@@ -5,6 +5,7 @@
 #include "ToolbarButtons/ToolbarButton.h"
 
 #include <QLabel>
+#include <QFont>
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QFrame>
@@ -14,31 +15,75 @@
 #include <QSizePolicy>
 
 
-ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
+ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
 {
     //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 
+    connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotDetail::onThumbnailReady);
+
     PrefManager& PrefManager = PrefManager::instance();
+
+    m_uneditables = new QFrame(this);
+
+    QString backgroundFillColor;
+#ifdef Q_OS_MAC
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+            backgroundFillColor = "palette(mid)";
+        } else {
+            backgroundFillColor = "palette(base)";
+        }
+#else
+        backgroundFillColor = "palette(base)";
+#endif
+
+    m_uneditables->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+    m_uneditables->setToolTip(PrefManager.getText("shot_detail_uneditable_tooltip"));
+    QVBoxLayout* uneditablesLayout = new QVBoxLayout(m_uneditables);
+
+    QLabel* infoLabel = new QLabel(this);
+    QFont infoFont = infoLabel->font();
+    infoFont.setPointSize(12);
+    infoFont.setBold(true);
+    infoLabel->setFont(infoFont);
+    infoLabel->setText("<b>" + PrefManager.getText("shot_detail_informations_title") + "</b>");
+
+    QLabel* analysisLabel = new QLabel(this);
+    QFont analysisFont = analysisLabel->font();
+    analysisFont.setPointSize(12);
+    analysisFont.setBold(true);
+    analysisLabel->setFont(analysisFont);
+    analysisLabel->setText("<b>" + PrefManager.getText("shot_detail_analysis_title") + "</b>");
 
     m_shotIdForm = new FormLineEditWidget(PrefManager.getText("shot_detail_id_name") , "", false, this);
     m_shotTitle = new FormLineEditWidget(PrefManager.getText("shot_detail_title_name") , "", true, this);
     m_startTime = new FormLineEditWidget(PrefManager.getText("shot_detail_start_time_name") , "", false, this);
     m_endTime = new FormLineEditWidget(PrefManager.getText("shot_detail_end_time_name"), "", false, this);
     m_duration = new FormLineEditWidget(PrefManager.getText("shot_detail_duration_time_name") , "", false, this);
-    m_notes = new FormTextEditWidget(PrefManager.getText("shot_detail_note_name") , "", true, this);
+    m_imgTxtEdit = new FormTextEditWidget(PrefManager.getText("shot_detail_img_txt_name") , "", true, this);
+    m_soundTxtEdit = new FormTextEditWidget(PrefManager.getText("shot_detail_sound_txt_name"), "", true, this);
     m_tagImage = new QLabel(this);
     m_tagImage->setToolTip(PrefManager.getText("tagimage_tooltip"));
     m_tagImage->setStyleSheet("");
 
 
-    m_notes->setMaximumHeight(250);
+    m_imgTxtEdit->setMaximumHeight(250);
     
-    m_notes->setToolTip(PrefManager.getText("click_to_modify"));
-    connect(m_notes->textEdit(), &QTextEdit::textChanged, this, [this](){
+    m_imgTxtEdit->setToolTip(PrefManager.getText("click_to_modify"));
+    connect(m_imgTxtEdit->textEdit(), &QTextEdit::textChanged, this, [this](){
         if(m_shotData) {
-            QString text = m_notes->textEdit()->toPlainText();
-            m_shotData->note = text;
+            QString text = m_imgTxtEdit->textEdit()->toPlainText();
+            m_shotData->imgTxt = text;
+        }
+    });
+
+    m_soundTxtEdit->setMaximumHeight(250);
+    
+    m_soundTxtEdit->setToolTip(PrefManager.getText("click_to_modify"));
+    connect(m_soundTxtEdit->textEdit(), &QTextEdit::textChanged, this, [this](){
+        if(m_shotData) {
+            QString text = m_soundTxtEdit->textEdit()->toPlainText();
+            m_shotData->soundTxt= text;
         }
     });
 
@@ -52,6 +97,7 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
 
     QFrame* frameButtonsActions = new QFrame(this);
     QGridLayout* frameButtonsLayout = new QGridLayout(frameButtonsActions);
+    frameButtonsLayout->setContentsMargins(0, 0, 0, 0);
 
     m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", PrefManager::instance().getText("tooltip_to_prev_shot"));
     connect(m_toPrevShotBtn, &ToolbarButton::clicked, this, [this](){
@@ -66,38 +112,52 @@ ShotDetail::ShotDetail(QWidget *parent) : QWidget(parent)
     frameButtonsLayout->addWidget(m_toNextShotBtn, 0, 1);
 
     m_layout = new QVBoxLayout(this);
-    m_layout->addWidget(m_shotIdForm);
-    m_layout->addWidget(m_shotTitle);
-    m_layout->addWidget(m_startTime);
-    m_layout->addWidget(m_endTime);
-    m_layout->addWidget(m_duration);
-    m_layout->addWidget(m_notes);
+
+    m_layout->addWidget(infoLabel);
+
+    uneditablesLayout->addWidget(m_shotIdForm);
+    uneditablesLayout->addWidget(m_startTime);
+    uneditablesLayout->addWidget(m_endTime);
+    uneditablesLayout->addWidget(m_duration);
+    m_layout->addWidget(m_uneditables);
+    
+    m_layout->addSpacing(6);
+
     m_layout->addWidget(m_tagImage);
     m_tagImage->adjustSize();
     m_tagImage->setAlignment(Qt::AlignCenter);
+    m_tagImage->setFixedHeight(m_imageSize.height());
+
+    frameButtonsLayout->setContentsMargins(0, 0, 0, 0);
     m_layout->addWidget(frameButtonsActions);
+
+    m_layout->addWidget(analysisLabel);
+    m_layout->addWidget(m_shotTitle);
+    m_layout->addWidget(m_imgTxtEdit);
+    m_layout->addWidget(m_soundTxtEdit);
+    
     m_layout->addStretch();
 
 }
 
 void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
 {
-    emit clearThumbnailQueueRequested();
     m_shotData = shotData;
     m_shotId = shotId;
 
     m_tagImage->clear();
 
 
-    double fps = ProjectManager::instance().projet()->media->fps();
+    double fps = ProjectManager::instance().project()->media->fps();
     int64_t duration = shotData->end - shotData->start;
 
-    m_shotIdForm->setText(PrefManager::instance().getText("shot_detail_id_text") + QString::number(shotId + 1));
+    m_shotIdForm->setText(QString::number(shotId + 1));
     m_shotTitle->setText(shotData->title);
     m_startTime->setText(TimeFormatter::msToHHMMSSFF(shotData->start, fps));
     m_endTime->setText(TimeFormatter::msToHHMMSSFF(shotData->end, fps));
     m_duration->setText(TimeFormatter::msToHHMMSSFF(duration, fps));
-    m_notes->setText(shotData->note);
+    m_imgTxtEdit->setText(shotData->imgTxt);
+    m_soundTxtEdit->setText(shotData->soundTxt);
 
     m_toNextShotBtn->setEnabled(true);
     m_toPrevShotBtn->setEnabled(true);
@@ -111,8 +171,8 @@ void ShotDetail::updateShotDetail(int shotCount, int shotId, Shot * shotData)
     Media* projMedia = ProjectManager::instance().media();
     if(projMedia->filePath().isEmpty()){
         qDebug() << "[ShotDetail] Impossible de récuperer la tag image, le path du média du project est vide";
-    }else {
-        emit updateImageRequested(-1, shotData->tagImageTime, 0, projMedia, m_imageSize);
+    }else if(projMedia->type() == MediaType::Video){
+        p_thumbnailWorker->requestThumbnail(ThumbnailWorker::Requester::ShotDetail, 0, shotData->tagImageTime, 0, projMedia->filePath(), m_imageSize, projMedia->sar());
     }
 
 }
@@ -124,9 +184,13 @@ void ShotDetail::toggleShotControlButtons(bool state)
     m_toPrevShotBtn->setEnabled(state);
 }
 
-void ShotDetail::updateTagImage(QImage image)
+void ShotDetail::onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image)
 {
+    if(requester != ThumbnailWorker::Requester::ShotDetail)
+        return;
+
     m_tagImage->clear();
     QPixmap pixmap = QPixmap::fromImage(image);
     m_tagImage->setPixmap(pixmap);
+    m_tagImage->setFixedHeight(pixmap.height());
 }

@@ -8,6 +8,9 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    bool isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+    QString checkIcon = isDarkMode ? ":/icons/check_white" : ":/icons/check";
+
 #if defined(Q_OS_MAC)
 
     QString ffmpegPath = QCoreApplication::applicationDirPath() + "/../Resources/ffmpeg/ffmpeg";
@@ -32,7 +35,7 @@ int main(int argc, char *argv[])
         "   image: url();"
         "}"
         "QRadioButton::indicator:checked {"
-        "   image: url(:/icons/check_white);"
+        "   image: url(" + checkIcon + ");"
         "}"
     );
 
@@ -85,7 +88,7 @@ int main(int argc, char *argv[])
         "   image: url();"
         "}"
         "QRadioButton::indicator:checked {"
-        "   image: url(:/icons/check_white);"
+        "   image: url(" + checkIcon + ");"
         "}"
 
     );

@@ -296,7 +296,7 @@ void HelperWidget::setClassicContent(int scrollLevel)
         Qt::SmoothTransformation
         ));
 
-    QLabel* classicToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_classic_toolbar_buttons_descriptions") + "</h3>");
+    QLabel* classicToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_classic_toolbar_buttons_description") + "</h3>");
 
     QString theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
     QGridLayout* classicToolbarButtonsHelpLayout = new QGridLayout();
@@ -338,17 +338,17 @@ void HelperWidget::setClassicContent(int scrollLevel)
     classicToolbarButtonsHelpLayout->addWidget(changeMediaLabel, 3, 1, Qt::AlignCenter);
     classicToolbarButtonsHelpLayout->addWidget(changeMediaDescription, 3, 2, Qt::AlignLeft);
 
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/slow" + theme, pref.getText("help_menu_speed_label"), pref.getText("help_menu_speed_description"), 4);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/loop_off" + theme, pref.getText("help_menu_loop_label"), pref.getText("help_menu_loop_description"), 5);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/sound_on" + theme, pref.getText("help_menu_volume_label"), pref.getText("help_menu_volume_description"), 6);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/lang" + theme, pref.getText("help_menu_language_label"), pref.getText("help_menu_language_description"), 7);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/slow" + theme, pref.getText("help_menu_slow_label"), pref.getText("help_menu_slow_description"), 4);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/loop_off" + theme, pref.getText("help_menu_loop_off_label"), pref.getText("help_menu_loop_off_description"), 5);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/sound_on" + theme, pref.getText("help_menu_sound_on_label"), pref.getText("help_menu_sound_on_description"), 6);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/lang" + theme, pref.getText("help_menu_lang_label"), pref.getText("help_menu_lang_description"), 7);
     addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/media_info" + theme, pref.getText("help_menu_media_info_label"), pref.getText("help_menu_media_info_description"), 8);
     addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/zoom" + theme, pref.getText("help_menu_zoom_label"), pref.getText("help_menu_zoom_description"), 9);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/capture" + theme, pref.getText("help_menu_screenshot_label"), pref.getText("help_menu_screenshot_description"), 10);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/extract_sequence" + theme, pref.getText("help_menu_extraction_label"), pref.getText("help_menu_extraction_description"), 11);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/duplicate_media" + theme, pref.getText("help_menu_duplicate_label"), pref.getText("help_menu_duplicate_description"), 12);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/capture" + theme, pref.getText("help_menu_capture_label"), pref.getText("help_menu_capture_description"), 10);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/extract_sequence" + theme, pref.getText("help_menu_extract_sequence_label"), pref.getText("help_menu_extract_sequence_description"), 11);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/duplicate_media" + theme, pref.getText("help_menu_duplicate_media_label"), pref.getText("help_menu_duplicate_media_description"), 12);
     addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/fullscreen" + theme, pref.getText("help_menu_fullscreen_label"), pref.getText("help_menu_fullscreen_description"), 13);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/right_arrow" + theme, pref.getText("help_menu_extended_label"), pref.getText("help_menu_extended_description"), 14);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/right_arrow" + theme, pref.getText("help_menu_right_arrow_label"), pref.getText("help_menu_right_arrow_description"), 14);
 
     layout->addSpacing(10);
     layout->addWidget(classicToolbarTitle);
@@ -368,18 +368,18 @@ void HelperWidget::setClassicContent(int scrollLevel)
     extendedToolbarButtonsHelpLayout->setSpacing(30);
     extendedToolbarButtonsHelpLayout->setContentsMargins(30, 10, 30, 10);
 
-    QLabel* extendedToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_extended_toolbar_buttons_descriptions") + "</h3>");
+    QLabel* extendedToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_extended_toolbar_buttons_description") + "</h3>");
 
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/show_image" + theme, pref.getText("help_menu_hide_media_label"), pref.getText("help_menu_hide_media_description"), 4);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/show_image" + theme, pref.getText("help_menu_show_image_label"), pref.getText("help_menu_show_image_description"), 4);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/adjustments" + theme, pref.getText("help_menu_adjustments_label"), pref.getText("help_menu_adjustments_description"), 5);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/draw" + theme, pref.getText("help_menu_draw_label"), pref.getText("help_menu_draw_description"), 6);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/compo_rule" + theme, pref.getText("help_menu_compo_rule_label"), pref.getText("help_menu_compo_rule_description"), 7);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/backward" + theme, pref.getText("help_menu_backward_label"), pref.getText("help_menu_backward_description"), 8);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/prev_frame" + theme, pref.getText("help_menu_prev_frame_label"), pref.getText("help_menu_prev_frame_description"), 9);
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/record_off" + theme, pref.getText("help_menu_record_label"), pref.getText("help_menu_record_description"), 10);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/record_off" + theme, pref.getText("help_menu_record_off_label"), pref.getText("help_menu_record_off_description"), 10);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/rotate" + theme, pref.getText("help_menu_rotate_label"), pref.getText("help_menu_rotate_description"), 11);
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/invert_h" + theme, pref.getText("help_menu_flip_label"), pref.getText("help_menu_flip_description"), 12);
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/timeline_off" + theme, pref.getText("help_menu_timeline_label"), pref.getText("help_menu_timeline_description"), 13);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/invert_h" + theme, pref.getText("help_menu_invert_h_label"), pref.getText("help_menu_invert_h_description"), 12);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/timeline_off" + theme, pref.getText("help_menu_timeline_off_label"), pref.getText("help_menu_timeline_off_description"), 13);
 
     layout->addSpacing(10);
     layout->addWidget(extendedToolbarTitle);
@@ -655,10 +655,10 @@ void HelperWidget::setTimelineContent(int scrollLevel)
     timelineButtonsHelpLayout->setContentsMargins(30, 10, 30, 10);
     QString theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
 
-    addButtonDescription(timelineButtonsHelpLayout, ":/icons/abloop" + theme, pref.getText("help_menu_ab_loop_label"), pref.getText("help_menu_ab_loop_description"), 0);
+    addButtonDescription(timelineButtonsHelpLayout, ":/icons/abloop" + theme, pref.getText("help_menu_abloop_label"), pref.getText("help_menu_abloop_description"), 0);
     timelineButtonsHelpLayout->setColumnStretch(2, 0);
-    addButtonDescription(timelineButtonsHelpLayout, ":/icons/auto_segmentation" + theme, pref.getText("help_menu_segmentation_label"), pref.getText("help_menu_segmentation_description"), 1);
-    addButtonDescription(timelineButtonsHelpLayout, ":/icons/split_shot" + theme, pref.getText("help_menu_split_label"), pref.getText("help_menu_split_description"), 2);
+    addButtonDescription(timelineButtonsHelpLayout, ":/icons/auto_segmentation" + theme, pref.getText("help_menu_auto_segmentation_label"), pref.getText("help_menu_auto_segmentation_description"), 1);
+    addButtonDescription(timelineButtonsHelpLayout, ":/icons/split_shot" + theme, pref.getText("help_menu_split_shot_label"), pref.getText("help_menu_split_shot_description"), 2);
 
     QLabel* mergeLeftIcon = new QLabel();
     mergeLeftIcon->setPixmap(QPixmap(":/icons/merge_left" + theme).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));

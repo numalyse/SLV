@@ -1,8 +1,5 @@
 #include "ContentBase.h"
 
-#include "PrefManager.h"
-#include <QGuiApplication>
-#include <QStyleHints>
 #include <QVBoxLayout>
 #include <QTableWidget>
 #include <QVector>
@@ -10,10 +7,20 @@
 #include <QLabel>
 
 ContentBase::ContentBase(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent) , pref(PrefManager::instance())
 {
-    PrefManager pref = PrefManager::instance();
-    QString theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : ""; 
+    pref = PrefManager::instance();
+    theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : ""; 
+    
+#ifdef Q_OS_MAC
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
+        backgroundFillColor = "palette(mid)";
+    } else {
+        backgroundFillColor = "palette(base)";
+    }
+#else
+    backgroundFillColor = "palette(base)";
+#endif
 
     m_layout = new QVBoxLayout(this);
 
@@ -32,6 +39,79 @@ void ContentBase::addLayout(QLayout* layout)
 {
     m_layout->addLayout(layout);
 }
+
+QWidget* ContentBase::createTable(const QString& tableName, const QList<QWidget*>& rows)
+{
+    auto* widget = new QWidget(this);
+    widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    auto* layout = new QVBoxLayout(widget);
+    
+    if(pref.getText(tableName) != "[none]"){
+        auto* titleTable = new QLabel(pref.getText(tableName));
+        layout->addWidget(titleTable);
+    }
+
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(8);
+
+    for (QWidget* row : rows)
+    {
+        row->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        layout->addWidget(row);
+    }
+
+    return widget;
+}
+
+QWidget* ContentBase::createButtonDescriptionTable(const QString& tableName, std::initializer_list<ButtonDescriptionData> buttons)
+{
+    QList<QWidget*> rows;
+
+    for (const auto& button : buttons)
+    {
+        rows << createButtonDescription(
+            button.icon,
+            button.label,
+            button.description
+        );
+    }
+
+    return createTable(tableName, rows);
+}
+
+QWidget* ContentBase::createButtonDescription(const QString& iconName, const QString& buttonLabel, const QString& buttonDescription)
+{
+    auto* widget = new QWidget(this);
+    widget->setMinimumHeight(20);
+    widget->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+
+    auto* layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(20, 20, 20, 20);
+
+    auto* icon = new QLabel();
+    icon->setPixmap(QPixmap(iconName + theme).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    auto* label = new QLabel("<b>" + pref.getText(buttonLabel) + "</b>");
+    label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    auto* description = new QLabel(pref.getText(buttonDescription));
+    description->setWordWrap(true);
+    description->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    layout->addWidget(icon, 1);
+    layout->addSpacing(20);
+    layout->addWidget(label, 1);
+    layout->addSpacing(20);
+    layout->addWidget(description, 6);
+
+    widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    widget->adjustSize();
+
+    return widget;
+}
+
 
 void ContentBase::addTable(const QVector<TableRow>& rows)
 {
@@ -59,9 +139,8 @@ void ContentBase::addTable(const QVector<TableRow>& rows)
         }
     }
 
-    table->horizontalHeader()
-          ->setSectionResizeMode(QHeaderView::Stretch);
-
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->horizontalHeader()->setVisible(false);
     table->verticalHeader()->setVisible(false);
 
     addContent(table);
@@ -72,8 +151,8 @@ TableRow ContentBase::addButtonDescription(const QString& iconName, const QStrin
     TableRow rowButton;
 
     QLabel* extendedIcon = new QLabel();
-    QLabel* extendedLabel = new QLabel("<b>" + buttonLabel + "</b>");
-    QLabel* extendedDescription = new QLabel(buttonDescription);
+    QLabel* extendedLabel = new QLabel("<b>" + pref.getText(buttonLabel) + "</b>");
+    QLabel* extendedDescription = new QLabel(pref.getText(buttonDescription));
 
     rowButton.append(extendedIcon);
     rowButton.append(extendedLabel);
@@ -81,3 +160,4 @@ TableRow ContentBase::addButtonDescription(const QString& iconName, const QStrin
 
     return rowButton;
 }
+

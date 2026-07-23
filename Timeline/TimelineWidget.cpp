@@ -468,20 +468,8 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == mergeWithNextShot){
         mergeWithNextShotAction();
     } else if(selectedAction == actionExtractShot){
-        QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"),
-            PrefManager::instance().getPref("Paths", "lp_extract_sequence")
-                + '/' + p_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, p_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, p_media->fps()));
-        if(saveSequencePath != ""){
-            SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(p_media->filePath(), item->shot().start, item->shot().end);
-            sequenceExtractor->extractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
-            connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, sequenceExtractor, saveSequencePath](const int exitCode){
-                if (exitCode == 1){
-                    exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
-                } else {
-                    QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shot_failed"));
-                }
-            });
-        }
+        ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
+        sequenceExtractor->show();
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);

@@ -8,38 +8,40 @@
 #include <QStyleHints>
 
 MonoviewContent::MonoviewContent(QWidget* parent)
-    : CategoryBase("Monoview", parent)
+    : CategoryBase("help_menu_classic_category", parent)
 {
+    QString openMedia = "help_menu_open_files_label";
 
     addSubcategory(
-        "Introduction",
-        introduction()
+        openMedia,
+        openmedia(openMedia)
     );
 
     addSubcategory(
         "Player",
-        player()
+        player(openMedia)
     );
 
     
 }
 
-QWidget* MonoviewContent::introduction()
+QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
 {
-    QWidget* widget = new QWidget;
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    auto* layout = new QVBoxLayout(widget);
-    layout->addWidget(new QLabel("Bienvenue dans la documentation!!!!"));
+    widget->setDescription("help_menu_open_files_content_1");
+    widget->setImage("open_medias");
+
+    widget->setDescription("help_menu_open_files_content_2");
+    widget->setImage("open_medias_drag_drop");
 
     return widget;
 }
 
-QWidget* MonoviewContent::player()
+QWidget* MonoviewContent::player(const QString& subcategoryName)
 {
-    QWidget* widget = new QWidget;
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    auto* layout = new QVBoxLayout(widget);
-    layout->addWidget(new QLabel("Test"));
 
     return widget;
 }

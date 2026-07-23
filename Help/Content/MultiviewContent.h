@@ -11,7 +11,7 @@ public:
     explicit MultiviewContent(QWidget* parent = nullptr);
 
 private:
-    QWidget* introduction();
+    QWidget* introduction(const QString& subcategoryName);
 };
 
 #endif

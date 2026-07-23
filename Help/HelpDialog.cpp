@@ -53,15 +53,19 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
 
     auto* general = new GeneralContent(this);
     general->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(general);
 
     auto* monoview = new MonoviewContent(this);
     monoview->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(monoview);
 
     auto* multiview = new MultiviewContent(this);
     multiview->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(multiview);
 
     auto* tooltbars = new ToolbarsContent(this);
     tooltbars->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(tooltbars);
 
     m_sideMenuTreeWidget->topLevelItem(0)->setExpanded(true);
 

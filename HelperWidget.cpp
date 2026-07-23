@@ -57,7 +57,7 @@ void HelperWidget::initLayout()
         animateWidget(generalSubTab, state);
     });
 
-    m_classicTab = new CustomCheckbox("<b>" + pref.getText("help_menu_classic_checkbox") + "</b>");
+    m_classicTab = new CustomCheckbox("<b>" + pref.getText("help_menu_classic_category") + "</b>");
 
     QWidget *classicSubTab = new QWidget();
     QVBoxLayout *classicSubTabLayout = new QVBoxLayout();
@@ -75,7 +75,7 @@ void HelperWidget::initLayout()
     });
     emit m_classicTab->stateChanged(false);
 
-    m_multiviewTab = new CustomCheckbox("<b>" + pref.getText("help_menu_multiview_checkbox") + "</b>");
+    m_multiviewTab = new CustomCheckbox("<b>" + pref.getText("help_menu_multiview_category") + "</b>");
 
     QWidget *multiviewSubTab = new QWidget();
     QVBoxLayout *multiviewSubTabLayout = new QVBoxLayout();
@@ -93,7 +93,7 @@ void HelperWidget::initLayout()
     });
     emit m_multiviewTab->stateChanged(false);
 
-    m_playlistTab = new CustomCheckbox("<b>" +pref.getText("help_menu_playlist_checkbox") + "</b>");
+    m_playlistTab = new CustomCheckbox("<b>" +pref.getText("help_menu_playlist_category") + "</b>");
 
     QWidget *playlistSubTab = new QWidget();
     QVBoxLayout *playlistSubTabLayout = new QVBoxLayout();
@@ -111,7 +111,7 @@ void HelperWidget::initLayout()
     });
     emit m_playlistTab->stateChanged(false);
 
-    m_timelineTab = new CustomCheckbox("<b>" +pref.getText("help_menu_timeline_checkbox") + "</b>");
+    m_timelineTab = new CustomCheckbox("<b>" +pref.getText("help_menu_timeline_category") + "</b>");
 
     QWidget *timelineSubTab = new QWidget();
     QVBoxLayout *timelineSubTabLayout = new QVBoxLayout();
@@ -241,7 +241,7 @@ void HelperWidget::setClassicContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* classicContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_classic_checkbox") + "</b></h1>");
+    QLabel* classicContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_classic_category") + "</b></h1>");
 
     QLabel* openFilesTitle = new QLabel("<h2><b>" + pref.getText("help_menu_open_files_label") + "</b></h2>");
 
@@ -414,7 +414,7 @@ void HelperWidget::setMultiviewContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* multiviewContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_multiview_checkbox") + "</b></h1>");
+    QLabel* multiviewContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_multiview_category") + "</b></h1>");
     QLabel* enterMultiviewTitle = new QLabel("<h2><b>" + pref.getText("help_menu_enter_multiview_label") + "</b></h2>");
     QLabel* enterMultiviewContent1 = new QLabel(pref.getText("help_menu_enter_multiview_content_1"));
     enterMultiviewContent1->setWordWrap(true);
@@ -535,7 +535,7 @@ void HelperWidget::setPlaylistContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* playlistContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_playlist_checkbox") + "</b></h1>");
+    QLabel* playlistContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_playlist_category") + "</b></h1>");
 
     QLabel* accessPlaylistTitle = new QLabel("<h2><b>" + pref.getText("help_menu_access_playlist_label") + "</b></h2>");
     QLabel* accessPlaylistContent1 = new QLabel(pref.getText("help_menu_access_playlist_content_1"));
@@ -618,7 +618,7 @@ void HelperWidget::setTimelineContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* timelineContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_timeline_checkbox") + "</b></h1>");
+    QLabel* timelineContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_timeline_category") + "</b></h1>");
 
     QLabel* timelineDisplayTitle = new QLabel("<h2><b>" + pref.getText("help_menu_timeline_display_label") + "</b></h2>");
     QLabel* timelineDisplayContent1 = new QLabel(pref.getText("help_menu_timeline_display_content_1"));

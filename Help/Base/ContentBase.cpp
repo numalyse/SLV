@@ -189,6 +189,10 @@ void ContentBase::setDescription(const QString& descriptionName)
 
     QLabel* descriptionLabel = new QLabel(pref.getText(descriptionName));
     
+    descriptionLabel->setWordWrap(true);
+    descriptionLabel->setAlignment(Qt::AlignJustify);
+    descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    
     layout->addWidget(descriptionLabel);
 
     addContent(widget);

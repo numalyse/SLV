@@ -11,9 +11,8 @@ public:
     explicit MonoviewContent(QWidget* parent = nullptr);
 
 private:
-    QWidget* introduction();
-    QWidget* player();
-    QWidget *classicBar();
+    QWidget* openmedia(const QString& subcategoryName);
+    QWidget* player(const QString& subcategoryName);
 };
 
 #endif

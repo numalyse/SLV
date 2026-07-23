@@ -8,23 +8,21 @@
 #include <QStyleHints>
 
 MultiviewContent::MultiviewContent(QWidget* parent)
-    : CategoryBase("Multiview", parent)
+    : CategoryBase("help_menu_multiview_category", parent)
 {
+    QString multiview = "help_menu_enter_multiview_label";
 
     addSubcategory(
-        "Introduction",
-        introduction()
+        multiview,
+        introduction(multiview)
     );
 
     
 }
 
-QWidget* MultiviewContent::introduction()
+QWidget* MultiviewContent::introduction(const QString& subcategoryName)
 {
-    QWidget* widget = new QWidget;
-
-    auto* layout = new QVBoxLayout(widget);
-    layout->addWidget(new QLabel("Bienvenue dans la documentation!!!!"));
+    QWidget* widget = new ContentBase(this, categoryName(), subcategoryName);
 
     return widget;
 }

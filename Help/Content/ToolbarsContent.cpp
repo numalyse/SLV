@@ -36,6 +36,8 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
+    widget->setDescription("help_menu_classic_toolbar_content_1");
+
     widget->createButtonDescriptionTable(
         "help_menu_classic_toolbar_left_buttons", 
         {

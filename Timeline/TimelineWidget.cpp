@@ -409,8 +409,8 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
-    QAction *actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
-    QAction *actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
+    QAction *actionSplit = nullptr;
+    QAction *actionExtractShot = nullptr;
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -418,32 +418,38 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionExtractAB = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
-    QAction* actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+    QAction* actionOpenShotInfo = nullptr;
 
-    if(m_showMergeWithPrevShotBtn){
-        mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
-    }
-    if(m_showMergeWithNextShotBtn){
-        mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
-    }
-
-    switch (m_abManager->getMarkerCount())
+    if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
-    case 0:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
-        break;
-    case 1:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
-        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        break;
-    case 2:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
-        break;
-    }
-
-    if ( m_shotManager->getNbShotsSelected() > 0 ) {
         actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
+    } else 
+    {
+        actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
+        actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+        actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
+
+        if(m_showMergeWithPrevShotBtn){
+            mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
+        }
+        if(m_showMergeWithNextShotBtn){
+            mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
+        }
+
+        switch (m_abManager->getMarkerCount())
+        {
+        case 0:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
+            break;
+        case 1:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
+            deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+            break;
+        case 2:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+            actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
+            break;
+        }
     }
 
     QAction *selectedAction = menu.exec(globalPos);

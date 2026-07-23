@@ -44,12 +44,14 @@ public slots:
     void releaseOpenCvCap();
 
 signals:
+    void colorReady(ThumbnailWorker::Requester requester, int requestId, const QColor& color);
     void thumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
 
 protected:
     void run() override;
 
 private:
+    QColor getImgColor(const QImage &img) const;
     struct ThumbnailRequest{
         Requester requester;
         int requestId;
@@ -61,6 +63,7 @@ private:
     };
 
     QQueue<ThumbnailRequest> m_queue;
+    QQueue<ThumbnailRequest> m_colorQueue;
     QQueue<ThumbnailRequest> m_priorityQueue;
     QMutex m_mutex;
     QWaitCondition m_condition;

@@ -92,8 +92,8 @@ private:
     VideoCaptureManager m_videoCaptureManager;
 
 private slots:
-    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image);
-
+    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
+    void colorReady(ThumbnailWorker::Requester requester, int requestId, const QColor& color);
 };
 
 

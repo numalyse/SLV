@@ -64,12 +64,23 @@ void ContentBase::addLayout(QLayout* layout)
 
 void ContentBase::setCategoryName(const QString& categoryName){
     auto* name = new QLabel(pref.getText(categoryName));
-    name->setStyleSheet("font-weight: bold;");
+
+    QFont nameFont = name->font();
+    nameFont.setPointSize(20);
+    nameFont.setBold(true);
+    name->setFont(nameFont);
+
     addContent(name);
 }
 
 void ContentBase::setsubcategoryName(const QString& subcategoryName){
     auto* name = new QLabel(pref.getText(subcategoryName));
+
+    QFont nameFont = name->font();
+    nameFont.setPointSize(12);
+    nameFont.setBold(true);
+    name->setFont(nameFont);
+
     addContent(name);
 }
 

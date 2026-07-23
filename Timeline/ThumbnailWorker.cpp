@@ -1,5 +1,6 @@
 #include "ThumbnailWorker.h"
 #include "VideoCaptureHelper.h"
+#include "PrefManager.h"
 
 #include <QDebug>
 #include <QFile>
@@ -63,6 +64,8 @@ void ThumbnailWorker::run()
     QString previousMediaPath = "";
     double fps {};
 
+    bool getColorFromRequests = PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image";
+
     while(!m_stop){
         ThumbnailRequest req;
 
@@ -87,7 +90,6 @@ void ThumbnailWorker::run()
 
             req = (!m_priorityQueue.empty()) ? m_priorityQueue.dequeue() : 
                   (!m_colorQueue.empty())    ? m_colorQueue.dequeue() : m_queue.dequeue();
-
 
         }
 
@@ -154,6 +156,12 @@ void ThumbnailWorker::run()
         if(req.requester == Requester::Color){
             emit colorReady(req.requester, req.requestId, getImgColor(img));
         }else {
+            // For timeline shots, compute the color directly from the already-decoded thumbnail
+            // instead of pushing a separate request to the color queue, which would decode the
+            // image a second time (displayTagFrame mode).
+            if(req.requester == Requester::TimelineShot && getColorFromRequests)
+                emit colorReady(req.requester, req.requestId, getImgColor(img));
+
             emit thumbnailReady(req.requester, req.requestId, img.copy()); // copy because img does a shallow copy of the cv::mat otherwise
         }
     }

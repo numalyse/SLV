@@ -159,12 +159,33 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     m_mediaLogoWidget = new MediaLogoWidget(containerWidget, c_DragDropIcon, c_DragDropWidth); // base state to drag and drop
 
     auto& prefManager = PrefManager::instance();
+
+    // forced dark, whatever the app theme is, since this sits over the black media background
+    const QString labelStyle = "QLabel { color: white; background: transparent; }";
+    const QString buttonStyle =
+        "QPushButton {"
+        "   background-color: #2b2b2b;"
+        "   color: white;"
+        "   border: 1px solid #4a4a4a;"
+        "   border-radius: 6px;"
+        "   padding: 6px 16px;"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: #3d3d3d;"
+        "   border: 1px solid #5e5e5e;"
+        "}"
+        "QPushButton:pressed {"
+        "   background-color: #1e1e1e;"
+        "}";
+
     QLabel* dragDropHint = new QLabel(prefManager.getText("drag_drop_hint"), m_mediaLogoWidget);
     dragDropHint->setAlignment(Qt::AlignCenter);
+    dragDropHint->setStyleSheet(labelStyle);
     m_mediaLogoWidget->contentLayout()->addWidget(dragDropHint);
 
     QLabel* orLabel = new QLabel(prefManager.getText("drag_drop_or"), m_mediaLogoWidget);
     orLabel->setAlignment(Qt::AlignCenter);
+    orLabel->setStyleSheet(labelStyle);
     m_mediaLogoWidget->contentLayout()->addWidget(orLabel);
 
     // wrapped in a widget so setContentVisible() can toggle the whole row at once
@@ -173,10 +194,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     buttonRowLayout->setContentsMargins(0,0,0,0);
 
     QPushButton* openMediaButton = new QPushButton(prefManager.getText("drag_drop_open_button"), buttonRow);
+    openMediaButton->setStyleSheet(buttonStyle);
     connect(openMediaButton, &QPushButton::clicked, this, &PlayerWidget::play); // use play since if no media loaded, will open a dialog to load
     buttonRowLayout->addWidget(openMediaButton);
 
     QPushButton* openProjectButton = new QPushButton(prefManager.getText("drag_drop_open_project_button"), buttonRow);
+    openProjectButton->setStyleSheet(buttonStyle);
     connect(openProjectButton, &QPushButton::clicked, this, [this](){
         if(!confirmSaveCurrentProject()) return;
         ProjectManager::instance().openProject();

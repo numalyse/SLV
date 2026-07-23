@@ -284,6 +284,11 @@ void MainWindow::createToolBar()
         m_navPanelBtn->setButtonState(m_globalPlayerManager->isNavPanelOpen());
     });
 
+    connect(&SignalManager::instance(), &SignalManager::displayNavPanel, this, [this](PanelType type){
+        m_globalPlayerManager->displayNavPanel(type);
+        m_navPanelBtn->setButtonState(m_globalPlayerManager->isNavPanelOpen());
+    });
+
     m_toolbarQt->setMovable(false);
     m_toolbarQt->setFloatable(false);
     // toolbar->addSeparator();

@@ -194,6 +194,9 @@ void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
 /// ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath()); aurait reset le projet créer 
 /// @param filesPaths 
 void PlayerLayoutManager::createLayoutFromProject(const QStringList& filesPaths){
+    detachAllPlayers();
+    activePlayerUpdate(1);
+    
     QWidget* container = create1(filesPaths);
     PlayerWidget* player = m_activePlayers[0];
     emit enableNavPanelRequested();

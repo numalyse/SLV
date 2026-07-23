@@ -335,6 +335,10 @@
 
     "dialog_open_files" : "Apri file multimediali",
     "dialog_open_file" : "Apri file",
+    "drag_drop_hint" : "Trascina e rilascia qui",
+    "drag_drop_or" : "o",
+    "drag_drop_open_button" : "Apri file",
+    "drag_drop_open_project_button" : "Apri progetto",
     "dialog_open_project" : "Apri progetto",
 
     "project_window_title_copy_video": "Creazione progetto: copia video in corso...",

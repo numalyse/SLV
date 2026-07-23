@@ -72,7 +72,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
     // connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
-    connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
+    connect(m_toolBar, &Toolbar::ejectRequest, this, [this]{
+        m_toolBar->ejectBtn()->setDisabled(true);
+        emit &PlayerWidget::eject;
+    });
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
     connect(m_toolBar, &SimpleToolbar::enableMuteRequest, this, &PlayerWidget::mute);

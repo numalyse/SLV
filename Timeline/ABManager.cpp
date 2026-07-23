@@ -89,30 +89,8 @@ void ABManager::extractLoop()
     // if the project is saved in a folder, use it else use prefmanager export path
     QString dialogDir = (projManager.project()->path.isEmpty()) ? prefManager.getPref("Paths", "lp_export") : projManager.project()->path;
 
-    QString selectedPath = QFileDialog::getSaveFileName(
-        nullptr,
-        prefManager.getText("export_file_path_title"),
-        dialogDir + "/" + mediaFileInfo.baseName() + "_"
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[0]->time(), projManager.project()->media->fps())
-            + TimeFormatter::fileFormatMsToHHMMSSFF(m_markers[1]->time(), projManager.project()->media->fps())
-    );
-
-    selectedPath += '.' + mediaFileInfo.suffix();
-
-    SequenceExtractionHelper *ffmpegProcess = new SequenceExtractionHelper(mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time());
-    connect(ffmpegProcess, &SequenceExtractionHelper::extractionFinished, this, [this, selectedPath, ffmpegProcess](const int exitCode) {
-        if (exitCode < 1) {
-            emit loopExtractionFailed();
-        } else {
-            emit loopExtracted(selectedPath);
-        }
-        ffmpegProcess->deleteLater();
-    });
-    ffmpegProcess->extractSequence(
-        mediaFileInfo.filePath(), m_markers[0]->time(), m_markers[1]->time(), selectedPath
-    );
-
-
+    ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*projManager.media(), nullptr, m_markers[0]->time(), m_markers[1]->time()); // TODO give current track for audio extraction
+    sequenceExtractor->show();
 
 }
 

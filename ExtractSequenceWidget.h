@@ -53,6 +53,7 @@ private:
     QComboBox* m_methodChoice;
     QPushButton* m_cancelButton;
     QLabel* m_warningMsg;
+    QString m_selectedPath;
 
 signals:
 

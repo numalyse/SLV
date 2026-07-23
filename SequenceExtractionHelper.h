@@ -46,19 +46,35 @@ private:
     const int m_startTime;
     const int m_endTime;
     int m_progression;
-    QTemporaryDir m_tempDir;
     QFile *m_segmentList = nullptr;
     KeyframeBounds m_kb;
     CodecParams m_codecParams;
+    QHash<QProcess*, QString> m_progressBuffer;
+    QProcess *m_currentProcess = nullptr;
+    QStringList m_currentWorkingPaths;
 
 public:
 
     SequenceExtractionHelper(const QString& filePath, const int start, const int end) : m_videoPath(filePath), m_startTime(start), m_endTime(end), m_progression(0)
-    {}
+    {
+    }
 
     ~SequenceExtractionHelper()
     {
-        m_tempDir.remove();
+
+        if (m_currentProcess) {
+            m_currentProcess->disconnect(this);
+            QStringList paths = m_currentWorkingPaths;
+            connect(m_currentProcess, &QProcess::finished, [paths]{
+                for (const QString &path : std::as_const(paths)){
+                    int res = QFile(path).remove();
+                }
+            });
+            m_currentProcess->kill();
+            m_currentProcess->deleteLater();
+            m_currentProcess = nullptr;
+        } 
+
     }
 
     enum class ExtractionType{
@@ -100,6 +116,8 @@ public:
     /// @param startTime : start of the sequence from media in ms
     /// @param endTime : end of the sequence from media in ms
     /// @param savePath : path in which the sequence will be saved
+    /// @param exportType : Original or AudioOnly
+    /// @param finishSignal : if true, emit signals when process is finished and progress steps
     inline QProcess* extractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original, bool finishSignal = true, unsigned int audioTrack = 0){
         QProcess *ffmpeg = new QProcess();
 
@@ -149,14 +167,14 @@ public:
                  << "-map" << "0:a?"
                  << "-map" << "0:s?"
                  << "-c" << "copy";
-                 // << "-progress" << "pipe:1"
-                 // << "-nostats";
             break;
         }
 
-        args << finalSavePath;
+        args << "-progress" << "pipe:1"
+             << "-nostats"
+             << finalSavePath;
 
-        connect(ffmpeg, &QProcess::finished, [this, ffmpeg, finishSignal](){
+        connect(ffmpeg, &QProcess::finished, this,  [this, ffmpeg, finishSignal](){
             if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0){
                 qDebug() << "Exit Status : " << ffmpeg->exitStatus() << " exitCode : " << ffmpeg->exitCode() << "errors : " << ffmpeg->readAllStandardError();
             }
@@ -164,8 +182,16 @@ public:
             if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0)
                 emit extractionFinished(-1);
             emit extractionFinished(1);
-
+            m_currentProcess = nullptr;
+            m_currentWorkingPaths.clear();
         });
+
+        if(finishSignal){
+            connect(ffmpeg, &QProcess::readyReadStandardOutput, this, [this, ffmpeg, duration](){ computeProgress(ffmpeg, duration); });
+        }
+
+        m_currentProcess = ffmpeg;
+        m_currentWorkingPaths.append(finalSavePath);
         ffmpeg->start(getFfmpegPath(), args);
         //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
         return ffmpeg;
@@ -187,7 +213,7 @@ public:
         return ffmpeg;
     }
 
-    inline static QProcess* processForceKeyframes(const QString& filePath, QVector<int> keyframesTimecode, const QString& savePath, const CodecParams &codecParams)
+    inline QProcess* processForceKeyframes(const QString& filePath, QVector<int> keyframesTimecode, const QString& savePath, const CodecParams &codecParams)
     {
         QProcess *ffmpeg = new QProcess();
         QStringList args;
@@ -203,7 +229,7 @@ public:
              << "-map" << "0:s?" // copy subtitles tracks if exist
              << "-map" << "0:t?"; // copy ass subtitles if exist
 
-        // If codecParams are valid, keep them for extraction. This part should never be accessed
+        // If codecParams are valid, keep them for extraction. This part may never be accessed
         if (codecParams.valid) {
             args << "-c:v" << codecParams.codecName
                  << "-profile:v" << codecParams.profile
@@ -218,12 +244,146 @@ public:
         args << "-c:a" << "copy"
              << "-c:s" << "copy"
              << "-c:t" << "copy"
+             << "-progress" << "pipe:1"
+             << "-nostats"
              << savePath;
 
         qDebug() << args.join(" ");
+        m_currentProcess = ffmpeg;
+        m_currentWorkingPaths.append(savePath);
+        connect(ffmpeg, &QProcess::finished, this, [this](){
+            m_currentProcess = nullptr;
+            m_currentWorkingPaths.clear();
+        });
         ffmpeg->start(getFfmpegPath(), args);
         return ffmpeg;
     }
+
+
+    /// @brief Extract sequence from a media path (Reencodes media with *presumably* no artefact)
+    /// @param filePath : media path
+    /// @param startTime : start of the sequence from media in ms
+    /// @param endTime : end of the sequence from media in ms
+    /// @param savePath : path in which the sequence will be saved
+    /// @note values in computeProgress calls can be changed for a better progress bar
+    inline QProcess* reencodeExtractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath)
+    {
+        QFileInfo fi(savePath);
+        QString baseName = fi.dir().filePath(fi.completeBaseName());
+        QString extention = fi.suffix();
+        QString savePathTemp = baseName + "_temp." + extention;
+        QString savePathTemp2 = baseName + "_temp_2." + extention;
+
+        if(QFile(savePathTemp).exists() || QFile(savePathTemp2).exists()){
+            emit this->extractionFinished(-1);
+        }
+
+
+        // 10s margin in the first cut to place keyframes efficiently after
+        int startKeyFrameCut = std::max(startTime - 10000, 0);
+        int cutStartTime = startTime - startKeyFrameCut;
+        int endKeyFrameCut = endTime + 10000; // ajouter min(end+10s, durationMedia)
+        int cutEndTime = cutStartTime + (endTime-startTime);
+
+        // We don't use QProcess::waitForFinish() here to prevent potential crashes
+
+        // First cut to reencode only the given interval
+        m_currentWorkingPaths.append(savePathTemp);
+        QProcess *keyFrameCutProcess = extractSequence(filePath, startKeyFrameCut, endKeyFrameCut, savePathTemp, ExtractionType::Original, false);
+        int duration = endKeyFrameCut-startKeyFrameCut;
+        connect(keyFrameCutProcess, &QProcess::readyReadStandardOutput, this, [keyFrameCutProcess, duration, this](){ computeProgress(keyFrameCutProcess, duration, 3); });
+        connect(keyFrameCutProcess, &QProcess::finished, this, [this, keyFrameCutProcess, startTime, endTime, cutStartTime, cutEndTime, savePath, savePathTemp, savePathTemp2](){
+            if (keyFrameCutProcess->exitStatus() == QProcess::NormalExit && keyFrameCutProcess->exitCode() == 0){
+
+                // Add keyframes to avoid artifacts. This reencods the entire interval so this process may take time
+                m_currentWorkingPaths.append(savePathTemp2);
+                QProcess *addKeyFramesProcess = processForceKeyframes(savePathTemp, {cutStartTime, cutEndTime}, savePathTemp2, m_codecParams);
+                int duration = cutEndTime - cutStartTime;
+                connect(addKeyFramesProcess, &QProcess::readyReadStandardOutput, this, [addKeyFramesProcess, duration, this](){ computeProgress(addKeyFramesProcess, duration, 3, 100); });
+                connect(addKeyFramesProcess, &QProcess::finished, this, [this, addKeyFramesProcess, startTime, endTime, cutStartTime, cutEndTime, savePath, savePathTemp, savePathTemp2](){
+                    if (addKeyFramesProcess->exitStatus() == QProcess::NormalExit && addKeyFramesProcess->exitCode() == 0){
+                        qDebug() << "start : " << cutStartTime << " end : " << cutEndTime;
+
+                        // Cut the 10s margins
+                        m_currentWorkingPaths.append(savePath);
+                        QProcess *ffmpeg = extractSequence(savePathTemp2, cutStartTime, cutEndTime, savePath, ExtractionType::Original, false);
+                        int duration = cutEndTime - cutStartTime;
+                        connect(ffmpeg, &QProcess::readyReadStandardOutput, this, [ffmpeg, duration, this](){ computeProgress(ffmpeg, duration, 3, 200); });
+                        connect(ffmpeg, &QProcess::finished, this, [this, ffmpeg, savePathTemp, savePathTemp2](){
+                            if (ffmpeg->exitStatus() == QProcess::NormalExit && ffmpeg->exitCode() == 0){
+                                QFile(savePathTemp).remove();
+                                QFile(savePathTemp2).remove();
+                                emit this->extractionFinished(1);
+                            }
+                            else{
+                                qDebug() << "Exit Status : " << ffmpeg->exitStatus() << " exitCode : " << ffmpeg->exitCode() << "errors : " << ffmpeg->readAllStandardError();
+                                qDebug() << "Error in second extraction.";
+                            }
+                        });
+
+                    }else{
+                        qDebug() << "Exit Status : " << addKeyFramesProcess->exitStatus() << " exitCode : " << addKeyFramesProcess->exitCode() << "errors : " << addKeyFramesProcess->readAllStandardError();
+                        qDebug() << "Error when adding keyframes.";
+                        emit this->extractionFinished(-3);
+                    }
+                });
+            }
+            else{
+                qDebug() << "Exit Status : " << keyFrameCutProcess->exitStatus() << " exitCode : " << keyFrameCutProcess->exitCode() << "errors : " << keyFrameCutProcess->readAllStandardError();
+                qDebug() << "Error when extracting for keyframes.";
+                emit this->extractionFinished(-2);
+            }
+        });
+        return nullptr;
+    }
+
+public slots:
+    /// @brief Used to generate a ProgressDialog from a ffmpeg process
+    /// @param process : process which progression is watched
+    /// @param duration : duration of the given timecodes
+    /// @param stepNumber : number of subprocesses
+    /// @param offset : offset for subprocesses
+    void computeProgress(QProcess* process, int duration, int stepNumber = 1, int offset = 0)
+    {
+        m_progressBuffer[process] += QString::fromUtf8(process->readAllStandardOutput());
+
+        QString &buffer = m_progressBuffer[process];
+
+        static QRegularExpression re(R"(out_time_ms=(\d+))");
+
+        auto it = re.globalMatch(buffer);
+
+        while (it.hasNext()) {
+            auto match = it.next();
+
+            qint64 outTimeMs = match.captured(1).toLongLong();
+
+            double currentMs = outTimeMs / 1000.0;
+
+            int progress = qBound(
+                0,
+                int(offset + (currentMs * 100.0 / duration)),
+                stepNumber * 100);
+
+            emit progressStep(float(progress)/stepNumber);
+        }
+
+        int lastNewline = buffer.lastIndexOf('\n');
+        if (lastNewline >= 0)
+            buffer.remove(0, lastNewline + 1);
+    }
+
+    void cancelCurrentProcess()
+    {
+
+    }
+
+
+    // __________________________________________________
+    //
+    // Experimental functions to extract sequences with libavcodec and libavformat
+    //
+    // __________________________________________________
 
     // inline static bool findKeyframeBounds(const QString &filePath, int64_t startMs, int64_t endMs, KeyframeBounds &kb)
     // {
@@ -333,45 +493,45 @@ public:
     // }
 
     /// @brief Extract, force keyframe at startTime and extract again
-    inline void reencodeTimecode(const bool isStart, const int BT, const int AT)
-    {
-        QString extractionPath1 = m_tempDir.path() + "/extract1_" + (isStart ? "start" : "end") + "." + QFileInfo(m_videoPath).suffix();
+    // inline void reencodeTimecode(const bool isStart, const int BT, const int AT)
+    // {
+    //     QString extractionPath1 = m_tempDir.path() + "/extract1_" + (isStart ? "start" : "end") + "." + QFileInfo(m_videoPath).suffix();
 
-        // First extraction, to avoid reencoding the entire video
-        QProcess *extract1 = extractSequence(m_videoPath, BT, AT, extractionPath1, ExtractionType::Original, false);
-        connect(extract1, &QProcess::finished, [this, extract1, isStart, extractionPath1, BT, AT](){
-            if (extract1->exitStatus() != QProcess::NormalExit || extract1->exitCode() != 0)
-                qDebug() << "[Sequence extraction] Error in first extraction for " + QString(isStart ? "start" : "end");
-            QString forceKFpath = m_tempDir.path() + "/fkf_" + (isStart ? "start" : "end") + "."  + QFileInfo(m_videoPath).suffix();
+    //     // First extraction, to avoid reencoding the entire video
+    //     QProcess *extract1 = extractSequence(m_videoPath, BT, AT, extractionPath1, ExtractionType::Original, false);
+    //     connect(extract1, &QProcess::finished, [this, extract1, isStart, extractionPath1, BT, AT](){
+    //         if (extract1->exitStatus() != QProcess::NormalExit || extract1->exitCode() != 0)
+    //             qDebug() << "[Sequence extraction] Error in first extraction for " + QString(isStart ? "start" : "end");
+    //         QString forceKFpath = m_tempDir.path() + "/fkf_" + (isStart ? "start" : "end") + "."  + QFileInfo(m_videoPath).suffix();
 
-            // Add keyframes at the specified timecode (m_startTime or m_endTime)
-            QProcess *forceKeyFrame = processForceKeyframes(extractionPath1, {isStart ? (m_startTime - BT) : (m_endTime - BT)}, forceKFpath, m_codecParams);
-            connect(forceKeyFrame, &QProcess::finished, [this, forceKeyFrame, isStart, extractionPath1, forceKFpath, BT, AT](){
-                if (forceKeyFrame->exitStatus() != QProcess::NormalExit || forceKeyFrame->exitCode() != 0){
-                    qDebug() << "[Sequence extraction] Error in force keyframes for " + QString(isStart ? "start" : "end");
-                    qDebug() << "Exit Status : " << forceKeyFrame->exitStatus() << " exitCode : " << forceKeyFrame->exitCode() << "errors : " << forceKeyFrame->readAllStandardError();
-                }
-                QString extractionPath2 = m_tempDir.path() + "/extract2_" + (isStart ? "start" : "end") + "."  + QFileInfo(m_videoPath).suffix();
+    //         // Add keyframes at the specified timecode (m_startTime or m_endTime)
+    //         QProcess *forceKeyFrame = processForceKeyframes(extractionPath1, {isStart ? (m_startTime - BT) : (m_endTime - BT)}, forceKFpath, m_codecParams);
+    //         connect(forceKeyFrame, &QProcess::finished, [this, forceKeyFrame, isStart, extractionPath1, forceKFpath, BT, AT](){
+    //             if (forceKeyFrame->exitStatus() != QProcess::NormalExit || forceKeyFrame->exitCode() != 0){
+    //                 qDebug() << "[Sequence extraction] Error in force keyframes for " + QString(isStart ? "start" : "end");
+    //                 qDebug() << "Exit Status : " << forceKeyFrame->exitStatus() << " exitCode : " << forceKeyFrame->exitCode() << "errors : " << forceKeyFrame->readAllStandardError();
+    //             }
+    //             QString extractionPath2 = m_tempDir.path() + "/extract2_" + (isStart ? "start" : "end") + "."  + QFileInfo(m_videoPath).suffix();
 
-                // Second extraction, between specified timecode and first keyframe before/after
-                int intervalStart = isStart ? m_startTime - BT : 0;
-                int intervalEnd = isStart ? AT - BT : m_endTime - BT;
-                qDebug() << "BT =" << BT;
-                qDebug() << "AT =" << AT;
-                qDebug() << "intervalStart =" << intervalStart;
-                qDebug() << "intervalEnd =" << intervalEnd;
-                QProcess *extract2 = extractSequence(forceKFpath, intervalStart, intervalEnd, extractionPath2, ExtractionType::Original, false);
-                connect(extract2, &QProcess::finished, [this, extract2, isStart, extractionPath1, forceKFpath, BT, AT](){
-                    if (extract2->exitStatus() != QProcess::NormalExit || extract2->exitCode() != 0)
-                        qDebug() << "[Sequence extraction] Error in second extraction for " + QString(isStart ? "start" : "end");
-                        qDebug() << "Exit Status : " << extract2->exitStatus() << " exitCode : " << extract2->exitCode() << "errors : " << extract2->readAllStandardError();
-                    QFile(extractionPath1).remove();
-                    QFile(forceKFpath).remove();
-                    emit stepFinished();
-                });
-            });
-        });
-    }
+    //             // Second extraction, between specified timecode and first keyframe before/after
+    //             int intervalStart = isStart ? m_startTime - BT : 0;
+    //             int intervalEnd = isStart ? AT - BT : m_endTime - BT;
+    //             qDebug() << "BT =" << BT;
+    //             qDebug() << "AT =" << AT;
+    //             qDebug() << "intervalStart =" << intervalStart;
+    //             qDebug() << "intervalEnd =" << intervalEnd;
+    //             QProcess *extract2 = extractSequence(forceKFpath, intervalStart, intervalEnd, extractionPath2, ExtractionType::Original, false);
+    //             connect(extract2, &QProcess::finished, [this, extract2, isStart, extractionPath1, forceKFpath, BT, AT](){
+    //                 if (extract2->exitStatus() != QProcess::NormalExit || extract2->exitCode() != 0)
+    //                     qDebug() << "[Sequence extraction] Error in second extraction for " + QString(isStart ? "start" : "end");
+    //                 qDebug() << "Exit Status : " << extract2->exitStatus() << " exitCode : " << extract2->exitCode() << "errors : " << extract2->readAllStandardError();
+    //                 QFile(extractionPath1).remove();
+    //                 QFile(forceKFpath).remove();
+    //                 emit stepFinished();
+    //             });
+    //         });
+    //     });
+    // }
 
     // inline void extractSequenceLossless(const QString& savePath)
     // {
@@ -405,79 +565,24 @@ public:
     //     reencodeTimecode(false, kb.BE, kb.AE);
     // }
 
-    inline QProcess* reencodeExtractSequence(const QString& filePath, int startTime, int endTime, const QString& savePath, ExtractionType exportType = ExtractionType::Original)
-    {
-        if(exportType == ExtractionType::AudioOnly){
-            return extractSequence(filePath, startTime, endTime, savePath, exportType);
-        }
+    // inline void finishSequenceExtraction(const QString& savePath)
+    // {
+    //     m_progression++;
+    //     if(m_progression != 3) return;
 
-        QFileInfo fi(savePath);
-        QString baseName = fi.dir().filePath(fi.completeBaseName());
-        QString extention = fi.suffix();
-        QString savePathTemp = baseName + "_temp." + extention;
-        QString savePathTemp2 = baseName + "_temp_2." + extention;
+    //     m_progression = 0;
+    //     qDebug() << QFileInfo(*m_segmentList).filePath();
+    //     QProcess *concatProcess = concatenateSequences(QFileInfo(*m_segmentList).filePath(), savePath);
+    //     connect(concatProcess, &QProcess::finished, [this, concatProcess](){
+    //         if (concatProcess->exitStatus() != QProcess::NormalExit || concatProcess->exitCode() != 0){
+    //             qDebug() << "[Sequence extraction] Error in concatenation";
+    //             qDebug() << "Exit Status : " << concatProcess->exitStatus() << " exitCode : " << concatProcess->exitCode() << "errors : " << concatProcess->readAllStandardError();
+    //         }
+    //         m_tempDir.remove();
+    //         emit extractionFinished(1);
+    //     });
 
-        if(QFile(savePathTemp).exists() || QFile(savePathTemp2).exists()){
-            emit this->extractionFinished(-1);
-        }
-
-        int startKeyFrameCut = std::max(startTime - 10000, 0);
-        int cutStartTime = startTime - startKeyFrameCut;
-        int endKeyFrameCut = endTime + 10000; // ajouter min(end+10s, durationMedia)
-        int cutEndTime = cutStartTime + (endTime-startTime);
-
-        // m_codecParams = getVideoCodecParams(filePath);
-
-        // on découpe une séquence grossière pour pouvoir y placer des keyframes sans encoder toute la vidéo
-        QProcess *keyFrameCutProcess = extractSequence(filePath, startKeyFrameCut, endKeyFrameCut, savePathTemp, ExtractionType::Original, false);
-        connect(keyFrameCutProcess, &QProcess::finished, [this, keyFrameCutProcess, startTime, endTime, cutStartTime, cutEndTime, savePath, savePathTemp, savePathTemp2](){
-            qDebug() << "Exit Status : " << keyFrameCutProcess->exitStatus() << " exitCode : " << keyFrameCutProcess->exitCode() << "errors : " << keyFrameCutProcess->readAllStandardError();
-            if (keyFrameCutProcess->exitStatus() == QProcess::NormalExit && keyFrameCutProcess->exitCode() == 0){
-                QProcess *addKeyFramesProcess = processForceKeyframes(savePathTemp, {cutStartTime, cutEndTime}, savePathTemp2, m_codecParams);
-                connect(addKeyFramesProcess, &QProcess::finished, [this, addKeyFramesProcess, startTime, endTime, cutStartTime, cutEndTime, savePath, savePathTemp, savePathTemp2](){
-                    if (addKeyFramesProcess->exitStatus() == QProcess::NormalExit && addKeyFramesProcess->exitCode() == 0){
-                        qDebug() << "start : " << cutStartTime << " end : " << cutEndTime;
-                        QProcess *ffmpeg = extractSequence(savePathTemp2, cutStartTime, cutEndTime, savePath, ExtractionType::Original, false);
-                        connect(ffmpeg, &QProcess::finished, [this, ffmpeg, savePathTemp, savePathTemp2](){
-                            qDebug() << "Exit Status : " << ffmpeg->exitStatus() << " exitCode : " << ffmpeg->exitCode() << "errors : " << ffmpeg->readAllStandardError();
-                            QFile(savePathTemp).remove();
-                            QFile(savePathTemp2).remove();
-                            emit this->extractionFinished(1);
-                        });
-                    }else{
-                        qDebug() << "error when adding keyframes.";
-                        qDebug() << "Exit Status : " << addKeyFramesProcess->exitStatus() << " exitCode : " << addKeyFramesProcess->exitCode() << "errors : " << addKeyFramesProcess->readAllStandardError();
-                        emit this->extractionFinished(-3);
-                    }
-                });
-            }
-            else{
-                qDebug() << "error when extracting for keyframes.";
-                emit this->extractionFinished(-2);
-            }
-        });
-        return nullptr;
-    }
-
-public slots:
-    inline void finishSequenceExtraction(const QString& savePath)
-    {
-        m_progression++;
-        if(m_progression != 3) return;
-
-        m_progression = 0;
-        qDebug() << QFileInfo(*m_segmentList).filePath();
-        QProcess *concatProcess = concatenateSequences(QFileInfo(*m_segmentList).filePath(), savePath);
-        connect(concatProcess, &QProcess::finished, [this, concatProcess](){
-            if (concatProcess->exitStatus() != QProcess::NormalExit || concatProcess->exitCode() != 0){
-                qDebug() << "[Sequence extraction] Error in concatenation";
-                qDebug() << "Exit Status : " << concatProcess->exitStatus() << " exitCode : " << concatProcess->exitCode() << "errors : " << concatProcess->readAllStandardError();
-            }
-            m_tempDir.remove();
-            emit extractionFinished(1);
-        });
-
-    }
+    // }
 
 signals:
     void extractionFinished(const int exitCode);

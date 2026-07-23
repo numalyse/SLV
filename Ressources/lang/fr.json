@@ -475,6 +475,7 @@
     "extract_sequence_reencode" : "Avancée",
     "extract_sequence_warning" : "La méthode avancée peut prendre plusieurs minutes selon la durée de la séquence.",
     "extraction_method_choice" : "Méthode d'extraction",
+    "extract_sequence_progress_text" : "Extraction de séquence en cours...",
 
     "help_menu_general_checkbox" : "Général",
     "help_menu_report_issues_label" : "Signaler un problème",

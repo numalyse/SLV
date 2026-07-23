@@ -4,6 +4,7 @@
 #include <QScreen>
 #include <QComboBox>
 #include <QProgressDialog>
+#include <QDesktopServices>
 
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime, int audioTrack)
     : QDialog{parent}, m_media(media)
@@ -45,8 +46,20 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
     connect(m_thumbnailEndTimer, &QTimer::timeout, this, [this](){ requestEndFrameDisplay(); });
     createButtons();
     initUiLayout();
-    connect(this, &QDialog::finished, this, [this, parent](int res){ if(res == QDialog::Accepted){
-            QMessageBox::information(parent, "", PrefManager::instance().getText("messagebox_extract_sequence_completed"));
+    connect(this, &QDialog::finished, this, [this](int res){ if(res == QDialog::Accepted){
+            QMessageBox msg;
+            QPushButton *openDirBtn = msg.addButton(
+                PrefManager::instance().getText("open_file_directory"),
+                QMessageBox::AcceptRole);
+            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg.setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
+            msg.setIcon(QMessageBox::Information);
+            msg.exec();
+
+            if (msg.clickedButton() == openDirBtn) {
+                QFileInfo fi(m_selectedPath);
+                QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+            }
         }
     });
 }
@@ -195,6 +208,7 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
     auto& prefManager = PrefManager::instance();
     QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), prefManager.getPref("Paths", "lp_extract_sequence")
         + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
+    m_selectedPath = saveSequencePath;
     if(saveSequencePath != ""){
         // On garde seulement la base du nom sans l'extension avec un split
         SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_media.filePath(), m_startTime, m_endTime);
@@ -202,15 +216,16 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
             if(exitCode == 1)
                 this->accept();
         });
-        // QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("extract_sequence_progress_text"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
-        // progressDialog->setWindowTitle(prefManager.getText("extract_sequence_progress_title"));
-        // progressDialog->setWindowModality(Qt::WindowModal);
+        QProgressDialog* progressDialog = new QProgressDialog(prefManager.getText("extract_sequence_progress_text"), prefManager.getText("generic_dialog_btn_cancel"), 0, 100, nullptr);
+        progressDialog->setWindowTitle(prefManager.getText("extract_sequence_action"));
+        progressDialog->setWindowModality(Qt::WindowModal);
 
-        // connect(progressDialog, &QProgressDialog::canceled, this, [this](){
-        //     close();
-        // });
-        // connect(sequenceExtractor, &SequenceExtractionHelper::progressStep, progressDialog, &QProgressDialog::setValue);
-        // progressDialog->show();
+        connect(progressDialog, &QProgressDialog::canceled, this, [this, sequenceExtractor](){
+            sequenceExtractor->deleteLater();
+            close();
+        });
+        connect(sequenceExtractor, &SequenceExtractionHelper::progressStep, progressDialog, &QProgressDialog::setValue);
+        progressDialog->show();
 
         switch(type){
         case SequenceExtractionHelper::ExtractionType::Original:
@@ -221,7 +236,7 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
             // sequenceExtractor->extractSequenceLossless(saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
             break;
         case SequenceExtractionHelper::ExtractionType::Reencode:
-            sequenceExtractor->reencodeExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension(), type);
+            sequenceExtractor->reencodeExtractSequence(m_media.filePath(), m_startTime, m_endTime, saveSequencePath.split('.')[0] + '.' + m_media.fileExtension());
             break;
         }
 

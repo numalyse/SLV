@@ -478,6 +478,7 @@
     "extract_sequence_reencode" : "Erweitert",
     "extract_sequence_warning" : "Die erweiterte Methode kann je nach Länge der Sequenz mehrere Minuten dauern.",
     "extraction_method_choice" : "Extraktionsmethode",
+    "extract_sequence_progress_text" : "Sequenzextraktion läuft...",
 
     "help_menu_general_checkbox" : "Allgemein",
     "help_menu_report_issues_label" : "Ein Problem melden",

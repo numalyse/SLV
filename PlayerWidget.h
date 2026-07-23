@@ -136,6 +136,11 @@ private:
     void updateSingleOverlayGeom(QWidget *widget, bool isVisible);
     void updateSingleLogoGeom(QWidget* widget, bool isVisible);
 
+    // Prompts to save the current project when needed.
+    // Returns false when the user canceled : the caller must abort.
+    bool confirmSaveCurrentProject();
+    void openProjectFromPath(const QString& path);
+
     double m_media_fps {};
     bool m_muted = false;
     SimpleToolbar* m_toolBar = nullptr;

@@ -174,6 +174,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     buttonRowLayout->addWidget(openMediaButton);
 
     QPushButton* openProjectButton = new QPushButton(prefManager.getText("drag_drop_open_project_button"), buttonRow);
+    connect(openProjectButton, &QPushButton::clicked, this, [this](){
+        if(!confirmSaveCurrentProject()) return;
+        ProjectManager::instance().openProject();
+    });
     buttonRowLayout->addWidget(openProjectButton);
 
     m_mediaLogoWidget->contentLayout()->addWidget(buttonRow, 0, Qt::AlignCenter);
@@ -659,7 +663,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
             qDebug() << "Fichier droppé :" << filePath;
             if(FileFormatManager::instance().isFormatAccepted(info.suffix())) filePaths.append(filePath);
             else if(info.isDir()){
-                ProjectManager::instance().openProjectFromPath(filePath);
+                openProjectFromPath(filePath);
                 event->acceptProposedAction();
                 return;
             }
@@ -681,22 +685,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
         }
         else if (filePaths.size() == 1) {
             if(m_mediaWidget->media()){
-                if(ProjectManager::instance().needSave()){
-
-                    PrefManager& txtManager = PrefManager::instance();
-                    bool canceled = false;
-                    SLV::showGenericDialog(
-                        this,
-                        txtManager.getText("dialog_save_project_dialog_title"),
-                        txtManager.getText("dialog_save_project_dialog_text"),
-                        []() {
-                            ProjectManager::instance().saveProject(false);
-                        },
-                        [](){},
-                        [&canceled](){ canceled = true; }
-                    );
-                    if(canceled) return;
-                }
+                if(!confirmSaveCurrentProject()) return;
                 m_pendingFilePath = filePaths.first();
                 eject();
             }
@@ -733,6 +722,51 @@ void PlayerWidget::updateSingleOverlayGeom(QWidget* widget, bool isVisible){
         
         restoreOverlayStackOrder();
     }  
+}
+
+void PlayerWidget::showDragDropLogo()
+{
+    m_mediaLogoWidget->setIcon(c_DragDropIcon, c_DragDropWidth);
+    m_mediaLogoWidget->setContentVisible(true);
+    m_mediaLogoWidget->setDisplay(true);
+    updateSingleLogoGeom(m_mediaLogoWidget, true);
+}
+
+void PlayerWidget::showAudioLogo()
+{
+    m_mediaLogoWidget->setIcon(c_AudioIcon, c_AudioWidth);
+    m_mediaLogoWidget->setContentVisible(false);
+    m_mediaLogoWidget->setDisplay(true);
+    updateSingleLogoGeom(m_mediaLogoWidget, true);
+}
+
+void PlayerWidget::hideMediaLogo()
+{
+    m_mediaLogoWidget->setDisplay(false);
+}
+
+bool PlayerWidget::confirmSaveCurrentProject()
+{
+    ProjectManager& projManager = ProjectManager::instance();
+    if(!projManager.needSave()) return true;
+
+    PrefManager& txtManager = PrefManager::instance();
+    bool canceled = false;
+    SLV::showGenericDialog(
+        this,
+        txtManager.getText("dialog_save_project_dialog_title"),
+        txtManager.getText("dialog_save_project_dialog_text"),
+        [&projManager]() { projManager.saveProject(false); },
+        [](){},
+        [&canceled](){ canceled = true; }
+    );
+    return !canceled;
+}
+
+void PlayerWidget::openProjectFromPath(const QString& path)
+{
+    if(!confirmSaveCurrentProject()) return;
+    ProjectManager::instance().openProjectFromPath(path);
 }
 
 void PlayerWidget::updateSingleLogoGeom(QWidget* widget, bool isVisible){

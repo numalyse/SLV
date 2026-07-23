@@ -484,7 +484,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         }
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
-        emit SignalManager::instance().toggleNavPanel(PanelType::ShotDetail);
+        emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);
     }else if (selectedAction == actionExtractShotsSelected){
 
         QFileInfo fileInfo (p_media->filePath());

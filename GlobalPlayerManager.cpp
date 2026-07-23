@@ -245,6 +245,15 @@ void GlobalPlayerManager::toggleNavPanel(PanelType type){
     }
 }
 
+/// @brief Displays the selected panel. Does nothing if the panel is already open on that type.
+void GlobalPlayerManager::displayNavPanel(PanelType type){
+    if(m_navPanel->isOpen() && m_navPanel->currentPanel() == type){
+        return;
+    }
+    m_navPanel->setPanel(type);
+    openNavPanel();
+}
+
 // slots
 
 void GlobalPlayerManager::resizeEvent(QResizeEvent *event)

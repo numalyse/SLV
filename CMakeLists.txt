@@ -185,6 +185,7 @@ set(ADDITIONAL_SOURCES
     Help/Content/GeneralContent.h Help/Content/GeneralContent.cpp 
     Help/Content/MonoviewContent.h Help/Content/MonoviewContent.cpp 
     Help/Content/MultiviewContent.h Help/Content/MultiviewContent.cpp 
+    Help/Content/ToolbarsContent.h Help/Content/ToolbarsContent.cpp 
 
     # Project extras si manquants
     SequenceExtractionHelper.h

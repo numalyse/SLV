@@ -670,7 +670,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 event->acceptProposedAction();
                 return;
             }
-            if (filePaths.size() >= 4) break;
+            
         }
 
         bool fileNotSupported = filePaths.size() < event->mimeData()->urls().size();
@@ -691,14 +691,19 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 if(!confirmSaveCurrentProject()) return;
                 m_pendingFilePath = filePaths.first();
                 eject();
-            }
-            else{
+            }else {
                 if (setMediaFromPath(filePaths.first()) && !m_toolBar->isVisible()){
                     ProjectManager::instance().requestProjectCreation({filePaths.first()});
                     QFileInfo fileInfo (filePaths.first());
                     PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
                 }
             }
+        }   else if (filePaths.size() > 4) { // more than 4 medias to load 
+            SLV::showGenericDialog(this, PrefManager::instance().getText("open_more_than_four_files_title"), PrefManager::instance().getText("open_more_than_four_files_dialog"), [filePaths, this](){
+                emit SignalManager::instance().addPlaylistItems(filePaths);
+                emit SignalManager::instance().displayPlaylist();
+                emit SignalManager::instance().playFirstPlaylistItem(); // used to update the layout to one player after adding items
+            });
         } else {
             emit mediaDropped(filePaths);
         }

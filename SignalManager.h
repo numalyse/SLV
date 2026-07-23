@@ -64,6 +64,7 @@ signals:
     void requestPlaylistSize();
     void playlistSizeResponse();
     void displayAnnotationPanel();
+    void playFirstPlaylistItem();
 };
 
 

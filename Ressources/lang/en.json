@@ -472,7 +472,7 @@
     "extract_sequence_warning" : "The advanced method may take several minutes depending on the sequence length.",
     "extraction_method_choice" : "Extraction method",
 
-    "help_menu_general_checkbox" : "General",
+    "help_menu_general_category" : "General",
     "help_menu_report_issues_label" : "Report an issue",
     "help_menu_classic_category" : "Mono-view interface",
     "help_menu_open_files_label" : "Play a media",

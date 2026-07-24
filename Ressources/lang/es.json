@@ -473,7 +473,7 @@
     "extract_sequence_warning" : "El método avanzado puede tardar varios minutos dependiendo de la duración de la secuencia.",
     "extraction_method_choice" : "Método de extracción",
 
-    "help_menu_general_checkbox" : "General",
+    "help_menu_general_category" : "General",
     "help_menu_report_issues_label" : "Reportar un problema",
     "help_menu_classic_category" : "Pantalla de una vista",
     "help_menu_open_files_label" : "Reproducir un medio",

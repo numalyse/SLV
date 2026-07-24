@@ -25,15 +25,55 @@ MonoviewContent::MonoviewContent(QWidget* parent)
     
 }
 
+// QMap<QString, QString> createQMAP(QList<QString> list){
+//      QMap<QString, QString> title = {
+//         {"fr", ""},
+//         {"en", ""},
+//         {"es", ""},
+//         {"de", ""},
+//         {"it", ""},
+//         {"pt", ""}
+//     };
+
+
+// }
+
 QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    widget->setDescription("help_menu_open_files_content_1");
-    widget->setImage("open_medias");
+    //widget->addTextFromLangJSON("help_menu_open_files_content_1");
 
-    widget->setDescription("help_menu_open_files_content_2");
-    widget->setImage("open_medias_drag_drop");
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "Il existe différentes façon d'ouvrir un média. \n"
+            "Faire cela."
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
+    //widget->addTextFromLangQMAP(title);
+
+    widget->addImage("open_medias");
+
+    widget->addTextFromLangJSON("help_menu_open_files_content_2");
+    widget->addImage("open_medias_drag_drop");
+
+    widget->addSectionName("help_menu");
 
     return widget;
 }

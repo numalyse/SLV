@@ -36,9 +36,9 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    widget->setDescription("help_menu_classic_toolbar_content_1");
+    widget->addTextFromLangJSON("help_menu_classic_toolbar_content_1");
 
-    widget->createButtonDescriptionTable(
+    widget->addButtonDescriptionTable(
         "help_menu_classic_toolbar_left_buttons", 
         {
             "sound_on",
@@ -47,7 +47,7 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
         }
     );
 
-    widget->createButtonDescriptionTable(
+    widget->addButtonDescriptionTable(
         "help_menu_classic_toolbar_central_buttons", 
         {
             "slow",
@@ -59,7 +59,7 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
         }
     );
 
-    widget->createButtonDescriptionTable(
+    widget->addButtonDescriptionTable(
         "help_menu_classic_toolbar_right_buttons", 
         {
             "zoom",
@@ -78,7 +78,7 @@ QWidget* ToolbarsContent::extendedToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    widget->createButtonDescriptionTable(
+    widget->addButtonDescriptionTable(
         "none", 
         {
             "show_image",
@@ -101,7 +101,7 @@ QWidget* ToolbarsContent::timelineToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    widget->createButtonDescriptionTable(
+    widget->addButtonDescriptionTable(
         "none", 
         {
             "abloop",

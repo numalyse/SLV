@@ -336,7 +336,7 @@
     "dialog_open_file": "Open a file",
     "drag_drop_hint": "Drag & drop here",
     "drag_drop_or": "or",
-    "drag_drop_open_button": "Open a file",
+    "drag_drop_open_button": "Open a media",
     "drag_drop_open_project_button": "Open a project",
     "dialog_open_project": "Open a project",
 
@@ -479,6 +479,7 @@
     "extract_sequence_reencode" : "Advanced",
     "extract_sequence_warning" : "The advanced method may take several minutes depending on the sequence length.",
     "extraction_method_choice" : "Extraction method",
+    "extract_sequence_progress_text" : "Sequence extraction in progress...",
 
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Report an issue",

@@ -337,7 +337,7 @@
     "dialog_open_file" : "Abrir archivo",
     "drag_drop_hint" : "Arrastra y suelta aquí",
     "drag_drop_or" : "o",
-    "drag_drop_open_button" : "Abrir archivo",
+    "drag_drop_open_button" : "Abrir un medio",
     "drag_drop_open_project_button" : "Abrir proyecto",
     "dialog_open_project" : "Abrir proyecto",
 
@@ -479,6 +479,7 @@
     "extract_sequence_reencode" : "Avanzado",
     "extract_sequence_warning" : "El método avanzado puede tardar varios minutos dependiendo de la duración de la secuencia.",
     "extraction_method_choice" : "Método de extracción",
+    "extract_sequence_progress_text" : "Extracción de la secuencia en curso...",
 
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Reportar un problema",

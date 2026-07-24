@@ -159,6 +159,10 @@ Playlist::Playlist(QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
         if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
     });
+    connect(&SignalManager::instance(), &SignalManager::playFirstPlaylistItem, this, [this](){
+        if(m_items.isEmpty()) return;
+        m_items[m_itemsSortOrder[0]]->playMedia();
+    });
     connect(this, &Playlist::playlistItemCountChanged, this, &Playlist::updateDurationPlaylist);
 
 }

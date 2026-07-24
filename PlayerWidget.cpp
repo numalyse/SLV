@@ -72,7 +72,10 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     connect(m_toolBar, &Toolbar::playRequest, this, &PlayerWidget::play);
     connect(m_toolBar, &Toolbar::pauseRequest, this, &PlayerWidget::pause);
     // connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
-    connect(m_toolBar, &Toolbar::ejectRequest, this, &PlayerWidget::eject);
+    connect(m_toolBar, &Toolbar::ejectRequest, this, [this]{
+        m_toolBar->ejectBtn()->setDisabled(true);
+        emit &PlayerWidget::eject;
+    });
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
     connect(m_toolBar, &SimpleToolbar::enableMuteRequest, this, &PlayerWidget::mute);
@@ -156,12 +159,33 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     m_mediaLogoWidget = new MediaLogoWidget(containerWidget, c_DragDropIcon, c_DragDropWidth); // base state to drag and drop
 
     auto& prefManager = PrefManager::instance();
+
+    // forced dark, whatever the app theme is, since this sits over the black media background
+    const QString labelStyle = "QLabel { color: white; background: transparent; }";
+    const QString buttonStyle =
+        "QPushButton {"
+        "   background-color: #2b2b2b;"
+        "   color: white;"
+        "   border: 1px solid #4a4a4a;"
+        "   border-radius: 6px;"
+        "   padding: 6px 16px;"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: #3d3d3d;"
+        "   border: 1px solid #5e5e5e;"
+        "}"
+        "QPushButton:pressed {"
+        "   background-color: #1e1e1e;"
+        "}";
+
     QLabel* dragDropHint = new QLabel(prefManager.getText("drag_drop_hint"), m_mediaLogoWidget);
     dragDropHint->setAlignment(Qt::AlignCenter);
+    dragDropHint->setStyleSheet(labelStyle);
     m_mediaLogoWidget->contentLayout()->addWidget(dragDropHint);
 
     QLabel* orLabel = new QLabel(prefManager.getText("drag_drop_or"), m_mediaLogoWidget);
     orLabel->setAlignment(Qt::AlignCenter);
+    orLabel->setStyleSheet(labelStyle);
     m_mediaLogoWidget->contentLayout()->addWidget(orLabel);
 
     // wrapped in a widget so setContentVisible() can toggle the whole row at once
@@ -170,10 +194,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     buttonRowLayout->setContentsMargins(0,0,0,0);
 
     QPushButton* openMediaButton = new QPushButton(prefManager.getText("drag_drop_open_button"), buttonRow);
+    openMediaButton->setStyleSheet(buttonStyle);
     connect(openMediaButton, &QPushButton::clicked, this, &PlayerWidget::play); // use play since if no media loaded, will open a dialog to load
     buttonRowLayout->addWidget(openMediaButton);
 
     QPushButton* openProjectButton = new QPushButton(prefManager.getText("drag_drop_open_project_button"), buttonRow);
+    openProjectButton->setStyleSheet(buttonStyle);
     connect(openProjectButton, &QPushButton::clicked, this, [this](){
         if(!confirmSaveCurrentProject()) return;
         ProjectManager::instance().openProject();
@@ -667,7 +693,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 event->acceptProposedAction();
                 return;
             }
-            if (filePaths.size() >= 4) break;
+            
         }
 
         bool fileNotSupported = filePaths.size() < event->mimeData()->urls().size();
@@ -688,14 +714,19 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 if(!confirmSaveCurrentProject()) return;
                 m_pendingFilePath = filePaths.first();
                 eject();
-            }
-            else{
+            }else {
                 if (setMediaFromPath(filePaths.first()) && !m_toolBar->isVisible()){
                     ProjectManager::instance().requestProjectCreation({filePaths.first()});
                     QFileInfo fileInfo (filePaths.first());
                     PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
                 }
             }
+        }   else if (filePaths.size() > 4) { // more than 4 medias to load 
+            SLV::showGenericDialog(this, PrefManager::instance().getText("open_more_than_four_files_title"), PrefManager::instance().getText("open_more_than_four_files_dialog"), [filePaths, this](){
+                emit SignalManager::instance().addPlaylistItems(filePaths);
+                emit SignalManager::instance().displayPlaylist();
+                emit SignalManager::instance().playFirstPlaylistItem(); // used to update the layout to one player after adding items
+            });
         } else {
             emit mediaDropped(filePaths);
         }

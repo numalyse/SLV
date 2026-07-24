@@ -37,7 +37,7 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
     m_sideMenuLayout->setSpacing(0);
 
     m_sideMenuTreeWidget = new QTreeWidget();
-    m_sideMenuTreeWidget->setHeaderLabel(pref.getText("help"));
+    m_sideMenuTreeWidget->setHeaderLabel(pref.getText("help_dialog_title"));
     m_sideMenuTreeWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
     m_sideMenuLayout->addWidget(m_sideMenuTreeWidget);
@@ -67,8 +67,20 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
     tooltbars->populateTree(m_sideMenuTreeWidget);
     m_contentWidget->addWidget(tooltbars);
 
-    m_sideMenuTreeWidget->topLevelItem(0)->setExpanded(true);
+    // Initialisation de l'affichage
+    QTreeWidgetItem* firstCategory = m_sideMenuTreeWidget->topLevelItem(0);
+    firstCategory->setExpanded(true);
 
+    if (firstCategory->childCount() > 0)
+    {
+        QTreeWidgetItem* firstSubcategory = firstCategory->child(0);
+        m_sideMenuTreeWidget->setCurrentItem(firstSubcategory);
+
+        QWidget* widget = firstSubcategory->data(0, Qt::UserRole).value<QWidget*>();
+
+        if (widget)
+            showContent(widget);
+    }
 
     connect(m_sideMenuTreeWidget, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, int)
     {

@@ -45,6 +45,7 @@ protected:
     QVBoxLayout* m_mainLayout;
     QVBoxLayout* m_contentLayout;
     PrefManager& pref;
+    FileFormatManager& format;
     QString theme;
     QString backgroundFillColor;
 

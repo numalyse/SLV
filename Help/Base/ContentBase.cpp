@@ -11,6 +11,7 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     : QWidget(parent) , pref(PrefManager::instance())
 {
     pref = PrefManager::instance();
+    format = FileFormatManager::instance();
     theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : ""; 
     
 #ifdef Q_OS_MAC
@@ -260,4 +261,26 @@ void ContentBase::addMails(const QStringList& mails)
     addContent(widget);
 }
 
+void ContentBase::getFormatsAvailables(){
+    auto* widget = new QWidget(this);
+    auto* layout = new QVBoxLayout(widget);
+
+    QList formatList = format.getFormatsList();
+
+    widget->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+
+     for (auto &&mail : mails)
+        {
+        QLabel *label_mail = new QLabel( );
+        label_mail->setAlignment(Qt::AlignCenter);
+        label_mail->setTextFormat(Qt::RichText);
+        label_mail->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        label_mail->setOpenExternalLinks(true);
+        label_mail->setStyleSheet("a { text-decoration: none; }");
+        layout->addWidget(label_mail);
+    }
+
+    addContent(widget);
+    
+}
 

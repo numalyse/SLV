@@ -158,6 +158,8 @@ private:
     QRect m_mediaRect;
     QString m_pendingFilePath;
 
+    QPushButton* m_openProjectButton = nullptr;
+
 private slots:
     void showDragDropLogo();
     void showAudioLogo();

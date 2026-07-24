@@ -53,6 +53,20 @@ public:
     int currentAudioTrackIndex() const { return m_audioLangComboBox->currentIndex(); }
     int currentSubtitlesTrackId() const { return m_subLangComboBox->currentData().toInt(); }
     
+    /// @brief Marks this toolbar as replaced by an AdvancedToolbar (1-player mode).
+    /// Kept as an explicit bool so the mode can be queried reliably, instead of
+    /// inferring it from UI state (isVisible()/isHidden()), which can be a problem when queried while layout building
+    void setReplacedByAdvanced(bool replaced) {
+        m_isReplacedByAdvanced = replaced;
+        if (replaced) {
+            hide();
+        }
+    }
+
+    bool isReplacedByAdvanced() const {
+        return m_isReplacedByAdvanced;
+    }
+
     void resetSlider();
     void stopSlider();
 
@@ -98,6 +112,11 @@ public slots:
 
 private:
     static constexpr int s_bottomMarginFullscreen = 60;
+    
+    // stays hidden after setDefaultUI() while an AdvancedToolbar replaces the tooblar
+    bool shouldShowOnDefaultUI() const override { return !m_isReplacedByAdvanced; }
+
+    bool m_isReplacedByAdvanced = false; // explicit mode flag, see setReplacedByAdvanced()
 
 protected:
     void createSlider();

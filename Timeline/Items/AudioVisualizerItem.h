@@ -9,7 +9,7 @@ class AudioVisualizerItem : public QGraphicsItem
 {
 
 private:
-    const QVector<double> m_amplitudes;
+    QVector<short int> m_amplitudes;
     double m_width;
     const QColor m_color{QColor(108, 73, 184, 255)};
     double m_sizeCoeff{300};

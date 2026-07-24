@@ -74,7 +74,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     // connect(m_toolBar, &Toolbar::stopRequest, this, &PlayerWidget::stop);
     connect(m_toolBar, &Toolbar::ejectRequest, this, [this]{
         m_toolBar->ejectBtn()->setDisabled(true);
-        emit &PlayerWidget::eject;
+        eject();
     });
     connect(m_toolBar, &Toolbar::enableFullscreenRequest, this, &PlayerWidget::enablePlayerFullscreen);
     connect(m_toolBar, &Toolbar::disableFullscreenRequest, this, &PlayerWidget::disablePlayerFullscreen);
@@ -195,16 +195,19 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
     QPushButton* openMediaButton = new QPushButton(prefManager.getText("drag_drop_open_button"), buttonRow);
     openMediaButton->setStyleSheet(buttonStyle);
-    connect(openMediaButton, &QPushButton::clicked, this, &PlayerWidget::play); // use play since if no media loaded, will open a dialog to load
+    connect(openMediaButton, &QPushButton::clicked, this, [this](){
+        if(m_toolBar->isReplacedByAdvanced()) playFromAdvanced(); // use play from advanced since if no media loaded and create project in 1 player mode
+        else play(); // use play since if no media loaded and in multi player mode
+    }); 
     buttonRowLayout->addWidget(openMediaButton);
 
-    QPushButton* openProjectButton = new QPushButton(prefManager.getText("drag_drop_open_project_button"), buttonRow);
-    openProjectButton->setStyleSheet(buttonStyle);
-    connect(openProjectButton, &QPushButton::clicked, this, [this](){
+    m_openProjectButton = new QPushButton(prefManager.getText("drag_drop_open_project_button"), buttonRow);
+    m_openProjectButton->setStyleSheet(buttonStyle);
+    connect(m_openProjectButton, &QPushButton::clicked, this, [this](){
         if(!confirmSaveCurrentProject()) return;
         ProjectManager::instance().openProject();
     });
-    buttonRowLayout->addWidget(openProjectButton);
+    buttonRowLayout->addWidget(m_openProjectButton);
 
     m_mediaLogoWidget->contentLayout()->addWidget(buttonRow, 0, Qt::AlignCenter);
 
@@ -393,7 +396,7 @@ void PlayerWidget::pause()
 void PlayerWidget::togglePlayPause(bool isPlaying)
 {
     if(isPlaying) pause();
-    else if(!m_toolBar->isVisible()) playFromAdvanced();
+    else if(m_toolBar->isReplacedByAdvanced()) playFromAdvanced();
     else play();
 }
 
@@ -636,7 +639,7 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     // Charger le fichier en attente après eject
     if (!m_pendingFilePath.isEmpty()) {
         setMediaFromPath(m_pendingFilePath);
-        if(!m_toolBar->isVisible()){
+        if(m_toolBar->isReplacedByAdvanced()){
             ProjectManager::instance().requestProjectCreation({m_pendingFilePath});
             QFileInfo fileInfo (m_pendingFilePath);
             PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
@@ -715,7 +718,7 @@ void PlayerWidget::dropEvent(QDropEvent *event)
                 m_pendingFilePath = filePaths.first();
                 eject();
             }else {
-                if (setMediaFromPath(filePaths.first()) && !m_toolBar->isVisible()){
+                if (setMediaFromPath(filePaths.first()) && m_toolBar->isReplacedByAdvanced()){
                     ProjectManager::instance().requestProjectCreation({filePaths.first()});
                     QFileInfo fileInfo (filePaths.first());
                     PrefManager::instance().setPref("Paths", "lp_open_media", fileInfo.absolutePath());
@@ -760,6 +763,7 @@ void PlayerWidget::showDragDropLogo()
     m_mediaLogoWidget->setIcon(c_DragDropIcon, c_DragDropWidth);
     m_mediaLogoWidget->setContentVisible(true);
     m_mediaLogoWidget->setDisplay(true);
+    m_openProjectButton->setVisible(m_toolBar->isReplacedByAdvanced());
     updateSingleLogoGeom(m_mediaLogoWidget, true);
 }
 

@@ -134,7 +134,7 @@ public:
         }
 
         QTimer::singleShot(0, this, [this]() {
-            if (!m_isReplacedByAdvanced) {
+            if (shouldShowOnDefaultUI()) {
                 show();
             }
         });
@@ -146,13 +146,6 @@ public:
     void setTBParent(QWidget* parent){
         m_parent = parent;
         setParent(parent);
-    }
-
-    void setReplacedByAdvanced(bool replaced) {
-        m_isReplacedByAdvanced = replaced;
-        if (replaced) {
-            hide();
-        }
     }
 
     void showAnimation();
@@ -195,7 +188,10 @@ protected:
     ToolbarToggleButton* m_muteBtn = nullptr;
     ToolbarToggleButton* m_zoomBtn = nullptr;
     bool m_firstTimeDialog = false;
-    bool m_isReplacedByAdvanced = false; 
+
+    /// @brief Whether setDefaultUI() should show the toolbar once done.
+    /// SimpleToolbar overrides this to stay hidden when replaced by an AdvancedToolbar.
+    virtual bool shouldShowOnDefaultUI() const { return true; }
 
     QShortcut* m_dynamicFullscreenShortcut = nullptr;
 

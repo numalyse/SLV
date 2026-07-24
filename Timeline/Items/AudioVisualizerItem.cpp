@@ -91,7 +91,7 @@ void AudioVisualizerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *opt
             }
 
         }
-        unsigned int indexLast = last >= m_amplitudes.size() ? m_amplitudes.size()-1 : last+1;
+        unsigned int indexLast = last >= m_amplitudes.size()-1 ? m_amplitudes.size()-1 : last+1;
         double nextX = indexLast * m_columnWidth;
         poly << QPoint(nextX, s_topMargin + s_height - m_amplitudes[indexLast])
              << QPoint(nextX, s_topMargin + s_height); // base

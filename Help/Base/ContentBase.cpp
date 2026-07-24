@@ -23,29 +23,33 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     backgroundFillColor = "palette(base)";
 #endif
 
+    m_imageWidth = 800;
+
+    // Setup barre de défilement    
     QScrollArea* scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
 
-    //m_imageWidth = (scrollArea->viewport()->width() - 30) * 0.85;
-    m_imageWidth = 800;
-
+    // Setup contenu
     QWidget* content = new QWidget();
-    m_layout = new QVBoxLayout(content);
-
-    setsubcategoryName(subcategoryName);
-    setCategoryName(categoryName);
-
-    m_layout->setContentsMargins(20, 20, 20, 20);
-    m_layout->setSpacing(10);
-    m_layout->addStretch();
+    m_contentLayout = new QVBoxLayout(content);
+    m_contentLayout->setContentsMargins(20, 20, 20, 20);
+    m_contentLayout->setSpacing(10);
+    m_contentLayout->addStretch();
 
     scrollArea->setWidget(content);
+    m_mainLayout = new QVBoxLayout(this);
+    m_mainLayout->addWidget(scrollArea);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(scrollArea);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    // Titre & sous-titre
+    setCategoryName(categoryName);
+    QFrame *separator = new QFrame();
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+    addContent(separator);
+    setsubcategoryName(subcategoryName);
 
 }
 
@@ -54,15 +58,15 @@ void ContentBase::addContent(QWidget* widget)
     if (!widget)
         return;
 
-    const int nbWidget = m_layout->count();
+    const int nbWidget = m_contentLayout->count();
     const int index = (nbWidget > 0) ? nbWidget - 1 : 0;
 
-    m_layout->insertWidget(index, widget);
+    m_contentLayout->insertWidget(index, widget);
 }
 
 void ContentBase::addLayout(QLayout* layout)
 {
-    m_layout->addLayout(layout);
+    m_contentLayout->addLayout(layout);
 }
 
 void ContentBase::setCategoryName(const QString& categoryName){
@@ -81,6 +85,17 @@ void ContentBase::setsubcategoryName(const QString& subcategoryName){
 
     QFont nameFont = name->font();
     nameFont.setPointSize(12);
+    nameFont.setBold(true);
+    name->setFont(nameFont);
+
+    addContent(name);
+}
+
+void ContentBase::addSectionName(const QString& sectionName){
+    auto* name = new QLabel(pref.getText(sectionName));
+
+    QFont nameFont = name->font();
+    nameFont.setPointSize(11);
     nameFont.setBold(true);
     name->setFont(nameFont);
 
@@ -144,7 +159,7 @@ QWidget* ContentBase::createButtonDescription(const QString& iconName, const QSt
     return widget;
 }
 
-void ContentBase::createButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> buttons)
+void ContentBase::addButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> buttons)
 {
     QList<QWidget*> rows;
 
@@ -160,13 +175,13 @@ void ContentBase::createButtonDescriptionTable(const QString& tableName, std::in
     addContent(createTable(tableName, rows));
 }
 
-void ContentBase::setImage(const QString& imageName)
+void ContentBase::addImage(const QString& imageName)
 {
     auto* widget = new QWidget(this);
     auto* layout = new QHBoxLayout(widget);
 
     QLabel* illustrationLabel = new QLabel();
-    QPixmap illustration(":/help_dialog_illustrations/"+imageName);
+    QPixmap illustration(":/help_dialog_illustrations/" + imageName);
     illustrationLabel->setPixmap(illustration.scaled(
         m_imageWidth,
         10000,
@@ -182,18 +197,67 @@ void ContentBase::setImage(const QString& imageName)
     addContent(widget);
 }
 
-void ContentBase::setDescription(const QString& descriptionName)
+void ContentBase::addTextFromLangJSON(const QString& descriptionKey)
 {
     auto* widget = new QWidget(this);
     auto* layout = new QHBoxLayout(widget);
 
-    QLabel* descriptionLabel = new QLabel(pref.getText(descriptionName));
+    QLabel* descriptionLabel = new QLabel(pref.getText(descriptionKey));
+
+    QFont descriptionFont = descriptionLabel->font();
+    descriptionFont.setPointSize(11);
+    descriptionLabel->setFont(descriptionFont);
     
     descriptionLabel->setWordWrap(true);
-    descriptionLabel->setAlignment(Qt::AlignJustify);
+    descriptionLabel->setAlignment(Qt::AlignLeft);
     descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     
     layout->addWidget(descriptionLabel);
 
     addContent(widget);
 }
+
+void ContentBase::addTextFromLangQMAP(QMap<QString, QString> texts)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QHBoxLayout(widget);
+
+    QString langCode = pref.getLangCode();
+    QString textToDisplay = texts.contains(langCode) ? texts[langCode] : "[Missing translation for : " + langCode + "]";
+    QLabel* textLabel = new QLabel(textToDisplay);
+
+    QFont textFont = textLabel->font();
+    textFont.setPointSize(11);
+    textLabel->setFont(textFont);
+    
+    textLabel->setWordWrap(true);
+    textLabel->setAlignment(Qt::AlignLeft);
+    textLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    
+    layout->addWidget(textLabel);
+
+    addContent(widget);
+}
+
+void ContentBase::addMails(const QStringList& mails)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QVBoxLayout(widget);
+
+    widget->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+
+     for (auto &&mail : mails)
+        {
+        QLabel *label_mail = new QLabel("<a href=mailto:" + mail + ">" + mail + "</a>");
+        label_mail->setAlignment(Qt::AlignCenter);
+        label_mail->setTextFormat(Qt::RichText);
+        label_mail->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        label_mail->setOpenExternalLinks(true);
+        label_mail->setStyleSheet("a { text-decoration: none; }");
+        layout->addWidget(label_mail);
+    }
+
+    addContent(widget);
+}
+
+

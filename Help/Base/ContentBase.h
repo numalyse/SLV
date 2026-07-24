@@ -2,6 +2,7 @@
 #define CONTENTBASE_H
 
 #include "PrefManager.h"
+#include "FileFormatManager.h"
 #include <QWidget>
 #include <QGuiApplication>
 #include <QStyleHints>
@@ -28,16 +29,21 @@ public:
 
     void setCategoryName(const QString &categoryName);
     void setsubcategoryName(const QString &subcategoryName);
+    void addSectionName(const QString &sectionName);
 
     QWidget *createTable(const QString& tableName, const QList<QWidget *> &rows);
     QWidget *createButtonDescription(const QString &iconName, const QString &buttonLabel, const QString &buttonDescription);
-    void createButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
+    void addButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
 
-    void setImage(const QString &imageName);
-    void setDescription(const QString &descriptionName);
+    void addImage(const QString &imageName);
+    void addTextFromLangJSON(const QString &descriptionName);
+    void addTextFromLangQMAP(QMap<QString, QString> texts);
+
+    void addMails(const QStringList &mails);
 
 protected:
-    QVBoxLayout* m_layout;
+    QVBoxLayout* m_mainLayout;
+    QVBoxLayout* m_contentLayout;
     PrefManager& pref;
     QString theme;
     QString backgroundFillColor;

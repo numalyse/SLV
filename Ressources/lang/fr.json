@@ -89,16 +89,16 @@
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
     "timeline_ab_action_2": "Supprimer les marqueurs",
-    "timeline_ab_extract": "Extraire la séquence AB",
-    "messagebox_extract_ab_loop_done" : "Extraction de la séquence AB terminée.",
-    "messagebox_extract_ab_loop_failed" : "Échec de l'extraction de la séquence AB.",
+    "timeline_ab_extract": "Extraire la séquence A-B",
+    "messagebox_extract_ab_loop_done" : "Extraction de la séquence A-B terminée.",
+    "messagebox_extract_ab_loop_failed" : "Échec de l'extraction de la séquence A-B.",
     "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
     "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
     "timeline_extract_selected_shots" : "Extraire les plans sélectionnés",
     "timeline_shot_count_label" : "plan(s)",
     "messagebox_extract_selected_shots_completed" : "Extraction des plans sélectionnés terminée.",
     "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des plans sélectionnés.",
-    
+
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",
     "export_type_txt": "Fichier texte (*.txt)",
@@ -325,7 +325,6 @@
     "shot_start_image_tooltip" : "+100 frames",
     "shot_tag_image" : "Image repère",
 
-
     "sequence_extraction_audio_format" : "Extraction de séquence audio",
     "audio_format_mp3" : "MP3",
     "audio_format_aac" : "M4A",
@@ -476,24 +475,30 @@
     "help_menu_general_checkbox" : "Général",
     "help_menu_report_issues_label" : "Signaler un problème",
     "help_menu_classic_category" : "Affichage mono-vue",
-    "help_menu_open_files_label" : "Ouvrir un média",
+    "help_menu_open_files_label" : "Lire un média",
+
     "help_menu_toolbars_label" : "Barres d'outils",
     "help_menu_classic_toolbar_label" : "Barre d'outil classique",
-    "help_menu_extended_toolbar_label" : "Barre d'outils étendue",
+    "help_menu_extended_toolbar_label" : "Barre d'outils avancée",
+
     "help_menu_multiview_category" : "Affichage multi-vues",
-    "help_menu_enter_multiview_label" : "Entrer en multi-vues",
-    "help_menu_simplified_toolbar_label" : "Barre d'outils simplifiée",
-    "help_menu_global_toolbar_label" : "Barre d'outils globale",
+    "help_menu_enter_multiview_label" : "Accéder au mode multi-vues",
+    "help_menu_simplified_toolbar_label" : "Barre d'outils individuelle",
+    "help_menu_global_toolbar_label" : "Barre d'outils commune",
+
     "help_menu_playlist_category" : "Playlist",
     "help_menu_access_playlist_label" : "Accéder à la playlist",
     "help_menu_add_elements_playlist_label" : "Gérer les éléments de la liste",
     "help_menu_playlist_buttons_label" : "Boutons de la playlist",
+    "help_menu_playlist_toolbar_label" : "Barre d'outils de la playlist",
+
     "help_menu_timeline_category" : "Timeline détaillée",
     "help_menu_timeline_display_label" : "Afficher la timeline détaillée",
     "help_menu_timeline_buttons_label" : "Boutons de la timeline",
     "help_menu_timeline_toolbar_label" : "Barre d'outils de la timeline",
     "help_menu_shot_infos_label" : "Informations du plan",
     "help_menu_exportation_label" : "Exportation",
+
     "help_menu_options_category" : "Options",
     "help_menu_settings_label" : "Paramètres généraux",
     "help_menu_shortcuts_label" : "Raccourcis clavier",
@@ -512,7 +517,8 @@
     "help_menu_change_media_label" : "Média précédent/suivant",
     "help_menu_change_media_description" : "Passe au média précédent/suivant dans l'ordre de la playlist.",
     "help_menu_slow_label" : "Modification de vitesse",
-    "help_menu_slow_description" : "Ouvre un slider pour modifier la vitesse de lecture du média. Les vitesses prises en compte sont x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Ouvre un slider pour modifier la vitesse de lecture du média. Les vitesses prises en compte sont : x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+
     "help_menu_loop_off_label" : "Boucle",
     "help_menu_loop_off_description" : "Active ou désactive la lecture en boucle du média.",
     "help_menu_sound_on_label" : "Volume",
@@ -589,7 +595,6 @@
     "help_menu_shot_infos_content_1" : "Les informations du plan à la position actuelle sont affichables avec le bouton de panneau latéral situé en haut à droite de l'écran ou via le bouton correspondant dans la timeline. Dans cet affichage les informations de numérotation de plan, le titre, le début, la fin et la durée du plan sous forme de timecode, les notes et l'image repère du plan apparaissent. Les champs de titre et de notes sont modifiables.",
     "help_menu_exportation_content_1" : "Le projet en cours peut être sauvegardé via le menu \"Fichier\" puis \"Enregistrer\". Les projets sont exportables en format texte (.txt et .docx), PDF, Powerpoint, au format de vidéo annotée (les titres et notes des plans sont affichés à chaque plan) et en images repères (l'ensemble des images repères des plans sont sauvegardés dans le dossier indiqué.",
     
-
     "project_manager_error_folder_not_found": "Impossible de trouver le dossier du projet.",
     "project_manager_error_json_file_not_found": "Le fichier de sauvegarde du projet est introuvable.",
     "project_manager_error_cannot_open_json_file": "Impossible d'ouvrir le projet. Le fichier est peut-être bloqué ou endommagé.",
@@ -606,7 +611,5 @@
     "project_manager_error_media_mismatch_duration": "Le média actuel est différent de celui du projet (la durée a changé).",
     "project_manager_error_unexpected_error": "Une erreur inconnue s'est produite.",
     "project_error_copy_failed": "La copie du fichier a échoué. Veuillez réessayer ou vérifier l'espace sur votre disque."
-
-
 
 }

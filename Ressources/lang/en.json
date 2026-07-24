@@ -99,7 +99,6 @@
     "messagebox_extract_selected_shots_completed" : "Extraction of the selected shots completed.",
     "messagebox_extract_selected_shots_failed" : "Extraction of the selected shots failed.",
 
-
     "export_running": "Exporting...",
     "export_directory_path_title": "Select export folder",
     "export_type_txt": "Text file (*.txt)",
@@ -451,7 +450,6 @@
     "tab_param_shortcuts" : "Shortcuts configuration",
     "tab_param_paths" : "Paths customization",
     
-
     "open_more_than_four_files_title" : "Multiple media selection",
     "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?",
 
@@ -477,24 +475,30 @@
     "help_menu_general_checkbox" : "General",
     "help_menu_report_issues_label" : "Report an issue",
     "help_menu_classic_category" : "Mono-view interface",
-    "help_menu_open_files_label" : "Open media files",
+    "help_menu_open_files_label" : "Play a media",
+
     "help_menu_toolbars_label" : "Toolbars",
     "help_menu_classic_toolbar_label" : "Classic toolbar",
-    "help_menu_extended_toolbar_label" : "Extended toolbar",
+    "help_menu_extended_toolbar_label" : "Advanced toolbar",
+
     "help_menu_multiview_category" : "Multi-view display",
-    "help_menu_enter_multiview_label" : "Enter multi-view",
-    "help_menu_simplified_toolbar_label" : "Simplified toolbar",
-    "help_menu_global_toolbar_label" : "Global toolbar",
+    "help_menu_enter_multiview_label" : "Access multi-view mode",
+    "help_menu_simplified_toolbar_label" : "Individual toolbar",
+    "help_menu_global_toolbar_label" : "Common toolbar",
+
     "help_menu_playlist_category" : "Playlist",
     "help_menu_access_playlist_label" : "Access playlist",
     "help_menu_add_elements_playlist_label" : "Manage playlist items",
     "help_menu_playlist_buttons_label" : "Playlist buttons",
+    "help_menu_playlist_toolbar_label" : "Playlist toolbar",
+
     "help_menu_timeline_category" : "Detailed timeline",
     "help_menu_timeline_display_label" : "Display detailed timeline",
     "help_menu_timeline_buttons_label" : "Timeline buttons",
     "help_menu_timeline_toolbar_label" : "Timeline toolbar",
     "help_menu_shot_infos_label" : "Shot information",
     "help_menu_exportation_label" : "Exportation",
+
     "help_menu_options_category" : "Options",
     "help_menu_settings_label" : "General settings",
     "help_menu_shortcuts_label" : "Keyboard shortcuts",
@@ -513,7 +517,7 @@
     "help_menu_change_media_label" : "Previous/Next media",
     "help_menu_change_media_description" : "Switches to the previous/next media in the playlist order.",
     "help_menu_slow_label" : "Speed modification",
-    "help_menu_slow_description" : "Opens a slider to modify the playback speed of the media. The supported speeds are x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Opens a slider to modify the playback speed of the media. The supported speeds are : x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
 
     "help_menu_loop_off_label" : "Loop",
     "help_menu_loop_off_description" : "Toggle media loop playback on or off.",
@@ -552,9 +556,9 @@
     "help_menu_record_off_label" : "Live recording",
     "help_menu_record_off_description" : "Allows recording the currently playing media; time jumps are considered.",
     "help_menu_rotate_label" : "Rotate",
-    "help_menu_rotate_description" : "Rotate the media 90° to the right. ⚠️ If the media is paused the screen remains black. Restart playback to see the transform.",
+    "help_menu_rotate_description" : "Rotate the media 90° to the right. \n ⚠️ If the media is paused the screen remains black. Restart playback to see the transform.",
     "help_menu_invert_h_label" : "Flip",
-    "help_menu_invert_h_description" : "Flip the media horizontally or vertically. ⚠️ If the media is paused the screen remains black. Restart playback to see the transform.",
+    "help_menu_invert_h_description" : "Flip the media horizontally or vertically. \n ⚠️ If the media is paused the screen remains black. Restart playback to see the transform.",
     "help_menu_timeline_off_label" : "Detailed timeline",
     "help_menu_timeline_off_description" : "Show the media's detailed timeline.",
     "help_menu_enter_multiview_content_1" : "It is possible to display 1 to 4 players simultaneously. In multi-view mode (when 2 or more players are present), each media has its own simplified toolbar and a global bar appears at the bottom for operations affecting all medias.",

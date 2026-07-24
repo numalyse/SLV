@@ -75,7 +75,7 @@ private:
 
             QString fullOutputPath = prefManager.getPref("Paths", "screenshot")
                                     + '/'
-                                    + pathBytes.constData()
+                                    + pathBytes.constData() + "_"
                                     + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps)
                                     + ".png";
 
@@ -95,7 +95,7 @@ private:
                 emit finishedError();
                 return;
             }
-            mergedPath += path.left(std::min(5, int(path.size()))) 
+            mergedPath += path.left(std::min(5, int(path.size()))) + '_'
                         + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps) 
                         + (IPlayerData != m_playersData.size()-1 ? "_" : "");
                         

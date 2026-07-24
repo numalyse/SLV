@@ -333,7 +333,7 @@ QWidget* PlayerLayoutManager::create3(const QStringList& filesPaths, const Playe
                 adjacentPlayers->addWidget(m_activePlayers[2]);
                 mainSplitter->addWidget(m_activePlayers[0]);
                 mainSplitter->addWidget(adjacentPlayers);
-                // m_currentArrangement = Arrangement3Left;
+                m_currentArrangement = Arrangement3Left;
             }
 
             adjacentPlayers->setSizes(QList<int>({c_splitterFallbackSize, c_splitterFallbackSize}));

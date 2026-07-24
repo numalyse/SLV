@@ -25,11 +25,12 @@ public:
     void updateTypeIcon();
     QPixmap generateVideoThumbnail(const QString &videoPath);
     void updateThumbnail();
-    QString getTitle() const { return m_mediaData->fileName(); };
+    QString getTitle() const { return m_mediaData->fileName(); }
     MediaType getType() const { return m_mediaData->type(); }
     QSize thumbnailSize() const  {return m_thumbnailSize; }
     QString setThumbnailTime();
-    qint64 getDuration() const { return m_mediaData->duration(); };
+    qint64 getDuration() const { return m_mediaData->duration(); }
+    QString getPath() const { return m_mediaData->filePath(); }
 
 private:
     bool m_isDarkMode = true;

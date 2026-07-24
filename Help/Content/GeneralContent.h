@@ -11,8 +11,8 @@ public:
     explicit GeneralContent(QWidget* parent = nullptr);
 
 private:
-    QWidget* introduction();
-    QWidget* player();
+    QWidget* introduction(const QString& subcategoryName);
+    QWidget* reportIssue(const QString& subcategoryName);
 };
 
 #endif

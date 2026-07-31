@@ -295,12 +295,9 @@ void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
 
 
 
-/// @brief met à jour la position / taille des plans, pendant la mise à jour des positions, désactive la mise à jour de l'affichage
+/// @brief met à jour la position / taille des plans après un changement d'échelle
 void ShotManager::updateShotItemsPosition(){
     if(!p_scene || !p_view) return;
-
-    p_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    p_view->setUpdatesEnabled(false);
 
     double newXPos{};
     double newWidth{};
@@ -318,8 +315,6 @@ void ShotManager::updateShotItemsPosition(){
         audioShotItem->setWidth(newWidth);
     }
 
-    p_view->setUpdatesEnabled(true);
-    p_scene->setItemIndexMethod(QGraphicsScene::BspTreeIndex);
     p_scene->update();
 }
 

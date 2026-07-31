@@ -305,11 +305,12 @@ void ShotManager::updateShotItemsPosition(){
     double newXPos{};
     double newWidth{};
 
-    for(auto* shotItem : m_shotItems){
+    for (int i = 0; i < m_shotItems.size(); ++i) {
+        ShotItem* shotItem = m_shotItems[i];
+        AudioShotItem* audioShotItem = m_audioShotItems[i];
 
         newXPos = shotItem->shot().start * p_mathManager->pixelsPerMs();
         shotItem->setX(newXPos);
-        AudioShotItem* audioShotItem = m_audioShotItems[m_shotItems.indexOf(shotItem)];
         audioShotItem->setX(newXPos);
 
         newWidth = (shotItem->shot().end - shotItem->shot().start) * p_mathManager->pixelsPerMs();

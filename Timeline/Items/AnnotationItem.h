@@ -12,7 +12,7 @@ class AnnotationItem : public QGraphicsItem
 {
 
 public:
-    explicit AnnotationItem(const Annotation& annot, double width, QGraphicsItem* parent = nullptr);
+    explicit AnnotationItem(const Annotation& annot, double widthMs, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -20,25 +20,35 @@ public:
 
     Annotation& annotation() { return m_annot; };
     int annotationId() const { return m_annot.id; };
-    
-    void setWidth(double newWidth);
-    double width() { return m_width; };
 
-    /// @brief returns handle closest to the item center
-    AnnotationHandleItem* closestHandle(double sceneX) { return (sceneX < scenePos().x() + m_width / 2.0) ? m_leftHandle : m_rightHandle; };
-    void updateAnnotation(const Annotation& annot) {m_annot = annot; updateTextItem();};
+    void setWidth(double newWidthMs);
+    double width() { return m_widthMs; };
+
+    /// @brief returns handle closest to the item center, sceneX in pixels
+    AnnotationHandleItem* closestHandle(double sceneX) { 
+        return (sceneX < mapToScene(QPointF(m_widthMs / 2.0, 0)).x()) ? m_leftHandle : m_rightHandle; 
+    };
+    
+    void updateAnnotation(const Annotation& annot) {
+        m_annot = annot;
+        invalidateTextCache();
+        update();
+    };
 
     static constexpr double height() { return s_height; }
 
 private:
-    void updateTextItem();
+    /// @brief forces paint() to elide the text on next draw
+    void invalidateTextCache() { m_elidedForWidth = -1; }
 
     Annotation m_annot{};
-    double m_width{};
+    double m_widthMs{};
 
-    QGraphicsTextItem* m_annotTxtItem = nullptr;
     AnnotationHandleItem* m_leftHandle = nullptr;
     AnnotationHandleItem* m_rightHandle = nullptr;
+
+    QString m_elidedText;
+    int m_elidedForWidth = -1; 
 
     static constexpr double s_height = 17.0;
     static constexpr double s_topMargin = 30.0;

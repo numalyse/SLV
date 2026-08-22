@@ -4,6 +4,7 @@
 #include "Timeline/TimelineView.h"
 #include "Timeline/TimelineMath.h"
 #include "Timeline/Items/AnnotationItem.h"
+#include "Timeline/Items/TimelineLayerItem.h"
 
 #include <QObject>
 #include <QGraphicsScene>
@@ -41,6 +42,8 @@ private:
     void createAnnotItem(const Annotation &annotation);
 
     QVector<AnnotationItem*> m_items;
+
+    TimelineLayerItem* m_layer = nullptr;
 
     QGraphicsScene* p_scene = nullptr;
     TimelineView* p_view = nullptr;

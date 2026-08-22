@@ -2,10 +2,16 @@
 
 #include "Project/ProjectManager.h"
 #include "Timeline/Items/AnnotationHandleItem.h"
+#include "Timeline/Items/TimelineLayerItem.h"
 
-AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, QObject *parent) 
+AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, QObject *parent)
 : QObject(parent), p_scene{scene}, p_view{view}, p_mathManager{mathManager}
 {
+    m_layer = new TimelineLayerItem();
+    m_layer->setZValue(4);
+    m_layer->setTransform(QTransform::fromScale(p_mathManager->pixelsPerMs(), 1.0));
+    p_scene->addItem(m_layer);
+
     auto* annotations = ProjectManager::instance().annotationManager();
 
     connect(annotations, &AnnotationManager::annotationAdded,   this, &AnnotationItemManager::onAnnotationAdded);
@@ -24,29 +30,12 @@ AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView
 }
 
 void AnnotationItemManager::updateAnnotItemsPosition(){
-    if(!p_scene || !p_view) {
-        qDebug() << "[Timeline][AnnotationItemManager] scene or view null, could not update items position";
-        return;
-    }
+    if(!m_layer) return;
 
-    p_view->setUpdatesEnabled(false);
+    const double pixelsPerMs = p_mathManager->pixelsPerMs();
 
-    double newXPos{};
-    double newWidth{};
-
-    for(auto* annotItem : m_items){
-        const Annotation& annot = annotItem->annotation();
-        newXPos = annot.start * p_mathManager->pixelsPerMs();
-        newWidth = (annot.end - annot.start) * p_mathManager->pixelsPerMs();
-
-        annotItem->setX(newXPos);
-        annotItem->setWidth(newWidth);
-    }
-
-    p_view->setUpdatesEnabled(true);
-    p_scene->update();
-} 
-
+    m_layer->setTransform(QTransform::fromScale(pixelsPerMs, 1.0));
+}
 
 void AnnotationItemManager::onAnnotationAdded(Annotation& annotation){
     createAnnotItem(annotation);
@@ -59,13 +48,9 @@ void AnnotationItemManager::onAnnotationUpdated(const Annotation& annotation){
         return;
     }
 
-    double startPos = p_mathManager->pixelsPerMs() * annotation.start;
-    double endPos = p_mathManager->pixelsPerMs() * annotation.end;
-    double newWidth = endPos - startPos;
-
     (*it)->updateAnnotation(annotation);
-    (*it)->setX(startPos);
-    (*it)->setWidth(newWidth);
+    (*it)->setX(annotation.start);
+    (*it)->setWidth(annotation.end - annotation.start);
 }
 
 
@@ -82,7 +67,7 @@ void AnnotationItemManager::onAnnotationRemoved(int annotationId)
         return;
     }
 
-    p_scene->removeItem((*it));
+    delete (*it); 
     m_items.erase(it);
 }
 
@@ -91,11 +76,7 @@ void AnnotationItemManager::onAnnotationRemoved(int annotationId)
 void AnnotationItemManager::rebuild(){
     const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
 
-    for(int IAnnotItem = 0; IAnnotItem < m_items.size(); ++IAnnotItem){
-        auto* annotItem = m_items[IAnnotItem];
-        p_scene->removeItem(annotItem);
-    }
-
+    qDeleteAll(m_items);
     m_items.clear();
 
     for(auto&& annotation : annotations){
@@ -132,14 +113,8 @@ void AnnotationItemManager::createAnnotItem(const Annotation& annotation)
         return;
     }
 
-    double startPos = p_mathManager->pixelsPerMs() * annotation.start;
-    double endPos = p_mathManager->pixelsPerMs() * annotation.end;
-    double width = endPos - startPos;
-
-    AnnotationItem* item = new AnnotationItem(annotation, width);
+    AnnotationItem* item = new AnnotationItem(annotation, annotation.end - annotation.start, m_layer);
 
     m_items.append(item);
-    p_scene->addItem(item);
-
-    item->setX(startPos);
+    item->setX(annotation.start);
 }

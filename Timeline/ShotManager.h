@@ -75,6 +75,8 @@ private:
 
     QVector<ShotItem*> m_shotItems;
     QVector<AudioShotItem*> m_audioShotItems;
+
+    QGraphicsItem* m_layer = nullptr;
     QVector<QPair<ShotItem*, AudioShotItem*>> m_selectedShots;
 
     ShotItem* m_currentShotItem = nullptr;

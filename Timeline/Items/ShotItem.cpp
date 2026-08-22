@@ -5,11 +5,10 @@
 #include <QPen>
 
 ShotItem::ShotItem(Shot shot, double width, QGraphicsItem* parent)
-: QGraphicsItem(parent), m_shot{shot}, m_width{width}, m_baseColor{m_shot.color}
+: QGraphicsItem(parent), m_shot{shot}, m_widthMs{width}, m_baseColor{m_shot.color}
 {
     setZValue(0);
 
- 
     // to keep the shotItem undearneath the audio visualizer but to have our "selected m_selectedNumber above the visualizer"
     // we create an item that will follow shotItem but with a different z value 
     m_selectionBox = new QGraphicsRectItem();     // it can't have this as parent, it would place it below the audio visualizer
@@ -40,48 +39,53 @@ void ShotItem::setThumbnail(const QPixmap& pixmap){
 
 QRectF ShotItem::boundingRect() const
 {
-    return QRectF(0, topMargin(), m_width, height());
+    return QRectF(0, topMargin(), m_widthMs, height());
 }
 
 void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option); 
+    Q_UNUSED(option);
     Q_UNUSED(widget);
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    // set border style
     QPen borderPen(m_shot.borderColor);
-    borderPen.setWidth(1);
+    borderPen.setCosmetic(true); // cosmetic pen, the horizontal scale will not thicken its borders
     p->setPen(borderPen);
     QColor drawColor = m_selected ? m_shot.color.lighter(150) : m_shot.color;
 
-    // draw rect 
     p->setBrush(QBrush(drawColor));
-    p->drawRect(0, topMargin(), m_width, height());
+    p->drawRect(0, topMargin(), m_widthMs, height());
 
-    // draw thumbnail if set
-    if(!m_pixmap.isNull() && m_width > s_minSizeForImage){
+    // to cancel painter horizontal scale to draw pixmap
+    const double sx = p->transform().m11();
+    if (sx <= 0.0) return;
+    const double widthPx = m_widthMs * sx;
+
+    if(!m_pixmap.isNull() && widthPx > s_minSizeForImage){
         double targetHeight = height() - 4;
         double scaleRatio = targetHeight / m_pixmap.height();
         double scaledImgWidth = m_pixmap.width() * scaleRatio;
-        double finalDrawWidth = qMin(scaledImgWidth, m_width);
+        double finalDrawWidth = qMin(scaledImgWidth, widthPx);
 
         QRectF target(2.0, topMargin()+2.0, finalDrawWidth, targetHeight);
         double sourceCropWidth = finalDrawWidth / scaleRatio;
 
         QRectF srcRect(0, 0, sourceCropWidth, m_pixmap.height());
 
+        p->save();
+        p->scale(1.0 / sx, 1.0); 
         p->drawPixmap(target, m_pixmap, srcRect);
+        p->restore();
     }
 
 }
 
 void ShotItem::setWidth(double width)
 {
-    if (m_width == width) return;
+    if (m_widthMs == width) return;
     prepareGeometryChange(); 
-    m_width = width;
+    m_widthMs = width;
     updateTextPosition();
     update();
 }
@@ -114,12 +118,15 @@ void ShotItem::setSelected(bool state) {
 }
 
 void ShotItem::updateTextPosition(){
-    m_selectionBox->setRect(0, 0, m_width, height());
+    // ms to scene pixel
+    const double widthPx = m_widthMs * sceneTransform().m11();
+
+    m_selectionBox->setRect(0, 0, widthPx, height());
     m_selectionBox->setPos(this->mapToScene(0, topMargin()));
 
     QRectF textRect = m_selectionText->boundingRect();
-    double xPos = (m_width - textRect.width()) / 2.0;
+    double xPos = (widthPx - textRect.width()) / 2.0;
     double yPos = (height() - textRect.height()) / 2.0;
-    
+
     m_selectionText->setPos(xPos, yPos);
 }

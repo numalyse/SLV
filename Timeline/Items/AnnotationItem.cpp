@@ -8,68 +8,71 @@
 #include <QFontMetrics>
 #include <algorithm>
 
-AnnotationItem::AnnotationItem(const Annotation& annot, double width, QGraphicsItem *parent)
-: QGraphicsItem(parent), m_annot{annot}, m_width{width}
+AnnotationItem::AnnotationItem(const Annotation& annot, double widthMs, QGraphicsItem *parent)
+: QGraphicsItem(parent), m_annot{annot}, m_widthMs{widthMs}
 {
     setZValue(4);
-
-    m_annotTxtItem = new QGraphicsTextItem(this);
-    QFont textFont;
-    textFont.setPointSize(10);
-    m_annotTxtItem->setFont(textFont);
 
     m_leftHandle = new AnnotationHandleItem(true, this);
     m_rightHandle = new AnnotationHandleItem(false, this);
     m_leftHandle->setPos(0, s_topMargin);
-    m_rightHandle->setPos(m_width, s_topMargin);
-
-    updateTextItem();
+    m_rightHandle->setPos(m_widthMs, s_topMargin);
 }
 
 QRectF AnnotationItem::boundingRect() const
 {
-    return QRectF(0, s_topMargin, m_width, s_height);
+    return QRectF(0, s_topMargin, m_widthMs, s_height);
 }
 
 void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option); 
+    Q_UNUSED(option);
     Q_UNUSED(widget);
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    p->setPen(QPen(Qt::black));
+    // cosmetic pen, the horizontal scale will not thicken its borders
+    QPen pen(Qt::black);
+    pen.setCosmetic(true);
+    p->setPen(pen);
     p->setBrush(QBrush(m_annot.color));
 
-    p->drawRect(0, s_topMargin, m_width, s_height);
+    // the layer transform will resize the item based on its transform
+    p->drawRect(QRectF(0, s_topMargin, m_widthMs, s_height));
+
+    // horizontal factor of the parent layer transform
+    const double pixelsPerMs = p->transform().m11();
+    if (pixelsPerMs <= 0.0) return;
+
+    const double availableWidthPx = m_widthMs * pixelsPerMs - 2 * s_textMargin;
+    if (availableWidthPx < 20.0) return; // size too small, prevent rendering text
+
+    static const QFont s_textFont = []{ QFont f; f.setPointSize(10); return f; }();
+    static const QFontMetrics s_textMetrics(s_textFont);
+
+    const int availableWidthPxInt = static_cast<int>(availableWidthPx);
+    if (availableWidthPxInt != m_elidedForWidth) { 
+        QString text = m_annot.name + " " + QString(m_annot.note).replace('\n', " ");
+        m_elidedText = s_textMetrics.elidedText(text, Qt::ElideRight, availableWidthPxInt);
+        m_elidedForWidth = availableWidthPxInt;
+    }
+
+    if (m_elidedText.isEmpty()) return;
+
+    p->save();
+    p->scale(1.0 / pixelsPerMs, 1.0); // cancel painter horizontal scale to draw text
+    p->setFont(s_textFont);
+    p->setPen(qGray(m_annot.color.rgb()) > 128 ? Qt::black : Qt::white);
+    p->drawText(QRectF(s_textMargin, s_topMargin, availableWidthPx, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedText);
+    p->restore();
 }
 
-void AnnotationItem::setWidth(double newWidth)
+void AnnotationItem::setWidth(double newWidthMs)
 {
-    if (m_width == newWidth) return;
+    if (m_widthMs == newWidthMs) return;
     prepareGeometryChange();
-    m_width = newWidth;
-    m_rightHandle->setX(m_width);
-    updateTextItem();
+    m_widthMs = newWidthMs;
+    m_rightHandle->setX(m_widthMs);
+    invalidateTextCache();
     update();
-}
-
-void AnnotationItem::updateTextItem()
-{
-    // *2 to account for left and right margin
-    const double availableWidth = std::max(0.0, m_width - 2 * s_textMargin);
-
-    // replaces \n with " " and elide the text fo fit in 
-    QFontMetrics metrics(m_annotTxtItem->font());
-    const QString text = m_annot.name + " " + m_annot.note.replace('\n', " ");
-    const QString elidedText = metrics.elidedText(text, Qt::ElideRight, static_cast<int>(availableWidth));
-    m_annotTxtItem->setPlainText(elidedText);
-
-    // dark text on light backgrounds, light text on dark backgrounds
-    m_annotTxtItem->setDefaultTextColor(qGray(m_annot.color.rgb()) > 128 ? Qt::black : Qt::white);
-
-    // centers text on y 
-    const double textHeight = m_annotTxtItem->boundingRect().height();
-    const double y = s_topMargin + (s_height - textHeight) / 2.0;
-    m_annotTxtItem->setPos(s_textMargin, y);
 }

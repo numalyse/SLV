@@ -4,6 +4,7 @@
 #include "FileFormatManager.h"
 #include "Project/ProjectManager.h"
 #include "GenericDialog.h"
+#include "PlaylistLoader.h"
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -96,14 +97,14 @@ Playlist::Playlist(QWidget *parent)
     playlistLabelLayout->addWidget(m_sortPlaylistBtn);
 
     // save playlist in xspf file
-    m_savePlaylistBtn = new QPushButton;
-    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
-        m_savePlaylistBtn->setIcon(QIcon(":/icons/export_white"));
-    } else {
-        m_savePlaylistBtn->setIcon(QIcon(":/icons/export"));
-    }
-    connect(m_savePlaylistBtn, &QPushButton::clicked, this, &Playlist::savePlaylist);
+    m_savePlaylistBtn = new ToolbarButton(this, "export_white", PrefManager::instance().getText("tooltip_save_playlist"));
+    connect(m_savePlaylistBtn, &QPushButton::clicked, this, [this](){ SLV::savePlaylist(m_items, m_itemsSortOrder); });
     playlistLabelLayout->addWidget(m_savePlaylistBtn);
+
+    // load playlist from xspf file
+    m_loadPlaylistBtn = new ToolbarButton(this, "drag_drop_white", PrefManager::instance().getText("tooltip_load_playlist"));
+    connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
+    playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
     // [Bouton] Supprimer tous les éléments
     m_deleteAllBtn = new QPushButton;
@@ -858,33 +859,11 @@ void Playlist::sortPlaylist(int id, bool checked)
     }
 }
 
-/// @brief Save current playlist into a new .xspf file compatible with VLC
-void Playlist::savePlaylist()
+void Playlist::loadPlaylist()
 {
-    // TODO add filter for .xspf files (see FileFormatManager)
-    QString savePath = QFileDialog::getSaveFileName(this, PrefManager::instance().getText("save_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"));
-    savePath += ".xspf";
-    QFile *playlistFile = new QFile(savePath);
-    if ( playlistFile->open(QIODevice::ReadWrite | QIODevice::Append) )
-    {
-        QTextStream stream(playlistFile);
-        stream << R"(<?xml version="1.0" encoding="UTF-8"?>)" << "\n"
-               << R"(<playlist version="1" xmlns="http://xspf.org/ns/0/">)" << "\n \n"
-               << "\t" << R"(<title>Playlist</title>)" << "\n \n"
-               << "\t" << R"(<trackList>)" << "\n \n";
-
-        for(size_t IPItem = 0; IPItem < m_items.size(); ++IPItem){
-            stream << "\t \t" << R"(<track>)" << "\n"
-                   << "\t \t \t" << R"(<location>file:///)" + m_items[m_itemsSortOrder[IPItem]]->getPath().toUtf8() + R"(</location>)" << "\n"
-                   << "\t \t \t" << R"(<duration>)" + QString::number(m_items[m_itemsSortOrder[IPItem]]->getDuration()) + R"(</duration>)" << "\n"
-                   << "\t \t" << R"(</track>)" << "\n \n";
-        }
-
-        stream << "\t" << R"(</trackList>)" << "\n"
-               << R"(</playlist>)";
-
-        playlistFile->close();
-    }
+    deleteAllItems();
+    QStringList paths = SLV::loadPlaylist();
+    addItemsViaButton(paths);
 }
 
 void Playlist::updateDurationPlaylist()

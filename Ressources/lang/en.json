@@ -203,6 +203,8 @@
     "tooltip_loop_playlist" : "Loop mode",
     "tooltip_shuffle_playlist" : "Shuffle mode",
     "tooltip_sort_playlist" : "Sort playlist",
+    "tooltip_save_playlist" : "Save playlist",
+    "tooltip_load_playlist" : "Load playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "By ascending addition ↓",

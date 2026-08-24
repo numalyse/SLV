@@ -41,7 +41,8 @@ private:
     ToolbarToggleButton *m_loopItemBtn = nullptr;
     ToolbarToggleButton *m_shuffleItemBtn = nullptr;
     ToolbarPopupButton *m_sortPlaylistBtn = nullptr;
-    QPushButton *m_savePlaylistBtn = nullptr;
+    ToolbarButton *m_savePlaylistBtn = nullptr;
+    ToolbarButton *m_loadPlaylistBtn = nullptr;
     QPushButton *m_addItemBtn = nullptr;
     QPushButton *m_deleteAllBtn = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
@@ -71,8 +72,7 @@ public slots:
     void enableShuffle();
     void disableShuffle();
     void sortPlaylist(int id, bool checked);
-    void savePlaylist();
-    // void loadPlaylist();
+    void loadPlaylist();
 
     void updateDurationPlaylist();
 

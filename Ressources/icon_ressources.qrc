@@ -304,5 +304,7 @@
         <file alias="open_annot">icons/open_annot.png</file>
         <file alias="open_annot_white">icons/open_annot_white.png</file>
         <file alias="open_annot_gray">icons/open_annot_gray.png</file>
+        <file alias="drag_drop_white">icons/drag_drop_white.png</file>
+        <file alias="drag_drop">icons/drag_drop.png</file>
     </qresource>
 </RCC>

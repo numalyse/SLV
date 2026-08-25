@@ -184,6 +184,8 @@ set(ADDITIONAL_SOURCES
     Help/Base/ContentBase.h Help/Base/ContentBase.cpp
     Help/Content/GeneralContent.h Help/Content/GeneralContent.cpp 
     Help/Content/MonoviewContent.h Help/Content/MonoviewContent.cpp 
+    Help/Content/PlaylistContent.h Help/Content/PlaylistContent.cpp 
+    Help/Content/TimelineContent.h Help/Content/TimelineContent.cpp 
     Help/Content/MultiviewContent.h Help/Content/MultiviewContent.cpp 
     Help/Content/ToolbarsContent.h Help/Content/ToolbarsContent.cpp 
 

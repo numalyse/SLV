@@ -3,6 +3,8 @@
 #include "Base/CategoryBase.h"
 #include "Content/GeneralContent.h"
 #include "Content/MonoviewContent.h"
+#include "Content/PlaylistContent.h"
+#include "Content/TimelineContent.h"
 #include "Content/MultiviewContent.h"
 #include "Content/ToolbarsContent.h"
 
@@ -59,13 +61,21 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
     monoview->populateTree(m_sideMenuTreeWidget);
     m_contentWidget->addWidget(monoview);
 
+    auto* playlist = new PlaylistContent(this);
+    playlist->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(playlist);
+
+    auto* timeline = new TimelineContent(this);
+    timeline->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(timeline);
+
     auto* multiview = new MultiviewContent(this);
     multiview->populateTree(m_sideMenuTreeWidget);
     m_contentWidget->addWidget(multiview);
 
-    auto* tooltbars = new ToolbarsContent(this);
-    tooltbars->populateTree(m_sideMenuTreeWidget);
-    m_contentWidget->addWidget(tooltbars);
+    auto* toolbars = new ToolbarsContent(this);
+    toolbars->populateTree(m_sideMenuTreeWidget);
+    m_contentWidget->addWidget(toolbars);
 
     // Initialisation de l'affichage
     QTreeWidgetItem* firstCategory = m_sideMenuTreeWidget->topLevelItem(0);

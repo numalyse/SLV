@@ -4,6 +4,7 @@
 #include "FileFormatManager.h"
 #include "Project/ProjectManager.h"
 #include "GenericDialog.h"
+#include "PlaylistLoader.h"
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -67,6 +68,19 @@ Playlist::Playlist(QWidget *parent)
     //playlistLabel->setTextFormat(Qt::RichText);
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
+    playlistLabelLayout->setSpacing(1);
+
+    // save playlist in xspf file
+    m_savePlaylistBtn = new ToolbarButton(this, "save_white", PrefManager::instance().getText("tooltip_save_playlist"));
+    m_savePlaylistBtn->setFixedSize(24,24);
+    connect(m_savePlaylistBtn, &QPushButton::clicked, this, [this](){ SLV::savePlaylist(m_items, m_itemsSortOrder); });
+    playlistLabelLayout->addWidget(m_savePlaylistBtn);
+
+    // load playlist from xspf file
+    m_loadPlaylistBtn = new ToolbarButton(this, "playlist_import_white", PrefManager::instance().getText("tooltip_import_playlist"));
+    m_loadPlaylistBtn->setFixedSize(24,24);
+    connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
+    playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
     m_loopItemBtn = new ToolbarToggleButton(this,
         false,
@@ -497,7 +511,7 @@ void Playlist::deleteAllItemsDialog()
     }
 }
 
-void Playlist::deleteAllItems()
+void Playlist::deleteAllItems(const bool ejectMedia)
 {
     // while(!m_items.isEmpty()){
     //     deleteItem(static_cast<unsigned int>(m_items.size() - 1));
@@ -507,7 +521,7 @@ void Playlist::deleteAllItems()
         m_items[IItem]->deleteLater();
     }
 
-    emit ejectCurrentMedia();
+    if(ejectMedia) emit ejectCurrentMedia();
     m_currentMediaIndex = 0;
     m_items.clear();
     m_itemsShuffleOrder.clear();
@@ -846,6 +860,17 @@ void Playlist::sortPlaylist(int id, bool checked)
         updateItemIndices();
         updateLayout();
     }
+}
+
+void Playlist::loadPlaylist()
+{
+    QString loadPath = QFileDialog::getOpenFileName(nullptr, PrefManager::instance().getText("tooltip_import_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
+                                                    PrefManager::instance().getText("file_playlist") + "(*.xspf)");
+    if(loadPath.isEmpty())
+        return;
+    deleteAllItems(false);
+    QStringList paths = SLV::loadPlaylist(loadPath);
+    addItemsViaButton(paths);
 }
 
 void Playlist::updateDurationPlaylist()

@@ -301,14 +301,15 @@ QPixmap PlaylistItem::generateVideoThumbnail(const QString &videoPath)
     ffmpegExe = appDir + "/bin/ffmpeg";
 #endif
 
-    m_thumbnailGenerator->start(ffmpegExe, args);
+    QProcess thumbnailGenerator;
+    thumbnailGenerator.start(ffmpegExe, args);
     //ffmpeg.start(QString(FFMPEG_EXECUTABLE), args);
-    m_thumbnailGenerator->waitForFinished(-1);
+    thumbnailGenerator.waitForFinished(-1);
 
     QPixmap pixmap;
     if(m_itemDeleted)
         return pixmap;
-    QByteArray imageData = m_thumbnailGenerator->readAllStandardOutput();
+    QByteArray imageData = thumbnailGenerator.readAllStandardOutput();
 
     pixmap.loadFromData(imageData, "PNG");
 

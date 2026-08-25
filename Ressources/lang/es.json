@@ -203,6 +203,8 @@
     "tooltip_loop_playlist" : "Reproducir lista en bucle",
     "tooltip_shuffle_playlist" : "Reproducción aleatoria de la lista",
     "tooltip_sort_playlist" : "Ordenar lista de reproducción",
+    "tooltip_save_playlist" : "Guardar la lista de reproducción",
+    "tooltip_import_playlist" : "Importar una lista de reproducción",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "Por orden de adición ascendente ↓",

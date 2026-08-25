@@ -41,11 +41,13 @@ public:
 
     void addMails(const QStringList &mails);
 
+    void getFormatsAvailables();
+
 protected:
     QVBoxLayout* m_mainLayout;
     QVBoxLayout* m_contentLayout;
     PrefManager& pref;
-    FileFormatManager& format;
+    FileFormatManager& fileformat;
     QString theme;
     QString backgroundFillColor;
 

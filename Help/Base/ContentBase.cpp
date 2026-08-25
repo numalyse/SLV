@@ -8,10 +8,10 @@
 #include <QScrollArea>
 
 ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName)
-    : QWidget(parent) , pref(PrefManager::instance())
+    : QWidget(parent) , pref(PrefManager::instance()), fileformat(FileFormatManager::instance())
 {
     pref = PrefManager::instance();
-    format = FileFormatManager::instance();
+    fileformat = FileFormatManager::instance();
     theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : ""; 
     
 #ifdef Q_OS_MAC
@@ -247,8 +247,8 @@ void ContentBase::addMails(const QStringList& mails)
 
     widget->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
 
-     for (auto &&mail : mails)
-        {
+    for (auto &&mail : mails)
+    {
         QLabel *label_mail = new QLabel("<a href=mailto:" + mail + ">" + mail + "</a>");
         label_mail->setAlignment(Qt::AlignCenter);
         label_mail->setTextFormat(Qt::RichText);
@@ -265,19 +265,25 @@ void ContentBase::getFormatsAvailables(){
     auto* widget = new QWidget(this);
     auto* layout = new QVBoxLayout(widget);
 
-    QList formatList = format.getFormatsList();
 
-    widget->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+    QStringList categoriesList = fileformat.getAllCatergories();
 
-     for (auto &&mail : mails)
-        {
-        QLabel *label_mail = new QLabel( );
-        label_mail->setAlignment(Qt::AlignCenter);
-        label_mail->setTextFormat(Qt::RichText);
-        label_mail->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        label_mail->setOpenExternalLinks(true);
-        label_mail->setStyleSheet("a { text-decoration: none; }");
-        layout->addWidget(label_mail);
+    for (auto &&category : categoriesList)
+    {
+        QLabel *label_category = new QLabel(pref.getText(category));
+        label_category->setAlignment(Qt::AlignLeft);
+        layout->addWidget(label_category);
+        
+        // Les formats de la catégorie sont affichés et séparés par des virgules, le tout centré dans le widget
+        QString formats = fileformat.getFormats(category);
+
+        QLabel *label_format = new QLabel(formats);
+        label_format->setAlignment(Qt::AlignCenter);
+        label_format->setTextFormat(Qt::RichText);
+        label_format->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        label_format->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+        //label_format->setStyleSheet("a { text-decoration: none; }");
+        layout->addWidget(label_format);
     }
 
     addContent(widget);

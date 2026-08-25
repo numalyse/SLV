@@ -40,6 +40,7 @@ private:
     QList<Subcategory> m_subcategories;
     
     PrefManager pref;
+    //FileFormatManager format;
     QString theme;
 
 };

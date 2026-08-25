@@ -39,10 +39,8 @@ void savePlaylist(const QVector<PlaylistItem *>& items, const QVector<unsigned i
     }
 }
 
-QStringList loadPlaylist()
-{
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, PrefManager::instance().getText("tooltip_load_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
-                                                    PrefManager::instance().getText("file_playlist") + "(*.xspf)");
+QStringList loadPlaylist(const QString& loadPath)
+{   
     QFile *playlistFile = new QFile(loadPath);
     if( !playlistFile->open(QIODevice::ReadOnly) ){
         qDebug() << "Error reading playlist file";
@@ -62,6 +60,10 @@ QStringList loadPlaylist()
         QRegularExpressionMatch match = i.next();
         QString path = match.captured("path");
         path = QUrl(path).toLocalFile();
+        #if defined(Q_OS_MAC)
+            path.remove(0, 1);
+        #endif
+        qDebug() << "Loaded path : " << path;
         pathsList << path;
     }
 

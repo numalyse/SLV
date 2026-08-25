@@ -10,7 +10,8 @@ class MultiviewContent : public CategoryBase
 public:
     explicit MultiviewContent(QWidget* parent = nullptr);
 
-private:
+    private:
+    QWidget *presentation(const QString &subcategoryName);
     QWidget* introduction(const QString& subcategoryName);
 };
 

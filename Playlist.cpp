@@ -68,6 +68,19 @@ Playlist::Playlist(QWidget *parent)
     //playlistLabel->setTextFormat(Qt::RichText);
     playlistLabel->setText("<b>"+PrefManager::instance().getText("playlist")+"</b>");
     playlistLabelLayout->addWidget(playlistLabel);
+    playlistLabelLayout->setSpacing(1);
+
+    // save playlist in xspf file
+    m_savePlaylistBtn = new ToolbarButton(this, "save_white", PrefManager::instance().getText("tooltip_save_playlist"));
+    m_savePlaylistBtn->setFixedSize(24,24);
+    connect(m_savePlaylistBtn, &QPushButton::clicked, this, [this](){ SLV::savePlaylist(m_items, m_itemsSortOrder); });
+    playlistLabelLayout->addWidget(m_savePlaylistBtn);
+
+    // load playlist from xspf file
+    m_loadPlaylistBtn = new ToolbarButton(this, "playlist_import_white", PrefManager::instance().getText("tooltip_import_playlist"));
+    m_loadPlaylistBtn->setFixedSize(24,24);
+    connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
+    playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
     m_loopItemBtn = new ToolbarToggleButton(this,
         false,
@@ -95,16 +108,6 @@ Playlist::Playlist(QWidget *parent)
 
     createSortBtn();
     playlistLabelLayout->addWidget(m_sortPlaylistBtn);
-
-    // save playlist in xspf file
-    m_savePlaylistBtn = new ToolbarButton(this, "export_white", PrefManager::instance().getText("tooltip_save_playlist"));
-    connect(m_savePlaylistBtn, &QPushButton::clicked, this, [this](){ SLV::savePlaylist(m_items, m_itemsSortOrder); });
-    playlistLabelLayout->addWidget(m_savePlaylistBtn);
-
-    // load playlist from xspf file
-    m_loadPlaylistBtn = new ToolbarButton(this, "drag_drop_white", PrefManager::instance().getText("tooltip_load_playlist"));
-    connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
-    playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
     // [Bouton] Supprimer tous les éléments
     m_deleteAllBtn = new QPushButton;

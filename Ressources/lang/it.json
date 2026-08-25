@@ -204,7 +204,7 @@
     "tooltip_shuffle_playlist" : "Riproduzione casuale della playlist",
     "tooltip_sort_playlist" : "Ordina playlist",
     "tooltip_save_playlist" : "Salva playlist",
-    "tooltip_load_playlist" : "Carica playlist",
+    "tooltip_import_playlist" : "Importa playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "Per aggiunta crescente ↓",

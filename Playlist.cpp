@@ -864,7 +864,7 @@ void Playlist::sortPlaylist(int id, bool checked)
 
 void Playlist::loadPlaylist()
 {
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, PrefManager::instance().getText("tooltip_load_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
+    QString loadPath = QFileDialog::getOpenFileName(nullptr, PrefManager::instance().getText("tooltip_import_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
                                                     PrefManager::instance().getText("file_playlist") + "(*.xspf)");
     if(loadPath.isEmpty())
         return;

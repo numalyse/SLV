@@ -511,7 +511,7 @@ void Playlist::deleteAllItemsDialog()
     }
 }
 
-void Playlist::deleteAllItems()
+void Playlist::deleteAllItems(const bool ejectMedia)
 {
     // while(!m_items.isEmpty()){
     //     deleteItem(static_cast<unsigned int>(m_items.size() - 1));
@@ -521,7 +521,7 @@ void Playlist::deleteAllItems()
         m_items[IItem]->deleteLater();
     }
 
-    emit ejectCurrentMedia();
+    if(ejectMedia) emit ejectCurrentMedia();
     m_currentMediaIndex = 0;
     m_items.clear();
     m_itemsShuffleOrder.clear();
@@ -868,7 +868,7 @@ void Playlist::loadPlaylist()
                                                     PrefManager::instance().getText("file_playlist") + "(*.xspf)");
     if(loadPath.isEmpty())
         return;
-    deleteAllItems();
+    deleteAllItems(false);
     QStringList paths = SLV::loadPlaylist(loadPath);
     addItemsViaButton(paths);
 }

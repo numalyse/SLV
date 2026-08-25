@@ -63,7 +63,7 @@ public slots:
     void insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex);
     void addItemsViaButton(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);
-    void deleteAllItems();
+    void deleteAllItems(const bool ejectMedia = true);
     void playMedia(const QString &filePath, const bool isClicked);
     void playPreviousMedia();
     void playNextMedia();

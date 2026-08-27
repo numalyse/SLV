@@ -396,7 +396,7 @@ namespace ProjectExportHelper {
         QFileInfo mediaFileInfo(mediaPath);
         QString mediaName = mediaFileInfo.baseName();
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
 
         DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), toImageTimes(items));
 
@@ -489,7 +489,7 @@ namespace ProjectExportHelper {
         int itemCount = items.size();
         int currItemId = 0;
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
 
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath,
@@ -666,7 +666,7 @@ namespace ProjectExportHelper {
         if (!tempDir.isValid()) return false;
         QString tempPath = tempDir.path();
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, sar, imageQueue.get(), toImageTimes(items), nullptr,
             std::optional<int>(), std::optional<cv::Size>(imgSize)
@@ -889,7 +889,7 @@ namespace ProjectExportHelper {
         auto [fontSize, lineSpacing] = computeFontSizeAndSpacing(displaySize.width, displaySize.height, 0.020);
         QImage textOverlay(displaySize.width, displaySize.height, QImage::Format_ARGB32_Premultiplied);
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, sar, imageQueue.get(), {}
         );

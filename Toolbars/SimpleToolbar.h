@@ -112,6 +112,8 @@ public slots:
 
 private:
     static constexpr int s_bottomMarginFullscreen = 60;
+
+    int fullscreenBottomMargin() const override { return s_bottomMarginFullscreen; }
     
     // stays hidden after setDefaultUI() while an AdvancedToolbar replaces the tooblar
     bool shouldShowOnDefaultUI() const override { return !m_isReplacedByAdvanced; }

@@ -36,6 +36,7 @@ private:
 
     QVector<QShortcut*> m_globalShortcuts;
     static constexpr int s_bottomMarginFullscreen = 10;
+    int fullscreenBottomMargin() const override { return s_bottomMarginFullscreen; }
     QSpacerItem* m_extraSpacingItem = nullptr;
 
     void addShortcuts();

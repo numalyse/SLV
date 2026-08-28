@@ -15,6 +15,8 @@
 #include <QStyleHints>
 #include <QGuiApplication>
 #include <QColor>
+#include <QMenu>
+
 #include "PrefManager.h"
 #include "SignalManager.h"
 
@@ -122,7 +124,11 @@ public:
 
         QTimer::singleShot(0, this, [this, bottomMargin]() {
             moveOnTopOfParent(bottomMargin);
+            if(m_isRepositioned) {
+                move(m_fullscreenPosition);
+            }
         });
+
     }
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
@@ -192,6 +198,7 @@ protected:
     QPoint m_fullscreenPosition;
     QPoint m_dragOffset;
     bool m_dragging = false;
+    bool m_isRepositioned = false;
 
     /// @brief Whether setDefaultUI() should show the toolbar once done.
     /// SimpleToolbar overrides this to stay hidden when replaced by an AdvancedToolbar.
@@ -203,6 +210,8 @@ protected:
 
     bool m_isFullscreen = false;
     QWidget* m_parent = nullptr;
+
+    virtual int fullscreenBottomMargin() const { return 40; }
 
     void moveOnTopOfParent(int bottomMargin){
         if (m_parent && m_isFullscreen) {
@@ -264,6 +273,62 @@ protected:
         else painter.drawRect(rect()); // pas de bords arrondies en mode normal
         QWidget::paintEvent(event);
     }
+
+    
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton && m_isFullscreen) {
+            m_dragOffset = event->globalPosition().toPoint() - frameGeometry().topLeft();
+            m_dragging = true;
+            event->accept();
+            return;
+        }
+
+        if (event->button() == Qt::RightButton && m_isFullscreen) {
+            QMenu menu;
+            QAction *repositionAction = menu.addAction(PrefManager::instance().getText("tooltip_reposition_toolbar"));
+
+            QAction *selectedAction = menu.exec(event->globalPosition().toPoint());
+            if (!selectedAction) return;
+
+            if (selectedAction == repositionAction){
+                m_isRepositioned = false;
+                setFullscreenUI(fullscreenBottomMargin()); // virtual getter so each class can have its own bottom margin
+                setWindowOpacity(1.0);
+            }
+            event->accept();
+            return;
+        }
+
+        QWidget::mousePressEvent(event);
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        if (m_dragging && (event->buttons() & Qt::LeftButton)) {
+            const QPoint cursorPosition = event->globalPosition().toPoint();
+            m_fullscreenPosition = cursorPosition - m_dragOffset;
+            move(m_fullscreenPosition);
+            m_isRepositioned = true;
+            event->accept();
+            return;
+        }
+
+        QWidget::mouseMoveEvent(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) {
+            m_dragging = false;
+            event->accept();
+            return;
+        }
+
+        QWidget::mouseReleaseEvent(event);
+    }
+
+
 
 
 signals:

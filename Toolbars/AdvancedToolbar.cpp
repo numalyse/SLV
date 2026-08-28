@@ -299,19 +299,13 @@ void AdvancedToolbar::setFullscreenUI(int bottomMargin)
     segmentationBtn->setDisabled(true);
 
     Toolbar::setFullscreenUI(bottomMargin);
-
-    if(m_isRepositioned) {
-        QTimer::singleShot(0, this, [this](){
-            move(m_fullscreenPosition);
-        });
-    } 
 }
 
 
 void AdvancedToolbar::setDefaultUI()
 {
     Toolbar::setDefaultUI();
-    /* m_pinBtn->hide(); */
+
     m_duplicatePlayerBtn->setDisabled(false);
     m_extensionToolbar->getSegmBtn()->setDisabled(false);
 
@@ -518,59 +512,5 @@ void AdvancedToolbar::decrementSpeedSlider(){
 
 void AdvancedToolbar::resetSpeedSlider(){
     m_speedSlider->setValue(3);
-}
-
-
-void AdvancedToolbar::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton && m_isFullscreen) {
-        m_dragOffset = event->globalPosition().toPoint() - frameGeometry().topLeft();
-        m_dragging = true;
-        event->accept();
-        return;
-    }
-
-    if (event->button() == Qt::RightButton && m_isFullscreen) {
-        QMenu menu;
-        QAction *repositionAction = menu.addAction(PrefManager::instance().getText("tooltip_reposition_toolbar"));
-
-        QAction *selectedAction = menu.exec(event->globalPosition().toPoint());
-        if (!selectedAction) return;
-
-        if (selectedAction == repositionAction){
-            m_isRepositioned = false;
-            setFullscreenUI();
-            setWindowOpacity(1.0);
-        }
-        event->accept();
-        return;
-    }
-
-    Toolbar::mousePressEvent(event);
-}
-
-void AdvancedToolbar::mouseMoveEvent(QMouseEvent *event)
-{
-    if (m_dragging && (event->buttons() & Qt::LeftButton)) {
-        const QPoint cursorPosition = event->globalPosition().toPoint();
-        m_fullscreenPosition = cursorPosition - m_dragOffset;
-        move(m_fullscreenPosition);
-        m_isRepositioned = true;
-        event->accept();
-        return;
-    }
-
-    Toolbar::mouseMoveEvent(event);
-}
-
-void AdvancedToolbar::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        m_dragging = false;
-        event->accept();
-        return;
-    }
-
-    Toolbar::mouseReleaseEvent(event);
 }
 

@@ -52,8 +52,13 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     addContent(separator);
     setsubcategoryName(subcategoryName);
 
+    pageWidth = m_contentLayout->parentWidget()->width()
+                - m_contentLayout->contentsMargins().left()
+                - m_contentLayout->contentsMargins().right();
+
 }
 
+// Add this widget to the Content page
 void ContentBase::addContent(QWidget* widget)
 {
     if (!widget)
@@ -65,11 +70,24 @@ void ContentBase::addContent(QWidget* widget)
     m_contentLayout->insertWidget(index, widget);
 }
 
+// Add a layout 
 void ContentBase::addLayout(QLayout* layout)
 {
     m_contentLayout->addLayout(layout);
 }
 
+// Add a vertical space 
+void ContentBase::addVSpacing(int spacing)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QVBoxLayout(widget);
+    layout->addSpacing(spacing);
+
+    addContent(widget);
+}
+
+// [] 
+// Set the name of the Category name at the beginning of the Content page
 void ContentBase::setCategoryName(const QString& categoryName){
     auto* name = new QLabel(pref.getText(categoryName));
 
@@ -80,7 +98,8 @@ void ContentBase::setCategoryName(const QString& categoryName){
 
     addContent(name);
 }
-
+// [] 
+// Set the name of the subcategory name at the beginning of the Content page
 void ContentBase::setsubcategoryName(const QString& subcategoryName){
     auto* name = new QLabel(pref.getText(subcategoryName));
 
@@ -92,6 +111,7 @@ void ContentBase::setsubcategoryName(const QString& subcategoryName){
     addContent(name);
 }
 
+// Add a section with a bold font
 void ContentBase::addSectionName(const QString& sectionName){
     auto* name = new QLabel(pref.getText(sectionName));
 
@@ -103,6 +123,7 @@ void ContentBase::addSectionName(const QString& sectionName){
     addContent(name);
 }
 
+// Create a table depending of a list of widgets
 QWidget* ContentBase::createTable(const QString& tableName, const QList<QWidget*>& rows)
 {
     auto* widget = new QWidget(this);
@@ -198,10 +219,36 @@ void ContentBase::addImage(const QString& imageName)
     addContent(widget);
 }
 
-void ContentBase::addTextFromLangJSON(const QString& descriptionKey)
+
+
+void ContentBase::addImages(const QList<QString>& imageNames)
 {
     auto* widget = new QWidget(this);
     auto* layout = new QHBoxLayout(widget);
+
+
+    for (const QString& imageName : imageNames)
+    {
+        QLabel* illustrationLabel = new QLabel();
+        
+        QPixmap illustration(":/help_dialog_illustrations/" + imageName);
+        illustrationLabel->setPixmap(illustration);
+
+        illustrationLabel->setAlignment(Qt::AlignCenter);
+        illustrationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        
+        layout->addWidget(illustrationLabel, 1);
+    }
+
+        widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    addContent(widget);
+}
+
+void ContentBase::addTextFromLangJSON(const QString& descriptionKey)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QVBoxLayout(widget);
 
     QLabel* descriptionLabel = new QLabel(pref.getText(descriptionKey));
 
@@ -221,7 +268,7 @@ void ContentBase::addTextFromLangJSON(const QString& descriptionKey)
 void ContentBase::addTextFromLangQMAP(QMap<QString, QString> texts)
 {
     auto* widget = new QWidget(this);
-    auto* layout = new QHBoxLayout(widget);
+    auto* layout = new QVBoxLayout(widget);
 
     QString langCode = pref.getLangCode();
     QString textToDisplay = texts.contains(langCode) ? texts[langCode] : "[Missing translation for : " + langCode + "]";
@@ -238,6 +285,55 @@ void ContentBase::addTextFromLangQMAP(QMap<QString, QString> texts)
     layout->addWidget(textLabel);
 
     addContent(widget);
+}
+
+void ContentBase::addQMAPTexts(QMap<QString, QPair<QString, QString>> texts)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QVBoxLayout(widget);
+
+    QString langCode = pref.getLangCode();
+
+    // Title
+    QString titleToDisplay = texts.contains(langCode) ? texts[langCode].first : "[Missing translation for : " + langCode + "]";
+    QLabel* titleLabel = new QLabel(titleToDisplay);
+
+    QFont qmapFont = titleLabel->font();
+    qmapFont.setPointSize(11);
+    qmapFont.setBold(true);
+
+    titleLabel->setFont(qmapFont);
+    titleLabel->setAlignment(Qt::AlignLeft);
+    titleLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    // Text
+    QString textToDisplay = texts.contains(langCode) ? texts[langCode].second : "[Missing translation for : " + langCode + "]";
+    QLabel* textLabel = new QLabel(textToDisplay);
+
+    qmapFont.setBold(false);
+    textLabel->setFont(qmapFont);
+
+    textLabel->setWordWrap(true);
+    textLabel->setAlignment(Qt::AlignLeft);
+    textLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    if(titleToDisplay != ""){
+        layout->addWidget(titleLabel);
+        layout->addSpacing(10);
+        
+    }    
+    if(textToDisplay != "") {
+        layout->addWidget(textLabel);
+    }
+
+    addContent(widget);
+}
+
+QString ContentBase::setTextFromLangQMAP(QMap<QString, QString> texts)
+{
+    QString langCode = pref.getLangCode();
+    QString textToDisplay = texts.contains(langCode) ? texts[langCode] : "[Missing translation for : " + langCode + "]";    
+    return textToDisplay;
 }
 
 void ContentBase::addMails(const QStringList& mails)
@@ -281,7 +377,7 @@ void ContentBase::getFormatsAvailables(){
         label_format->setAlignment(Qt::AlignCenter);
         label_format->setTextFormat(Qt::RichText);
         label_format->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        label_format->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 1px; border-radius: 5px;");
+        label_format->setStyleSheet("border: none; background-color: " + backgroundFillColor + "; padding: 5px; border-radius: 5px;");
         //label_format->setStyleSheet("a { text-decoration: none; }");
         layout->addWidget(label_format);
     }

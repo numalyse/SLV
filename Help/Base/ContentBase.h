@@ -27,6 +27,8 @@ public:
     void addContent(QWidget* widget);
     void addLayout(QLayout *layout);
 
+    void addVSpacing(int spacing);
+
     void setCategoryName(const QString &categoryName);
     void setsubcategoryName(const QString &subcategoryName);
     void addSectionName(const QString &sectionName);
@@ -36,8 +38,14 @@ public:
     void addButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
 
     void addImage(const QString &imageName);
+    void addImages(const QList<QString> &imageNames);
     void addTextFromLangJSON(const QString &descriptionName);
+
     void addTextFromLangQMAP(QMap<QString, QString> texts);
+    void addQMAPTexts(QMap<QString, QPair<QString, QString>> texts);
+
+    QString setTextFromLangQMAP(QMap<QString, QString> texts);
+
 
     void addMails(const QStringList &mails);
 
@@ -52,6 +60,7 @@ protected:
     QString backgroundFillColor;
 
     int m_imageWidth;
+    int pageWidth;
 
 
 };

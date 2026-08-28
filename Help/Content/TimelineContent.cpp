@@ -57,3 +57,35 @@ QWidget* TimelineContent::presentation(const QString& subcategoryName)
 
     return widget;
 }
+
+QWidget* TimelineContent::introduction(const QString& subcategoryName)
+{
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "\n"
+            "\n"
+            "\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
+
+    return widget;
+}
+

@@ -71,7 +71,7 @@ QWidget* GeneralContent::reportIssue(const QString& subcategoryName)
     widget->addTextFromLangQMAP({
         {"fr", 
             "Numalyse Player est un logiciel en cours de développement.\n"
-            "Nous vous invitons à nous contacter à l'adresse ci-dessous en cas de problèmes, afin de signaler un bug ou également en cas de difficultés de prise en main avec le logiciel."
+            "Nous vous invitons à nous contacter à l'adresse ci-dessous en cas de problème, afin de signaler un bug ou également en cas de difficulté avec la prise en main du logiciel."
         },
         {"en", 
             "Numalyse Player is currently under development.\n"

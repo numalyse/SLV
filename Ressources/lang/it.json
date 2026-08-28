@@ -474,16 +474,23 @@
     "extraction_method_choice" : "Metodo di estrazione",
 
     "help_menu_general_category" : "Generale",
+    "help_menu_formats_label" : "Formati di esportazione",
     "help_menu_report_issues_label" : "Segnala un problema",
     "help_menu_classic_category" : "Visualizzazione a vista singola",
-    "help_menu_open_files_label" : "Apri un file multimediale",
+    "help_menu_open_file_label" : "Apri un file multimediale",
+    "help_menu_play_file_label" : "Riproduci un file multimediale",
+    "help_menu_presentation_label" : "Presentazione",
 
     "help_menu_toolbars_label" : "Barras degli strumenti",
     "help_menu_classic_toolbar_label" : "Barra degli strumenti classica",
+    "help_menu_classic_toolbar_left_buttons_label" : "Pulsanti della parte sinistra",
+    "help_menu_classic_toolbar_central_buttons_label" : "Pulsanti della parte centrale",
+    "help_menu_classic_toolbar_right_buttons_label" : "Pulsanti della parte destra",
     "help_menu_extended_toolbar_label" : "Barra degli strumenti estesa",
 
     "help_menu_multiview_category" : "Visualizzazione multi-vista",
-    "help_menu_enter_multiview_label" : "Accedi alla vista multipla",
+    "help_menu_open_multiview_label" : "Accedi alla vista multipla",
+    "help_menu_duplicate_file_label" : "Duplica il file multimediale",
     "help_menu_simplified_toolbar_label" : "Barra degli strumenti semplificata",
     "help_menu_global_toolbar_label" : "Barra degli strumenti globale",
 

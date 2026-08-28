@@ -473,16 +473,23 @@
     "extraction_method_choice" : "Extraction method",
 
     "help_menu_general_category" : "General",
+    "help_menu_formats_label" : "Supported formats",
     "help_menu_report_issues_label" : "Report an issue",
     "help_menu_classic_category" : "Mono-view interface",
-    "help_menu_open_files_label" : "Play a media",
+    "help_menu_open_file_label" : "Open a media file",
+    "help_menu_play_file_label" : "Play a media file",
+    "help_menu_presentation_label" : "Presentation",
 
     "help_menu_toolbars_label" : "Toolbars",
     "help_menu_classic_toolbar_label" : "Classic toolbar",
+    "help_menu_classic_toolbar_left_buttons_label" : "Buttons left side",
+    "help_menu_classic_toolbar_central_buttons_label" : "Buttons central part",
+    "help_menu_classic_toolbar_right_buttons_label" : "Buttons right side",
     "help_menu_extended_toolbar_label" : "Advanced toolbar",
 
     "help_menu_multiview_category" : "Multi-view display",
-    "help_menu_enter_multiview_label" : "Access multi-view mode",
+    "help_menu_open_multiview_label" : "Access multi-view mode",
+    "help_menu_duplicate_file_label" : "Duplicate media",
     "help_menu_simplified_toolbar_label" : "Individual toolbar",
     "help_menu_global_toolbar_label" : "Common toolbar",
 

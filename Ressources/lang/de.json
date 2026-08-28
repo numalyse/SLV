@@ -473,16 +473,23 @@
     "extraction_method_choice" : "Extraktionsmethode",
 
     "help_menu_general_category" : "Allgemein",
+    "help_menu_formats_label" : "Unterstützte Formate",
     "help_menu_report_issues_label" : "Ein Problem melden",
     "help_menu_classic_category" : "Einfache Anzeige",
-    "help_menu_open_files_label" : "Mediendateien öffnen",
+    "help_menu_open_file_label" : "Mediendatei öffnen",
+    "help_menu_play_file_label" : "Mediendatei abspielen",
+    "help_menu_presentation_label" : "Präsentation",
 
-    "help_menu_toolbars_label" : "Symbolleistes",
+    "help_menu_toolbars_label" : "Symbolleisten",
     "help_menu_classic_toolbar_label" : "Klassische Symbolleiste",
+    "help_menu_classic_toolbar_left_buttons_label" : "Schaltflächen im linken Bereich",
+    "help_menu_classic_toolbar_central_buttons_label" : "Schaltflächen im mittleren Bereich",
+    "help_menu_classic_toolbar_right_buttons_label" : "Schaltflächen im rechten Bereich",
     "help_menu_extended_toolbar_label" : "Erweiterte Symbolleiste",
 
     "help_menu_multiview_category" : "Multi-View-Anzeige",
-    "help_menu_enter_multiview_label" : "In Multi-View wechseln",
+    "help_menu_open_multiview_label" : "Mehrere Mediendateien öffnen",
+    "help_menu_duplicate_file_label" : "Medium duplizieren",
     "help_menu_simplified_toolbar_label" : "Vereinfachte Symbolleiste",
     "help_menu_global_toolbar_label" : "Globale Symbolleiste",
 

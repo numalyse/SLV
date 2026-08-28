@@ -36,10 +36,35 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
-    widget->addTextFromLangJSON("help_menu_classic_toolbar_content_1");
+    //widget->addTextFromLangJSON("help_menu_classic_toolbar_content_1");
+
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "La barre d'outils classique est composée de plusieurs boutons permettant d'accéder à différentes fonctionnalités.\n"
+            "Elle est divisée en trois parties : gauche, centrale et droite.\n"
+            "La partie gauche contient les boutons liés au son et aux informations du média.\n"
+            "La partie centrale contient les boutons de lecture et de contrôle du média.\n"
+            "La partie droite contient les boutons liés à l'affichage et aux fonctionnalités avancées.\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
 
     widget->addButtonDescriptionTable(
-        "help_menu_classic_toolbar_left_buttons", 
+        "help_menu_classic_toolbar_left_buttons_label", 
         {
             "sound_on",
             "lang",
@@ -47,8 +72,10 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
         }
     );
 
+    widget->addVSpacing(10);
+
     widget->addButtonDescriptionTable(
-        "help_menu_classic_toolbar_central_buttons", 
+        "help_menu_classic_toolbar_central_buttons_label", 
         {
             "slow",
             "play",
@@ -57,10 +84,12 @@ QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
             "eject",
             "loop_off"
         }
-    );
+    ); 
+
+    widget->addVSpacing(10);
 
     widget->addButtonDescriptionTable(
-        "help_menu_classic_toolbar_right_buttons", 
+        "help_menu_classic_toolbar_right_buttons_label", 
         {
             "zoom",
             "capture",

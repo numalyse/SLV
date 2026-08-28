@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Fusionar con el plano anterior",
     "tooltip_merge_with_next_shot": "Fusionar con el siguiente plano",
     "tooltip_export": "Exportar",
+    "tooltip_reposition_toolbar" : "Restablecer la posición de la barra de herramientas",
 
     "timeline_split_shot_at_cursor" : "Cortar en el cabezal",
     "timeline_ab_action_0": "Añadir marcador A en el cabezal",

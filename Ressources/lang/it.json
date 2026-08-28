@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Unisci con il piano precedente",
     "tooltip_merge_with_next_shot": "Unisci con il piano successivo",
     "tooltip_export": "Esporta",
+    "tooltip_reposition_toolbar" : "Ripristina la posizione della barra degli strumenti",
 
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",

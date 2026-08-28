@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Mit vorherigem Schnitt zusammenführen",
     "tooltip_merge_with_next_shot": "Mit nächstem Schnitt zusammenführen",
     "tooltip_export": "Exportieren",
+    "tooltip_reposition_toolbar" : "Position der Werkzeugleiste zurücksetzen",
 
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
     "timeline_ab_action_0": "A-Marker am Abspielkopf setzen",

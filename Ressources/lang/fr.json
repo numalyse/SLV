@@ -85,6 +85,8 @@
     "tooltip_merge_with_next_shot": "Fusionner avec le plan suivant",
     "tooltip_export": "Exporter",
 
+    "tooltip_reposition_toolbar" : "Reinitialiser la position de la barre d'outils",
+
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",

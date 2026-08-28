@@ -85,6 +85,8 @@
     "tooltip_merge_with_next_shot": "Merge with the next shot",
     "tooltip_export": "Export",
 
+    "tooltip_reposition_toolbar" : "Reset toolbar position",
+
     "timeline_split_shot_at_cursor" : "Cut at cursor",
     "timeline_ab_action_0": "Add marker A at cursor",
     "timeline_ab_action_1": "Add marker B at cursor",

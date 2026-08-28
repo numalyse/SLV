@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Fundir com o plano anterior",
     "tooltip_merge_with_next_shot": "Fundir com o plano seguinte",
     "tooltip_export": "Exportar",
+    "tooltip_reposition_toolbar" : "Repor a posição da barra de ferramentas",
 
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
     "timeline_ab_action_0": "Adicionar marcador A no cursor",

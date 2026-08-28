@@ -60,6 +60,12 @@ private:
 
     QVector<QShortcut*> m_advancedShortcuts;
 
+    bool m_isRepositioned = false;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+
 protected slots: 
     virtual void onSliderPressed() override;
     virtual void onSliderReleased() override;

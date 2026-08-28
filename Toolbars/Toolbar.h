@@ -189,6 +189,10 @@ protected:
     ToolbarToggleButton* m_zoomBtn = nullptr;
     bool m_firstTimeDialog = false;
 
+    QPoint m_fullscreenPosition;
+    QPoint m_dragOffset;
+    bool m_dragging = false;
+
     /// @brief Whether setDefaultUI() should show the toolbar once done.
     /// SimpleToolbar overrides this to stay hidden when replaced by an AdvancedToolbar.
     virtual bool shouldShowOnDefaultUI() const { return true; }

@@ -66,6 +66,8 @@ signals:
     void playlistSizeResponse();
     void displayAnnotationPanel();
     void playFirstPlaylistItem();
+    void globalRecordingStarted();
+    void globalRecordingFinished();
 };
 
 

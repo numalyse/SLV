@@ -225,6 +225,7 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         Ressources/help_dialog_illustrations.qrc
         PlaylistLoader.h
+        MultiviewVideoCaptureManager.h MultiviewVideoCaptureManager.cpp
 
 
     )

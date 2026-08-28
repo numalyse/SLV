@@ -36,6 +36,7 @@ public:
     /// @brief N'utilise pas libvlc, update seulement le temps interne m_vlcTime
     void setVlcTime(uint64_t newTime){ m_vlcTime = newTime; }
     void setLoopValue(const int64_t val){ m_loopValue = val; }
+    void setIsRecording(const bool recording){ m_isRecordingGlobal = recording; }
 
     bool isPlaying() { 
         return (m_player) ? libvlc_media_player_is_playing(m_player) : false; 
@@ -118,6 +119,7 @@ private:
     ZoomHelper m_zoomHelper;
     QPoint m_lastPanPos;
     bool m_isPanning = false;
+    bool m_isRecordingGlobal = false;
 
 
     enum class TransformState {

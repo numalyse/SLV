@@ -487,6 +487,9 @@ void MainWindow::createViewGridBtn()
 
     m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"));
     m_viewGridBtn->setOnTop(false);
+
+    connect(&SignalManager::instance(), &SignalManager::globalRecordingStarted, this, [this]{ m_viewGridBtn->setEnabled(false); });
+    connect(&SignalManager::instance(), &SignalManager::globalRecordingFinished, this, [this]{ m_viewGridBtn->setEnabled(true); });
 }
 
 void MainWindow::moveEvent(QMoveEvent *event)

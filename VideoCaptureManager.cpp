@@ -42,7 +42,7 @@ void VideoCaptureManager::startMediaRecording(const int startTime)
     if(!m_mediaFile.exists()) return;
     m_startRecordTime = startTime;
     m_concatRecordNumber = 0;
-    initMediaTempDirectory();
+    // initMediaTempDirectory();
 }
 
 void VideoCaptureManager::mediaCutAndConcat(const int cutTime, const int newTime)
@@ -66,41 +66,49 @@ void VideoCaptureManager::endMediaRecording(const int endTime, const QString& sa
 {
     if(!m_mediaFile.exists() || m_startRecordTime == -1) return;
 
-    QString concatVideoName = m_concatRecordNumber != 0 ? m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix() : savePath;
+    if(endTime < m_startRecordTime){
+        emit recordSegmentFailed();
+        return;
+    }
+
+    // QString concatVideoName = m_concatRecordNumber != 0 ? m_concatMediaPath + '/' + m_mediaFile.baseName() + QString::number(m_concatRecordNumber) + '.' + m_mediaFile.suffix() : savePath;
+
     SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_mediaFile.filePath(), m_startRecordTime, endTime);
-    sequenceExtractor->extractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, concatVideoName);
-    connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, concatVideoName, savePath](const int exitCode){
+    sequenceExtractor->extractSequence(m_mediaFile.filePath(), m_startRecordTime, endTime, savePath); // savePath -> concatVideoName if concat method
+    connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, savePath](const int exitCode){
         if(exitCode != 1){
-            deleteMediaTempDirectory();
+            // deleteMediaTempDirectory();
             emit recordSegmentFailed();
             return;
         }
         m_startRecordTime = -1;
 
-        if(m_concatRecordNumber == 0) {
-            deleteMediaTempDirectory();
-            emit recordSegmentDone(savePath);
-            return;
-        }
+        emit recordSegmentDone(savePath);
 
-        if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
-        {
-            QTextStream stream( m_concatFile );
-            QString strConcat = concatVideoName;
-            stream << "file '" << strConcat.replace("\\", "/")<< "'" << Qt::endl;
-            m_concatFile->close();
-        }
-        m_concatRecordNumber = 0;
-        QProcess* sequenceConcatenate = SequenceExtractionHelper::concatenateSequences(QFileInfo(*m_concatFile).filePath(), savePath);
-        connect(sequenceConcatenate, &QProcess::finished, this, [this, savePath](int exitCode){
-            if(exitCode != 0){
-                deleteMediaTempDirectory();
-                emit recordSegmentFailed();
-                return;
-            }
-            deleteMediaTempDirectory();
-            emit recordSegmentDone(savePath);
-        });
+        // if(m_concatRecordNumber == 0) {
+        //     deleteMediaTempDirectory();
+        //     emit recordSegmentDone(savePath);
+        //     return;
+        // }
+
+        // if ( m_concatFile->open(QIODevice::ReadWrite | QIODevice::Append) )
+        // {
+        //     QTextStream stream( m_concatFile );
+        //     QString strConcat = concatVideoName;
+        //     stream << "file '" << strConcat.replace("\\", "/")<< "'" << Qt::endl;
+        //     m_concatFile->close();
+        // }
+        // m_concatRecordNumber = 0;
+        // QProcess* sequenceConcatenate = SequenceExtractionHelper::concatenateSequences(QFileInfo(*m_concatFile).filePath(), savePath);
+        // connect(sequenceConcatenate, &QProcess::finished, this, [this, savePath](int exitCode){
+        //     if(exitCode != 0){
+        //         deleteMediaTempDirectory();
+        //         emit recordSegmentFailed();
+        //         return;
+        //     }
+        //     deleteMediaTempDirectory();
+        //     emit recordSegmentDone(savePath);
+        // });
     });
 
 }

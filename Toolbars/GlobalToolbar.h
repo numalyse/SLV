@@ -32,12 +32,15 @@ public slots:
 signals:
     void enableMute();
     void disableMute();
+    void enableRecord();
+    void disableRecord();
 private: 
 
     QVector<QShortcut*> m_globalShortcuts;
     static constexpr int s_bottomMarginFullscreen = 10;
     int fullscreenBottomMargin() const override { return s_bottomMarginFullscreen; }
     QSpacerItem* m_extraSpacingItem = nullptr;
+    ToolbarToggleButton* m_multiviewRecordBtn = nullptr;
 
     void addShortcuts();
 };

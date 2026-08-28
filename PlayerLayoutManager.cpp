@@ -56,7 +56,7 @@ void equalizeAllSplitters(QWidget* root)
 PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     : QWidget{}
 {
-
+    m_multiviewRecord = new MultiviewVideoCaptureManager();
     m_players.reserve(s_maxPlayerCount);
     connect(&SignalManager::instance(), &SignalManager::newArrangementRequested, this, &PlayerLayoutManager::arrangePlayerLayout);
     connect(&SignalManager::instance(), &SignalManager::playerWidgetMediaDropped, this, &PlayerLayoutManager::createLayoutFromPaths);
@@ -420,6 +420,8 @@ Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     connect(globalToolbar, &Toolbar::disableFullscreenRequest, globalToolbar, &GlobalToolbar::disableFullscreenUiUpdate);
     connect(this, &PlayerLayoutManager::buttonsDisabled, globalToolbar, &GlobalToolbar::disableButtons);
     connect(globalToolbar, &Toolbar::screenshotRequest, this, &PlayerLayoutManager::takeGlobalScreenshot);
+    connect(globalToolbar, &GlobalToolbar::enableRecord, this, &PlayerLayoutManager::startMultiviewRecord);
+    connect(globalToolbar, &GlobalToolbar::disableRecord, this, &PlayerLayoutManager::endMultiviewRecord);
     
     globalToolbar->muteBtn()->setButtonState(newGlobalMuteState());
     globalToolbar->playPauseBtn()->setButtonState(newGlobalPlayState());
@@ -895,4 +897,38 @@ void PlayerLayoutManager::handlePlaylistEject()
     if(m_activePlayers.size() <= 0) return;
     PlayerWidget* player = m_activePlayers[0];
     if(player) player->eject();
+}
+
+void PlayerLayoutManager::startMultiviewRecord()
+{
+    QVector<Media*> activeMedias;
+    QVector<int> startTimes;
+
+    for(size_t IPlayer = 0 ; IPlayer < m_activePlayers.size() ; ++IPlayer){
+        activeMedias.append(m_activePlayers[IPlayer]->mediaWidget()->media());
+        startTimes.append(m_activePlayers[IPlayer]->mediaWidget()->getCurrentTime());
+        m_activePlayers[IPlayer]->toolbar()->slider()->setEnabled(false);
+        m_activePlayers[IPlayer]->mediaWidget()->setIsRecording(true);
+    }
+
+    m_multiviewRecord->startMultiviewRecord(activeMedias, startTimes, m_currentArrangement);
+    m_isRecording = true;
+    emit SignalManager::instance().globalRecordingStarted();
+}
+
+void PlayerLayoutManager::endMultiviewRecord()
+{
+    QVector<int> endTimes;
+
+    for(size_t IPlayer = 0 ; IPlayer < m_activePlayers.size() ; ++IPlayer){
+        endTimes.append(m_activePlayers[IPlayer]->mediaWidget()->getCurrentTime());
+        m_activePlayers[IPlayer]->toolbar()->slider()->setEnabled(true);
+        m_activePlayers[IPlayer]->mediaWidget()->setIsRecording(false);
+    }
+
+    const QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("dialog_capture"), PrefManager::instance().getPref("Paths", "lp_capture"));
+
+    m_multiviewRecord->endMultiviewRecord(endTimes, savePath);
+    m_isRecording = true;
+    emit SignalManager::instance().globalRecordingFinished();
 }

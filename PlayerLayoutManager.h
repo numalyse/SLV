@@ -6,6 +6,7 @@
 
 #include "PlayerWidget.h"
 #include "GlobalScreenshotHelper.h"
+#include "MultiviewVideoCaptureManager.h"
 
 class PlayerWidget;
 
@@ -61,6 +62,8 @@ private:
     QList<GlobalScreenshotPlayerData> getActivePlayersData();
 
     PlayerLayoutArrangement m_currentArrangement = ArrangementUnknown;
+    MultiviewVideoCaptureManager* m_multiviewRecord = nullptr;
+    bool m_isRecording = false;
 
     void handlePlaylistEject();
 
@@ -120,6 +123,9 @@ public slots:
     // void enableButtons();
     void disableGlobalToolbarButtons();
     void arrangePlayerLayout(const PlayerLayoutArrangement&);
+
+    void startMultiviewRecord();
+    void endMultiviewRecord();
 };
 
 #endif // PLAYERLAYOUTMANAGER_H

@@ -202,7 +202,7 @@ void PlaylistItem::mousePressEvent(QMouseEvent *event)
 
 void PlaylistItem::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(rect().contains(event->pos())){
+    if(rect().contains(event->pos()) && !m_isCurrentMedia){
         emit updatePlaylistCurrentIndex(m_itemIndex);
         playMedia(true);
     }

@@ -69,6 +69,7 @@ signals:
     void shotsExtractionFinished(const QString& outputPath);
     void shotsExtractionFailed();
     void shotCountUpdated(int newShotCount);
+    void selectedShotCountUpdated(int newSelectedShotCount);
 
 private:
     void mergeCurrentInto(int ShotItemId);

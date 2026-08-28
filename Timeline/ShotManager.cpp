@@ -121,6 +121,7 @@ void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* aud
             updateSelectedNumbers();
         }
     }
+    emit selectedShotCountUpdated(static_cast<int>(m_selectedShots.size()));
 }
 
 void ShotManager::updateSelectedNumbers(){

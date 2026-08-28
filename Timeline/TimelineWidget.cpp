@@ -168,6 +168,14 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_shotCountLabel->setFont(shotCountFont);
     updateShotCount(static_cast<int>(projectShots.size()));
 
+    m_selectedShotCountLabel = new QLabel(this);
+    m_selectedShotCountLabel->setContentsMargins(0, 0, 1, 0);
+    QFont selectedShotCountFont = m_selectedShotCountLabel->font();
+    selectedShotCountFont.setItalic(true);
+    m_selectedShotCountLabel->setFont(selectedShotCountFont);
+    updateSelectedShotCount(0);
+
+    ButtonLayout->addWidget(m_selectedShotCountLabel);
     ButtonLayout->addWidget(m_shotCountLabel);
 
     layout->addLayout(ButtonLayout);
@@ -212,6 +220,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
     });
+    connect(m_shotManager, &ShotManager::selectedShotCountUpdated, this, &TimelineWidget::updateSelectedShotCount);
 
     m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
     connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);
@@ -287,6 +296,15 @@ bool TimelineWidget::event(QEvent *event)
 void TimelineWidget::updateShotCount(int shotCount)
 {
     m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
+}
+
+void TimelineWidget::updateSelectedShotCount(int selectedShotCount)
+{
+    if(selectedShotCount == 0){
+        m_selectedShotCountLabel->setText("");
+        return;
+    }
+    m_selectedShotCountLabel->setText(QString::number(selectedShotCount) + " " + PrefManager::instance().getText("timeline_selected_shot_count_label") + ",");
 }
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items

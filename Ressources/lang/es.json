@@ -97,6 +97,7 @@
     "timeline_merge_with_next_shot" : "Fusionar plano actual con el siguiente",
     "timeline_extract_selected_shots" : "Extraer planos seleccionados",
     "timeline_shot_count_label" : "plano(s)",
+    "timeline_selected_shot_count_label" : "plano(s) seleccionado(s)",
     "messagebox_extract_selected_shots_completed" : "Extracción de los planos seleccionados completada.",
     "messagebox_extract_selected_shots_failed" : "Falló la extracción de los planos seleccionados.",
 

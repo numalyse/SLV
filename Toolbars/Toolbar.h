@@ -15,6 +15,8 @@
 #include <QStyleHints>
 #include <QGuiApplication>
 #include <QColor>
+#include <QMenu>
+
 #include "PrefManager.h"
 #include "SignalManager.h"
 
@@ -100,6 +102,7 @@ public:
     ToolbarToggleButton* fullscreenBtn() const { return m_fullscreenBtn; }
     ToolbarToggleButton* muteBtn() { return m_muteBtn; };
     ToolbarToggleButton* zoomBtn() { return m_zoomBtn; };
+    bool isFullscreen() const { return m_isFullscreen; }
 
     QVariant m_maxFullscreenOpacity = 1.0;
 
@@ -122,7 +125,11 @@ public:
 
         QTimer::singleShot(0, this, [this, bottomMargin]() {
             moveOnTopOfParent(bottomMargin);
+            if(m_isRepositioned) {
+                move(m_fullscreenPosition);
+            }
         });
+
     }
 
     /// @brief Met à jour le layout pour afficher l'interface par défaut
@@ -134,7 +141,7 @@ public:
         }
 
         QTimer::singleShot(0, this, [this]() {
-            if (!m_isReplacedByAdvanced) {
+            if (shouldShowOnDefaultUI()) {
                 show();
             }
         });
@@ -148,12 +155,7 @@ public:
         setParent(parent);
     }
 
-    void setReplacedByAdvanced(bool replaced) {
-        m_isReplacedByAdvanced = replaced;
-        if (replaced) {
-            hide();
-        }
-    }
+    void setIsRepositioned(bool isRepositioned) { m_isRepositioned = isRepositioned; }
 
     void showAnimation();
     void hideAnimation();
@@ -195,7 +197,15 @@ protected:
     ToolbarToggleButton* m_muteBtn = nullptr;
     ToolbarToggleButton* m_zoomBtn = nullptr;
     bool m_firstTimeDialog = false;
-    bool m_isReplacedByAdvanced = false; 
+
+    QPoint m_fullscreenPosition;
+    QPoint m_dragOffset;
+    bool m_dragging = false;
+    bool m_isRepositioned = false;
+
+    /// @brief Whether setDefaultUI() should show the toolbar once done.
+    /// SimpleToolbar overrides this to stay hidden when replaced by an AdvancedToolbar.
+    virtual bool shouldShowOnDefaultUI() const { return true; }
 
     QShortcut* m_dynamicFullscreenShortcut = nullptr;
 
@@ -203,6 +213,8 @@ protected:
 
     bool m_isFullscreen = false;
     QWidget* m_parent = nullptr;
+
+    virtual int fullscreenBottomMargin() const { return 40; }
 
     void moveOnTopOfParent(int bottomMargin){
         if (m_parent && m_isFullscreen) {
@@ -220,7 +232,7 @@ protected:
                 posX = qMax(geo.left(), qMin(posX, geo.right() - width()));
                 posY = qMax(geo.top(), qMin(posY, geo.bottom() - height()));
             }
-
+            
             move(posX, posY);
         }
     }
@@ -264,6 +276,62 @@ protected:
         else painter.drawRect(rect()); // pas de bords arrondies en mode normal
         QWidget::paintEvent(event);
     }
+
+    
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton && m_isFullscreen) {
+            m_dragOffset = event->globalPosition().toPoint() - frameGeometry().topLeft();
+            m_dragging = true;
+            event->accept();
+            return;
+        }
+
+        if (event->button() == Qt::RightButton && m_isFullscreen) {
+            QMenu menu;
+            QAction *repositionAction = menu.addAction(PrefManager::instance().getText("tooltip_reposition_toolbar"));
+
+            QAction *selectedAction = menu.exec(event->globalPosition().toPoint());
+            if (!selectedAction) return;
+
+            if (selectedAction == repositionAction){
+                m_isRepositioned = false;
+                setFullscreenUI(fullscreenBottomMargin()); // virtual getter so each class can have its own bottom margin
+                setWindowOpacity(1.0);
+            }
+            event->accept();
+            return;
+        }
+
+        QWidget::mousePressEvent(event);
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        if (m_dragging && (event->buttons() & Qt::LeftButton)) {
+            const QPoint cursorPosition = event->globalPosition().toPoint();
+            m_fullscreenPosition = cursorPosition - m_dragOffset;
+            move(m_fullscreenPosition);
+            m_isRepositioned = true;
+            event->accept();
+            return;
+        }
+
+        QWidget::mouseMoveEvent(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) {
+            m_dragging = false;
+            event->accept();
+            return;
+        }
+
+        QWidget::mouseReleaseEvent(event);
+    }
+
+
 
 
 signals:

@@ -168,6 +168,14 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_shotCountLabel->setFont(shotCountFont);
     updateShotCount(static_cast<int>(projectShots.size()));
 
+    m_selectedShotCountLabel = new QLabel(this);
+    m_selectedShotCountLabel->setContentsMargins(0, 0, 1, 0);
+    QFont selectedShotCountFont = m_selectedShotCountLabel->font();
+    selectedShotCountFont.setItalic(true);
+    m_selectedShotCountLabel->setFont(selectedShotCountFont);
+    updateSelectedShotCount(0);
+
+    ButtonLayout->addWidget(m_selectedShotCountLabel);
     ButtonLayout->addWidget(m_shotCountLabel);
 
     layout->addLayout(ButtonLayout);
@@ -212,6 +220,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
     });
+    connect(m_shotManager, &ShotManager::selectedShotCountUpdated, this, &TimelineWidget::updateSelectedShotCount);
 
     m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
     connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);
@@ -287,6 +296,15 @@ bool TimelineWidget::event(QEvent *event)
 void TimelineWidget::updateShotCount(int shotCount)
 {
     m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
+}
+
+void TimelineWidget::updateSelectedShotCount(int selectedShotCount)
+{
+    if(selectedShotCount == 0){
+        m_selectedShotCountLabel->setText("");
+        return;
+    }
+    m_selectedShotCountLabel->setText(QString::number(selectedShotCount) + " " + PrefManager::instance().getText("timeline_selected_shot_count_label") + ",");
 }
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
@@ -409,8 +427,8 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
-    QAction *actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
-    QAction *actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
+    QAction *actionSplit = nullptr;
+    QAction *actionExtractShot = nullptr;
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -418,32 +436,38 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *actionExtractAB = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
-    QAction* actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+    QAction* actionOpenShotInfo = nullptr;
 
-    if(m_showMergeWithPrevShotBtn){
-        mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
-    }
-    if(m_showMergeWithNextShotBtn){
-        mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
-    }
-
-    switch (m_abManager->getMarkerCount())
+    if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
-    case 0:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
-        break;
-    case 1:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
-        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        break;
-    case 2:
-        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
-        break;
-    }
-
-    if ( m_shotManager->getNbShotsSelected() > 0 ) {
         actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
+    } else 
+    {
+        actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
+        actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+        actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
+
+        if(m_showMergeWithPrevShotBtn){
+            mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
+        }
+        if(m_showMergeWithNextShotBtn){
+            mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
+        }
+
+        switch (m_abManager->getMarkerCount())
+        {
+        case 0:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
+            break;
+        case 1:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
+            deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+            break;
+        case 2:
+            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+            actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
+            break;
+        }
     }
 
     QAction *selectedAction = menu.exec(globalPos);
@@ -462,23 +486,11 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == mergeWithNextShot){
         mergeWithNextShotAction();
     } else if(selectedAction == actionExtractShot){
-        QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"),
-            PrefManager::instance().getPref("Paths", "lp_extract_sequence")
-                + '/' + p_media->fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().start, p_media->fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(item->shot().end, p_media->fps()));
-        if(saveSequencePath != ""){
-            SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(p_media->filePath(), item->shot().start, item->shot().end);
-            sequenceExtractor->extractSequence(p_media->filePath(), item->shot().start, item->shot().end, saveSequencePath.split('.')[0] + '.' + p_media->fileExtension());
-            connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, sequenceExtractor, saveSequencePath](const int exitCode){
-                if (exitCode == 1){
-                    exportDone(PrefManager::instance().getText("messagebox_extract_shot_completed"), saveSequencePath);
-                } else {
-                    QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shot_failed"));
-                }
-            });
-        }
+        ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
+        sequenceExtractor->show();
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
-        emit SignalManager::instance().toggleNavPanel(PanelType::ShotDetail);
+        emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);
     }else if (selectedAction == actionExtractShotsSelected){
 
         QFileInfo fileInfo (p_media->filePath());

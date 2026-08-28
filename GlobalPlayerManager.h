@@ -62,6 +62,7 @@ public slots:
     void setGlobalZoomState(bool);
 
     void toggleNavPanel(PanelType type);
+    void displayNavPanel(PanelType type);
 
 private slots:
     void createTimelineWidget();

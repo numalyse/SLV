@@ -396,7 +396,7 @@ namespace ProjectExportHelper {
         QFileInfo mediaFileInfo(mediaPath);
         QString mediaName = mediaFileInfo.baseName();
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
 
         DecodeThread* decodeThread = new DecodeThread(mediaPath, sar, imageQueue.get(), toImageTimes(items));
 
@@ -489,7 +489,7 @@ namespace ProjectExportHelper {
         int itemCount = items.size();
         int currItemId = 0;
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
 
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath,
@@ -666,7 +666,7 @@ namespace ProjectExportHelper {
         if (!tempDir.isValid()) return false;
         QString tempPath = tempDir.path();
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, sar, imageQueue.get(), toImageTimes(items), nullptr,
             std::optional<int>(), std::optional<cv::Size>(imgSize)
@@ -690,7 +690,7 @@ namespace ProjectExportHelper {
                 }
 
                 if (progressCallback && itemCount > 0) { 
-                    int percent = static_cast<int>(((currItemId + 1) * 95.0) / itemCount); // On va de 0 à 95% car c'est le plus long 
+                    int percent = static_cast<int>(((currItemId + 1) * 85.0) / itemCount); // On va de 0 à 85% car c'est le plus long 
                     if (!progressCallback(percent)) {
                         stopDecodeThread(decodeThread, imageQueue.get());
                         return false;
@@ -774,7 +774,7 @@ namespace ProjectExportHelper {
                 
                 if (line.startsWith("PROGRESS:")) {
                     int pyPercent = line.mid(9).toInt(); // Python envoie de 0 à 100
-                    int totalPercent = 95 + static_cast<int>(pyPercent * 0.05); // Remap de 95 à 100
+                    int totalPercent = 85 + static_cast<int>(pyPercent * 0.15); // Remap de 85 à 100
                     
                     if (progressCallback && !progressCallback(totalPercent)) {
                         pythonProcess.kill();
@@ -889,7 +889,7 @@ namespace ProjectExportHelper {
         auto [fontSize, lineSpacing] = computeFontSizeAndSpacing(displaySize.width, displaySize.height, 0.020);
         QImage textOverlay(displaySize.width, displaySize.height, QImage::Format_ARGB32_Premultiplied);
 
-        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(5));
+        std::unique_ptr<TSQueue<ImgData>> imageQueue(new TSQueue<ImgData>(1));
         DecodeThread* decodeThread = new DecodeThread(
             mediaPath, sar, imageQueue.get(), {}
         );

@@ -154,9 +154,11 @@ void MainWindow::createMenuBar()
 
     auto *openProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_open_project_action"));
     openProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "open_project")));
+    openProjectAction->setToolTip(prefManager.getText("main_window_file_open_project_action_tooltip"));
 
     auto *saveProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_project_action"));
     saveProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "save_project")));
+    saveProjectAction->setToolTip(prefManager.getText("main_window_file_save_project_action_tooltip"));
     saveProjectAction->setDisabled(true);
 
     auto *saveAsProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_as_project_action"));
@@ -283,6 +285,11 @@ void MainWindow::createToolBar()
     connect(m_annotationPanelBtn, &ToolbarButton::clicked, m_navPanelBtn, &ToolbarToggleHoverButton::stateActivated);
     connect(&SignalManager::instance(), &SignalManager::toggleNavPanel, this, [this](PanelType type){
         m_globalPlayerManager->toggleNavPanel(type);
+        m_navPanelBtn->setButtonState(m_globalPlayerManager->isNavPanelOpen());
+    });
+
+    connect(&SignalManager::instance(), &SignalManager::displayNavPanel, this, [this](PanelType type){
+        m_globalPlayerManager->displayNavPanel(type);
         m_navPanelBtn->setButtonState(m_globalPlayerManager->isNavPanelOpen());
     });
 
@@ -484,6 +491,9 @@ void MainWindow::createViewGridBtn()
 
     m_viewGridBtn = new ToolbarToggleHoverButton(m_toolbarQt, viewLayout, false, "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"), "player_arrangement_white", PrefManager::instance().getText("tooltip_view_grid"));
     m_viewGridBtn->setOnTop(false);
+
+    connect(&SignalManager::instance(), &SignalManager::globalRecordingStarted, this, [this]{ m_viewGridBtn->setEnabled(false); });
+    connect(&SignalManager::instance(), &SignalManager::globalRecordingFinished, this, [this]{ m_viewGridBtn->setEnabled(true); });
 }
 
 void MainWindow::moveEvent(QMoveEvent *event)

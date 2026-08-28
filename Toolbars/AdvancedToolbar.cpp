@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include <QShortcut>
 #include <QTimer>
+#include <QMenu>
 
 AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
 {
@@ -42,8 +43,6 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
     );
 
     m_extensionToolbar = new ExtensionToolbar(this);
-
-    
     
     connect(m_extensionBtn, &ToolbarToggleButton::stateActivated, m_extensionToolbar, [this](){
         // affiche l'extension et si le bouton de ségmentation est toujours on demande l'affichage de la segmentation
@@ -52,7 +51,6 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         if(m_extensionToolbar->m_segmBtn->isChecked() && ProjectManager::instance().project() != nullptr)
             emit enableSegmentationRequest();
         else if (m_isFullscreen) {
-            setFullscreenUI();
             setWindowOpacity(1.0); // force l'affichage de la barre 
         }
             
@@ -66,7 +64,7 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_extensionBtn->setButtonState(false);
         emit disableSegmentationRequest();
         if (m_isFullscreen) {
-            setFullscreenUI();
+            adjustSize();
             setWindowOpacity(1.0); // force l'affichage de la barre 
         }
             
@@ -292,7 +290,6 @@ AdvancedToolbar::~AdvancedToolbar()
 
 void AdvancedToolbar::setFullscreenUI(int bottomMargin)
 {
-
     m_duplicatePlayerBtn->setDisabled(true);
     auto* segmentationBtn = m_extensionToolbar->getSegmBtn();
 
@@ -501,6 +498,11 @@ void AdvancedToolbar::disableFullscreenRequested(){
     emit disableFullscreenRequest();
 }
 
+void AdvancedToolbar::updateFullscreenPosition()
+{
+    Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
+}
+
 void AdvancedToolbar::incrementSpeedSlider(){
     if (m_speedSlider->value() < m_speedSlider->maximum()) {
         m_speedSlider->setValue(m_speedSlider->value() + 1);
@@ -516,3 +518,4 @@ void AdvancedToolbar::decrementSpeedSlider(){
 void AdvancedToolbar::resetSpeedSlider(){
     m_speedSlider->setValue(3);
 }
+

@@ -12,6 +12,7 @@
 #include <QMimeData>
 #include <QApplication>
 #include <QThreadPool>
+#include <QProcess>
 
 class PlaylistItem : public QWidget
 {
@@ -19,15 +20,17 @@ class PlaylistItem : public QWidget
 
 public:
     explicit PlaylistItem(QWidget *parent = nullptr, const QString &mediaFilePath = "");
+    ~PlaylistItem();
     void initStyle();
     void updateTypeIcon();
     QPixmap generateVideoThumbnail(const QString &videoPath);
     void updateThumbnail();
-    QString getTitle() const { return m_mediaData->fileName(); };
+    QString getTitle() const { return m_mediaData->fileName(); }
     MediaType getType() const { return m_mediaData->type(); }
     QSize thumbnailSize() const  {return m_thumbnailSize; }
     QString setThumbnailTime();
-    qint64 getDuration() const { return m_mediaData->duration(); };
+    qint64 getDuration() const { return m_mediaData->duration(); }
+    QString getPath() const { return m_mediaData->filePath(); }
 
 private:
     bool m_isDarkMode = true;
@@ -47,6 +50,8 @@ private:
     QSize m_thumbnailSize {64, 36};
     bool m_isCurrentMedia = false;
     QPoint m_dragStartPosition;
+    QProcess *m_thumbnailGenerator;
+    bool m_itemDeleted = false;
 
 protected:
     void enterEvent(QEnterEvent *event) override;

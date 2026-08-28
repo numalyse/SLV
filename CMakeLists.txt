@@ -166,6 +166,7 @@ set(ADDITIONAL_SOURCES
     Timeline/Items/RangeMarkerItem.cpp Timeline/Items/RangeMarkerItem.h
     Timeline/Items/AnnotationItem.h Timeline/Items/AnnotationItem.cpp
     Timeline/Items/AnnotationHandleItem.h Timeline/Items/AnnotationHandleItem.cpp
+    Timeline/Items/TimelineLayerItem.h
 
     # Preferences complètes
     Preference/Tabs/InterfaceTab.cpp Preference/Tabs/InterfaceTab.h
@@ -235,6 +236,8 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         Ressources/help_dialog_illustrations.qrc
+        PlaylistLoader.h
+        MultiviewVideoCaptureManager.h MultiviewVideoCaptureManager.cpp
 
 
     )

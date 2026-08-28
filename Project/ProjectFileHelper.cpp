@@ -160,6 +160,10 @@ namespace ProjectFileHelper {
 
         if(projectData.contains("shots") && projectData["shots"].isArray()){
             QJsonArray shotsArray = projectData["shots"].toArray();
+
+            // If the shots array contains a "note" field, this is an older project format, we use it to populate imgTxt.
+            bool isNotePresent = !(shotsArray[0].toObject().value("note").isUndefined());
+
             for (const QJsonValue& value : shotsArray) {
                 QJsonObject shotJson = value.toObject();
                 Shot currentShot; 
@@ -168,7 +172,7 @@ namespace ProjectFileHelper {
                 currentShot.start = shotJson.value("start").toInteger(0LL); 
                 currentShot.end = shotJson.value("end").toInteger(0LL);
                 currentShot.tagImageTime = shotJson.value("tagImageTime").toInteger(0LL);
-                currentShot.imgTxt = shotJson.value("imgTxt").toString("");
+                currentShot.imgTxt = (isNotePresent) ? shotJson.value("note").toString("") : shotJson.value("imgTxt").toString("");
                 currentShot.soundTxt = shotJson.value("soundTxt").toString("");
 
                 loadedData.shots.append(currentShot);

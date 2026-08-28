@@ -149,6 +149,24 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
     m_player = player;
     m_playersWidget = newPlayersWidget;
 
+    if (m_playersWidget) {
+        const auto splitters = m_playersWidget->findChildren<QSplitter*>();
+        for (QSplitter* splitter : splitters) {
+            connect(splitter, &QSplitter::splitterMoved, this, [this](int, int) {
+                for (PlayerWidget* player : m_layoutManager->activePlayers()) {
+                    if (player && player->toolbar()->isFullscreen()) {
+                        player->toolbar()->setIsRepositioned(false);
+                        player->toolbar()->updateFullscreenPosition();
+                    }
+                }
+                if (m_toolbarWidget && m_toolbarWidget->isFullscreen()) {
+                    m_toolbarWidget->setIsRepositioned(false);
+                    m_toolbarWidget->updateFullscreenPosition();
+                }
+            });
+        }
+    }
+
     // ajout du nouveau playerWidget et toolbar 
     if (newPlayersWidget){
         layout->addWidget(m_playersWidget);
@@ -243,6 +261,15 @@ void GlobalPlayerManager::toggleNavPanel(PanelType type){
         m_navPanel->setPanel(type);
         openNavPanel();
     }
+}
+
+/// @brief Displays the selected panel. Does nothing if the panel is already open on that type.
+void GlobalPlayerManager::displayNavPanel(PanelType type){
+    if(m_navPanel->isOpen() && m_navPanel->currentPanel() == type){
+        return;
+    }
+    m_navPanel->setPanel(type);
+    openNavPanel();
 }
 
 // slots

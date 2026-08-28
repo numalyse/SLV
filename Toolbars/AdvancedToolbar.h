@@ -42,10 +42,13 @@ public slots:
 
     virtual void ejectRequested() override;
     virtual void disableFullscreenRequested() override;
+    virtual void updateFullscreenPosition() override;
     
 private:
 
     static constexpr int s_bottomMarginFullscreen = 60;
+
+    int fullscreenBottomMargin() const override { return s_bottomMarginFullscreen; }
 
     void addShortcuts();
     void incrementSpeedSlider();

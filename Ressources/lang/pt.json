@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Fundir com o plano anterior",
     "tooltip_merge_with_next_shot": "Fundir com o plano seguinte",
     "tooltip_export": "Exportar",
+    "tooltip_reposition_toolbar" : "Repor a posição da barra de ferramentas",
 
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
     "timeline_ab_action_0": "Adicionar marcador A no cursor",
@@ -96,10 +97,10 @@
     "timeline_merge_with_next_shot" : "Fundir plano atual com o seguinte",
     "timeline_extract_selected_shots" : "Extrair planos selecionados",
     "timeline_shot_count_label" : "plano(s)",
+    "timeline_selected_shot_count_label" : "plano(s) selecionado(s)",
     "messagebox_extract_selected_shots_completed" : "Extração dos planos selecionados concluída.",
     "messagebox_extract_selected_shots_failed" : "Falha na extração dos planos selecionados.",
     
-
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",
     "export_type_txt": "Ficheiro de texto (*.txt)",
@@ -179,10 +180,13 @@
 
     "main_window_menu_bar_file": "Ficheiro",
     "main_window_file_open_media_action": "Abra um ou mais dispositivos de mídia",
-    "main_window_file_open_project_action": "Abrir projeto",
-    "main_window_file_save_project_action": "Salve o projeto",
+    "main_window_file_open_project_action": "Abrir um diretório de projeto",
+    "main_window_file_save_project_action": "Salve o diretório do projeto",
     "main_window_file_save_as_project_action": "Salvar como...",
-    "project_manager_open_project_dialog" : "Abrir projeto",
+    "project_manager_open_project_dialog" : "Abrir um diretório de projeto",
+
+    "main_window_file_open_project_action_tooltip" : "Abra um projeto existente selecionando a pasta do projeto. A pasta contém um arquivo .json e um atalho para a mídia.",
+    "main_window_file_save_project_action_tooltip" : "Salve o projeto atual como uma pasta. A pasta conterá um arquivo .json e um atalho para a mídia.",
 
     "main_window_menu_bar_option" : "Opções",
     "main_window_option_open_pref" :  "Preferências",
@@ -201,6 +205,8 @@
     "tooltip_loop_playlist" : "Repetir lista de reprodução",
     "tooltip_shuffle_playlist" : "Reprodução aleatória da lista",
     "tooltip_sort_playlist" : "Ordenar lista de reprodução",
+    "tooltip_save_playlist" : "Guardar a lista de reprodução",
+    "tooltip_import_playlist" : "Importar uma lista de reprodução",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "Por adição crescente ↓",
@@ -333,6 +339,10 @@
 
     "dialog_open_files" : "Abrir ficheiros multimédia",
     "dialog_open_file" : "Abrir ficheiro",
+    "drag_drop_hint" : "Arraste e solte aqui",
+    "drag_drop_or" : "ou",
+    "drag_drop_open_button" : "Abrir um média",
+    "drag_drop_open_project_button" : "Abrir projeto",
     "dialog_open_project" : "Abrir projeto",
 
     "project_window_title_copy_video": "Criação do projeto: a copiar vídeo...",
@@ -473,6 +483,7 @@
     "extract_sequence_reencode" : "Avançado",
     "extract_sequence_warning" : "O método avançado pode levar vários minutos, dependendo da duração da sequência.",
     "extraction_method_choice" : "Método de extração",
+    "extract_sequence_progress_text" : "Extração da sequência em andamento...",
 
     "help_menu_general_category" : "Geral",
     "help_menu_formats_label" : "Formatos de arquivo suportados",

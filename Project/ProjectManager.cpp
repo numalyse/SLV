@@ -356,7 +356,7 @@ void ProjectManager::openProjectFromPath(const QString& path)
         projectData.shots,
         projectData.annots,
         new Media(projectData.mediaAbsolutePath, this),
-        QFileInfo(path).baseName(),
+        QDir(path).dirName(),
         path,
         projectData.mediaLinkAbsolutePath
     };
@@ -463,9 +463,10 @@ bool ProjectManager::relinkJson(const QString& errorJson, const QString& project
         return false;
     }
 
-    QString projectName = QFileInfo(projectPath).baseName();
+    QDir projectDir(projectPath);
+    QString projectName = projectDir.dirName();
 
-    bool renamed = QFile::rename(jsonPath, projectPath + QDir::separator() + projectName + ".json" );
+    bool renamed = QFile::rename(jsonPath, projectDir.filePath(projectName + ".json"));
 
     if(!renamed){
         QMessageBox warningBox(QMessageBox::Warning,

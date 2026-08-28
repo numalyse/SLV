@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Mit vorherigem Schnitt zusammenführen",
     "tooltip_merge_with_next_shot": "Mit nächstem Schnitt zusammenführen",
     "tooltip_export": "Exportieren",
+    "tooltip_reposition_toolbar" : "Position der Werkzeugleiste zurücksetzen",
 
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
     "timeline_ab_action_0": "A-Marker am Abspielkopf setzen",
@@ -96,6 +97,7 @@
     "timeline_merge_with_next_shot" : "Aktuellen Schnitt mit nächstem zusammenführen",
     "timeline_extract_selected_shots" : "Ausgewählte Schnitte extrahieren",
     "timeline_shot_count_label" : "Schnitt(e)",
+    "timeline_selected_shot_count_label" : "ausgewählte Schnitte",
     "messagebox_extract_selected_shots_completed" : "Extraction der ausgewählten Schnitte abgeschlossen.",
     "messagebox_extract_selected_shots_failed" : "Extraction der ausgewählten Schnitte fehlgeschlagen.",
 
@@ -178,10 +180,13 @@
 
     "main_window_menu_bar_file": "Datei",
     "main_window_file_open_media_action": "Öffnen Sie ein oder mehrere Medien",
-    "main_window_file_open_project_action": "Projekt öffnen",
-    "main_window_file_save_project_action": "Speichern Sie das Projekt",
+    "main_window_file_open_project_action": "Öffnen Sie ein Projektverzeichnis",
+    "main_window_file_save_project_action": "Speichern Sie das Projektverzeichnis",
     "main_window_file_save_as_project_action": "Speichern unter...",
-    "project_manager_open_project_dialog" : "Projekt öffnen",
+    "project_manager_open_project_dialog" : "Projektverzeichnis öffnen",
+
+    "main_window_file_open_project_action_tooltip" : "Ein bestehendes Projekt öffnen, indem Sie den Projektordner auswählen. Der Ordner enthält eine .json-Datei und einen Verknüpfung zu den Medien.",
+    "main_window_file_save_project_action_tooltip" : "Das aktuelle Projekt als Ordner speichern. Der Ordner wird eine .json-Datei und eine Verknüpfung zu den Medien enthalten.",
 
     "main_window_menu_bar_option" : "Optionen",
     "main_window_option_open_pref" :  "Einstellungen",
@@ -200,6 +205,8 @@
     "tooltip_loop_playlist" : "Playlist in Schleife abspielen",
     "tooltip_shuffle_playlist" : "Playlist zufällig abspielen",
     "tooltip_sort_playlist" : "Playlist sortieren",
+    "tooltip_save_playlist" : "Playlist speichern",
+    "tooltip_import_playlist" : "Playlist importieren",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "Nach Hinzufügung aufsteigend ↓",
@@ -331,6 +338,10 @@
 
     "dialog_open_files" : "Mediendateien öffnen",
     "dialog_open_file" : "Datei öffnen",
+    "drag_drop_hint" : "Hier ablegen",
+    "drag_drop_or" : "oder",
+    "drag_drop_open_button" : "Medium öffnen",
+    "drag_drop_open_project_button" : "Projekt öffnen",
     "dialog_open_project" : "Projekt öffnen",
 
     "project_window_title_copy_video": "Projekt wird erstellt: Video wird kopiert...",
@@ -471,6 +482,7 @@
     "extract_sequence_reencode" : "Erweitert",
     "extract_sequence_warning" : "Die erweiterte Methode kann je nach Länge der Sequenz mehrere Minuten dauern.",
     "extraction_method_choice" : "Extraktionsmethode",
+    "extract_sequence_progress_text" : "Sequenzextraktion läuft...",
 
     "help_menu_general_category" : "Allgemein",
     "help_menu_formats_label" : "Unterstützte Formate",

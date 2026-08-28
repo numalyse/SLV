@@ -404,7 +404,7 @@ void MediaWidget::takeScreenshot()
     m_lastSnapshotTime = getCurrentTime();
 
     QString zoomStr = (m_zoomActivated) ? m_zoomHelper.getZoomStr() : "";
-    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + TimeFormatter::fileFormatMsToHHMMSSFF(m_lastSnapshotTime, m_media->fps()) + zoomStr +".png";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + '_' + TimeFormatter::fileFormatMsToHHMMSSFF(m_lastSnapshotTime, m_media->fps()) + zoomStr +".png";
     if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
 
     QByteArray capturePathBytes = capturePath.toUtf8();
@@ -425,7 +425,7 @@ void MediaWidget::takeScreenshot()
 void MediaWidget::setTime(int64_t time, bool frameSeekBias)
 {
     if(!m_player) return;
-    m_videoCaptureManager.mediaCutAndConcat(getCurrentTime(), time);
+    // m_videoCaptureManager.mediaCutAndConcat(getCurrentTime(), time);
 
     // we insure that we show the correct frame when frameSeekBias is true, by adding a quarter of a frame to the requested frame
     int64_t seekTime = time;
@@ -819,7 +819,7 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 emit mediaWidget->mediaFinished();
             }
             // cas où on loop le média
-            else if(mediaWidget->m_loopValue != 1){
+            else if(mediaWidget->m_loopValue != 1 && !mediaWidget->m_isRecordingGlobal){
                 libvlc_media_player_stop(mediaWidget->m_player);
                 libvlc_media_player_play(mediaWidget->m_player);
                 mediaWidget->setTime(mediaWidget->m_loopValue);

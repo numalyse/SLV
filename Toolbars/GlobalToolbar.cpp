@@ -32,6 +32,18 @@ GlobalToolbar::GlobalToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_muteBtn, &ToolbarToggleButton::stateDeactivated, this, &GlobalToolbar::disableMute);
     // connect(m_screenshotBtn, &ToolbarButton::clicked, this, &GlobalToolbar::screenshotRequest);
 
+    m_multiviewRecordBtn = new ToolbarToggleButton(
+        this,
+        false,
+        "record_on_white",
+        PrefManager::instance().getText("tooltip_record_on"),
+        "record_off_white",
+        PrefManager::instance().getText("tooltip_record_off")
+    );
+    connect(m_multiviewRecordBtn, &ToolbarToggleButton::stateActivated, this, &GlobalToolbar::enableRecord);
+    connect(m_multiviewRecordBtn, &ToolbarToggleButton::stateDeactivated, this, &GlobalToolbar::disableRecord);
+    connect(m_multiviewRecordBtn, &ToolbarToggleButton::clicked, m_multiviewRecordBtn, &ToolbarToggleButton::toggleUpdateIcon);
+
     setMaximumHeight(50);
 
     setDefaultUI();
@@ -73,6 +85,7 @@ void GlobalToolbar::setDefaultUI()
         buttonLayout->addWidget(m_muteBtn);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
         buttonLayout->addSpacing(m_muteBtn->width()+1);
+        buttonLayout->addSpacing(m_muteBtn->width()+1);
         m_extraSpacingItem = new QSpacerItem(m_muteBtn->width()+1, 1, QSizePolicy::Fixed, QSizePolicy::Minimum);
         buttonLayout->addSpacerItem(m_extraSpacingItem);
         
@@ -83,6 +96,7 @@ void GlobalToolbar::setDefaultUI()
         buttonLayout->addSpacing(m_ejectBtn->width()+1);
 
         buttonLayout->addStretch();
+        buttonLayout->addWidget(m_multiviewRecordBtn);
         buttonLayout->addWidget(m_zoomBtn);
         buttonLayout->addWidget(m_screenshotBtn);
         buttonLayout->addWidget(m_fullscreenBtn);
@@ -111,14 +125,14 @@ void GlobalToolbar::setFullscreenUI(int bottomMargin)
 void GlobalToolbar::enableButtons()
 {
     Toolbar::enableButtons();
-
+    m_multiviewRecordBtn->setEnabled(true);
     m_zoomBtn->setEnabled(true);
 }
 
 void GlobalToolbar::disableButtons()
 {
     Toolbar::disableButtons();
-
+    m_multiviewRecordBtn->setEnabled(false);
     m_zoomBtn->setEnabled(false);
 }
 
@@ -149,5 +163,5 @@ void GlobalToolbar::disableFullscreenRequested(){
 
 void GlobalToolbar::updateFullscreenPosition()
 {
-    Toolbar::moveOnTopOfParent(GlobalToolbar::s_bottomMarginFullscreen);
+    Toolbar::moveOnTopOfParent(GlobalToolbar::s_bottomMarginFullscreen);  
 }

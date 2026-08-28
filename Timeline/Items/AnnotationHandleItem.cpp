@@ -6,10 +6,13 @@
 AnnotationHandleItem::AnnotationHandleItem(bool isLeftHandle, AnnotationItem * parent)
 : QGraphicsItem(parent), m_isLeft{isLeftHandle}
 {
+    // position updated with its parent but the paint should be in pixels
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
+
     if (parent){
         setZValue(parent->zValue() - 1);
         m_annotParent = parent;
-    } 
+    }
 }
 
 QRectF AnnotationHandleItem::boundingRect() const

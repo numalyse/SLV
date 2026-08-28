@@ -69,12 +69,15 @@ signals:
     void shotsExtractionFinished(const QString& outputPath);
     void shotsExtractionFailed();
     void shotCountUpdated(int newShotCount);
+    void selectedShotCountUpdated(int newSelectedShotCount);
 
 private:
     void mergeCurrentInto(int ShotItemId);
 
     QVector<ShotItem*> m_shotItems;
     QVector<AudioShotItem*> m_audioShotItems;
+
+    QGraphicsItem* m_layer = nullptr;
     QVector<QPair<ShotItem*, AudioShotItem*>> m_selectedShots;
 
     ShotItem* m_currentShotItem = nullptr;
@@ -92,8 +95,8 @@ private:
     VideoCaptureManager m_videoCaptureManager;
 
 private slots:
-    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, QImage image);
-
+    void updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image);
+    void colorReady(ThumbnailWorker::Requester requester, int requestId, const QColor& color);
 };
 
 

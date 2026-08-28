@@ -1,23 +1,47 @@
 #include "MediaLogoWidget.h"
 
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 
 MediaLogoWidget::MediaLogoWidget(QWidget *parent, const QString &iconPath, int maxWidth)
 : QWidget(parent)
 {
-    // pas besoin d'etre transparent donc on peut ne pas les mettre en fenetre flottante
-    setAttribute(Qt::WA_TransparentForMouseEvents);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    QHBoxLayout* layout = new QHBoxLayout(this);
-    m_logo = new AspectRatioPixmapLabel(this);
-    m_logo->setMaximumWidth(maxWidth);
+    // stretch to center
+    QVBoxLayout* rootLayout = new QVBoxLayout(this);
+    rootLayout->addStretch();
 
-    QPixmap audioLogo(iconPath); 
-    m_logo->setPixmap(audioLogo);
+    QHBoxLayout* logoRow = new QHBoxLayout();
+    m_logo = new AspectRatioPixmapLabel(this);
+    m_logo->setAttribute(Qt::WA_TransparentForMouseEvents);
     m_logo->setAlignment(Qt::AlignCenter);
-    layout->addWidget(m_logo);
+    logoRow->addWidget(m_logo);
+    rootLayout->addLayout(logoRow);
+
+    // layout to add optionnal widgets 
+    m_contentLayout = new QVBoxLayout();
+    m_contentLayout->setAlignment(Qt::AlignCenter);
+    rootLayout->addLayout(m_contentLayout);
+
+    rootLayout->addStretch();
+
+    setIcon(iconPath, maxWidth);
+}
+
+void MediaLogoWidget::setIcon(const QString &iconPath, int maxWidth)
+{
+    m_logo->setMaximumWidth(maxWidth);
+    m_logo->setPixmap(QPixmap(iconPath));
+}
+
+void MediaLogoWidget::setContentVisible(bool visible)
+{
+    for (int i = 0; i < m_contentLayout->count(); ++i) {
+        if (QWidget* w = m_contentLayout->itemAt(i)->widget())
+            w->setVisible(visible);
+    }
 }
 
 void MediaLogoWidget::onMediaRectChanged(const QRect &rect)

@@ -2,9 +2,9 @@
 #define GLOBALSCREENSHOTHELPER_H
 
 #include "TimeFormatter.h"
-#include "PlayerLayoutManager.h"
 #include "PrefManager.h"
 #include "VideoCaptureHelper.h"
+#include "SignalManager.h"
 
 #include <QObject>
 #include <opencv2/opencv.hpp>
@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QThread>
 #include <QMessageBox>
+#include <QDir>
 
 struct GlobalScreenshotPlayerData{
     QString mediaPath;
@@ -75,7 +76,7 @@ private:
 
             QString fullOutputPath = prefManager.getPref("Paths", "screenshot")
                                     + '/'
-                                    + pathBytes.constData()
+                                    + pathBytes.constData() + "_"
                                     + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps)
                                     + ".png";
 
@@ -95,7 +96,7 @@ private:
                 emit finishedError();
                 return;
             }
-            mergedPath += path.left(std::min(5, int(path.size()))) 
+            mergedPath += path.left(std::min(5, int(path.size()))) + '_'
                         + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps) 
                         + (IPlayerData != m_playersData.size()-1 ? "_" : "");
                         
@@ -135,11 +136,13 @@ private:
             Q_ASSERT(resizedScreenshots.size() == 2);
             addBlackPadding(resizedScreenshots[0], resizedScreenshots[1], 0);
             cv::hconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
+            mergedPath += "_2H";
             break;
         case Arrangement2V:
             Q_ASSERT(resizedScreenshots.size() == 2);
             addBlackPadding(resizedScreenshots[0], resizedScreenshots[1], 1);
             cv::vconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
+            mergedPath += "_2V";
             break;
         case Arrangement3H:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -147,6 +150,7 @@ private:
             cv::hconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[2], 0);
             cv::hconcat(mergedScreenshot, resizedScreenshots[2], mergedScreenshot);
+            mergedPath += "_3H";
             break;
         case Arrangement3V:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -154,6 +158,7 @@ private:
             cv::vconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[2], 1);
             cv::vconcat(mergedScreenshot, resizedScreenshots[2], mergedScreenshot);
+            mergedPath += "_3V";
             break;
         case Arrangement3Top:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -161,6 +166,7 @@ private:
             cv::hconcat(resizedScreenshots[1], resizedScreenshots[2], mergedScreenshot);
             addBlackPadding(resizedScreenshots[0], mergedScreenshot, 1);
             cv::vconcat(resizedScreenshots[0], mergedScreenshot, mergedScreenshot);
+            mergedPath += "_3T";
             break;
         case Arrangement3Bot:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -168,6 +174,7 @@ private:
             cv::hconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[2], 1);
             cv::vconcat(mergedScreenshot, resizedScreenshots[2], mergedScreenshot);
+            mergedPath += "_3B";
             break;
         case Arrangement3Left:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -175,6 +182,7 @@ private:
             cv::vconcat(resizedScreenshots[1], resizedScreenshots[2], mergedScreenshot);
             addBlackPadding(resizedScreenshots[0], mergedScreenshot, 0);
             cv::hconcat(resizedScreenshots[0], mergedScreenshot, mergedScreenshot);
+            mergedPath += "_3L";
             break;
         case Arrangement3Right:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -182,6 +190,7 @@ private:
             cv::vconcat(resizedScreenshots[0], resizedScreenshots[2], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[1], 0);
             cv::hconcat(mergedScreenshot, resizedScreenshots[1], mergedScreenshot);
+            mergedPath += "_3R";
             break;
         case Arrangement4:
             Q_ASSERT(resizedScreenshots.size() == 4);

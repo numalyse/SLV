@@ -85,6 +85,8 @@
     "tooltip_merge_with_next_shot": "Merge with the next shot",
     "tooltip_export": "Export",
 
+    "tooltip_reposition_toolbar" : "Reset toolbar position",
+
     "timeline_split_shot_at_cursor" : "Cut at cursor",
     "timeline_ab_action_0": "Add marker A at cursor",
     "timeline_ab_action_1": "Add marker B at cursor",
@@ -96,6 +98,7 @@
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
     "timeline_extract_selected_shots" : "Extract selected shots",
     "timeline_shot_count_label" : "shot(s)",
+    "timeline_selected_shot_count_label" : "selected shot(s)",
     "messagebox_extract_selected_shots_completed" : "Extraction of the selected shots completed.",
     "messagebox_extract_selected_shots_failed" : "Extraction of the selected shots failed.",
 
@@ -178,10 +181,13 @@
 
     "main_window_menu_bar_file": "File",
     "main_window_file_open_media_action": "Open one or more media",
-    "main_window_file_open_project_action": "Open a project",
-    "main_window_file_save_project_action": "Save project",
+    "main_window_file_open_project_action": "Open a project directory",
+    "main_window_file_save_project_action": "Save project directory",
     "main_window_file_save_as_project_action": "Save as...",
-    "project_manager_open_project_dialog" : "Open a project",
+    "project_manager_open_project_dialog" : "Open a project directory",
+
+    "main_window_file_open_project_action_tooltip" : "Open an existing project by selecting the project folder. The folder contains a .json file and a shortcut to the media.",
+    "main_window_file_save_project_action_tooltip" : "Save the current project as a folder. The folder will contain a .json file and a shortcut to the media.",
 
     "main_window_menu_bar_option": "Options",
     "main_window_option_open_pref": "Preferences",
@@ -200,6 +206,8 @@
     "tooltip_loop_playlist" : "Loop mode",
     "tooltip_shuffle_playlist" : "Shuffle mode",
     "tooltip_sort_playlist" : "Sort playlist",
+    "tooltip_save_playlist" : "Save playlist",
+    "tooltip_import_playlist" : "Import playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "By ascending addition ↓",
@@ -331,6 +339,10 @@
 
     "dialog_open_files": "Open multimedia files",
     "dialog_open_file": "Open a file",
+    "drag_drop_hint": "Drag & drop here",
+    "drag_drop_or": "or",
+    "drag_drop_open_button": "Open a media",
+    "drag_drop_open_project_button": "Open a project",
     "dialog_open_project": "Open a project",
 
     "project_window_title_copy_video": "Project creation : Copying current video...",
@@ -471,6 +483,7 @@
     "extract_sequence_reencode" : "Advanced",
     "extract_sequence_warning" : "The advanced method may take several minutes depending on the sequence length.",
     "extraction_method_choice" : "Extraction method",
+    "extract_sequence_progress_text" : "Sequence extraction in progress...",
 
     "help_menu_general_category" : "General",
     "help_menu_formats_label" : "Supported formats",

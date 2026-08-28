@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Unisci con il piano precedente",
     "tooltip_merge_with_next_shot": "Unisci con il piano successivo",
     "tooltip_export": "Esporta",
+    "tooltip_reposition_toolbar" : "Ripristina la posizione della barra degli strumenti",
 
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",
@@ -96,6 +97,7 @@
     "timeline_merge_with_next_shot" : "Unisci piano corrente con il successivo",
     "timeline_extract_selected_shots" : "Estrai piani selezionati",
     "timeline_shot_count_label" : "piano/i",
+    "timeline_selected_shot_count_label" : "piano/i selezionato/i",
     "messagebox_extract_selected_shots_completed" : "Estrazione dei piani selezionati completata.",
     "messagebox_extract_selected_shots_failed" : "Si è verificato un errore durante l'estrazione dei piani selezionati.",
 
@@ -178,10 +180,13 @@
 
     "main_window_menu_bar_file": "File",
     "main_window_file_open_media_action": "Apri uno o più media",
-    "main_window_file_open_project_action": "Apri progetto",
-    "main_window_file_save_project_action": "Salva il progetto",
+    "main_window_file_open_project_action": "Apri una cartella di progetto",
+    "main_window_file_save_project_action": "Salva la cartella di progetto",
     "main_window_file_save_as_project_action": "Salva con nome...",
-    "project_manager_open_project_dialog" : "Apri progetto",
+    "project_manager_open_project_dialog" : "Apri una cartella di progetto",
+
+    "main_window_file_open_project_action_tooltip" : "Apri un progetto esistente selezionando la cartella del progetto. La cartella contiene un file .json e un collegamento al media.",
+    "main_window_file_save_project_action_tooltip" : "Salva il progetto corrente come una cartella. La cartella conterrà un file .json e un collegamento al media.",
 
     "main_window_menu_bar_option" : "Opzioni",
     "main_window_option_open_pref" :  "Preferenze",
@@ -200,6 +205,8 @@
     "tooltip_loop_playlist" : "Riproduzione in loop della playlist",
     "tooltip_shuffle_playlist" : "Riproduzione casuale della playlist",
     "tooltip_sort_playlist" : "Ordina playlist",
+    "tooltip_save_playlist" : "Salva playlist",
+    "tooltip_import_playlist" : "Importa playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",
     "sort_addition_down_playlist" : "Per aggiunta crescente ↓",
@@ -332,6 +339,10 @@
 
     "dialog_open_files" : "Apri file multimediali",
     "dialog_open_file" : "Apri file",
+    "drag_drop_hint" : "Trascina e rilascia qui",
+    "drag_drop_or" : "o",
+    "drag_drop_open_button" : "Apri un media",
+    "drag_drop_open_project_button" : "Apri progetto",
     "dialog_open_project" : "Apri progetto",
 
     "project_window_title_copy_video": "Creazione progetto: copia video in corso...",
@@ -472,6 +483,7 @@
     "extract_sequence_reencode" : "Avanzato",
     "extract_sequence_warning" : "Il metodo avanzato può richiedere diversi minuti a seconda della durata della sequenza.",
     "extraction_method_choice" : "Metodo di estrazione",
+    "extract_sequence_progress_text" : "Estrazione della sequenza in corso...",
 
     "help_menu_general_category" : "Generale",
     "help_menu_formats_label" : "Formati di esportazione",

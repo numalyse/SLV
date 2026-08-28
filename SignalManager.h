@@ -43,6 +43,7 @@ private:
 signals:
     void mediaWidgetMediaFinished();
     void toggleNavPanel(PanelType type);
+    void displayNavPanel(PanelType type);
     void extensionToolbarDisplayShotDetail();
     void displayPlaylist();
     void playlistEjectPlayer();
@@ -61,8 +62,12 @@ signals:
     void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
     void activateMediaChangeBtn(const bool);
     void requestPlaylistSize();
+    void requestPlaylistNextMedia();
     void playlistSizeResponse();
     void displayAnnotationPanel();
+    void playFirstPlaylistItem();
+    void globalRecordingStarted();
+    void globalRecordingFinished();
 };
 
 

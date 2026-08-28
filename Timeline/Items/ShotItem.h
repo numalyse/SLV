@@ -21,12 +21,10 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void setWidth(double width);
-    double width(){return m_width;}
+    double width(){return m_widthMs;}
     Shot& shot(){return m_shot;};
 
     bool isSelected() {return m_selected;}
-    bool isColorDirty() { return m_isColorDirty; };
-    void setColorDirty(bool isDirty ) { m_isColorDirty = isDirty; };
     void setSelected(bool state);
 
     void updateTextPosition();
@@ -50,11 +48,10 @@ private:
     QPixmap m_pixmap;
     QGraphicsRectItem* m_selectionBox = nullptr;
     QGraphicsTextItem* m_selectionText = nullptr;
-    double m_width{};
+    double m_widthMs{};
     int m_selectedNumber = 1;
     bool m_selected = false;
     bool m_selectionNeedUpdate = false;
-    bool m_isColorDirty = true;
 
     static constexpr double s_height = 40.0;
     static constexpr double s_topMargin = 50.0;

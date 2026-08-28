@@ -13,6 +13,7 @@ MultiviewContent::MultiviewContent(QWidget* parent)
     QString presentationTitle = "help_menu_presentation_label";
     QString multiview = "help_menu_open_multiview_label";
     QString duplicate = "help_menu_duplicate_file_label";
+    QString manage = "help_menu_manage_multiview_label";
 
     addSubcategory(
         presentationTitle,
@@ -27,6 +28,11 @@ MultiviewContent::MultiviewContent(QWidget* parent)
     addSubcategory(
         duplicate,
         duplicateFile(duplicate)
+    );
+
+    addSubcategory(
+        manage,
+        manageMultiview(manage)
     );
 
 }
@@ -120,8 +126,6 @@ QWidget* MultiviewContent::openMultiviewMode(const QString& subcategoryName)
     return widget;
 }
 
-
-
 QWidget* MultiviewContent::duplicateFile(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
@@ -153,3 +157,85 @@ QWidget* MultiviewContent::duplicateFile(const QString& subcategoryName)
 
     return widget;
 }
+
+
+
+QWidget* MultiviewContent::manageMultiview(const QString& subcategoryName)
+{
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    widget->addQMAPTexts({
+        {"fr", {"Barre de navigation individuelle",
+            "Une barre de lecture simplifiée permet de gérer chaque lecteur indépendamment. Elle offre les fonctionnalités essentielles pour contrôler la lecture de chaque média.\n"
+            "\n"}
+        },
+        {"en", {"",
+            ""}
+        },
+        {"es", {"",
+            ""}
+        },
+        {"de", {"",
+            ""}
+        },
+        {"it", {"",
+            ""}
+        },
+        {"pt", {"",
+            ""}
+        }
+    });
+
+    widget->addImage("multiview_simplified_toolbar");
+
+    widget->addQMAPTexts({
+        {"fr", {"Barre de navigation commune",
+            "Une barre de navigation commune permet de gérer tous les lecteurs simultanément.\n"
+            "\n"}
+        },
+        {"en", {"",
+            ""}
+        },
+        {"es", {"",
+            ""}
+        },
+        {"de", {"",
+            ""}
+        },
+        {"it", {"",
+            ""}
+        },
+        {"pt", {"",
+            ""}
+        }
+    });
+
+    widget->addImage("multiview_global_toolbar");
+
+    widget->addQMAPTexts({
+        {"fr", {"Capture d'écran multiple",
+            "Le bouton de capture de la barre commune permet de prendre une capture d'écran de chaque média et les combine entre elles en une seule image en gardant la disposition des lecteurs.\n"
+            "Les captures d'écrans sont enregistrées dans le dossier choisi par l'utilisateur dans les paramètres de préférence. (NumalysePlayer_Content par défaut)\n"}
+        },
+        {"en", {"",
+            ""}
+        },
+        {"es", {"",
+            ""}
+        },
+        {"de", {"",
+            ""}
+        },
+        {"it", {"",
+            ""}
+        },
+        {"pt", {"",
+            ""}
+        }
+    });
+
+    widget->addImage("multiview_captures");
+    
+    return widget;
+}
+

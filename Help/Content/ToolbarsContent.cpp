@@ -107,6 +107,31 @@ QWidget* ToolbarsContent::extendedToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "La barre d'outils avancée permet d'accéder à des fonctionnalités plus techniques.\n"
+            "Elle est composée de plusieurs boutons permettant d'effectuer des actions spécifiques sur le média.\n"
+            "Parmi ces fonctionnalités, il est possible de réaliser des ajustements sur l'image, d'appliquer des filtres, de dessiner sur le média, de gérer les règles de composition, de naviguer dans les images et d'accéder à la timeline détaillée.\n"
+            "Pour y accéder, cliquer sur l'icône de barre d'outils avancée dans la partie droite de la barre d'outils classique.\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
+
     widget->addButtonDescriptionTable(
         "none", 
         {
@@ -129,6 +154,29 @@ QWidget* ToolbarsContent::extendedToolbar(const QString& subcategoryName)
 QWidget* ToolbarsContent::timelineToolbar(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "La barre d'outils de la timeline détaillée permet d'effectuer des actions spécifiques sur la timeline.\n"
+            "Elle est composée de plusieurs boutons permettant de naviguer dans la timeline, de gérer les segments et les plans, d'accéder aux détails des plans et d'exporter.\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
 
     widget->addButtonDescriptionTable(
         "none", 

@@ -10,9 +10,12 @@ class TimelineContent : public CategoryBase
 public:
     explicit TimelineContent(QWidget* parent = nullptr);
 
+    
     private:
     QWidget *presentation(const QString &subcategoryName);
-    QWidget* introduction(const QString& subcategoryName);
+    QWidget* openTimeline(const QString& subcategoryName);
+    QWidget* shotDetail(const QString& subcategoryName);
+    QWidget *exportation(const QString &subcategoryName);
 };
 
 #endif

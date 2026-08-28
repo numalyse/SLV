@@ -23,10 +23,10 @@ MonoviewContent::MonoviewContent(QWidget* parent)
         openmedia(openMedia)
     );
 
-    addSubcategory(
-        "Player",
-        player(openMedia)
-    );
+    // addSubcategory(
+    //     "Player",
+    //     player(openMedia)
+    // );
 
     
 }

@@ -12,7 +12,8 @@ public:
 
 private:
     QWidget *presentation(const QString &subcategoryName);
-    //QWidget* introduction(const QString& subcategoryName);
+    QWidget *managePlaylist(const QString &subcategoryName);
+    // QWidget* introduction(const QString& subcategoryName);
 };
 
 #endif

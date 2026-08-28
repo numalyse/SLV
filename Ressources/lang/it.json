@@ -490,22 +490,25 @@
 
     "help_menu_multiview_category" : "Visualizzazione multi-vista",
     "help_menu_open_multiview_label" : "Accedi alla vista multipla",
-    "help_menu_duplicate_file_label" : "Duplica il file multimediale",
+    "help_menu_duplicate_file_label" : "Duplica il file multimediale", 
+    "help_menu_manage_multiview_label" : "Gestisci la vista multipla",
     "help_menu_simplified_toolbar_label" : "Barra degli strumenti semplificata",
     "help_menu_global_toolbar_label" : "Barra degli strumenti globale",
 
     "help_menu_playlist_category" : "Playlist",
     "help_menu_access_playlist_label" : "Accedi alla playlist",
-    "help_menu_add_elements_playlist_label" : "Gestisci elementi dell'elenco",
+    "help_menu_manage_playlist_label" : "Gestisci elementi dell'elenco",
     "help_menu_playlist_buttons_label" : "Pulsanti della playlist",
 
     "help_menu_timeline_category" : "Timeline dettagliata",
     "help_menu_timeline_display_label" : "Visualizza la timeline dettagliata",
+    "help_menu_open_timeline_label" : "Apri la timeline dettagliata",
+    "help_menu_open_info_label" : "Apri le informazioni della timeline",
     "help_menu_timeline_buttons_label" : "Pulsanti della timeline",
     "help_menu_timeline_toolbar_label" : "Barra degli strumenti della timeline",
     "help_menu_shot_infos_label" : "Informazioni dell'inquadratura",
-    "help_menu_exportation_label" : "Esportazione",
-    
+    "help_menu_timeline_exportation_label" : "Esportazione",
+
     "help_menu_options_category" : "Opzioni",
     "help_menu_settings_label" : "Impostazioni generali",
     "help_menu_shortcuts_label" : "Scorciatoie da tastiera",

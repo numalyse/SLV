@@ -490,22 +490,25 @@
 
     "help_menu_multiview_category" : "Pantalla multi-vista",
     "help_menu_open_multiview_label" : "Abrir varios medios",
-    "help_menu_open_duplicate_label" : "Copiar un medio",
+    "help_menu_duplicate_file_label" : "Duplicar un medio",
+    "help_menu_manage_multiview_label" : "Gestionar varios medios",
     "help_menu_simplified_toolbar_label" : "Barra de herramientas individual",
     "help_menu_global_toolbar_label" : "Barra de herramientas común",
 
     "help_menu_playlist_category" : "Lista de reproducción",
     "help_menu_access_playlist_label" : "Acceder a la lista de reproducción",
-    "help_menu_add_elements_playlist_label" : "Gestionar elementos de la lista",
+    "help_menu_manage_playlist_label" : "Gestionar elementos de la lista",
     "help_menu_playlist_buttons_label" : "Botones de la lista de reproducción",
     "help_menu_playlist_toolbar_label" : "Barra de herramientas de la lista de reproducción",
 
     "help_menu_timeline_category" : "Línea de tiempo detallada",
     "help_menu_timeline_display_label" : "Mostrar la línea de tiempo detallada",
+    "help_menu_open_timeline_label" : "Abrir la línea de tiempo detallada",
+    "help_menu_open_info_label" : "Abrir las informaciones de la línea de tiempo",
     "help_menu_timeline_buttons_label" : "Botones de la línea de tiempo",
     "help_menu_timeline_toolbar_label" : "Barra de herramientas de la línea de tiempo",
     "help_menu_shot_infos_label" : "Información del plano",
-    "help_menu_exportation_label" : "Exportación",
+    "help_menu_timeline_exportation_label" : "Exportación",
 
     "help_menu_options_category" : "Opciones",
     "help_menu_settings_label" : "Configuración general",

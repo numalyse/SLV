@@ -16,7 +16,6 @@ HelperWidget::HelperWidget(QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle(PrefManager::instance().getText("help_dialog_title"));
-    // setFixedSize(500, 400);
     int fixedDialogWidth = double(QGuiApplication::primaryScreen()->size().width()) * 0.5;
     int fixedDialogHeight = double(QGuiApplication::primaryScreen()->size().height()) * 0.5;
     setFixedSize(fixedDialogWidth, fixedDialogHeight);
@@ -58,7 +57,7 @@ void HelperWidget::initLayout()
         animateWidget(generalSubTab, state);
     });
 
-    m_classicTab = new CustomCheckbox("<b>" + pref.getText("help_menu_classic_checkbox") + "</b>");
+    m_classicTab = new CustomCheckbox("<b>" + pref.getText("help_menu_classic_category") + "</b>");
 
     QWidget *classicSubTab = new QWidget();
     QVBoxLayout *classicSubTabLayout = new QVBoxLayout();
@@ -76,7 +75,7 @@ void HelperWidget::initLayout()
     });
     emit m_classicTab->stateChanged(false);
 
-    m_multiviewTab = new CustomCheckbox("<b>" + pref.getText("help_menu_multiview_checkbox") + "</b>");
+    m_multiviewTab = new CustomCheckbox("<b>" + pref.getText("help_menu_multiview_category") + "</b>");
 
     QWidget *multiviewSubTab = new QWidget();
     QVBoxLayout *multiviewSubTabLayout = new QVBoxLayout();
@@ -94,7 +93,7 @@ void HelperWidget::initLayout()
     });
     emit m_multiviewTab->stateChanged(false);
 
-    m_playlistTab = new CustomCheckbox("<b>" +pref.getText("help_menu_playlist_checkbox") + "</b>");
+    m_playlistTab = new CustomCheckbox("<b>" +pref.getText("help_menu_playlist_category") + "</b>");
 
     QWidget *playlistSubTab = new QWidget();
     QVBoxLayout *playlistSubTabLayout = new QVBoxLayout();
@@ -112,7 +111,7 @@ void HelperWidget::initLayout()
     });
     emit m_playlistTab->stateChanged(false);
 
-    m_timelineTab = new CustomCheckbox("<b>" +pref.getText("help_menu_timeline_checkbox") + "</b>");
+    m_timelineTab = new CustomCheckbox("<b>" +pref.getText("help_menu_timeline_category") + "</b>");
 
     QWidget *timelineSubTab = new QWidget();
     QVBoxLayout *timelineSubTabLayout = new QVBoxLayout();
@@ -132,32 +131,20 @@ void HelperWidget::initLayout()
     });
     emit m_timelineTab->stateChanged(false);
 
-    // m_optionsTab = new CustomCheckbox("<b>" + pref.getText("help_menu_options_checkbox") + "</b>");
-
-    // QWidget *optionsSubTab = new QWidget();
-    // QVBoxLayout *optionsSubTabLayout = new QVBoxLayout();
-
-    // CustomHoverLabel *settingsLabel = new CustomHoverLabel(pref.getText("help_menu_settings_label"));
-    // CustomHoverLabel *shortcutsLabel = new CustomHoverLabel(pref.getText("help_menu_shortcuts_label"));
-    // CustomHoverLabel *pathsLabel = new CustomHoverLabel(pref.getText("help_menu_paths_label"));
-    // optionsSubTabLayout->addWidget(settingsLabel);
-    // optionsSubTabLayout->addWidget(shortcutsLabel);
-    // optionsSubTabLayout->addWidget(pathsLabel);
-    // optionsSubTab->setLayout(optionsSubTabLayout);
-    // connect(m_optionsTab, &CustomCheckbox::stateChanged, this, [this, optionsSubTab](const bool state){
-    //     animateWidget(optionsSubTab, state);
-    // });
-
     sideMenuLayout->addWidget(m_generalTab);
+
     sideMenuLayout->addWidget(generalSubTab);
     sideMenuLayout->addWidget(m_classicTab);
     sideMenuLayout->addWidget(classicSubTab);
+
     sideMenuLayout->addWidget(m_multiviewTab);
     sideMenuLayout->addWidget(multiviewSubTab);
     sideMenuLayout->addWidget(m_playlistTab);
+
     sideMenuLayout->addWidget(playlistSubTab);
     sideMenuLayout->addWidget(m_timelineTab);
     sideMenuLayout->addWidget(timelineSubTab);
+
     sideMenuLayout->addStretch();
 
     m_sideMenu->setLayout(sideMenuLayout);
@@ -174,15 +161,19 @@ void HelperWidget::initLayout()
     layout->addWidget(m_mainWidget);
 
     connect(reportIssuesLabel, &CustomHoverLabel::clicked, this, &HelperWidget::setGeneralContent);
+
     connect(openFilesLabel, &CustomHoverLabel::clicked, this, [this](){setClassicContent(0);});
     connect(classicToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setClassicContent(1);});
     connect(extendedToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setClassicContent(2);});
+
     connect(enterMultiviewLabel, &CustomHoverLabel::clicked, this, [this](){setMultiviewContent(0);});
     connect(simplifiedToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setMultiviewContent(1);});
     connect(globalToolbarLabel, &CustomHoverLabel::clicked, this, [this](){setMultiviewContent(2);});
+
     connect(accessPlaylistLabel, &CustomHoverLabel::clicked, this, [this](){setPlaylistContent(0);});
     connect(addElementsPlaylistLabel, &CustomHoverLabel::clicked, this, [this](){setPlaylistContent(1);});
     connect(playlistButtonsLabel, &CustomHoverLabel::clicked, this, [this](){setPlaylistContent(2);});
+
     connect(timelineDisplayLabel, &CustomHoverLabel::clicked, this, [this](){setTimelineContent(0);});
     connect(timelineButtonsLabel, &CustomHoverLabel::clicked, this, [this](){setTimelineContent(1);});
     connect(shotInfosLabel, &CustomHoverLabel::clicked, this, [this](){setTimelineContent(2);});
@@ -192,6 +183,9 @@ void HelperWidget::initLayout()
 
 }
 
+// ------
+// ------ PANNEAU : GENERAL
+// ------
 void HelperWidget::setGeneralContent()
 {
     m_contentWidget = new QWidget();
@@ -237,7 +231,9 @@ void HelperWidget::setGeneralContent()
     m_scrollArea->setWidget(m_contentWidget);
 }
 
-
+// ------
+// ------ PANNEAU : MODE CLASSIQUE
+// ------
 void HelperWidget::setClassicContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -245,7 +241,7 @@ void HelperWidget::setClassicContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* classicContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_classic_checkbox") + "</b></h1>");
+    QLabel* classicContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_classic_category") + "</b></h1>");
 
     QLabel* openFilesTitle = new QLabel("<h2><b>" + pref.getText("help_menu_open_files_label") + "</b></h2>");
 
@@ -300,11 +296,11 @@ void HelperWidget::setClassicContent(int scrollLevel)
         Qt::SmoothTransformation
         ));
 
-    QLabel* classicToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_classic_toolbar_buttons_descriptions") + "</h3>");
+    QLabel* classicToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_classic_toolbar_buttons_description") + "</h3>");
 
     QString theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
     QGridLayout* classicToolbarButtonsHelpLayout = new QGridLayout();
-    classicToolbarButtonsHelpLayout->setSpacing(30);
+    //classicToolbarButtonsHelpLayout->setSpacing(30);
     classicToolbarButtonsHelpLayout->setContentsMargins(30, 10, 30, 10);
     QLabel* playInfoIcon = new QLabel();
     playInfoIcon->setPixmap(QPixmap(":/icons/play" + theme).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -342,17 +338,17 @@ void HelperWidget::setClassicContent(int scrollLevel)
     classicToolbarButtonsHelpLayout->addWidget(changeMediaLabel, 3, 1, Qt::AlignCenter);
     classicToolbarButtonsHelpLayout->addWidget(changeMediaDescription, 3, 2, Qt::AlignLeft);
 
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/slow" + theme, pref.getText("help_menu_speed_label"), pref.getText("help_menu_speed_description"), 4);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/loop_off" + theme, pref.getText("help_menu_loop_label"), pref.getText("help_menu_loop_description"), 5);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/sound_on" + theme, pref.getText("help_menu_volume_label"), pref.getText("help_menu_volume_description"), 6);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/lang" + theme, pref.getText("help_menu_language_label"), pref.getText("help_menu_language_description"), 7);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/slow" + theme, pref.getText("help_menu_slow_label"), pref.getText("help_menu_slow_description"), 4);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/loop_off" + theme, pref.getText("help_menu_loop_off_label"), pref.getText("help_menu_loop_off_description"), 5);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/sound_on" + theme, pref.getText("help_menu_sound_on_label"), pref.getText("help_menu_sound_on_description"), 6);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/lang" + theme, pref.getText("help_menu_lang_label"), pref.getText("help_menu_lang_description"), 7);
     addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/media_info" + theme, pref.getText("help_menu_media_info_label"), pref.getText("help_menu_media_info_description"), 8);
     addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/zoom" + theme, pref.getText("help_menu_zoom_label"), pref.getText("help_menu_zoom_description"), 9);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/capture" + theme, pref.getText("help_menu_screenshot_label"), pref.getText("help_menu_screenshot_description"), 10);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/extract_sequence" + theme, pref.getText("help_menu_extraction_label"), pref.getText("help_menu_extraction_description"), 11);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/duplicate_media" + theme, pref.getText("help_menu_duplicate_label"), pref.getText("help_menu_duplicate_description"), 12);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/capture" + theme, pref.getText("help_menu_capture_label"), pref.getText("help_menu_capture_description"), 10);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/extract_sequence" + theme, pref.getText("help_menu_extract_sequence_label"), pref.getText("help_menu_extract_sequence_description"), 11);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/duplicate_media" + theme, pref.getText("help_menu_duplicate_media_label"), pref.getText("help_menu_duplicate_media_description"), 12);
     addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/fullscreen" + theme, pref.getText("help_menu_fullscreen_label"), pref.getText("help_menu_fullscreen_description"), 13);
-    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/right_arrow" + theme, pref.getText("help_menu_extended_label"), pref.getText("help_menu_extended_description"), 14);
+    addButtonDescription(classicToolbarButtonsHelpLayout, ":/icons/right_arrow" + theme, pref.getText("help_menu_right_arrow_label"), pref.getText("help_menu_right_arrow_description"), 14);
 
     layout->addSpacing(10);
     layout->addWidget(classicToolbarTitle);
@@ -372,18 +368,18 @@ void HelperWidget::setClassicContent(int scrollLevel)
     extendedToolbarButtonsHelpLayout->setSpacing(30);
     extendedToolbarButtonsHelpLayout->setContentsMargins(30, 10, 30, 10);
 
-    QLabel* extendedToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_extended_toolbar_buttons_descriptions") + "</h3>");
+    QLabel* extendedToolbarButtonsLabel = new QLabel("<h3>" + pref.getText("help_menu_extended_toolbar_buttons_description") + "</h3>");
 
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/show_image" + theme, pref.getText("help_menu_hide_media_label"), pref.getText("help_menu_hide_media_description"), 4);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/show_image" + theme, pref.getText("help_menu_show_image_label"), pref.getText("help_menu_show_image_description"), 4);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/adjustments" + theme, pref.getText("help_menu_adjustments_label"), pref.getText("help_menu_adjustments_description"), 5);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/draw" + theme, pref.getText("help_menu_draw_label"), pref.getText("help_menu_draw_description"), 6);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/compo_rule" + theme, pref.getText("help_menu_compo_rule_label"), pref.getText("help_menu_compo_rule_description"), 7);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/backward" + theme, pref.getText("help_menu_backward_label"), pref.getText("help_menu_backward_description"), 8);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/prev_frame" + theme, pref.getText("help_menu_prev_frame_label"), pref.getText("help_menu_prev_frame_description"), 9);
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/record_off" + theme, pref.getText("help_menu_record_label"), pref.getText("help_menu_record_description"), 10);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/record_off" + theme, pref.getText("help_menu_record_off_label"), pref.getText("help_menu_record_off_description"), 10);
     addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/rotate" + theme, pref.getText("help_menu_rotate_label"), pref.getText("help_menu_rotate_description"), 11);
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/invert_h" + theme, pref.getText("help_menu_flip_label"), pref.getText("help_menu_flip_description"), 12);
-    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/timeline_off" + theme, pref.getText("help_menu_timeline_label"), pref.getText("help_menu_timeline_description"), 13);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/invert_h" + theme, pref.getText("help_menu_invert_h_label"), pref.getText("help_menu_invert_h_description"), 12);
+    addButtonDescription(extendedToolbarButtonsHelpLayout, ":/icons/timeline_off" + theme, pref.getText("help_menu_timeline_off_label"), pref.getText("help_menu_timeline_off_description"), 13);
 
     layout->addSpacing(10);
     layout->addWidget(extendedToolbarTitle);
@@ -408,6 +404,9 @@ void HelperWidget::setClassicContent(int scrollLevel)
     }
 }
 
+// ------
+// ------ PANNEAU : MODE MULTIVUE
+// ------
 void HelperWidget::setMultiviewContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -415,7 +414,7 @@ void HelperWidget::setMultiviewContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* multiviewContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_multiview_checkbox") + "</b></h1>");
+    QLabel* multiviewContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_multiview_category") + "</b></h1>");
     QLabel* enterMultiviewTitle = new QLabel("<h2><b>" + pref.getText("help_menu_enter_multiview_label") + "</b></h2>");
     QLabel* enterMultiviewContent1 = new QLabel(pref.getText("help_menu_enter_multiview_content_1"));
     enterMultiviewContent1->setWordWrap(true);
@@ -526,6 +525,9 @@ void HelperWidget::setMultiviewContent(int scrollLevel)
     }
 }
 
+// ------
+// ------ PANNEAU : PLAYLIST
+// ------
 void HelperWidget::setPlaylistContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -533,7 +535,7 @@ void HelperWidget::setPlaylistContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* playlistContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_playlist_checkbox") + "</b></h1>");
+    QLabel* playlistContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_playlist_category") + "</b></h1>");
 
     QLabel* accessPlaylistTitle = new QLabel("<h2><b>" + pref.getText("help_menu_access_playlist_label") + "</b></h2>");
     QLabel* accessPlaylistContent1 = new QLabel(pref.getText("help_menu_access_playlist_content_1"));
@@ -606,6 +608,9 @@ void HelperWidget::setPlaylistContent(int scrollLevel)
     }
 }
 
+// ------
+// ------ PANNEAU : TIMELINE
+// ------
 void HelperWidget::setTimelineContent(int scrollLevel)
 {
     PrefManager pref = PrefManager::instance();
@@ -613,7 +618,7 @@ void HelperWidget::setTimelineContent(int scrollLevel)
     QVBoxLayout *layout = new QVBoxLayout();
     m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Expanding);
 
-    QLabel* timelineContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_timeline_checkbox") + "</b></h1>");
+    QLabel* timelineContentTitle = new QLabel("<h1><b>" + pref.getText("help_menu_timeline_category") + "</b></h1>");
 
     QLabel* timelineDisplayTitle = new QLabel("<h2><b>" + pref.getText("help_menu_timeline_display_label") + "</b></h2>");
     QLabel* timelineDisplayContent1 = new QLabel(pref.getText("help_menu_timeline_display_content_1"));
@@ -650,10 +655,10 @@ void HelperWidget::setTimelineContent(int scrollLevel)
     timelineButtonsHelpLayout->setContentsMargins(30, 10, 30, 10);
     QString theme = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? "_white" : "";
 
-    addButtonDescription(timelineButtonsHelpLayout, ":/icons/abloop" + theme, pref.getText("help_menu_ab_loop_label"), pref.getText("help_menu_ab_loop_description"), 0);
+    addButtonDescription(timelineButtonsHelpLayout, ":/icons/abloop" + theme, pref.getText("help_menu_abloop_label"), pref.getText("help_menu_abloop_description"), 0);
     timelineButtonsHelpLayout->setColumnStretch(2, 0);
-    addButtonDescription(timelineButtonsHelpLayout, ":/icons/auto_segmentation" + theme, pref.getText("help_menu_segmentation_label"), pref.getText("help_menu_segmentation_description"), 1);
-    addButtonDescription(timelineButtonsHelpLayout, ":/icons/split_shot" + theme, pref.getText("help_menu_split_label"), pref.getText("help_menu_split_description"), 2);
+    addButtonDescription(timelineButtonsHelpLayout, ":/icons/auto_segmentation" + theme, pref.getText("help_menu_auto_segmentation_label"), pref.getText("help_menu_auto_segmentation_description"), 1);
+    addButtonDescription(timelineButtonsHelpLayout, ":/icons/split_shot" + theme, pref.getText("help_menu_split_shot_label"), pref.getText("help_menu_split_shot_description"), 2);
 
     QLabel* mergeLeftIcon = new QLabel();
     mergeLeftIcon->setPixmap(QPixmap(":/icons/merge_left" + theme).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -768,10 +773,16 @@ void HelperWidget::addButtonDescription(QGridLayout* gridLayout, const QString& 
 {
     QLabel* extendedIcon = new QLabel();
     extendedIcon->setPixmap(QPixmap(iconName).scaled(20, 20, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    extendedIcon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     QLabel* extendedLabel = new QLabel("<b>" + buttonLabel + "</b>");
+    extendedLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
     QLabel* extendedDescription = new QLabel(buttonDescription);
-    extendedDescription->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //extendedDescription->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     extendedDescription->setWordWrap(true);
+    extendedDescription->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
     gridLayout->addWidget(extendedIcon, lineIndex, 0, Qt::AlignCenter);
     gridLayout->addWidget(extendedLabel, lineIndex, 1, Qt::AlignCenter);
     gridLayout->addWidget(extendedDescription, lineIndex, 2, Qt::AlignLeft);

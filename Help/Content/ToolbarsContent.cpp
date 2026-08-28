@@ -1,0 +1,199 @@
+#include "ToolbarsContent.h"
+
+#include "PrefManager.h"
+#include "../Base/ContentBase.h"
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QGuiApplication>
+#include <QStyleHints>
+
+ToolbarsContent::ToolbarsContent(QWidget* parent)
+    : CategoryBase("help_menu_toolbars_label", parent)
+{
+    QString classicToolbarName = "help_menu_classic_toolbar_label";
+    QString extendedToolbarName = "help_menu_extended_toolbar_label";
+    QString timelineToolbarName = "help_menu_timeline_toolbar_label";
+
+    addSubcategory(
+        classicToolbarName,
+        classicToolbar(classicToolbarName)
+    );
+
+    addSubcategory(
+        extendedToolbarName,
+        extendedToolbar(extendedToolbarName)
+    );
+
+    addSubcategory(
+        timelineToolbarName,
+        timelineToolbar(timelineToolbarName)
+    );
+
+    
+}
+
+QWidget* ToolbarsContent::classicToolbar(const QString& subcategoryName)
+{
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    //widget->addTextFromLangJSON("help_menu_classic_toolbar_content_1");
+
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "La barre d'outils classique est composée de plusieurs boutons permettant d'accéder à différentes fonctionnalités.\n"
+            "Elle est divisée en trois parties : gauche, centrale et droite.\n"
+            "La partie gauche contient les boutons liés au son et aux informations du média.\n"
+            "La partie centrale contient les boutons de lecture et de contrôle du média.\n"
+            "La partie droite contient les boutons liés à l'affichage et aux fonctionnalités avancées.\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
+    widget->addButtonDescriptionTable(
+        "help_menu_classic_toolbar_left_buttons_label", 
+        {
+            "sound_on",
+            "lang",
+            "media_info"
+        }
+    );
+
+    widget->addVSpacing(10);
+
+    widget->addButtonDescriptionTable(
+        "help_menu_classic_toolbar_central_buttons_label", 
+        {
+            "slow",
+            "play",
+            "pause",
+            "stop",
+            "eject",
+            "loop_off"
+        }
+    ); 
+
+    widget->addVSpacing(10);
+
+    widget->addButtonDescriptionTable(
+        "help_menu_classic_toolbar_right_buttons_label", 
+        {
+            "zoom",
+            "capture",
+            "extract_sequence",
+            "duplicate_media",
+            "fullscreen",
+            "right_arrow"
+        }
+    );
+
+    return widget;
+}
+
+QWidget* ToolbarsContent::extendedToolbar(const QString& subcategoryName)
+{
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "La barre d'outils avancée permet d'accéder à des fonctionnalités plus techniques.\n"
+            "Elle est composée de plusieurs boutons permettant d'effectuer des actions spécifiques sur le média.\n"
+            "Parmi ces fonctionnalités, il est possible de réaliser des ajustements sur l'image, d'appliquer des filtres, de dessiner sur le média, de gérer les règles de composition, de naviguer dans les images et d'accéder à la timeline détaillée.\n"
+            "Pour y accéder, cliquer sur l'icône de barre d'outils avancée dans la partie droite de la barre d'outils classique.\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
+
+    widget->addButtonDescriptionTable(
+        "none", 
+        {
+            "show_image",
+            "adjustments",
+            "draw",
+            "compo_rule",
+            "backward",
+            "prev_frame",
+            "record_off",
+            "rotate",
+            "invert_h",
+            "timeline_off"
+        }
+    );
+
+    return widget;
+}
+
+QWidget* ToolbarsContent::timelineToolbar(const QString& subcategoryName)
+{
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    widget->addTextFromLangQMAP({
+        {"fr", 
+            "La barre d'outils de la timeline détaillée permet d'effectuer des actions spécifiques sur la timeline.\n"
+            "Elle est composée de plusieurs boutons permettant de naviguer dans la timeline, de gérer les segments et les plans, d'accéder aux détails des plans et d'exporter.\n"
+        },
+        {"en", 
+            ""
+        },
+        {"es", 
+            ""
+        },
+        {"de", 
+            ""
+        },
+        {"it", 
+            ""
+        },
+        {"pt", 
+            ""
+        }
+    });
+
+
+    widget->addButtonDescriptionTable(
+        "none", 
+        {
+            "abloop",
+            "auto_segmentation",
+            "split_shot",
+            "merge_left",
+            "to_prev_shot",
+            "shot_detail",
+            "to_next_shot",
+            "merge_right",
+            "open_annot",
+            "plus",
+            "export"
+        }
+    );
+
+    return widget;
+}

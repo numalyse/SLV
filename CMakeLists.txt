@@ -120,6 +120,7 @@ set(PROJECT_SOURCES
     AnnotationPanel.h AnnotationPanel.cpp
     AnnotationWidget.h AnnotationWidget.cpp
     AnnotationDialog.h AnnotationDialog.cpp
+
 )
 
 # =========================================================
@@ -177,6 +178,17 @@ set(ADDITIONAL_SOURCES
     Preference/Frames/FormComboBoxFrame.cpp Preference/Frames/FormComboBoxFrame.h
 
     Preference/BasePreferenceFrame.cpp Preference/BasePreferenceFrame.h
+
+    # Aide
+    Help/HelpDialog.h Help/HelpDialog.cpp
+    Help/Base/CategoryBase.h Help/Base/CategoryBase.cpp
+    Help/Base/ContentBase.h Help/Base/ContentBase.cpp
+    Help/Content/GeneralContent.h Help/Content/GeneralContent.cpp 
+    Help/Content/MonoviewContent.h Help/Content/MonoviewContent.cpp 
+    Help/Content/PlaylistContent.h Help/Content/PlaylistContent.cpp 
+    Help/Content/TimelineContent.h Help/Content/TimelineContent.cpp 
+    Help/Content/MultiviewContent.h Help/Content/MultiviewContent.cpp 
+    Help/Content/ToolbarsContent.h Help/Content/ToolbarsContent.cpp 
 
     # Project extras si manquants
     SequenceExtractionHelper.h

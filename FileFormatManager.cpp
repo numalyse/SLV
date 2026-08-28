@@ -53,3 +53,20 @@ const QString FileFormatManager::getFormats(const QString& type)
         formats += "*." + v.toString() + " ";
     return formats;
 }
+
+const QStringList FileFormatManager::getAllCatergories()
+{
+    QStringList categories;
+    for (const auto &key : m_formatsJson.keys())
+        categories << key;
+    return categories;
+}
+
+const QStringList FileFormatManager::getAllFormats()
+{
+    QStringList formats;
+    for (const auto &key : m_formatsJson.keys())
+        for (const auto &v : m_formatsJson[key].toArray())
+            formats << v.toString();
+    return formats;
+}

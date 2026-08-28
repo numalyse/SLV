@@ -22,6 +22,10 @@ public:
     /// @returns QString for file dialogs : (*.mp4 *.mov...)
     const QString getFormats(const QString&);
 
+    const QStringList getAllCatergories();
+
+    const QStringList getAllFormats();
+
     // /// @brief get all video container formats (mp4, mov, etc.)
     // /// @returns QString for file dialogs : (*.mp4 *.mov...)
     // const QString getVideoContainerFormats();

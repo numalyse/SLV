@@ -149,6 +149,24 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
     m_player = player;
     m_playersWidget = newPlayersWidget;
 
+    if (m_playersWidget) {
+        const auto splitters = m_playersWidget->findChildren<QSplitter*>();
+        for (QSplitter* splitter : splitters) {
+            connect(splitter, &QSplitter::splitterMoved, this, [this](int, int) {
+                for (PlayerWidget* player : m_layoutManager->activePlayers()) {
+                    if (player && player->toolbar()->isFullscreen()) {
+                        player->toolbar()->setIsRepositioned(false);
+                        player->toolbar()->updateFullscreenPosition();
+                    }
+                }
+                if (m_toolbarWidget && m_toolbarWidget->isFullscreen()) {
+                    m_toolbarWidget->setIsRepositioned(false);
+                    m_toolbarWidget->updateFullscreenPosition();
+                }
+            });
+        }
+    }
+
     // ajout du nouveau playerWidget et toolbar 
     if (newPlayersWidget){
         layout->addWidget(m_playersWidget);

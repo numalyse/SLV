@@ -498,6 +498,11 @@ void AdvancedToolbar::disableFullscreenRequested(){
     emit disableFullscreenRequest();
 }
 
+void AdvancedToolbar::updateFullscreenPosition()
+{
+    Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
+}
+
 void AdvancedToolbar::incrementSpeedSlider(){
     if (m_speedSlider->value() < m_speedSlider->maximum()) {
         m_speedSlider->setValue(m_speedSlider->value() + 1);

@@ -42,6 +42,7 @@ public slots:
 
     virtual void ejectRequested() override;
     virtual void disableFullscreenRequested() override;
+    virtual void updateFullscreenPosition() override;
     
 private:
 

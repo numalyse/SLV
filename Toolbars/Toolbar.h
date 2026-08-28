@@ -102,6 +102,7 @@ public:
     ToolbarToggleButton* fullscreenBtn() const { return m_fullscreenBtn; }
     ToolbarToggleButton* muteBtn() { return m_muteBtn; };
     ToolbarToggleButton* zoomBtn() { return m_zoomBtn; };
+    bool isFullscreen() const { return m_isFullscreen; }
 
     QVariant m_maxFullscreenOpacity = 1.0;
 
@@ -153,6 +154,8 @@ public:
         m_parent = parent;
         setParent(parent);
     }
+
+    void setIsRepositioned(bool isRepositioned) { m_isRepositioned = isRepositioned; }
 
     void showAnimation();
     void hideAnimation();
@@ -229,7 +232,7 @@ protected:
                 posX = qMax(geo.left(), qMin(posX, geo.right() - width()));
                 posY = qMax(geo.top(), qMin(posY, geo.bottom() - height()));
             }
-
+            
             move(posX, posY);
         }
     }

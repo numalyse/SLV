@@ -149,5 +149,5 @@ void GlobalToolbar::disableFullscreenRequested(){
 
 void GlobalToolbar::updateFullscreenPosition()
 {
-    Toolbar::moveOnTopOfParent(GlobalToolbar::s_bottomMarginFullscreen);
+    Toolbar::moveOnTopOfParent(GlobalToolbar::s_bottomMarginFullscreen);  
 }

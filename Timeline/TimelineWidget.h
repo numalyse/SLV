@@ -55,6 +55,7 @@ public slots:
     void initShotDetail();
     bool event(QEvent *event) override;
     void updateShotCount(int shotCount);
+    void updateSelectedShotCount(int selectedShotCount);
     void setPlayerPlaying(bool playing) { m_isPlayerPlaying = playing; };
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
@@ -120,7 +121,7 @@ private:
     ToolbarButton* m_addAnnotBtn = nullptr;
 
     QLabel* m_shotCountLabel = nullptr;
-
+    QLabel* m_selectedShotCountLabel = nullptr;
     QTimer* m_seekTimer = nullptr;
     int m_seekPendingTime = 50;
     bool m_isDraggingCursor = false;

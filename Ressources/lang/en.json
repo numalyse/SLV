@@ -98,6 +98,7 @@
     "timeline_merge_with_next_shot" : "Merge the current shot with the next shot",
     "timeline_extract_selected_shots" : "Extract selected shots",
     "timeline_shot_count_label" : "shot(s)",
+    "timeline_selected_shot_count_label" : "selected shot(s)",
     "messagebox_extract_selected_shots_completed" : "Extraction of the selected shots completed.",
     "messagebox_extract_selected_shots_failed" : "Extraction of the selected shots failed.",
 

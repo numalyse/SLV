@@ -524,6 +524,9 @@ bool SimpleToolbar::subtitleTrackAdd(int trackId, const QString &label)
 void SimpleToolbar::updateFullscreenPosition()
 {
     Toolbar::moveOnTopOfParent(s_bottomMarginFullscreen);
+    if (fullscreenBtn()->isChecked()) {
+        m_isRepositioned = false;
+    }
 }
 
 void SimpleToolbar::updateAudioTracks(const QList<QPair<int, QString>>& tracks){

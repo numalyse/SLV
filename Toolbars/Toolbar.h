@@ -229,7 +229,7 @@ protected:
                 posX = qMax(geo.left(), qMin(posX, geo.right() - width()));
                 posY = qMax(geo.top(), qMin(posY, geo.bottom() - height()));
             }
-
+            
             move(posX, posY);
         }
     }

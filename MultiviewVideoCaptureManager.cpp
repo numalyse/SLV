@@ -125,9 +125,9 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
-             << "-metadata:s:a:0" << "title=Audio media 1"
-             << "-metadata:s:a:1" << "title=Audio media 2"
-             << "-metadata:s:a:2" << "title=Audio mixed";
+             << "-metadata:s:a:0" << "title=Audio mixed"
+             << "-metadata:s:a:1" << "title=Audio media 1"
+             << "-metadata:s:a:2" << "title=Audio media 2";
     }
     else if(m_medias.size() == 3){
         args << "-i" << m_clipsPaths[0]
@@ -259,10 +259,10 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
-             << "-metadata:s:a:0" << "title=Audio media 1"
-             << "-metadata:s:a:1" << "title=Audio media 2"
-             << "-metadata:s:a:2" << "title=Audio media 3"
-             << "-metadata:s:a:3" << "title=Audio mixed";
+             << "-metadata:s:a:0" << "title=Audio mixed"
+             << "-metadata:s:a:1" << "title=Audio media 1"
+             << "-metadata:s:a:2" << "title=Audio media 2"
+             << "-metadata:s:a:3" << "title=Audio media 3";
 
     }
     else if(m_medias.size() == 4 && m_arrangement == Arrangement4){
@@ -314,11 +314,11 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
-             << "-metadata:s:a:0" << "title=Audio media 1"
-             << "-metadata:s:a:1" << "title=Audio media 2"
-             << "-metadata:s:a:2" << "title=Audio media 3"
-             << "-metadata:s:a:3" << "title=Audio media 4"
-             << "-metadata:s:a:4" << "title=Audio mixed";
+             << "-metadata:s:a:0" << "title=Audio mixed"
+             << "-metadata:s:a:1" << "title=Audio media 1"
+             << "-metadata:s:a:2" << "title=Audio media 2"
+             << "-metadata:s:a:3" << "title=Audio media 3"
+             << "-metadata:s:a:4" << "title=Audio media 4";
     }
 
     args << savePath;

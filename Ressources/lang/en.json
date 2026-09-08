@@ -618,7 +618,7 @@
     "help_menu_shot_infos_content_1" : "Current track informations are viewable with the side panel button at the top-right or via the corresponding button in the timeline. It shows numbering, title, start, end and duration as timecodes, notes and the reference image. Title and notes fields are editable.",
     "help_menu_exportation_content_1" : "The current project can be saved via the 'Files' → 'Save' menu. Projects can be exported as text (.txt and .docx), PDF, PowerPoint, as annotated video (titles and notes per track) and as reference images (all reference images are saved into the configured folder).",
  
-"project_manager_error_folder_not_found": "Cannot find the project folder.",
+    "project_manager_error_folder_not_found": "Cannot find the project folder.",
     "project_manager_error_json_file_not_found": "The project save file could not be found.",
     "project_manager_error_cannot_open_json_file": "Cannot open the project. The file might be locked or damaged.",
     "project_manager_error_json_parsing_error": "The project file is corrupted and cannot be read.",

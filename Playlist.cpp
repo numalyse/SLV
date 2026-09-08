@@ -82,6 +82,18 @@ Playlist::Playlist(QWidget *parent)
     connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
     playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
+    m_autoplayBtn = new ToolbarToggleButton(this,
+        false,
+        "autoplay_white",
+        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "autoplay_white",
+        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
+    m_autoplayBtn->setFixedSize(24,24);
+    m_autoplayBtn->setToggledIconFrame(true);
+    connect(m_autoplayBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableAutoplay);
+    connect(m_autoplayBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableAutoplay);
+    playlistLabelLayout->addWidget(m_autoplayBtn);
+
     m_loopItemBtn = new ToolbarToggleButton(this,
         false,
         "playlist_loop_white",
@@ -169,6 +181,7 @@ Playlist::Playlist(QWidget *parent)
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistNextMedia, this, &Playlist::playNextMedia);
+    connect(&SignalManager::instance(), &SignalManager::requestPlaylistNextMediaAutoplay, this, &Playlist::handleAutoplayRequest);
     connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsViaButton);
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
         if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
@@ -760,6 +773,23 @@ void Playlist::updateLayout()
     }
 
     this->updateGeometry();
+}
+
+void Playlist::enableAutoplay(){
+    m_autoplayBtn->setButtonState(true);
+    m_playlistAutoplay = true;
+}
+
+void Playlist::disableAutoplay(){
+    m_autoplayBtn->setButtonState(false);
+    m_playlistAutoplay = false;
+}
+
+void Playlist::handleAutoplayRequest()
+{
+    if (m_playlistAutoplay) {
+        playNextMedia();
+    }
 }
 
 void Playlist::enableLoop(){

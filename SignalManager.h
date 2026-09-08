@@ -63,6 +63,7 @@ signals:
     void activateMediaChangeBtn(const bool);
     void requestPlaylistSize();
     void requestPlaylistNextMedia();
+    void requestPlaylistNextMediaAutoplay();
     void playlistSizeResponse();
     void displayAnnotationPanel();
     void playFirstPlaylistItem();

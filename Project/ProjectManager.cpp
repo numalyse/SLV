@@ -260,33 +260,52 @@ void ProjectManager::initProjectShot(){
 bool ProjectManager::createProjectFolder(){
     PrefManager& prefManager = PrefManager::instance();
 
-    QString fileType = prefManager.getText("project_manager_create_project_dialog_file_type") + "(*)";
+    QString fileType = prefManager.getText("project_manager_create_project_dialog_file_type") + " (*)";
+    QString defaultProjectName = "Project";
+
+    if (m_project && m_project->media) {
+        QString mediaBaseName = QFileInfo(m_project->media->filePath()).completeBaseName();
+        if (!mediaBaseName.isEmpty()) {
+            defaultProjectName = mediaBaseName;
+        }
+    }
+
+    // if (!defaultProjectName.endsWith(".numaproj")) {
+    //     defaultProjectName += ".numaproj";
+    // }
+
+    QString defaultProjectPath = QDir(prefManager.getPref("Paths", "lp_project")).filePath(defaultProjectName);
 
     QString selectedPath = QFileDialog::getSaveFileName(
-        nullptr, 
-        tr(prefManager.getText("project_manager_create_project_dialog").toStdString().c_str()), 
-        prefManager.getPref("Paths", "lp_project"),
-        tr(fileType.toStdString().c_str() )
+        nullptr,
+        tr(prefManager.getText("project_manager_create_project_dialog").toStdString().c_str()),
+        defaultProjectPath,
+        tr(fileType.toStdString().c_str())
     );
 
     if(selectedPath.isEmpty()){
         qDebug() << "[ProjectManager] Project folder creation aborted";
         return false; 
     }
-    
+
     QFileInfo fileInfo(selectedPath);
+    QString projectFolderName = fileInfo.fileName();
+    if (projectFolderName.isEmpty()) {
+        projectFolderName = fileInfo.baseName();
+    }
+
     prefManager.setPref("Paths", "lp_project", fileInfo.absolutePath());
 
     QDir dir(fileInfo.absolutePath());
-    
-    if(!dir.exists(fileInfo.baseName())) {
-        if(!dir.mkdir(fileInfo.baseName())) {
+
+    if(!dir.exists(projectFolderName)) {
+        if(!dir.mkdir(projectFolderName)) {
             qCritical() << "[ProjectManager] Failed to create project folder";
             return false;
         }
     }
 
-    m_project->path = QDir(fileInfo.absolutePath()).filePath(fileInfo.baseName());
+    m_project->path = QDir(fileInfo.absolutePath()).filePath(projectFolderName);
     m_project->name = QDir(m_project->path).dirName();
     qDebug() << "[ProjectManager] Project folder created";
     return true;
@@ -465,6 +484,10 @@ bool ProjectManager::relinkJson(const QString& errorJson, const QString& project
 
     QDir projectDir(projectPath);
     QString projectName = projectDir.dirName();
+    // static const QString projectExtension = ".numaproj";
+    // if (projectName.endsWith(projectExtension)) {
+    //     projectName.chop(projectExtension.size());
+    // }
 
     bool renamed = QFile::rename(jsonPath, projectDir.filePath(projectName + ".json"));
 

@@ -86,10 +86,15 @@ namespace ProjectFileHelper {
             return std::unexpected(ProjectFileError::FolderNotFound);
         }
 
-        QString projectName = projDir.dirName(); 
+        QString projectName = projDir.dirName();
+        QString jsonProjectName = projectName;
+        // static const QString projectExtension = ".numaproj";
+        // if (jsonProjectName.endsWith(projectExtension)) {
+        //     jsonProjectName.chop(projectExtension.size());
+        // }
         qDebug() << "Project Name with baseName: " << projectName;
 
-        QString jsonFilePath = QDir(projectAbsolutePath).filePath(projectName + ".json");
+        QString jsonFilePath = QDir(projectAbsolutePath).filePath(jsonProjectName + ".json");
         qDebug() << "Loading project from JSON file path:" << jsonFilePath;
     
 
@@ -221,8 +226,13 @@ namespace ProjectFileHelper {
         if (!project || !timeline) return false;
 
         QDir projDir = QDir(project->path);
-        QString jsonPath = projDir.filePath(projDir.dirName() + ".json");
-        
+        QString projectFolderName = projDir.dirName();
+        // static const QString projectExtension = ".numaproj";
+        // if (projectFolderName.endsWith(projectExtension)) {
+        //     projectFolderName.chop(projectExtension.size());
+        // }
+        QString jsonPath = projDir.filePath(projectFolderName + ".json");
+
         QFile projectDataFile(jsonPath);
         if (!projectDataFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
             qCritical() << "Impossible d'ouvrir le fichier en écriture :" << jsonPath;

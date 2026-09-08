@@ -120,9 +120,9 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
 
         }
         args << "-map" << "[v]"
+             << "-map" << "[mix]"
              << "-map" << "0:a?"
              << "-map" << "1:a?"
-             << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
              << "-metadata:s:a:0" << "title=Audio mixed"
@@ -253,10 +253,10 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         }
 
         args << "-map" << "[v]"
+             << "-map" << "[mix]"
              << "-map" << "0:a:0?"
              << "-map" << "1:a:0?"
              << "-map" << "2:a:0?"
-             << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
              << "-metadata:s:a:0" << "title=Audio mixed"
@@ -307,11 +307,11 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         .arg(maxDuration - (endTimes[3]-m_startRecordTimes[3]));
 
         args << "-map" << "[v]"
+            << "-map" << "[mix]"
              << "-map" << "0:a:0?"
              << "-map" << "1:a:0?"
              << "-map" << "2:a:0?"
              << "-map" << "3:a:0?"
-             << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
              << "-metadata:s:a:0" << "title=Audio mixed"

@@ -190,8 +190,8 @@ void MainWindow::createMenuBar()
 
     auto *HelpMenu = menuBar()->addMenu("&" + prefManager.getText("main_window_menu_bar_help"));
 
-    auto *openHelperAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
-    connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);
+    //auto *openHelperAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
+    //connect(openHelperAction, &QAction::triggered, this, &MainWindow::openHelperWidget);
     
     auto *openHelpAction = HelpMenu->addAction("&" + prefManager.getText("main_window_option_open_helper"));
     connect(openHelpAction, &QAction::triggered, this, &MainWindow::openHelpDialog);

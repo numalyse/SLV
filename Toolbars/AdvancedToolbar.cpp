@@ -137,9 +137,9 @@ AdvancedToolbar::AdvancedToolbar(QWidget *parent) : SimpleToolbar(parent)
         m_nextMediaBtn->setEnabled(true);
     });
 
-    connect(&SignalManager::instance(), &SignalManager::activateMediaChangeBtn, this, [this](const bool state){
-        m_prevMediaBtn->setEnabled(state);
-        m_nextMediaBtn->setEnabled(state);
+    connect(&SignalManager::instance(), &SignalManager::updateMediaChangeButtons, this, [this](bool canGoPrevious, bool canGoNext){
+        m_prevMediaBtn->setEnabled(canGoPrevious);
+        m_nextMediaBtn->setEnabled(canGoNext);
     });
 
     delete m_removePlayerBtn; // On ne veut pas de ce bouton dans cette toolbar

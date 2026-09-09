@@ -32,12 +32,14 @@ private:
     qint64 m_playlistDuration = 0;
     QColor m_palbtnColor;
     QString m_palbtnColorStr;
+    bool m_playlistAutoplay = false;
     bool m_playlistLooping = false;
     bool m_playlistShuffled = false;
     unsigned int m_currentMediaIndex = 0;
     QVector<unsigned int> m_itemsShuffleOrder;
     QVector<unsigned int> m_itemsSortOrder;
     QVector<PlaylistItem*> m_items;
+    ToolbarToggleButton *m_autoplayBtn = nullptr;
     ToolbarToggleButton *m_loopItemBtn = nullptr;
     ToolbarToggleButton *m_shuffleItemBtn = nullptr;
     ToolbarPopupButton *m_sortPlaylistBtn = nullptr;
@@ -67,6 +69,9 @@ public slots:
     void playMedia(const QString &filePath, const bool isClicked);
     void playPreviousMedia();
     void playNextMedia();
+    void handleAutoplayRequest();
+    void enableAutoplay();
+    void disableAutoplay();
     void enableLoop();
     void disableLoop();
     void enableShuffle();
@@ -77,6 +82,7 @@ public slots:
     void updateDurationPlaylist();
 
 private slots:
+    void updateMediaChangeButtonsState();
     void updateItemIndices();
     void updateLayout();
 };

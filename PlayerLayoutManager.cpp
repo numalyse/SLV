@@ -63,7 +63,7 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
     connect(&SignalManager::instance(), &SignalManager::playlistEjectPlayer, this, &PlayerLayoutManager::handlePlaylistEject);
     connect(&SignalManager::instance(), &SignalManager::mediaWidgetMediaFinished, this, [this]{
         if(m_activePlayers.size() <= 1)
-            emit SignalManager::instance().requestPlaylistNextMedia();
+            emit SignalManager::instance().requestPlaylistNextMediaAutoplay();
     });
 
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){

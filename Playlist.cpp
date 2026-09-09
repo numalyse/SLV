@@ -82,6 +82,18 @@ Playlist::Playlist(QWidget *parent)
     connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
     playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
+    m_autoplayBtn = new ToolbarToggleButton(this,
+        false,
+        "autoplay_white",
+        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "autoplay_white",
+        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
+    m_autoplayBtn->setFixedSize(24,24);
+    m_autoplayBtn->setToggledIconFrame(true);
+    connect(m_autoplayBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableAutoplay);
+    connect(m_autoplayBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableAutoplay);
+    playlistLabelLayout->addWidget(m_autoplayBtn);
+
     m_loopItemBtn = new ToolbarToggleButton(this,
         false,
         "playlist_loop_white",
@@ -169,6 +181,7 @@ Playlist::Playlist(QWidget *parent)
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistNextMedia, this, &Playlist::playNextMedia);
+    connect(&SignalManager::instance(), &SignalManager::requestPlaylistNextMediaAutoplay, this, &Playlist::handleAutoplayRequest);
     connect(&SignalManager::instance(), &SignalManager::addPlaylistItems, this, &Playlist::addItemsViaButton);
     connect(&SignalManager::instance(), &SignalManager::requestPlaylistSize, this, [this](){
         if(m_items.size() > 1) emit SignalManager::instance().playlistSizeResponse();
@@ -220,13 +233,13 @@ void Playlist::dragEnterEvent(QDragEnterEvent *event){
 
 int Playlist::visualDroppedIndex(const QPoint &dropPos) const
 {
-    // On itère sur les éléments de la playlist pour déterminer l'index visuel où l'élément a été déposé
+    // We iterate over playlist items to determine the visual drop index.
     for (int i = 0; i < m_itemsSortOrder.size(); ++i) {
         QWidget *playlistItemWidget = m_items[m_itemsSortOrder[i]];
         QRect itemRect = playlistItemWidget->geometry();
         int midY = itemRect.top() + itemRect.height() / 2;
 
-        // Si la position de dépôt est au-dessus du milieu de cet élément, on retourne l'index visuel actuel
+        // If the drop position is above the middle of an item, return its current visual index.
         if (dropPos.toPointF().y() < midY) {
             return i;
         }
@@ -241,52 +254,59 @@ void Playlist::dropEvent(QDropEvent *event)
 
     qDebug() << "Old sort order: " << m_itemsSortOrder;
 
-    // Cas où un élément de la playlist est déplacé
+    // Case where a playlist item is moved.
     if (mimeData->hasFormat("move-PlaylistItem")) {
-        // Récupération de l'index de l'élément déplacé à partir des données MIME
-        int oldItemIndex = mimeData->data("move-PlaylistItem").toInt();
+        const int oldItemIndex = mimeData->data("move-PlaylistItem").toInt();
         qDebug() << "Dragged item index: " << oldItemIndex;
 
-        int newItemIndex = -1; // Initialisation de l'index de l'élément déplacé à -1 (invalide)
-        const int visualDropIndex = visualDroppedIndex(event->pos()); // Récupération de l'index visuel où l'élément a été déposé
+        // Validate the old item index to ensure it's within bounds.
+        if (oldItemIndex < 0 || oldItemIndex >= m_itemsSortOrder.size()) {
+            event->ignore();
+            return;
+        }
+
+        const int visualDropIndex = visualDroppedIndex(event->pos());
         qDebug() << "Visual drop index: " << visualDropIndex;
 
-        // Convert visualDropIndex to the new item position to use move()
-        newItemIndex = visualDropIndex == 0 ? 0 : visualDropIndex-1;
-
-        // Move the dragged item to the new position in the sort order
-        if (newItemIndex != -1) {
-            const int targetVisibleIndex = m_itemsSortOrder.indexOf(newItemIndex);
-            if (targetVisibleIndex != oldItemIndex && targetVisibleIndex >= 0) {
-
-                m_itemsSortOrder.move(oldItemIndex, newItemIndex);
-                m_itemsShuffleOrder.move(oldItemIndex, newItemIndex);
-
-                if(m_currentMediaIndex > oldItemIndex && m_currentMediaIndex <= newItemIndex) {
-                    m_currentMediaIndex--;
-                    qDebug() << "Current media - : " << m_currentMediaIndex;
-                }
-                else if(m_currentMediaIndex < oldItemIndex && m_currentMediaIndex >= newItemIndex) {
-                    m_currentMediaIndex++;
-                    qDebug() << "Current media + : " << m_currentMediaIndex;
-                }
-                else if(m_currentMediaIndex == oldItemIndex) {
-                    m_currentMediaIndex = newItemIndex;
-                }
-
-                qDebug() << "Updated sort order: " << m_itemsSortOrder;
-            }
+        // Calculate the new item index based on the visual drop index.
+        int newItemIndex = qBound(0, visualDropIndex == 0 ? 0 : visualDropIndex - 1, m_itemsSortOrder.size() - 1);
+        if (newItemIndex == oldItemIndex) {
+            event->acceptProposedAction();
+            return;
         }
+
+        m_itemsSortOrder.move(oldItemIndex, newItemIndex);
+        m_itemsShuffleOrder.move(oldItemIndex, newItemIndex);
+
+        // Update the current media index based on the moved item.
+        if (m_currentMediaIndex > static_cast<unsigned int>(oldItemIndex) && m_currentMediaIndex <= static_cast<unsigned int>(newItemIndex)) {
+            --m_currentMediaIndex;
+        } else if (m_currentMediaIndex < static_cast<unsigned int>(oldItemIndex) && m_currentMediaIndex >= static_cast<unsigned int>(newItemIndex)) {
+            ++m_currentMediaIndex;
+        } else if (m_currentMediaIndex == static_cast<unsigned int>(oldItemIndex)) {
+            m_currentMediaIndex = static_cast<unsigned int>(newItemIndex);
+        }
+
+        // Ensure the current media index is within valid bounds after the move.
+        if (m_currentMediaIndex >= m_itemsSortOrder.size())
+            m_currentMediaIndex = static_cast<unsigned int>(std::max(0, static_cast<int>(m_itemsSortOrder.size()) - 1));
+
+        qDebug() << "Updated sort order: " << m_itemsSortOrder;
 
         updateItemIndices();
         updateLayout();
+        updateMediaChangeButtonsState();
 
         event->acceptProposedAction();
+        
     } else if (mimeData->hasUrls()) {
+        // Case where files are dropped into the playlist.
         QStringList filePaths = dataHasValidUrls(event->mimeData());
         if(filePaths.size() < event->mimeData()->urls().size()){
             QMessageBox::warning(this, "", PrefManager::instance().getText("messagebox_format_not_accepted"));
         }
+
+        // If there are valid file paths, insert them into the playlist.
         if (!filePaths.isEmpty()) {
             const int insertionIndex = visualDroppedIndex(event->pos());
 
@@ -308,6 +328,7 @@ void Playlist::dropEvent(QDropEvent *event)
 
         event->acceptProposedAction();
     } else {
+        // If the drop event doesn't contain valid data, ignore it.
         event->ignore();
     }
 }
@@ -394,6 +415,11 @@ void Playlist::addItemsViaButton(const QStringList &filesPaths)
 
     updateItemIndices();
     updateLayout();
+    updateMediaChangeButtonsState();
+
+    if (!filesPaths.empty()) {
+        emit SignalManager::instance().displayNavPanel(PanelType::Playlist);
+    }
 
     emit disableToolbarLoopRequested();
     if(m_items.size() > 1)
@@ -527,7 +553,9 @@ void Playlist::deleteAllItems(const bool ejectMedia)
     m_itemsShuffleOrder.clear();
     m_itemsSortOrder.clear();
     emit SignalManager::instance().activateMediaChangeBtn(false);
+    updateMediaChangeButtonsState();
     emit playlistItemCountChanged();
+    emit SignalManager::instance().playlistEjectPlayer();
 }
 
 void Playlist::deleteItem(const unsigned int index)
@@ -595,6 +623,7 @@ void Playlist::deleteItem(const unsigned int index)
         if (m_items.size() <= 1)
             emit SignalManager::instance().activateMediaChangeBtn(false);
 
+        updateMediaChangeButtonsState();
         emit playlistItemCountChanged();
     });
     
@@ -626,6 +655,7 @@ void Playlist::playMedia(const QString& filePath, const bool isClicked)
         else
             m_items[m_itemsSortOrder[IMedia]]->setCurrentMedia(true);
     }
+    updateMediaChangeButtonsState();
 }
 
 void Playlist::playPreviousMedia()
@@ -734,6 +764,35 @@ void Playlist::playNextMedia()
     }
 }
 
+void Playlist::updateMediaChangeButtonsState()
+{
+    bool canGoPrevious = false;
+    bool canGoNext = false;
+
+    if (!m_items.empty()) {
+        // Keep the current media index in bounds after a reorder or a playlist change.
+        const unsigned int safeCurrentIndex = std::min(m_currentMediaIndex, static_cast<unsigned int>(std::max(0, static_cast<int>(m_itemsSortOrder.size()) - 1)));
+        if (m_currentMediaIndex >= m_itemsSortOrder.size())
+            m_currentMediaIndex = safeCurrentIndex;
+
+        if (m_playlistShuffled) {
+            // Compute the previous/next state from the shuffled position, not from the sorted index.
+            if (!m_itemsShuffleOrder.isEmpty() && safeCurrentIndex < m_itemsSortOrder.size()) {
+                const int currentShufflePos = m_itemsShuffleOrder.indexOf(m_itemsSortOrder[safeCurrentIndex]);
+                canGoPrevious = currentShufflePos > 0;
+                canGoNext = currentShufflePos >= 0 && currentShufflePos + 1 < m_itemsShuffleOrder.size();
+            }
+        } else if (m_itemsSortOrder.size() > 0) {
+            // In the normal order, the buttons depend on the current position in the playlist.
+            canGoPrevious = safeCurrentIndex > 0;
+            canGoNext = safeCurrentIndex < static_cast<unsigned int>(m_items.size() - 1);
+        }
+    }
+
+    // Refresh the toolbar buttons after the playlist order or current item changed.
+    emit SignalManager::instance().updateMediaChangeButtons(canGoPrevious, canGoNext);
+}
+
 void Playlist::updateItemIndices()
 {
     for (int i = 0; i < m_items.size(); ++i) {
@@ -760,6 +819,23 @@ void Playlist::updateLayout()
     }
 
     this->updateGeometry();
+}
+
+void Playlist::enableAutoplay(){
+    m_autoplayBtn->setButtonState(true);
+    m_playlistAutoplay = true;
+}
+
+void Playlist::disableAutoplay(){
+    m_autoplayBtn->setButtonState(false);
+    m_playlistAutoplay = false;
+}
+
+void Playlist::handleAutoplayRequest()
+{
+    if (m_playlistAutoplay) {
+        playNextMedia();
+    }
 }
 
 void Playlist::enableLoop(){

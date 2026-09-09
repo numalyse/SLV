@@ -128,7 +128,16 @@ void GlobalPlayerManager::setPlayersFromPaths(QStringList filesPaths)
 void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPlayersWidget, Toolbar* newToolbar)
 {
     // clean ancienne UI
+    bool wasToolbarFullscreen = false;
+    bool wasExtensionOpen = false;
+    bool wasSegmentationEnabled = false;
     if (m_toolbarWidget){
+        // remember fullscreen state to restore it on the new toolbar
+        wasToolbarFullscreen = m_toolbarWidget->isFullscreen();
+        if (auto* oldAdvanced = qobject_cast<AdvancedToolbar*>(m_toolbarWidget)) {
+            wasExtensionOpen = oldAdvanced->isExtensionOpen();
+            wasSegmentationEnabled = oldAdvanced->getExtendedToolbar()->m_segmBtn->isChecked();
+        }
         m_toolbarWidget->disconnect();
         layout->removeWidget(m_toolbarWidget);
         m_toolbarWidget->deleteLater(); 
@@ -210,6 +219,27 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
 
         layout->addWidget(m_toolbarWidget);
         m_toolbarWidget->setTBParent(this); // since toolbar was created in playerlayoutmanager, need to update its internal m_parent 
+
+        if (auto* newAdvanced = qobject_cast<AdvancedToolbar*>(m_toolbarWidget)) {
+            newAdvanced->setExtensionOpen(wasExtensionOpen);
+            newAdvanced->getExtendedToolbar()->m_segmBtn->setButtonState(wasSegmentationEnabled);
+            if (wasExtensionOpen && wasSegmentationEnabled && ProjectManager::instance().project()) {
+                emit newAdvanced->enableSegmentationRequest();
+            }
+        }
+
+        // If the previous toolbar was in fullscreen mode, restore that state on the newly created toolbar
+        if (wasToolbarFullscreen) {
+            // defer to the event loop to ensure previous widgets are fully deleted
+            QTimer::singleShot(0, this, [this]() {
+                if (!m_toolbarWidget) return;
+                m_toolbarWidget->setFullscreenUI();
+                if (m_toolbarWidget->fullscreenBtn())
+                    m_toolbarWidget->fullscreenBtn()->setButtonState(true);
+                updateSplittersStyle(true);
+                emit enableFullscreenMainRequested();
+            });
+        }
     }
 
     // maintient la fenetre dans l'écran actuel

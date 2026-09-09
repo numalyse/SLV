@@ -816,6 +816,16 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
                 libvlc_media_player_stop(mediaWidget->m_player);
                 mediaWidget->play();
                 mediaWidget->pause();
+
+                // Ensure timecode corresponds to the end of the media
+                if (mediaWidget->m_media && mediaWidget->m_media->duration() > 0) {
+                    mediaWidget->setTime(mediaWidget->m_media->duration());
+                } else {
+                    int64_t currentTime = libvlc_media_player_get_time(mediaWidget->m_player);
+                    mediaWidget->m_vlcTime = currentTime;
+                    emit mediaWidget->vlcTimeChanged(currentTime);
+                }
+
                 emit mediaWidget->mediaFinished();
             }
             // cas où on loop le média

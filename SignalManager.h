@@ -61,8 +61,10 @@ signals:
     void addPlaylistItems(const QStringList&);
     void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
     void activateMediaChangeBtn(const bool);
+    void updateMediaChangeButtons(bool canGoPrevious, bool canGoNext);
     void requestPlaylistSize();
     void requestPlaylistNextMedia();
+    void requestPlaylistNextMediaAutoplay();
     void playlistSizeResponse();
     void displayAnnotationPanel();
     void playFirstPlaylistItem();

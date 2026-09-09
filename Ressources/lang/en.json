@@ -207,6 +207,7 @@
     "tooltip_shuffle_playlist" : "Shuffle mode",
     "tooltip_sort_playlist" : "Sort playlist",
     "tooltip_save_playlist" : "Save playlist",
+    "file_playlist" : "XSPF playlist",
     "tooltip_import_playlist" : "Import playlist",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",

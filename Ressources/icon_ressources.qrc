@@ -312,5 +312,8 @@
         <file alias="save">icons/save.png</file>
         <file alias="save_gray">icons/save_gray.png</file>
         <file alias="save_white">icons/save_white.png</file>
+        <file alias="autoplay_gray">icons/autoplay_gray.png</file>
+        <file alias="autoplay_white">icons/autoplay_white.png</file>
+        <file alias="autoplay">icons/autoplay.png</file>
     </qresource>
 </RCC>

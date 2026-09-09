@@ -408,6 +408,10 @@ void Playlist::addItemsViaButton(const QStringList &filesPaths)
     updateItemIndices();
     updateLayout();
 
+    if (!filesPaths.empty()) {
+        emit SignalManager::instance().displayNavPanel(PanelType::Playlist);
+    }
+
     emit disableToolbarLoopRequested();
     if(m_items.size() > 1)
         emit SignalManager::instance().activateMediaChangeBtn(true);
@@ -541,6 +545,7 @@ void Playlist::deleteAllItems(const bool ejectMedia)
     m_itemsSortOrder.clear();
     emit SignalManager::instance().activateMediaChangeBtn(false);
     emit playlistItemCountChanged();
+    emit SignalManager::instance().playlistEjectPlayer();
 }
 
 void Playlist::deleteItem(const unsigned int index)

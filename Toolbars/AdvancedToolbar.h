@@ -31,6 +31,13 @@ public:
     void setFullscreenUI(int bottomMargin = AdvancedToolbar::s_bottomMarginFullscreen) override;
     void setDefaultUI() override;
     ExtensionToolbar* getExtendedToolbar(){ return m_extensionToolbar; }
+    bool isExtensionOpen() const { return m_extensionBtn && m_extensionBtn->isChecked(); }
+    void setExtensionOpen(bool open) {
+        if (!m_extensionBtn || !m_extensionToolbar) return;
+        m_extensionBtn->setButtonState(open);
+        if (open) m_extensionToolbar->show();
+        else m_extensionToolbar->hide();
+    }
 
 public slots:
     void enableButtons();

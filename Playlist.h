@@ -82,6 +82,7 @@ public slots:
     void updateDurationPlaylist();
 
 private slots:
+    void updateMediaChangeButtonsState();
     void updateItemIndices();
     void updateLayout();
 };

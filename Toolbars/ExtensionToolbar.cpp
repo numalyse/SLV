@@ -106,12 +106,11 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     m_adjustmentWidget = new AdjustmentsWidget(this);
     m_adjustmentsBtn = new ToolbarPopupButton(this, m_adjustmentWidget, "adjustments_white", PrefManager::instance().getText("tooltip_adjust"));
 
-    connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
+    connect(m_segmBtn, &ToolbarToggleButton::stateActivated, this, [this] { // vérifie qu'il y a bien un projet avant d'activer la timeline
         if( ProjectManager::instance().project()){
             qDebug() << "oui projet";
             m_segmBtn->setButtonState(true);
             emit enableSegmentationRequested();
-            emit SignalManager::instance().extensionToolbarDisplayShotDetail();
         } else {
             qDebug() << "non projet";
         }
@@ -140,10 +139,9 @@ ExtensionToolbar::ExtensionToolbar(QWidget *parent) : QWidget(parent)
     connect(m_horizontalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::horizontalFlipRequested);
     connect(m_verticalInvBtn, &ToolbarToggleButton::clicked, this, &ExtensionToolbar::verticalFlipRequested);
 
-    connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, [this] { // vérifie qu'il y a bien un projet avant d'afficher la timeline
+    connect(m_segmBtn, &ToolbarToggleButton::stateDeactivated, this, [this] { // vérifie qu'il y a bien un projet avant de désactiver la timeline
         emit disableSegmentationRequested();
         m_segmBtn->setButtonState(false);
-        emit SignalManager::instance().displayPlaylist();
     });
     connect(&SignalManager::instance(), &SignalManager::recordButtonUiUpdate, this, &ExtensionToolbar::updateRecordButtonUI);
     connect(m_adjustmentWidget, &AdjustmentsWidget::adjustmentChangeRequested, this, &ExtensionToolbar::adjustmentChangeRequested);

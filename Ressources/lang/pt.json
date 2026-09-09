@@ -206,6 +206,7 @@
     "tooltip_shuffle_playlist" : "Reprodução aleatória da lista",
     "tooltip_sort_playlist" : "Ordenar lista de reprodução",
     "tooltip_save_playlist" : "Guardar a lista de reprodução",
+    "file_playlist" : "Lista de reprodução XSPF",
     "tooltip_import_playlist" : "Importar uma lista de reprodução",
     "sort_AZ_playlist" : "A → Z",
     "sort_ZA_playlist" : "Z → A",

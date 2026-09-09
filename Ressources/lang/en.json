@@ -104,6 +104,7 @@
 
     "export_running": "Exporting...",
     "export_directory_path_title": "Select export folder",
+    "export_directory_tagimages": "Select the save location for the Tag Frames folder",
     "export_type_txt": "Text file (*.txt)",
     "export_type_pdf": "PDF document (*.pdf)",
     "export_type_pptx": "PowerPoint presentation (*.pptx)",

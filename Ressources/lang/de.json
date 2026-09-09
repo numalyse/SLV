@@ -103,6 +103,7 @@
 
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",
+    "export_directory_tagimages": "Speicherort für den Ordner mit Referenzbildern auswählen",
     "export_type_txt": "Textdatei (*.txt)",
     "export_type_pdf": "PDF-Dokument (*.pdf)",
     "export_type_pptx": "PowerPoint-Präsentation (*.pptx)",

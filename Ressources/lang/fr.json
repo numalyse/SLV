@@ -104,6 +104,8 @@
 
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",
+    "export_directory_tagimages": "Sélectionner l'emplacement de sauvegarde du dossier d'Images-Repères",
+    "export_subfolder_tagimages": "Sauvegarder dans un sous-dossier",
     "export_type_txt": "Fichier texte (*.txt)",
     "export_type_pdf": "Document PDF (*.pdf)",
     "export_type_pptx": "Présentation PowerPoint (*.pptx)",
@@ -398,7 +400,7 @@
     "media_track_info_dimensions" : "Dimensions de l'image",
     "media_track_info_sar" : "Rapport d'aspect de pixel",
     "media_track_info_fps" : "Fréquence d'images",
-    "media_track_info_encoding" : "Encondage",
+    "media_track_info_encoding" : "Encodage",
     "media_track_info_bitrate" : "Débit",
     "media_track_info_fourcc" : "FourCC",
 

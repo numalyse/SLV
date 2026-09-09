@@ -103,6 +103,7 @@
 
     "export_running": "Exportación en curso...",
     "export_directory_path_title": "Seleccionar carpeta de exportación",
+    "export_directory_tagimages": "Seleccionar el lugar de guardado para la carpeta de Imágenes de Referencia",
     "export_type_txt": "Archivo de texto (*.txt)",
     "export_type_pdf": "Documento PDF (*.pdf)",
     "export_type_pptx": "Presentación PowerPoint (*.pptx)",

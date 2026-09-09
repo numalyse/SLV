@@ -551,10 +551,27 @@ void ProjectManager::exportProject(){
     if(selectedFormat == ExportType::TagImage){
         selectedPath = QFileDialog::getExistingDirectory(
             nullptr, 
-            prefManager.getText("export_directory_path_title"),
+            prefManager.getText("export_directory_tagimages"),
             dialogDir,
             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
         );
+
+        if (selectedPath.isEmpty()) return;
+
+        QString mediaBaseName = QFileInfo(m_project->media->filePath()).completeBaseName();
+        QString exportFolderName = "TagImages_" + mediaBaseName;
+        QString exportDir = QDir(selectedPath).filePath(exportFolderName);
+
+        if (!QDir(selectedPath).exists(exportFolderName)) {
+            if (!QDir(selectedPath).mkpath(exportFolderName)) {
+                QMessageBox::critical(nullptr,
+                    prefManager.getText("messagebox_error"),
+                    prefManager.getText("project_exportation_error"));
+                return;
+            }
+        }
+
+        selectedPath = exportDir;
     }else {
         QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
         if(selectedFormat == ExportType::SRC)

@@ -91,6 +91,14 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
         m_snapshotPopup->showWithFade();
     });
 
+    connect(m_layoutManager, &PlayerLayoutManager::multiviewMergeCompleted, this, [this](const QString& mergedPath){
+        if (m_snapshotPopup)
+            delete m_snapshotPopup;
+    
+        m_snapshotPopup = new SnapshotPopup(m_playersWidget ? m_playersWidget : this, mergedPath, -1, 0.0);
+        m_snapshotPopup->showWithFade();
+    }); 
+
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalPlayStateRequested, this, &GlobalPlayerManager::setGlobalPlayState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalMuteStateRequested, this, &GlobalPlayerManager::setGlobalMuteState);
     connect(m_layoutManager, &PlayerLayoutManager::setGlobalZoomStateRequested, this, &GlobalPlayerManager::setGlobalZoomState);

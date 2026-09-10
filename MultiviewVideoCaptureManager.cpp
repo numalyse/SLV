@@ -99,6 +99,7 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
                 "[1:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
                 "[v0][v1]vstack=inputs=2[v];"
                 "[0:a:0][1:a:0]amix=inputs=2:duration=longest[mix]"
+                "amix=inputs=2:duration=longest[mix][0:a:0][1:a:0]"
             ).arg(minW).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
             .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]));
         }
@@ -127,7 +128,10 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-c:a" << "aac" << "-b:a" << "192k"
              << "-metadata:s:a:0" << "title=Audio mixed"
              << "-metadata:s:a:1" << "title=Audio media 1"
-             << "-metadata:s:a:2" << "title=Audio media 2";
+             << "-metadata:s:a:2" << "title=Audio media 2"
+             << "-disposition:a:0" << "default"
+             << "-disposition:a:1" << "0"
+             << "-disposition:a:2" << "0";;
     }
     else if(m_medias.size() == 3){
         args << "-i" << m_clipsPaths[0]
@@ -262,7 +266,11 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-metadata:s:a:0" << "title=Audio mixed"
              << "-metadata:s:a:1" << "title=Audio media 1"
              << "-metadata:s:a:2" << "title=Audio media 2"
-             << "-metadata:s:a:3" << "title=Audio media 3";
+             << "-metadata:s:a:3" << "title=Audio media 3"
+             << "-disposition:a:0" << "default"
+             << "-disposition:a:1" << "0"
+             << "-disposition:a:2" << "0"
+             << "-disposition:a:3" << "0";
 
     }
     else if(m_medias.size() == 4 && m_arrangement == Arrangement4){
@@ -318,7 +326,12 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-metadata:s:a:1" << "title=Audio media 1"
              << "-metadata:s:a:2" << "title=Audio media 2"
              << "-metadata:s:a:3" << "title=Audio media 3"
-             << "-metadata:s:a:4" << "title=Audio media 4";
+             << "-metadata:s:a:4" << "title=Audio media 4"
+             << "-disposition:a:0" << "default"
+             << "-disposition:a:1" << "0"
+             << "-disposition:a:2" << "0"
+             << "-disposition:a:3" << "0"
+             << "-disposition:a:4" << "0";
     }
 
     args << savePath;

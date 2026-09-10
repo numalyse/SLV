@@ -104,20 +104,20 @@
 
     "export_running": "Exporting...",
     "export_directory_path_title": "Select export folder",
-    "export_directory_tagimages": "Select the save location for the Tag Frames folder",
+    "export_directory_tagimages": "Select the saving location for the Tag Frames",
     "export_type_txt": "Text file (*.txt)",
     "export_type_pdf": "PDF document (*.pdf)",
     "export_type_pptx": "PowerPoint presentation (*.pptx)",
     "export_type_docx": "Word document (*.docx)",
     "export_type_mp4": "MP4 video (*.mp4)",
     "export_type_src": "Source file (*.src)",
-    "export_type_tagimage": "Tag frames (*.png)",
+    "export_type_tagimage": "Tag Frames (*.png)",
     "export_type_unknown": "All files (*.*)",
     "export_file_path_title": "Save as...",
 
     "export_format_selection_title" : "Project export",
     "export_format_selection_txt" : "Select export format",
-    "export_format_selection_txt_tagImage" : "Tag Frames Folder",
+    "export_format_selection_txt_tagImage" : "Tag Frames Collection",
 
     "export_format_txt" : "Text",
     "export_format_pdf" : "PDF",

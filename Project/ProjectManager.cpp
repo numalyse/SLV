@@ -558,20 +558,22 @@ void ProjectManager::exportProject(){
 
         if (selectedPath.isEmpty()) return;
 
-        QString mediaBaseName = QFileInfo(m_project->media->filePath()).completeBaseName();
-        QString exportFolderName = "TagImages_" + mediaBaseName;
-        QString exportDir = QDir(selectedPath).filePath(exportFolderName);
+        if (isSubfolderChecked()){ // if the user checked the "create subfolder" checkbox, create a subfolder inside the selected directory
+            QString mediaBaseName = QFileInfo(m_project->media->filePath()).completeBaseName();
+            QString exportFolderName = "TagImages_" + mediaBaseName;
+            QString exportDir = QDir(selectedPath).filePath(exportFolderName);
 
-        if (!QDir(selectedPath).exists(exportFolderName)) {
-            if (!QDir(selectedPath).mkpath(exportFolderName)) {
-                QMessageBox::critical(nullptr,
-                    prefManager.getText("messagebox_error"),
-                    prefManager.getText("project_exportation_error"));
-                return;
+            if (!QDir(selectedPath).exists(exportFolderName)) {
+                if (!QDir(selectedPath).mkpath(exportFolderName)) {
+                    QMessageBox::critical(nullptr,
+                        prefManager.getText("messagebox_error"),
+                        prefManager.getText("project_exportation_error"));
+                    return;
+                }
             }
+            selectedPath = exportDir;
         }
 
-        selectedPath = exportDir;
     }else {
         QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
         if(selectedFormat == ExportType::SRC)

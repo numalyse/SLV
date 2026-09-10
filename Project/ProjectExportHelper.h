@@ -111,6 +111,7 @@ namespace ProjectExportHelper {
 
     /// @brief Opens a dialog to select format of export and the source to export shots or annotations, if no annotations in this project, cannot select annotations (disabled)
     std::optional<ExportSelection> selectFormatWindow(const MediaType mediaType, const QString& extension, bool hasAnnotations);
+
 }
 
 

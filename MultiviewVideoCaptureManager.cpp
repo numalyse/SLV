@@ -337,13 +337,19 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
     args << savePath;
 
     ffmpegMerge->start(SequenceExtractionHelper::getFfmpegPath(), args);
-    connect(ffmpegMerge, &QProcess::finished, this, [ffmpegMerge](int exitCode, QProcess::ExitStatus exitStatus){
+    connect(ffmpegMerge, &QProcess::finished, this, [this, ffmpegMerge](int exitCode, QProcess::ExitStatus exitStatus){
         if(exitStatus != QProcess::NormalExit || exitCode != 0){
             qDebug() << "Clip merge failed";
             qDebug() << "Exit Status : " << ffmpegMerge->exitStatus() << " exitCode : " << ffmpegMerge->exitCode() << "errors : " << ffmpegMerge->readAllStandardError();
+            return;
         }
-        else
-            qDebug() << "Clip merge complete";
+
+        qDebug() << "Clip merge complete";
+
+        for (const QString& clipPath : m_clipsPaths) {
+            QFile::remove(clipPath);
+        }
+        m_clipsPaths.clear();
     });
 
 }

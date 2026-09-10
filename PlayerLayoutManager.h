@@ -94,7 +94,6 @@ signals:
 
     /// @brief Emitted when on global screenshot success
     void globalScreenshotSaved(const QString& mergedPath);
-    //void multiviewRecordCompleted(const QString& mergedPath);
     void multiviewMergeCompleted(const QString& mergedPath);
 
 public slots:

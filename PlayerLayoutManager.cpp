@@ -909,6 +909,7 @@ void PlayerLayoutManager::startMultiviewRecord()
         startTimes.append(m_activePlayers[IPlayer]->mediaWidget()->getCurrentTime());
         m_activePlayers[IPlayer]->toolbar()->slider()->setEnabled(false);
         m_activePlayers[IPlayer]->mediaWidget()->setIsRecording(true);
+        m_activePlayers[IPlayer]->play();
     }
 
     m_multiviewRecord->startMultiviewRecord(activeMedias, startTimes, m_currentArrangement);
@@ -924,11 +925,12 @@ void PlayerLayoutManager::endMultiviewRecord()
         endTimes.append(m_activePlayers[IPlayer]->mediaWidget()->getCurrentTime());
         m_activePlayers[IPlayer]->toolbar()->slider()->setEnabled(true);
         m_activePlayers[IPlayer]->mediaWidget()->setIsRecording(false);
+        m_activePlayers[IPlayer]->pause();
     }
 
     const QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("dialog_capture"), PrefManager::instance().getPref("Paths", "lp_capture"));
 
     m_multiviewRecord->endMultiviewRecord(endTimes, savePath);
-    m_isRecording = true;
+    m_isRecording = false;
     emit SignalManager::instance().globalRecordingFinished();
 }

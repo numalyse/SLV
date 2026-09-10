@@ -928,9 +928,17 @@ void PlayerLayoutManager::endMultiviewRecord()
         m_activePlayers[IPlayer]->pause();
     }
 
-    const QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("dialog_capture"), PrefManager::instance().getPref("Paths", "lp_capture"));
+    const QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("dialog_capture"), PrefManager::instance().getPref("Paths", "lp_capture") + "/multiview_capture", PrefManager::instance().getText("export_type_mp4"));
+
+    m_multiviewRecord->endMultiviewRecord(endTimes, savePath);    
+    
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted,
+            this, [this](const QString& mergedPath) {
+        emit multiviewMergeCompleted(mergedPath);
+    });
 
     m_multiviewRecord->endMultiviewRecord(endTimes, savePath);
     m_isRecording = false;
     emit SignalManager::instance().globalRecordingFinished();
 }
+

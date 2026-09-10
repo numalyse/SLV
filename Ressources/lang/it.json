@@ -103,19 +103,20 @@
 
     "export_running": "Esportazione in corso...",
     "export_directory_path_title": "Seleziona cartella di esportazione",
+    "export_directory_tagimages": "Seleziona la posizione di salvataggio delle Immagini-Riferimento",
     "export_type_txt": "File di testo (*.txt)",
     "export_type_pdf": "Documento PDF (*.pdf)",
     "export_type_pptx": "Presentazione PowerPoint (*.pptx)",
     "export_type_docx": "Documento Word (*.docx)",
     "export_type_mp4": "Video MP4 (*.mp4)",
     "export_type_src": "File sorgente (*.src)",
-    "export_type_tagimage": "Immagini di riferimento (*.png)",
+    "export_type_tagimage": "Immagini-Riferimento (*.png)",
     "export_type_unknown": "Tutti i file (*.*)",
     "export_file_path_title": "Salva come...",
 
     "export_format_selection_title" : "Esportazione del progetto",
     "export_format_selection_txt" : "Seleziona formato di esportazione",
-    "export_format_selection_txt_tagImage" : "Cartella di Immagini di Riferimento",
+    "export_format_selection_txt_tagImage" : "Collezione di Immagini-Riferimento",
 
     "export_format_txt" : "Testo",
     "export_format_pdf" : "PDF",
@@ -616,7 +617,7 @@
     "help_menu_export_label" : "Esporta",
     "help_menu_export_description" : "Apre un dialogo per scegliere il formato di esportazione del progetto.",
     "help_menu_shot_infos_content_1" : "Le informazioni del piano corrente sono visualizzabili con il pulsante del pannello laterale in alto a destra o tramite il pulsante corrispondente nella timeline. Mostra numerazione, titolo, inizio, fine e durata come timecode, note e l'immagine di riferimento del piano. I campi titolo e note sono modificabili.",
-    "help_menu_exportation_content_1" : "Il progetto corrente può essere salvato tramite il menu 'File' → 'Salva'. I progetti possono essere esportati in formato testo (.txt e .docx), PDF, PowerPoint, come video annotato (titoli e note per piano) e come immagini di riferimento (tutte le immagini vengono salvate nella cartella indicata).",
+    "help_menu_exportation_content_1" : "Il progetto corrente può essere salvato tramite il menu 'File' → 'Salva'. I progetti possono essere esportati in formato testo (.txt e .docx), PDF, PowerPoint, come video annotato (titoli e note per piano) e come Immagini-Riferimento (tutte le immagini vengono salvate nella cartella indicata).",
 
     "project_manager_error_folder_not_found": "Impossibile trovare la cartella del progetto.",
     "project_manager_error_json_file_not_found": "Il file di salvataggio del progetto non è stato trovato.",

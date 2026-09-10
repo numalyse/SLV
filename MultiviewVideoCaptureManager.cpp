@@ -67,7 +67,8 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
                 emit multiviewCaptureFailed();
                 return;
             }
-            mergeClips(savePath+".mp4", endTimes);
+            //mergeClips(savePath+".mp4", endTimes);
+            mergeClips(savePath, endTimes);
         });
     }
 }
@@ -99,6 +100,7 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
                 "[1:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
                 "[v0][v1]vstack=inputs=2[v];"
                 "[0:a:0][1:a:0]amix=inputs=2:duration=longest[mix]"
+                "amix=inputs=2:duration=longest[mix][0:a:0][1:a:0]"
             ).arg(minW).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
             .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]));
         }
@@ -120,14 +122,17 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
 
         }
         args << "-map" << "[v]"
+             << "-map" << "[mix]"
              << "-map" << "0:a?"
              << "-map" << "1:a?"
-             << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
-             << "-metadata:s:a:0" << "title=Audio media 1"
-             << "-metadata:s:a:1" << "title=Audio media 2"
-             << "-metadata:s:a:2" << "title=Audio mixed";
+             << "-metadata:s:a:0" << "title=Audio mixed"
+             << "-metadata:s:a:1" << "title=Audio media 1"
+             << "-metadata:s:a:2" << "title=Audio media 2"
+             << "-disposition:a:0" << "default"
+             << "-disposition:a:1" << "0"
+             << "-disposition:a:2" << "0";;
     }
     else if(m_medias.size() == 3){
         args << "-i" << m_clipsPaths[0]
@@ -253,16 +258,20 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         }
 
         args << "-map" << "[v]"
+             << "-map" << "[mix]"
              << "-map" << "0:a:0?"
              << "-map" << "1:a:0?"
              << "-map" << "2:a:0?"
-             << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
-             << "-metadata:s:a:0" << "title=Audio media 1"
-             << "-metadata:s:a:1" << "title=Audio media 2"
-             << "-metadata:s:a:2" << "title=Audio media 3"
-             << "-metadata:s:a:3" << "title=Audio mixed";
+             << "-metadata:s:a:0" << "title=Audio mixed"
+             << "-metadata:s:a:1" << "title=Audio media 1"
+             << "-metadata:s:a:2" << "title=Audio media 2"
+             << "-metadata:s:a:3" << "title=Audio media 3"
+             << "-disposition:a:0" << "default"
+             << "-disposition:a:1" << "0"
+             << "-disposition:a:2" << "0"
+             << "-disposition:a:3" << "0";
 
     }
     else if(m_medias.size() == 4 && m_arrangement == Arrangement4){
@@ -307,30 +316,43 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         .arg(maxDuration - (endTimes[3]-m_startRecordTimes[3]));
 
         args << "-map" << "[v]"
+            << "-map" << "[mix]"
              << "-map" << "0:a:0?"
              << "-map" << "1:a:0?"
              << "-map" << "2:a:0?"
              << "-map" << "3:a:0?"
-             << "-map" << "[mix]"
              << "-c:v" << "libx264"
              << "-c:a" << "aac" << "-b:a" << "192k"
-             << "-metadata:s:a:0" << "title=Audio media 1"
-             << "-metadata:s:a:1" << "title=Audio media 2"
-             << "-metadata:s:a:2" << "title=Audio media 3"
-             << "-metadata:s:a:3" << "title=Audio media 4"
-             << "-metadata:s:a:4" << "title=Audio mixed";
+             << "-metadata:s:a:0" << "title=Audio mixed"
+             << "-metadata:s:a:1" << "title=Audio media 1"
+             << "-metadata:s:a:2" << "title=Audio media 2"
+             << "-metadata:s:a:3" << "title=Audio media 3"
+             << "-metadata:s:a:4" << "title=Audio media 4"
+             << "-disposition:a:0" << "default"
+             << "-disposition:a:1" << "0"
+             << "-disposition:a:2" << "0"
+             << "-disposition:a:3" << "0"
+             << "-disposition:a:4" << "0";
     }
 
     args << savePath;
 
     ffmpegMerge->start(SequenceExtractionHelper::getFfmpegPath(), args);
-    connect(ffmpegMerge, &QProcess::finished, this, [ffmpegMerge](int exitCode, QProcess::ExitStatus exitStatus){
+    connect(ffmpegMerge, &QProcess::finished, this, [this, ffmpegMerge, savePath](int exitCode, QProcess::ExitStatus exitStatus){
         if(exitStatus != QProcess::NormalExit || exitCode != 0){
             qDebug() << "Clip merge failed";
             qDebug() << "Exit Status : " << ffmpegMerge->exitStatus() << " exitCode : " << ffmpegMerge->exitCode() << "errors : " << ffmpegMerge->readAllStandardError();
+            return;
         }
-        else
-            qDebug() << "Clip merge complete";
+
+        qDebug() << "Clip merge complete";
+
+        for (const QString& clipPath : m_clipsPaths) {
+            QFile::remove(clipPath);
+        }
+        m_clipsPaths.clear();
+
+        emit multiviewMergeCompleted(savePath);
     });
 
 }

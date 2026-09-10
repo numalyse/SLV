@@ -1,5 +1,6 @@
 #include "Project/ProjectExportHelper.h"
 #include "ProjectExportHelper.h"
+#include "Project/ProjectManager.h"
 #include "VideoCaptureHelper.h"
 #include "PrefManager.h"
 #include "TimeFormatter.h"
@@ -39,6 +40,7 @@
 #include <QPainterPath>
 #include <QFont>
 #include <QFontMetrics>
+#include <QCheckBox>
 
 #include <memory>
 #include <optional>
@@ -999,6 +1001,8 @@ namespace ProjectExportHelper {
         sourceLayout->addWidget(annotationsRadio);
         layout->addLayout(sourceLayout);
 
+        layout->addSpacing(10);
+
         QLabel* label = new QLabel(txtManager.getText("export_format_selection_txt"), &dialog);
         layout->addWidget(label);
 
@@ -1019,6 +1023,28 @@ namespace ProjectExportHelper {
         }
         
         layout->addWidget(comboBox);
+
+        // Add an option to create a subfolder for tagimages if the toggle button is checked
+        QWidget *subfolderWidget = new QWidget(&dialog);
+        QCheckBox *subfolderCheckBox = new QCheckBox(txtManager.getText("export_subfolder_tagimages"), subfolderWidget);
+
+        QVBoxLayout *subfolderLayout = new QVBoxLayout(subfolderWidget);
+        subfolderLayout->setContentsMargins(0, 0, 0, 0);
+        subfolderLayout->addWidget(subfolderCheckBox);
+        layout->addWidget(subfolderWidget);
+
+        subfolderWidget->setFixedHeight(subfolderCheckBox->sizeHint().height());
+
+        subfolderCheckBox->setChecked(ProjectManager::instance().isSubfolderChecked());
+        subfolderCheckBox->setVisible(comboBox->currentData().toInt() == static_cast<int>(ExportType::TagImage));
+
+        QObject::connect(comboBox, &QComboBox::currentIndexChanged, &dialog, [comboBox, subfolderCheckBox](int index){
+            subfolderCheckBox->setVisible(comboBox->itemData(index).toInt() == static_cast<int>(ExportType::TagImage));
+        });
+
+        QObject::connect(subfolderCheckBox, &QCheckBox::toggled, &dialog, [](bool checked){
+            ProjectManager::instance().setSubfolderChecked(checked);
+        });
 
         QObject::connect(annotationsRadio, &QRadioButton::toggled, &dialog, [comboBox, mediaType](bool checked){
             if(mediaType != MediaType::Video) return;

@@ -91,6 +91,14 @@ public:
         return m_needSave;
     }
 
+    bool isSubfolderChecked() const {
+        return m_issubfolderChecked;
+    }
+
+    void setSubfolderChecked(bool checked) {
+        m_issubfolderChecked = checked;
+    }
+
     /// @brief Deletes the current project and its media resetting the manager state.
     ///
     /// Deletes the current project and its media and annotations then emits a signal to close and delete the timeline
@@ -115,6 +123,8 @@ private:
     bool m_isFpsParsed = false;
     bool m_fpsError = false;    
     bool m_projectInitialized = false;
+
+    bool m_issubfolderChecked = true; // Member variable to store the state of the subfolder checkbox
 
     /// @brief owns a pointer to the timeline, so when exporting, retrieve shots data from the timeline
     TimelineWidget* p_timeline = nullptr;

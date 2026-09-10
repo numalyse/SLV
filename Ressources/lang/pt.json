@@ -103,19 +103,20 @@
     
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",
+    "export_directory_tagimages": "Selecionar local de salvamento das Imagens-Referência",
     "export_type_txt": "Ficheiro de texto (*.txt)",
     "export_type_pdf": "Documento PDF (*.pdf)",
     "export_type_pptx": "Apresentação PowerPoint (*.pptx)",
     "export_type_docx": "Documento Word (*.docx)",
     "export_type_mp4": "Vídeo MP4 (*.mp4)",
     "export_type_src": "Ficheiro fonte (*.src)",
-    "export_type_tagimage": "Imagens de referência (*.png)",
+    "export_type_tagimage": "Imagens-Referência (*.png)",
     "export_type_unknown": "Todos os ficheiros (*.*)",
     "export_file_path_title": "Guardar como...",
 
     "export_format_selection_title" : "Exportação de projeto",
     "export_format_selection_txt" : "Selecionar formato de exportação",
-    "export_format_selection_txt_tagImage" : "Pasta de Imagens de Referência",
+    "export_format_selection_txt_tagImage" : "Coleção de Imagens-Referência",
 
     "export_format_txt" : "Texto",
     "export_format_pdf" : "PDF",
@@ -320,7 +321,7 @@
     "shortcut_prev_frame": "Fotograma anterior",
     "shortcut_next_frame": "Fotograma seguinte",
 
-    "tagimage_tooltip" : "Imagem de referência (TagFrame) : Permite identificar o plano com uma imagem representativa do conteúdo do plano.",
+    "tagimage_tooltip" : "Imagem-Referência (TagFrame) : Permite identificar o plano com uma imagem representativa do conteúdo do plano.",
 
     "paths_screenshot" : "Pasta de capturas de ecrã",
     "paths_default_video" : "Pasta padrão para salvar capturas de vídeo",
@@ -615,7 +616,7 @@
     "help_menu_shot_detail_description" : "Abre as informações do plano no painel lateral. O título e as notas do plano são editáveis.",
     "help_menu_export_label" : "Exportar",
     "help_menu_export_description" : "Abre uma janela de diálogo para escolher o formato de exportação do projeto.",
-    "help_menu_shot_infos_content_1" : "As informações do plano na posição atual são exibidas com o botão do painel lateral no canto superior direito ou através do botão correspondente na linha do tempo. Nesta visualização aparecem a numeração do plano, o título, o início, o fim e a duração em timecode, as notas e a imagem de referência do plano. Os campos de título e notas podem ser editados.",
+    "help_menu_shot_infos_content_1" : "As informações do plano na posição atual são exibidas com o botão do painel lateral no canto superior direito ou através do botão correspondente na linha do tempo. Nesta visualização aparecem a numeração do plano, o título, o início, o fim e a duração em timecode, as notas e a Imagem-Referência do plano. Os campos de título e notas podem ser editados.",
     "help_menu_exportation_content_1" : "O projeto atual pode ser salvo através do menu 'Arquivo' → 'Salvar'. Os projetos podem ser exportados em formato de texto (.txt e .docx), PDF, PowerPoint, no formato de vídeo anotado (títulos e notas por plano) e em imagens de referência (todas as imagens de referência são guardadas na pasta indicada).",
 
     "project_manager_error_folder_not_found": "Não é possível encontrar a pasta do projeto.",

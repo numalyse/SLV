@@ -26,7 +26,8 @@ private:
 
 signals:
     void multiviewCaptureFailed();
-    void multiviewCaptureCompleted();
+    //void multiviewCaptureCompleted();
+    void multiviewMergeCompleted(const QString& mergedPath);
 };
 
 #endif // MULTIVIEWVIDEOCAPTUREMANAGER_H

@@ -67,7 +67,8 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
                 emit multiviewCaptureFailed();
                 return;
             }
-            mergeClips(savePath+".mp4", endTimes);
+            //mergeClips(savePath+".mp4", endTimes);
+            mergeClips(savePath, endTimes);
         });
     }
 }
@@ -337,7 +338,7 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
     args << savePath;
 
     ffmpegMerge->start(SequenceExtractionHelper::getFfmpegPath(), args);
-    connect(ffmpegMerge, &QProcess::finished, this, [this, ffmpegMerge](int exitCode, QProcess::ExitStatus exitStatus){
+    connect(ffmpegMerge, &QProcess::finished, this, [this, ffmpegMerge, savePath](int exitCode, QProcess::ExitStatus exitStatus){
         if(exitStatus != QProcess::NormalExit || exitCode != 0){
             qDebug() << "Clip merge failed";
             qDebug() << "Exit Status : " << ffmpegMerge->exitStatus() << " exitCode : " << ffmpegMerge->exitCode() << "errors : " << ffmpegMerge->readAllStandardError();
@@ -350,6 +351,8 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             QFile::remove(clipPath);
         }
         m_clipsPaths.clear();
+
+        emit multiviewMergeCompleted(savePath);
     });
 
 }

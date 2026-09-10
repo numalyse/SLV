@@ -504,8 +504,9 @@ void MediaWidget::endRecord()
     auto& prefManager = PrefManager::instance();
     QString saveRecordPath = QFileDialog::getSaveFileName(
         this,
-        prefManager.getText("dialog_capture") + m_media->fileName() + "_record",
-        prefManager.getPref("Paths", "lp_capture")
+        prefManager.getText("save_recording"),
+        prefManager.getPref("Paths", "lp_capture") + '/' + m_media->fileName() + "_record_" + TimeFormatter::fileFormatMsToHHMMSSFF(m_startRecordTime, m_media->fps()) + "_to_" + TimeFormatter::fileFormatMsToHHMMSSFF(endTime, m_media->fps()),
+        PrefManager::instance().getText("export_type_mp4")
     );
 
     if (saveRecordPath.isEmpty()){
@@ -520,7 +521,8 @@ void MediaWidget::endRecord()
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);
 
-    QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_record_completed"));
+    createSnapshotPopup(saveRecordPath, -1);
+    //QMessageBox::information(this, "", PrefManager::instance().getText("messagebox_record_completed"));
 
     m_startRecordTime = -1;
 }

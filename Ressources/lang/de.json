@@ -114,6 +114,8 @@
     "export_type_unknown": "Alle Dateien (*.*)",
     "export_file_path_title": "Speichern unter...",
 
+    "save_recording": "Aufnahme speichern",
+
     "export_format_selection_title" : "Projektexport",
     "export_format_selection_txt" : "Exportformat auswählen",
     "export_format_selection_txt_tagImage" : "Sammlung von Referenzbildern",

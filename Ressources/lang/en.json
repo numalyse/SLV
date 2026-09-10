@@ -115,6 +115,8 @@
     "export_type_unknown": "All files (*.*)",
     "export_file_path_title": "Save as...",
 
+    "save_recording": "Save recording",
+
     "export_format_selection_title" : "Project export",
     "export_format_selection_txt" : "Select export format",
     "export_format_selection_txt_tagImage" : "Tag Frames Collection",

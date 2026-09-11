@@ -153,6 +153,7 @@
     "number_of_annotations" : "Número total de anotações",
     "shots" : "Planos",
     "export_source_selection_txt" : "Selecionar o conteúdo a exportar",
+    "average_shot_duration" : "Duração média dos planos",
 
     "compo_rule_None" : "Nenhum",
     "compo_rule_RuleOfThirds" : "Regra dos terços",

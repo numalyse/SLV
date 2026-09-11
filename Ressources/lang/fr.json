@@ -155,6 +155,7 @@
     "number_of_annotations" : "Nombre total d'annotations",
     "shots" : "Plans",
     "export_source_selection_txt" : "Sélectionner le contenu à exporter",
+    "average_shot_duration" : "Durée moyenne des plans",
 
     "compo_rule_None" : "Aucun",
     "compo_rule_RuleOfThirds" : "Tiers",

@@ -600,6 +600,7 @@ namespace ProjectExportHelper {
         out << "\n";
 
         int itemCount = items.size();
+        int64_t totalDurationMs = 0;
 
         for (int currItemId = 0; currItemId < itemCount; ++currItemId) {
 
@@ -614,7 +615,9 @@ namespace ProjectExportHelper {
             auto& item = items[currItemId];
             QString start = TimeFormatter::msToHHMMSSFF(item.start, fps);
             QString end = TimeFormatter::msToHHMMSSFF(item.end, fps);
-            QString itemDuration = TimeFormatter::msToHHMMSSFF(item.end - item.start, fps);
+            int64_t itemDurationMs = item.end - item.start;
+            totalDurationMs += itemDurationMs;
+            QString itemDuration = TimeFormatter::msToHHMMSSFF(itemDurationMs, fps);
 
             // Échappe les champs texte pour respecter le format CSV (guillemets, retours à la ligne, séparateur)
             auto csvField = [](QString text) -> QString {
@@ -632,6 +635,32 @@ namespace ProjectExportHelper {
                 out << ";" << csvField(item.soundTxt);
             }
             out << "\n";
+
+            // Ajout d'une ligne pour la moyenne de la durée des plans
+            // La durée moyenne est calculée en millisecondes, puis convertie en format HH:MM:SS:FF
+            // On met cette ligne 2 lignes après la dernière ligne de données
+
+            if (currItemId == itemCount - 1) {
+                double averageDurationMs = static_cast<double>(totalDurationMs) / itemCount;
+                QString averageDuration = TimeFormatter::msToHHMMSSFF(static_cast<int64_t>(averageDurationMs), fps);
+                out << "\n"
+                    << PrefManager::instance().getText("average_shot_duration")
+                    << ";"
+                    << "\"\""
+                    << ";"
+                    << "\"\""
+                    << ";"
+                    << "\"\""
+                    << ";"
+                    << csvField(averageDuration)
+                    << ";"
+                    << "\"\"";
+                if (hasSoundColumn) {
+                    out << ";" << "\"\"";
+                }
+                out << "\n";
+            }
+
         }
 
         file.close();

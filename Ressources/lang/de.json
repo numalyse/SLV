@@ -153,6 +153,7 @@
     "number_of_annotations" : "Anzahl der Anmerkungen",
     "shots" : "Schnitte",
     "export_source_selection_txt" : "Zu exportierenden Inhalt auswählen",
+    "average_shot_duration" : "Durchschnittliche Schnittdauer",
 
     "compo_rule_None" : "Keine",
     "compo_rule_RuleOfThirds" : "Drittelregel",

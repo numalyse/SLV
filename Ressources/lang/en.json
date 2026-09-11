@@ -154,6 +154,7 @@
     "number_of_annotations" : "Total number of annotations",
     "shots" : "Shots",
     "export_source_selection_txt" : "Select the content to export",
+    "average_shot_duration" : "Average shot duration",
 
     "compo_rule_None" : "None",
     "compo_rule_RuleOfThirds" : "Thirds",

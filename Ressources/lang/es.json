@@ -232,10 +232,16 @@
     "annotation_name" : "Nombre",
     "annotation_note" : "Nota",
     "annotation_conflict" : "Conflicto con otra anotación",
+
     "remove_all" : "Retirar todo",
-    "remove_all_items_playlist" : "Retirar playlist",
-    "tooltip_remove_all_items_playlist" : "Retirar todos los elementos de la playlist",
-    "remove_all_items" : "¿Desea retirar todos los elementos de la playlist ?",
+    "remove_existing_items" : "Retirar",
+    "keep_existing_items" : "Conservar",
+    "remove_all_items_playlist" : "Restablecer playlist",
+    "remove_all_items_playlist_before_loading" : "Restablecer antes de importar una nueva playlist",
+    "tooltip_remove_all_items_playlist" : "Restablecer todos los elementos de la playlist",
+    "remove_all_items" : "¿Desea retirar todos los elementos de la playlist?",
+    "ask_before_loading_playlist1" : "Antes de importar una nueva playlist",
+    "ask_before_loading_playlist2" : "¿Desea retirar los elementos existentes?",
         
     "duration" : "Duración",
 

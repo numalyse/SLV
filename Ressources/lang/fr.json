@@ -265,6 +265,7 @@
     "green" : "Vert",
     "blue" : "Bleu",
     "purple" : "Violet",
+
     "tooltip_linewidth" : "Épaisseur du trait",
     "tooltip_opacity" : "Opacité",
     "tooltip_eraser_tool" : "Gomme",
@@ -552,6 +553,7 @@
     "help_menu_stop_description" : "Remet le média à 0 et le met en pause.",
     "help_menu_eject_label" : "Éjecter",
     "help_menu_eject_description" : "Retire le média du lecteur.",
+
     "help_menu_change_media_label" : "Média précédent/suivant",
     "help_menu_change_media_description" : "Passe au média précédent/suivant dans l'ordre de la playlist.",
     "help_menu_slow_label" : "Modification de vitesse",
@@ -597,6 +599,7 @@
     "help_menu_rotate_description" : "Fait pivoter le média de 90° vers la droite. \n ⚠️ Si le média est en pause, l'écran reste noir. Relancer la lecture réaffiche le média avec la transformation appliquée.",
     "help_menu_invert_h_label" : "Retourner",
     "help_menu_invert_h_description" : "Retourne le média horizontalement ou verticalement. \n ⚠️ Si le média est en pause, l'écran reste noir. Relancer la lecture réaffiche le média avec la transformation appliquée.",
+    
     "help_menu_timeline_off_label" : "Timeline détaillée",
     "help_menu_timeline_off_description" : "Affiche la timeline détaillée du média.",
     "help_menu_enter_multiview_content_1" : "Il est possible d'afficher de 1 à 4 lecteurs en simultané. En mode multi-vues (lorsqu'il y a 2 lecteurs ou plus), chaque média possède sa propre barre d'outils simplifiée dédiée et une barre d'outil globale apparaît en bas pour effectuer des opérations sur l'ensemble des médias.",
@@ -606,6 +609,7 @@
     "help_menu_global_toolbar_content_2" : "La capture d'écran combinée prend une capture d'écran de chaque média présent, puis combine chacune des captures en une seule image en gardant la disposition des lecteurs. Les captures d'écrans sont enregistrées dans le dossier indiqué dans les préférences (modifiable, enregistré dans NumalysePlayer_Content par défaut).",
     "help_menu_access_playlist_content_1" : "Une playlist peut être créée en ajoutant les médias voulus. Pour accéder à la playlist, cliquez sur le bouton de panneau latéral situé en haut à droite de la fenêtre (la playlist n'est pas disponible en mode multi-vues).",
     "help_menu_manage_items_content_1" : "Les éléments de la playlist sont composés du titre du média correspondant, de sa durée, de son type, d'une miniature et de son numéro dans la liste. Cliquez sur le bouton + pour ajouter des médias à la playlist et sur l'icône de corbeille pour retirer le média de la playlist. Il est aussi possible de déplacer les éléments en les glissant pour changer l'ordre de lecture.",
+    
     "help_menu_playlist_loop_label" : "Boucle",
     "help_menu_playlist_loop_description" : "Si activée, passe au média suivant lorsque le média actuel est terminé.",
     "help_menu_playlist_shuffle_label" : "Aléatoire",
@@ -616,6 +620,7 @@
     "help_menu_playlist_delete_description" : "Retire tous les éléments de la playlist. Un message de confirmation s'affiche.",
     "help_menu_timeline_display_content_1" : "La timeline détaillée offre une visualisation sur l'audio (barre violette) et sur les différents plans de la vidéo (barre bleue). Les plans sont annotables et peuvent être ajoutés manuellement ou automatiquement. Les vidéos segmentées sont enregistrables sous forme de projets et exportables en divers formats.",
     "help_menu_timeline_display_content_2" : "La timeline comporte une échelle temporelle, un affichage de la vidéo en bleu avec une image de début de plan, un affichage de l'audio en violet avec l'onde sonore correspondante et de boutons pour modifier les plans. Par défaut, la timeline ne dispose que d'un seul plan. Il est possible de zoomer sur la timeline en utilisant la molette, sélectionner un plan avec un clic gauche (ctrl+clic gauche pour en sélectionner plusieurs), se déplacer horizontalement avec shift+clic gauche. Des actions supplémentaires sont disponibles en faisant clic droit sur les plans.",
+    
     "help_menu_abloop_label" : "Boucle AB",
     "help_menu_abloop_description" : "Cliquer : placer un marqueur AB à la position actuelle. Une fois les deux marqueurs placés, la vidéo boucle sur l'intervalle et la séquence peut être sauvegardée. Cliquer à nouveau pour retirer les marqueurs.",
     "help_menu_auto_segmentation_label" : "Segmentation automatique",

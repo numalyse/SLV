@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Unisci con il piano precedente",
     "tooltip_merge_with_next_shot": "Unisci con il piano successivo",
     "tooltip_export": "Esporta",
+
     "tooltip_reposition_toolbar" : "Ripristina la posizione della barra degli strumenti",
 
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
@@ -104,6 +105,7 @@
     "export_running": "Esportazione in corso...",
     "export_directory_path_title": "Seleziona cartella di esportazione",
     "export_directory_tagimages": "Seleziona la posizione di salvataggio delle Immagini-Riferimento",
+    "export_subfolder_tagimages": "Salvare in una sottocartella",
     "export_type_txt": "File di testo (*.txt)",
     "export_type_pdf": "Documento PDF (*.pdf)",
     "export_type_pptx": "Presentazione PowerPoint (*.pptx)",
@@ -497,6 +499,7 @@
     "extract_sequence_progress_text" : "Estrazione della sequenza in corso...",
 
     "help_menu_general_category" : "Generale",
+    "help_menu_introduction_label" : "Introduzione",
     "help_menu_formats_label" : "Formati di esportazione",
     "help_menu_report_issues_label" : "Segnala un problema",
     "help_menu_classic_category" : "Visualizzazione a vista singola",
@@ -522,6 +525,7 @@
     "help_menu_access_playlist_label" : "Accedi alla playlist",
     "help_menu_manage_playlist_label" : "Gestisci elementi dell'elenco",
     "help_menu_playlist_buttons_label" : "Pulsanti della playlist",
+    "help_menu_playlist_toolbar_label" : "Barra degli strumenti della playlist",
 
     "help_menu_timeline_category" : "Timeline dettagliata",
     "help_menu_timeline_display_label" : "Visualizza la timeline dettagliata",
@@ -541,12 +545,15 @@
     "help_menu_open_files_content_2" : "È anche possibile aprire file multimediali trascinando e rilasciando il file desiderato nell'area nera del lettore.",
     "help_menu_classic_toolbar_content_1" : "Viene visualizzata una barra degli strumenti sotto il file multimediale associato. Consente di eseguire varie operazioni sul file multimediale.",
     "help_menu_classic_toolbar_buttons_description" : "Descrizione dei pulsanti della barra degli strumenti",
-    "help_menu_play_pause_label" : "Riproduci/Pausa",
-    "help_menu_play_pause_description" : "Consente di riprodurre o mettere in pausa il file multimediale.",
+    "help_menu_play_label" : "Riproduci",
+    "help_menu_play_description" : "Riproduce il file multimediale.",
+    "help_menu_pause_label" : "Pausa",
+    "help_menu_pause_description" : "Mette in pausa il file multimediale.",
     "help_menu_stop_label" : "Ferma",
     "help_menu_stop_description" : "Riporta il file multimediale a 0 e lo mette in pausa.",
     "help_menu_eject_label" : "Espelli",
     "help_menu_eject_description" : "Rimuove il file multimediale dal lettore.",
+
     "help_menu_change_media_label" : "File multimediale precedente/successivo",
     "help_menu_change_media_description" : "Passa al file multimediale precedente/successivo nell'ordine della playlist.",
     "help_menu_slow_label" : "Modifica della velocità",
@@ -570,8 +577,8 @@
     "help_menu_duplicate_media_description" : "Permette di duplicare il media selezionato in un nuovo player. Le modifiche sul duplicato si applicano solo a quest'ultimo.",
     "help_menu_fullscreen_label" : "Schermo intero",
     "help_menu_fullscreen_description" : "Attiva o disattiva la modalità schermo intero.",
-    "help_menu_right_arrow_label" : "Barra degli strumenti estesa",
-    "help_menu_right_arrow_description" : "Apre la barra degli strumenti estesa.",
+    "help_menu_plus_label" : "Barra degli strumenti estesa",
+    "help_menu_plus_description" : "Apre la barra degli strumenti estesa.",
 
     "help_menu_extended_toolbar_buttons_description" : "Descrizione dei pulsanti della barra strumenti estesa",
     "help_menu_show_image_label" : "Nascondi media",
@@ -592,6 +599,7 @@
     "help_menu_rotate_description" : "Ruota il media di 90° verso destra. \n ⚠️ Se il media è in pausa lo schermo rimane nero. Riavvia la riproduzione per visualizzare la trasformazione.",
     "help_menu_invert_h_label" : "Capovolgi",
     "help_menu_invert_h_description" : "Capovolge il media orizzontalmente o verticalmente. \n ⚠️ Se il media è in pausa lo schermo rimane nero. Riavvia la riproduzione per visualizzare la trasformazione.",
+
     "help_menu_timeline_off_label" : "Timeline dettagliata",
     "help_menu_timeline_off_description" : "Mostra la timeline dettagliata del media.",
     "help_menu_enter_multiview_content_1" : "È possibile visualizzare da 1 a 4 player contemporaneamente. In modalità multi-vista (con 2 o più player), ogni media ha la propria barra degli strumenti semplificata e appare una barra globale in basso per operazioni su tutti i media.",
@@ -601,6 +609,7 @@
     "help_menu_global_toolbar_content_2" : "La funzione screenshot combinato cattura un'immagine di ogni media presente e le combina in un'unica immagine mantenendo la disposizione dei player. Gli screenshot vengono salvati nella cartella impostata nelle preferenze (di default NumalysePlayer_Content).",
     "help_menu_access_playlist_content_1" : "Una playlist può essere creata aggiungendo i media desiderati. Per accedere alla playlist, fai clic sul pulsante del pannello laterale in alto a destra (non disponibile in multi-vista).",
     "help_menu_manage_items_content_1" : "Gli elementi della playlist sono composti da titolo, durata, tipo, miniatura e dalla loro posizione nell'elenco. Fai clic su + per aggiungere media e sull'icona del cestino per rimuoverli. È anche possibile spostare gli elementi con drag & drop.",
+
     "help_menu_playlist_loop_label" : "Loop",
     "help_menu_playlist_loop_description" : "Se abilitato, passa al media successivo quando il corrente termina.",
     "help_menu_playlist_shuffle_label" : "Casuale",
@@ -611,15 +620,22 @@
     "help_menu_playlist_delete_description" : "Rimuove tutti gli elementi dalla playlist. Verrà mostrata una conferma.",
     "help_menu_timeline_display_content_1" : "La timeline dettagliata offre una visualizzazione dell'audio (barra viola) e dei diversi piani del video (barra blu). I piani sono annotabili e possono essere aggiunti manualmente o automaticamente. I video segmentati possono essere salvati come progetti ed esportati in vari formati.",
     "help_menu_timeline_display_content_2" : "La timeline presenta una scala temporale, una visualizzazione video in blu con l'immagine iniziale del piano, una visualizzazione audio in viola con la forma d'onda e pulsanti per modificare i piani. Per impostazione predefinita c'è un solo piano. È possibile ingrandire la timeline utilizzando la rotellina del mouse, selezionare un fotogramma con un clic sinistro (Ctrl+clic sinistro per selezionarne più di uno) e spostarsi orizzontalmente con Shift+clic sinistro. Cliccando con il tasto destro sui fotogrammi sono disponibili ulteriori opzioni.",
+
     "help_menu_abloop_label" : "Loop A-B",
     "help_menu_abloop_description" : "Clic: posiziona un marcatore A/B alla posizione corrente. Una volta posizionati entrambi i marker, il video esegue il loop su quel intervallo; un altro clic rimuove i marker.",
     "help_menu_auto_segmentation_label" : "Segmentazione automatica",
     "help_menu_auto_segmentation_description" : "Calcola automaticamente le transizioni nel video e applica il risultato alla timeline. La segmentazione precedente viene sovrascritta.",
     "help_menu_split_shot_label" : "Taglia il piano",
     "help_menu_split_shot_description" : "Divide il piano nella posizione corrente in due piani.",
-    "help_menu_merge_label" : "Unisci piani",
+    "help_menu_merge_left_label" : "Unisci il piano a sinistra",
+    "help_menu_merge_right_label" : "Unisci il piano a destra ",
+    "help_menu_merge_left_description" : "Unisce il piano corrente con quello precedente.",
+    "help_menu_merge_right_description" : "Unisce il piano corrente con quello successivo.",
     "help_menu_merge_description" : "Unisce il piano corrente con quello precedente/successivo.",
-    "help_menu_change_shot_label" : "Piano precedente/successivo",
+    "help_menu_to_prev_shot_label" : "Piano precedente",
+    "help_menu_to_next_shot_label" : "Piano successivo",
+    "help_menu_to_prev_shot_description" : "Vai al piano precedente",
+    "help_menu_to_next_shot_description" : "Vai al piano successivo",
     "help_menu_change_shot_description" : "Imposta il timecode all'inizio del piano precedente/successivo.",
     "help_menu_shot_detail_label" : "Informazioni sul piano",
     "help_menu_shot_detail_description" : "Apre le informazioni del piano nel pannello laterale. Titolo e note del piano sono modificabili.",
@@ -627,6 +643,9 @@
     "help_menu_export_description" : "Apre un dialogo per scegliere il formato di esportazione del progetto.",
     "help_menu_shot_infos_content_1" : "Le informazioni del piano corrente sono visualizzabili con il pulsante del pannello laterale in alto a destra o tramite il pulsante corrispondente nella timeline. Mostra numerazione, titolo, inizio, fine e durata come timecode, note e l'immagine di riferimento del piano. I campi titolo e note sono modificabili.",
     "help_menu_exportation_content_1" : "Il progetto corrente può essere salvato tramite il menu 'File' → 'Salva'. I progetti possono essere esportati in formato testo (.txt e .docx), PDF, PowerPoint, come video annotato (titoli e note per piano) e come Immagini-Riferimento (tutte le immagini vengono salvate nella cartella indicata).",
+
+    "help_menu_open_annot_label" : "Annotazioni",
+    "help_menu_open_annot_description" : "Apre il pannello delle annotazioni",
 
     "project_manager_error_folder_not_found": "Impossibile trovare la cartella del progetto.",
     "project_manager_error_json_file_not_found": "Il file di salvataggio del progetto non è stato trovato.",
@@ -644,6 +663,5 @@
     "project_manager_error_media_mismatch_duration": "Il media attuale è diverso da quello del progetto (la durata è cambiata).",
     "project_manager_error_unexpected_error": "Si è verificato un errore sconosciuto.",
     "project_error_copy_failed": "La copia del file è fallita. Riprova o controlla lo spazio sul disco."
-
 
 }

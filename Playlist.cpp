@@ -430,9 +430,8 @@ void Playlist::addItemsViaButton(const QStringList &filesPaths)
     // qDebug() << "PLAYLIST - Liste m_itemsShuffleOrder : " << m_itemsShuffleOrder;
 }
 
-void Playlist::deleteAllItemsDialog()
+void Playlist::deleteAllItemsDialog(bool loadPlaylistRequested)
 {
-
     auto& prefManager = PrefManager::instance();
 
     QDialog dialog;
@@ -467,7 +466,7 @@ void Playlist::deleteAllItemsDialog()
 
     QLabel* titleLabel = new QLabel;
     titleLabel->setAlignment(Qt::AlignCenter);
-    titleLabel->setText(prefManager.getText("remove_all_items_playlist"));
+    titleLabel->setText(loadPlaylistRequested ? prefManager.getText("remove_all_items_playlist_before_loading") : prefManager.getText("remove_all_items_playlist"));
 
     QFont titleFont = titleLabel->font();
     titleFont.setPointSize(12);
@@ -481,14 +480,14 @@ void Playlist::deleteAllItemsDialog()
     textLabel->setFont(textFont);
     textLabel->setAlignment(Qt::AlignCenter);
     textLabel->setTextFormat(Qt::RichText);
-    textLabel->setText(
-                        prefManager.getText("remove_all_items") + "<br>" +
-                        "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i><br>");
+    textLabel->setText(loadPlaylistRequested ? 
+                        prefManager.getText("ask_before_loading_playlist1") + "<br>" + prefManager.getText("ask_before_loading_playlist2") : 
+                        prefManager.getText("remove_all_items") + "<br>" + "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i><br>");
     layout.addWidget(textLabel);
 
     QHBoxLayout* btnLayout = new QHBoxLayout;
-    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("remove_all"));
-    QPushButton* cancelBtn = new QPushButton(prefManager.getText("generic_dialog_btn_cancel"));
+    QPushButton* deleteAllBtn = new QPushButton(loadPlaylistRequested ? prefManager.getText("remove_existing_items") : prefManager.getText("remove_all"));
+    QPushButton* cancelBtn = new QPushButton(loadPlaylistRequested ? prefManager.getText("keep_existing_items") : prefManager.getText("generic_dialog_btn_cancel"));
 
     QFont btnFont = deleteAllBtn->font();
     btnFont.setPointSize(10);
@@ -940,13 +939,19 @@ void Playlist::sortPlaylist(int id, bool checked)
 
 void Playlist::loadPlaylist()
 {
+    if(!m_items.isEmpty()){
+        deleteAllItemsDialog(true);
+    }
+
     QString loadPath = QFileDialog::getOpenFileName(nullptr, PrefManager::instance().getText("tooltip_import_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
                                                     PrefManager::instance().getText("file_playlist") + "(*.xspf)");
     if(loadPath.isEmpty())
         return;
-    deleteAllItems(false);
+
     QStringList paths = SLV::loadPlaylist(loadPath);
+
     addItemsViaButton(paths);
+
 }
 
 void Playlist::updateDurationPlaylist()

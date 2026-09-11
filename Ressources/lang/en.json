@@ -234,10 +234,16 @@
     "annotation_name" : "Name",
     "annotation_note" : "Note",
     "annotation_conflict" : "Conflicts with another annotation",
+
     "remove_all" : "Remove all",
-    "remove_all_items_playlist" : "Remove playlist",
+    "remove_existing_items" : "Remove",
+    "keep_existing_items" : "Keep",
+    "remove_all_items_playlist" : "Reset playlist",
+    "remove_all_items_playlist_before_loading" : "Reset playlist before importing a new one",
     "tooltip_remove_all_items_playlist" : "Remove all items in the playlist",
     "remove_all_items" : "Do you want to remove all items in the playlist ?",
+    "ask_before_loading_playlist1" : "Before importing a new playlist",
+    "ask_before_loading_playlist2" : "do you want to remove the existing items?",
     
     "duration" : "Duration",
 

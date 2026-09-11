@@ -233,10 +233,16 @@
     "annotation_name" : "Name",
     "annotation_note" : "Notiz",
     "annotation_conflict" : "Konflikt mit einer anderen Anmerkung",
+
     "remove_all" : "Alle entfernen",
-    "remove_all_items_playlist" : "Playlist entfernen",
-    "tooltip_remove_all_items_playlist" : "Alle Elemente der Playlist entfernen",
-    "remove_all_items" : "Möchten Sie alle Elemente der Playlist entfernen ?",
+    "remove_existing_items" : "Entfernen",
+    "keep_existing_items" : "Beibehalten",
+    "remove_all_items_playlist" : "Playlist zurücksetzen",
+    "remove_all_items_playlist_before_loading" : "Playlist vor dem Importieren zurücksetzen",
+    "tooltip_remove_all_items_playlist" : "Alle Elemente aus der Playlist entfernen",
+    "remove_all_items" : "Möchten Sie alle Elemente aus der Playlist entfernen?",
+    "ask_before_loading_playlist1" : "Vor dem Importieren einer neuen Playlist",
+    "ask_before_loading_playlist2" : "möchten Sie die vorhandenen Elemente entfernen?",
 
     "duration" : "Dauer",
 

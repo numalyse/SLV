@@ -492,7 +492,9 @@ void MediaWidget::disableZoomMode()
 void MediaWidget::startRecord()
 {
     if(!m_player || !m_media) return;
+    m_startRecordTime = getCurrentTime();
     m_videoCaptureManager.startMediaRecording(getCurrentTime());
+    play();
 }
 
 void MediaWidget::endRecord()
@@ -511,6 +513,7 @@ void MediaWidget::endRecord()
 
     if (saveRecordPath.isEmpty()){
         qDebug() << "[MediaWidget] Enregistrement de la capture annulé";
+        m_startRecordTime = -1;
         return;
     }
 

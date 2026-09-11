@@ -7,7 +7,8 @@
             "general_timeline_shot_image" : "shot_start_image" 
         },
         "Exports" : {
-            "sequence_extraction_audio_format" : "audio_format_mp3"
+            "sequence_extraction_audio_format" : "audio_format_mp3",
+            "sequence_extraction_method" : "0"
         }
     },
     "Paths" : {

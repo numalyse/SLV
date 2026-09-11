@@ -61,7 +61,7 @@ signals:
 
 public slots:
     void addItemDialog();
-    void deleteAllItemsDialog();
+    void deleteAllItemsDialog(const bool loadPlaylistRequested = false);
     void insertItemsFromPaths(const QStringList &filesPaths, int insertionIndex);
     void addItemsViaButton(const QStringList &filesPaths);
     void deleteItem(const unsigned int index);

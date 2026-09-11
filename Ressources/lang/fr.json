@@ -234,10 +234,16 @@
     "annotation_name" : "Nom",
     "annotation_note" : "Note",
     "annotation_conflict" : "Conflit avec une autre annotation",
+
     "remove_all" : "Tout retirer",
+    "remove_existing_items" : "Retirer",
+    "keep_existing_items" : "Conserver",
     "remove_all_items_playlist" : "Réinitialiser la playlist",
+    "remove_all_items_playlist_before_loading" : "Réinitialiser la playlist avant nouvelle importation",
     "tooltip_remove_all_items_playlist" : "Retirer tous les éléments de la playlist",
     "remove_all_items" : "Voulez-vous retirer tous les éléments de la playlist ?",
+    "ask_before_loading_playlist1" : "Avant d'importer une nouvelle playlist",
+    "ask_before_loading_playlist2" : "souhaitez-vous retirer les éléments existants ?",
 
     "duration" : "Durée",
 

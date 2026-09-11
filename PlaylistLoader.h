@@ -15,6 +15,9 @@ void savePlaylist(const QVector<PlaylistItem *>& items, const QVector<unsigned i
     QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("tooltip_save_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
                                                     PrefManager::instance().getText("file_playlist") + " " + "(*.xspf)");
     // savePath += ".xspf";
+    if(QFile(savePath).exists()){
+        QFile::remove(savePath);
+    }
     QFile *playlistFile = new QFile(savePath);
     if ( playlistFile->open(QIODevice::ReadWrite | QIODevice::Append) )
     {

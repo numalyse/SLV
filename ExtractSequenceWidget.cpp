@@ -95,9 +95,17 @@ void ExtractSequenceWidget::createButtons()
         }
     });
     connect(m_methodChoice, &QComboBox::currentIndexChanged, [this](int index){
+        PrefManager::instance().setPref("General", "Exports", "sequence_extraction_method", QString::number(index));
         if(index == 1) m_warningMsg->show();
         else m_warningMsg->hide();
     });
+
+    bool ok = false;
+    int savedMethodIndex = PrefManager::instance().getPref("General", "Exports", "sequence_extraction_method").toInt(&ok);
+    if(!ok || savedMethodIndex < 0 || savedMethodIndex >= m_methodChoice->count()) {
+        savedMethodIndex = 0;
+    }
+    m_methodChoice->setCurrentIndex(savedMethodIndex);
     // connect(m_losslessButton, &QPushButton::released, this, [this](){
     //     confirmExtraction(SequenceExtractionHelper::ExtractionType::Lossless);
     // });

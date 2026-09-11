@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Fundir com o plano anterior",
     "tooltip_merge_with_next_shot": "Fundir com o plano seguinte",
     "tooltip_export": "Exportar",
+
     "tooltip_reposition_toolbar" : "Repor a posição da barra de ferramentas",
 
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
@@ -104,6 +105,7 @@
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",
     "export_directory_tagimages": "Selecionar local de salvamento das Imagens-Referência",
+    "export_subfolder_tagimages": "Guardar numa subpasta",
     "export_type_txt": "Ficheiro de texto (*.txt)",
     "export_type_pdf": "Documento PDF (*.pdf)",
     "export_type_pptx": "Apresentação PowerPoint (*.pptx)",

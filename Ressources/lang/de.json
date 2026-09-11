@@ -84,6 +84,7 @@
     "tooltip_merge_with_prev_shot": "Mit vorherigem Schnitt zusammenführen",
     "tooltip_merge_with_next_shot": "Mit nächstem Schnitt zusammenführen",
     "tooltip_export": "Exportieren",
+
     "tooltip_reposition_toolbar" : "Position der Werkzeugleiste zurücksetzen",
 
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
@@ -104,6 +105,7 @@
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",
     "export_directory_tagimages": "Speicherort für Referenzbilder auswählen",
+    "export_subfolder_tagimages": "In einem Unterordner speichern",
     "export_type_txt": "Textdatei (*.txt)",
     "export_type_pdf": "PDF-Dokument (*.pdf)",
     "export_type_pptx": "PowerPoint-Präsentation (*.pptx)",

@@ -478,8 +478,11 @@
     "open_more_than_four_files_title" : "Seleção de múltiplas mídias",
     "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. Deseja carregar sua seleção na playlist?",
 
-    "project_exportation_finished" : "A exportação da mídia foi concluída com sucesso.",
+    "project_exportation_finished" : "Exportação concluída",
+    "project_exportation_desc" : "A exportação da mídia foi concluída com sucesso.",
     "project_exportation_error" : "Ocorreu um erro durante a exportação.",
+    "project_exportation_ask_open_directory" : "Deseja abrir a pasta que contém este ficheiro?",
+    "project_exportation_open_directory" : "Abrir pasta",
     "open_file_directory" : "Abrir local do arquivo",
 
     "messagebox_format_not_accepted" : "Um dos arquivos selecionados possui um formato não suportado.",

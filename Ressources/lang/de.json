@@ -478,8 +478,11 @@
     "open_more_than_four_files_title" : "Auswahl mehrerer Mediendateien",
     "open_more_than_four_files_dialog" : "Der Medienplayer ist auf 4 gleichzeitige Mediendateien beschränkt. Möchten Sie Ihre Auswahl zur Wiedergabeliste hinzufügen?",
 
-    "project_exportation_finished" : "Der Medienexport wurde erfolgreich abgeschlossen.",
+    "project_exportation_finished" : "Export abgeschlossen",
+    "project_exportation_desc" : "Der Medienexport wurde erfolgreich abgeschlossen.",
     "project_exportation_error" : "Beim Export ist ein Fehler aufgetreten.",
+    "project_exportation_ask_open_directory" : "Möchten Sie den Ordner öffnen, der diese Datei enthält?",
+    "project_exportation_open_directory" : "Ordner öffnen",
     "open_file_directory" : "Dateispeicherort öffnen",
 
     "messagebox_format_not_accepted" : "Eine der ausgewählten Dateien hat ein nicht unterstütztes Format.",

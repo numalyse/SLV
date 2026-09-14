@@ -478,8 +478,11 @@
     "open_more_than_four_files_title" : "Selección de varios medios",
     "open_more_than_four_files_dialog" : "El reproductor multimedia está limitado a 4 medios simultáneos. ¿Desea cargar su selección en la lista de reproducción?",
 
-    "project_exportation_finished" : "La exportación del medio se completó correctamente.",
+    "project_exportation_finished" : "Exportación completada",
+    "project_exportation_desc" : "La exportación del medio se completó correctamente.",
     "project_exportation_error" : "Ocurrió un error durante la exportación.",
+    "project_exportation_ask_open_directory" : "¿Desea abrir la carpeta que contiene este archivo?",
+    "project_exportation_open_directory" : "Abrir carpeta",
     "open_file_directory" : "Abrir ubicación del archivo",
 
     "messagebox_format_not_accepted" : "Uno de los archivos seleccionados tiene un formato no compatible.",

@@ -478,8 +478,11 @@
     "open_more_than_four_files_title" : "Multiple media selection",
     "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?",
 
-    "project_exportation_finished" : "The media export was completed successfully.",
+    "project_exportation_finished" : "Export completed",
+    "project_exportation_desc" : "The media export was completed successfully.",
     "project_exportation_error" : "An error occurred during export",
+    "project_exportation_ask_open_directory" : "Would you like to open the folder containing this file?",
+    "project_exportation_open_directory" : "Open folder",
     "open_file_directory" : "Open file location",
 
     "messagebox_format_not_accepted" : "One of the selected files has an unsupported format.",

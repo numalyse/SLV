@@ -116,6 +116,10 @@ private:
     explicit ProjectManager(QObject* parent = nullptr);
     ~ProjectManager();
 
+    bool m_isDarkMode = true;
+    QColor m_palbtnColor;
+    QString m_palbtnColorStr;
+
     Project* m_project = nullptr;
     bool m_needSave = false;
     bool m_isDurationParsed = false;

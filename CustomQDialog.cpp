@@ -19,7 +19,6 @@ CustomQDialog::CustomQDialog(
     const QString& texte,
     const QString& bouton1,
     const QString& bouton2,
-    const QString& path,
     QWidget* parent
 )
     : QDialog(parent)
@@ -27,7 +26,6 @@ CustomQDialog::CustomQDialog(
     , m_texte(texte)
     , m_bouton1(bouton1)
     , m_bouton2(bouton2)
-    , m_path(path)
 {
     setupUi();
     setupColors();
@@ -119,7 +117,7 @@ void CustomQDialog::setupUi()
         m_button1,
         &QPushButton::clicked,
         this,
-        &CustomQDialog::onCloseClicked
+        &CustomQDialog::onRejectClicked
     );
 
     if (m_button2)
@@ -128,7 +126,7 @@ void CustomQDialog::setupUi()
             m_button2,
             &QPushButton::clicked,
             this,
-            &CustomQDialog::onPathClicked
+            &CustomQDialog::onAcceptClicked
         );
     }
 }
@@ -198,27 +196,12 @@ void CustomQDialog::setupStyle()
 
 }
 
-void CustomQDialog::onCloseClicked()
+void CustomQDialog::onRejectClicked()
 {
-    accept();
+    reject();
 }
 
-void CustomQDialog::onPathClicked()
+void CustomQDialog::onAcceptClicked()
 {
-    if (m_path.isEmpty())
-        return;
-
-    QFileInfo fi(m_path);
-#ifdef Q_OS_WIN
-    QStringList args;
-    args << "/select," << QDir::toNativeSeparators(fi.absoluteFilePath());
-    QProcess::startDetached("explorer.exe", args);
-#elif defined(Q_OS_MACOS)
-    QProcess::startDetached("open", QStringList() << "-R" << fi.absoluteFilePath());
-#else
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absolutePath()));
-#endif
-
     accept();
-
 }

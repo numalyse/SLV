@@ -17,15 +17,14 @@ public:
         const QString& texte,
         const QString& bouton1,
         const QString& bouton2 = QString(),
-        const QString& path = QString(),
         QWidget* parent = nullptr
     );
 
     ~CustomQDialog() override = default;
 
 private slots:
-    void onCloseClicked();
-    void onPathClicked();
+    void onRejectClicked();
+    void onAcceptClicked();
 
 private:
     void setupUi();
@@ -37,7 +36,6 @@ private:
     QString m_texte;
     QString m_bouton1;
     QString m_bouton2;
-    QString m_path;
 
     QLabel* m_titleLabel = nullptr;
     QLabel* m_textLabel = nullptr;

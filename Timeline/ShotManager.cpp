@@ -121,6 +121,13 @@ void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* aud
             updateSelectedNumbers();
         }
     }
+
+    // qDebug to show the different elements selected
+    qDebug() << " [SHOTMANAGER]  Selected shots : ";
+    for(int ISelectedShots = 0; ISelectedShots < m_selectedShots.size(); ++ISelectedShots){
+        qDebug() << " [SHOTMANAGER]  Selected shot " << ISelectedShots << " : " << m_selectedShots[ISelectedShots].first->shot().start << " - " << m_selectedShots[ISelectedShots].first->shot().end;
+    }
+
     emit selectedShotCountUpdated(static_cast<int>(m_selectedShots.size()));
 }
 
@@ -166,6 +173,12 @@ void ShotManager::extractShotsSelected(const QString& outputPath)
 
     for(int ISelectedShot = 1; ISelectedShot < m_selectedShots.size(); ++ISelectedShot){
         m_videoCaptureManager.mediaCutAndConcat(m_selectedShots[ISelectedShot-1].first->shot().end, m_selectedShots[ISelectedShot].first->shot().start);
+    }
+
+    qDebug() << "[ShotManager] Shots sélectionnés (ordre choisi) :";
+    for(int i = 0; i < m_selectedShots.size(); ++i){
+        qDebug() << "  [" << i << "] start =" << m_selectedShots[i].first->shot().start
+                << " end =" << m_selectedShots[i].first->shot().end;
     }
     m_videoCaptureManager.endMediaRecording(m_selectedShots.last().first->shot().end, outputPath);
 

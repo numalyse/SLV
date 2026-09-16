@@ -49,28 +49,28 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
     createButtons();
     initUiLayout();
     connect(this, &QDialog::finished, this, [this](int res){ if(res == QDialog::Accepted){
-            // QMessageBox msg;
-            // QPushButton *openDirBtn = msg.addButton(
-            //     PrefManager::instance().getText("open_file_directory"),
-            //     QMessageBox::AcceptRole);
-            // msg.setStandardButtons(QMessageBox::StandardButton::Ok);
-            // msg.setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
-            // msg.setIcon(QMessageBox::Information);
-            // msg.exec();
-
-            // if (msg.clickedButton() == openDirBtn) {
-            //     QFileInfo fi(m_selectedPath);
-            //     QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
-            // }
-
-            CustomQDialog dialog(
-                PrefManager::instance().getText("messagebox_extract_sequence_completed"),
-                PrefManager::instance().getText("messagebox_extract_sequence_completed"),
-                PrefManager::instance().getText("close"),
+            QMessageBox msg;
+            QPushButton *openDirBtn = msg.addButton(
                 PrefManager::instance().getText("open_file_directory"),
-                m_selectedPath
-                );
-            dialog.exec();
+                QMessageBox::AcceptRole);
+            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            msg.setInformativeText(PrefManager::instance().getText("messagebox_extract_sequence_completed"));
+            msg.setIcon(QMessageBox::Information);
+            msg.exec();
+
+            if (msg.clickedButton() == openDirBtn) {
+                QFileInfo fi(m_selectedPath);
+                QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+            }
+
+            // CustomQDialog dialog(
+            //     PrefManager::instance().getText("messagebox_extract_sequence_completed"),
+            //     PrefManager::instance().getText("messagebox_extract_sequence_completed"),
+            //     PrefManager::instance().getText("close"),
+            //     PrefManager::instance().getText("open_file_directory"),
+            //     m_selectedPath
+            //     );
+            // dialog.exec();
 
             // if (dialog.exec() == QDialog::Accepted) {
             //     // QFileInfo fi(m_selectedPath);

@@ -87,6 +87,9 @@
 
     "tooltip_reposition_toolbar" : "Ripristina la posizione della barra degli strumenti",
 
+    "dialog_save_multiview_video" : "Salva registrazione multiview",
+    "dialog_save_extract_shots" : "Salva estrazione piani",
+
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",
     "timeline_ab_action_1": "Aggiungi marcatore B al cursore",

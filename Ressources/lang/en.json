@@ -87,6 +87,9 @@
 
     "tooltip_reposition_toolbar" : "Reset toolbar position",
 
+    "dialog_save_multiview_video" : "Save multiview recording",
+    "dialog_save_extract_shots" : "Save shots extraction",
+
     "timeline_split_shot_at_cursor" : "Cut at cursor",
     "timeline_ab_action_0": "Add marker A at cursor",
     "timeline_ab_action_1": "Add marker B at cursor",

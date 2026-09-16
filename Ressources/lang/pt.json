@@ -87,6 +87,9 @@
 
     "tooltip_reposition_toolbar" : "Repor a posição da barra de ferramentas",
 
+    "dialog_save_multiview_video" : "Guardar gravação multivistas",
+    "dialog_save_extract_shots" : "Guardar extração de planos",
+
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
     "timeline_ab_action_0": "Adicionar marcador A no cursor",
     "timeline_ab_action_1": "Adicionar marcador B no cursor",

@@ -150,24 +150,30 @@ public:
              << "-i" << filePath
              << "-t" << QString::number(duration)+"ms";
 
-        switch (exportType)
-        {
-        case ExtractionType::AudioOnly:
-            if (userAudioPreference == AudioFormat::AAC) {
-                args << "-vn" << "-map" << "0:a"
-                     << "-c:a" << "aac" << "-b:a" << "320k";
-            }else {
-                args << "-vn" << "-map" << "0:a:"+QString::number(audioTrack)
-                     << "-c:a" << "libmp3lame" << "-q:a" << "2";
-            }
-            break;
-        case ExtractionType::Original:
-        default:
-            args << "-map" << "0:v"
-                 << "-map" << "0:a?"
-                 << "-map" << "0:s?"
-                 << "-c" << "copy";
-            break;
+        switch (exportType){
+            case ExtractionType::AudioOnly:
+                if (userAudioPreference == AudioFormat::AAC) {
+                    args << "-vn" << "-map" << "0:a"
+                        << "-c:a" << "aac" << "-b:a" << "320k";
+                }else {
+                    args << "-vn" << "-map" << "0:a:"+QString::number(audioTrack)
+                        << "-c:a" << "libmp3lame" << "-q:a" << "2";
+                }
+                break;
+            case ExtractionType::Reencode:
+                args << "-map" << "0:v:0"
+                    << "-map" << "0:a?"
+                    << "-map" << "0:s?"
+                    << "-c:v" << "libx264" << "-preset" << "veryfast" << "-crf" << "18"
+                    << "-c:a" << "aac" << "-b:a" << "320k";
+                break;
+            case ExtractionType::Original:
+            default:
+                args << "-map" << "0:v"
+                    << "-map" << "0:a?"
+                    << "-map" << "0:s?"
+                    << "-c" << "copy";
+                break;
         }
 
         args << "-progress" << "pipe:1"
@@ -175,13 +181,14 @@ public:
              << finalSavePath;
 
         connect(ffmpeg, &QProcess::finished, this,  [this, ffmpeg, finishSignal](){
-            if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0){
+            bool failed = (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0);
+            if (failed){
                 qDebug() << "Exit Status : " << ffmpeg->exitStatus() << " exitCode : " << ffmpeg->exitCode() << "errors : " << ffmpeg->readAllStandardError();
             }
             if(!finishSignal) return;
-            if (ffmpeg->exitStatus() != QProcess::NormalExit || ffmpeg->exitCode() != 0)
-                emit extractionFinished(-1);
-            emit extractionFinished(1);
+
+            emit extractionFinished(failed ? -1 : 1);   
+
             m_currentProcess = nullptr;
             m_currentWorkingPaths.clear();
         });
@@ -192,6 +199,9 @@ public:
 
         m_currentProcess = ffmpeg;
         m_currentWorkingPaths.append(finalSavePath);
+
+        qDebug() << "[ffmpeg] args :" << args.join(" ");
+
         ffmpeg->start(getFfmpegPath(), args);
         //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
         return ffmpeg;

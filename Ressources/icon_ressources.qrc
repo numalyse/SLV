@@ -3,6 +3,9 @@
         <file alias="abloop_white">icons/abloop_white.png</file>
         <file alias="abloop_gray">icons/abloop_gray.png</file>
         <file alias="abloop">icons/abloop.png</file>
+        <file alias="add_annot_white">icons/plus_white.png</file>
+        <file alias="add_annot_gray">icons/plus_gray.png</file>
+        <file alias="add_annot">icons/plus.png</file>
         <file alias="add_media_white">icons/add_media_white.png</file>
         <file alias="add_media_gray">icons/add_media_gray.png</file>
         <file alias="add_media">icons/add_media.png</file>
@@ -157,6 +160,7 @@
         <file alias="plus_white">icons/plus_white.png</file>
         <file alias="plus_gray">icons/plus_gray.png</file>
         <file alias="plus">icons/plus.png</file>
+        <file alias="playlist_loop">icons/playlist_loop.png</file>
         <file alias="prev_frame_white">icons/prev_frame_white.png</file>
         <file alias="prev_frame_gray">icons/prev_frame_gray.png</file>
         <file alias="prev_frame">icons/prev_frame.png</file>
@@ -196,7 +200,7 @@
         <file alias="segmentation_on_white">icons/segmentation_on_white.png</file>
         <file alias="segmentation_on_gray">icons/segmentation_on_gray.png</file>
         <file alias="segmentation_on">icons/segmentation_on.png</file>
-        <file>icons/segmentation_white.png</file>
+        <file alias="segmentation_white">icons/segmentation_white.png</file>
         <file alias="segmentation">icons/segmentation.png</file>
         <file alias="shuffle_white">icons/shuffle_white.png</file>
         <file alias="shuffle_gray">icons/shuffle_gray.png</file>

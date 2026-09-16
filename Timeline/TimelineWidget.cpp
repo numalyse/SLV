@@ -496,10 +496,14 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         QFileInfo fileInfo (p_media->filePath());
 
         auto& prefManager = PrefManager::instance();
+
+        QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+
         QString saveRecordPath = QFileDialog::getSaveFileName(
             this,
-            prefManager.getText("dialog_capture") + fileInfo.fileName() + "_record",
-            prefManager.getPref("Paths", "lp_capture")
+            prefManager.getText("dialog_save_extract_shots")  + " - " + fileInfo.fileName(),
+            prefManager.getPref("Paths", "lp_capture") + '/' + defaultFileName,
+            prefManager.getText("export_type_mp4")
         );
 
         if (saveRecordPath.isEmpty()){

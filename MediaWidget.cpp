@@ -520,6 +520,10 @@ void MediaWidget::endRecord()
     QFileInfo fileInfo (saveRecordPath);
     prefManager.setPref("Paths", "lp_capture", fileInfo.absolutePath());
 
+    if (!saveRecordPath.endsWith('.' + m_media->fileExtension(), Qt::CaseInsensitive)) {
+        saveRecordPath += '.' + m_media->fileExtension();
+    }
+
     saveRecordPath += '.' + m_media->fileExtension();
     // SequenceExtractionHelper::extractSequence(m_media->filePath(), m_startRecordTime, libvlc_media_player_get_time(m_player), saveRecordPath);
     m_videoCaptureManager.endMediaRecording(endTime, saveRecordPath);

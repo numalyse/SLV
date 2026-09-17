@@ -92,6 +92,7 @@ Playlist::Playlist(QWidget *parent)
     m_deleteAllBtn = new QPushButton;
     if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
         m_deleteAllBtn->setIcon(QIcon(":/icons/delete_white"));
+        
     } else {
         m_deleteAllBtn->setIcon(QIcon(":/icons/delete"));
     }
@@ -108,6 +109,12 @@ Playlist::Playlist(QWidget *parent)
         "}");
     m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_remove_all_items_playlist"));
     playlistLabelLayout->addWidget(m_deleteAllBtn);
+
+    // Deactivate m_deleteAllBtn button if no item in playlist
+    m_deleteAllBtn->setEnabled(!m_items.isEmpty());
+    connect(this, &Playlist::playlistItemCountChanged, this, [this](){
+        m_deleteAllBtn->setEnabled(!m_items.isEmpty());
+    });
 
     // [Button] Add item to playlist
     m_addItemBtn = new QPushButton;
@@ -137,11 +144,16 @@ Playlist::Playlist(QWidget *parent)
     scrollLayout()->addStretch();
 
     // FOOTER ZONE
-    // Left side : Loop Shuffle and Autoplay buttons
-    // Right side : Total duration label
+    // 1st right side : Loop Shuffle and Autoplay buttons
+    // 2nd right side : Total duration label
 
+    QVBoxLayout *footerButtonsLabelLayout = new QVBoxLayout();
+    QHBoxLayout *footerButtonsLayout = new QHBoxLayout();
     QHBoxLayout *playlistLabelBottomLayout = new QHBoxLayout();
 
+    // Puts buttons to the right side of the footer
+    footerButtonsLayout->addStretch();
+     
     // [Button] Loop button
     m_loopItemBtn = new ToolbarToggleButton(this,
         false,
@@ -153,7 +165,7 @@ Playlist::Playlist(QWidget *parent)
     m_loopItemBtn->setToggledIconFrame(true);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
-    playlistLabelBottomLayout->addWidget(m_loopItemBtn);
+    footerButtonsLayout->addWidget(m_loopItemBtn);
 
     // [Button] Shuffle button
     m_shuffleItemBtn = new ToolbarToggleButton(this,
@@ -166,7 +178,7 @@ Playlist::Playlist(QWidget *parent)
     m_shuffleItemBtn->setToggledIconFrame(true);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
-    playlistLabelBottomLayout->addWidget(m_shuffleItemBtn);
+    footerButtonsLayout->addWidget(m_shuffleItemBtn);
 
     // [Button] Autoplay button
     m_autoplayBtn = new ToolbarToggleButton(this,
@@ -179,9 +191,9 @@ Playlist::Playlist(QWidget *parent)
     m_autoplayBtn->setToggledIconFrame(true);
     connect(m_autoplayBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableAutoplay);
     connect(m_autoplayBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableAutoplay);
-    playlistLabelBottomLayout->addWidget(m_autoplayBtn);
+    footerButtonsLayout->addWidget(m_autoplayBtn);
  
-    // Separator between left and right side of footer
+    // Puts buttons to the right side of the footer
     playlistLabelBottomLayout->addStretch();
 
     // [Label] Total duration label
@@ -189,7 +201,9 @@ Playlist::Playlist(QWidget *parent)
     m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : 00:00:00");
     playlistLabelBottomLayout->addWidget(m_playlistTotalDurationLabel);
 
-    footerLayout()->addLayout(playlistLabelBottomLayout);
+    footerButtonsLabelLayout->addLayout(footerButtonsLayout);
+    footerButtonsLabelLayout->addLayout(playlistLabelBottomLayout);
+    footerLayout()->addLayout(footerButtonsLabelLayout);
 
     //m_mainLayout->addStretch();
 

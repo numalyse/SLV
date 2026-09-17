@@ -30,6 +30,19 @@ ProjectManager::ProjectManager(QObject* parent) : QObject(parent)
 {
     m_annotationManager = new AnnotationManager(this);
 
+    m_isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+
+    #ifdef Q_OS_MAC
+        QColor colorBtn = qApp->palette().color(QPalette::Button);
+        QColor enhancedColor = m_isDarkMode ? colorBtn.lighter(150) : colorBtn.darker(150);
+        m_palbtnColor = m_isDarkMode ? enhancedColor : "palette(mid)";
+        m_palbtnColorStr = m_isDarkMode ? QString(enhancedColor.name()) : "palette(mid)";
+    #else
+        m_palbtnColor = m_isDarkMode ? "palette(button)" : "palette(mid)";
+        m_palbtnColorStr = m_isDarkMode ? "palette(button)" : "palette(mid)";
+
+    #endif
+
     connect(m_annotationManager, &AnnotationManager::annotationAdded, this, &ProjectManager::setSaveNeeded);
     connect(m_annotationManager, &AnnotationManager::annotationUpdated, this, &ProjectManager::setSaveNeeded);
     connect(m_annotationManager, &AnnotationManager::annotationRemoved, this, &ProjectManager::setSaveNeeded);
@@ -618,19 +631,149 @@ void ProjectManager::exportProject(){
     connect(exportThread, &ProjectExportThread::exportFinished, this, [progressDialog, selectedPath, this](bool success, bool canceled) {
         if (success) {
             qDebug() << "Export réussi";
-            QMessageBox msg;
-            QPushButton *openDirBtn = msg.addButton(
-                PrefManager::instance().getText("open_file_directory"),
-                QMessageBox::AcceptRole);
-            msg.setStandardButtons(QMessageBox::StandardButton::Ok);
-            msg.setInformativeText(PrefManager::instance().getText("project_exportation_finished"));
-            msg.setIcon(QMessageBox::Information);
-            msg.exec();
+            // QMessageBox msg;
 
-            if (msg.clickedButton() == openDirBtn) {
+            // QPushButton *openDirBtn = msg.addButton(
+            //     PrefManager::instance().getText("open_file_directory"),
+            //     QMessageBox::AcceptRole);
+            // msg.setStandardButtons(QMessageBox::StandardButton::Ok);
+            // msg.setInformativeText(PrefManager::instance().getText("project_exportation_finished"));
+            // msg.setIcon(QMessageBox::Information);
+
+
+            // msg.exec();
+
+            // if (msg.clickedButton() == openDirBtn) {
+            //     QFileInfo fi(selectedPath);
+            //     QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+            // }
+            auto& prefManager = PrefManager::instance();
+
+            QDialog dialog;
+            dialog.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+            dialog.setAttribute(Qt::WA_TranslucentBackground);
+            dialog.setFixedSize(500, 220);
+            dialog.setObjectName("dialogWindow");
+
+            dialog.setStyleSheet(
+                "#dialogWindow {"
+                    "background-color: transparent;"
+                "}"
+            );
+
+            QVBoxLayout outerLayout(&dialog);
+            outerLayout.setContentsMargins(0, 0, 0, 0);
+
+            QWidget* container = new QWidget;
+            container->setObjectName("dialogContainer");
+
+            container->setStyleSheet(
+                "#dialogContainer {"
+                    "background-color: palette(Window);"
+                    "border: 2px solid " + m_palbtnColorStr + ";"
+                    "border-radius: 20px;"
+                "}"
+            );
+
+            outerLayout.addWidget(container);
+
+            QVBoxLayout layout(container);
+            layout.setContentsMargins(20, 20, 20, 20);
+            layout.setSpacing(15);
+
+            // Titre
+            QLabel* titleLabel = new QLabel;
+            titleLabel->setAlignment(Qt::AlignCenter);
+            titleLabel->setText(prefManager.getText("project_exportation_finished"));
+
+            QFont titleFont = titleLabel->font();
+            titleFont.setPointSize(12);
+            titleFont.setBold(true);
+            titleLabel->setFont(titleFont);
+
+            layout.addWidget(titleLabel);
+
+            // Texte
+            QLabel* textLabel = new QLabel;
+            textLabel->setAlignment(Qt::AlignCenter);
+            textLabel->setText(prefManager.getText("project_exportation_desc") + "\n" +prefManager.getText("project_exportation_ask_open_directory"));
+
+            QFont textFont = textLabel->font();
+            textFont.setPointSize(10);
+            textLabel->setFont(textFont);
+
+            layout.addWidget(textLabel);
+
+            // Boutons
+            QHBoxLayout* btnLayout = new QHBoxLayout;
+            btnLayout->setSpacing(20);
+
+            QPushButton* openDirBtn = new QPushButton(prefManager.getText("project_exportation_open_directory"));
+
+            QPushButton* okBtn = new QPushButton(prefManager.getText("close"));
+
+            QFont btnFont = openDirBtn->font();
+            btnFont.setPointSize(10);
+            btnFont.setBold(true);
+
+            openDirBtn->setFont(btnFont);
+            okBtn->setFont(btnFont);
+
+            openDirBtn->setFixedSize(200, 40);
+            okBtn->setFixedSize(200, 40);
+
+            // Bouton "Ouvrir le dossier"
+            openDirBtn->setStyleSheet(
+                "QPushButton {"
+                    "background-color: " + m_palbtnColorStr + ";"
+                    "border: 1px solid " + m_palbtnColorStr + ";"
+                    "border-radius: 4px;"
+                "}"
+                "QPushButton:hover {"
+                    "background-color: palette(Window);"
+                    "border: 2px solid " + m_palbtnColorStr + ";"
+                    "border-radius: 4px;"
+                "}"
+            );
+
+            // Bouton "OK"
+            okBtn->setStyleSheet(
+                "QPushButton {"
+                    "background-color: palette(Window);"
+                    "border: 1px solid " + m_palbtnColorStr + ";"
+                    "border-radius: 4px;"
+                "}"
+                "QPushButton:hover {"
+                    "background-color: " + m_palbtnColorStr + ";"
+                    "border: 2px solid " + m_palbtnColorStr + ";"
+                    "border-radius: 4px;"
+                "}"
+            );
+            
+            connect(openDirBtn, &QPushButton::clicked, [&]() {
                 QFileInfo fi(selectedPath);
-                QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
-            }
+
+            #ifdef Q_OS_WIN
+                QStringList args;
+                args << "/select," << QDir::toNativeSeparators(fi.absoluteFilePath());
+                QProcess::startDetached("explorer.exe", args);
+            #elif defined(Q_OS_MACOS)
+                QProcess::startDetached("open", QStringList() << "-R" << fi.absoluteFilePath());
+            #else
+                QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absolutePath()));
+            #endif
+
+                dialog.accept();
+            });
+
+            connect(okBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+
+            btnLayout->addWidget(openDirBtn);
+            btnLayout->addWidget(okBtn);
+
+            layout.addLayout(btnLayout);
+
+            dialog.exec();
         }else if (!canceled) { // if user canceled doens't show error dialog
             qDebug() << "Erreur lors de l'export";
             QMessageBox msg;

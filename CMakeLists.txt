@@ -121,6 +121,8 @@ set(PROJECT_SOURCES
     AnnotationWidget.h AnnotationWidget.cpp
     AnnotationDialog.h AnnotationDialog.cpp
 
+    CustomQDialog.h CustomQDialog.cpp
+
 )
 
 # =========================================================

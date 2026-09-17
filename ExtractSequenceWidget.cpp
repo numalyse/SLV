@@ -6,6 +6,8 @@
 #include <QProgressDialog>
 #include <QDesktopServices>
 
+#include "CustomQDialog.h"
+
 ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent, int startTime, int endTime, int audioTrack)
     : QDialog{parent}, m_media(media)
 {
@@ -60,6 +62,20 @@ ExtractSequenceWidget::ExtractSequenceWidget(const Media& media, QWidget *parent
                 QFileInfo fi(m_selectedPath);
                 QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
             }
+
+            // CustomQDialog dialog(
+            //     PrefManager::instance().getText("messagebox_extract_sequence_completed"),
+            //     PrefManager::instance().getText("messagebox_extract_sequence_completed"),
+            //     PrefManager::instance().getText("close"),
+            //     PrefManager::instance().getText("open_file_directory"),
+            //     m_selectedPath
+            //     );
+            // dialog.exec();
+
+            // if (dialog.exec() == QDialog::Accepted) {
+            //     // QFileInfo fi(m_selectedPath);
+            //     // QDesktopServices::openUrl(QUrl::fromLocalFile(fi.dir().path()));
+            // }
         }
     });
 }

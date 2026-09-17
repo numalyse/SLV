@@ -481,8 +481,11 @@
     "open_more_than_four_files_title" : "Multiple media selection",
     "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?",
 
-    "project_exportation_finished" : "The media export was completed successfully.",
+    "project_exportation_finished" : "Export completed",
+    "project_exportation_desc" : "The media export was completed successfully.",
     "project_exportation_error" : "An error occurred during export",
+    "project_exportation_ask_open_directory" : "Would you like to open the folder containing this file?",
+    "project_exportation_open_directory" : "Open folder",
     "open_file_directory" : "Open file location",
 
     "messagebox_format_not_accepted" : "One of the selected files has an unsupported format.",
@@ -548,6 +551,7 @@
     "help_menu_open_files_content_2" : "It is also possible to open media files by performing a <i> drag and drop </i> of the desired file onto the black area of the player.",
     "help_menu_classic_toolbar_content_1" : "A toolbar is displayed below the media it is associated with. It allows you to perform various operations on the media.",
     "help_menu_classic_toolbar_buttons_description" : "Description of the toolbar buttons",
+
     "help_menu_play_label" : "Play",
     "help_menu_play_description" : "Plays the media.",
     "help_menu_pause_label" : "Pause",
@@ -559,6 +563,12 @@
 
     "help_menu_change_media_label" : "Previous/Next media",
     "help_menu_change_media_description" : "Switches to the previous/next media in the playlist order.",
+
+    "help_menu_prev_label" : "Previous media",
+    "help_menu_prev_description" : "Skips to the previous media in the playlist.",
+    "help_menu_next_label" : "Next media",
+    "help_menu_next_description" : "Skips to the next media in the playlist.",
+
     "help_menu_slow_label" : "Speed modification",
     "help_menu_slow_description" : "Opens a slider to modify the playback speed of the media. The supported speeds are : x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
 
@@ -577,34 +587,40 @@
     "help_menu_extract_sequence_label" : "Extract sequence",
     "help_menu_extract_sequence_description" : "Opens a dialog to enter start and end timecodes to extract the corresponding sequence.",
     "help_menu_duplicate_media_label" : "Duplicate media",
-    "help_menu_duplicate_media_description" : "Allows duplicating the selected media into a new player. Changes on the duplicate only apply to it.",
+    "help_menu_duplicate_media_description" : "Allows you to duplicate the selected media into a new player. \n Changes made to the duplicated media apply to the new media.",
     "help_menu_fullscreen_label" : "Fullscreen",
     "help_menu_fullscreen_description" : "Toggle fullscreen mode on or off.",
-    "help_menu_plus_label" : "Extended toolbar",
-    "help_menu_plus_description" : "Open the extended toolbar.",
+
+    "help_menu_right_arrow_label" : "Extended toolbar",
+    "help_menu_right_arrow_description" : "Open the extended toolbar.",
 
     "help_menu_extended_toolbar_buttons_description" : "Description of the extended toolbar buttons",
     "help_menu_show_image_label" : "Hide media",
-    "help_menu_show_image_description" : "Show a black screen instead of the media. Hovering the button reveals a slider to set opacity.",
-    "help_menu_adjustments_label" : "Adjustments",
-    "help_menu_adjustments_description" : "Shows various sliders to set brightness, contrast, saturation and hue of the media.",
+    "help_menu_show_image_description" : "Displays a black overlay layer on top of the media. \n Opacity can be adjusted by hovering over the icon.",
+    "help_menu_adjustments_label" : "Visual adjustments",
+    "help_menu_adjustments_description" : "Settings to adjust the brightness, contrast, saturation and hue of the media.",    
     "help_menu_draw_label" : "Draw",
     "help_menu_draw_description" : "When draw mode is active you can draw over the media and pick stroke parameters.",
     "help_menu_compo_rule_label" : "Composition rules",
-    "help_menu_compo_rule_description" : "Displays various composition rules over the media.",
-    "help_menu_backward_label" : "Backward/Forward",
-    "help_menu_backward_description" : "Allows skipping backward or forward 5 seconds in the media.",
-    "help_menu_prev_frame_label" : "Previous/Next frame",
-    "help_menu_prev_frame_description" : "Step to the previous or next frame of the media.",
-    "help_menu_record_off_label" : "Live recording",
-    "help_menu_record_off_description" : "Allows recording the currently playing media; time jumps are considered.",
-    "help_menu_rotate_label" : "Rotate",
-    "help_menu_rotate_description" : "Rotate the media 90° to the right. \n ⚠️ If the media is paused the screen remains black. Restart playback to see the transform.",
+    "help_menu_compo_rule_description" : "Setting to display a composition grid overlaid on the media.",
+    "help_menu_backward_label" : "Rewind",
+    "help_menu_backward_description" : "Rewinds 5 seconds",
+    "help_menu_forward_label" : "Forward",
+    "help_menu_forward_description" : "Forwards 5 seconds",
+    "help_menu_prev_frame_label" : "Previous frame",
+    "help_menu_prev_frame_description" : "Allows you to move to the previous frame",
+    "help_menu_next_frame_label" : "Next frame",
+    "help_menu_next_frame_description" : "Allows you to move to the next frame",
+    "help_menu_record_off_label" : "Recording",
+    "help_menu_record_off_description" : "Allows you to record the media currently playing on the fly. Recording takes into account any time jumps made.",
+    "help_menu_rotate_label" : "Rotation",
+    "help_menu_rotate_description" : "Rotates the media 90° to the right. \n ⚠️ Warning: the transformation applies during playback. If the media is paused, restart playback to display it.",
     "help_menu_invert_h_label" : "Flip",
-    "help_menu_invert_h_description" : "Flip the media horizontally or vertically. \n ⚠️ If the media is paused the screen remains black. Restart playback to see the transform.",
-
+    "help_menu_invert_h_description" : "Flips the media horizontally or vertically. \n ⚠️ Warning: the transformation applies during playback. If the media is paused, restart playback to display it.",
+    
     "help_menu_timeline_off_label" : "Detailed timeline",
     "help_menu_timeline_off_description" : "Show the media's detailed timeline.",
+
     "help_menu_enter_multiview_content_1" : "It is possible to display 1 to 4 players simultaneously. In multi-view mode (when 2 or more players are present), each media has its own simplified toolbar and a global bar appears at the bottom for operations affecting all medias.",
     "help_menu_enter_multiview_content_2" : "To enter multi-view mode, hover the media layout button at the top-right. You can then choose the number of players and their layout. Players are resizable by dragging the splitters between them. You can also use the duplicate button.",
     "help_menu_simplified_content_1" : "The simplified toolbar available in multi-view players includes most buttons from the classic toolbar but without extensions. There is also a button to remove the player from the view.",
@@ -648,7 +664,10 @@
     "help_menu_exportation_content_1" : "The current project can be saved via the 'Files' → 'Save' menu. Projects can be exported as text (.txt and .docx), PDF, PowerPoint, as annotated video (titles and notes per track) and as reference images (all reference images are saved into the configured folder).",
 
     "help_menu_open_annot_label" : "Annotations",
-    "help_menu_open_annot_description" : "Open the annotations panel",
+    "help_menu_open_annot_description" : "Open the annotations panel",    
+    
+    "help_menu_add_annot_label" : "Add annotation",
+    "help_menu_add_annot_description" : "Adds an annotation to the media.",
 
     "project_manager_error_folder_not_found": "Cannot find the project folder.",
     "project_manager_error_json_file_not_found": "The project save file could not be found.",

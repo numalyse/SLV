@@ -15,7 +15,7 @@
 #include <QSizePolicy>
 
 
-ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
+ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : NavPanelContentBase(parent), p_thumbnailWorker{thumbnailWorker}
 {
     //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
@@ -111,32 +111,34 @@ ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWid
     });
     frameButtonsLayout->addWidget(m_toNextShotBtn, 0, 1);
 
-    m_layout = new QVBoxLayout(this);
+    //m_layout = new QVBoxLayout(this);
 
-    m_layout->addWidget(infoLabel);
+    // info section - header zone
+    headerLayout()->addWidget(infoLabel);
 
     uneditablesLayout->addWidget(m_shotIdForm);
     uneditablesLayout->addWidget(m_startTime);
     uneditablesLayout->addWidget(m_endTime);
     uneditablesLayout->addWidget(m_duration);
-    m_layout->addWidget(m_uneditables);
+    headerLayout()->addWidget(m_uneditables);
     
-    m_layout->addSpacing(6);
+    headerLayout()->addSpacing(6);
 
-    m_layout->addWidget(m_tagImage);
+    headerLayout()->addWidget(m_tagImage);
     m_tagImage->adjustSize();
     m_tagImage->setAlignment(Qt::AlignCenter);
     m_tagImage->setFixedHeight(m_imageSize.height());
 
     frameButtonsLayout->setContentsMargins(0, 0, 0, 0);
-    m_layout->addWidget(frameButtonsActions);
+    headerLayout()->addWidget(frameButtonsActions);
 
-    m_layout->addWidget(analysisLabel);
-    m_layout->addWidget(m_shotTitle);
-    m_layout->addWidget(m_imgTxtEdit);
-    m_layout->addWidget(m_soundTxtEdit);
+    // Analysis section - scroll zone
+    scrollLayout()->addWidget(analysisLabel);
+    scrollLayout()->addWidget(m_shotTitle);
+    scrollLayout()->addWidget(m_imgTxtEdit);
+    scrollLayout()->addWidget(m_soundTxtEdit);
     
-    m_layout->addStretch();
+    scrollLayout()->addStretch();
 
 }
 

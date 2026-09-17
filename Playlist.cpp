@@ -38,7 +38,7 @@ QStringList collectValidFilesFromPath(const QString &path)
 }
 
 Playlist::Playlist(QWidget *parent)
-    : QWidget{parent}
+    : NavPanelContentBase{parent}
 {
     m_isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
 
@@ -54,12 +54,14 @@ Playlist::Playlist(QWidget *parent)
 #endif
 
     setAcceptDrops(true);
-    m_mainLayout = new QVBoxLayout();
-    this->setLayout(m_mainLayout);
+    // m_mainLayout = new QVBoxLayout();
+    // this->setLayout(m_mainLayout);
 
+    // HEADER ZONE
     QHBoxLayout *playlistLabelLayout = new QHBoxLayout();
-    m_mainLayout->addLayout(playlistLabelLayout);
+    headerLayout()->addLayout(playlistLabelLayout);
 
+    // [Label]
     QLabel *playlistLabel = new QLabel();
     QFont playlistFont = playlistLabel->font();
     playlistFont.setPointSize(12);
@@ -70,58 +72,23 @@ Playlist::Playlist(QWidget *parent)
     playlistLabelLayout->addWidget(playlistLabel);
     playlistLabelLayout->setSpacing(1);
 
-    // save playlist in xspf file
+    // [Button] save playlist in xspf file
     m_savePlaylistBtn = new ToolbarButton(this, "save_white", PrefManager::instance().getText("tooltip_save_playlist"));
     m_savePlaylistBtn->setFixedSize(24,24);
     connect(m_savePlaylistBtn, &QPushButton::clicked, this, [this](){ SLV::savePlaylist(m_items, m_itemsSortOrder); });
     playlistLabelLayout->addWidget(m_savePlaylistBtn);
 
-    // load playlist from xspf file
+    // [Button] load playlist from xspf file
     m_loadPlaylistBtn = new ToolbarButton(this, "playlist_import_white", PrefManager::instance().getText("tooltip_import_playlist"));
     m_loadPlaylistBtn->setFixedSize(24,24);
     connect(m_loadPlaylistBtn, &QPushButton::clicked, this, &Playlist::loadPlaylist);
     playlistLabelLayout->addWidget(m_loadPlaylistBtn);
 
-    m_autoplayBtn = new ToolbarToggleButton(this,
-        false,
-        "autoplay_white",
-        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(activated)"),
-        "autoplay_white",
-        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
-    m_autoplayBtn->setFixedSize(24,24);
-    m_autoplayBtn->setToggledIconFrame(true);
-    connect(m_autoplayBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableAutoplay);
-    connect(m_autoplayBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableAutoplay);
-    playlistLabelLayout->addWidget(m_autoplayBtn);
-
-    m_loopItemBtn = new ToolbarToggleButton(this,
-        false,
-        "playlist_loop_white",
-        PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(activated)"),
-        "playlist_loop_white",
-        PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
-    m_loopItemBtn->setFixedSize(24,24);
-    m_loopItemBtn->setToggledIconFrame(true);
-    connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
-    connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
-    playlistLabelLayout->addWidget(m_loopItemBtn);
-
-    m_shuffleItemBtn = new ToolbarToggleButton(this,
-        false,
-        "shuffle_white",
-        PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(activated)"),
-        "shuffle_white",
-        PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
-    m_shuffleItemBtn->setFixedSize(24,24);
-    m_shuffleItemBtn->setToggledIconFrame(true);
-    connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
-    connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
-    playlistLabelLayout->addWidget(m_shuffleItemBtn);
-
+    // [Button] Sort playlist button
     createSortBtn();
     playlistLabelLayout->addWidget(m_sortPlaylistBtn);
 
-    // [Bouton] Supprimer tous les éléments
+    // [Button] Delete all items from playlist
     m_deleteAllBtn = new QPushButton;
     if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
         m_deleteAllBtn->setIcon(QIcon(":/icons/delete_white"));
@@ -142,7 +109,7 @@ Playlist::Playlist(QWidget *parent)
     m_deleteAllBtn->setToolTip(PrefManager::instance().getText("tooltip_remove_all_items_playlist"));
     playlistLabelLayout->addWidget(m_deleteAllBtn);
 
-    // [Bouton] Ajouter un élément à la playlist
+    // [Button] Add item to playlist
     m_addItemBtn = new QPushButton;
     if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark){
         m_addItemBtn->setIcon(QIcon(":/icons/plus_white"));
@@ -163,20 +130,68 @@ Playlist::Playlist(QWidget *parent)
         "}");
     playlistLabelLayout->addWidget(m_addItemBtn);
 
-    // LAYOUT ITEMS
+    // SCROLL ZONE - ITEMS
     m_itemsLayout = new QVBoxLayout();
-    m_mainLayout->addLayout(m_itemsLayout);
-    m_mainLayout->addWidget(m_addItemBtn);
+    scrollLayout()->addLayout(m_itemsLayout);
+    scrollLayout()->addWidget(m_addItemBtn);
+    scrollLayout()->addStretch();
+
+    // FOOTER ZONE
+    // Left side : Loop Shuffle and Autoplay buttons
+    // Right side : Total duration label
 
     QHBoxLayout *playlistLabelBottomLayout = new QHBoxLayout();
+
+    // [Button] Loop button
+    m_loopItemBtn = new ToolbarToggleButton(this,
+        false,
+        "playlist_loop_white",
+        PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "playlist_loop_white",
+        PrefManager::instance().getText("tooltip_loop_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
+    m_loopItemBtn->setFixedSize(24,24);
+    m_loopItemBtn->setToggledIconFrame(true);
+    connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
+    connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
+    playlistLabelBottomLayout->addWidget(m_loopItemBtn);
+
+    // [Button] Shuffle button
+    m_shuffleItemBtn = new ToolbarToggleButton(this,
+        false,
+        "shuffle_white",
+        PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "shuffle_white",
+        PrefManager::instance().getText("tooltip_shuffle_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
+    m_shuffleItemBtn->setFixedSize(24,24);
+    m_shuffleItemBtn->setToggledIconFrame(true);
+    connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
+    connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
+    playlistLabelBottomLayout->addWidget(m_shuffleItemBtn);
+
+    // [Button] Autoplay button
+    m_autoplayBtn = new ToolbarToggleButton(this,
+        false,
+        "autoplay_white",
+        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(activated)"),
+        "autoplay_white",
+        PrefManager::instance().getText("tooltip_autoplay_playlist") + " " + PrefManager::instance().getText("(deactivated)"));
+    m_autoplayBtn->setFixedSize(24,24);
+    m_autoplayBtn->setToggledIconFrame(true);
+    connect(m_autoplayBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableAutoplay);
+    connect(m_autoplayBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableAutoplay);
+    playlistLabelBottomLayout->addWidget(m_autoplayBtn);
+ 
+    // Separator between left and right side of footer
     playlistLabelBottomLayout->addStretch();
+
+    // [Label] Total duration label
     m_playlistTotalDurationLabel = new QLabel();
     m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : 00:00:00");
     playlistLabelBottomLayout->addWidget(m_playlistTotalDurationLabel);
 
-    m_mainLayout->addLayout(playlistLabelBottomLayout);
+    footerLayout()->addLayout(playlistLabelBottomLayout);
 
-    m_mainLayout->addStretch();
+    //m_mainLayout->addStretch();
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);

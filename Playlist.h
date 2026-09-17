@@ -1,6 +1,8 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
+#include "NavPanelContentBase.h"
+
 #include <QWidget>
 #include "PlaylistItem.h"
 #include <QFileDialog>
@@ -12,7 +14,7 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 
-class Playlist : public QWidget
+class Playlist : public NavPanelContentBase
 {
     Q_OBJECT
 public:

@@ -95,6 +95,7 @@ set(PROJECT_SOURCES
     MediaWidget.h MediaWidget.cpp
     SnapshotPopup.h SnapshotPopup.cpp
     NavPanel.h NavPanel.cpp
+    NavPanelContentBase.h NavPanelContentBase.cpp
     PlaylistItem.h PlaylistItem.cpp
     Playlist.h Playlist.cpp
     ShotDetail.h ShotDetail.cpp

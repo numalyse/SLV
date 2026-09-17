@@ -20,17 +20,18 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
     m_sideWidget->addWidget(m_annotationPanel);
     m_sideWidget->setCurrentWidget(m_playlistWidget);
     
-    m_scrollArea = new QScrollArea(this);
-    m_scrollArea->setWidgetResizable(true);
-    m_scrollArea->setFrameShape(QFrame::NoFrame);
+    // m_scrollArea = new QScrollArea(this);
+    // m_scrollArea->setWidgetResizable(true);
+    // m_scrollArea->setFrameShape(QFrame::NoFrame);
 
-    m_scrollArea->setWidget(m_sideWidget);
-    m_mainLayout->addWidget(m_scrollArea);
+    // m_scrollArea->setWidget(m_sideWidget);
+    // m_mainLayout->addWidget(m_scrollArea);
 
+    m_mainLayout->addWidget(m_sideWidget); 
     m_sideWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
-    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    // m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     m_sideWidget->hide();
     setFixedWidth(0);

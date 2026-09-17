@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QStyle>
 
-AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent) : QWidget(parent), p_thumbnailWorker{thumbnailWorker}
+AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent) : NavPanelContentBase(parent), p_thumbnailWorker{thumbnailWorker}
 {
     auto* annotations = ProjectManager::instance().annotationManager();
 
@@ -27,17 +27,18 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
     connect(this, &AnnotationPanel::updateAnnotationRequested, annotations, &AnnotationManager::updateAnnotation);
     connect(this, &AnnotationPanel::removeAnnotationRequested, annotations, &AnnotationManager::removeAnnotation);
 
-    m_layout = new QVBoxLayout(this);
-    m_layout->setSpacing(4);
-    m_layout->setContentsMargins(0, 0, 0, 4);
+    // m_layout = new QVBoxLayout(this);
+    // m_layout->setSpacing(4);
+    // m_layout->setContentsMargins(0, 0, 0, 4);
 
+    // HEADER ZONE
     QHBoxLayout *buttonLayout = new QHBoxLayout();
 
     // keep the same default margins as the playlist panel to keep titles aligned without modifying 
     // layout margins, so the annotationwidgets take the full width available
-    const int sideMargin = style()->pixelMetric(QStyle::PM_LayoutLeftMargin);
-    const int topMargin = qMax(0, style()->pixelMetric(QStyle::PM_LayoutTopMargin));
-    buttonLayout->setContentsMargins(sideMargin, topMargin, sideMargin, 0);
+    // const int sideMargin = style()->pixelMetric(QStyle::PM_LayoutLeftMargin);
+    // const int topMargin = qMax(0, style()->pixelMetric(QStyle::PM_LayoutTopMargin));
+    // buttonLayout->setContentsMargins(sideMargin, topMargin, sideMargin, 0);
 
     QLabel* titleLabel = new QLabel(this);
     QFont titleFont = titleLabel->font();
@@ -98,21 +99,23 @@ AnnotationPanel::AnnotationPanel(ThumbnailWorker* thumbnailWorker, QWidget *pare
     buttonLayout->addWidget(m_addAnnotationBtn);
     buttonLayout->addWidget(m_filterByColorBtn);
 
-    m_layout->addLayout(buttonLayout);
+    headerLayout()->addLayout(buttonLayout);
 
-    QScrollArea* scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setFrameShape(QFrame::NoFrame);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // QScrollArea* scrollArea = new QScrollArea(this);
+    // scrollArea->setWidgetResizable(true);
+    // scrollArea->setFrameShape(QFrame::NoFrame);
+    // scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QWidget* itemsContainer = new QWidget(scrollArea);
-    m_itemsLayout = new QVBoxLayout(itemsContainer);
+    //QWidget* itemsContainer = new QWidget(scrollArea);
+   //m_itemsLayout = new QVBoxLayout(itemsContainer);
+    m_itemsLayout = new QVBoxLayout();
     m_itemsLayout->setSpacing(4);
     m_itemsLayout->setContentsMargins(0, 0, 0, 0);
     m_itemsLayout->setAlignment(Qt::AlignTop); 
 
-    scrollArea->setWidget(itemsContainer);
-    m_layout->addWidget(scrollArea, 1);
+    // scrollArea->setWidget(itemsContainer);
+    // m_layout->addWidget(scrollArea, 1);
+    scrollLayout()->addLayout(m_itemsLayout);
 }
 
 void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)

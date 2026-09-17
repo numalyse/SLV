@@ -1,6 +1,8 @@
 #ifndef SHOTDETAIL_H
 #define SHOTDETAIL_H
 
+#include "NavPanelContentBase.h"
+
 #include "Shot.h"
 #include "FormTextEditWidget.h"
 #include "FormLineEditWidget.h"
@@ -17,7 +19,7 @@
 #include <QSize>
 
 
-class ShotDetail : public QWidget
+class ShotDetail : public NavPanelContentBase
 {
 Q_OBJECT
 

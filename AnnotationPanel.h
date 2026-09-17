@@ -1,6 +1,8 @@
 #ifndef ANNOTATIONPANEL_H
 #define ANNOTATIONPANEL_H
 
+#include "NavPanelContentBase.h"
+
 #include <QWidget>
 #include <QVector>
 #include <QVBoxLayout>
@@ -13,7 +15,7 @@
 #include "ToolbarButtons/ToolbarToggleButton.h"
 #include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
-class AnnotationPanel : public QWidget
+class AnnotationPanel : public NavPanelContentBase
 {
 Q_OBJECT
 

@@ -1037,6 +1037,10 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
 
         emit mediaPlayerLoaded();
 
+        setTime(0);
+        pause();
+        emit playbackPaused();
+
     }, Qt::QueuedConnection);
 
     return true;

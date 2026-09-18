@@ -53,6 +53,7 @@ Playlist::Playlist(QWidget *parent)
 
 #endif
 
+    //setStyleSheet("background-color: blue ;");
     setAcceptDrops(true);
     // m_mainLayout = new QVBoxLayout();
     // this->setLayout(m_mainLayout);
@@ -144,15 +145,20 @@ Playlist::Playlist(QWidget *parent)
     scrollLayout()->addStretch();
 
     // FOOTER ZONE
-    // 1st right side : Loop Shuffle and Autoplay buttons
-    // 2nd right side : Total duration label
-
-    QVBoxLayout *footerButtonsLabelLayout = new QVBoxLayout();
+    QHBoxLayout *playlistdurationLabelLayout = new QHBoxLayout();
     QHBoxLayout *footerButtonsLayout = new QHBoxLayout();
-    QHBoxLayout *playlistLabelBottomLayout = new QHBoxLayout();
 
-    // Puts buttons to the right side of the footer
-    footerButtonsLayout->addStretch();
+    // [Label] Total duration label
+    m_playlistTotalDurationLabel = new QLabel();
+    //m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : 00:00:00");
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration_total") + " : " + "00:00:00");
+    //m_playlistTotalDurationLabel->setText("00:00:00");
+    m_playlistTotalDurationLabel->setToolTip(PrefManager::instance().getText("duration_total"));
+    m_playlistTotalDurationLabel->setFixedHeight(24+1); // +1 so if the playlist is long enough, it will match the player height length
+    
+    playlistdurationLabelLayout->addStretch();
+    playlistdurationLabelLayout->addWidget(m_playlistTotalDurationLabel);
+    playlistdurationLabelLayout->addStretch();
      
     // [Button] Loop button
     m_loopItemBtn = new ToolbarToggleButton(this,
@@ -165,7 +171,6 @@ Playlist::Playlist(QWidget *parent)
     m_loopItemBtn->setToggledIconFrame(true);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableLoop);
     connect(m_loopItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableLoop);
-    footerButtonsLayout->addWidget(m_loopItemBtn);
 
     // [Button] Shuffle button
     m_shuffleItemBtn = new ToolbarToggleButton(this,
@@ -178,7 +183,6 @@ Playlist::Playlist(QWidget *parent)
     m_shuffleItemBtn->setToggledIconFrame(true);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableShuffle);
     connect(m_shuffleItemBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableShuffle);
-    footerButtonsLayout->addWidget(m_shuffleItemBtn);
 
     // [Button] Autoplay button
     m_autoplayBtn = new ToolbarToggleButton(this,
@@ -191,21 +195,16 @@ Playlist::Playlist(QWidget *parent)
     m_autoplayBtn->setToggledIconFrame(true);
     connect(m_autoplayBtn, &ToolbarToggleButton::stateActivated, this, &Playlist::enableAutoplay);
     connect(m_autoplayBtn, &ToolbarToggleButton::stateDeactivated, this, &Playlist::disableAutoplay);
+
+
+    footerButtonsLayout->addStretch();
+    footerButtonsLayout->addWidget(m_loopItemBtn);
+    footerButtonsLayout->addWidget(m_shuffleItemBtn);
     footerButtonsLayout->addWidget(m_autoplayBtn);
- 
-    // Puts buttons to the right side of the footer
-    playlistLabelBottomLayout->addStretch();
+    footerButtonsLayout->addStretch();
 
-    // [Label] Total duration label
-    m_playlistTotalDurationLabel = new QLabel();
-    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : 00:00:00");
-    playlistLabelBottomLayout->addWidget(m_playlistTotalDurationLabel);
-
-    footerButtonsLabelLayout->addLayout(footerButtonsLayout);
-    footerButtonsLabelLayout->addLayout(playlistLabelBottomLayout);
-    footerLayout()->addLayout(footerButtonsLabelLayout);
-
-    //m_mainLayout->addStretch();
+    footerLayout()->addLayout(playlistdurationLabelLayout);
+    footerLayout()->addLayout(footerButtonsLayout);
 
     connect(m_addItemBtn, &ToolbarButton::clicked, this, &Playlist::addItemDialog);
     connect(m_deleteAllBtn, &ToolbarButton::clicked, this, &Playlist::deleteAllItemsDialog);
@@ -992,5 +991,8 @@ void Playlist::updateDurationPlaylist()
 
     QString time = TimeFormatter::msToHHMMSS(totalDuration);
 
-    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : " + time);
+    //m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration") + " : " + time);
+    
+    m_playlistTotalDurationLabel->setText(PrefManager::instance().getText("duration_total") + " : " + time);
+    //m_playlistTotalDurationLabel->setText(time);
 }

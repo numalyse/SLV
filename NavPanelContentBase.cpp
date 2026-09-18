@@ -4,7 +4,10 @@ NavPanelContentBase::NavPanelContentBase(QWidget *parent)
     : QWidget(parent)
 {
     auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    int left, top, right, bottom;
+    mainLayout->getContentsMargins(&left, &top, &right, &bottom);
+    mainLayout->setContentsMargins(left, 0, right, 0);
+    //mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
     auto *headerContainer = new QWidget(this);
@@ -23,6 +26,8 @@ NavPanelContentBase::NavPanelContentBase(QWidget *parent)
     mainLayout->addWidget(scrollArea, 1); 
 
     auto *footerContainer = new QWidget(this);
+    //footerContainer->setContentsMargins(0, 0, 0, 0);
+    //footerContainer->setStyleSheet("background-color: green ;");
     m_footerLayout = new QVBoxLayout(footerContainer);
     mainLayout->addWidget(footerContainer);
 }

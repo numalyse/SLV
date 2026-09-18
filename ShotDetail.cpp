@@ -68,6 +68,7 @@ ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : NavP
 
 
     m_imgTxtEdit->setMaximumHeight(250);
+    m_imgTxtEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     
     m_imgTxtEdit->setToolTip(PrefManager.getText("click_to_modify"));
     connect(m_imgTxtEdit->textEdit(), &QTextEdit::textChanged, this, [this](){
@@ -78,6 +79,7 @@ ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : NavP
     });
 
     m_soundTxtEdit->setMaximumHeight(250);
+    m_soundTxtEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     
     m_soundTxtEdit->setToolTip(PrefManager.getText("click_to_modify"));
     connect(m_soundTxtEdit->textEdit(), &QTextEdit::textChanged, this, [this](){
@@ -132,8 +134,9 @@ ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : NavP
     frameButtonsLayout->setContentsMargins(0, 0, 0, 0);
     headerLayout()->addWidget(frameButtonsActions);
 
+    headerLayout()->addWidget(analysisLabel);
+
     // Analysis section - scroll zone
-    scrollLayout()->addWidget(analysisLabel);
     scrollLayout()->addWidget(m_shotTitle);
     scrollLayout()->addWidget(m_imgTxtEdit);
     scrollLayout()->addWidget(m_soundTxtEdit);

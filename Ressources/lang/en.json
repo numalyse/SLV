@@ -250,6 +250,7 @@
     "ask_before_loading_playlist2" : "do you want to remove the existing items?",
     
     "duration" : "Duration",
+    "duration_total" :"Total duration",
 
     "messagebox_not_a_video" : "This media is not a video",
     "messagebox_extract_sequence_completed" : "Sequence successfully extracted.",
@@ -491,6 +492,7 @@
     "messagebox_format_not_accepted" : "One of the selected files has an unsupported format.",
 
     "tooltip_playlist_button" : "Playlist",
+    "tooltip_autoplay_playlist" : "Playlist autoplay",
     "tooltip_shot_detail_button" : "Shot information",
     "tooltip_annotation_button" : "Annotations",
 

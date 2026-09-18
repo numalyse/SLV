@@ -211,8 +211,8 @@
     "deactivate" : "Désactiver",
 
     "playlist" : "Playlist",
-    "tooltip_loop_playlist" : "Lecture de la playlist en boucle",
-    "tooltip_shuffle_playlist" : "Lecture aléatoire de la playlist",
+    "tooltip_loop_playlist": "Mode boucle",
+    "tooltip_shuffle_playlist": "Mode aléatoire",
     "tooltip_sort_playlist" : "Trier la playlist",
     "tooltip_save_playlist" : "Sauvegarder la playlist",
     "file_playlist" : "Liste de lecture XSPF",
@@ -225,7 +225,7 @@
 
     "delete" : "Supprimer",
     "delete_all" : "Tout supprimer",
-    "delete_all_items_playlist" : "Supprimer Playlist",
+    "delete_all_items_playlist" : "Supprimer playlist",
     "tooltip_delete_all_items_playlist" : "Supprimer tous les éléments de la playlist",
     "delete_all_items" : "Voulez-vous supprimer tous les éléments de la playlist ?",
     "delete_all_items_confirm" : "Cette action est irréversible.",
@@ -250,6 +250,7 @@
     "ask_before_loading_playlist2" : "souhaitez-vous retirer les éléments existants ?",
 
     "duration" : "Durée",
+    "duration_total" :"Durée totale",
 
     "messagebox_not_a_video" : "Ce média n'est pas une vidéo",
     "messagebox_extract_sequence_completed" : "La séquence a été extraite avec succès.",
@@ -491,6 +492,7 @@
     "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en compte.",
 
     "tooltip_playlist_button" : "Playlist",
+    "tooltip_autoplay_playlist" : "Lecture automatique de la playlist",
     "tooltip_shot_detail_button" : "Informations du plan",
     "tooltip_annotation_button" : "Annotations",
 

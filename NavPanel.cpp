@@ -8,6 +8,7 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_mainLayout = new QHBoxLayout(this);
+    m_mainLayout->setContentsMargins(0,0,0,0);
     m_mainLayout->setSpacing(0);
     
     m_sideWidget = new QStackedWidget(this);

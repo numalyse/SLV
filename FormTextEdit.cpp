@@ -9,6 +9,12 @@ FormTextEdit::FormTextEdit(const QString &text, bool editable, QWidget *parent) 
 {
     setText(text);
     setReadOnly(!editable);
+
+    verticalScrollBar()->setStyleSheet("");
+    verticalScrollBar()->setAttribute(Qt::WA_StyleSheet, false);
+    horizontalScrollBar()->setStyleSheet("");
+    horizontalScrollBar()->setAttribute(Qt::WA_StyleSheet, false);
+
     if(editable){
         connect(this, &FormTextEdit::focusIn, &SignalManager::instance(), &SignalManager::formLineEditPause );
         connect(this, &FormTextEdit::focusOut, &SignalManager::instance(), &SignalManager::formLineEditPlay );

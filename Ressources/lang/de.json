@@ -211,8 +211,8 @@
     "deactivate" : "Deaktivieren",
 
     "playlist" : "Playlist",
-    "tooltip_loop_playlist" : "Playlist in Schleife abspielen",
-    "tooltip_shuffle_playlist" : "Playlist zufällig abspielen",
+    "tooltip_loop_playlist": "Wiederholungsmodus",
+    "tooltip_shuffle_playlist": "Zufallsmodus",
     "tooltip_sort_playlist" : "Playlist sortieren",
     "tooltip_save_playlist" : "Playlist speichern",
     "file_playlist" : "XSPF Playlist",
@@ -250,6 +250,7 @@
     "ask_before_loading_playlist2" : "möchten Sie die vorhandenen Elemente entfernen?",
 
     "duration" : "Dauer",
+    "duration_total" :"Gesamtdauer",
 
     "messagebox_not_a_video" : "Dieses Medium ist kein Video",
     "messagebox_extract_sequence_completed" : "Die Sequenz wurde erfolgreich extrahiert.",
@@ -491,6 +492,7 @@
     "messagebox_format_not_accepted" : "Eine der ausgewählten Dateien hat ein nicht unterstütztes Format.",
 
     "tooltip_playlist_button" : "Wiedergabeliste",
+    "tooltip_autoplay_playlist" : "Playlist automatisch abspielen",
     "tooltip_shot_detail_button" : "Shot-Informationen",
     "tooltip_annotation_button" : "Anmerkungen",
 

@@ -211,8 +211,8 @@
     "deactivate" : "Desactivar",
 
     "playlist" : "Lista de reproducción",
-    "tooltip_loop_playlist" : "Reproducir lista en bucle",
-    "tooltip_shuffle_playlist" : "Reproducción aleatoria de la lista",
+    "tooltip_loop_playlist": "Modo bucle",
+    "tooltip_shuffle_playlist": "Modo aleatorio",
     "tooltip_sort_playlist" : "Ordenar lista de reproducción",
     "tooltip_save_playlist" : "Guardar la lista de reproducción",
     "file_playlist" : "Lista de reproducción XSPF",
@@ -250,6 +250,7 @@
     "ask_before_loading_playlist2" : "¿Desea retirar los elementos existentes?",
         
     "duration" : "Duración",
+    "duration_total" : "Duración total",
 
     "messagebox_not_a_video" : "Este medio no es un vídeo",
     "messagebox_extract_sequence_completed" : "La secuencia se ha extraído correctamente.",
@@ -491,6 +492,7 @@
     "messagebox_format_not_accepted" : "Uno de los archivos seleccionados tiene un formato no compatible.",
 
     "tooltip_playlist_button" : "Lista de reproducción",
+    "tooltip_autoplay_playlist" : "Reproducción automática de la lista",
     "tooltip_shot_detail_button" : "Información del plano",
     "tooltip_annotation_button" : "Anotaciones",
 

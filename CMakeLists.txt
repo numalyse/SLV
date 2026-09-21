@@ -9,6 +9,55 @@ if(MSVC)
 endif()
 
 # =========================================================
+# Datation du build
+# =========================================================
+
+# Date de build
+string(TIMESTAMP APP_BUILD_DATE "%Y-%m-%d")
+
+# Hash Git court du commit courant
+find_package(Git QUIET)
+
+if(NOT GIT_FOUND AND WIN32)
+
+    file(GLOB GITHUB_DESKTOP_GIT_DIRS
+        "$ENV{LOCALAPPDATA}/GitHubDesktop/app-*/resources/app/git/cmd"
+    )
+
+    foreach(GIT_DIR ${GITHUB_DESKTOP_GIT_DIRS})
+        if(EXISTS "${GIT_DIR}/git.exe")
+            set(GIT_EXECUTABLE "${GIT_DIR}/git.exe")
+            break()
+        endif()
+    endforeach()
+
+endif()
+
+if(GIT_EXECUTABLE)
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE APP_GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
+if(NOT APP_GIT_HASH)
+    set(APP_GIT_HASH "unknown")
+endif()
+
+message(STATUS "Git executable: ${GIT_EXECUTABLE}")
+message(STATUS "Git hash: ${APP_GIT_HASH}")
+
+# Génère version.h à partir du template
+configure_file(
+    ${CMAKE_SOURCE_DIR}/version.h.in
+    ${CMAKE_BINARY_DIR}/version.h
+    @ONLY
+)
+
+# =========================================================
 # Options générales
 # =========================================================
 set(CMAKE_CXX_STANDARD 23)
@@ -250,6 +299,8 @@ else()
     add_executable(SLV ${PROJECT_SOURCES})
 
 endif()
+
+target_include_directories(SLV PRIVATE ${CMAKE_BINARY_DIR})
 
 # =========================================================
 # Configuration par plateforme

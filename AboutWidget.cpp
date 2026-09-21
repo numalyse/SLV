@@ -1,5 +1,6 @@
 #include "AboutWidget.h"
 #include "PrefManager.h"
+#include "version.h"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -28,11 +29,25 @@ AboutWidget::AboutWidget(QWidget *parent)
     layout->addWidget(title);
 
     // Version
+
+    QString osVersion;
+#if defined(Q_OS_WIN)
+    osVersion = "Windows";
+#elif defined(Q_OS_MAC)
+    osVersion = "macOS" ;
+    #else
+    osVersion = "Linux";
+#endif
+
     QLabel *version = new QLabel(
-                                "<i>V1.0-alpha (" 
-                                + PrefManager::instance().getText("about_dialog_last_update") 
-                                + "2026-08-28)</i>",
-                                this
+        "<i>V" + QString(APP_VERSION) + "-" + QString(APP_GIT_HASH) + " - "
+        + osVersion
+        + "<br>"
+        + "("
+        + PrefManager::instance().getText("about_dialog_last_update")
+        + QString(APP_BUILD_DATE) 
+        + ")</i>",
+        this
     );
     version->setAlignment(Qt::AlignCenter);
     layout->addWidget(version);

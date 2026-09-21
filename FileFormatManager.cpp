@@ -30,7 +30,9 @@ const QString FileFormatManager::getOpenFileDialogFilters()
     PrefManager prefManager = PrefManager::instance();
     return prefManager.getText("file_multimedia") + " ("
         + FileFormatManager::instance().getFormats("containers_video")
+        + " "
         + FileFormatManager::instance().getFormats("containers_audio")
+        + " "
         + FileFormatManager::instance().getFormats("images")
         + ");;"
         + prefManager.getText("file_video") + " (" + FileFormatManager::instance().getFormats("containers_video") + ");;"
@@ -48,9 +50,13 @@ const QStringList FileFormatManager::getFormatsList(const QString& type)
 
 const QString FileFormatManager::getFormats(const QString& type)
 {
-    QString formats = "";
-    for (const auto &v : m_formatsJson[type].toArray())
-        formats += "*." + v.toString() + " ";
+    QString formats;
+    for (const auto &v : m_formatsJson[type].toArray()) {
+        if (!formats.isEmpty())
+            formats += " ";
+
+        formats += "*." + v.toString();
+    }
     return formats;
 }
 

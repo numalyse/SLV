@@ -207,6 +207,9 @@
     "(activated)" : "(Aktiviert)",
     "(deactivated)" : "(Deaktiviert)",
 
+    "activated" : "Aktiviert",
+    "deactivated" : "Deaktiviert",
+
     "activate" : "Aktivieren",
     "deactivate" : "Deaktivieren",
 
@@ -342,7 +345,12 @@
     "paths_default_video" : "Standardordner für Videoaufnahmen",
     "paths_screenshot_tooltip" : "Dieser Pfad wird automatisch durch die letzte Speicherung überschrieben",
 
-    "general_lang_code" : "Oberflächensprache: ",
+    "general_lang_code" : "Oberflächensprache",
+
+    "Player_options" : "Player-Einstellungen",
+    "autoplay_when_media_opened" : "Automatische Wiedergabe beim Öffnen des Mediums",
+    "autoplay_when_media_opened_deactivated_tooltip" : "Das Medium wird nach dem Drücken der Wiedergabetaste abgespielt",
+    "autoplay_when_media_opened_activated_tooltip" : "Das Medium wird automatisch abgespielt",
 
     "Advanced_timeline_options" : "Timeline-Einstellungen",
     "general_timeline_shot_image" : "Vorschaubilder anzeigen",

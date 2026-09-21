@@ -3,6 +3,9 @@
         "Lang" : {
             "code" : "en"
         },
+        "Player_options" : {
+            "autoplay_when_media_opened" : "deactivated"
+        },
         "Advanced_timeline_options":{
             "general_timeline_shot_image" : "shot_start_image" 
         },

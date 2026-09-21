@@ -207,6 +207,9 @@
     "(activated)" : "(Attivato)",
     "(deactivated)" : "(Disattivato)",
 
+    "activated" : "Attivato",
+    "deactivated" : "Disattivato",
+
     "activate" : "Attiva",
     "deactivate" : "Disattiva",
 
@@ -342,7 +345,12 @@
     "paths_default_video" : "Cartella predefinita per il salvataggio delle acquisizioni video",
     "paths_screenshot_tooltip" : "Questo percorso verrà sovrascritto automaticamente dal salvataggio più recente",
 
-    "general_lang_code" : "Lingua interfaccia: ",
+    "general_lang_code" : "Lingua interfaccia",
+
+    "Player_options" : "Impostazioni del lettore",
+    "autoplay_when_media_opened" : "Riproduzione automatica all'apertura del contenuto multimediale",
+    "autoplay_when_media_opened_deactivated_tooltip" : "Il contenuto multimediale viene riprodotto dopo aver premuto il pulsante di riproduzione",
+    "autoplay_when_media_opened_activated_tooltip" : "Il contenuto multimediale viene riprodotto automaticamente",
 
     "Advanced_timeline_options" : "Impostazioni della timeline",
     "general_timeline_shot_image" : "Visualizzazione miniature",

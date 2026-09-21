@@ -18,7 +18,7 @@
 ShotDetail::ShotDetail(ThumbnailWorker* thumbnailWorker, QWidget *parent) : NavPanelContentBase(parent), p_thumbnailWorker{thumbnailWorker}
 {
     //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 
     connect(p_thumbnailWorker, &ThumbnailWorker::thumbnailReady, this, &ShotDetail::onThumbnailReady);
 

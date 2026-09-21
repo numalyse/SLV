@@ -24,6 +24,9 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QThreadPool>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QPixmap>
 
 // Fonction helper pour appliquer les transformations VLC correctes au média
 void applyTransformOptions(libvlc_media_t* vlcMedia, unsigned int rotation, bool hflip, bool vflip) {
@@ -417,6 +420,15 @@ void MediaWidget::takeScreenshot()
         libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), w, h);
     else
         libvlc_video_take_snapshot(m_player, 0, capturePathBytes.constData(), h, w);
+
+    // Sur macOS, libvlc_video_take_snapshot peut ignorer la crop/display geometry
+    // (selon le backend vidéo). On capture en fallback la fenêtre native si besoin.
+#ifdef Q_OS_MAC
+    QPixmap pix = QGuiApplication::primaryScreen()->grabWindow(m_mediaSurface->winId());
+    if(!pix.isNull()){
+        pix.save(capturePath);
+    }
+#endif
 
     if(isMediaAdjusted)
          libvlc_video_set_adjust_int(m_player, libvlc_adjust_Enable, 1);
@@ -991,13 +1003,16 @@ void MediaWidget::wheelEvent(QWheelEvent *event)
 {
     if(!m_player || !m_media || !m_zoomActivated) return;
 
+    // On macOS les trackpads utilisent souvent pixelDelta() (angleDelta() == 0).
+    // Prendre pixelDelta si angleDelta est nul pour que le zoom fonctionne correctement.
     int delta = event->angleDelta().y();
+    if (delta == 0) delta = event->pixelDelta().y();
 
     QPointF cursorPosNormalized = QPointF(event->position().x() / geometry().width(), event->position().y() / geometry().height());
 
     if (delta < 0)
         libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(0.1, cursorPosNormalized).toUtf8().constData());
-    else
+    else if (delta > 0)
         libvlc_video_set_crop_geometry(m_player, m_zoomHelper.zoom(-0.1, cursorPosNormalized).toUtf8().constData());
 
     emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');

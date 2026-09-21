@@ -29,9 +29,21 @@ AboutWidget::AboutWidget(QWidget *parent)
     layout->addWidget(title);
 
     // Version
+
+    QString osVersion;
+#if defined(Q_OS_WIN)
+    osVersion = "Windows";
+#elif defined(Q_OS_MAC)
+    osVersion = "macOS" ;
+    #else
+    osVersion = "Linux";
+#endif
+
     QLabel *version = new QLabel(
-        "<i>V" + QString(APP_VERSION) + "-" + QString(APP_GIT_HASH) +
-        " ("
+        "<i>V" + QString(APP_VERSION) + "-" + QString(APP_GIT_HASH) + " - "
+        + osVersion
+        + "<br>"
+        + "("
         + PrefManager::instance().getText("about_dialog_last_update")
         + QString(APP_BUILD_DATE) 
         + ")</i>",

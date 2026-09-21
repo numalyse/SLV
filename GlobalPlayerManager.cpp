@@ -245,6 +245,7 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
                 if (m_toolbarWidget->fullscreenBtn())
                     m_toolbarWidget->fullscreenBtn()->setButtonState(true);
                 updateSplittersStyle(true);
+                m_toolbarWidget->enableFullscreenRequested();
                 emit enableFullscreenMainRequested();
             });
         }

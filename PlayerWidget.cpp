@@ -631,7 +631,7 @@ void PlayerWidget::mediaPlayerEjectedHandler()
     }else {
         hideMediaLogo();
     }
-    //emit SignalManager::instance().updateMediaChangeButtons(false, false);
+    emit SignalManager::instance().updateMediaChangeButtons(false, false);
     emit ejectUiUpdateRequested();
     emit checkPlayersPlayStatusRequested();
     emit SignalManager::instance().displayPlaylist();

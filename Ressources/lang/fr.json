@@ -207,6 +207,9 @@
     "(activated)" : "(Activé)",
     "(deactivated)" : "(Désactivé)",
 
+    "activated" : "Activé",
+    "deactivated" : "Désactivé",
+
     "activate" : "Activer",
     "deactivate" : "Désactiver",
 
@@ -342,7 +345,12 @@
     "paths_default_video" : "Dossier par défaut de sauvegarde des captures vidéos",
     "paths_screenshot_tooltip" : "Ce chemin sera automatiquement écrasé par la sauvegarde la plus récente",
 
-    "general_lang_code" : "Langue de l'interface : ",
+    "general_lang_code" : "Langue de l'interface",
+
+    "Player_options" : "Paramètres du lecteur",
+    "autoplay_when_media_opened" : "Lecture automatique à l'ouverture du média",
+    "autoplay_when_media_opened_deactivated_tooltip" : "Le média est lu après avoir appuyé sur le bouton Lecture",
+    "autoplay_when_media_opened_activated_tooltip" : "Le média est lu automatiquement",
 
     "Advanced_timeline_options" : "Paramètres de la timeline",
     "general_timeline_shot_image" : "Affichage des vignettes",

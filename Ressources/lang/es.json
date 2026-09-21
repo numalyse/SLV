@@ -207,6 +207,9 @@
     "(activated)" : "(Activado)",
     "(deactivated)" : "(Desactivado)",
 
+    "activated" : "Activado",
+    "deactivated" : "Desactivado",
+
     "activate" : "Activar",
     "deactivate" : "Desactivar",
 
@@ -342,7 +345,12 @@
     "paths_default_video" : "Carpeta predeterminada para guardar capturas de vídeo",
     "paths_screenshot_tooltip" : "Esta ruta se sobrescribirá automáticamente con el guardado más reciente",
 
-    "general_lang_code" : "Idioma de la interfaz: ",
+    "general_lang_code" : "Idioma de la interfaz",
+
+    "Player_options" : "Configuración del reproductor",
+    "autoplay_when_media_opened" : "Reproducción automática al abrir el contenido multimedia",
+    "autoplay_when_media_opened_deactivated_tooltip" : "El contenido multimedia se reproduce después de pulsar el botón de reproducción",
+    "autoplay_when_media_opened_activated_tooltip" : "El contenido multimedia se reproduce automáticamente",
 
     "Advanced_timeline_options" : "Ajustes de la línea de tiempo",
     "general_timeline_shot_image" : "Visualización de miniaturas",

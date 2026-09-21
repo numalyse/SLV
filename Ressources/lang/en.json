@@ -207,6 +207,9 @@
     "(activated)" : "(Activated)",
     "(deactivated)" : "(Deactivated)",
 
+    "activated" : "Activated",
+    "deactivated" : "Deactivated",
+
     "activate" : "Activate",
     "deactivate" : "Deactivate",
     
@@ -342,7 +345,12 @@
     "paths_default_video" : "Default folder for saving video captures",
     "paths_screenshot_tooltip" : "This path will be automatically overwritten by the most recent save",
 
-    "general_lang_code": "Interface Language : ",
+    "general_lang_code": "Interface Language",
+
+    "Player_options" : "Player settings",
+    "autoplay_when_media_opened" : "Autoplay when media is opened",
+    "autoplay_when_media_opened_deactivated_tooltip" : "The media plays after pressing the play button",
+    "autoplay_when_media_opened_activated_tooltip" : "The media plays automatically",
 
     "Advanced_timeline_options" : "Timeline settings",
     "general_timeline_shot_image" : "Thumbnail display",

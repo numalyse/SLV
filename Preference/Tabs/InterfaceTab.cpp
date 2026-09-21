@@ -38,6 +38,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("General", paren
     m_containerLayout->insertWidget(0, line);
     m_containerLayout->insertWidget(0, titleWidget);
 
+    // Languages Options
     QString preferredLang = prefManager.getPref("General", "Lang", "code");
     QStringList availableLangs = prefManager.getAvailableLangs();
 
@@ -52,6 +53,25 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("General", paren
 
     addPreferenceFrame(langFrame);
 
+    // Player Options
+    QLabel* playerOptionsLabel = new QLabel(prefManager.getText("Player_options"));
+    m_containerLayout->addWidget(playerOptionsLabel);
+
+    QString autoplayPlayerPreference = prefManager.getPref("General", "Player_options", "autoplay_when_media_opened");
+    
+    FormComboBoxFrame* autoplayPlayerOption = new FormComboBoxFrame(
+        prefManager.getText("autoplay_when_media_opened"),
+        "Player_options",
+        "autoplay_when_media_opened",
+        autoplayPlayerPreference,
+        QStringList({"deactivated", "activated"}),
+        m_container
+    );
+
+    addPreferenceFrame(autoplayPlayerOption);
+
+
+    // Timeline Options
     QLabel* timelineOptionsLabel = new QLabel(prefManager.getText("Advanced_timeline_options"));
     m_containerLayout->addWidget(timelineOptionsLabel);
 
@@ -69,6 +89,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("General", paren
 
     addPreferenceFrame(timelineTagFrame);
 
+    // Exports Options
     QLabel* subTabTitle = new QLabel;
     subTabTitle->setText(PrefManager::instance().getText("tab_param_export"));
 
@@ -79,7 +100,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("General", paren
 
     QString userAudioPreference = PrefManager::instance().getPref("General", "Exports", "sequence_extraction_audio_format");
 
-    //Exports sequence_extraction_audio_format
+    // Exports sequence_extraction_audio_format
     FormComboBoxFrame* audioFormatType = new FormComboBoxFrame(
         prefManager.getText("sequence_extraction_audio_format"),
         "Exports",

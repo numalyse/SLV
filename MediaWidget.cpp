@@ -1037,9 +1037,12 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
 
         emit mediaPlayerLoaded();
 
-        setTime(0);
-        pause();
-        emit playbackPaused();
+        if(PrefManager::instance().getPref("General", "Player_options", "autoplay_when_media_opened") == "deactivated"){
+            setTime(0);
+            pause();
+            emit playbackPaused();
+        }
+            
 
     }, Qt::QueuedConnection);
 

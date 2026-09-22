@@ -12,6 +12,7 @@ MonoviewContent::MonoviewContent(QWidget* parent)
 {
     QString presentationTitle = "help_menu_presentation_label";
     QString openMedia = "help_menu_open_file_label";
+    QString extractSequenceTitle = "help_menu_extract_sequence_label";
 
     addSubcategory(
         presentationTitle,
@@ -27,6 +28,11 @@ MonoviewContent::MonoviewContent(QWidget* parent)
     //     "Player",
     //     player(openMedia)
     // );
+
+    addSubcategory(
+        extractSequenceTitle,
+        extractSequence(extractSequenceTitle)
+    );
 
     
 }
@@ -151,7 +157,7 @@ QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
         }
     });
 
-    widget->addImage("open_medias");
+    widget->addImage("file_open_dialog");
 
     widget->addQMAPTexts({
         {"fr", {"Par glisser-déposer",
@@ -179,7 +185,7 @@ QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
         }
     });
 
-    widget->addImage("open_medias_drag_drop");
+    widget->addImage("dragdrop_file");
 
     widget->addQMAPTexts({
         {"fr", {"Avec le bouton Lecture",
@@ -207,7 +213,7 @@ QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
         }
     });
 
-        widget->addImage("open_medias_play_button");
+    widget->addImage("player");
 
     return widget;
 }
@@ -215,6 +221,43 @@ QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
 QWidget* MonoviewContent::player(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+
+    return widget;
+}
+
+QWidget* MonoviewContent::extractSequence(const QString& subcategoryName)
+{
+    auto* widget = new ContentBase(this, categoryName(), subcategoryName);
+
+    widget->addQMAPTexts({
+        {"fr", {"Extraire une séquence",
+            "Une fenêtre s'ouvre pour configurer l'extraction.\n"
+            "Par défaut, le timecode de début est celui correspondant au curseur temporel. Si possible, +10 secondes sont ajoutées par défaut au timecode de fin.\n"}
+        },
+        {"en", {"Extract a sequence",
+            "A window opens to configure the extraction.\n"
+            "By default, the start timecode is the one corresponding to the time cursor. If possible, +10 seconds are added by default to the end timecode.\n"}
+        },
+        {"es", {"Extraer una secuencia",
+            "Se abre una ventana para configurar la extracción.\n"
+            "Por defecto, el timecode de inicio es el que corresponde al cursor temporal. Si es posible, se añaden por defecto +10 segundos al timecode de fin.\n"}
+        },
+        {"de", {"Eine Sequenz extrahieren",
+            "Ein Fenster öffnet sich, um die Extraktion zu konfigurieren.\n"
+            "Standardmäßig entspricht der Start-Timecode der Position des Zeitcursors. Falls möglich, werden standardmäßig +10 Sekunden zum End-Timecode hinzugefügt.\n"}
+        },
+        {"it", {"Estrarre una sequenza",
+            "Si apre una finestra per configurare l'estrazione.\n"
+            "Per impostazione predefinita, il timecode di inizio è quello corrispondente al cursore temporale. Se possibile, vengono aggiunti per impostazione predefinita +10 secondi al timecode di fine.\n"}
+        },
+        {"pt", {"Extrair uma sequência",
+            "Uma janela é aberta para configurar a extração.\n"
+            "Por padrão, o timecode de início é aquele correspondente ao cursor temporal. Se possível, +10 segundos são adicionados por padrão ao timecode de fim.\n"}
+        }
+    });
+
+    widget->addImages({"extract_sequence", "extract_sequence_options"});
 
 
     return widget;

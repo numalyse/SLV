@@ -82,6 +82,8 @@ QWidget* MultiviewContent::presentation(const QString& subcategoryName)
 
     widget->addImage("multiview_display");
 
+    widget->addImages({"player2", "player2", "player3"});
+
     widget->addTextFromLangQMAP({
         {"fr", 
             "Deux méthodes permettent d'afficher plusieurs médias au sein du Numalyse Player. \n"
@@ -161,7 +163,8 @@ QWidget* MultiviewContent::openMultiviewMode(const QString& subcategoryName)
         }
     });
 
-    widget->addImages({"multiview_change_arrangement", "multiview_change_arrangement_2"});
+    widget->addImages({"views_all"});
+    widget->addImages({"views_2", "views_3"});
 
     return widget;
 }
@@ -256,36 +259,36 @@ QWidget* MultiviewContent::manageMultiview(const QString& subcategoryName)
         }
     });
 
-    widget->addImage("multiview_simplified_toolbar");
+    widget->addImage("");
 
     widget->addQMAPTexts({
         {"fr", {"Barre de navigation commune",
             "Une barre de navigation commune permet de gérer tous les lecteurs simultanément.\n"
             "\n"}
         },
-        {"en", {"Individual navigation bar",
-            "A simplified playback bar lets you manage each player independently. It provides the essential features to control the playback of each media.\n"
+        {"en", {"Common navigation bar",
+            "A common navigation bar lets you manage all players simultaneously.\n"
             "\n"}
         },
-        {"es", {"Barra de navegación individual",
-            "Una barra de reproducción simplificada permite gestionar cada reproductor de forma independiente. Ofrece las funciones esenciales para controlar la reproducción de cada medio.\n"
+        {"es", {"Barra de navegación común",
+            "Una barra de navegación común permite gestionar todos los reproductores simultáneamente.\n"
             "\n"}
         },
-        {"de", {"Individuelle Navigationsleiste",
-            "Eine vereinfachte Wiedergabeleiste ermöglicht die unabhängige Verwaltung jedes Players. Sie bietet die wesentlichen Funktionen zur Steuerung der Wiedergabe jedes Mediums.\n"
+        {"de", {"Gemeinsame Navigationsleiste",
+            "Eine gemeinsame Navigationsleiste ermöglicht die gleichzeitige Verwaltung aller Player.\n"
             "\n"}
         },
-        {"it", {"Barra di navigazione individuale",
-            "Una barra di riproduzione semplificata consente di gestire ciascun lettore in modo indipendente. Offre le funzionalità essenziali per controllare la riproduzione di ogni contenuto multimediale.\n"
+        {"it", {"Barra di navigazione comune",
+            "Una barra di navigazione comune consente di gestire tutti i lettori simultaneamente.\n"
             "\n"}
         },
-        {"pt", {"Barra de navegação individual",
-            "Uma barra de reprodução simplificada permite gerenciar cada leitor de forma independente. Ela oferece as funcionalidades essenciais para controlar a reprodução de cada mídia.\n"
+        {"pt", {"Barra de navegação comum",
+            "Uma barra de navegação comum permite gerenciar todos os leitores simultaneamente.\n"
             "\n"}
         }
     });
 
-    widget->addImage("multiview_global_toolbar");
+    widget->addImage("");
 
     widget->addQMAPTexts({
         {"fr", {"Capture d'écran multiple",
@@ -314,7 +317,8 @@ QWidget* MultiviewContent::manageMultiview(const QString& subcategoryName)
         }
     });
 
-    widget->addImage("multiview_captures");
+    widget->addImage("multiview_screenshot");
+    widget->addImage("multiview_screenshot_dialog");
     
     return widget;
 }

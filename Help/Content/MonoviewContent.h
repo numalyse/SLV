@@ -14,6 +14,7 @@ private:
     QWidget *presentation(const QString &subcategoryName);
     QWidget *openmedia(const QString &subcategoryName);
     QWidget* player(const QString& subcategoryName);
+    QWidget *extractSequence(const QString &subcategoryName);
 };
 
 #endif

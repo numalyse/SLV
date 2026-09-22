@@ -163,12 +163,25 @@ void MainWindow::createMenuBar()
 
     auto *saveAsProjectAction = fileMenu->addAction("&" + prefManager.getText("main_window_file_save_as_project_action"));
     saveAsProjectAction->setShortcut(QKeySequence(prefManager.getPref("Shortcuts", "MainWindow", "save_as_project")));
+    saveAsProjectAction->setDisabled(true);
 
-    connect(projManager, &ProjectManager::enableSaveButton, this, [saveProjectAction](){
-        saveProjectAction->setEnabled(true);
-    });
-    connect(projManager, &ProjectManager::disableSaveButton, this, [saveProjectAction](){
+    auto updateSaveActionsState = [projManager, saveProjectAction, saveAsProjectAction]() {
+        const bool hasProject = projManager->project() != nullptr;
+        saveProjectAction->setEnabled(hasProject && projManager->needSave());
+        saveAsProjectAction->setEnabled(hasProject);
+    };
+
+    updateSaveActionsState();
+
+    connect(projManager, &ProjectManager::enableSaveButton, this, updateSaveActionsState);
+    connect(projManager, &ProjectManager::disableSaveButton, this, [saveProjectAction, saveAsProjectAction, projManager]() {
         saveProjectAction->setDisabled(true);
+        saveAsProjectAction->setEnabled(projManager->project() != nullptr);
+    });
+    connect(projManager, &ProjectManager::projectInitialized, this, updateSaveActionsState);
+    connect(projManager, &ProjectManager::projectDeleted, this, [saveProjectAction, saveAsProjectAction]() {
+        saveProjectAction->setDisabled(true);
+        saveAsProjectAction->setDisabled(true);
     });
     connect(saveProjectAction, &QAction::triggered, this, [projManager]() {
         projManager->saveProject(false);

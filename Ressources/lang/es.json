@@ -371,7 +371,7 @@
     "dialog_open_project" : "Abrir proyecto",
 
     "project_window_title_copy_video": "Creación del proyecto: copiando vídeo...",
-    "project_manager_create_project_dialog": "Crear proyecto",
+    "project_manager_create_project_dialog": "Guardar proyecto",
     "project_manager_create_project_dialog_file_type": "Carpeta del proyecto",
 
     "confirm" : "Confirmar",

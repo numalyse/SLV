@@ -69,7 +69,7 @@ QWidget* PlaylistContent::presentation(const QString& subcategoryName)
         }
     });
 
-    widget->addImage("playlist_display");
+    widget->addImage("navpanel_playlist");
 
     return widget;
 }
@@ -129,7 +129,8 @@ QWidget* PlaylistContent::managePlaylist(const QString& subcategoryName)
         }
     });
 
-    widget->addImage("playlist_display");
+    widget->addImage("playlist_open_dialog");
+    widget->addImages({"playlist_remove", "playlist_sort"});
 
     return widget;
 }

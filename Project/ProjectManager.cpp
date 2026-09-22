@@ -275,10 +275,29 @@ bool ProjectManager::createProjectFolder(){
 
     QString fileType = prefManager.getText("project_manager_create_project_dialog_file_type") + "(*)";
 
+    QString defaultDir = prefManager.getPref("Paths", "lp_project");
+
+    QString baseName = "[numaproj] ";
+
+    if(m_project && m_project->media){
+        QString mediaBaseName = QFileInfo(m_project->media->filePath()).completeBaseName();
+        baseName += mediaBaseName;
+    }
+        
+    QDir dirCheck(defaultDir);
+    QString defaultName = baseName;
+    int suffix = 2;
+    while(dirCheck.exists(defaultName)){
+        defaultName = QString("%1 (%2)").arg(baseName).arg(suffix);
+        ++suffix;
+    }
+
+    QString defaultPath = QDir(defaultDir).filePath(defaultName);
+
     QString selectedPath = QFileDialog::getSaveFileName(
         nullptr, 
         tr(prefManager.getText("project_manager_create_project_dialog").toStdString().c_str()), 
-        prefManager.getPref("Paths", "lp_project"),
+        defaultPath,
         tr(fileType.toStdString().c_str() )
     );
 

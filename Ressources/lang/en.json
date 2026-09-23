@@ -244,6 +244,7 @@
     "annotation_name" : "Name",
     "annotation_note" : "Note",
     "annotation_conflict" : "Conflicts with another annotation",
+    "annotation_conflict_2" : "Invalid end timecode",
 
     "remove_all" : "Remove all",
     "remove_existing_items" : "Remove",

@@ -245,6 +245,7 @@
     "annotation_name" : "Nom",
     "annotation_note" : "Note",
     "annotation_conflict" : "Conflit avec une autre annotation",
+    "annotation_conflict_2" : "Timecode de fin invalide",
 
     "remove_all" : "Tout retirer",
     "remove_existing_items" : "Retirer",

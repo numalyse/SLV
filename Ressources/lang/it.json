@@ -50,7 +50,8 @@
     "tooltip_slider_disabled" : "Rimuovi loop A/B per riattivare",
     "tooltip_adjust" : "Regola colore video",
 
-    "tooltip_time_total_btn": "Mostra tempo totale / rimanente",
+    "tooltip_time_total_btn": "Tempo totale",
+    "tooltip_time_remaining_btn" : "Tempo rimanente",
     "tooltip_extract_sequence": "Estrai sequenza",
     "tooltip_prev_frame": "Fotogramma precedente",
     "tooltip_next_frame": "Fotogramma successivo",
@@ -144,7 +145,7 @@
     "shot_detail_informations_title" : "Informazioni",
     "shot_detail_uneditable_tooltip" : "Informazioni non modificabili",
     "shot_detail_analysis_title" : "Analisi utente",
-    "shot_detail_id_name" : "Numero del piano",
+    "shot_detail_id_name" : "Numero",
     "shot_detail_title_name" : "Titolo",
     "shot_detail_start_time_name" : "Inizio",
     "shot_detail_end_time_name" : "Fine",
@@ -174,10 +175,13 @@
     "subtitles" : "Sottotitoli",
     "no_audio" : "Nessuna traccia audio",
     "no_subtitles" : "Nessuna traccia sottotitoli",
-    "add_subtitles" : "Aggiungi sottotitoli",
+    "add_subtitles" : "Aggiungi file di sottotitoli...",
+    "subtitles_files" : "File di sottotitoli",
     "added_subtitles" : "Sottotitoli aggiunti",
     "fail_subtitles" : "Impossibile aggiungere i sottotitoli",
     "conflict_subtitles" : "Questa traccia di sottotitoli esiste già",
+    "subtitles_path_selection" : "Aggiungi sottotitoli esterni",
+
 
     "extract_start_label" : "Inizio",
     "extract_end_label" : "Fine",
@@ -241,6 +245,7 @@
     "annotation_name" : "Nome",
     "annotation_note" : "Nota",
     "annotation_conflict" : "Conflitto con un'altra annotazione",
+    "annotation_conflict_2" : "Timecode di fine non valido",
 
     "remove_all" : "Rimuovi tutto",
     "remove_existing_items" : "Rimuovi",
@@ -506,7 +511,7 @@
 
     "messagebox_fullscreen_experimental" : "La funzionalità schermo intero del software è attualmente in fase di sviluppo.",
 
-    "extract_sequence_action" : "Estrarre la sequenza",
+    "extract_sequence_action" : "Estrarre sequenza",
     "extract_sequence_audio_only_action" : "Solo audio",
     "extract_sequence_default" : "Semplice (predefinito)",
     "extract_sequence_reencode" : "Avanzato",

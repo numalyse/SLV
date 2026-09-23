@@ -659,11 +659,14 @@ void PlayerWidget::resetLayerWidgets()
 
 void PlayerWidget::openSubtitlesFileDialog()
 {
+    QFileInfo mediaInfo(getMediaPath());
+    QString initialPath = mediaInfo.absolutePath();
+
     QString filePath = QFileDialog::getOpenFileName(
         this,
         PrefManager::instance().getText("subtitles_path_selection"),
-        getMediaPath(),
-        FileFormatManager::instance().getFormats("subtitles")
+        initialPath,
+        PrefManager::instance().getText("subtitles_files") + " (" + FileFormatManager::instance().getFormats("subtitles") + ")"
     );
 
     if(filePath.isEmpty()) return;

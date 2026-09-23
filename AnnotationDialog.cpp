@@ -148,6 +148,16 @@ void AnnotationDialog::accept()
     if (!annotManager) return;
 
     Annotation annot = annotation();
+
+    if (annot.end < annot.start)
+    {
+        m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+        m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+        m_errorLabel->setText(PrefManager::instance().getText("annotation_conflict_2"));
+        m_errorLabel->show();
+        return;
+    }
+
     auto conflict = annotManager->findConflict(annot);
 
     if(conflict.has_value())

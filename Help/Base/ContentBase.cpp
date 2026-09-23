@@ -104,6 +104,7 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
 
     // Setup contenu
     m_contentWidget = new QWidget();
+    m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     m_contentLayout = new QVBoxLayout(m_contentWidget);
     m_contentLayout->setContentsMargins(20, 20, 20, 20);
     m_contentLayout->setSpacing(10);

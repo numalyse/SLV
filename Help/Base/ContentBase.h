@@ -43,7 +43,9 @@ public:
     QWidget *createButtonDescription(const QString &iconName, const QString &buttonLabel, const QString &buttonDescription);
     void addButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
 
-    void addImage(const QString &imageName);
+    void addImage(const QString &imageName, double widthRatio = 1.0);
+
+    //void addImage(const QString &imageName);
     void addImages(const QList<QString> &imageNames);
     void addTextFromLangJSON(const QString &descriptionName);
 

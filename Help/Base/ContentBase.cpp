@@ -7,49 +7,74 @@
 #include <QLabel>
 #include <QScrollArea>
 
-class ImageLabel : public QLabel
-{
+class ImageLabel : public QLabel {
 public:
-    explicit ImageLabel(const QPixmap& pixmap, QWidget* parent = nullptr)
-        : QLabel(parent), m_pixmap(pixmap)
-    {
+    explicit ImageLabel(const QPixmap &pixmap, QWidget *parent = nullptr) : QLabel(parent), m_pixmap(pixmap){
         setAlignment(Qt::AlignCenter);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
 
-    QSize sizeHint() const override
-    {
+    void setWidthRatio(double ratio){
+        m_widthRatio = qBound(0.0, ratio, 1.0);
+        updateGeometry();
+        updatePixmap();
+    }
+
+    QSize sizeHint() const override{
         if (m_pixmap.isNull())
-            return QLabel::sizeHint();
+            return QSize(0, 0);
 
-        const int w = parentWidget()
-            ? parentWidget()->width()
-            : m_pixmap.width();
+        int width = 100;
 
-        return QSize(
-            w,
-            m_pixmap.height() * w / m_pixmap.width()
-        );
+        if (m_widthRatio > 0.0 && parentWidget())
+            width = parentWidget()->width() * m_widthRatio;
+
+        width = qMax(width, 1);
+        width = qMin(width, m_pixmap.width());
+
+        const int height = width * m_pixmap.height() / m_pixmap.width();
+
+        return QSize(width, height);
     }
 
 protected:
-    void resizeEvent(QResizeEvent* event) override
-    {
+    void resizeEvent(QResizeEvent *event) override{
         QLabel::resizeEvent(event);
+        updatePixmap();
+    }
 
+private:
+    void updatePixmap(){
         if (m_pixmap.isNull())
             return;
 
+        int width = contentsRect().width();
+
+        if (width <= 0)
+            return;
+
+        if (m_widthRatio > 0.0 && parentWidget()){
+            width = qMin(
+                width,
+                static_cast<int>(parentWidget()->contentsRect().width() * m_widthRatio)
+            );
+        }
+
+        width = qMin(width, m_pixmap.width());
+
+        const int height = width * m_pixmap.height() / m_pixmap.width();
+
         setPixmap(m_pixmap.scaled(
-            width(),
-            height(),
+            width,
+            height,
             Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-        ));
+            Qt::SmoothTransformation)
+        );
     }
 
 private:
     QPixmap m_pixmap;
+    double m_widthRatio = 0.0;
 };
 
 ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName)
@@ -238,11 +263,11 @@ void ContentBase::addButtonDescriptionTable(const QString& tableName, std::initi
     addContent(createTable(tableName, rows));
 }
 
-void ContentBase::addImage(const QString& imageName)
+void ContentBase::addImage(const QString& imageName, double widthRatio)
 {
     auto* widget = new QWidget(this);
 
-    widget->setStyleSheet("background-color: red;");
+    //widget->setStyleSheet("background-color: red;");
     auto* layout = new QHBoxLayout(widget);
 
     layout->setContentsMargins(0, 0, 0, 0);
@@ -252,6 +277,10 @@ void ContentBase::addImage(const QString& imageName)
     );
 
     auto* illustrationLabel = new ImageLabel(illustration);
+
+    if (widthRatio > 0.0)
+        illustrationLabel->setWidthRatio(widthRatio);
+
 
     layout->addWidget(illustrationLabel);
 
@@ -268,6 +297,9 @@ void ContentBase::addImage(const QString& imageName)
 void ContentBase::addImages(const QList<QString>& imageNames)
 {
     auto* widget = new QWidget(this);
+
+    //widget->setStyleSheet("background-color: green;");
+
     auto* layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);

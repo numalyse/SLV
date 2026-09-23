@@ -26,7 +26,7 @@ HelpDialog::HelpDialog(QWidget *parent) : QDialog(parent)
     PrefManager pref = PrefManager::instance();
     setWindowTitle(pref.getText("help_dialog_title"));
 
-    int fixedDialogWidth = double(QGuiApplication::primaryScreen()->size().width()) * 0.5;
+    int fixedDialogWidth = qMax(800., double(QGuiApplication::primaryScreen()->size().width()) * 0.5);
     int fixedDialogHeight = double(QGuiApplication::primaryScreen()->size().height()) * 0.75;
     setFixedSize(fixedDialogWidth, fixedDialogHeight);
 

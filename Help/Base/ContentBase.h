@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QGuiApplication>
 #include <QStyleHints>
+#include <QScrollArea>
+#include <QResizeEvent>
 
 class QVBoxLayout;
 using TableRow = QVector<QWidget*>;
@@ -22,6 +24,10 @@ class ContentBase : public QWidget
     Q_OBJECT
 
 public:
+
+    QScrollArea* m_scrollArea;
+    QWidget* m_contentWidget;
+
     explicit ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName);
 
     void addContent(QWidget* widget);
@@ -37,7 +43,9 @@ public:
     QWidget *createButtonDescription(const QString &iconName, const QString &buttonLabel, const QString &buttonDescription);
     void addButtonDescriptionTable(const QString& tableName, std::initializer_list<QString> button);
 
-    void addImage(const QString &imageName);
+    void addImage(const QString &imageName, double widthRatio = 1.0);
+
+    //void addImage(const QString &imageName);
     void addImages(const QList<QString> &imageNames);
     void addTextFromLangJSON(const QString &descriptionName);
 
@@ -61,6 +69,7 @@ protected:
 
     int m_imageWidth;
     int pageWidth;
+
 
 
 };

@@ -1,4 +1,5 @@
 #include "ContentBase.h"
+#include "ImageLabel.h"
 
 #include <QVBoxLayout>
 #include <QTableWidget>
@@ -24,24 +25,25 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     backgroundFillColor = "palette(base)";
 #endif
 
-    m_imageWidth = 800;
+    //m_imageWidth = 800;
 
     // Setup barre de défilement    
-    QScrollArea* scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    m_scrollArea = new QScrollArea(this);
+    m_scrollArea->setWidgetResizable(true);
+    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
 
     // Setup contenu
-    QWidget* content = new QWidget();
-    m_contentLayout = new QVBoxLayout(content);
+    m_contentWidget = new QWidget();
+    m_contentWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    m_contentLayout = new QVBoxLayout(m_contentWidget);
     m_contentLayout->setContentsMargins(20, 20, 20, 20);
     m_contentLayout->setSpacing(10);
     m_contentLayout->addStretch();
 
-    scrollArea->setWidget(content);
+    m_scrollArea->setWidget(m_contentWidget);
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->addWidget(scrollArea);
+    m_mainLayout->addWidget(m_scrollArea);
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
     // Titre & sous-titre
@@ -51,10 +53,6 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     separator->setFrameShadow(QFrame::Sunken);
     addContent(separator);
     setsubcategoryName(subcategoryName);
-
-    pageWidth = m_contentLayout->parentWidget()->width()
-                - m_contentLayout->contentsMargins().left()
-                - m_contentLayout->contentsMargins().right();
 
 }
 
@@ -197,24 +195,31 @@ void ContentBase::addButtonDescriptionTable(const QString& tableName, std::initi
     addContent(createTable(tableName, rows));
 }
 
-void ContentBase::addImage(const QString& imageName)
+void ContentBase::addImage(const QString& imageName, double widthRatio)
 {
     auto* widget = new QWidget(this);
+
+    //widget->setStyleSheet("background-color: red;");
     auto* layout = new QHBoxLayout(widget);
 
-    QLabel* illustrationLabel = new QLabel();
-    QPixmap illustration(":/help_dialog_illustrations/" + imageName);
-    illustrationLabel->setPixmap(illustration.scaled(
-        m_imageWidth,
-        10000,
-        Qt::KeepAspectRatio,
-        Qt::SmoothTransformation
-    ));
+    layout->setContentsMargins(0, 0, 0, 0);
 
-    illustrationLabel->setAlignment(Qt::AlignCenter);
-    illustrationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    
+    QPixmap illustration(
+        ":/help_dialog_illustrations/" + imageName
+    );
+
+    auto* illustrationLabel = new ImageLabel(illustration);
+
+    if (widthRatio > 0.0)
+        illustrationLabel->setWidthRatio(widthRatio);
+
+
     layout->addWidget(illustrationLabel);
+
+    widget->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Preferred
+    );
 
     addContent(widget);
 }
@@ -224,23 +229,28 @@ void ContentBase::addImage(const QString& imageName)
 void ContentBase::addImages(const QList<QString>& imageNames)
 {
     auto* widget = new QWidget(this);
-    auto* layout = new QHBoxLayout(widget);
 
+    //widget->setStyleSheet("background-color: green;");
+
+    auto* layout = new QHBoxLayout(widget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     for (const QString& imageName : imageNames)
     {
-        QLabel* illustrationLabel = new QLabel();
-        
-        QPixmap illustration(":/help_dialog_illustrations/" + imageName);
-        illustrationLabel->setPixmap(illustration);
+        QPixmap illustration(
+            ":/help_dialog_illustrations/" + imageName
+        );
 
-        illustrationLabel->setAlignment(Qt::AlignCenter);
-        illustrationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        
+        auto* illustrationLabel = new ImageLabel(illustration);
+
         layout->addWidget(illustrationLabel, 1);
     }
 
-        widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    widget->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Minimum
+    );
 
     addContent(widget);
 }

@@ -1,4 +1,5 @@
 #include "ContentBase.h"
+#include "ImageLabel.h"
 
 #include <QVBoxLayout>
 #include <QTableWidget>
@@ -6,76 +7,6 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QScrollArea>
-
-class ImageLabel : public QLabel {
-public:
-    explicit ImageLabel(const QPixmap &pixmap, QWidget *parent = nullptr) : QLabel(parent), m_pixmap(pixmap){
-        setAlignment(Qt::AlignCenter);
-        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    }
-
-    void setWidthRatio(double ratio){
-        m_widthRatio = qBound(0.0, ratio, 1.0);
-        updateGeometry();
-        updatePixmap();
-    }
-
-    QSize sizeHint() const override{
-        if (m_pixmap.isNull())
-            return QSize(0, 0);
-
-        int width = 100;
-
-        if (m_widthRatio > 0.0 && parentWidget())
-            width = parentWidget()->width() * m_widthRatio;
-
-        width = qMax(width, 1);
-        width = qMin(width, m_pixmap.width());
-
-        const int height = width * m_pixmap.height() / m_pixmap.width();
-
-        return QSize(width, height);
-    }
-
-protected:
-    void resizeEvent(QResizeEvent *event) override{
-        QLabel::resizeEvent(event);
-        updatePixmap();
-    }
-
-private:
-    void updatePixmap(){
-        if (m_pixmap.isNull())
-            return;
-
-        int width = contentsRect().width();
-
-        if (width <= 0)
-            return;
-
-        if (m_widthRatio > 0.0 && parentWidget()){
-            width = qMin(
-                width,
-                static_cast<int>(parentWidget()->contentsRect().width() * m_widthRatio)
-            );
-        }
-
-        width = qMin(width, m_pixmap.width());
-
-        const int height = width * m_pixmap.height() / m_pixmap.width();
-
-        setPixmap(m_pixmap.scaled(
-            width,
-            height,
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation)
-        );
-    }
-
-private:
-    QPixmap m_pixmap;
-    double m_widthRatio = 0.0;
-};
 
 ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName)
     : QWidget(parent) , pref(PrefManager::instance()), fileformat(FileFormatManager::instance())

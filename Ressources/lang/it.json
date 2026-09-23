@@ -50,7 +50,8 @@
     "tooltip_slider_disabled" : "Rimuovi loop A/B per riattivare",
     "tooltip_adjust" : "Regola colore video",
 
-    "tooltip_time_total_btn": "Mostra tempo totale / rimanente",
+    "tooltip_time_total_btn": "Tempo totale",
+    "tooltip_time_remaining_btn" : "Tempo rimanente",
     "tooltip_extract_sequence": "Estrai sequenza",
     "tooltip_prev_frame": "Fotogramma precedente",
     "tooltip_next_frame": "Fotogramma successivo",

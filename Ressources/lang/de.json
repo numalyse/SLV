@@ -50,7 +50,8 @@
     "tooltip_slider_disabled" : "A/B-Schleife entfernen, um zu reaktivieren",
     "tooltip_adjust" : "Farbkorrektur des Videos anpassen",
 
-    "tooltip_time_total_btn": "Gesamtzeit / Restzeit anzeigen",
+    "tooltip_time_total_btn": "Gesamtzeit",
+    "tooltip_time_remaining_btn" : "Verbleibende Zeit",
     "tooltip_extract_sequence": "Sequenz extrahieren",
     "tooltip_prev_frame": "Vorheriges Bild",
     "tooltip_next_frame": "Nächstes Bild",

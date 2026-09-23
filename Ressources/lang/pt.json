@@ -174,10 +174,12 @@
     "subtitles" : "Legendas",
     "no_audio" : "Sem faixa de áudio",
     "no_subtitles" : "Sem faixa de legendas",
-    "add_subtitles" : "Adicionar legendas",
+    "add_subtitles" : "Adicionar arquivo de legendas...",
+    "subtitles_files" : "Arquivo de legendas",
     "added_subtitles" : "Legendas adicionadas",
     "fail_subtitles" : "Não foi possível adicionar as legendas",
     "conflict_subtitles" : "Esta faixa de legendas já existe",
+    "subtitles_path_selection" : "Adicionar legendas externas",
 
     "extract_start_label" : "Início",
     "extract_end_label" : "Fim",

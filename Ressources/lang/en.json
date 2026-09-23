@@ -174,10 +174,12 @@
     "subtitles" : "Subtitles",
     "no_audio" : "No audio track",
     "no_subtitles" : "No subtitle track",
-    "add_subtitles" : "Add subtitles",
+    "add_subtitles" : "Add subtitles file...",
+    "subtitles_files" : "Subtitle file",
     "added_subtitles" : "Subtitles added",
     "fail_subtitles" : "Unable to add subtitles",
     "conflict_subtitles" : "This subtitle track already exists",
+    "subtitles_path_selection" : "Add external subtitles",
 
     "extract_start_label" : "Start",
     "extract_end_label" : "End",

@@ -174,10 +174,12 @@
     "subtitles" : "Untertitel",
     "no_audio" : "Keine Audiospur",
     "no_subtitles" : "Keine Untertitelspur",
-    "add_subtitles" : "Untertitel hinzufügen",
+    "add_subtitles" : "Untertiteldatei hinzufügen...",
+    "subtitles_files" : "Untertiteldatei",
     "added_subtitles" : "Untertitel hinzugefügt",
     "fail_subtitles" : "Untertitel konnten nicht hinzugefügt werden",
     "conflict_subtitles" : "Diese Untertitelspur existiert bereits",
+    "subtitles_path_selection" : "Externe Untertitel hinzufügen",
 
     "extract_start_label" : "Start",
     "extract_end_label" : "Ende",

@@ -174,10 +174,12 @@
     "subtitles" : "Subtítulos",
     "no_audio" : "Sin pista de audio",
     "no_subtitles" : "Sin pista de subtítulos",
-    "add_subtitles" : "Añadir subtítulos",
+    "add_subtitles" : "Añadir archivo de subtítulos...",
+    "subtitles_files" : "Archivo de subtítulos",
     "added_subtitles" : "Subtítulos añadidos",
     "fail_subtitles" : "No se pudieron añadir los subtítulos",
     "conflict_subtitles" : "Esta pista de subtítulos ya existe",
+    "subtitles_path_selection" : "Añadir subtítulos externos",
 
     "extract_start_label" : "Inicio",
     "extract_end_label" : "Fin",

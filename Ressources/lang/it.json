@@ -145,7 +145,7 @@
     "shot_detail_informations_title" : "Informazioni",
     "shot_detail_uneditable_tooltip" : "Informazioni non modificabili",
     "shot_detail_analysis_title" : "Analisi utente",
-    "shot_detail_id_name" : "Numero del piano",
+    "shot_detail_id_name" : "Numero",
     "shot_detail_title_name" : "Titolo",
     "shot_detail_start_time_name" : "Inizio",
     "shot_detail_end_time_name" : "Fine",

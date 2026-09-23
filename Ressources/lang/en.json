@@ -145,7 +145,7 @@
     "shot_detail_informations_title" : "Information",
     "shot_detail_uneditable_tooltip" : "Non-editable information",
     "shot_detail_analysis_title" : "User analysis",
-    "shot_detail_id_name" : "Shot numbering",
+    "shot_detail_id_name" : "Number",
     "shot_detail_title_name" : "Title",
     "shot_detail_start_time_name" : "Start",
     "shot_detail_end_time_name" : "End",

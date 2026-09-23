@@ -145,7 +145,7 @@
     "shot_detail_informations_title" : "Informationen",
     "shot_detail_uneditable_tooltip" : "Nicht bearbeitbare Informationen",
     "shot_detail_analysis_title" : "Benutzeranalyse",
-    "shot_detail_id_name" : "Schnittnummer",
+    "shot_detail_id_name" : "Nummer",
     "shot_detail_title_name" : "Titel",
     "shot_detail_start_time_name" : "Start",
     "shot_detail_end_time_name" : "Ende",

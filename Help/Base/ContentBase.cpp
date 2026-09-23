@@ -7,6 +7,51 @@
 #include <QLabel>
 #include <QScrollArea>
 
+class ImageLabel : public QLabel
+{
+public:
+    explicit ImageLabel(const QPixmap& pixmap, QWidget* parent = nullptr)
+        : QLabel(parent), m_pixmap(pixmap)
+    {
+        setAlignment(Qt::AlignCenter);
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+
+    QSize sizeHint() const override
+    {
+        if (m_pixmap.isNull())
+            return QLabel::sizeHint();
+
+        const int w = parentWidget()
+            ? parentWidget()->width()
+            : m_pixmap.width();
+
+        return QSize(
+            w,
+            m_pixmap.height() * w / m_pixmap.width()
+        );
+    }
+
+protected:
+    void resizeEvent(QResizeEvent* event) override
+    {
+        QLabel::resizeEvent(event);
+
+        if (m_pixmap.isNull())
+            return;
+
+        setPixmap(m_pixmap.scaled(
+            width(),
+            height(),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        ));
+    }
+
+private:
+    QPixmap m_pixmap;
+};
+
 ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QString& subcategoryName)
     : QWidget(parent) , pref(PrefManager::instance()), fileformat(FileFormatManager::instance())
 {
@@ -24,24 +69,24 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     backgroundFillColor = "palette(base)";
 #endif
 
-    m_imageWidth = 800;
+    //m_imageWidth = 800;
 
     // Setup barre de défilement    
-    QScrollArea* scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    m_scrollArea = new QScrollArea(this);
+    m_scrollArea->setWidgetResizable(true);
+    m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
+    m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); 
 
     // Setup contenu
-    QWidget* content = new QWidget();
-    m_contentLayout = new QVBoxLayout(content);
+    m_contentWidget = new QWidget();
+    m_contentLayout = new QVBoxLayout(m_contentWidget);
     m_contentLayout->setContentsMargins(20, 20, 20, 20);
     m_contentLayout->setSpacing(10);
     m_contentLayout->addStretch();
 
-    scrollArea->setWidget(content);
+    m_scrollArea->setWidget(m_contentWidget);
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->addWidget(scrollArea);
+    m_mainLayout->addWidget(m_scrollArea);
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
     // Titre & sous-titre
@@ -51,10 +96,6 @@ ContentBase::ContentBase(QWidget *parent, const QString& categoryName, const QSt
     separator->setFrameShadow(QFrame::Sunken);
     addContent(separator);
     setsubcategoryName(subcategoryName);
-
-    pageWidth = m_contentLayout->parentWidget()->width()
-                - m_contentLayout->contentsMargins().left()
-                - m_contentLayout->contentsMargins().right();
 
 }
 
@@ -200,21 +241,24 @@ void ContentBase::addButtonDescriptionTable(const QString& tableName, std::initi
 void ContentBase::addImage(const QString& imageName)
 {
     auto* widget = new QWidget(this);
+
+    widget->setStyleSheet("background-color: red;");
     auto* layout = new QHBoxLayout(widget);
 
-    QLabel* illustrationLabel = new QLabel();
-    QPixmap illustration(":/help_dialog_illustrations/" + imageName);
-    illustrationLabel->setPixmap(illustration.scaled(
-        m_imageWidth,
-        10000,
-        Qt::KeepAspectRatio,
-        Qt::SmoothTransformation
-    ));
+    layout->setContentsMargins(0, 0, 0, 0);
 
-    illustrationLabel->setAlignment(Qt::AlignCenter);
-    illustrationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    
+    QPixmap illustration(
+        ":/help_dialog_illustrations/" + imageName
+    );
+
+    auto* illustrationLabel = new ImageLabel(illustration);
+
     layout->addWidget(illustrationLabel);
+
+    widget->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Preferred
+    );
 
     addContent(widget);
 }
@@ -225,22 +269,24 @@ void ContentBase::addImages(const QList<QString>& imageNames)
 {
     auto* widget = new QWidget(this);
     auto* layout = new QHBoxLayout(widget);
-
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     for (const QString& imageName : imageNames)
     {
-        QLabel* illustrationLabel = new QLabel();
-        
-        QPixmap illustration(":/help_dialog_illustrations/" + imageName);
-        illustrationLabel->setPixmap(illustration);
+        QPixmap illustration(
+            ":/help_dialog_illustrations/" + imageName
+        );
 
-        illustrationLabel->setAlignment(Qt::AlignCenter);
-        illustrationLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        
+        auto* illustrationLabel = new ImageLabel(illustration);
+
         layout->addWidget(illustrationLabel, 1);
     }
 
-        widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    widget->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Minimum
+    );
 
     addContent(widget);
 }

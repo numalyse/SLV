@@ -12,9 +12,24 @@ namespace SLV {
 /// @brief Save current playlist into a new .xspf file compatible with VLC
 void savePlaylist(const QVector<PlaylistItem *>& items, const QVector<unsigned int>& sortOrder = {})
 {
-    QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("tooltip_save_playlist"), PrefManager::instance().getPref("Paths", "lp_extract_sequence"),
+    QString dir = PrefManager::instance().getPref("Paths", "lp_extract_sequence");
+
+    QString initialPath = dir + "/playlist.xspf";
+    int i = 1;
+    while(QFileInfo::exists(initialPath)) {
+        initialPath = dir + "/playlist (" + QString::number(i) + ").xspf";
+        ++i;
+    }
+
+    QString savePath = QFileDialog::getSaveFileName(nullptr, PrefManager::instance().getText("tooltip_save_playlist"), initialPath,
                                                     PrefManager::instance().getText("file_playlist") + " " + "(*.xspf)");
-    // savePath += ".xspf";
+    
+    if(savePath.isEmpty()) return;
+
+    if(!savePath.endsWith(".xspf", Qt::CaseInsensitive)) {
+        savePath += ".xspf";
+    }
+
     QFile *playlistFile = new QFile(savePath);
     if ( playlistFile->open(QIODevice::ReadWrite | QIODevice::Append) )
     {

@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QResizeEvent>
 
 class ImageLabel : public QLabel
@@ -67,6 +68,7 @@ protected:
     {
         m_mouseInside = false;
         m_loupeActive = false;
+        m_zoom = 2.5;
 
         setCursor(Qt::PointingHandCursor);
 
@@ -104,6 +106,26 @@ protected:
         }
 
         QLabel::mousePressEvent(event);
+    }
+
+    void wheelEvent(QWheelEvent *event) override
+    {
+        if (!m_loupeActive) {
+            QLabel::wheelEvent(event);
+            return;
+        }
+
+        if (event->angleDelta().y() > 0) {
+            m_zoom += 0.25;
+        } else if (event->angleDelta().y() < 0) {
+            m_zoom -= 0.25;
+        }
+
+        m_zoom = qBound(2.5, m_zoom, 8.0);
+
+        update();
+
+        event->accept();
     }
 
     void paintEvent(QPaintEvent *event) override
@@ -169,15 +191,13 @@ protected:
         double sourceX = xRatio * m_pixmap.width();
         double sourceY = yRatio * m_pixmap.height();
 
-        const double zoom = 2.5;
-
         double sourceWidth =
-            diameter / zoom *
+            diameter / m_zoom *
             m_pixmap.width() /
             displayedPixmap.width();
 
         double sourceHeight =
-            diameter / zoom *
+            diameter / m_zoom *
             m_pixmap.height() /
             displayedPixmap.height();
 
@@ -270,6 +290,7 @@ private:
     QPixmap m_pixmap;
 
     double m_widthRatio = 0.0;
+    double m_zoom = 2.5;
 
     bool m_mouseInside = false;
     bool m_loupeActive = false;

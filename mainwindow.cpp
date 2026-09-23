@@ -58,16 +58,16 @@ MainWindow::MainWindow(QWidget *parent)
     auto *rootLayout = new QVBoxLayout(ui->centralwidget);
     rootLayout->setContentsMargins(0,0,0,0);
 
-    showMaximized();
-
     m_globalPlayerManager = new GlobalPlayerManager(this);
-
+    
     auto *layout = ui->centralwidget->layout();
     layout->addWidget(m_globalPlayerManager);
-
+    
     createMenuBar();
     createToolBar();
     statusBar()->hide();
+    
+    showMaximized();
 
     connect(m_globalPlayerManager, &GlobalPlayerManager::enableFullscreenMainRequested, this, &MainWindow::enableFullscreenMain);
     connect(m_globalPlayerManager, &GlobalPlayerManager::disableFullscreenMainRequested, this, &MainWindow::disableFullscreenMain);

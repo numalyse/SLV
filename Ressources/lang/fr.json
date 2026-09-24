@@ -75,21 +75,21 @@
     "no_preview" : "Pas d'aperçu",
     "preview" : "Aperçu",
 
-    "tooltip_to_next_shot" : "Aller au plan suivant",
-    "tooltip_to_prev_shot" : "Aller au plan précédent",
+    "tooltip_to_next_shot" : "Aller au segment suivant",
+    "tooltip_to_prev_shot" : "Aller au segment précédent",
 
     "tooltip_segmentation_auto" : "Segmenter automatiquement",
 
-    "tooltip_split_shot" : "Scinder le plan",
+    "tooltip_split_shot" : "Scinder le segment",
     "tooltip_ab_loop": "Créer une boucle A-B",
-    "tooltip_merge_with_prev_shot": "Fusionner avec le plan précédent",
-    "tooltip_merge_with_next_shot": "Fusionner avec le plan suivant",
+    "tooltip_merge_with_prev_shot": "Fusionner avec le segment précédent",
+    "tooltip_merge_with_next_shot": "Fusionner avec le segment suivant",
     "tooltip_export": "Exporter",
 
     "tooltip_reposition_toolbar" : "Reinitialiser la position de la barre d'outils",
 
     "dialog_save_multiview_video" : "Enregistrer l'enregistrement multivues",
-    "dialog_save_extract_shots" : "Enregistrer l'extraction de plans",
+    "dialog_save_extract_shots" : "Enregistrer l'extraction de segments",
 
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
@@ -98,13 +98,13 @@
     "timeline_ab_extract": "Extraire la séquence A-B",
     "messagebox_extract_ab_loop_done" : "Extraction de la séquence A-B terminée.",
     "messagebox_extract_ab_loop_failed" : "Échec de l'extraction de la séquence A-B.",
-    "timeline_merge_with_previous_shot" : "Fusionner le plan actuel avec le plan précédent", 
-    "timeline_merge_with_next_shot" : "Fusionner le plan actuel avec le plan suivant",
-    "timeline_extract_selected_shots" : "Extraire les plans sélectionnés",
-    "timeline_shot_count_label" : "plan(s)",
-    "timeline_selected_shot_count_label" : "plan(s) sélectionné(s)",
-    "messagebox_extract_selected_shots_completed" : "Extraction des plans sélectionnés terminée.",
-    "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des plans sélectionnés.",
+    "timeline_merge_with_previous_shot" : "Fusionner le segment actuel avec le segment précédent", 
+    "timeline_merge_with_next_shot" : "Fusionner le segment actuel avec le segment suivant",
+    "timeline_extract_selected_shots" : "Extraire les segments sélectionnés",
+    "timeline_shot_count_label" : "segment(s)",
+    "timeline_selected_shot_count_label" : "segment(s) sélectionné(s)",
+    "messagebox_extract_selected_shots_completed" : "Extraction des segments sélectionnés terminée.",
+    "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des segments sélectionnés.",
 
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",
@@ -136,7 +136,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Segmentation automatique",
     "timeline_dialog_text_auto_segmentation": "Segmentation en cours...",
-    "timeline_dialog_text_auto_segmentation_finished": "Segmentation automatique terminée, nombre de plans total : ",
+    "timeline_dialog_text_auto_segmentation_finished": "Segmentation automatique terminée, nombre de segments total : ",
     "dialog_auto_segmentation_title": "Segmentation automatique",
     "dialog_auto_segmentation_text": "Voulez-vous lancer la segmentation automatique ?\n Une fois terminée, elle écrasera la segmentation actuelle.",
 
@@ -153,13 +153,13 @@
     "shot_detail_img_txt_name" : "Image",
     "shot_detail_sound_txt_name" : "Son",
     
-    "shot_detail_id_text" : "Plan n°",
-    "shot" : "Plan",
-    "number_of_shots" : "Nombre total de plans",
+    "shot_detail_id_text" : "segment n°",
+    "shot" : "segment",
+    "number_of_shots" : "Nombre total de segments",
     "number_of_annotations" : "Nombre total d'annotations",
-    "shots" : "Plans",
+    "shots" : "segments",
     "export_source_selection_txt" : "Sélectionner le contenu à exporter",
-    "average_shot_duration" : "Durée moyenne des plans",
+    "average_shot_duration" : "Durée moyenne des segments",
 
     "compo_rule_None" : "Aucun",
     "compo_rule_RuleOfThirds" : "Tiers",
@@ -343,7 +343,7 @@
     "shortcut_prev_frame": "Image précédente",
     "shortcut_next_frame": "Image suivante",
 
-    "tagimage_tooltip" : "Image repère (TagFrame) : Permet d'identifier le plan avec une image répresentative du contenu du plan.",
+    "tagimage_tooltip" : "Image repère (TagFrame) : Permet d'identifier le segment avec une image répresentative du contenu du segment.",
 
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
     "paths_default_video" : "Dossier par défaut de sauvegarde des captures vidéos",
@@ -388,9 +388,9 @@
 
     "reset" : "Réinitialiser",
 
-    "timeline_extract_selected_shot" : "Extraire le plan",
-    "messagebox_extract_shot_failed" : "Échec de l'extraction du plan.",
-    "messagebox_extract_shot_completed" : "Extraction du plan terminée.",
+    "timeline_extract_selected_shot" : "Extraire le segment",
+    "messagebox_extract_shot_failed" : "Échec de l'extraction du segment.",
+    "messagebox_extract_shot_completed" : "Extraction du segment terminée.",
     "close" : "Fermer",
 
     "about_dialog_title" : "À propos",
@@ -505,7 +505,7 @@
 
     "tooltip_playlist_button" : "Playlist",
     "tooltip_autoplay_playlist" : "Lecture automatique de la playlist",
-    "tooltip_shot_detail_button" : "Informations du plan",
+    "tooltip_shot_detail_button" : "Informations du segment",
     "tooltip_annotation_button" : "Annotations",
 
     "messagebox_fullscreen_experimental" : "La fonctionnalité de plein écran du logiciel est en cours de développement.",
@@ -550,10 +550,10 @@
     "help_menu_timeline_category" : "Timeline détaillée",
     "help_menu_timeline_display_label" : "Afficher la timeline détaillée",
     "help_menu_open_timeline_label" : "Ouvrir la timeline détaillée",
-    "help_menu_open_info_label" : "Ouvrir les informations du plan",
+    "help_menu_open_info_label" : "Ouvrir les informations du segment",
     "help_menu_timeline_buttons_label" : "Boutons de la timeline",
     "help_menu_timeline_toolbar_label" : "Barre d'outils de la timeline",
-    "help_menu_shot_infos_label" : "Informations du plan",
+    "help_menu_shot_infos_label" : "Informations du segment",
     "help_menu_timeline_exportation_label" : "Exportation",
 
     "help_menu_options_category" : "Options",
@@ -645,20 +645,22 @@
     "help_menu_abloop_description" : "Cliquer : placer un marqueur AB à la position actuelle. Une fois les deux marqueurs placés, la vidéo boucle sur l'intervalle et la séquence peut être sauvegardée. Cliquer à nouveau pour retirer les marqueurs.",
     "help_menu_auto_segmentation_label" : "Segmentation automatique",
     "help_menu_auto_segmentation_description" : "Calcule automatiquement les transitions présentes dans la vidéo et applique le résultat sur la timeline. La segmentation précédente est écrasée.",
-    "help_menu_split_shot_label" : "Couper le plan",
-    "help_menu_split_shot_description" : "Coupe le plan de la position actuelle en deux plans.",
-    "help_menu_merge_left_label" : "Fusionner le plan à gauche",
-    "help_menu_merge_right_label" : "Fusionner le plan à droite ",
-    "help_menu_merge_left_description" : "Fusionne le plan actuel avec le plan précédent.",
-    "help_menu_merge_right_description" : "Fusionne le plan actuel avec le plan suivant.",
-    "help_menu_merge_description" : "Fusionne le plan actuel avec le plan précédent/suivant.",
-    "help_menu_to_prev_shot_label" : "Plan précédent",
-    "help_menu_to_next_shot_label" : "Plan suivant",
-    "help_menu_to_prev_shot_description" : "Aller au plan précédent",
-    "help_menu_to_next_shot_description" : "Aller au plan suivant",
-    "help_menu_change_shot_description" : "Change le timecode pour se situer au début du plan précédent/suivant.",
-    "help_menu_shot_detail_label" : "Informations du plan",
-    "help_menu_shot_detail_description" : "Ouvre les informations du plan dans le volet latéral. Le titre et les notes du plan sont modifiables.",
+    
+    "help_menu_split_shot_label" : "Couper le segment",
+    "help_menu_split_shot_description" : "Coupe le segment de la position actuelle en deux segments.",
+    "help_menu_merge_left_label" : "Fusionner le segment à gauche",
+    "help_menu_merge_right_label" : "Fusionner le segment à droite ",
+    "help_menu_merge_left_description" : "Fusionne le segment actuel avec le segment précédent.",
+    "help_menu_merge_right_description" : "Fusionne le segment actuel avec le segment suivant.",
+    "help_menu_merge_description" : "Fusionne le segment actuel avec le segment précédent/suivant.",
+    "help_menu_to_prev_shot_label" : "segment précédent",
+    "help_menu_to_next_shot_label" : "segment suivant",
+    "help_menu_to_prev_shot_description" : "Aller au segment précédent",
+    "help_menu_to_next_shot_description" : "Aller au segment suivant",
+    "help_menu_change_shot_description" : "Change le timecode pour se situer au début du segment précédent/suivant.",
+    "help_menu_shot_detail_label" : "Informations du segment",
+    "help_menu_shot_detail_description" : "Ouvre les informations du segment dans le volet latéral. Le titre et les notes du segment sont modifiables.",
+    
     "help_menu_export_label" : "Exporter",
     "help_menu_export_description" : "Ouvre une fenêtre de dialogue pour choisir le format d'exportation du projet.",
 

@@ -561,9 +561,6 @@
     "help_menu_shortcuts_label" : "Atajos de teclado",
     "help_menu_paths_label" : "Personalización de rutas",
 
-    "help_menu_open_files_content_1" : "Al iniciarse, el reproductor muestra una pantalla vacía. Para abrir un medio, haga clic en el menú \"Archivos\" y luego \"Abrir uno o varios medios\" para abrir una ventana de selección de archivos. También puede usar el botón de reproducción en la barra de herramientas en la parte inferior de la pantalla.",
-    "help_menu_open_files_content_2" : "También es posible abrir medios arrastrando y soltando el archivo deseado en el área negra del reproductor.",
-    "help_menu_classic_toolbar_content_1" : "Se muestra una barra de herramientas debajo del medio asociado. Permite realizar varias operaciones en el medio.",
     "help_menu_classic_toolbar_buttons_description" : "Descripción de los botones de la barra de herramientas",
     
     "help_menu_play_label" : "Reproducir",
@@ -635,14 +632,6 @@
     "help_menu_timeline_off_label" : "Timeline detallada",
     "help_menu_timeline_off_description" : "Muestra la timeline detallada del medio.",
 
-    "help_menu_enter_multiview_content_1" : "Es posible mostrar de 1 a 4 reproductores simultáneamente. En modo multi-vistas (con 2 o más reproductores), cada medio tiene su propia barra de herramientas simplificada y aparece una barra global en la parte inferior para operaciones sobre todos los medios.",
-    "help_menu_enter_multiview_content_2" : "Para entrar en modo multi-vistas, pase el cursor por el botón de disposición de medios en la esquina superior derecha. Podrá elegir el número de reproductores y su disposición. Los reproductores son redimensionables arrastrando los splitters entre ellos. También puede usar el botón de duplicar medio.",
-    "help_menu_simplified_content_1" : "La barra de herramientas simplificada en multi-vistas contiene la mayoría de botones de la barra clásica, pero sin extensiones. También dispone de un botón para quitar el reproductor de la vista.",
-    "help_menu_global_toolbar_content_1" : "Además de las barras simplificadas, en modo multi-vistas se muestra una barra global para operar sobre los medios presentes.",
-    "help_menu_global_toolbar_content_2" : "La captura de pantalla combinada toma una captura de cada medio y las combina en una sola imagen respetando la disposición de los reproductores. Las capturas se guardan en la carpeta indicada en Preferencias (por defecto NumalysePlayer_Content).",
-    "help_menu_access_playlist_content_1" : "Se puede crear una playlist añadiendo los medios deseados. Para acceder a la playlist, haga clic en el botón del panel lateral arriba a la derecha (no disponible en multi-vistas).",
-    "help_menu_manage_items_content_1" : "Los elementos de la playlist contienen título, duración, tipo, miniatura y su índice en la lista. Haga clic en + para añadir medios y en el icono de papelera para eliminarlos. También puede mover elementos con arrastrar y soltar.",
-
     "help_menu_playlist_loop_label" : "Bucle",
     "help_menu_playlist_loop_description" : "Si está activado, avanza al siguiente medio cuando el actual termina.",
     "help_menu_playlist_shuffle_label" : "Aleatorio",
@@ -651,8 +640,6 @@
     "help_menu_playlist_sort_description" : "Ordena la lista según los criterios indicados.",
     "help_menu_playlist_delete_label" : "Eliminar todo",
     "help_menu_playlist_delete_description" : "Elimina todos los elementos de la playlist. Se mostrará un mensaje de confirmación.",
-    "help_menu_timeline_display_content_1" : "La timeline detallada ofrece una visualización del audio (barra violeta) y de los distintos planos del vídeo (barra azul). Los planos son anotables y pueden añadirse manual o automáticamente. Los vídeos segmentados pueden guardarse como proyectos y exportarse a varios formatos.",
-    "help_menu_timeline_display_content_2" : "La timeline tiene una escala temporal, una vista de vídeo en azul con la imagen inicial del plano, una vista de audio en violeta con la forma de onda y botones para modificar los planos. Por defecto solo hay un plano. Se puede ampliar la línea de tiempo con la rueda del ratón, seleccionar un plano con un clic izquierdo (Ctrl + clic izquierdo para seleccionar varios) y desplazarse horizontalmente con Mayús + clic izquierdo. Hay más opciones disponibles al hacer clic con el botón derecho del ratón sobre los planos.",
 
     "help_menu_abloop_label" : "Bucle AB",
     "help_menu_abloop_description" : "Clic: coloca un marcador A/B en la posición actual. Una vez colocados ambos marcadores, el vídeo hace bucle en ese intervalo; otro clic quita los marcadores.",
@@ -674,8 +661,6 @@
     "help_menu_shot_detail_description" : "Abre la información del plano en el panel lateral. El título y las notas del plano se pueden editar.",
     "help_menu_export_label" : "Exportar",
     "help_menu_export_description" : "Abre un diálogo para elegir el formato de exportación del proyecto.",
-    "help_menu_shot_infos_content_1" : "La información del plano actual está disponible con el botón del panel lateral arriba a la derecha o con el botón correspondiente en la timeline. Muestra numeración, título, inicio, fin y duración en timecode, notas y la imagen representativa del plano. Los campos de título y notas son editables.",
-    "help_menu_exportation_content_1" : "El proyecto en curso puede guardarse desde el menú 'Archivo' → 'Guardar'. Los proyectos se pueden exportar en formato texto (.txt y .docx), PDF, PowerPoint, en vídeo anotado (títulos y notas por plano) y en Imágenes-Referencia (todas las imágenes se guardan en la carpeta indicada).",
 
     "help_menu_open_annot_label" : "Anotaciones",
     "help_menu_open_annot_description" : "Abre el panel de anotaciones",    

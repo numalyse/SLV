@@ -561,11 +561,7 @@
     "help_menu_settings_label" : "Impostazioni generali",
     "help_menu_shortcuts_label" : "Scorciatoie da tastiera",
     "help_menu_paths_label" : "Personalizzazione percorsi",
-
-    "help_menu_open_files_content_1" : "All'avvio, il lettore visualizza uno schermo vuoto. Per aprire un file multimediale, fare clic sul menu \"File\" e quindi su \"Apri uno o più file multimediali\" per aprire una finestra di selezione dei file. È anche possibile utilizzare il pulsante di riproduzione nella barra degli strumenti in fondo allo schermo.",
-    "help_menu_open_files_content_2" : "È anche possibile aprire file multimediali trascinando e rilasciando il file desiderato nell'area nera del lettore.",
-    "help_menu_classic_toolbar_content_1" : "Viene visualizzata una barra degli strumenti sotto il file multimediale associato. Consente di eseguire varie operazioni sul file multimediale.",
-    "help_menu_classic_toolbar_buttons_description" : "Descrizione dei pulsanti della barra degli strumenti",
+   "help_menu_classic_toolbar_buttons_description" : "Descrizione dei pulsanti della barra degli strumenti",
     
     "help_menu_play_label" : "Riproduci",
     "help_menu_play_description" : "Riproduce il file multimediale.",
@@ -636,14 +632,6 @@
     "help_menu_timeline_off_label" : "Timeline dettagliata",
     "help_menu_timeline_off_description" : "Mostra la timeline dettagliata del media.",
 
-    "help_menu_enter_multiview_content_1" : "È possibile visualizzare da 1 a 4 player contemporaneamente. In modalità multi-vista (con 2 o più player), ogni media ha la propria barra degli strumenti semplificata e appare una barra globale in basso per operazioni su tutti i media.",
-    "help_menu_enter_multiview_content_2" : "Per entrare in modalità multi-vista, passa il cursore sul pulsante di disposizione dei media in alto a destra. Potrai scegliere il numero di player e la loro disposizione. I player sono ridimensionabili trascinando gli splitters tra di essi. Puoi anche usare il pulsante duplica.",
-    "help_menu_simplified_content_1" : "La barra strumenti semplificata disponibile in multi-vista include la maggior parte dei pulsanti della barra classica, ma senza estensioni. È presente anche un pulsante per rimuovere il player dalla vista.",
-    "help_menu_global_toolbar_content_1" : "Oltre alle barre semplificate, in multi-vista viene mostrata una barra globale per eseguire operazioni sui media presenti.",
-    "help_menu_global_toolbar_content_2" : "La funzione screenshot combinato cattura un'immagine di ogni media presente e le combina in un'unica immagine mantenendo la disposizione dei player. Gli screenshot vengono salvati nella cartella impostata nelle preferenze (di default NumalysePlayer_Content).",
-    "help_menu_access_playlist_content_1" : "Una playlist può essere creata aggiungendo i media desiderati. Per accedere alla playlist, fai clic sul pulsante del pannello laterale in alto a destra (non disponibile in multi-vista).",
-    "help_menu_manage_items_content_1" : "Gli elementi della playlist sono composti da titolo, durata, tipo, miniatura e dalla loro posizione nell'elenco. Fai clic su + per aggiungere media e sull'icona del cestino per rimuoverli. È anche possibile spostare gli elementi con drag & drop.",
-
     "help_menu_playlist_loop_label" : "Loop",
     "help_menu_playlist_loop_description" : "Se abilitato, passa al media successivo quando il corrente termina.",
     "help_menu_playlist_shuffle_label" : "Casuale",
@@ -652,8 +640,6 @@
     "help_menu_playlist_sort_description" : "Ordina la lista secondo i criteri indicati.",
     "help_menu_playlist_delete_label" : "Rimuovi tutto",
     "help_menu_playlist_delete_description" : "Rimuove tutti gli elementi dalla playlist. Verrà mostrata una conferma.",
-    "help_menu_timeline_display_content_1" : "La timeline dettagliata offre una visualizzazione dell'audio (barra viola) e dei diversi piani del video (barra blu). I piani sono annotabili e possono essere aggiunti manualmente o automaticamente. I video segmentati possono essere salvati come progetti ed esportati in vari formati.",
-    "help_menu_timeline_display_content_2" : "La timeline presenta una scala temporale, una visualizzazione video in blu con l'immagine iniziale del piano, una visualizzazione audio in viola con la forma d'onda e pulsanti per modificare i piani. Per impostazione predefinita c'è un solo piano. È possibile ingrandire la timeline utilizzando la rotellina del mouse, selezionare un fotogramma con un clic sinistro (Ctrl+clic sinistro per selezionarne più di uno) e spostarsi orizzontalmente con Shift+clic sinistro. Cliccando con il tasto destro sui fotogrammi sono disponibili ulteriori opzioni.",
 
     "help_menu_abloop_label" : "Loop A-B",
     "help_menu_abloop_description" : "Clic: posiziona un marcatore A/B alla posizione corrente. Una volta posizionati entrambi i marker, il video esegue il loop su quel intervallo; un altro clic rimuove i marker.",
@@ -675,8 +661,6 @@
     "help_menu_shot_detail_description" : "Apre le informazioni del piano nel pannello laterale. Titolo e note del piano sono modificabili.",
     "help_menu_export_label" : "Esporta",
     "help_menu_export_description" : "Apre un dialogo per scegliere il formato di esportazione del progetto.",
-    "help_menu_shot_infos_content_1" : "Le informazioni del piano corrente sono visualizzabili con il pulsante del pannello laterale in alto a destra o tramite il pulsante corrispondente nella timeline. Mostra numerazione, titolo, inizio, fine e durata come timecode, note e l'immagine di riferimento del piano. I campi titolo e note sono modificabili.",
-    "help_menu_exportation_content_1" : "Il progetto corrente può essere salvato tramite il menu 'File' → 'Salva'. I progetti possono essere esportati in formato testo (.txt e .docx), PDF, PowerPoint, come video annotato (titoli e note per piano) e come Immagini-Riferimento (tutte le immagini vengono salvate nella cartella indicata).",
 
     "help_menu_open_annot_label" : "Annotazioni",
     "help_menu_open_annot_description" : "Apre il pannello delle annotazioni",    

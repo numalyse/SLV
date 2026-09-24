@@ -561,9 +561,6 @@
     "help_menu_shortcuts_label" : "Keyboard shortcuts",
     "help_menu_paths_label" : "Access paths",
 
-    "help_menu_open_files_content_1" : "At startup, the player displays a blank screen. To open a media file, click on the \"Files\" menu and then \"Open media files\" to open a file selection window. You can also use the play button located in the toolbar at the bottom of the screen.",
-    "help_menu_open_files_content_2" : "It is also possible to open media files by performing a <i> drag and drop </i> of the desired file onto the black area of the player.",
-    "help_menu_classic_toolbar_content_1" : "A toolbar is displayed below the media it is associated with. It allows you to perform various operations on the media.",
     "help_menu_classic_toolbar_buttons_description" : "Description of the toolbar buttons",
 
     "help_menu_play_label" : "Play",
@@ -635,14 +632,6 @@
     "help_menu_timeline_off_label" : "Detailed timeline",
     "help_menu_timeline_off_description" : "Show the media's detailed timeline.",
 
-    "help_menu_enter_multiview_content_1" : "It is possible to display 1 to 4 players simultaneously. In multi-view mode (when 2 or more players are present), each media has its own simplified toolbar and a global bar appears at the bottom for operations affecting all medias.",
-    "help_menu_enter_multiview_content_2" : "To enter multi-view mode, hover the media layout button at the top-right. You can then choose the number of players and their layout. Players are resizable by dragging the splitters between them. You can also use the duplicate button.",
-    "help_menu_simplified_content_1" : "The simplified toolbar available in multi-view players includes most buttons from the classic toolbar but without extensions. There is also a button to remove the player from the view.",
-    "help_menu_global_toolbar_content_1" : "In addition to per-player simplified toolbars, a global toolbar is shown in multi-view to perform operations on the medias present.",
-    "help_menu_global_toolbar_content_2" : "Combined screenshot captures an image of each present media and combines them into a single image preserving the players layout. Screenshots are saved to the folder set in preferences (default NumalysePlayer_Content).",
-    "help_menu_access_playlist_content_1" : "A playlist can be created by adding the desired medias. To access the playlist click the side panel button at the top-right (playlist is not available in multi-view mode).",
-    "help_menu_manage_items_content_1" : "Playlist items consist of the media title, its duration, type, thumbnail and position in the list. Click + to add media and the trash icon to remove them. Items can also be reordered with drag & drop.",
-
     "help_menu_playlist_loop_label" : "Loop",
     "help_menu_playlist_loop_description" : "If enabled, moves to the next media when the current one ends.",
     "help_menu_playlist_shuffle_label" : "Shuffle",
@@ -651,8 +640,6 @@
     "help_menu_playlist_sort_description" : "Sort the list according to the selected criteria.",
     "help_menu_playlist_delete_label" : "Remove all",
     "help_menu_playlist_delete_description" : "Remove all items from the playlist. A confirmation will be shown.",
-    "help_menu_timeline_display_content_1" : "The detailed timeline provides a view of audio (purple bar) and the different video tracks (blue bar). Tracks are annotatable and can be added manually or automatically. Segmented videos can be saved as projects and exported in various formats.",
-    "help_menu_timeline_display_content_2" : "The timeline shows a time scale, a blue video view with the track's initial image, a purple audio view with the waveform and buttons to edit tracks. By default there is a single track. You can zoom in on the timeline using the scroll wheel, select a clip by left-clicking (Ctrl+left-click to select multiple clips), and move horizontally using Shift+left-click. Additional options are available by right-clicking on the clips.",
 
     "help_menu_abloop_label" : "A-B loop",
     "help_menu_abloop_description" : "Click: place an A/B marker at the current position. Once both markers are set the video loops on that range; clicking again removes the markers.",
@@ -674,8 +661,6 @@
     "help_menu_shot_detail_description" : "Open the track information in the side panel. Title and notes are editable.",
     "help_menu_export_label" : "Export",
     "help_menu_export_description" : "Open a dialog to choose the project export format.",
-    "help_menu_shot_infos_content_1" : "Current track informations are viewable with the side panel button at the top-right or via the corresponding button in the timeline. It shows numbering, title, start, end and duration as timecodes, notes and the reference image. Title and notes fields are editable.",
-    "help_menu_exportation_content_1" : "The current project can be saved via the 'Files' → 'Save' menu. Projects can be exported as text (.txt and .docx), PDF, PowerPoint, as annotated video (titles and notes per track) and as reference images (all reference images are saved into the configured folder).",
 
     "help_menu_open_annot_label" : "Annotations",
     "help_menu_open_annot_description" : "Open the annotations panel",    

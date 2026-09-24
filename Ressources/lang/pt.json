@@ -561,9 +561,6 @@
     "help_menu_shortcuts_label" : "Atalhos de teclado",
     "help_menu_paths_label" : "Personalização de caminhos",
 
-    "help_menu_open_files_content_1" : "Ao iniciar, o reprodutor exibe uma tela em branco. Para abrir uma mídia, clique no menu \"Arquivo\" e depois em \"Abrir uma ou várias mídias\" para abrir uma janela de seleção de arquivos. Você também pode usar o botão de reprodução na barra de ferramentas na parte inferior da tela.",
-    "help_menu_open_files_content_2" : "Também é possível abrir mídias arrastando e soltando o arquivo desejado na área preta do reprodutor.",
-    "help_menu_classic_toolbar_content_1" : "Uma barra de ferramentas é exibida abaixo da mídia associada. Ela permite realizar várias operações na mídia.",
     "help_menu_classic_toolbar_buttons_description" : "Descrição dos botões da barra de ferramentas",
 
     "help_menu_play_label" : "Reproduzir",
@@ -635,14 +632,6 @@
     "help_menu_timeline_off_label" : "Linha do tempo detalhada",
     "help_menu_timeline_off_description" : "Mostra a linha do tempo detalhada da mídia.",
 
-    "help_menu_enter_multiview_content_1" : "É possível mostrar de 1 a 4 reprodutores simultaneamente. Em modo multi-vistas (quando há 2 ou mais reprodutores), cada mídia tem a sua própria barra de ferramentas simplificada e aparece uma barra global na parte inferior para operações em todas as mídias.",
-    "help_menu_enter_multiview_content_2" : "Para entrar em modo multi-vistas, passe o cursor sobre o botão de disposição dos meios no canto superior direito. Pode então escolher o número de reprodutores a mostrar e a sua disposição. Os reprodutores são redimensionáveis arrastando os <i>splitters</i> entre eles. Também pode usar o botão de duplicar mídia disponível nas barras de ferramentas.",
-    "help_menu_simplified_content_1" : "A barra de ferramentas simplificada disponível nos reprodutores em modo multi-vistas inclui a maioria dos botões da barra clássica, mas não tem extensão. Há também um botão para remover o reprodutor da vista.",
-    "help_menu_global_toolbar_content_1" : "Além das barras de ferramentas simplificadas para cada reprodutor, uma barra de ferramentas global é exibida em modo multi-vistas para executar operações em cada uma das mídias presentes.",
-    "help_menu_global_toolbar_content_2" : "A captura de ecrã combinada tira uma captura de cada mídia presente e combina cada captura numa única imagem mantendo a disposição dos reprodutores. As capturas são guardadas na pasta indicada nas preferências (por padrão NumalysePlayer_Content).",
-    "help_menu_access_playlist_content_1" : "Uma playlist pode ser criada adicionando as mídias desejadas. Para aceder à playlist, clique no botão do painel lateral no canto superior direito (a playlist não está disponível em modo multi-vistas).",
-    "help_menu_manage_items_content_1" : "Os itens da playlist consistem no título do meio correspondente, na sua duração, tipo, miniatura e posição na lista. Clique no botão + para adicionar mídias e no ícone da lixeira para remover uma mídia da playlist. Também é possível mover os itens arrastando-os para alterar a ordem de reprodução.",
-
     "help_menu_playlist_loop_label" : "Loop",
     "help_menu_playlist_loop_description" : "Se ativado, passa para a próxima mídia quando a atual termina.",
     "help_menu_playlist_shuffle_label" : "Aleatório",
@@ -651,8 +640,6 @@
     "help_menu_playlist_sort_description" : "Ordena a lista de acordo com os critérios indicados.",
     "help_menu_playlist_delete_label" : "Remover tudo",
     "help_menu_playlist_delete_description" : "Remove todos os elementos da playlist. Uma mensagem de confirmação será exibida.",
-    "help_menu_timeline_display_content_1" : "A linha do tempo detalhada oferece uma visualização do áudio (barra violeta) e dos diferentes planos do vídeo (barra azul). Os planos são anotáveis e podem ser adicionados manualmente ou automaticamente. Os vídeos segmentados podem ser guardados como projetos e exportados para diversos formatos.",
-    "help_menu_timeline_display_content_2" : "A linha do tempo contém uma escala temporal, uma visualização de vídeo em azul com a imagem inicial do plano, uma visualização de áudio em violeta com a forma de onda correspondente e botões para modificar os planos. Por padrão, a linha do tempo tem apenas um plano. É possível ampliar a linha do tempo utilizando a roda do rato, selecionar um plano com um clique do botão esquerdo (Ctrl + clique do botão esquerdo para selecionar vários) e deslocar-se horizontalmente com Shift + clique do botão esquerdo. Estão disponíveis ações adicionais ao clicar com o botão direito do rato nos planos.",
 
     "help_menu_abloop_label" : "Loop AB",
     "help_menu_abloop_description" : "Clique: posiciona um marcador AB na posição atual. Uma vez colocados ambos os marcadores, o vídeo faz loop no intervalo e a sequência pode ser guardada. Clique novamente para remover os marcadores.",
@@ -674,8 +661,6 @@
     "help_menu_shot_detail_description" : "Abre as informações do plano no painel lateral. O título e as notas do plano são editáveis.",
     "help_menu_export_label" : "Exportar",
     "help_menu_export_description" : "Abre uma janela de diálogo para escolher o formato de exportação do projeto.",
-    "help_menu_shot_infos_content_1" : "As informações do plano na posição atual são exibidas com o botão do painel lateral no canto superior direito ou através do botão correspondente na linha do tempo. Nesta visualização aparecem a numeração do plano, o título, o início, o fim e a duração em timecode, as notas e a Imagem-Referência do plano. Os campos de título e notas podem ser editados.",
-    "help_menu_exportation_content_1" : "O projeto atual pode ser salvo através do menu 'Arquivo' → 'Salvar'. Os projetos podem ser exportados em formato de texto (.txt e .docx), PDF, PowerPoint, no formato de vídeo anotado (títulos e notas por plano) e em imagens de referência (todas as imagens de referência são guardadas na pasta indicada).",
 
     "help_menu_open_annot_label" : "Anotações",
     "help_menu_open_annot_description" : "Abre o painel de anotações",    

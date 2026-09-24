@@ -645,6 +645,7 @@
     "help_menu_abloop_description" : "Clique: posiciona um marcador AB na posição atual. Uma vez colocados ambos os marcadores, o vídeo faz loop no intervalo e a sequência pode ser guardada. Clique novamente para remover os marcadores.",
     "help_menu_auto_segmentation_label" : "Segmentação automática",
     "help_menu_auto_segmentation_description" : "Calcula automaticamente as transições presentes no vídeo e aplica o resultado na linha do tempo. A segmentação anterior é sobrescrita.",
+    
     "help_menu_split_shot_label" : "Cortar segment",
     "help_menu_split_shot_description" : "Corta o segment na posição atual em dois segments.",
     "help_menu_merge_left_label" : "Fundir o segment à esquerda",
@@ -652,8 +653,8 @@
     "help_menu_merge_left_description" : "Funde o segment atual com o segment anterior.",
     "help_menu_merge_right_description" : "Funde o segment atual com o segment seguinte.",
     "help_menu_merge_description" : "Funde o segment atual com o anterior/seguinte.",
-    "help_menu_to_prev_shot_label" : "segment anterior",
-    "help_menu_to_next_shot_label" : "segment seguinte",
+    "help_menu_to_prev_shot_label" : "Segment anterior",
+    "help_menu_to_next_shot_label" : "Segment seguinte",
     "help_menu_to_prev_shot_description" : "Ir para o segment anterior",
     "help_menu_to_next_shot_description" : "Ir para o segment seguinte",
     "help_menu_change_shot_description" : "Altera o timecode para posicionar no início do segment anterior/seguinte.",

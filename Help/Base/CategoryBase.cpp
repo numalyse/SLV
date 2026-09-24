@@ -27,12 +27,14 @@ void CategoryBase::populateTree(QTreeWidget* tree)
     auto* categoryItem = new QTreeWidgetItem(tree);
 
     categoryItem->setText(0, pref.getText(m_categoryName));
+    categoryItem->setToolTip(0, pref.getText(m_categoryName));
 
     for(auto subcategory : m_subcategories)
     {
         auto* subcategoryItem = new QTreeWidgetItem(categoryItem);
 
         subcategoryItem->setText(0, subcategory.name);
+        subcategoryItem->setToolTip(0, subcategory.name);
         subcategoryItem->setData(0, Qt::UserRole, QVariant::fromValue(subcategory.content));
     }
 

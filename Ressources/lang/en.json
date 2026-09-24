@@ -403,8 +403,8 @@
     "help_dialog_wip" : "Work in progress.",
     "help_dialog_report" : "To report any problem, please contact us:",
 
-    "messagebox_screenshot_with_adjustment" : "The current media has adjustments. Do you want to take a screenshot without the adjustments ?",
-    "screenshot_without_adjustment_button" : "Screenshot without adjustment",
+    "messagebox_screenshot_with_adjustment" : "The software cannot save the adjustments applied to the media during capture. \n Do you want to save a screenshot without adjustments?",
+    "screenshot_without_adjustment_button" : "Capture anyway",
 
     "media_info_dialog_title" : "Media informations",
     "media_info_title" : "Title",

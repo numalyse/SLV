@@ -404,8 +404,8 @@
     "help_dialog_wip" : "In sviluppo.",
     "help_dialog_report" : "Per segnalare un problema, contattaci ai seguenti indirizzi:",
 
-    "messagebox_screenshot_with_adjustment" : "Il media corrente ha delle regolazioni. Vuoi salvare uno screenshot senza le regolazioni?",
-    "screenshot_without_adjustment_button" : "Screenshot senza regolazioni",
+    "messagebox_screenshot_with_adjustment" : "Il software non può salvare le regolazioni applicate al media durante l'acquisizione. \n Vuoi salvare una schermata senza regolazioni?",
+    "screenshot_without_adjustment_button" : "Cattura comunque",
 
     "media_info_dialog_title" : "Informazioni media",
     "media_info_title" : "Titolo",

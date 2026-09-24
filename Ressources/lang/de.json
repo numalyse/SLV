@@ -401,8 +401,8 @@
     "help_dialog_wip" : "In Entwicklung.",
     "help_dialog_report" : "Um ein Problem zu melden, kontaktieren Sie uns unter folgenden Adressen:",
 
-    "messagebox_screenshot_with_adjustment" : "Das aktuelle Medium enthält Anpassungen. Möchten Sie einen Screenshot ohne Anpassungen speichern?",
-    "screenshot_without_adjustment_button" : "Screenshot ohne Anpassungen",
+    "messagebox_screenshot_with_adjustment" : "Die Software kann die während der Aufnahme auf das Medium angewendeten Anpassungen nicht speichern. \n Möchten Sie einen Screenshot ohne Anpassungen speichern?",
+    "screenshot_without_adjustment_button" : "Trotzdem aufnehmen",
 
     "media_info_dialog_title" : "Medieninformationen",
     "media_info_title" : "Titel",

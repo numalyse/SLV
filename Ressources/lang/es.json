@@ -403,8 +403,8 @@
     "help_dialog_wip" : "En desarrollo.",
     "help_dialog_report" : "Para reportar un problema, contáctenos en las siguientes direcciones:",
 
-    "messagebox_screenshot_with_adjustment" : "El medio actual tiene ajustes. ¿Desea guardar una captura sin los ajustes?",
-    "screenshot_without_adjustment_button" : "Captura sin ajustes",
+    "messagebox_screenshot_with_adjustment" : "El software no puede guardar los ajustes aplicados al medio durante la captura. \n ¿Desea guardar una captura de pantalla sin ajustes?",
+    "screenshot_without_adjustment_button" : "Capturar de todos modos",
 
     "media_info_dialog_title" : "Información del medio",
     "media_info_title" : "Título",

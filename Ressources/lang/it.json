@@ -344,7 +344,7 @@
     "shortcut_prev_frame": "Fotogramma precedente",
     "shortcut_next_frame": "Fotogramma successivo",
 
-    "tagimage_tooltip" : "Immagine di riferimento (TagFrame) : Permette di identificare il segmento con un'immagine rappresentativa del contenuto del segmento.",
+    "tagimage_tooltip" : "Immagine di riferimento (TagFrame): consente di identificare il segmento con un'immagine rappresentativa del suo contenuto.",
 
     "paths_screenshot" : "Cartella screenshot",
     "paths_default_video" : "Cartella predefinita per il salvataggio delle acquisizioni video",
@@ -645,15 +645,16 @@
     "help_menu_abloop_description" : "Clic: posiziona un marcatore A/B alla posizione corrente. Una volta posizionati entrambi i marker, il video esegue il loop su quel intervallo; un altro clic rimuove i marker.",
     "help_menu_auto_segmentation_label" : "Segmentazione automatica",
     "help_menu_auto_segmentation_description" : "Calcola automaticamente le transizioni nel video e applica il risultato alla timeline. La segmentazione precedente viene sovrascritta.",
-    "help_menu_split_shot_label" : "Taglia il segmento",
+    
+    "help_menu_split_shot_label" : "Taglia segmento",
     "help_menu_split_shot_description" : "Divide il segmento nella posizione corrente in due segmenti.",
     "help_menu_merge_left_label" : "Unisci il segmento a sinistra",
     "help_menu_merge_right_label" : "Unisci il segmento a destra ",
     "help_menu_merge_left_description" : "Unisce il segmento corrente con quello precedente.",
     "help_menu_merge_right_description" : "Unisce il segmento corrente con quello successivo.",
     "help_menu_merge_description" : "Unisce il segmento corrente con quello precedente/successivo.",
-    "help_menu_to_prev_shot_label" : "segmento precedente",
-    "help_menu_to_next_shot_label" : "segmento successivo",
+    "help_menu_to_prev_shot_label" : "Segmento precedente",
+    "help_menu_to_next_shot_label" : "Segmento successivo",
     "help_menu_to_prev_shot_description" : "Vai al segmento precedente",
     "help_menu_to_next_shot_description" : "Vai al segmento successivo",
     "help_menu_change_shot_description" : "Imposta il timecode all'inizio del segmento precedente/successivo.",

@@ -343,7 +343,7 @@
     "shortcut_prev_frame": "Fotograma anterior",
     "shortcut_next_frame": "Fotograma siguiente",
     
-    "tagimage_tooltip" : "Imagen de referencia (TagFrame) : Permite identificar el segmento con una imagen representativa del contenido del segmento.",
+    "tagimage_tooltip" : "Imagen de referencia (TagFrame): Permite identificar el segmento con una imagen representativa de su contenido.",
 
     "paths_screenshot" : "Carpeta de capturas de pantalla",
     "paths_default_video" : "Carpeta predeterminada para guardar capturas de vídeo",
@@ -646,7 +646,7 @@
     "help_menu_auto_segmentation_label" : "Segmentación automática",
     "help_menu_auto_segmentation_description" : "Calcula automáticamente las transiciones en el vídeo y aplica el resultado en la timeline. La segmentación anterior se sobrescribe.",
     
-    "help_menu_split_shot_label" : "Dividir el segmento",
+    "help_menu_split_shot_label" : "Dividir segmento",
     "help_menu_split_shot_description" : "Divide el segmento en la posición actual en dos segmentos.",
     "help_menu_merge_left_label" : "Fusionar el segmento a la izquierda",
     "help_menu_merge_right_label" : "Fusionar el segmento a la derecha",

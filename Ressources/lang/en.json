@@ -343,7 +343,7 @@
     "shortcut_prev_frame": "Previous Frame",
     "shortcut_next_frame": "Next Frame",
 
-    "tagimage_tooltip" : "Tag image (TagFrame): Helps identifying the segment with a representative image of the segment's content.",
+    "tagimage_tooltip" : "Tag image (TagFrame): Allows you to identify the segment with an image representative of its content.",
 
     "paths_screenshot": "Screenshot Save Folder",
     "paths_default_video" : "Default folder for saving video captures",

@@ -343,7 +343,7 @@
     "shortcut_prev_frame": "Image précédente",
     "shortcut_next_frame": "Image suivante",
 
-    "tagimage_tooltip" : "Image repère (TagFrame) : Permet d'identifier le segment avec une image répresentative du contenu du segment.",
+    "tagimage_tooltip" : "Image repère (TagFrame) : Permet d'identifier le segment avec une image répresentative de son contenu.",
 
     "paths_screenshot" : "Dossier de sauvegarde des captures d'écran",
     "paths_default_video" : "Dossier par défaut de sauvegarde des captures vidéos",

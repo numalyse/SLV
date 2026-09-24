@@ -341,7 +341,7 @@
     "shortcut_prev_frame": "Vorheriges Bild",
     "shortcut_next_frame": "Nächstes Bild",
 
-    "tagimage_tooltip" : "Referenzbild (TagFrame): Ermöglicht die Identifizierung des Segments anhand eines repräsentativen Bildes des Segmentinhalts.",
+    "tagimage_tooltip" : "Referenzbild (TagFrame): Ermöglicht die Identifizierung des Segments anhand eines repräsentativen Bildes seines Inhalts.",
 
     "paths_screenshot" : "Speicherordner für Screenshots",
     "paths_default_video" : "Standardordner für Videoaufnahmen",

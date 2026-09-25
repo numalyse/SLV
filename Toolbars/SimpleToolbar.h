@@ -120,6 +120,11 @@ private:
 
     bool m_isReplacedByAdvanced = false; // explicit mode flag, see setReplacedByAdvanced()
 
+    QWidget* m_leftContainer = nullptr;
+    QWidget* m_rightContainer = nullptr;
+
+    void equalizeContainerWidths();
+
 protected:
     void createSlider();
     void createTimeTotBtn();

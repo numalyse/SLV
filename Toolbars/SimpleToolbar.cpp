@@ -217,6 +217,8 @@ void SimpleToolbar::setFullscreenUI(bool hideFullscreenBtn, int bottomMargin)
     m_ejectBtn->hide();
     hideFullscreenBtn ? m_fullscreenBtn->hide() : m_fullscreenBtn->show();
 
+    equalizeContainerWidths(); 
+
     adjustSize();
 
     Toolbar::setFullscreenUI(bottomMargin);
@@ -235,11 +237,11 @@ void SimpleToolbar::setDefaultUI()
     m_fullscreenBtn->show();
 
     if ( !layout() ) {
-        
+
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(5,5,5,5);
         mainLayout->setSpacing(1);
-        
+
         m_nameLabel->hide();
 
         QHBoxLayout* timecodeLayout = new QHBoxLayout();
@@ -249,42 +251,74 @@ void SimpleToolbar::setDefaultUI()
         timecodeLayout->addWidget(m_durationBtn);
         mainLayout->addLayout(timecodeLayout);
 
-        // mainLayout->addWidget(m_slider);
-
         QHBoxLayout* buttonLayout = new QHBoxLayout();
         buttonLayout->setContentsMargins(0,0,0,0);
-        //buttonLayout->setSpacing(1);
-        buttonLayout->addWidget(m_muteBtn);
-        buttonLayout->addWidget(m_langBtn);
-        buttonLayout->addWidget(m_mediaInfoBtn);
-        buttonLayout->addSpacing(m_langBtn->width()+1);
-        buttonLayout->addSpacing(m_langBtn->width()+1);
-        buttonLayout->addSpacing(m_langBtn->width()+1);
-        buttonLayout->addSpacing(m_zoomIndicator->width()+1);
-        buttonLayout->addStretch();
-        buttonLayout->addWidget(m_speedBtn);
-        //buttonLayout->addWidget(m_stopBtn); MODIF
-        buttonLayout->addWidget(m_customStopBtn);
-        // buttonLayout->addWidget(m_slowDownBtn);
-        buttonLayout->addWidget(m_playPauseBtn);
-        // buttonLayout->addWidget(m_speedUpBtn);
 
-        buttonLayout->addWidget(m_ejectBtn);
-        buttonLayout->addWidget(m_loopBtn);
+        // --- Left ---
+        m_leftContainer = new QWidget(this);
+        QHBoxLayout* leftLayout = new QHBoxLayout(m_leftContainer);
+        leftLayout->setContentsMargins(0,0,0,0);
+        leftLayout->setSpacing(0);
+        leftLayout->addWidget(m_muteBtn);
+        leftLayout->addWidget(m_langBtn);
+        leftLayout->addWidget(m_mediaInfoBtn);
+        leftLayout->addStretch();
 
-        buttonLayout->addStretch();
-        buttonLayout->addWidget(m_zoomIndicator);
-        buttonLayout->addWidget(m_zoomBtn);
-        buttonLayout->addWidget(m_screenshotBtn);
-        buttonLayout->addWidget(m_extractSequenceBtn);
-        buttonLayout->addWidget(m_duplicatePlayerBtn);
-        buttonLayout->addWidget(m_removePlayerBtn);
-        buttonLayout->addWidget(m_fullscreenBtn);
+        // --- Middle ---
+        QWidget* middleContainer = new QWidget(this);
+        QHBoxLayout* middleLayout = new QHBoxLayout(middleContainer);
+        middleLayout->setContentsMargins(0,0,0,0);
+        middleLayout->setSpacing(0);
+        middleLayout->addWidget(m_speedBtn);
+        middleLayout->addWidget(m_customStopBtn);
+        middleLayout->addWidget(m_playPauseBtn);
+        middleLayout->addWidget(m_ejectBtn);
+        middleLayout->addWidget(m_loopBtn);
+
+        // --- Right ---
+        m_rightContainer = new QWidget(this);
+        QHBoxLayout* rightLayout = new QHBoxLayout(m_rightContainer);
+        rightLayout->setContentsMargins(0,0,0,0);
+        rightLayout->setSpacing(0);
+        rightLayout->addStretch();
+        rightLayout->addWidget(m_zoomIndicator);
+        rightLayout->addWidget(m_zoomBtn);
+        rightLayout->addWidget(m_screenshotBtn);
+        rightLayout->addWidget(m_extractSequenceBtn);
+        rightLayout->addWidget(m_duplicatePlayerBtn);
+        rightLayout->addWidget(m_removePlayerBtn);
+        rightLayout->addWidget(m_fullscreenBtn);
+
+        // 
+        buttonLayout->addWidget(m_leftContainer);
+        buttonLayout->addStretch(1);
+        buttonLayout->addWidget(middleContainer);
+        buttonLayout->addStretch(1);
+        buttonLayout->addWidget(m_rightContainer);
+
         mainLayout->addLayout(buttonLayout);
-        
-    }
 
+    }
+    
+    equalizeContainerWidths();
     adjustSize();
+}
+
+void SimpleToolbar::equalizeContainerWidths()
+{
+    if (!m_leftContainer || !m_rightContainer)
+        return;
+
+    m_leftContainer->setMinimumWidth(0);
+    m_leftContainer->setMaximumWidth(QWIDGETSIZE_MAX);
+    m_rightContainer->setMinimumWidth(0);
+    m_rightContainer->setMaximumWidth(QWIDGETSIZE_MAX);
+
+    int w = qMax(m_leftContainer->sizeHint().width(),
+                 m_rightContainer->sizeHint().width());
+
+    m_leftContainer->setFixedWidth(w);
+    m_rightContainer->setFixedWidth(w);
 }
 
 void SimpleToolbar::resetSlider()

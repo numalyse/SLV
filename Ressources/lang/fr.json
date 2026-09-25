@@ -503,7 +503,7 @@
     "project_exportation_open_directory" : "Ouvrir le dossier",
     "open_file_directory" : "Ouvrir l'emplacement du fichier",
 
-    "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en compte.",
+    "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en charge.",
 
     "tooltip_playlist_button" : "Playlist",
     "tooltip_autoplay_playlist" : "Passage automatique au média suivant",

@@ -138,8 +138,10 @@
     "timeline_dialog_text_auto_segmentation": "Segmentation in progress...",
     "timeline_dialog_text_auto_segmentation_finished": "Automatic segmentation completed, total number of segments: ",
     "dialog_auto_segmentation_title": "Auto segmentation",
-    "dialog_auto_segmentation_text": "Do you want to start automatic segmentation? Once completed, it will overwrite the current segmentation.",
-
+    "dialog_auto_segmentation_question": "Start automatic segmentation?",
+    "dialog_auto_segmentation_text": "The video will be split by shots.",
+    "dialog_auto_segmentation_text_warning": "This action will replace the current segmentation.",
+  
     "cancel_action" : "Cancel",
 
     "shot_detail_informations_title" : "Information",
@@ -403,7 +405,7 @@
     "help_dialog_wip" : "Work in progress.",
     "help_dialog_report" : "To report any problem, please contact us:",
 
-    "messagebox_screenshot_with_adjustment" : "The software cannot save the adjustments applied to the media during capture. \n Do you want to save a screenshot without adjustments?",
+    "messagebox_screenshot_with_adjustment" : "The software cannot save the adjustments applied to the media during capture. \nDo you want to save a screenshot without adjustments?",
     "screenshot_without_adjustment_button" : "Capture anyway",
 
     "media_info_dialog_title" : "Media informations",
@@ -598,7 +600,7 @@
     "help_menu_extract_sequence_label" : "Extract sequence",
     "help_menu_extract_sequence_description" : "Opens a dialog to enter start and end timecodes to extract the corresponding sequence.",
     "help_menu_duplicate_media_label" : "Duplicate media",
-    "help_menu_duplicate_media_description" : "Allows you to duplicate the selected media into a new player. \n Changes made to the duplicated media apply to the new media.",
+    "help_menu_duplicate_media_description" : "Allows you to duplicate the selected media into a new player. \nChanges made to the duplicated media apply to the new media.",
     "help_menu_fullscreen_label" : "Fullscreen",
     "help_menu_fullscreen_description" : "Toggle fullscreen mode on or off.",
 
@@ -607,7 +609,7 @@
 
     "help_menu_extended_toolbar_buttons_description" : "Description of the extended toolbar buttons",
     "help_menu_show_image_label" : "Hide media",
-    "help_menu_show_image_description" : "Displays a black overlay layer on top of the media. \n Opacity can be adjusted by hovering over the icon.",
+    "help_menu_show_image_description" : "Displays a black overlay layer on top of the media. \nOpacity can be adjusted by hovering over the icon.",
     "help_menu_adjustments_label" : "Visual adjustments",
     "help_menu_adjustments_description" : "Settings to adjust the brightness, contrast, saturation and hue of the media.",    
     "help_menu_draw_label" : "Draw",

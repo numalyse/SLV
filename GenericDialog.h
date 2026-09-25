@@ -17,7 +17,8 @@ namespace SLV
         const QString& textInfo,
         std::function<void()> onYes,        
         std::function<void()> onNo = nullptr,        
-        std::function<void()> onCancel = nullptr 
+        std::function<void()> onCancel = nullptr,
+        const QString& yesText = QString()
     ) {
         PrefManager& prefManager = PrefManager::instance();
 
@@ -30,7 +31,9 @@ namespace SLV
             msgBox.setInformativeText(textInfo);
         }
 
-        QPushButton *yesBtn = msgBox.addButton(prefManager.getText("generic_dialog_btn_yes"), QMessageBox::YesRole);
+        QString yesLabel = yesText.isEmpty() ? prefManager.getText("generic_dialog_btn_yes") : yesText;
+        QPushButton *yesBtn = msgBox.addButton(yesLabel, QMessageBox::YesRole);
+
         QPushButton *noBtn = nullptr;
         if(onNo){
             noBtn = msgBox.addButton(prefManager.getText("generic_dialog_btn_no"), QMessageBox::NoRole);
@@ -55,9 +58,10 @@ namespace SLV
         const QString& text,
         std::function<void()> onYes,        
         std::function<void()> onNo = nullptr,        
-        std::function<void()> onCancel = nullptr 
+        std::function<void()> onCancel = nullptr,
+        const QString& yesText = QString() 
     ) {
-        showGenericDialog(parent, title, text, QString(), onYes, onNo, onCancel);
+        showGenericDialog(parent, title, text, QString(), onYes, onNo, onCancel, yesText);
     }
 
 

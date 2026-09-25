@@ -138,7 +138,9 @@
     "timeline_dialog_text_auto_segmentation": "Segmentation en cours...",
     "timeline_dialog_text_auto_segmentation_finished": "Segmentation automatique terminée, nombre de segments total : ",
     "dialog_auto_segmentation_title": "Segmentation automatique",
-    "dialog_auto_segmentation_text": "Voulez-vous lancer la segmentation automatique ?\n Une fois terminée, elle écrasera la segmentation actuelle.",
+    "dialog_auto_segmentation_question": "Lancer la segmentation automatique ?",
+    "dialog_auto_segmentation_text": "Le découpage se fera par plans.",
+    "dialog_auto_segmentation_text_warning": "Cette action remplacera la segmentation actuelle.",
 
     "cancel_action" : "Annuler",
     
@@ -403,7 +405,7 @@
     "help_dialog_wip" : "En cours de développement.",
     "help_dialog_report" : "Pour signaler un problème, veuillez nous contacter aux adresses suivantes :",
 
-    "messagebox_screenshot_with_adjustment" : "Le logiciel ne peut pas enregistrer les ajustements appliqués au média lors de la capture. \n Voulez-vous enregistrer une capture d'écran sans ajustements ?",
+    "messagebox_screenshot_with_adjustment" : "Le logiciel ne peut pas enregistrer les ajustements appliqués au média lors de la capture. \nVoulez-vous enregistrer une capture d'écran sans ajustements ?",
     "screenshot_without_adjustment_button" : "Capturer quand même",
 
     "media_info_dialog_title" : "Informations du média",
@@ -504,7 +506,7 @@
     "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en compte.",
 
     "tooltip_playlist_button" : "Playlist",
-    "tooltip_autoplay_playlist" : "Lecture automatique de la playlist",
+    "tooltip_autoplay_playlist" : "Passage automatique au média suivant",
     "tooltip_shot_detail_button" : "Informations du segment",
     "tooltip_annotation_button" : "Annotations",
 
@@ -598,7 +600,7 @@
     "help_menu_extract_sequence_label" : "Extraction de séquence",
     "help_menu_extract_sequence_description" : "Ouvre une fenêtre de dialogue qui permet de renseigner un timecode de début et de fin pour extraire la séquence correspondante.",
     "help_menu_duplicate_media_label" : "Dupliquer le média",
-    "help_menu_duplicate_media_description" : "Permet de dupliquer le média sélectionné dans un nouveau lecteur. \n Les changements effectués sur le média dupliqué s'appliquent sur le nouveau média.",
+    "help_menu_duplicate_media_description" : "Permet de dupliquer le média sélectionné dans un nouveau lecteur. \nLes changements effectués sur le média dupliqué s'appliquent sur le nouveau média.",
     "help_menu_fullscreen_label" : "Plein écran",
     "help_menu_fullscreen_description" : "Active ou désactive le mode plein écran.",
     
@@ -607,7 +609,7 @@
 
     "help_menu_extended_toolbar_buttons_description" : "Description des boutons de la barre d'outils étendue",
     "help_menu_show_image_label" : "Masquer le média",
-    "help_menu_show_image_description" : "Affichage d'un calque noir en superposition du média. \n Possibilité de régler l'opacité au survol de l'icône.",
+    "help_menu_show_image_description" : "Affichage d'un calque noir en superposition du média. \nPossibilité de régler l'opacité au survol de l'icône.",
     "help_menu_adjustments_label" : "Réglages visuels",
     "help_menu_adjustments_description" : "Réglages permettant de modifier la luminosité, le contraste, la saturation et la teinte du média.",
     "help_menu_draw_label" : "Dessin",

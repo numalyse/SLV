@@ -138,8 +138,10 @@
     "timeline_dialog_text_auto_segmentation": "Segmentazione in corso...",
     "timeline_dialog_text_auto_segmentation_finished": "Segmentazione automatica completata, numero totale di segmenti: ",
     "dialog_auto_segmentation_title": "Segmentazione automatica",
-    "dialog_auto_segmentation_text": "Vuoi avviare la segmentazione automatica?\nUna volta completata, sovrascriverà la segmentazione attuale.",
-
+    "dialog_auto_segmentation_question": "Avviare la segmentazione automatica?",
+    "dialog_auto_segmentation_text": "La suddivisione avverrà per inquadrature.",
+    "dialog_auto_segmentation_text_warning": "Questa azione sostituirà la segmentazione attuale.",
+ 
     "cancel_action" : "Annulla",
 
     "shot_detail_informations_title" : "Informazioni",
@@ -404,7 +406,7 @@
     "help_dialog_wip" : "In sviluppo.",
     "help_dialog_report" : "Per segnalare un problema, contattaci ai seguenti indirizzi:",
 
-    "messagebox_screenshot_with_adjustment" : "Il software non può salvare le regolazioni applicate al media durante l'acquisizione. \n Vuoi salvare una schermata senza regolazioni?",
+    "messagebox_screenshot_with_adjustment" : "Il software non può salvare le regolazioni applicate al media durante l'acquisizione. \nVuoi salvare una schermata senza regolazioni?",
     "screenshot_without_adjustment_button" : "Cattura comunque",
 
     "media_info_dialog_title" : "Informazioni media",
@@ -505,7 +507,7 @@
     "messagebox_format_not_accepted" : "Uno dei file selezionati ha un formato non supportato.",
 
     "tooltip_playlist_button" : "Playlist",
-    "tooltip_autoplay_playlist" : "Riproduzione automatica della playlist",
+    "tooltip_autoplay_playlist" : "Passaggio automatico al contenuto successivo",
     "tooltip_shot_detail_button" : "Informazioni dell'inquadratura",
     "tooltip_annotation_button" : "Anotazioni",
 
@@ -598,7 +600,7 @@
     "help_menu_extract_sequence_label" : "Estrazione sequenza",
     "help_menu_extract_sequence_description" : "Apre una finestra di dialogo per inserire timecode di inizio e fine per estrarre la sequenza corrispondente.",
     "help_menu_duplicate_media_label" : "Duplica media",
-    "help_menu_duplicate_media_description" : "Consente di duplicare il media selezionato in un nuovo lettore. \n Le modifiche apportate al media duplicato si applicano al nuovo media.",    
+    "help_menu_duplicate_media_description" : "Consente di duplicare il media selezionato in un nuovo lettore. \nLe modifiche apportate al media duplicato si applicano al nuovo media.",    
     "help_menu_fullscreen_label" : "Schermo intero",
     "help_menu_fullscreen_description" : "Attiva o disattiva la modalità schermo intero.",
     
@@ -607,7 +609,7 @@
 
     "help_menu_extended_toolbar_buttons_description" : "Descrizione dei pulsanti della barra strumenti estesa",
     "help_menu_show_image_label" : "Nascondi media",
-    "help_menu_show_image_description" : "Visualizzazione di un livello nero in sovrapposizione al media. \n Possibilità di regolare l'opacità passando il cursore sull'icona.",
+    "help_menu_show_image_description" : "Visualizzazione di un livello nero in sovrapposizione al media. \nPossibilità di regolare l'opacità passando il cursore sull'icona.",
     "help_menu_adjustments_label" : "Regolazioni visive",
     "help_menu_adjustments_description" : "Regolazioni che permettono di modificare la luminosità, il contrasto, la saturazione e la tonalità del media.",    
     "help_menu_draw_label" : "Disegno",

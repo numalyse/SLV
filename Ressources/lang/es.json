@@ -138,8 +138,10 @@
     "timeline_dialog_text_auto_segmentation": "Segmentando...",
     "timeline_dialog_text_auto_segmentation_finished": "Segmentación automática finalizada, número total de segmentos: ",
     "dialog_auto_segmentation_title": "Segmentación automática",
-    "dialog_auto_segmentation_text": "¿Desea iniciar la segmentación automática?\nUna vez finalizada, reemplazará la segmentación actual.",
-
+    "dialog_auto_segmentation_question": "¿Iniciar la segmentación automática?",
+    "dialog_auto_segmentation_text": "El corte se hará por planos.",
+    "dialog_auto_segmentation_text_warning": "Esta acción reemplazará la segmentación actual.",
+  
     "cancel_action" : "Cancelar",
 
     "shot_detail_informations_title" : "Información",
@@ -403,7 +405,7 @@
     "help_dialog_wip" : "En desarrollo.",
     "help_dialog_report" : "Para reportar un problema, contáctenos en las siguientes direcciones:",
 
-    "messagebox_screenshot_with_adjustment" : "El software no puede guardar los ajustes aplicados al medio durante la captura. \n ¿Desea guardar una captura de pantalla sin ajustes?",
+    "messagebox_screenshot_with_adjustment" : "El software no puede guardar los ajustes aplicados al medio durante la captura. \n¿Desea guardar una captura de pantalla sin ajustes?",
     "screenshot_without_adjustment_button" : "Capturar de todos modos",
 
     "media_info_dialog_title" : "Información del medio",
@@ -504,7 +506,7 @@
     "messagebox_format_not_accepted" : "Uno de los archivos seleccionados tiene un formato no compatible.",
 
     "tooltip_playlist_button" : "Lista de reproducción",
-    "tooltip_autoplay_playlist" : "Reproducción automática de la lista",
+    "tooltip_autoplay_playlist" : "Avance automático al siguiente contenido",
     "tooltip_shot_detail_button" : "Información del segmento",
     "tooltip_annotation_button" : "Anotaciones",
 
@@ -598,7 +600,7 @@
     "help_menu_extract_sequence_label" : "Extracción de secuencia",
     "help_menu_extract_sequence_description" : "Abre un diálogo para indicar timecode de inicio y fin y extraer la secuencia correspondiente.",
     "help_menu_duplicate_media_label" : "Duplicar medio",
-    "help_menu_duplicate_media_description" : "Permite duplicar el medio seleccionado en un nuevo reproductor. \n Los cambios realizados en el medio duplicado se aplican al nuevo medio.",
+    "help_menu_duplicate_media_description" : "Permite duplicar el medio seleccionado en un nuevo reproductor. \nLos cambios realizados en el medio duplicado se aplican al nuevo medio.",
     "help_menu_fullscreen_label" : "Pantalla completa",
     "help_menu_fullscreen_description" : "Activa o desactiva el modo de pantalla completa.",
 
@@ -607,7 +609,7 @@
 
     "help_menu_extended_toolbar_buttons_description" : "Descripción de los botones de la barra de herramientas ampliada",
     "help_menu_show_image_label" : "Ocultar medio",
-    "help_menu_show_image_description" : "Muestra una capa negra superpuesta al medio. \n Es posible ajustar la opacidad al pasar el cursor sobre el icono.",
+    "help_menu_show_image_description" : "Muestra una capa negra superpuesta al medio. \nEs posible ajustar la opacidad al pasar el cursor sobre el icono.",
     "help_menu_adjustments_label" : "Ajustes visuales",
     "help_menu_adjustments_description" : "Ajustes que permiten modificar el brillo, el contraste, la saturación y el tono del medio.",    
     "help_menu_draw_label" : "Dibujo",

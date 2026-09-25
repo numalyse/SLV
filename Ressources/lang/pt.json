@@ -138,8 +138,10 @@
     "timeline_dialog_text_auto_segmentation": "A segmentar...",
     "timeline_dialog_text_auto_segmentation_finished": "Segmentação automática concluída, número total de segments: ",
     "dialog_auto_segmentation_title": "Segmentação automática",
-    "dialog_auto_segmentation_text": "Deseja iniciar a segmentação automática?\nApós concluída, substituirá a segmentação atual.",
-
+    "dialog_auto_segmentation_question": "Iniciar a segmentação automática?",
+    "dialog_auto_segmentation_text": "A divisão será feita por planos.",
+    "dialog_auto_segmentation_text_warning": "Esta ação substituirá a segmentação atual.",
+ 
     "cancel_action" : "Cancelar",
 
     "shot_detail_informations_title" : "Informações",
@@ -403,7 +405,7 @@
     "help_dialog_wip" : "Em desenvolvimento.",
     "help_dialog_report" : "Para reportar um problema, contacte-nos nos seguintes endereços:",
 
-    "messagebox_screenshot_with_adjustment" : "O software não consegue guardar os ajustes aplicados ao media durante a captura. \n Deseja guardar uma captura de ecrã sem ajustes?",
+    "messagebox_screenshot_with_adjustment" : "O software não consegue guardar os ajustes aplicados ao media durante a captura. \nDeseja guardar uma captura de ecrã sem ajustes?",
     "screenshot_without_adjustment_button" : "Capturar mesmo assim",
 
     "media_info_dialog_title" : "Informações do média",
@@ -504,7 +506,7 @@
     "messagebox_format_not_accepted" : "Um dos arquivos selecionados possui um formato não suportado.",
 
     "tooltip_playlist_button" : "Playlist",
-    "tooltip_autoplay_playlist" : "Reprodução automática da playlist",
+    "tooltip_autoplay_playlist" : "Avanço automático para o próximo conteúdo",
     "tooltip_shot_detail_button" : "Informações do segment",
     "tooltip_annotation_button" : "Anotações",
 
@@ -598,7 +600,7 @@
     "help_menu_extract_sequence_label" : "Extrair sequência",
     "help_menu_extract_sequence_description" : "Abre um diálogo para indicar timecode de início e fim e extrair a sequência correspondente.",
     "help_menu_duplicate_media_label" : "Duplicar média",
-    "help_menu_duplicate_media_description" : "Permite duplicar a mídia selecionada em um novo player. \n As alterações feitas na mídia duplicada aplicam-se à nova mídia.",    
+    "help_menu_duplicate_media_description" : "Permite duplicar a mídia selecionada em um novo player. \nAs alterações feitas na mídia duplicada aplicam-se à nova mídia.",    
     "help_menu_fullscreen_label" : "Ecrã completo",
     "help_menu_fullscreen_description" : "Ativa ou desativa o modo de ecrã completo.",
 
@@ -607,7 +609,7 @@
 
     "help_menu_extended_toolbar_buttons_description" : "Descrição dos botões da barra de ferramentas estendida",
     "help_menu_show_image_label" : "Ocultar média",
-    "help_menu_show_image_description" : "Exibição de uma camada preta sobreposta à mídia. \n Possibilidade de ajustar a opacidade ao passar o cursor sobre o ícone.",
+    "help_menu_show_image_description" : "Exibição de uma camada preta sobreposta à mídia. \nPossibilidade de ajustar a opacidade ao passar o cursor sobre o ícone.",
     "help_menu_adjustments_label" : "Ajustes visuais",
     "help_menu_adjustments_description" : "Ajustes que permitem modificar o brilho, o contraste, a saturação e o matiz da mídia.",    
     "help_menu_draw_label" : "Desenho",

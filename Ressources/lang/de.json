@@ -135,8 +135,11 @@
 
     "timeline_dialog_title_auto_segmentation": "Automatische Segmentierung",
     "timeline_dialog_text_auto_segmentation": "Segmentierung läuft...",
-    "timeline_dialog_text_auto_segmentation_finished": "Automatische Segmentierung abgeschlossen, Gesamtzahl der Segmente: ",    "dialog_auto_segmentation_title": "Automatische Segmentierung",
-    "dialog_auto_segmentation_text": "Möchten Sie die automatische Segmentierung starten?\nNach Abschluss wird die aktuelle Segmentierung überschrieben.",
+    "timeline_dialog_text_auto_segmentation_finished": "Automatische Segmentierung abgeschlossen, Gesamtzahl der Segmente: ",    
+    "dialog_auto_segmentation_title": "Automatische Segmentierung",
+    "dialog_auto_segmentation_question": "Automatische Segmentierung starten?",
+    "dialog_auto_segmentation_text": "Die Aufteilung erfolgt nach Einstellungen.",
+    "dialog_auto_segmentation_text_warning": "Diese Aktion ersetzt die aktuelle Segmentierung.",
 
     "cancel_action" : "Abbrechen",
 
@@ -401,7 +404,7 @@
     "help_dialog_wip" : "In Entwicklung.",
     "help_dialog_report" : "Um ein Problem zu melden, kontaktieren Sie uns unter folgenden Adressen:",
 
-    "messagebox_screenshot_with_adjustment" : "Die Software kann die während der Aufnahme auf das Medium angewendeten Anpassungen nicht speichern. \n Möchten Sie einen Screenshot ohne Anpassungen speichern?",
+    "messagebox_screenshot_with_adjustment" : "Die Software kann die während der Aufnahme auf das Medium angewendeten Anpassungen nicht speichern. \nMöchten Sie einen Screenshot ohne Anpassungen speichern?",
     "screenshot_without_adjustment_button" : "Trotzdem aufnehmen",
 
     "media_info_dialog_title" : "Medieninformationen",
@@ -502,7 +505,7 @@
     "messagebox_format_not_accepted" : "Eine der ausgewählten Dateien hat ein nicht unterstütztes Format.",
 
     "tooltip_playlist_button" : "Wiedergabeliste",
-    "tooltip_autoplay_playlist" : "Playlist automatisch abspielen",
+    "tooltip_autoplay_playlist" : "Automatischer Wechsel zum nächsten Medium",
     "tooltip_shot_detail_button" : "Segmentinformationen",
     "tooltip_annotation_button" : "Anmerkungen",
 
@@ -596,7 +599,7 @@
     "help_menu_extract_sequence_label" : "Sequenz extrahieren",
     "help_menu_extract_sequence_description" : "Öffnet einen Dialog zur Angabe von Start- und End-Timecode, um die entsprechende Sequenz zu extrahieren.",
     "help_menu_duplicate_media_label" : "Medium duplizieren",
-    "help_menu_duplicate_media_description" : "Ermöglicht das Duplizieren des ausgewählten Mediums in einen neuen Player. \n Änderungen am duplizierten Medium wirken sich auf das neue Medium aus.",
+    "help_menu_duplicate_media_description" : "Ermöglicht das Duplizieren des ausgewählten Mediums in einen neuen Player. \nÄnderungen am duplizierten Medium wirken sich auf das neue Medium aus.",
     "help_menu_fullscreen_label" : "Vollbild",
     "help_menu_fullscreen_description" : "Aktiviert oder deaktiviert den Vollbildmodus.",
     
@@ -605,7 +608,7 @@
 
     "help_menu_extended_toolbar_buttons_description" : "Beschreibung der erweiterten Symbolleisten-Schaltflächen",
     "help_menu_show_image_label" : "Medium ausblenden",
-    "help_menu_show_image_description" : "Anzeige einer schwarzen Ebene über dem Medium. \n Die Deckkraft kann beim Überfahren des Symbols angepasst werden.",
+    "help_menu_show_image_description" : "Anzeige einer schwarzen Ebene über dem Medium. \nDie Deckkraft kann beim Überfahren des Symbols angepasst werden.",
     "help_menu_adjustments_label" : "Bildeinstellungen",
     "help_menu_adjustments_description" : "Einstellungen zur Änderung von Helligkeit, Kontrast, Sättigung und Farbton des Mediums.",
     "help_menu_draw_label" : "Zeichnen",

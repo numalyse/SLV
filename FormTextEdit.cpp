@@ -4,6 +4,7 @@
 #include "Project/ProjectManager.h"
 #include <QScrollBar>
 #include <QApplication>
+#include <QMimeData>
 
 FormTextEdit::FormTextEdit(const QString &text, bool editable, QWidget *parent) : QTextEdit(parent)
 {
@@ -37,4 +38,12 @@ void FormTextEdit::focusOutEvent(QFocusEvent *e)
 {    
     QTextEdit::focusOutEvent(e);
     emit focusOut();
+}
+
+void FormTextEdit::insertFromMimeData(const QMimeData *source)
+{
+    if (source->hasText())
+        insertPlainText(source->text());
+    else
+        QTextEdit::insertFromMimeData(source);
 }

@@ -473,7 +473,7 @@
     "open_screenshot_button" : "Abrir a captura",
 
     "dialog_save_project_dialog_title" : "Salvando o projeto",
-    "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. Deseja salvar o projeto?",
+    "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. \nDeseja salvar o projeto?",
     "project_saved_title" : "Salvamento do projeto",
     "project_saved_text" : "O projeto foi salvo com sucesso.",
     "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
@@ -494,7 +494,7 @@
     "tab_param_paths" : "Personalização de caminhos",
   
     "open_more_than_four_files_title" : "Seleção de múltiplas mídias",
-    "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. Deseja carregar sua seleção na playlist?",
+    "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. \nDeseja carregar sua seleção na playlist?",
 
     "project_exportation_finished" : "Exportação concluída",
     "project_exportation_desc" : "A exportação da mídia foi concluída com sucesso.",
@@ -583,7 +583,7 @@
     "help_menu_next_description" : "Avança para a próxima mídia na playlist.",
 
     "help_menu_slow_label" : "Alteração de velocidade",
-    "help_menu_slow_description" : "Abre um controle deslizante para alterar a velocidade de reprodução da mídia. As velocidades suportadas são x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Abre um controle deslizante para ajustar a velocidade de reprodução.\nVelocidades disponíveis: ×0,25, ×0,5, ×0,75, ×1, ×1,25, ×1,5, ×2",
 
     "help_menu_loop_off_label" : "Repetição",
     "help_menu_loop_off_description" : "Ativa ou desativa a reprodução em loop do meio.",
@@ -594,11 +594,11 @@
     "help_menu_media_info_label" : "Informações do meio",
     "help_menu_media_info_description" : "Mostra informações técnicas e metadados do meio.",
     "help_menu_zoom_label" : "Zoom",
-    "help_menu_zoom_description" : "Ativa/desativa o modo de zoom. Com zoom ativo, use a roda do mouse para ampliar e Ctrl (Cmd no Mac) + clique esquerdo para deslocar.",
+    "help_menu_zoom_description": "Ativa/desativa o zoom.\nRoda do mouse para dar zoom, Ctrl/Cmd + clique esquerdo mantido para se mover.",
     "help_menu_capture_label" : "Captura de ecrã",
     "help_menu_capture_description" : "Tira uma captura do frame atual do meio.",
     "help_menu_extract_sequence_label" : "Extrair sequência",
-    "help_menu_extract_sequence_description" : "Abre um diálogo para indicar timecode de início e fim e extrair a sequência correspondente.",
+    "help_menu_extract_sequence_description": "Abre uma janela para definir um timecode de início e fim, e extrair a sequência correspondente.",
     "help_menu_duplicate_media_label" : "Duplicar média",
     "help_menu_duplicate_media_description" : "Permite duplicar a mídia selecionada em um novo player. \nAs alterações feitas na mídia duplicada aplicam-se à nova mídia.",    
     "help_menu_fullscreen_label" : "Ecrã completo",

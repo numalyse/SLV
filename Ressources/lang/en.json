@@ -473,7 +473,7 @@
     "open_screenshot_button" : "Open screenshot",
 
     "dialog_save_project_dialog_title" : "Save project",
-    "dialog_save_project_dialog_text" : "The timeline contains unsaved changes. Do you want to save the project?",
+    "dialog_save_project_dialog_text" : "The timeline contains unsaved changes. \nDo you want to save the project?",
     "project_saved_title" : "Project save",
     "project_saved_text" : "The project has been saved successfully.",
     "messagebox_record_completed" : "The media record was completed successfully.",
@@ -494,7 +494,7 @@
     "tab_param_paths" : "Paths customization",
     
     "open_more_than_four_files_title" : "Multiple media selection",
-    "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?",
+    "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. \nDo you want to load your selection into the playlist?",
 
     "project_exportation_finished" : "Export completed",
     "project_exportation_desc" : "The media export was completed successfully.",
@@ -583,7 +583,7 @@
     "help_menu_next_description" : "Skips to the next media in the playlist.",
 
     "help_menu_slow_label" : "Speed modification",
-    "help_menu_slow_description" : "Opens a slider to modify the playback speed of the media. The supported speeds are : x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Opens a slider to adjust the media playback speed.\nAvailable speeds: ×0.25, ×0.5, ×0.75, ×1, ×1.25, ×1.5, ×2",
 
     "help_menu_loop_off_label" : "Loop",
     "help_menu_loop_off_description" : "Toggle media loop playback on or off.",
@@ -594,11 +594,11 @@
     "help_menu_media_info_label" : "Media information",
     "help_menu_media_info_description" : "Shows technical information and metadata for the media.",
     "help_menu_zoom_label" : "Zoom",
-    "help_menu_zoom_description" : "Toggle zoom mode. With zoom active use the mouse wheel to zoom and Ctrl (Cmd on Mac) + left click to pan.",
+    "help_menu_zoom_description": "Toggle zoom mode.\nMouse wheel to zoom, Ctrl/Cmd + hold left click to move around.",
     "help_menu_capture_label" : "Screenshot",
     "help_menu_capture_description" : "Capture a screenshot of the current media frame.",
     "help_menu_extract_sequence_label" : "Extract sequence",
-    "help_menu_extract_sequence_description" : "Opens a dialog to enter start and end timecodes to extract the corresponding sequence.",
+    "help_menu_extract_sequence_description": "Opens a window to set a start and end timecode, and extract the corresponding sequence.",
     "help_menu_duplicate_media_label" : "Duplicate media",
     "help_menu_duplicate_media_description" : "Allows you to duplicate the selected media into a new player. \nChanges made to the duplicated media apply to the new media.",
     "help_menu_fullscreen_label" : "Fullscreen",

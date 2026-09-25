@@ -94,7 +94,7 @@ public slots:
 private:
     QSize m_mediaSize;
 
-    bool m_loopActivated = true;
+    bool m_loopActivated = false;
     int64_t m_loopValue = 0;
     bool m_zoomActivated = false;
     bool m_vflipped = false;

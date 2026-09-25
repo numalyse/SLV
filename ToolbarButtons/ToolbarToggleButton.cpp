@@ -65,6 +65,8 @@ void ToolbarToggleButton::toggleUpdateIcon()
 
 void ToolbarToggleButton::onButtonToggled(bool checked)
 {
+    updateIcons(checked, isEnabled());
+
     if (checked) {
         emit stateActivated();
     } else {

@@ -18,6 +18,7 @@ signals:
 protected:
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
+    void insertFromMimeData(const QMimeData *source) override;
 };
 
 

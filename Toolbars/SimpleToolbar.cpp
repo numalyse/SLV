@@ -123,7 +123,7 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_loopBtn = new ToolbarToggleButton(
         this,
-        true,
+        false,
         "loop_off_white",
         PrefManager::instance().getText("tooltip_loop_off") + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
@@ -463,6 +463,8 @@ void SimpleToolbar::disableFullscreenUiUpdate()
 
 void SimpleToolbar::disableLoopMode()
 {
+    if (!m_loopBtn) return;
+    m_loopBtn->setButtonState(false);
     emit m_loopBtn->stateDeactivated();
 }
 

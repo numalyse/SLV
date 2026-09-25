@@ -474,7 +474,7 @@
     "open_screenshot_button" : "Apri lo screenshot",
 
     "dialog_save_project_dialog_title" : "Salvataggio del progetto",
-    "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. Vuoi salvare il progetto?",
+    "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. \nVuoi salvare il progetto?",
     "project_saved_title" : "Salvataggio del progetto",
     "project_saved_text" : "Il progetto è stato salvato con successo.",
     "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
@@ -495,7 +495,7 @@
     "tab_param_paths" : "Personalizzazione percorsi",
     
     "open_more_than_four_files_title" : "Selezione multipla di file multimediali",
-    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. Vuoi caricare la tua selezione nella playlist?",
+    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. \nVuoi caricare la tua selezione nella playlist?",
 
     "project_exportation_finished" : "Esportazione completata",
     "project_exportation_desc" : "L'esportazione del file multimediale è stata completata con successo.",
@@ -583,7 +583,7 @@
     "help_menu_next_description" : "Passa al media successivo nella playlist.",
     
     "help_menu_slow_label" : "Modifica della velocità",
-    "help_menu_slow_description" : "Apre uno slider per modificare la velocità di riproduzione del file multimediale. Le velocità supportate sono x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Apre un cursore per regolare la velocità di riproduzione.\nVelocità disponibili: ×0,25, ×0,5, ×0,75, ×1, ×1,25, ×1,5, ×2",
 
     "help_menu_loop_off_label" : "Loop",
     "help_menu_loop_off_description" : "Attiva o disattiva la riproduzione in loop del media.",
@@ -594,11 +594,11 @@
     "help_menu_media_info_label" : "Informazioni sul media",
     "help_menu_media_info_description" : "Mostra informazioni tecniche e metadati del media.",
     "help_menu_zoom_label" : "Zoom",
-    "help_menu_zoom_description" : "Attiva/disattiva la modalità zoom. Con zoom attivo usa la rotellina del mouse per zoomare e Ctrl (Cmd su Mac) + clic sinistro per spostarti.",
+    "help_menu_zoom_description": "Attiva/disattiva lo zoom.\nRotellina del mouse per zoomare, Ctrl/Cmd + clic sinistro tenuto premuto per spostarti.",
     "help_menu_capture_label" : "Screenshot",
     "help_menu_capture_description" : "Cattura uno screenshot del frame corrente del media.",
     "help_menu_extract_sequence_label" : "Estrazione sequenza",
-    "help_menu_extract_sequence_description" : "Apre una finestra di dialogo per inserire timecode di inizio e fine per estrarre la sequenza corrispondente.",
+    "help_menu_extract_sequence_description": "Apre una finestra per definire un timecode di inizio e fine ed estrarre la sequenza corrispondente.",
     "help_menu_duplicate_media_label" : "Duplica media",
     "help_menu_duplicate_media_description" : "Consente di duplicare il media selezionato in un nuovo lettore. \nLe modifiche apportate al media duplicato si applicano al nuovo media.",    
     "help_menu_fullscreen_label" : "Schermo intero",

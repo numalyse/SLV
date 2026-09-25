@@ -110,6 +110,13 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     ButtonLayout->addWidget(m_mergeWithPrevShotBtn);
     m_mergeWithPrevShotBtn->setEnabled(false);
 
+    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", pref.getText("tooltip_merge_with_next_shot"));
+    connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
+    ButtonLayout->addWidget(m_mergeWithNextShotBtn);
+    m_mergeWithNextShotBtn->setEnabled(false);
+
+    ButtonLayout->addWidget(makeSeparator());
+
     m_toPrevShotBtn = new ToolbarButton(this, "to_prev_shot_white", pref.getText("tooltip_to_prev_shot"));
     connect(m_toPrevShotBtn, &ToolbarButton::pressed, this, [this](){
         goToShot(m_shotManager->getCurrentShotId()-1);
@@ -129,11 +136,6 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     });
     ButtonLayout->addWidget(m_toNextShotBtn);
     m_toNextShotBtn->setEnabled(false);
-
-    m_mergeWithNextShotBtn = new ToolbarButton(this, "merge_right_white", pref.getText("tooltip_merge_with_next_shot"));
-    connect(m_mergeWithNextShotBtn, &ToolbarButton::pressed, this, &TimelineWidget::mergeWithNextShotAction);
-    ButtonLayout->addWidget(m_mergeWithNextShotBtn);
-    m_mergeWithNextShotBtn->setEnabled(false);
 
     ButtonLayout->addWidget(makeSeparator());
 

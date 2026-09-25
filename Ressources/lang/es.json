@@ -75,21 +75,21 @@
     "no_preview" : "Sin vista previa",
     "preview" : "Vista previa",
 
-    "tooltip_to_next_shot" : "Ir al siguiente plano",
-    "tooltip_to_prev_shot" : "Ir al plano anterior",
+    "tooltip_to_next_shot" : "Ir al siguiente segmento",
+    "tooltip_to_prev_shot" : "Ir al segmento anterior",
 
     "tooltip_segmentation_auto" : "Segmentación automática",
 
-    "tooltip_split_shot" : "Dividir plano",
+    "tooltip_split_shot" : "Dividir segmento",
     "tooltip_ab_loop": "Crear bucle A-B",
-    "tooltip_merge_with_prev_shot": "Fusionar con el plano anterior",
-    "tooltip_merge_with_next_shot": "Fusionar con el siguiente plano",
+    "tooltip_merge_with_prev_shot": "Fusionar con el segmento anterior",
+    "tooltip_merge_with_next_shot": "Fusionar con el siguiente segmento",
     "tooltip_export": "Exportar",
 
     "tooltip_reposition_toolbar" : "Restablecer la posición de la barra de herramientas",
 
     "dialog_save_multiview_video" : "Guardar grabación multivista",
-    "dialog_save_extract_shots" : "Guardar extracción de planos",
+    "dialog_save_extract_shots" : "Guardar extracción de segmentos",
 
     "timeline_split_shot_at_cursor" : "Cortar en el cabezal",
     "timeline_ab_action_0": "Añadir marcador A en el cabezal",
@@ -98,13 +98,13 @@
     "timeline_ab_extract": "Extraer secuencia AB",
     "messagebox_extract_ab_loop_done" : "Extracción de la secuencia AB completada.",
     "messagebox_extract_ab_loop_failed" : "Falló la extracción de la secuencia AB.",
-    "timeline_merge_with_previous_shot" : "Fusionar plano actual con el anterior",
-    "timeline_merge_with_next_shot" : "Fusionar plano actual con el siguiente",
-    "timeline_extract_selected_shots" : "Extraer planos seleccionados",
-    "timeline_shot_count_label" : "plano(s)",
-    "timeline_selected_shot_count_label" : "plano(s) seleccionado(s)",
-    "messagebox_extract_selected_shots_completed" : "Extracción de los planos seleccionados completada.",
-    "messagebox_extract_selected_shots_failed" : "Falló la extracción de los planos seleccionados.",
+    "timeline_merge_with_previous_shot" : "Fusionar segmento actual con el anterior",
+    "timeline_merge_with_next_shot" : "Fusionar segmento actual con el siguiente",
+    "timeline_extract_selected_shots" : "Extraer segmentos seleccionados",
+    "timeline_shot_count_label" : "segmento(s)",
+    "timeline_selected_shot_count_label" : "segmento(s) seleccionado(s)",
+    "messagebox_extract_selected_shots_completed" : "Extracción de los segmentos seleccionados completada.",
+    "messagebox_extract_selected_shots_failed" : "Falló la extracción de los segmentos seleccionados.",
 
     "export_running": "Exportación en curso...",
     "export_directory_path_title": "Seleccionar carpeta de exportación",
@@ -136,7 +136,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Segmentación automática",
     "timeline_dialog_text_auto_segmentation": "Segmentando...",
-    "timeline_dialog_text_auto_segmentation_finished": "Segmentación automática finalizada, número total de planos: ",
+    "timeline_dialog_text_auto_segmentation_finished": "Segmentación automática finalizada, número total de segmentos: ",
     "dialog_auto_segmentation_title": "Segmentación automática",
     "dialog_auto_segmentation_text": "¿Desea iniciar la segmentación automática?\nUna vez finalizada, reemplazará la segmentación actual.",
 
@@ -153,13 +153,13 @@
     "shot_detail_img_txt_name" : "Imagen",
     "shot_detail_sound_txt_name" : "Sonido",
 
-    "shot_detail_id_text" : "Plano n.º",
-    "shot" : "Plano",
-    "number_of_shots" : "Número total de planos",
+    "shot_detail_id_text" : "segmento n.º",
+    "shot" : "segmento",
+    "number_of_shots" : "Número total de segmentos",
     "number_of_annotations" : "Número total de anotaciones",
-    "shots" : "Planos",
+    "shots" : "segmentos",
     "export_source_selection_txt" : "Seleccionar el contenido a exportar",
-    "average_shot_duration" : "Duración promedio de los planos",
+    "average_shot_duration" : "Duración promedio de los segmentos",
 
     "compo_rule_None" : "Ninguno",
     "compo_rule_RuleOfThirds" : "Regla de los tercios",
@@ -343,7 +343,7 @@
     "shortcut_prev_frame": "Fotograma anterior",
     "shortcut_next_frame": "Fotograma siguiente",
     
-    "tagimage_tooltip" : "Imagen de referencia (TagFrame) : Permite identificar el plano con una imagen representativa del contenido del plano.",
+    "tagimage_tooltip" : "Imagen de referencia (TagFrame): Permite identificar el segmento con una imagen representativa de su contenido.",
 
     "paths_screenshot" : "Carpeta de capturas de pantalla",
     "paths_default_video" : "Carpeta predeterminada para guardar capturas de vídeo",
@@ -388,9 +388,9 @@
 
     "reset" : "Restablecer",
 
-    "timeline_extract_selected_shot" : "Extraer plano",
-    "messagebox_extract_shot_failed" : "Falló la extracción del plano.",
-    "messagebox_extract_shot_completed" : "Extracción del plano completada.",
+    "timeline_extract_selected_shot" : "Extraer segmento",
+    "messagebox_extract_shot_failed" : "Error al extraer el segmento.",
+    "messagebox_extract_shot_completed" : "Extracción del segmento completada.",
     "close" : "Cerrar",
 
     "about_dialog_title" : "Acerca de",
@@ -403,8 +403,8 @@
     "help_dialog_wip" : "En desarrollo.",
     "help_dialog_report" : "Para reportar un problema, contáctenos en las siguientes direcciones:",
 
-    "messagebox_screenshot_with_adjustment" : "El medio actual tiene ajustes. ¿Desea guardar una captura sin los ajustes?",
-    "screenshot_without_adjustment_button" : "Captura sin ajustes",
+    "messagebox_screenshot_with_adjustment" : "El software no puede guardar los ajustes aplicados al medio durante la captura. \n ¿Desea guardar una captura de pantalla sin ajustes?",
+    "screenshot_without_adjustment_button" : "Capturar de todos modos",
 
     "media_info_dialog_title" : "Información del medio",
     "media_info_title" : "Título",
@@ -505,7 +505,7 @@
 
     "tooltip_playlist_button" : "Lista de reproducción",
     "tooltip_autoplay_playlist" : "Reproducción automática de la lista",
-    "tooltip_shot_detail_button" : "Información del plano",
+    "tooltip_shot_detail_button" : "Información del segmento",
     "tooltip_annotation_button" : "Anotaciones",
 
     "messagebox_fullscreen_experimental" : "La función de pantalla completa del software está actualmente en desarrollo.",
@@ -550,10 +550,10 @@
     "help_menu_timeline_category" : "Línea de tiempo detallada",
     "help_menu_timeline_display_label" : "Mostrar la línea de tiempo detallada",
     "help_menu_open_timeline_label" : "Abrir la línea de tiempo detallada",
-    "help_menu_open_info_label" : "Abrir las informaciones de la línea de tiempo",
+    "help_menu_open_info_label" : "Abrir la información del segmento",
     "help_menu_timeline_buttons_label" : "Botones de la línea de tiempo",
     "help_menu_timeline_toolbar_label" : "Barra de herramientas de la línea de tiempo",
-    "help_menu_shot_infos_label" : "Información del plano",
+    "help_menu_shot_infos_label" : "Información del segmento",
     "help_menu_timeline_exportation_label" : "Exportación",
 
     "help_menu_options_category" : "Opciones",
@@ -561,9 +561,6 @@
     "help_menu_shortcuts_label" : "Atajos de teclado",
     "help_menu_paths_label" : "Personalización de rutas",
 
-    "help_menu_open_files_content_1" : "Al iniciarse, el reproductor muestra una pantalla vacía. Para abrir un medio, haga clic en el menú \"Archivos\" y luego \"Abrir uno o varios medios\" para abrir una ventana de selección de archivos. También puede usar el botón de reproducción en la barra de herramientas en la parte inferior de la pantalla.",
-    "help_menu_open_files_content_2" : "También es posible abrir medios arrastrando y soltando el archivo deseado en el área negra del reproductor.",
-    "help_menu_classic_toolbar_content_1" : "Se muestra una barra de herramientas debajo del medio asociado. Permite realizar varias operaciones en el medio.",
     "help_menu_classic_toolbar_buttons_description" : "Descripción de los botones de la barra de herramientas",
     
     "help_menu_play_label" : "Reproducir",
@@ -635,14 +632,6 @@
     "help_menu_timeline_off_label" : "Timeline detallada",
     "help_menu_timeline_off_description" : "Muestra la timeline detallada del medio.",
 
-    "help_menu_enter_multiview_content_1" : "Es posible mostrar de 1 a 4 reproductores simultáneamente. En modo multi-vistas (con 2 o más reproductores), cada medio tiene su propia barra de herramientas simplificada y aparece una barra global en la parte inferior para operaciones sobre todos los medios.",
-    "help_menu_enter_multiview_content_2" : "Para entrar en modo multi-vistas, pase el cursor por el botón de disposición de medios en la esquina superior derecha. Podrá elegir el número de reproductores y su disposición. Los reproductores son redimensionables arrastrando los splitters entre ellos. También puede usar el botón de duplicar medio.",
-    "help_menu_simplified_content_1" : "La barra de herramientas simplificada en multi-vistas contiene la mayoría de botones de la barra clásica, pero sin extensiones. También dispone de un botón para quitar el reproductor de la vista.",
-    "help_menu_global_toolbar_content_1" : "Además de las barras simplificadas, en modo multi-vistas se muestra una barra global para operar sobre los medios presentes.",
-    "help_menu_global_toolbar_content_2" : "La captura de pantalla combinada toma una captura de cada medio y las combina en una sola imagen respetando la disposición de los reproductores. Las capturas se guardan en la carpeta indicada en Preferencias (por defecto NumalysePlayer_Content).",
-    "help_menu_access_playlist_content_1" : "Se puede crear una playlist añadiendo los medios deseados. Para acceder a la playlist, haga clic en el botón del panel lateral arriba a la derecha (no disponible en multi-vistas).",
-    "help_menu_manage_items_content_1" : "Los elementos de la playlist contienen título, duración, tipo, miniatura y su índice en la lista. Haga clic en + para añadir medios y en el icono de papelera para eliminarlos. También puede mover elementos con arrastrar y soltar.",
-
     "help_menu_playlist_loop_label" : "Bucle",
     "help_menu_playlist_loop_description" : "Si está activado, avanza al siguiente medio cuando el actual termina.",
     "help_menu_playlist_shuffle_label" : "Aleatorio",
@@ -651,31 +640,29 @@
     "help_menu_playlist_sort_description" : "Ordena la lista según los criterios indicados.",
     "help_menu_playlist_delete_label" : "Eliminar todo",
     "help_menu_playlist_delete_description" : "Elimina todos los elementos de la playlist. Se mostrará un mensaje de confirmación.",
-    "help_menu_timeline_display_content_1" : "La timeline detallada ofrece una visualización del audio (barra violeta) y de los distintos planos del vídeo (barra azul). Los planos son anotables y pueden añadirse manual o automáticamente. Los vídeos segmentados pueden guardarse como proyectos y exportarse a varios formatos.",
-    "help_menu_timeline_display_content_2" : "La timeline tiene una escala temporal, una vista de vídeo en azul con la imagen inicial del plano, una vista de audio en violeta con la forma de onda y botones para modificar los planos. Por defecto solo hay un plano. Se puede ampliar la línea de tiempo con la rueda del ratón, seleccionar un plano con un clic izquierdo (Ctrl + clic izquierdo para seleccionar varios) y desplazarse horizontalmente con Mayús + clic izquierdo. Hay más opciones disponibles al hacer clic con el botón derecho del ratón sobre los planos.",
 
     "help_menu_abloop_label" : "Bucle AB",
     "help_menu_abloop_description" : "Clic: coloca un marcador A/B en la posición actual. Una vez colocados ambos marcadores, el vídeo hace bucle en ese intervalo; otro clic quita los marcadores.",
     "help_menu_auto_segmentation_label" : "Segmentación automática",
     "help_menu_auto_segmentation_description" : "Calcula automáticamente las transiciones en el vídeo y aplica el resultado en la timeline. La segmentación anterior se sobrescribe.",
-    "help_menu_split_shot_label" : "Cortar plano",
-    "help_menu_split_shot_description" : "Corta el plano en la posición actual en dos planos.",
-    "help_menu_merge_left_label" : "Fusionar el plano a la izquierda",
-    "help_menu_merge_right_label" : "Fusionar el plano a la derecha ",
-    "help_menu_merge_left_description" : "Fusiona el plano actual con el anterior.",
-    "help_menu_merge_right_description" : "Fusiona el plano actual con el siguiente.",
-    "help_menu_merge_description" : "Fusiona el plano actual con el anterior/siguiente.",
-    "help_menu_to_prev_shot_label" : "Plano anterior",
-    "help_menu_to_next_shot_label" : "Plano siguiente",
-    "help_menu_to_prev_shot_description" : "Ir al plano anterior",
-    "help_menu_to_next_shot_description" : "Ir al plano siguiente",
-    "help_menu_change_shot_description" : "Cambia el timecode al inicio del plano anterior/siguiente.",
-    "help_menu_shot_detail_label" : "Información del plano",
-    "help_menu_shot_detail_description" : "Abre la información del plano en el panel lateral. El título y las notas del plano se pueden editar.",
+    
+    "help_menu_split_shot_label" : "Dividir segmento",
+    "help_menu_split_shot_description" : "Divide el segmento en la posición actual en dos segmentos.",
+    "help_menu_merge_left_label" : "Fusionar el segmento a la izquierda",
+    "help_menu_merge_right_label" : "Fusionar el segmento a la derecha",
+    "help_menu_merge_left_description" : "Fusiona el segmento actual con el segmento anterior.",
+    "help_menu_merge_right_description" : "Fusiona el segmento actual con el segmento siguiente.",
+    "help_menu_merge_description" : "Fusiona el segmento actual con el segmento anterior/siguiente.",
+    "help_menu_to_prev_shot_label" : "segmento anterior",
+    "help_menu_to_next_shot_label" : "segmento siguiente",
+    "help_menu_to_prev_shot_description" : "Ir al segmento anterior",
+    "help_menu_to_next_shot_description" : "Ir al segmento siguiente",
+    "help_menu_change_shot_description" : "Cambia el timecode para situarse al principio del segmento anterior/siguiente.",
+    "help_menu_shot_detail_label" : "Información del segmento",
+    "help_menu_shot_detail_description" : "Abre la información del segmento en el panel lateral. El título y las notas del segmento son editables.",
+
     "help_menu_export_label" : "Exportar",
     "help_menu_export_description" : "Abre un diálogo para elegir el formato de exportación del proyecto.",
-    "help_menu_shot_infos_content_1" : "La información del plano actual está disponible con el botón del panel lateral arriba a la derecha o con el botón correspondiente en la timeline. Muestra numeración, título, inicio, fin y duración en timecode, notas y la imagen representativa del plano. Los campos de título y notas son editables.",
-    "help_menu_exportation_content_1" : "El proyecto en curso puede guardarse desde el menú 'Archivo' → 'Guardar'. Los proyectos se pueden exportar en formato texto (.txt y .docx), PDF, PowerPoint, en vídeo anotado (títulos y notas por plano) y en Imágenes-Referencia (todas las imágenes se guardan en la carpeta indicada).",
 
     "help_menu_open_annot_label" : "Anotaciones",
     "help_menu_open_annot_description" : "Abre el panel de anotaciones",    

@@ -75,21 +75,21 @@
     "no_preview" : "Keine Vorschau",
     "preview" : "Vorschau",
 
-    "tooltip_to_next_shot" : "Zum nächsten Schnitt",
-    "tooltip_to_prev_shot" : "Zum vorherigen Schnitt",
+    "tooltip_to_next_shot" : "Zum nächsten Segment gehen",
+    "tooltip_to_prev_shot" : "Zum vorherigen Segment gehen",
 
     "tooltip_segmentation_auto" : "Automatisch segmentieren",
 
-    "tooltip_split_shot" : "Schnitt teilen",
+    "tooltip_split_shot" : "Segment teilen",
     "tooltip_ab_loop": "A-B-Schleife erstellen",
-    "tooltip_merge_with_prev_shot": "Mit vorherigem Schnitt zusammenführen",
-    "tooltip_merge_with_next_shot": "Mit nächstem Schnitt zusammenführen",
+    "tooltip_merge_with_prev_shot": "Mit vorherigem Segment zusammenführen",
+    "tooltip_merge_with_next_shot": "Mit nächstem Segment zusammenführen",
     "tooltip_export": "Exportieren",
 
     "tooltip_reposition_toolbar" : "Position der Werkzeugleiste zurücksetzen",
 
     "dialog_save_multiview_video" : "Multiview-Aufnahme speichern",
-    "dialog_save_extract_shots" : "Schnitt-Extraktion speichern",
+    "dialog_save_extract_shots" : "Segmentextraktion speichern",
 
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
     "timeline_ab_action_0": "A-Marker am Abspielkopf setzen",
@@ -98,14 +98,13 @@
     "timeline_ab_extract": "AB-Sequenz extrahieren",
     "messagebox_extract_ab_loop_done" : "Extraction der AB-Sequenz abgeschlossen.",
     "messagebox_extract_ab_loop_failed" : "Extraction der AB-Sequenz fehlgeschlagen.",
-    "timeline_merge_with_previous_shot" : "Aktuellen Schnitt mit vorherigem zusammenführen",
-    "timeline_merge_with_next_shot" : "Aktuellen Schnitt mit nächstem zusammenführen",
-    "timeline_extract_selected_shots" : "Ausgewählte Schnitte extrahieren",
-    "timeline_shot_count_label" : "Schnitt(e)",
-    "timeline_selected_shot_count_label" : "ausgewählte Schnitte",
-    "messagebox_extract_selected_shots_completed" : "Extraction der ausgewählten Schnitte abgeschlossen.",
-    "messagebox_extract_selected_shots_failed" : "Extraction der ausgewählten Schnitte fehlgeschlagen.",
-
+    "timeline_merge_with_previous_shot" : "Aktuelles Segment mit vorherigem Segment zusammenführen",
+    "timeline_merge_with_next_shot" : "Aktuelles Segment mit nächstem Segment zusammenführen",
+    "timeline_extract_selected_shots" : "Ausgewählte Segmente extrahieren",
+    "timeline_shot_count_label" : "Segment(e)",
+    "timeline_selected_shot_count_label" : "Ausgewählte(s) Segment(e)",
+    "messagebox_extract_selected_shots_completed" : "Extraktion der ausgewählten Segmente abgeschlossen.",
+    "messagebox_extract_selected_shots_failed" : "Extraktion der ausgewählten Segmente fehlgeschlagen.",
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",
     "export_directory_tagimages": "Speicherort für Referenzbilder auswählen",
@@ -136,8 +135,7 @@
 
     "timeline_dialog_title_auto_segmentation": "Automatische Segmentierung",
     "timeline_dialog_text_auto_segmentation": "Segmentierung läuft...",
-    "timeline_dialog_text_auto_segmentation_finished": "Automatische Segmentierung abgeschlossen, Gesamtzahl der Schnitte: ",
-    "dialog_auto_segmentation_title": "Automatische Segmentierung",
+    "timeline_dialog_text_auto_segmentation_finished": "Automatische Segmentierung abgeschlossen, Gesamtzahl der Segmente: ",    "dialog_auto_segmentation_title": "Automatische Segmentierung",
     "dialog_auto_segmentation_text": "Möchten Sie die automatische Segmentierung starten?\nNach Abschluss wird die aktuelle Segmentierung überschrieben.",
 
     "cancel_action" : "Abbrechen",
@@ -153,13 +151,13 @@
     "shot_detail_img_txt_name" : "Bild",
     "shot_detail_sound_txt_name" : "Ton",
 
-    "shot_detail_id_text" : "Schnitt Nr.",
-    "shot" : "Schnitt",
-    "number_of_shots" : "Anzahl der Schnitte",
+    "shot_detail_id_text" : "Segment Nr.",
+    "shot" : "Segment",
+    "number_of_shots" : "Gesamtzahl der Segmente",
     "number_of_annotations" : "Anzahl der Anmerkungen",
-    "shots" : "Schnitte",
+    "shots" : "Segmente",
     "export_source_selection_txt" : "Zu exportierenden Inhalt auswählen",
-    "average_shot_duration" : "Durchschnittliche Schnittdauer",
+    "average_shot_duration" : "Durchschnittliche Segmentdauer",
 
     "compo_rule_None" : "Keine",
     "compo_rule_RuleOfThirds" : "Drittelregel",
@@ -343,7 +341,7 @@
     "shortcut_prev_frame": "Vorheriges Bild",
     "shortcut_next_frame": "Nächstes Bild",
 
-    "tagimage_tooltip" : "Tag-Bild (TagFrame): Ermöglicht die Identifizierung des Schnitts mit einem repräsentativen Bild des Inhalts des Schnitts.",
+    "tagimage_tooltip" : "Referenzbild (TagFrame): Ermöglicht die Identifizierung des Segments anhand eines repräsentativen Bildes seines Inhalts.",
 
     "paths_screenshot" : "Speicherordner für Screenshots",
     "paths_default_video" : "Standardordner für Videoaufnahmen",
@@ -388,9 +386,9 @@
 
     "reset" : "Zurücksetzen",
 
-    "timeline_extract_selected_shot" : "Schnitt extrahieren",
-    "messagebox_extract_shot_failed" : "Fehler bei der Extraktion des Schnitts.",
-    "messagebox_extract_shot_completed" : "Extraktion des Schnitts abgeschlossen.",
+    "timeline_extract_selected_shot" : "Segment extrahieren",
+    "messagebox_extract_shot_failed" : "Extraktion des Segments fehlgeschlagen.",
+    "messagebox_extract_shot_completed" : "Extraktion des Segments abgeschlossen.",
     "close" : "Schließen",
 
     "about_dialog_title" : "Über",
@@ -403,8 +401,8 @@
     "help_dialog_wip" : "In Entwicklung.",
     "help_dialog_report" : "Um ein Problem zu melden, kontaktieren Sie uns unter folgenden Adressen:",
 
-    "messagebox_screenshot_with_adjustment" : "Das aktuelle Medium enthält Anpassungen. Möchten Sie einen Screenshot ohne Anpassungen speichern?",
-    "screenshot_without_adjustment_button" : "Screenshot ohne Anpassungen",
+    "messagebox_screenshot_with_adjustment" : "Die Software kann die während der Aufnahme auf das Medium angewendeten Anpassungen nicht speichern. \n Möchten Sie einen Screenshot ohne Anpassungen speichern?",
+    "screenshot_without_adjustment_button" : "Trotzdem aufnehmen",
 
     "media_info_dialog_title" : "Medieninformationen",
     "media_info_title" : "Titel",
@@ -505,7 +503,7 @@
 
     "tooltip_playlist_button" : "Wiedergabeliste",
     "tooltip_autoplay_playlist" : "Playlist automatisch abspielen",
-    "tooltip_shot_detail_button" : "Shot-Informationen",
+    "tooltip_shot_detail_button" : "Segmentinformationen",
     "tooltip_annotation_button" : "Anmerkungen",
 
     "messagebox_fullscreen_experimental" : "Die Vollbildfunktion der Software befindet sich derzeit in Entwicklung.",
@@ -550,10 +548,10 @@
     "help_menu_timeline_category" : "Detailierte Zeitleiste",
     "help_menu_timeline_display_label" : "Detailierte Zeitleiste anzeigen",
     "help_menu_open_timeline_label" : "Detailierte Zeitleiste öffnen",
-    "help_menu_open_info_label" : "Detailierte Zeitleiste Informationen",
+    "help_menu_open_info_label" : "Segmentinformationen öffnen",
     "help_menu_timeline_buttons_label" : "Buttons der Zeitleiste",
     "help_menu_timeline_toolbar_label" : "Zeitleiste Symbolleiste",
-    "help_menu_shot_infos_label" : "Shot-Informationen",
+    "help_menu_shot_infos_label" : "Segmentinformationen",
     "help_menu_timeline_exportation_label" : "Exportieren",
     
     "help_menu_options_category" : "Optionen",
@@ -561,9 +559,6 @@
     "help_menu_shortcuts_label" : "Tastenkombinationen",
     "help_menu_paths_label" : "Pfade anpassen",
 
-    "help_menu_open_files_content_1" : "Beim Start zeigt der Player einen leeren Bildschirm an. Um eine Mediendatei zu öffnen, klicken Sie auf das Menü \"Datei\" und dann \"Eine oder mehrere Mediendateien öffnen\", um ein Dateiselectiefenster zu öffnen. Sie können auch den Play-Button in der Symbolleiste unten auf dem Bildschirm verwenden.",
-    "help_menu_open_files_content_2" : "Es ist auch möglich, Mediendateien durch Ziehen und Ablegen auf dem schwarzen Playerbereich zu öffnen.",
-    "help_menu_classic_toolbar_content_1" : "Eine Symbolleiste wird unterhalb des zugehörigen Mediums angezeigt. Sie ermöglicht verschiedene Operationen auf dem Medium.",
     "help_menu_classic_toolbar_buttons_description" : "Beschreibung der Symbolleisten-Buttons",
 
     "help_menu_play_label" : "Wiedergabe",
@@ -635,14 +630,6 @@
     "help_menu_timeline_off_label" : "Detaillierte Zeitleiste",
     "help_menu_timeline_off_description" : "Zeigt die detaillierte Zeitleiste des Mediums an.",
 
-    "help_menu_enter_multiview_content_1" : "Es ist möglich, 1 bis 4 Player gleichzeitig anzuzeigen. Im Multi-View-Modus (bei 2 oder mehr Playern) verfügt jedes Medium über eine eigene vereinfachte Symbolleiste, und unten wird eine globale Symbolleiste angezeigt, um Aktionen für alle Medien durchzuführen.",
-    "help_menu_enter_multiview_content_2" : "Um in den Multi-View-Modus zu wechseln, bewegen Sie die Maus über die Schaltfläche für die Anordnung der Medien oben rechts im Fenster. Dort können Sie die Anzahl der anzuzeigenden Player und ihre Anordnung auf dem Bildschirm auswählen. Die Player können über die zwischen ihnen befindlichen Splitter in ihrer Größe verändert werden. Sie können auch die Schaltfläche zum Duplizieren des Mediums in den Symbolleisten verwenden, um einen kopierten Player hinzuzufügen.",
-    "help_menu_simplified_content_1" : "Die im Multi-View-Modus für die Player verfügbare vereinfachte Symbolleiste enthält die meisten Schaltflächen der klassischen Symbolleiste, verfügt jedoch über keine Symbolleisten-Erweiterung. Außerdem gibt es eine Schaltfläche, um den Player aus der Ansicht zu entfernen.",
-    "help_menu_global_toolbar_content_1" : "Zusätzlich zu den vereinfachten Symbolleisten für jeden Player wird im Multi-View-Modus eine globale Symbolleiste angezeigt, um Aktionen für die vorhandenen Medien durchzuführen.",
-    "help_menu_global_toolbar_content_2" : "Die kombinierte Screenshot-Funktion erstellt einen Screenshot jedes vorhandenen Mediums und fügt die Screenshots zu einem einzigen Bild zusammen, wobei die Anordnung der Player beibehalten wird. Die Screenshots werden in dem in den Einstellungen angegebenen Ordner gespeichert (standardmäßig NumalysePlayer_Content).",
-    "help_menu_access_playlist_content_1" : "Eine Playlist kann erstellt werden, indem die gewünschten Medien hinzugefügt werden. Um auf die Playlist zuzugreifen, klicken Sie auf die Schaltfläche für das Seitenpanel oben rechts im Fenster (die Playlist ist im Multi-View-Modus nicht verfügbar).",
-    "help_menu_manage_items_content_1" : "Die Einträge der Playlist bestehen aus dem Titel des jeweiligen Mediums, seiner Dauer, seinem Typ, einem Vorschaubild und seiner Position in der Liste. Klicken Sie auf die Schaltfläche +, um Medien zur Playlist hinzuzufügen, und auf das Papierkorbsymbol, um ein Medium aus der Playlist zu entfernen. Die Elemente können per Drag & Drop verschoben werden, um die Wiedergabereihenfolge zu ändern.",
-
     "help_menu_playlist_loop_label" : "Schleife",
     "help_menu_playlist_loop_description" : "Wenn die Funktion aktiviert ist, wird nach dem Ende des aktuellen Mediums zum nächsten Medium gewechselt.",
     "help_menu_playlist_shuffle_label" : "Zufällig",
@@ -651,31 +638,29 @@
     "help_menu_playlist_sort_description" : "Sortiert die Liste nach den angegebenen Kriterien.",
     "help_menu_playlist_delete_label" : "Alles entfernen",
     "help_menu_playlist_delete_description" : "Entfernt alle Elemente aus der Playlist. Es wird eine Bestätigungsabfrage angezeigt.",
-    "help_menu_timeline_display_content_1" : "Die detaillierte Zeitleiste bietet eine Darstellung des Audios (violette Spur) und der verschiedenen Videoschnitte (blaue Spur). Die Schnitte können mit Anmerkungen versehen und manuell oder automatisch hinzugefügt werden. Segmentierte Videos können als Projekte gespeichert und in verschiedene Formate exportiert werden.",
-    "help_menu_timeline_display_content_2" : "Die Zeitleiste enthält eine Zeitskala, eine blaue Videoanzeige mit einem Startbild des Schnitts, eine violette Audioanzeige mit der entsprechenden Wellenform und Schaltflächen zum Bearbeiten der Schnitte. Standardmäßig enthält die Zeitleiste nur einen Schnitt. Sie können die Zeitleiste mit dem Mausrad zoomen, einen Schnitt mit einem Linksklick auswählen (Strg+Linksklick, um mehrere auszuwählen) und sich mit Umschalt+Linksklick horizontal bewegen. Zusätzliche Aktionen sind über einen Rechtsklick auf die Schnitte verfügbar.",
 
     "help_menu_abloop_label" : "A-B-Schleife",
     "help_menu_abloop_description" : "Klicken: Setzt einen A/B-Marker an der aktuellen Position. Sobald beide Marker gesetzt sind, wird das Video in diesem Intervall wiederholt und die Sequenz kann gespeichert werden. Erneut klicken, um die Marker zu entfernen.",
     "help_menu_auto_segmentation_label" : "Automatische Segmentierung",
     "help_menu_auto_segmentation_description" : "Berechnet automatisch die im Video vorhandenen Übergänge und wendet das Ergebnis auf die Zeitleiste an. Die vorherige Segmentierung wird überschrieben.",
-    "help_menu_split_shot_label" : "Schnitt teilen",
-    "help_menu_split_shot_description" : "Teilt den Schnitt an der aktuellen Position in zwei Schnitte.",
-    "help_menu_merge_left_label" : "Schnitt nach links zusammenführen",
-    "help_menu_merge_right_label" : "Schnitt nach rechts zusammenführen",
-    "help_menu_merge_left_description" : "Führt den aktuellen Schnitt mit dem vorherigen Schnitt zusammen.",
-    "help_menu_merge_right_description" : "Führt den aktuellen Schnitt mit dem nächsten Schnitt zusammen.",
-    "help_menu_merge_description" : "Führt den aktuellen Schnitt mit dem vorherigen oder nächsten Schnitt zusammen.",
-    "help_menu_to_prev_shot_label" : "Vorheriger Schnitt",
-    "help_menu_to_next_shot_label" : "Nächster Schnitt",
-    "help_menu_to_prev_shot_description" : "Zum vorherigen Schnitt wechseln",
-    "help_menu_to_next_shot_description" : "Zum nächsten Schnitt wechseln",
-    "help_menu_change_shot_description" : "Setzt den Timecode auf den Beginn des vorherigen oder nächsten Schnitts.",
-    "help_menu_shot_detail_label" : "Schnittinformationen",
-    "help_menu_shot_detail_description" : "Öffnet die Informationen zum Schnitt im Seitenpanel. Der Titel und die Notizen des Schnitts können bearbeitet werden.",
+
+    "help_menu_split_shot_label" : "Segment teilen",
+    "help_menu_split_shot_description" : "Teilt das Segment an der aktuellen Position in zwei Segmente.",
+    "help_menu_merge_left_label" : "Segment nach links zusammenführen",
+    "help_menu_merge_right_label" : "Segment nach rechts zusammenführen",
+    "help_menu_merge_left_description" : "Führt das aktuelle Segment mit dem vorherigen Segment zusammen.",
+    "help_menu_merge_right_description" : "Führt das aktuelle Segment mit dem nächsten Segment zusammen.",
+    "help_menu_merge_description" : "Führt das aktuelle Segment mit dem vorherigen/nächsten Segment zusammen.",
+    "help_menu_to_prev_shot_label" : "Vorheriges Segment",
+    "help_menu_to_next_shot_label" : "Nächstes Segment",
+    "help_menu_to_prev_shot_description" : "Zum vorherigen Segment gehen",
+    "help_menu_to_next_shot_description" : "Zum nächsten Segment gehen",
+    "help_menu_change_shot_description" : "Ändert den Timecode, um an den Anfang des vorherigen/nächsten Segments zu springen.",
+    "help_menu_shot_detail_label" : "Segmentinformationen",
+    "help_menu_shot_detail_description" : "Öffnet die Segmentinformationen im Seitenbereich. Titel und Notizen des Segments können bearbeitet werden.",
+
     "help_menu_export_label" : "Exportieren",
     "help_menu_export_description" : "Öffnet ein Dialogfenster zur Auswahl des Exportformats für das Projekt.",
-    "help_menu_shot_infos_content_1" : "Die Informationen zum Schnitt an der aktuellen Position können über die Schaltfläche für das Seitenpanel oben rechts auf dem Bildschirm oder über die entsprechende Schaltfläche in der Zeitleiste angezeigt werden. Dort werden die Schnittnummer, der Titel, der Anfang, das Ende und die Dauer des Schnitts als Timecode, die Notizen und das Referenzbild des Schnitts angezeigt. Die Felder für Titel und Notizen können bearbeitet werden.",
-    "help_menu_exportation_content_1" : "Das aktuelle Projekt kann über das Menü \"Datei\" und anschließend \"Speichern\" gespeichert werden. Projekte können als Textformat (.txt und .docx), PDF, PowerPoint, als annotiertes Video (Titel und Notizen der Schnitte werden bei jedem Schnitt angezeigt) und als Referenzbilder exportiert werden (alle Referenzbilder der Schnitte werden im angegebenen Ordner gespeichert).",
 
     "help_menu_open_annot_label" : "Annotationen",
     "help_menu_open_annot_description" : "Öffnet das Annotationsfenster",

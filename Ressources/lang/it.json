@@ -507,7 +507,7 @@
     "messagebox_format_not_accepted" : "Uno dei file selezionati ha un formato non supportato.",
 
     "tooltip_playlist_button" : "Playlist",
-    "tooltip_autoplay_playlist" : "Riproduzione automatica della playlist",
+    "tooltip_autoplay_playlist" : "Passaggio automatico al contenuto successivo",
     "tooltip_shot_detail_button" : "Informazioni dell'inquadratura",
     "tooltip_annotation_button" : "Anotazioni",
 

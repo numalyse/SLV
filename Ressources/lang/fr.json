@@ -506,7 +506,7 @@
     "messagebox_format_not_accepted" : "Un des fichiers sélectionnés possède un format non pris en compte.",
 
     "tooltip_playlist_button" : "Playlist",
-    "tooltip_autoplay_playlist" : "Lecture automatique de la playlist",
+    "tooltip_autoplay_playlist" : "Passage automatique au média suivant",
     "tooltip_shot_detail_button" : "Informations du segment",
     "tooltip_annotation_button" : "Annotations",
 

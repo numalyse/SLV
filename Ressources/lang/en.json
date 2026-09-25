@@ -506,7 +506,7 @@
     "messagebox_format_not_accepted" : "One of the selected files has an unsupported format.",
 
     "tooltip_playlist_button" : "Playlist",
-    "tooltip_autoplay_playlist" : "Playlist autoplay",
+    "tooltip_autoplay_playlist" : "Automatically advance to the next media",
     "tooltip_shot_detail_button" : "Shot information",
     "tooltip_annotation_button" : "Annotations",
 

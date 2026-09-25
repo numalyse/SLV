@@ -505,7 +505,7 @@
     "messagebox_format_not_accepted" : "Eine der ausgewählten Dateien hat ein nicht unterstütztes Format.",
 
     "tooltip_playlist_button" : "Wiedergabeliste",
-    "tooltip_autoplay_playlist" : "Playlist automatisch abspielen",
+    "tooltip_autoplay_playlist" : "Automatischer Wechsel zum nächsten Medium",
     "tooltip_shot_detail_button" : "Segmentinformationen",
     "tooltip_annotation_button" : "Anmerkungen",
 

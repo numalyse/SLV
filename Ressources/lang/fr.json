@@ -583,7 +583,7 @@
     "help_menu_next_description" : "Passe au média suivant dans la playlist.",
 
     "help_menu_slow_label" : "Modification de vitesse",
-    "help_menu_slow_description" : "Ouvre un slider pour modifier la vitesse de lecture du média. Les vitesses prises en compte sont : x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description": "Ouvre un curseur pour régler la vitesse de lecture du média.\nVitesses disponibles : ×0,25, ×0,5, ×0,75, ×1, ×1,25, ×1,5, ×2",
 
     "help_menu_loop_off_label" : "Boucle",
     "help_menu_loop_off_description" : "Active ou désactive la lecture en boucle du média.",
@@ -594,11 +594,11 @@
     "help_menu_media_info_label" : "Informations du média",
     "help_menu_media_info_description" : "Affiche les informations techniques et les métadonnées du média.",
     "help_menu_zoom_label" : "Zoom",
-    "help_menu_zoom_description" : "Active/désactive le mode zoom. Lorsque le zoom est actif, vous pouvez utiliser la molette de la souris pour zoomer, et maintenir Ctrl (Cmd sur Mac) + clic gauche pour vous déplacer dans l'image.",
+    "help_menu_zoom_description": "Active/désactive le zoom. \nMolette pour zoomer, Ctrl/Cmd + clic gauche maintenu pour se déplacer.",    
     "help_menu_capture_label" : "Capture d'écran",
     "help_menu_capture_description" : "Prend une capture d'écran de la frame actuelle du média.",
     "help_menu_extract_sequence_label" : "Extraction de séquence",
-    "help_menu_extract_sequence_description" : "Ouvre une fenêtre de dialogue qui permet de renseigner un timecode de début et de fin pour extraire la séquence correspondante.",
+    "help_menu_extract_sequence_description": "Ouvre une fenêtre pour définir un timecode de début et de fin, et extraire la séquence correspondante.",
     "help_menu_duplicate_media_label" : "Dupliquer le média",
     "help_menu_duplicate_media_description" : "Permet de dupliquer le média sélectionné dans un nouveau lecteur. \nLes changements effectués sur le média dupliqué s'appliquent sur le nouveau média.",
     "help_menu_fullscreen_label" : "Plein écran",

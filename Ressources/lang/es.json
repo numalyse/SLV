@@ -583,7 +583,7 @@
     "help_menu_next_description" : "Pasa al medio siguiente de la lista de reproducción.",
 
     "help_menu_slow_label" : "Cambio de velocidad",
-    "help_menu_slow_description" : "Abre un deslizador para cambiar la velocidad de reproducción del medio. Las velocidades admitidas son x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Abre un control deslizante para ajustar la velocidad de reproducción.\nVelocidades disponibles: ×0,25, ×0,5, ×0,75, ×1, ×1,25, ×1,5, ×2",
 
     "help_menu_loop_off_label" : "Bucle",
     "help_menu_loop_off_description" : "Activa o desactiva la reproducción en bucle del medio.",
@@ -594,11 +594,11 @@
     "help_menu_media_info_label" : "Información del medio",
     "help_menu_media_info_description" : "Muestra información técnica y metadatos del medio.",
     "help_menu_zoom_label" : "Zoom",
-    "help_menu_zoom_description" : "Activa/desactiva el modo zoom. Con zoom activo use la rueda del ratón para acercar y Ctrl (Cmd en Mac) + clic izquierdo para desplazar.",
+    "help_menu_zoom_description": "Activa/desactiva el zoom.\nRueda del ratón para hacer zoom, Ctrl/Cmd + clic izquierdo mantenido para desplazarte.",
     "help_menu_capture_label" : "Captura de pantalla",
     "help_menu_capture_description" : "Toma una captura del frame actual del medio.",
     "help_menu_extract_sequence_label" : "Extracción de secuencia",
-    "help_menu_extract_sequence_description" : "Abre un diálogo para indicar timecode de inicio y fin y extraer la secuencia correspondiente.",
+    "help_menu_extract_sequence_description": "Abre una ventana para definir un timecode de inicio y fin, y extraer la secuencia correspondiente.",
     "help_menu_duplicate_media_label" : "Duplicar medio",
     "help_menu_duplicate_media_description" : "Permite duplicar el medio seleccionado en un nuevo reproductor. \nLos cambios realizados en el medio duplicado se aplican al nuevo medio.",
     "help_menu_fullscreen_label" : "Pantalla completa",

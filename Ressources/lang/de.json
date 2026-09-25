@@ -582,7 +582,7 @@
     "help_menu_next_description" : "Wechselt zum nächsten Medium in der Playlist.",
     
     "help_menu_slow_label" : "Geschwindigkeitsänderung",
-    "help_menu_slow_description" : "Öffnet einen Schieberegler, um die Wiedergabegeschwindigkeit des Mediums zu ändern. Die unterstützten Geschwindigkeiten sind x0.25, x0.5, x0.75, x1.0, x1.25, x1.5, x2.0",
+    "help_menu_slow_description" : "Öffnet einen Schieberegler zum Anpassen der Wiedergabegeschwindigkeit.\nVerfügbare Geschwindigkeiten: ×0,25, ×0,5, ×0,75, ×1, ×1,25, ×1,5, ×2",
 
     "help_menu_loop_off_label" : "Schleife",
     "help_menu_loop_off_description" : "Aktiviert oder deaktiviert die Wiedergabe in Endlosschleife.",
@@ -593,11 +593,11 @@
     "help_menu_media_info_label" : "Medieninformationen",
     "help_menu_media_info_description" : "Zeigt technische Informationen und Metadaten zum Medium an.",
     "help_menu_zoom_label" : "Zoom",
-    "help_menu_zoom_description" : "Aktiviert/deaktiviert den Zoommodus. Im Zoommodus verwenden Sie das Mausrad zum Zoomen und Strg (Cmd auf Mac) + Linksklick, um sich zu bewegen.",
+    "help_menu_zoom_description": "Zoom ein-/ausschalten.\nMausrad zum Zoomen, Strg/Cmd + gehaltene linke Maustaste zum Verschieben.",
     "help_menu_capture_label" : "Screenshot",
     "help_menu_capture_description" : "Erstellt einen Screenshot des aktuellen Frames des Mediums.",
     "help_menu_extract_sequence_label" : "Sequenz extrahieren",
-    "help_menu_extract_sequence_description" : "Öffnet einen Dialog zur Angabe von Start- und End-Timecode, um die entsprechende Sequenz zu extrahieren.",
+    "help_menu_extract_sequence_description": "Öffnet ein Fenster, um einen Start- und Endtimecode festzulegen und die entsprechende Sequenz zu extrahieren.",
     "help_menu_duplicate_media_label" : "Medium duplizieren",
     "help_menu_duplicate_media_description" : "Ermöglicht das Duplizieren des ausgewählten Mediums in einen neuen Player. \nÄnderungen am duplizierten Medium wirken sich auf das neue Medium aus.",
     "help_menu_fullscreen_label" : "Vollbild",

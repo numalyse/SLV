@@ -507,7 +507,7 @@
 
     "tooltip_playlist_button" : "Playlist",
     "tooltip_autoplay_playlist" : "Automatically advance to the next media",
-    "tooltip_shot_detail_button" : "Shot information",
+    "tooltip_shot_detail_button" : "Segment information",
     "tooltip_annotation_button" : "Annotations",
 
     "messagebox_fullscreen_experimental" : "The software's fullscreen feature is currently under development.",

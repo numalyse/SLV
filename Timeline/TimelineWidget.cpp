@@ -619,7 +619,9 @@ void TimelineWidget::autoSegmentation(){
     SLV::showGenericDialog(
         this,
         txtManager.getText("dialog_auto_segmentation_title"),
-        txtManager.getText("dialog_auto_segmentation_text"),
+        txtManager.getText("dialog_auto_segmentation_question") + "\n" +
+        txtManager.getText("dialog_auto_segmentation_text") + "\n\n" +
+        txtManager.getText("dialog_auto_segmentation_text_warning"),
 
         [this, mediaPath]() {
             auto& txtManager = PrefManager::instance();
@@ -660,7 +662,8 @@ void TimelineWidget::autoSegmentation(){
             m_segmThread->setPriority(QThread::HighPriority);
         },
         nullptr,
-        nullptr
+        nullptr,
+        txtManager.getText("confirm")
     );
 
 }

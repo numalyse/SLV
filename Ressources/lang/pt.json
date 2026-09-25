@@ -473,7 +473,7 @@
     "open_screenshot_button" : "Abrir a captura",
 
     "dialog_save_project_dialog_title" : "Salvando o projeto",
-    "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. Deseja salvar o projeto?",
+    "dialog_save_project_dialog_text" : "A linha do tempo contém alterações não salvas. \nDeseja salvar o projeto?",
     "project_saved_title" : "Salvamento do projeto",
     "project_saved_text" : "O projeto foi salvo com sucesso.",
     "messagebox_record_completed" : "O registro de mídia foi concluído com sucesso.",
@@ -494,7 +494,7 @@
     "tab_param_paths" : "Personalização de caminhos",
   
     "open_more_than_four_files_title" : "Seleção de múltiplas mídias",
-    "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. Deseja carregar sua seleção na playlist?",
+    "open_more_than_four_files_dialog" : "O reprodutor multimídia é limitado a 4 mídias simultâneas. \nDeseja carregar sua seleção na playlist?",
 
     "project_exportation_finished" : "Exportação concluída",
     "project_exportation_desc" : "A exportação da mídia foi concluída com sucesso.",

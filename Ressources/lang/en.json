@@ -473,7 +473,7 @@
     "open_screenshot_button" : "Open screenshot",
 
     "dialog_save_project_dialog_title" : "Save project",
-    "dialog_save_project_dialog_text" : "The timeline contains unsaved changes. Do you want to save the project?",
+    "dialog_save_project_dialog_text" : "The timeline contains unsaved changes. \nDo you want to save the project?",
     "project_saved_title" : "Project save",
     "project_saved_text" : "The project has been saved successfully.",
     "messagebox_record_completed" : "The media record was completed successfully.",
@@ -494,7 +494,7 @@
     "tab_param_paths" : "Paths customization",
     
     "open_more_than_four_files_title" : "Multiple media selection",
-    "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. Do you want to load your selection into the playlist?",
+    "open_more_than_four_files_dialog" : "The media player is limited to 4 simultaneous media files. \nDo you want to load your selection into the playlist?",
 
     "project_exportation_finished" : "Export completed",
     "project_exportation_desc" : "The media export was completed successfully.",

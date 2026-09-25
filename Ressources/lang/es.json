@@ -473,7 +473,7 @@
     "open_screenshot_button" : "Abrir la captura",
 
     "dialog_save_project_dialog_title" : "Guardando el proyecto",
-    "dialog_save_project_dialog_text" : "La línea de tiempo contiene cambios no guardados. ¿Desea guardar el proyecto?",
+    "dialog_save_project_dialog_text" : "La línea de tiempo contiene cambios no guardados. \n¿Desea guardar el proyecto?",
     "project_saved_title" : "Guardado del proyecto",
     "project_saved_text" : "El proyecto se ha guardado correctamente.",
     "messagebox_record_completed" : "La grabación en los medios se completó con éxito.",
@@ -494,7 +494,7 @@
     "tab_param_paths" : "Personalización de rutas",
     
     "open_more_than_four_files_title" : "Selección de varios medios",
-    "open_more_than_four_files_dialog" : "El reproductor multimedia está limitado a 4 medios simultáneos. ¿Desea cargar su selección en la lista de reproducción?",
+    "open_more_than_four_files_dialog" : "El reproductor multimedia está limitado a 4 medios simultáneos. \n¿Desea cargar su selección en la lista de reproducción?",
 
     "project_exportation_finished" : "Exportación completada",
     "project_exportation_desc" : "La exportación del medio se completó correctamente.",

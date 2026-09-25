@@ -474,7 +474,7 @@
     "open_screenshot_button" : "Apri lo screenshot",
 
     "dialog_save_project_dialog_title" : "Salvataggio del progetto",
-    "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. Vuoi salvare il progetto?",
+    "dialog_save_project_dialog_text" : "La timeline contiene modifiche non salvate. \nVuoi salvare il progetto?",
     "project_saved_title" : "Salvataggio del progetto",
     "project_saved_text" : "Il progetto è stato salvato con successo.",
     "messagebox_record_completed" : "La registrazione dei media è stata completata con successo.",
@@ -495,7 +495,7 @@
     "tab_param_paths" : "Personalizzazione percorsi",
     
     "open_more_than_four_files_title" : "Selezione multipla di file multimediali",
-    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. Vuoi caricare la tua selezione nella playlist?",
+    "open_more_than_four_files_dialog" : "Il lettore multimediale è limitato a 4 file multimediali simultanei. \nVuoi caricare la tua selezione nella playlist?",
 
     "project_exportation_finished" : "Esportazione completata",
     "project_exportation_desc" : "L'esportazione del file multimediale è stata completata con successo.",

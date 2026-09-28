@@ -110,6 +110,9 @@ public:
         if(m_dynamicFullscreenShortcut) delete m_dynamicFullscreenShortcut;
     };
 
+    QSize m_normalMinSize;
+    QSize m_normalMaxSize;
+
     /// @brief Met à jour le layout pour afficher l'interface en plein écran
     virtual void setFullscreenUI(int bottomMargin = 40) {
         m_isFullscreen = true;
@@ -117,7 +120,12 @@ public:
         setAttribute(Qt::WA_TranslucentBackground);
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
+        if (layout()->sizeConstraint() != QLayout::SetFixedSize) {
+            m_normalMinSize = minimumSize();
+            m_normalMaxSize = maximumSize();
+        }
         adjustSize();
+
         show();
         raise();
         QWidget::activateWindow();
@@ -132,20 +140,25 @@ public:
 
     }
 
-    /// @brief Met à jour le layout pour afficher l'interface par défaut
     virtual void setDefaultUI(){
         m_isFullscreen = false;
 
-        if (m_parent) {
-            if (m_parent->layout()) m_parent->layout()->addWidget(this); 
+        if (layout() && layout()->sizeConstraint() == QLayout::SetFixedSize) {
+            layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
+            setMinimumSize(m_normalMinSize);
+            setMaximumSize(m_normalMaxSize);   // récupère le maxHeight(50)
+        }
+
+        setWindowFlags(Qt::Widget);
+
+        if (m_parent && m_parent->layout()) {
+            m_parent->layout()->addWidget(this);
         }
 
         QTimer::singleShot(0, this, [this]() {
-            if (shouldShowOnDefaultUI()) {
-                show();
-            }
+            if (shouldShowOnDefaultUI()) show();
         });
-    };
+    }
 
     /// @brief Move toolbar on resize when in fullscreen
     virtual void updateFullscreenPosition() {};

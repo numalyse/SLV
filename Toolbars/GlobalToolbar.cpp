@@ -114,12 +114,12 @@ void GlobalToolbar::setFullscreenUI(int bottomMargin)
 
     m_zoomBtn->hide();
 
-    Toolbar::setFullscreenUI(bottomMargin);
-
     if (layout() && m_extraSpacingItem) {
         m_extraSpacingItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Minimum);
         layout()->invalidate(); // pour forcer a recalculer les positions des btns 
     }
+    
+    Toolbar::setFullscreenUI(bottomMargin);
 }
 
 void GlobalToolbar::enableButtons()

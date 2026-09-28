@@ -25,7 +25,7 @@ public:
     ~PlayerWidget();
 
     void setActive(bool active);
-    bool setMediaFromPath(const QString& filePath);
+    bool setMediaFromPath(const QString& filePath, bool preserveTime = false);
 
     SimpleToolbar* toolbar() {return m_toolBar;};
     MediaWidget* mediaWidget() { return m_mediaWidget; };

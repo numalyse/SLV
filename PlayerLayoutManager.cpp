@@ -664,7 +664,8 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
         }, Qt::SingleShotConnection); 
 
         
-        player->setMediaFromPath(toBeDuplicated->mediaWidget()->media()->filePath());
+        // preserveTime=true to keep the current timecode of the duplicated player
+        player->setMediaFromPath(toBeDuplicated->mediaWidget()->media()->filePath(), true);
     }
 }
 

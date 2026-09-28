@@ -13,6 +13,8 @@
 #include <QTimer>
 #include <QDebug>
 #include <QtAssert>
+#include <QProgressDialog>
+#include <QMessageBox>
 
 // #include <iostream>
 
@@ -951,9 +953,27 @@ void PlayerLayoutManager::endMultiviewRecord()
     QFileInfo fileInfo(finalPath);
     PrefManager::instance().setPref("Paths", "lp_multicapture", fileInfo.absolutePath());
 
-    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted,
-            this, [this](const QString& mergedPath) {
+    auto *progress = new QProgressDialog(PrefManager::instance().getText("dialog_progressbar"), QString(), 0, 100, this);
+    progress->setWindowModality(Qt::ApplicationModal);
+    progress->setMinimumDuration(0);
+    progress->setCancelButton(nullptr);
+    progress->setWindowTitle(PrefManager::instance().getText("dialog_multiview_video"));
+    progress->show();
+    
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeProgress, progress, [progress](int value) {
+        progress->setValue(qMin(value, 100));
+    });
+
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted, this, [this, progress](const QString& mergedPath) {
+        progress->close();
+        progress->deleteLater();
         emit multiviewMergeCompleted(mergedPath);
+    });
+
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewCaptureFailed, this, [this, progress]() {
+        progress->close();
+        progress->deleteLater();
+        QMessageBox::critical(this, PrefManager::instance().getText("messagebox_error"), PrefManager::instance().getText("dialog_error_multiview_video"));
     });
 
     m_multiviewRecord->endMultiviewRecord(endTimes, finalPath);

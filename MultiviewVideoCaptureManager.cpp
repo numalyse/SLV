@@ -56,6 +56,9 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
         }
     }
     QString saveDir = QFileInfo(savePath).dir().path();
+
+    m_progress = 0;
+
     for(int ITime = 0 ; ITime < m_startRecordTimes.size() ; ++ITime){
         QString timeInterval = TimeFormatter::fileFormatMsToHHMMSSFF(m_startRecordTimes[ITime], m_medias[ITime]->fps()) + '_' + TimeFormatter::fileFormatMsToHHMMSSFF(endTimes[ITime], m_medias[ITime]->fps()) + '.' + m_medias[ITime]->fileExtension();
         QString extractPath = saveDir + '/' + m_medias[ITime]->fileName() + '_' + timeInterval;
@@ -67,6 +70,9 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
                 emit multiviewCaptureFailed();
                 return;
             }
+
+            m_progress += 10;
+            emit multiviewMergeProgress(m_progress);
             //mergeClips(savePath+".mp4", endTimes);
             mergeClips(savePath, endTimes);
         });

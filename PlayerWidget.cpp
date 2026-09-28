@@ -287,9 +287,9 @@ void PlayerWidget::setActive(bool active)
                       : "border: none;");
 }
 
-bool PlayerWidget::setMediaFromPath(const QString& filePath)
+bool PlayerWidget::setMediaFromPath(const QString& filePath, bool preserveTime)
 {
-    if (m_mediaWidget->setMediaFromPath(filePath)){
+    if (m_mediaWidget->setMediaFromPath(filePath, preserveTime)){
         m_muted = false;
         emit playUiUpdateRequested();
         emit unmuteUiUpdateRequested();

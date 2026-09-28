@@ -88,8 +88,13 @@
 
     "tooltip_reposition_toolbar" : "Reinitialiser la position de la barre d'outils",
 
+    "dialog_progressbar" : "Traitement en cours...",
     "dialog_save_multiview_video" : "Enregistrer l'enregistrement multivues",
+    "dialog_multiview_video" : "Enregistrement multivues",
+    "dialog_error_multiview_video" : "Une erreur est survenue lors de l'enregistrement multivues.",
     "dialog_save_extract_shots" : "Enregistrer l'extraction de segments",
+    "dialog_extract_shots" : "Enregistrer Extraction de segments",
+    "dialog_error_extract_shots" : "Une erreur est survenue lors de l'extraction de segments",
 
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",

@@ -1020,7 +1020,7 @@ void MediaWidget::wheelEvent(QWheelEvent *event)
 
 /// @brief Stops the current media player and load a new media from a path
 /// @param QString filePath : string containing the path of the media
-bool MediaWidget::setMediaFromPath(const QString& filePath)
+bool MediaWidget::setMediaFromPath(const QString& filePath, bool preserveTime)
 {
     if (!m_player)
         return false;
@@ -1033,7 +1033,7 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
     if(!m_media->vlcMedia()) return false;
 
     // La méthode stop de libvlc est bloquante, on utilise un appel asynchrone pour éviter un deadlock.
-    QMetaObject::invokeMethod(this, [this, pathCopy](){
+    QMetaObject::invokeMethod(this, [this, pathCopy, preserveTime](){
 
         libvlc_media_player_stop(m_player);
 
@@ -1052,7 +1052,9 @@ bool MediaWidget::setMediaFromPath(const QString& filePath)
 
         emit mediaPlayerLoaded();
 
-        if(PrefManager::instance().getPref("General", "Player_options", "autoplay_when_media_opened") == "deactivated"){
+        // If autoplay is deactivated we normally reset time to 0 and pause.
+        // preserve the original time if duplicate player
+        if (!preserveTime && PrefManager::instance().getPref("General", "Player_options", "autoplay_when_media_opened") == "deactivated"){
             setTime(0);
             pause();
             emit playbackPaused();

@@ -56,6 +56,9 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
         }
     }
     QString saveDir = QFileInfo(savePath).dir().path();
+
+    m_progress = 0;
+
     for(int ITime = 0 ; ITime < m_startRecordTimes.size() ; ++ITime){
         QString timeInterval = TimeFormatter::fileFormatMsToHHMMSSFF(m_startRecordTimes[ITime], m_medias[ITime]->fps()) + '_' + TimeFormatter::fileFormatMsToHHMMSSFF(endTimes[ITime], m_medias[ITime]->fps()) + '.' + m_medias[ITime]->fileExtension();
         QString extractPath = saveDir + '/' + m_medias[ITime]->fileName() + '_' + timeInterval;
@@ -67,6 +70,9 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
                 emit multiviewCaptureFailed();
                 return;
             }
+
+            m_progress += 10;
+            emit multiviewMergeProgress(m_progress);
             //mergeClips(savePath+".mp4", endTimes);
             mergeClips(savePath, endTimes);
         });
@@ -79,7 +85,7 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
     if(m_extractionsCount != m_medias.size())
         return;
 
-    QProcess *ffmpegMerge = new QProcess();
+    QProcess *ffmpegMerge = new QProcess(this);
     QStringList args;
 
     if(m_medias.size() == 2){
@@ -93,14 +99,14 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         {
             int minW = qMin(m_medias[0]->width(),
                             m_medias[1]->width());
+            minW -= minW % 2;
 
-            // scale to the same width and tpad to add black screen when the media is finished
+            // pixels carrés (SAR pris en compte), scale à la même largeur, tpad pour ajouter du noir quand le média est fini
             args << QString(
-                "[0:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
-                "[1:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
+                "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
+                "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
                 "[v0][v1]vstack=inputs=2[v];"
                 "[0:a:0][1:a:0]amix=inputs=2:duration=longest[mix]"
-                "amix=inputs=2:duration=longest[mix][0:a:0][1:a:0]"
             ).arg(minW).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
             .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]));
         }
@@ -109,17 +115,21 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         {
             int minH = qMin(m_medias[0]->height(),
                             m_medias[1]->height());
+            minH -= minH % 2;
 
             args << QString(
-                "[0:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
-                "[1:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
+                "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
+                "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
                 "[v0][v1]hstack=inputs=2[v];"
                 "[0:a:0][1:a:0]amix=inputs=2:duration=longest[mix]"
             ).arg(minH).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
             .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]));
         }
             break;
-
+        default:
+            emit multiviewCaptureFailed();
+            ffmpegMerge->deleteLater();
+            return;
         }
         args << "-map" << "[v]"
              << "-map" << "[mix]"
@@ -132,7 +142,7 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-metadata:s:a:2" << "title=Audio media 2"
              << "-disposition:a:0" << "default"
              << "-disposition:a:1" << "0"
-             << "-disposition:a:2" << "0";;
+             << "-disposition:a:2" << "0";
     }
     else if(m_medias.size() == 3){
         args << "-i" << m_clipsPaths[0]
@@ -148,12 +158,12 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             case Arrangement3V:
             {
                 int minW = qMin(m_medias[0]->width(),qMin(m_medias[1]->width(), m_medias[2]->width()));
-
+                minW -= minW % 2;
 
                 args << QString(
-                    "[0:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
-                    "[1:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
-                    "[2:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%4ms:color=black[v2];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%4ms:color=black[v2];"
                     "[v0][v1][v2]vstack=inputs=3[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
                 ).arg(minW).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
@@ -165,11 +175,12 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             case Arrangement3H:
             {
                 int minH = qMin(m_medias[0]->height(),qMin(m_medias[1]->height(), m_medias[2]->height()));
+                minH -= minH % 2;
 
                 args << QString(
-                    "[0:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
-                    "[1:v]scale-2:%1,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
-                    "[2:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms:color=black[v2];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms:color=black[v0];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms:color=black[v1];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms:color=black[v2];"
                     "[v0][v1][v2]hstack=inputs=3[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
                 ).arg(minH).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
@@ -180,19 +191,20 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             }
             case Arrangement3Top:
             {
-                int minH = qMin(m_medias[1]->height(), m_medias[2]->height());
-                int newWidth1 = 2 * qFloor((float(m_medias[1]->width() * minH) / m_medias[1]->height()) / 2);
-                int newWidth2 = 2 * qFloor((float(m_medias[2]->width() * minH) / m_medias[2]->height()) / 2);
-                int topWidth = newWidth1 + newWidth2;
+                int minH = qMin(m_medias[0]->height(), m_medias[1]->height());
+                minH -= minH % 2;
 
-                // We add black padding to the isolated video to prevent it from taking up too much space
                 args << QString(
-                    "[0:v]scale=%2:%1:force_original_aspect_ratio=decrease,pad=%2:%1:(ow-iw)/2:(oh-ih)/2:black,tpad=stop_mode=add:stop_duration=%3ms[v0];"
-                    "[1:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v1];"
-                    "[2:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%5ms[v2];"
-                    "[v0][v1][v2]xstack=inputs=3:layout=0_0|0_h0|w1_h0[v];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms[v0];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms[v1];"
+                    "[v0][v1]hstack=inputs=2,setsar=1,split=2[bot][ref];"
+                    "[ref]drawbox=x=0:y=0:w=iw:h=ih:color=black:t=fill[blk];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v2];"
+                    "[blk][v2]overlay=x=(W-w)/2:y=(H-h)/2:eof_action=pass[top];"
+                    "[top][bot]vstack=inputs=2[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
-                ).arg(minH).arg(topWidth).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
+                ).arg(minH)
+                .arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
                 .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]))
                 .arg(maxDuration - (endTimes[2]-m_startRecordTimes[2]));
 
@@ -201,17 +213,19 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             case Arrangement3Bot:
             {
                 int minH = qMin(m_medias[0]->height(), m_medias[1]->height());
-                int newWidth1 = 2 * qFloor((float(m_medias[0]->width() * minH) / m_medias[0]->height()) / 2);
-                int newWidth2 = 2 * qFloor((float(m_medias[1]->width() * minH) / m_medias[1]->height()) / 2);
-                int botWidth = newWidth1 + newWidth2;
+                minH -= minH % 2;
 
                 args << QString(
-                    "[0:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms[v0];"
-                    "[1:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v1];"
-                    "[2:v]scale=%2:%1:force_original_aspect_ratio=decrease,pad=%2:%1:(ow-iw)/2:(oh-ih)/2:black,tpad=stop_mode=add:stop_duration=%5ms[v2];"
-                    "[v0][v1][v2]xstack=inputs=3:layout=0_0|w0_0|0_h0:fill=black[v];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms[v0];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms[v1];"
+                    "[v0][v1]hstack=inputs=2,setsar=1,split=2[top][ref];"
+                    "[ref]drawbox=x=0:y=0:w=iw:h=ih:color=black:t=fill[blk];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v2];"
+                    "[blk][v2]overlay=x=(W-w)/2:y=(H-h)/2:eof_action=pass[bot];"
+                    "[top][bot]vstack=inputs=2[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
-                ).arg(minH).arg(botWidth).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
+                ).arg(minH)
+                .arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
                 .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]))
                 .arg(maxDuration - (endTimes[2]-m_startRecordTimes[2]));
 
@@ -225,9 +239,9 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
                 int leftHeight = newHeight1 + newHeight2;
 
                 args << QString(
-                    "[0:v]scale=%1:%2:force_original_aspect_ratio=decrease,pad=%1:%2:(ow-iw)/2:(oh-ih)/2:black,tpad=stop_mode=add:stop_duration=%3ms[v0];"
-                    "[1:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%4ms[v1];"
-                    "[2:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%5ms[v2];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:%2:force_original_aspect_ratio=decrease,pad=%1:%2:(ow-iw)/2:(oh-ih)/2:black,setsar=1,tpad=stop_mode=add:stop_duration=%3ms[v0];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%4ms[v1];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%5ms[v2];"
                     "[v0][v1][v2]xstack=inputs=3:layout=0_0|w0_0|w0_h1:fill=black[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
                 ).arg(minW).arg(leftHeight).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
@@ -244,9 +258,9 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
                 int rightHeight = newHeight1 + newHeight2;
 
                 args << QString(
-                    "[0:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms[v0];"
-                    "[1:v]scale=%1:%2:force_original_aspect_ratio=decrease,pad=%1:%2:(ow-iw)/2:(oh-ih)/2:black,tpad=stop_mode=add:stop_duration=%4ms[v1];"
-                    "[2:v]scale=%1:-2,tpad=stop_mode=add:stop_duration=%5ms[v2];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms[v0];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:%2:force_original_aspect_ratio=decrease,pad=%1:%2:(ow-iw)/2:(oh-ih)/2:black,setsar=1,tpad=stop_mode=add:stop_duration=%4ms[v1];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%5ms[v2];"
                     "[v0][v1][v2]xstack=inputs=3:layout=0_0|w0_0|0_h0:fill=black[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
                 ).arg(minW).arg(rightHeight).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
@@ -255,6 +269,10 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
 
                 break;
             }
+            default:
+                emit multiviewCaptureFailed();
+                ffmpegMerge->deleteLater();
+                return;
         }
 
         args << "-map" << "[v]"
@@ -300,14 +318,14 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         int minW = qMax(topWidth, bottomWidth);
 
         args << QString(
-            "[0:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v0];"
-            "[1:v]scale=-2:%1,tpad=stop_mode=add:stop_duration=%5ms[v1];"
+            "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v0];"
+            "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%5ms[v1];"
             "[v0][v1]hstack=inputs=2[top];"
-            "[2:v]scale=-2:%2,tpad=stop_mode=add:stop_duration=%6ms[v2];"
-            "[3:v]scale=-2:%2,tpad=stop_mode=add:stop_duration=%7ms[v3];"
+            "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%2,tpad=stop_mode=add:stop_duration=%6ms[v2];"
+            "[3:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%2,tpad=stop_mode=add:stop_duration=%7ms[v3];"
             "[v2][v3]hstack=inputs=2[bot];"
-            "[top]scale=%3:-2[topScaled];"
-            "[bot]scale=%3:-2[botScaled];"
+            "[top]setsar=1,scale=%3:-2[topScaled];"
+            "[bot]setsar=1,scale=%3:-2[botScaled];"
             "[topScaled][botScaled]vstack=inputs=2[v];"
             "[0:a:0][1:a:0][2:a:0][3:a:0]amix=inputs=4:duration=longest[mix]"
         ).arg(minH1).arg(minH2).arg(minW).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
@@ -334,14 +352,20 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
              << "-disposition:a:3" << "0"
              << "-disposition:a:4" << "0";
     }
+    else {
+        emit multiviewCaptureFailed();
+        ffmpegMerge->deleteLater();
+        return;
+    }
 
     args << savePath;
 
-    ffmpegMerge->start(SequenceExtractionHelper::getFfmpegPath(), args);
+    // On connecte avant de lancer le process pour ne pas rater le signal finished
     connect(ffmpegMerge, &QProcess::finished, this, [this, ffmpegMerge, savePath](int exitCode, QProcess::ExitStatus exitStatus){
         if(exitStatus != QProcess::NormalExit || exitCode != 0){
             qDebug() << "Clip merge failed";
             qDebug() << "Exit Status : " << ffmpegMerge->exitStatus() << " exitCode : " << ffmpegMerge->exitCode() << "errors : " << ffmpegMerge->readAllStandardError();
+            ffmpegMerge->deleteLater();
             return;
         }
 
@@ -352,7 +376,9 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         }
         m_clipsPaths.clear();
 
+        ffmpegMerge->deleteLater();
         emit multiviewMergeCompleted(savePath);
     });
 
+    ffmpegMerge->start(SequenceExtractionHelper::getFfmpegPath(), args);
 }

@@ -23,11 +23,13 @@ private:
     PlayerLayoutArrangement m_arrangement;
     int m_extractionsCount = 0;
     QStringList m_clipsPaths;
+    int m_progress = 0;
 
 signals:
     void multiviewCaptureFailed();
     //void multiviewCaptureCompleted();
     void multiviewMergeCompleted(const QString& mergedPath);
+    void multiviewMergeProgress(int progress);
 };
 
 #endif // MULTIVIEWVIDEOCAPTUREMANAGER_H

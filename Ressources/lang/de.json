@@ -88,8 +88,13 @@
 
     "tooltip_reposition_toolbar" : "Position der Werkzeugleiste zurücksetzen",
 
-    "dialog_save_multiview_video" : "Multiview-Aufnahme speichern",
+    "dialog_progressbar" : "Verarbeitung läuft...",
+    "dialog_save_multiview_video" : "Multiview-Aufzeichnung speichern",
+    "dialog_multiview_video" : "Multiview-Aufzeichnung",
+    "dialog_error_multiview_video" : "Beim Speichern der Multiview-Aufzeichnung ist ein Fehler aufgetreten.",
     "dialog_save_extract_shots" : "Segmentextraktion speichern",
+    "dialog_extract_shots" : "Segmentextraktion",
+    "dialog_error_extract_shots" : "Bei der Segmentextraktion ist ein Fehler aufgetreten",
 
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
     "timeline_ab_action_0": "A-Marker am Abspielkopf setzen",

@@ -13,6 +13,8 @@
 #include <QTimer>
 #include <QDebug>
 #include <QtAssert>
+#include <QProgressDialog>
+#include <QMessageBox>
 
 // #include <iostream>
 
@@ -664,7 +666,8 @@ void PlayerLayoutManager::duplicatePlayer(PlayerWidget* toBeDuplicated)
         }, Qt::SingleShotConnection); 
 
         
-        player->setMediaFromPath(toBeDuplicated->mediaWidget()->media()->filePath());
+        // preserveTime=true to keep the current timecode of the duplicated player
+        player->setMediaFromPath(toBeDuplicated->mediaWidget()->media()->filePath(), true);
     }
 }
 
@@ -928,7 +931,7 @@ void PlayerLayoutManager::endMultiviewRecord()
         m_activePlayers[IPlayer]->pause();
     }
 
-    QString dir = PrefManager::instance().getPref("Paths", "lp_capture");
+    QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
 
     QString initialPath = dir + "/[multiview] video capture.mp4";
     int i = 1;
@@ -946,14 +949,34 @@ void PlayerLayoutManager::endMultiviewRecord()
         finalPath += ".mp4";
     }
 
-    m_multiviewRecord->endMultiviewRecord(endTimes, savePath);    
+
+    QFileInfo fileInfo(finalPath);
+    PrefManager::instance().setPref("Paths", "lp_multicapture", fileInfo.absolutePath());
+
+    auto *progress = new QProgressDialog(PrefManager::instance().getText("dialog_progressbar"), QString(), 0, 100, this);
+    progress->setWindowModality(Qt::ApplicationModal);
+    progress->setMinimumDuration(0);
+    progress->setCancelButton(nullptr);
+    progress->setWindowTitle(PrefManager::instance().getText("dialog_multiview_video"));
+    progress->show();
     
-    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted,
-            this, [this](const QString& mergedPath) {
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeProgress, progress, [progress](int value) {
+        progress->setValue(qMin(value, 100));
+    });
+
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted, this, [this, progress](const QString& mergedPath) {
+        progress->close();
+        progress->deleteLater();
         emit multiviewMergeCompleted(mergedPath);
     });
 
-    m_multiviewRecord->endMultiviewRecord(endTimes, savePath);
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewCaptureFailed, this, [this, progress]() {
+        progress->close();
+        progress->deleteLater();
+        QMessageBox::critical(this, PrefManager::instance().getText("messagebox_error"), PrefManager::instance().getText("dialog_error_multiview_video"));
+    });
+
+    m_multiviewRecord->endMultiviewRecord(endTimes, finalPath);
     m_isRecording = false;
     emit SignalManager::instance().globalRecordingFinished();
 }

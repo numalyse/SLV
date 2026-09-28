@@ -152,12 +152,6 @@ public:
             m_sizeLocked = false;
         }
 
-        // if (layout() && layout()->sizeConstraint() == QLayout::SetFixedSize) {
-        //     layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
-        //     setMinimumSize(m_normalMinSize);
-        //     setMaximumSize(m_normalMaxSize);   // récupère le maxHeight(50)
-        // }
-
         setWindowFlags(Qt::Widget);
 
         if (m_parent && m_parent->layout()) {

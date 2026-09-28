@@ -71,6 +71,10 @@ void GlobalToolbar::setDefaultUI()
 {
     m_zoomBtn->show();
 
+    if (layout() && m_extraSpacingItem) {
+        m_extraSpacingItem->changeSize(m_muteBtn->width()+1, 1, QSizePolicy::Fixed, QSizePolicy::Minimum);
+    }
+    
     Toolbar::setDefaultUI();
 
     if( !layout() ){
@@ -102,11 +106,12 @@ void GlobalToolbar::setDefaultUI()
         buttonLayout->addWidget(m_fullscreenBtn);
 
         mainLayout->addLayout(buttonLayout);
-    } else if (m_extraSpacingItem) { // si on vient de quitter le mode plein écran, on a déja un layout
-        m_extraSpacingItem->changeSize(m_muteBtn->width()+1, 1, QSizePolicy::Fixed, QSizePolicy::Minimum); // augmente la taille du spacer
-        layout()->invalidate(); // pour forcer a recalculer les positions des btns 
+    } 
+    // else if (m_extraSpacingItem) { // si on vient de quitter le mode plein écran, on a déja un layout
+    //     m_extraSpacingItem->changeSize(m_muteBtn->width()+1, 1, QSizePolicy::Fixed, QSizePolicy::Minimum); // augmente la taille du spacer
+    //     layout()->invalidate(); // pour forcer a recalculer les positions des btns 
 
-    }
+    // }
 }
 
 void GlobalToolbar::setFullscreenUI(int bottomMargin)

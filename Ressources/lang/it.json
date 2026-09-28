@@ -88,8 +88,13 @@
 
     "tooltip_reposition_toolbar" : "Ripristina la posizione della barra degli strumenti",
 
-    "dialog_save_multiview_video" : "Salva registrazione multiview",
-    "dialog_save_extract_shots" : "Salva estrazione segmenti",
+    "dialog_progressbar" : "Elaborazione in corso...",
+    "dialog_save_multiview_video" : "Salva la registrazione multiview",
+    "dialog_multiview_video" : "Registrazione multiview",
+    "dialog_error_multiview_video" : "Si è verificato un errore durante il salvataggio della registrazione multiview.",
+    "dialog_save_extract_shots" : "Salva l'estrazione dei segmenti",
+    "dialog_extract_shots" : "Estrazione dei segmenti",
+    "dialog_error_extract_shots" : "Si è verificato un errore durante l'estrazione dei segmenti",
 
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",

@@ -88,8 +88,13 @@
 
     "tooltip_reposition_toolbar" : "Repor a posição da barra de ferramentas",
 
-    "dialog_save_multiview_video" : "Guardar gravação multivistas",
-    "dialog_save_extract_shots" : "Guardar extração de segments",
+    "dialog_progressbar" : "Processamento em curso...",
+    "dialog_save_multiview_video" : "Guardar a gravação multiview",
+    "dialog_multiview_video" : "Gravação multiview",
+    "dialog_error_multiview_video" : "Ocorreu um erro ao guardar a gravação multiview.",
+    "dialog_save_extract_shots" : "Guardar a extração de segmentos",
+    "dialog_extract_shots" : "Extração de segmentos",
+    "dialog_error_extract_shots" : "Ocorreu um erro durante a extração de segmentos",
 
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
     "timeline_ab_action_0": "Adicionar marcador A no cursor",

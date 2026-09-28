@@ -18,6 +18,7 @@
         "screenshot": "",
         "default": "",
         "lp_capture": "",
+        "lp_multicapture": "",
         "lp_project": "",
         "lp_open_media": "",
         "lp_export": "",

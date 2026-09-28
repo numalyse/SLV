@@ -303,6 +303,10 @@ void PrefManager::syncUserPrefs()
         pathCategory.insert("lp_capture", defaultPath);
         pathModified = true;
     }
+    if(pathCategory.value("lp_multicapture").toString().isEmpty()){
+        pathCategory.insert("lp_multicapture", defaultPath);
+        pathModified = true;
+    }
     if(pathCategory.value("screenshot").toString().isEmpty()){
         pathCategory.insert("screenshot", QDir::homePath() + "/NumalysePlayer_Content/Captures_Images");
         pathModified = true;

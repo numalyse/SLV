@@ -929,7 +929,7 @@ void PlayerLayoutManager::endMultiviewRecord()
         m_activePlayers[IPlayer]->pause();
     }
 
-    QString dir = PrefManager::instance().getPref("Paths", "lp_capture");
+    QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
 
     QString initialPath = dir + "/[multiview] video capture.mp4";
     int i = 1;
@@ -947,14 +947,16 @@ void PlayerLayoutManager::endMultiviewRecord()
         finalPath += ".mp4";
     }
 
-    m_multiviewRecord->endMultiviewRecord(endTimes, savePath);    
-    
+
+    QFileInfo fileInfo(finalPath);
+    PrefManager::instance().setPref("Paths", "lp_multicapture", fileInfo.absolutePath());
+
     connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted,
             this, [this](const QString& mergedPath) {
         emit multiviewMergeCompleted(mergedPath);
     });
 
-    m_multiviewRecord->endMultiviewRecord(endTimes, savePath);
+    m_multiviewRecord->endMultiviewRecord(endTimes, finalPath);
     m_isRecording = false;
     emit SignalManager::instance().globalRecordingFinished();
 }

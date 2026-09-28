@@ -112,6 +112,7 @@ public:
 
     QSize m_normalMinSize;
     QSize m_normalMaxSize;
+    bool m_sizeLocked = false;
 
     /// @brief Met à jour le layout pour afficher l'interface en plein écran
     virtual void setFullscreenUI(int bottomMargin = 40) {
@@ -120,34 +121,42 @@ public:
         setAttribute(Qt::WA_TranslucentBackground);
         setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
-        if (layout()->sizeConstraint() != QLayout::SetFixedSize) {
+        if (!m_sizeLocked) {
             m_normalMinSize = minimumSize();
             m_normalMaxSize = maximumSize();
         }
-        adjustSize();
 
+        layout()->setSizeConstraint(QLayout::SetFixedSize);
+        adjustSize();
         show();
+        setFixedSize(size());   // force min == max une fois la fenêtre native créée
+        m_sizeLocked = true;
+
         raise();
         QWidget::activateWindow();
         setWindowOpacity(0);
 
         QTimer::singleShot(0, this, [this, bottomMargin]() {
             moveOnTopOfParent(bottomMargin);
-            if(m_isRepositioned) {
-                move(m_fullscreenPosition);
-            }
+            if (m_isRepositioned) move(m_fullscreenPosition);
         });
-
     }
 
     virtual void setDefaultUI(){
         m_isFullscreen = false;
 
-        if (layout() && layout()->sizeConstraint() == QLayout::SetFixedSize) {
+        if (m_sizeLocked) {
             layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
             setMinimumSize(m_normalMinSize);
-            setMaximumSize(m_normalMaxSize);   // récupère le maxHeight(50)
+            setMaximumSize(m_normalMaxSize);
+            m_sizeLocked = false;
         }
+
+        // if (layout() && layout()->sizeConstraint() == QLayout::SetFixedSize) {
+        //     layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
+        //     setMinimumSize(m_normalMinSize);
+        //     setMaximumSize(m_normalMaxSize);   // récupère le maxHeight(50)
+        // }
 
         setWindowFlags(Qt::Widget);
 

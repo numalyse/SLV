@@ -191,16 +191,16 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             }
             case Arrangement3Top:
             {
-                int minH = qMin(m_medias[0]->height(), m_medias[1]->height());
+                int minH = qMin(m_medias[1]->height(), m_medias[2]->height());
                 minH -= minH % 2;
 
                 args << QString(
-                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms[v0];"
                     "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%3ms[v1];"
-                    "[v0][v1]hstack=inputs=2,setsar=1,split=2[bot][ref];"
-                    "[ref]drawbox=x=0:y=0:w=iw:h=ih:color=black:t=fill[blk];"
                     "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%4ms[v2];"
-                    "[blk][v2]overlay=x=(W-w)/2:y=(H-h)/2:eof_action=pass[top];"
+                    "[v1][v2]hstack=inputs=2,setsar=1,split=2[bot][ref];"
+                    "[ref]drawbox=x=0:y=0:w=iw:h=ih:color=black:t=fill[blk];"
+                    "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=-2:%1,tpad=stop_mode=add:stop_duration=%2ms[v0];"
+                    "[blk][v0]overlay=x=(W-w)/2:y=(H-h)/2:eof_action=pass[top];"
                     "[top][bot]vstack=inputs=2[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
                 ).arg(minH)
@@ -252,18 +252,20 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             }
             case Arrangement3Right:
             {
-                int minW = qMin(m_medias[0]->width(), m_medias[2]->width());
-                int newHeight1 = 2 * qFloor((float(m_medias[0]->height() * minW) / m_medias[0]->width()) / 2);
-                int newHeight2 = 2 * qFloor((float(m_medias[2]->height() * minW) / m_medias[2]->width()) / 2);
-                int rightHeight = newHeight1 + newHeight2;
+                int minW = qMin(m_medias[0]->width(), m_medias[1]->width());
+                minW -= minW % 2;
+                int newHeight0 = 2 * qFloor((float(m_medias[0]->height() * minW) / m_medias[0]->width()) / 2);
+                int newHeight1 = 2 * qFloor((float(m_medias[1]->height() * minW) / m_medias[1]->width()) / 2);
+                int rightHeight = newHeight0 + newHeight1;
 
                 args << QString(
                     "[0:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%3ms[v0];"
-                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:%2:force_original_aspect_ratio=decrease,pad=%1:%2:(ow-iw)/2:(oh-ih)/2:black,setsar=1,tpad=stop_mode=add:stop_duration=%4ms[v1];"
-                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%5ms[v2];"
-                    "[v0][v1][v2]xstack=inputs=3:layout=0_0|w0_0|0_h0:fill=black[v];"
+                    "[1:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:-2,tpad=stop_mode=add:stop_duration=%4ms[v1];"
+                    "[2:v]scale=trunc(iw*sar/2)*2:ih,setsar=1,scale=%1:%2:force_original_aspect_ratio=decrease,pad=%1:%2:(ow-iw)/2:(oh-ih)/2:black,setsar=1,tpad=stop_mode=add:stop_duration=%5ms[v2];"
+                    "[v0][v1][v2]xstack=inputs=3:layout=0_0|0_h0|w0_0:fill=black[v];"
                     "[0:a:0][1:a:0][2:a:0]amix=inputs=3:duration=longest[mix]"
-                ).arg(minW).arg(rightHeight).arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
+                ).arg(minW).arg(rightHeight)
+                .arg(maxDuration - (endTimes[0]-m_startRecordTimes[0]))
                 .arg(maxDuration - (endTimes[1]-m_startRecordTimes[1]))
                 .arg(maxDuration - (endTimes[2]-m_startRecordTimes[2]));
 

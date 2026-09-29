@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(SLV VERSION 1.0 LANGUAGES CXX)
+project(SLV VERSION 1.1 LANGUAGES CXX)
 set(PROJECT_STAGE "alpha")
 set(APP_VERSION "${PROJECT_VERSION}-${PROJECT_STAGE}")
 

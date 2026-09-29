@@ -486,12 +486,20 @@ void MediaWidget::disableLoopMode()
     m_loopActivated = false;
 }
 
+void MediaWidget::resetZoomMode()
+{
+    m_zoomHelper.reset();
+    emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
+    if(!m_player || !m_media) return;
+    libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+}
+
 void MediaWidget::enableZoomMode()
 {
     m_zoomActivated = true;
     emit zoomValueUpdated(QString::number(qFloor(m_zoomHelper.getZoomPercent())) + '%');
     if(!m_player || !m_media) return;
-        libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
+    libvlc_video_set_crop_geometry(m_player, m_zoomHelper.getZoomArg().toUtf8().constData());
 }
 
 void MediaWidget::disableZoomMode()
@@ -937,8 +945,10 @@ void MediaWidget::onVlcSnapshot(const libvlc_event_t *event, void *userData){
 
 void MediaWidget::createSnapshotPopup(const QString& filePath, int64_t vlcTime)
 {
-    if (m_snapshotPopup)
-        delete m_snapshotPopup; // QPointer automatically set to nullptr
+    if (m_snapshotPopup){
+        m_snapshotPopup->hide();
+        m_snapshotPopup->deleteLater();
+    } // QPointer automatically set to nullptr
 
     m_snapshotPopup = new SnapshotPopup(this, filePath, vlcTime, (m_media) ? m_media->fps() : 0.0);
     m_snapshotPopup->showWithFade();

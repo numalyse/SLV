@@ -24,6 +24,7 @@ private:
     int m_extractionsCount = 0;
     QStringList m_clipsPaths;
     int m_progress = 0;
+    static constexpr int kExtractionShare = 30;
 
 signals:
     void multiviewCaptureFailed();

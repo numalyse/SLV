@@ -1,6 +1,7 @@
 #ifndef SNAPSHOTPOPUP_H
 #define SNAPSHOTPOPUP_H
 
+#include <QPointer>
 #include <QFrame>
 #include <QTimer>
 #include <QPropertyAnimation>
@@ -30,7 +31,7 @@ private:
     /// @brief Fades out the popup then destroys it, called when the auto-close timer times out
     void fadeOutAndClose();
 
-    QWidget* m_anchor = nullptr;
+    QPointer<QWidget> m_anchor;
     // when timer ends, check the cursor position
     QTimer* m_closeTimer = nullptr;
     QPropertyAnimation* m_anim = nullptr;
@@ -40,6 +41,7 @@ private:
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
+    void dismiss();
 };
 
 #endif // SNAPSHOTPOPUP_H

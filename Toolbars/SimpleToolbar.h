@@ -85,6 +85,7 @@ public slots:
     void disableLoopUiUpdate();
     void enableZoomUiUpdate();
     void disableZoomUiUpdate();
+    void resetZoomValueUiUpdate(bool isEject=false);
     void nameUiUpdate(const QString &);
     void volumeUiUpdate(const QString &);
     void speedUiUpdate(const QString &);
@@ -191,6 +192,7 @@ signals:
     void extractSequenceRequest();
     void mediaInformationRequest();
     void customStopRequest(const QString&);
+    void resetZoomValueRequest();
     void subtitlesFileDialogRequested();
     void ejectUiUpdateDone();
     

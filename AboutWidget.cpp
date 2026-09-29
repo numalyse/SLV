@@ -40,7 +40,7 @@ AboutWidget::AboutWidget(QWidget *parent)
 #endif
 
     QLabel *version = new QLabel(
-        "<i>V" + QString(APP_VERSION) + "-" + QString(APP_GIT_HASH) + " - "
+        "<i>V" + QString(APP_VERSION) + " (" + QString(APP_GIT_HASH) + ") - "
         + osVersion
         + "<br>"
         + "("

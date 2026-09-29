@@ -57,6 +57,8 @@ public:
 
     void addMails(const QStringList &mails);
 
+    void addUrl(const QString &url);
+
     void getFormatsAvailables();
 
 protected:

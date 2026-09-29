@@ -367,6 +367,33 @@ void ContentBase::addMails(const QStringList& mails)
     addContent(widget);
 }
 
+void ContentBase::addUrl(const QString& url)
+{
+    auto* widget = new QWidget(this);
+    auto* layout = new QVBoxLayout(widget);
+
+    widget->setStyleSheet(
+        "border: none; "
+        "background-color: " + backgroundFillColor + "; "
+        "padding: 1px; "
+        "border-radius: 5px;"
+    );
+
+    auto* label_url = new QLabel(
+        "<a href=\"" + url + "\">" + url + "</a>"
+    );
+
+    label_url->setAlignment(Qt::AlignCenter);
+    label_url->setTextFormat(Qt::RichText);
+    label_url->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    label_url->setOpenExternalLinks(true);
+    label_url->setStyleSheet("a { text-decoration: none; }");
+
+    layout->addWidget(label_url);
+
+    addContent(widget);
+}
+
 void ContentBase::getFormatsAvailables(){
     auto* widget = new QWidget(this);
     auto* layout = new QVBoxLayout(widget);

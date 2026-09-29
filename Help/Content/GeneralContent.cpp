@@ -61,6 +61,53 @@ QWidget* GeneralContent::introduction(const QString& subcategoryName)
         }
     });
 
+    widget->addQMAPTexts({
+        {"fr", {
+            "<center><p style=\"color: red;\">PAGE D'AIDE EN COURS DE DÉVELOPPEMENT</p></center>\n",
+            "<center>Cette fenêtre d'aide est actuellement en cours de développement et d'écriture. Les différentes sections seront progressivement enrichies avec des descriptions plus détaillées et du contenu supplémentaire au fil des mises à jour.</center>\n"
+            "<center>N'hésitez pas à consulter régulièrement le site internet pour vous tenir informé.e des prochaines évolutions et nouveautés.</center>\n\n<br>"
+            "<center><i>Nous vous remercions pour votre patience</i></center>\n"
+            }
+        },
+        {"en",  {
+            "<center><p style=\"color: red;\">HELP PAGE UNDER DEVELOPMENT</p></center>\n",
+            "<center>This help window is currently under development and being written. The different sections will be progressively enhanced with more detailed descriptions and additional content as updates are released.</center>\n"
+            "<center>Feel free to check the website regularly to stay informed about the latest developments and new features.</center>\n\n<br>"
+            "<center><i>Thank you for your patience</i></center>\n"
+            }
+        },
+        {"es",  {
+            "<center><p style=\"color: red;\">PÁGINA DE AYUDA EN DESARROLLO</p></center>\n",
+            "<center>Esta ventana de ayuda se encuentra actualmente en desarrollo y en proceso de redacción. Las diferentes secciones se irán enriqueciendo progresivamente con descripciones más detalladas y contenido adicional a medida que se publiquen nuevas versiones.</center>\n"
+            "<center>No dude en consultar regularmente el sitio web para mantenerse informado sobre las últimas novedades y evoluciones.</center>\n\n<br>"
+            "<center><i>Gracias por su paciencia</i></center>\n"
+            }
+        },
+        {"de",  {
+            "<center><p style=\"color: red;\">HILFESEITE IN ENTWICKLUNG</p></center>\n",
+            "<center>Dieses Hilfefenster befindet sich derzeit in Entwicklung und wird schrittweise ergänzt. Die verschiedenen Bereiche werden nach und nach um ausführlichere Beschreibungen und zusätzliche Inhalte erweitert.</center>\n"
+            "<center>Besuchen Sie regelmäßig unsere Website, um über die neuesten Entwicklungen und Neuerungen informiert zu bleiben.</center>\n\n<br>"
+            "<center><i>Vielen Dank für Ihre Geduld</i></center>\n"
+            }
+        },
+        {"it",  {
+            "<center><p style=\"color: red;\">PAGINA DI AIUTO IN FASE DI SVILUPPO</p></center>\n",
+            "<center>Questa finestra di aiuto è attualmente in fase di sviluppo e redazione. Le diverse sezioni saranno progressivamente arricchite con descrizioni più dettagliate e contenuti aggiuntivi con il rilascio dei prossimi aggiornamenti.</center>\n"
+            "<center>Non esitate a consultare regolarmente il sito web per rimanere informati sulle ultime novità e sugli sviluppi.</center>\n\n<br>"
+            "<center><i>Grazie per la vostra pazienza</i></center>\n"
+            }
+        },
+        {"pt",  {
+            "<center><p style=\"color: red;\">PÁGINA DE AJUDA EM DESENVOLVIMENTO</p></center>\n",
+            "<center>Esta janela de ajuda encontra-se atualmente em desenvolvimento e em fase de redação. As diferentes secções serão progressivamente enriquecidas com descrições mais detalhadas e conteúdo adicional à medida que forem lançadas novas versões.</center>\n"
+            "<center>Não hesite em consultar regularmente o site para se manter informado sobre as últimas novidades e evoluções.</center>\n\n<br>"
+            "<center><i>Agradecemos a sua paciência</i></center>\n"
+            }
+        }
+    });
+
+    widget->addUrl("numalyse.github.io");
+
     return widget;
 }
 

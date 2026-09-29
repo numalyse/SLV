@@ -58,6 +58,8 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
     QString saveDir = QFileInfo(savePath).dir().path();
 
     m_progress = 0;
+    m_extractionsCount = 0; 
+    const int perClip = kExtractionShare / m_medias.size();
 
     for(int ITime = 0 ; ITime < m_startRecordTimes.size() ; ++ITime){
         QString timeInterval = TimeFormatter::fileFormatMsToHHMMSSFF(m_startRecordTimes[ITime], m_medias[ITime]->fps()) + '_' + TimeFormatter::fileFormatMsToHHMMSSFF(endTimes[ITime], m_medias[ITime]->fps()) + '.' + m_medias[ITime]->fileExtension();
@@ -65,13 +67,14 @@ void MultiviewVideoCaptureManager::endMultiviewRecord(const QVector<int> &endTim
         m_clipsPaths.append(extractPath);
         SequenceExtractionHelper *sequenceExtractor = new SequenceExtractionHelper(m_medias[ITime]->filePath(), m_startRecordTimes[ITime], endTimes[ITime]);
         sequenceExtractor->extractSequence(m_medias[ITime]->filePath(), m_startRecordTimes[ITime], endTimes[ITime], extractPath);
-        connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, savePath, endTimes](const int exitCode){
+        
+        connect(sequenceExtractor, &SequenceExtractionHelper::extractionFinished, this, [this, savePath, endTimes, perClip](const int exitCode){
             if(exitCode == -1){
                 emit multiviewCaptureFailed();
                 return;
             }
 
-            m_progress += 10;
+            m_progress += perClip;
             emit multiviewMergeProgress(m_progress);
             //mergeClips(savePath+".mp4", endTimes);
             mergeClips(savePath, endTimes);
@@ -84,6 +87,12 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
     m_extractionsCount++;
     if(m_extractionsCount != m_medias.size())
         return;
+
+    int totalMs = 0;
+    for(int i = 0; i < m_medias.size(); ++i)
+        totalMs = qMax(totalMs, endTimes[i] - m_startRecordTimes[i]);
+    m_progress = kExtractionShare;
+    emit multiviewMergeProgress(m_progress);
 
     QProcess *ffmpegMerge = new QProcess(this);
     QStringList args;
@@ -360,6 +369,7 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
         return;
     }
 
+    args << "-progress" << "pipe:1" << "-nostats";
     args << savePath;
 
     // On connecte avant de lancer le process pour ne pas rater le signal finished
@@ -368,10 +378,12 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
             qDebug() << "Clip merge failed";
             qDebug() << "Exit Status : " << ffmpegMerge->exitStatus() << " exitCode : " << ffmpegMerge->exitCode() << "errors : " << ffmpegMerge->readAllStandardError();
             ffmpegMerge->deleteLater();
+            emit multiviewCaptureFailed();
             return;
         }
 
         qDebug() << "Clip merge complete";
+        emit multiviewMergeProgress(100);
 
         for (const QString& clipPath : m_clipsPaths) {
             QFile::remove(clipPath);
@@ -380,6 +392,23 @@ void MultiviewVideoCaptureManager::mergeClips(const QString& savePath, const QVe
 
         ffmpegMerge->deleteLater();
         emit multiviewMergeCompleted(savePath);
+    });
+
+    connect(ffmpegMerge, &QProcess::readyReadStandardOutput, this, [this, ffmpegMerge, totalMs]() {
+        while(ffmpegMerge->canReadLine()){
+            const QByteArray line = ffmpegMerge->readLine().trimmed();
+            if(!line.startsWith("out_time_us="))
+                continue;
+            bool ok = false;
+            const qint64 us = line.mid(12).toLongLong(&ok); // "N/A" au début => ok == false
+            if(!ok || us < 0 || totalMs <= 0)
+                continue;
+            const int pct = qMin(99, kExtractionShare + int((us / 1000) * (100 - kExtractionShare) / totalMs));
+            if(pct > m_progress){
+                m_progress = pct;
+                emit multiviewMergeProgress(m_progress);
+            }
+        }
     });
 
     ffmpegMerge->start(SequenceExtractionHelper::getFfmpegPath(), args);

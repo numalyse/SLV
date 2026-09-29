@@ -283,3 +283,11 @@ bool SnapshotPopup::eventFilter(QObject* watched, QEvent* event)
     }
     return QFrame::eventFilter(watched, event);
 }
+
+void SnapshotPopup::dismiss()
+{
+    m_closeTimer->stop();
+    if (m_anim) m_anim->stop();
+    hide();
+    deleteLater();
+}

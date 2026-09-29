@@ -83,8 +83,10 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     });
 
     connect(m_layoutManager, &PlayerLayoutManager::globalScreenshotSaved, this, [this](const QString& mergedPath){
-        if (m_snapshotPopup)
-            delete m_snapshotPopup;
+        if (m_snapshotPopup){
+            m_snapshotPopup->hide();
+            m_snapshotPopup->deleteLater();
+        }
 
         // no timecode since all players can have varying timecode and fps
         m_snapshotPopup = new SnapshotPopup(m_playersWidget ? m_playersWidget : this, mergedPath, -1, 0.0);
@@ -92,9 +94,11 @@ GlobalPlayerManager::GlobalPlayerManager(QWidget *parent)
     });
 
     connect(m_layoutManager, &PlayerLayoutManager::multiviewMergeCompleted, this, [this](const QString& mergedPath){
-        if (m_snapshotPopup)
-            delete m_snapshotPopup;
-    
+        if (m_snapshotPopup){
+            m_snapshotPopup->hide();
+            m_snapshotPopup->deleteLater();
+        }
+        
         m_snapshotPopup = new SnapshotPopup(m_playersWidget ? m_playersWidget : this, mergedPath, -1, 0.0);
         m_snapshotPopup->showWithFade();
     }); 

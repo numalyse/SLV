@@ -20,6 +20,7 @@
 #include <QVariant>
 #include <QMetaType>
 #include <QFileDialog>
+#include <QPoint>
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
@@ -190,6 +191,18 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
     connect(m_mediaInfoBtn, &ToolbarButton::clicked, this, &SimpleToolbar::mediaInformationRequest);
     connect(m_zoomBtn, &ToolbarToggleButton::stateDeactivated, m_zoomIndicator, [this]{ m_zoomIndicator->setText(""); });
     connect(m_customStopBtn, &ToolbarToggleHoverButton::released, this, [this] { emit customStopRequest(m_customStopTimeEdit->text()); });
+
+    // Reset zoom -> right click on m_zoomIndicator
+    QMenu* menuZoomIndicator = new QMenu(m_zoomIndicator);
+    QAction *resetZoomIndicator = menuZoomIndicator->addAction(PrefManager::instance().getText("reset"));
+    connect(resetZoomIndicator, &QAction::triggered, this, [this](){
+        emit resetZoomValueRequest();
+    });
+
+    m_zoomIndicator->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_zoomIndicator, &QLabel::customContextMenuRequested, this, [this, menuZoomIndicator] (const QPoint &pos){
+        menuZoomIndicator->exec(m_zoomIndicator->mapToGlobal(pos));
+    });
 
     setDefaultUI();
     disableButtons();
@@ -406,6 +419,8 @@ void SimpleToolbar::ejectUiUpdate()
     updateDurationText();
     resetSlider();
     pauseUiUpdate();
+    resetZoomValueUiUpdate(true);
+    disableZoomUiUpdate();
     emit ejectUiUpdateDone();
 }
 
@@ -433,6 +448,15 @@ void SimpleToolbar::enableZoomUiUpdate()
 void SimpleToolbar::disableZoomUiUpdate()
 {
     m_zoomBtn->setButtonState(false);
+}
+
+void SimpleToolbar::resetZoomValueUiUpdate(bool isEject) 
+{
+    if (!isEject){
+        setZoomIndicatorText("100 %");
+    } else {
+        setZoomIndicatorText("");
+    }
 }
 
 void SimpleToolbar::nameUiUpdate(const QString & mediaName)

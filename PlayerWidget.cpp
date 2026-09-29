@@ -480,6 +480,12 @@ void PlayerWidget::disableLoopMode()
     emit disableLoopUiUpdateRequested();
 }
 
+void PlayerWidget::resetZoomMode()
+{
+    m_mediaWidget->resetZoomMode();
+    emit resetZoomUiUpdateRequested();
+}
+
 void PlayerWidget::enableZoomMode()
 {
     m_mediaWidget->enableZoomMode();

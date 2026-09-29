@@ -67,6 +67,7 @@ public slots:
     void updateFpsRequest(double);
     void enableLoopMode();
     void disableLoopMode();
+    void resetZoomMode();
     void enableZoomMode();
     void disableZoomMode();
     void startRecord();
@@ -110,6 +111,7 @@ signals:
     void unmuteUiUpdateRequested();
     void enableLoopUiUpdateRequested();
     void disableLoopUiUpdateRequested();
+    void resetZoomUiUpdateRequested();
     void enableZoomUiUpdateRequested();
     void disableZoomUiUpdateRequested();
     void nameUiUpdateRequest(const QString& );

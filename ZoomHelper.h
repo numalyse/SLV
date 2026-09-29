@@ -188,6 +188,21 @@ public:
         return (initialWidth / currentWidth) * 100.0;
     }
 
+    void reset()
+    {
+        x1 = maxWidth;
+        y1 = maxHeight;
+        x2 = 0;
+        y2 = 0;
+
+        fx1 = maxWidth;
+        fy1 = maxHeight;
+        fx2 = 0;
+        fy2 = 0;
+
+        scale = 1.0;
+    }
+
 };
 
 #endif // ZOOMHELPER_y1

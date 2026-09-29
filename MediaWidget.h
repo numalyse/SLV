@@ -72,6 +72,7 @@ public slots:
     void moveTimeForward();
     void enableLoopMode();
     void disableLoopMode();
+    void resetZoomMode();
     void enableZoomMode();
     void disableZoomMode();
     void startRecord();

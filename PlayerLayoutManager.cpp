@@ -489,6 +489,7 @@ Toolbar* PlayerLayoutManager::createAdvancedToolbar(){
     connect(advancedToolbar, &AdvancedToolbar::disableRecordRequested, activePlayer, &PlayerWidget::endRecord);
     connect(advancedToolbar, &AdvancedToolbar::extractSequenceRequest, activePlayer, &PlayerWidget::openSequenceExtractionDialog);
     connect(advancedToolbar, &AdvancedToolbar::mediaInformationRequest, activePlayer->mediaWidget(), &MediaWidget::openMediaInfoDialog);
+    connect(advancedToolbar, &AdvancedToolbar::resetZoomValueRequest, activePlayer, &PlayerWidget::resetZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::enableZoomMode, activePlayer->mediaWidget(), &MediaWidget::enableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::disableZoomMode, activePlayer->mediaWidget(), &MediaWidget::disableZoomMode);
     connect(advancedToolbar, &AdvancedToolbar::subtitlesFileDialogRequested, activePlayer, &PlayerWidget::openSubtitlesFileDialog);

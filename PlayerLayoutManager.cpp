@@ -964,11 +964,11 @@ void PlayerLayoutManager::endMultiviewRecord()
         progress->setValue(qMin(value, 100));
     });
 
-    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted, this, [this, progress](const QString& mergedPath) {
+    connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewMergeCompleted, progress, [this, progress](const QString& mergedPath) {
         progress->close();
         progress->deleteLater();
         emit multiviewMergeCompleted(mergedPath);
-    });
+    }, Qt::SingleShotConnection);
 
     connect(m_multiviewRecord, &MultiviewVideoCaptureManager::multiviewCaptureFailed, this, [this, progress]() {
         progress->close();

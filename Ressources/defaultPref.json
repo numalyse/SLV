@@ -29,7 +29,7 @@
         "MainWindow" : {
             "_order": ["open_media", "open_project", "save_project", "save_as_project"],
             "open_media" : "Ctrl + O",
-            "open_project" : "Ctrl + A",
+            "open_project" : "Ctrl + P",
             "save_project" : "Ctrl + S",
             "save_as_project" : "Ctrl + Shift + S"
         },
@@ -37,31 +37,31 @@
             "_order": ["play_pause", "stop", "mute", "enter_fullscreen", "exit_fullscreen", "screenshot"],
             "play_pause" : "Space",
             "stop" : "S",
-            "mute" : "M",
+            "mute" : "V",
             "enter_fullscreen" : "F",
             "exit_fullscreen" : "Escape",
             "screenshot" : "Shift + S"
         },
         "AdvancedTB" : {
-            "_order": ["increase_speed", "decrease_speed", "base_speed", "next_media", "prev_media", "loop"],
-            "increase_speed" : "+",
+            "_order": ["decrease_speed", "increase_speed", "base_speed", "prev_media", "next_media", "loop"],
             "decrease_speed" : "-",
+            "increase_speed" : "+",
             "base_speed" : "=",
-            "next_media" : "N",
-            "prev_media" : "P",
-            "loop" : "L"
+            "prev_media" : "Up",
+            "next_media" : "Down",
+            "loop" : "B"
         },
         "ExtensionTB" : {
             "_order": ["prev_frame", "next_frame", "forward", "backward", "rotate", "record", "h_flip", "v_flip", "hide_img"],
-            "prev_frame" : "A",
-            "next_frame" : "E",
+            "prev_frame" : "J",
+            "next_frame" : "L",
             "forward" : "Right",
             "backward" : "Left",
             "rotate" : "R",
             "record" : "Shift + R",
             "h_flip" : "H",
-            "v_flip" : "V",
-            "hide_img" : "I"
+            "v_flip" : "G",
+            "hide_img" : "N"
         }
     }
 }

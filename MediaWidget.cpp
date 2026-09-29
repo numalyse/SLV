@@ -937,8 +937,10 @@ void MediaWidget::onVlcSnapshot(const libvlc_event_t *event, void *userData){
 
 void MediaWidget::createSnapshotPopup(const QString& filePath, int64_t vlcTime)
 {
-    if (m_snapshotPopup)
-        delete m_snapshotPopup; // QPointer automatically set to nullptr
+    if (m_snapshotPopup){
+        m_snapshotPopup->hide();
+        m_snapshotPopup->deleteLater();
+    } // QPointer automatically set to nullptr
 
     m_snapshotPopup = new SnapshotPopup(this, filePath, vlcTime, (m_media) ? m_media->fps() : 0.0);
     m_snapshotPopup->showWithFade();

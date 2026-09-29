@@ -290,11 +290,15 @@ void PlayerWidget::setActive(bool active)
 bool PlayerWidget::setMediaFromPath(const QString& filePath, bool preserveTime)
 {
     if (m_mediaWidget->setMediaFromPath(filePath, preserveTime)){
-        m_muted = false;
         emit playUiUpdateRequested();
-        emit unmuteUiUpdateRequested();
         emit checkPlayersPlayStatusRequested();
-        emit checkPlayersMuteStatusRequested();
+
+        if (m_muted){
+            mute();
+        } else{
+            unmute();
+        }
+        
         return true;
     }
     return false;

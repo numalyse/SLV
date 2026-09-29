@@ -1,6 +1,6 @@
 ; --- configuration ---
 #define MyAppName "Numalyse Player (alpha version)"
-#define MyAppVersion "1.0-alpha"
+#define MyAppVersion "1.1-alpha"
 
 ; --- Éléments générés par Qt/windeploy ---
 

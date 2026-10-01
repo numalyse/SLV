@@ -34,6 +34,7 @@ public:
     /// @param cutTime : end time of the current segment of the record (time before warpping to another timecode)
     /// @param newTime : start time of the new segment of the record (time after warpping to another timecode)
     void mediaCutAndConcat(const int cutTime, const int newTime);
+    void tryFinishConcat();
     /// @brief Ends media recording and concatenate all of the media record segments from temporary directory into one media file.
     /// The temporary directory is then deleted
     /// @param endTime : ending time of the recorded segment
@@ -47,9 +48,22 @@ private:
     int m_concatRecordNumber = 0;
     int m_startRecordTime = -1;
 
+    QString m_savePath;
+
+    int  m_pendingExtractions = 0;
+    bool m_extractionFailed   = false;
+    bool m_allLaunched        = false;
+
+    QVector<double> m_segProgress;
+    QVector<int>    m_segDuration;
+    void trackSegmentProgress(SequenceExtractionHelper* seq, int duration);
+    void emitGlobalProgress();
+
 signals:
     void recordSegmentDone(const QString& segmentPath);
     void recordSegmentFailed();
+
+    void extractionProgress(int percent);
 };
 
 #endif // VIDEOCAPTUREMANAGER_H

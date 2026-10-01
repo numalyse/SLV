@@ -29,6 +29,7 @@ ToolbarToggleHoverButton::ToolbarToggleHoverButton(QWidget *parent, QLayout *lay
     layoutToDisplay->setParent(nullptr);
     container->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
     container->setAttribute(Qt::WA_TranslucentBackground);
+    container->setAttribute(Qt::WA_AlwaysShowToolTips); 
 
     QHBoxLayout* containerLayout = new QHBoxLayout(container);
     containerLayout->setContentsMargins(0,0,0,0);

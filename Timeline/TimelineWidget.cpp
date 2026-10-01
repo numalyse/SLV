@@ -220,7 +220,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
         exportDone(PrefManager::instance().getText("messagebox_extract_selected_shots_completed"), outputPath);
     });
     connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
-        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_selected_shots_failed"));
     });
     connect(m_shotManager, &ShotManager::selectedShotCountUpdated, this, &TimelineWidget::updateSelectedShotCount);
 
@@ -499,12 +499,23 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 
         auto& prefManager = PrefManager::instance();
 
-        QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+        const QString saveDir = prefManager.getPref("Paths", "lp_capture");
+        const QString baseName = fileInfo.completeBaseName() + "_extractedshots";
+        //QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+
+        const QString ext = fileInfo.suffix();
+
+        QString defaultFileName = baseName + "." + ext;
+        int i = 1;
+        while (QFileInfo::exists(saveDir + '/' + defaultFileName)) {
+            defaultFileName = baseName + " (" + QString::number(i) + ")." + ext;
+            ++i;
+        }
 
         QString saveRecordPath = QFileDialog::getSaveFileName(
             this,
-            prefManager.getText("dialog_save_extract_shots")  + " - " + fileInfo.fileName(),
-            prefManager.getPref("Paths", "lp_capture") + '/' + defaultFileName,
+            prefManager.getText("dialog_save_extract_shots") + " - " + fileInfo.fileName(),
+            saveDir + '/' + defaultFileName,
             prefManager.getText("export_type_mp4")
         );
 
@@ -513,7 +524,36 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
             return;
         } 
 
-        m_shotManager->extractShotsSelected(saveRecordPath +"."+ fileInfo.suffix());
+        if (QFileInfo(saveRecordPath).suffix().isEmpty()){
+            saveRecordPath += "." + fileInfo.suffix();
+        }
+
+        auto* progress = new QProgressDialog(prefManager.getText("dialog_progressbar"), QString(), 0, 100, this);
+        progress->setWindowModality(Qt::ApplicationModal);
+        progress->setMinimumDuration(0);
+        progress->setCancelButton(nullptr);
+        progress->setWindowTitle(prefManager.getText("dialog_extract_shots"));
+        progress->setAttribute(Qt::WA_DeleteOnClose);
+        progress->show();
+
+        auto& vcm = m_shotManager->videoCaptureManager();
+
+        connect(&vcm, &VideoCaptureManager::extractionProgress, progress, [progress](int value) {
+            progress->setValue(qMin(value, 100));
+        });
+
+        connect(&vcm, &VideoCaptureManager::recordSegmentDone, progress, [progress](const QString&) {
+            progress->close();
+        });
+
+        connect(&vcm, &VideoCaptureManager::recordSegmentFailed, progress, [this, progress]() {
+            progress->close();
+            QMessageBox::critical(this, PrefManager::instance().getText("messagebox_error"), PrefManager::instance().getText("dialog_error_extract_shots"));
+        });
+
+        m_shotManager->extractShotsSelected(saveRecordPath);
+
+        //m_shotManager->extractShotsSelected(saveRecordPath +"."+ fileInfo.suffix());
     }
 }
 

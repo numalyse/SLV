@@ -61,6 +61,8 @@ public:
     int getNbShotsSelected() { return static_cast<int>(m_selectedShots.size()) ;}
 
     const int getCurrentShotId(){ return m_shotItems.indexOf(m_currentShotItem); }
+    
+    VideoCaptureManager& videoCaptureManager() { return m_videoCaptureManager; }
 
 signals:
     void updateShotDetailRequested(int shotCount, int requestId, Shot*);

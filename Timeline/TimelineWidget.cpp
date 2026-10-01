@@ -524,9 +524,32 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
             return;
         } 
 
-        if (QFileInfo(saveRecordPath).suffix().isEmpty())
+        if (QFileInfo(saveRecordPath).suffix().isEmpty()){
             saveRecordPath += "." + fileInfo.suffix();
+        }
 
+        auto* progress = new QProgressDialog(prefManager.getText("dialog_progressbar"), QString(), 0, 100, this);
+        progress->setWindowModality(Qt::ApplicationModal);
+        progress->setMinimumDuration(0);
+        progress->setCancelButton(nullptr);
+        progress->setWindowTitle(prefManager.getText("dialog_extract_shots"));
+        progress->setAttribute(Qt::WA_DeleteOnClose);
+        progress->show();
+
+        auto& vcm = m_shotManager->videoCaptureManager();
+
+        connect(&vcm, &VideoCaptureManager::extractionProgress, progress, [progress](int value) {
+            progress->setValue(qMin(value, 100));
+        });
+
+        connect(&vcm, &VideoCaptureManager::recordSegmentDone, progress, [progress](const QString&) {
+            progress->close();
+        });
+
+        connect(&vcm, &VideoCaptureManager::recordSegmentFailed, progress, [this, progress]() {
+            progress->close();
+            QMessageBox::critical(this, PrefManager::instance().getText("messagebox_error"), PrefManager::instance().getText("dialog_error_extract_shots"));
+        });
 
         m_shotManager->extractShotsSelected(saveRecordPath);
 

@@ -210,16 +210,18 @@ public:
     inline static QProcess* concatenateSequences(const QString& enumSequenceFile, const QString& savePath){
         QProcess *ffmpeg = new QProcess();
         QStringList args;
-        args << "-f" << "concat"
+        args << "-y"
+             << "-f" << "concat"
              << "-safe" << "0"
              << "-i" << enumSequenceFile
              << "-c" << "copy"
              << savePath;
 
+        QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(), [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
+
         ffmpeg->start(getFfmpegPath(), args);
         //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
 
-        QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(), [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
         return ffmpeg;
     }
 

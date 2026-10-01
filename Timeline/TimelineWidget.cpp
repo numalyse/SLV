@@ -220,7 +220,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
         exportDone(PrefManager::instance().getText("messagebox_extract_selected_shots_completed"), outputPath);
     });
     connect(m_shotManager, &ShotManager::shotsExtractionFailed, this, [this](){
-        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_shots_failed"));
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_selected_shots_failed"));
     });
     connect(m_shotManager, &ShotManager::selectedShotCountUpdated, this, &TimelineWidget::updateSelectedShotCount);
 
@@ -499,12 +499,23 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 
         auto& prefManager = PrefManager::instance();
 
-        QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+        const QString saveDir = prefManager.getPref("Paths", "lp_capture");
+        const QString baseName = fileInfo.completeBaseName() + "_extractedshots";
+        //QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+
+        const QString ext = fileInfo.suffix();
+
+        QString defaultFileName = baseName + "." + ext;
+        int i = 1;
+        while (QFileInfo::exists(saveDir + '/' + defaultFileName)) {
+            defaultFileName = baseName + " (" + QString::number(i) + ")." + ext;
+            ++i;
+        }
 
         QString saveRecordPath = QFileDialog::getSaveFileName(
             this,
-            prefManager.getText("dialog_save_extract_shots")  + " - " + fileInfo.fileName(),
-            prefManager.getPref("Paths", "lp_capture") + '/' + defaultFileName,
+            prefManager.getText("dialog_save_extract_shots") + " - " + fileInfo.fileName(),
+            saveDir + '/' + defaultFileName,
             prefManager.getText("export_type_mp4")
         );
 
@@ -513,7 +524,13 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
             return;
         } 
 
-        m_shotManager->extractShotsSelected(saveRecordPath +"."+ fileInfo.suffix());
+        if (QFileInfo(saveRecordPath).suffix().isEmpty())
+            saveRecordPath += "." + fileInfo.suffix();
+
+
+        m_shotManager->extractShotsSelected(saveRecordPath);
+
+        //m_shotManager->extractShotsSelected(saveRecordPath +"."+ fileInfo.suffix());
     }
 }
 

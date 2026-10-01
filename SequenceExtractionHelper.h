@@ -207,21 +207,43 @@ public:
         return ffmpeg;
     }
 
+    // inline static QProcess* concatenateSequences(const QString& enumSequenceFile, const QString& savePath){
+    //     QProcess *ffmpeg = new QProcess();
+    //     QStringList args;
+    //     args << "-y"
+    //          << "-f" << "concat"
+    //          << "-safe" << "0"
+    //          << "-i" << enumSequenceFile
+    //          << "-c" << "copy"
+    //          << savePath;
+
+    //     QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(), [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
+
+    //     ffmpeg->start(getFfmpegPath(), args);
+    //     //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
+
+    //     return ffmpeg;
+    // }
+
     inline static QProcess* concatenateSequences(const QString& enumSequenceFile, const QString& savePath){
         QProcess *ffmpeg = new QProcess();
         QStringList args;
         args << "-y"
-             << "-f" << "concat"
-             << "-safe" << "0"
-             << "-i" << enumSequenceFile
-             << "-c" << "copy"
-             << savePath;
+            << "-f" << "concat"
+            << "-safe" << "0"
+            << "-i" << enumSequenceFile
+            << "-c" << "copy"
+            << savePath;
 
-        QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(), [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
+        QProcess::connect(ffmpeg, &QProcess::finished, ffmpeg, [ffmpeg](int code, QProcess::ExitStatus st){
+            if (code != 0 || st != QProcess::NormalExit)
+                qDebug() << "[ffmpeg concat] failed, exitCode :" << code
+                        << "stderr :" << ffmpeg->readAllStandardError();
+        });
+        QProcess::connect(ffmpeg, &QProcess::errorOccurred, &SignalManager::instance(),
+                        [](QProcess::ProcessError err){ qDebug() << "PROCESS ERROR : " << err; });
 
         ffmpeg->start(getFfmpegPath(), args);
-        //ffmpeg->start(QString(FFMPEG_EXECUTABLE), args);
-
         return ffmpeg;
     }
 

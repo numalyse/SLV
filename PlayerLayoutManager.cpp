@@ -70,6 +70,8 @@ PlayerLayoutManager::PlayerLayoutManager(QObject *parent)
 
     for (size_t IPlayer = 0; IPlayer < s_maxPlayerCount; IPlayer++){
         PlayerWidget* player = new PlayerWidget(this);
+        player->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+        player->setMinimumSize(0, 0);
         connect(player, &PlayerWidget::duplicatePlayerRequest, this, &PlayerLayoutManager::duplicatePlayer);
         connect(player, &PlayerWidget::removePlayerRequest, this, &PlayerLayoutManager::removePlayer);
         connect(player, &PlayerWidget::enablePlayerFullscreenRequested, this, &PlayerLayoutManager::enablePlayerLayoutFullscreen);
@@ -392,6 +394,8 @@ QWidget* PlayerLayoutManager::create4(const QStringList& filesPaths)
 
 Toolbar* PlayerLayoutManager::createGlobalToolbar(){
     GlobalToolbar* globalToolbar = new GlobalToolbar(nullptr);
+    globalToolbar->setSizePolicy(QSizePolicy::Ignored, globalToolbar->sizePolicy().verticalPolicy());
+    globalToolbar->setMinimumWidth(0);
 
     // Parcours les players pour connecter le play / play de la global a ses players
     for(auto& IActivePlayer : m_activePlayers){

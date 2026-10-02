@@ -169,6 +169,7 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
 
     m_player = player;
     m_playersWidget = newPlayersWidget;
+    m_playersWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     if (m_playersWidget) {
         const auto splitters = m_playersWidget->findChildren<QSplitter*>();

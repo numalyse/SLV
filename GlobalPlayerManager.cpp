@@ -169,6 +169,7 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
 
     m_player = player;
     m_playersWidget = newPlayersWidget;
+    m_playersWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     if (m_playersWidget) {
         const auto splitters = m_playersWidget->findChildren<QSplitter*>();
@@ -240,12 +241,9 @@ void GlobalPlayerManager::updateContainer(PlayerWidget* player, QWidget * newPla
             }
         }
 
-        // If the previous toolbar was in fullscreen mode, restore that state on the newly created toolbar
         if (wasToolbarFullscreen) {
-            // defer to the event loop to ensure previous widgets are fully deleted
             QTimer::singleShot(0, this, [this]() {
                 if (!m_toolbarWidget) return;
-                m_toolbarWidget->setFullscreenUI();
                 if (m_toolbarWidget->fullscreenBtn())
                     m_toolbarWidget->fullscreenBtn()->setButtonState(true);
                 updateSplittersStyle(true);

@@ -427,11 +427,14 @@ MainWindow::~MainWindow()
 
 }
 
-
-
 void MainWindow::enableFullscreenMain()
 {
-    wasMaximized = isMaximized();
+
+    if (!isFullScreen()) {
+        wasMaximized = isMaximized();
+        m_navPanelWasOpen = m_globalPlayerManager->isNavPanelOpen();
+    }
+
     ui->menubar->hide();
     m_toolbarQt->hide();
     emit m_navPanelBtn->stateDeactivated();
@@ -447,10 +450,17 @@ void MainWindow::disableFullscreenMain()
 #endif
     ui->menubar->show();
     m_toolbarQt->show();
-    if(!wasMaximized)
+    if(!wasMaximized){
         showNormal();
-    else
+    }
+    else {
         showMaximized();
+    }
+
+    if (m_navPanelWasOpen && m_navPanelBtn->isEnabled()){
+        emit m_navPanelBtn->stateActivated();
+    }
+    m_navPanelWasOpen = false;
 }
 
 void MainWindow::disableNavPanel()

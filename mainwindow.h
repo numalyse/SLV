@@ -96,6 +96,7 @@ private:
     ToolbarButton *m_view3VAlign = nullptr;
     ToolbarButton *m_view4 = nullptr;
     bool wasMaximized = false;
+    bool m_navPanelWasOpen = false;
 
     QTimer* m_fullscreenToolbarHideTimer = nullptr;
     int m_fullscreenToolbarHideDelayMs = 1000;

@@ -43,11 +43,29 @@ ToolbarToggleButton::ToolbarToggleButton(
 
 void ToolbarToggleButton::updateIcons(bool checked, bool enabled)
 {
+    const auto preserveCustomIcon = [&](const QIcon& iconToApply) {
+        if (!iconToApply.isNull()) {
+            setIcon(iconToApply);
+            return true;
+        }
+
+        if (!this->icon().isNull()) {
+            setToolTip(checked ? m_toolTipTextOn : m_toolTipTextOff);
+            return true;
+        }
+
+        return false;
+    };
+
     if (checked) {
-        setIcon(enabled ? property("normalIconOn").value<QIcon>() : property("grayIconOn").value<QIcon>());
+        if (!preserveCustomIcon(enabled ? property("normalIconOn").value<QIcon>() : property("grayIconOn").value<QIcon>())) {
+            setIcon(QIcon());
+        }
         setToolTip(m_toolTipTextOn);
     } else {
-        setIcon(enabled ? property("normalIconOff").value<QIcon>() : property("grayIconOff").value<QIcon>());
+        if (!preserveCustomIcon(enabled ? property("normalIconOff").value<QIcon>() : property("grayIconOff").value<QIcon>())) {
+            setIcon(QIcon());
+        }
         setToolTip(m_toolTipTextOff);
     }
 }

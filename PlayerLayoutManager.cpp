@@ -162,8 +162,15 @@ void PlayerLayoutManager::createLayout(const int count, const PlayerLayoutArrang
 
 void PlayerLayoutManager::createLayoutFromPaths(const QStringList& filesPaths)
 {
-    detachAllPlayers();
+    if (filesPaths.size() == 1 && m_activePlayers.size() == 1 && m_currentArrangement == Arrangement1) {
+        m_activePlayers[0]->setMediaFromPath(filesPaths.at(0));
+        ProjectManager::instance().requestProjectCreation(getActivePlayersMediaPath());
+        updateActivePlayersMediaState();
+        return;
+    }
 
+    detachAllPlayers();
+    
     int pathCount = filesPaths.size();
     activePlayerUpdate(pathCount);
 

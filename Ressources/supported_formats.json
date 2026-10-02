@@ -25,7 +25,7 @@
         ],
 
         "images": [
-                "jpg", "jpeg", "png", "bmp", "gif", "tiff", "webp"
+                "jpg", "jpeg", "png", "bmp", "gif", "webp"
         ],
 
         "streaming": [

@@ -12,7 +12,7 @@
 #define MySourceDir "..\build\dist"
 
 ; --- innosetup : nom de l'installer ---
-#define MyOutputName "NumalysePlayer_" + MyAppVersion + "_Installer"
+#define MyOutputName "NumalysePlayer_" + MyAppVersion + "_Installer_windows"
 
 [Setup]
 AppName={#MyAppName}

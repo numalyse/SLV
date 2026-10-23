@@ -12,6 +12,7 @@
 #include "Timeline/TransitionManager.h"
 #include "Timeline/ThumbnailWorker.h"
 #include "Timeline/AnnotationItemManager.h"
+#include "Timeline/TimelineImgExportDialog.h"
 
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/RulerItem.h"
@@ -59,6 +60,9 @@ public slots:
     void setPlayerPlaying(bool playing) { m_isPlayerPlaying = playing; };
 
     const QVector<ShotItem*>& shotItems() const { return m_shotManager->shotItems();};
+    
+    void exportToPngAction();
+    bool exportToPng(const TimelineImgExportOptions& options);
 
 signals:
     void updateShotDetailRequest(int shotCount, int requestId, Shot*);

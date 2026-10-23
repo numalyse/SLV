@@ -161,6 +161,10 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
+    auto* exportImgBtn = new ToolbarButton(this, "export_white", "Exporter la timeline en PNG");
+    connect(exportImgBtn, &ToolbarButton::pressed, this, &TimelineWidget::exportToPngAction);
+    ButtonLayout->addWidget(exportImgBtn);
+
     ButtonLayout->addStretch(1);
 
     m_shotCountLabel = new QLabel(this);
@@ -780,7 +784,102 @@ void TimelineWidget::initAudioVisualizer()
     m_scene->addItem(m_audioVisualizer);
 }
 
+void TimelineWidget::exportToPngAction()
+{
+    QFileInfo fileInfo(p_media->filePath());
+    const QString defaultPath = PrefManager::instance().getPref("Paths", "lp_capture") + '/' +
+                                fileInfo.completeBaseName() + "_timeline.png";
 
+    TimelineImgExportDialog dialog(defaultPath, this);
+    if (dialog.exec() != QDialog::Accepted) return;
+
+    const TimelineImgExportOptions options = dialog.options();
+
+    if (exportToPng(options)) {
+        exportDone("Timeline exportée.", options.filePath);
+    } else {
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error"),
+                             "Échec de l'export de la timeline.");
+    }
+}
+
+bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
+{
+    if (!m_scene || !m_mathManager || m_mathManager->duration() <= 0)
+        return false;
+
+    QVector<QGraphicsItem*> hiddenItems;
+    auto hideItem = [&hiddenItems](QGraphicsItem* it) {
+        if (it && it->isVisible()) {
+            it->hide();
+            hiddenItems.append(it);
+        }
+    };
+
+    for (QGraphicsItem* item : m_scene->items()) {
+        switch (item->type()) {
+        case SLV::TypeRulerItem:
+            if (!options.showRuler) hideItem(item);
+            break;
+        case SLV::TypeCursorItem:
+            if (!options.showCursor) hideItem(item);
+            break;
+        case SLV::TypeAudioVisualizerItem:
+            if (!options.showAudio) hideItem(item);
+            break;
+        case SLV::TypeShotItem:
+        case SLV::TypeAudioShotItem:
+        case SLV::TypeTransitionMarkerItem:
+            if (!options.showShots) hideItem(item);
+            break;
+        case SLV::TypeAnnotationItem:
+        case SLV::TypeAnnotationHandleItem:
+            if (!options.showAnnotations) hideItem(item);
+            break;
+        case SLV::TypeABMarkerItem:
+            if (!options.showABMarkers) hideItem(item);
+            break;
+        default:
+            break;
+        }
+    }
+
+    bool ok = false;
+
+    if (options.currentViewOnly) {
+        const QPixmap pixmap = m_view->viewport()->grab();
+        ok = pixmap.save(options.filePath, "PNG");
+    }
+    else {
+        const double oldPixelsPerMs = m_mathManager->pixelsPerMs();
+        const int oldScroll = m_view->horizontalScrollBar()->value();
+
+        m_mathManager->setPixelsPerMs(double(options.width) / m_mathManager->duration());
+        updateTimelineGeometry();
+
+        const QRectF sourceRect = m_scene->sceneRect();
+        QImage image(sourceRect.size().toSize(), QImage::Format_ARGB32_Premultiplied);
+        image.fill(options.transparentBackground ? Qt::transparent
+                                                 : palette().color(QPalette::Window));
+        {
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing);
+            painter.setRenderHint(QPainter::TextAntialiasing);
+            m_scene->render(&painter, QRectF(image.rect()), sourceRect);
+        }
+
+        m_mathManager->setPixelsPerMs(oldPixelsPerMs);
+        updateTimelineGeometry();
+        m_view->horizontalScrollBar()->setValue(oldScroll);
+
+        ok = image.save(options.filePath, "PNG");
+    }
+
+    for (QGraphicsItem* it : std::as_const(hiddenItems))
+        it->show();
+
+    return ok;
+}
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {

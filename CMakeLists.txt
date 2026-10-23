@@ -159,6 +159,7 @@ set(PROJECT_SOURCES
     Timeline/TransitionManager.h Timeline/TransitionManager.cpp
     Timeline/BaseRangeManager.h
     Timeline/AnnotationItemManager.h Timeline/AnnotationItemManager.cpp
+    Timeline/TimelineImgExportDialog.h Timeline/TimelineImgExportDialog.cpp
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp

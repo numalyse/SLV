@@ -15,6 +15,7 @@ private:
     double m_sizeCoeff{300};
     double m_columnWidth;
     double m_minAmplitude;
+    bool m_forceFullRange = false;
 
     static constexpr double s_height = 40.0;
     static constexpr double s_topMargin = 93.0;
@@ -22,6 +23,7 @@ private:
 public:
     AudioVisualizerItem(const QVector<double>& amplitudes, double width, QGraphicsItem* parent = nullptr);
     void setWidth(const double width);
+    void setForceFullRange(bool force);
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     double width() const { return m_width; }

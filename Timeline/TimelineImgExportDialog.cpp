@@ -93,19 +93,19 @@ void TimelineImgExportDialog::browse()
 
 TimelineImgExportOptions TimelineImgExportDialog::options() const
 {
-    TimelineImgExportOptions o;
-    o.filePath = m_pathEdit->text().trimmed();
-    if (QFileInfo(o.filePath).suffix().isEmpty())
-        o.filePath += ".png";
+    TimelineImgExportOptions optionTL;
+    optionTL.filePath = m_pathEdit->text().trimmed();
+    if (QFileInfo(optionTL.filePath).suffix().isEmpty())
+        optionTL.filePath += ".png";
 
-    o.width = m_widthSpin->value();
-    o.showRuler = m_rulerCheck->isChecked();
-    o.showShots = m_shotsCheck->isChecked();
-    o.showAudio = m_audioCheck->isChecked();
-    o.showAnnotations = m_annotCheck->isChecked();
-    o.showABMarkers = m_abCheck->isChecked();
-    o.showCursor = m_cursorCheck->isChecked();
-    o.transparentBackground = m_transparentCheck->isChecked();
-    o.currentViewOnly = m_currentViewCheck->isChecked();
-    return o;
+    optionTL.width = m_widthSpin->value();
+    optionTL.showRuler = m_rulerCheck->isChecked();
+    optionTL.showShots = m_shotsCheck->isChecked();
+    optionTL.showAudio = m_audioCheck->isChecked();
+    optionTL.showAnnotations = m_annotCheck->isChecked();
+    optionTL.showABMarkers = m_abCheck->isChecked();
+    optionTL.showCursor = m_cursorCheck->isChecked();
+    optionTL.transparentBackground = m_transparentCheck->isChecked();
+    optionTL.currentViewOnly = m_currentViewCheck->isChecked();
+    return optionTL;
 }

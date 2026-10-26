@@ -47,16 +47,22 @@ void RulerItem::computeZoomSteps(double fps, std::vector<double>& zoomSteps){
 }
 
 void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    Q_UNUSED(option); 
     Q_UNUSED(widget);
 
     QRectF visibleZone;
-
-    if (scene() && !scene()->views().isEmpty()) { // récupère la largeur du viewport et redessine dedans plutot que dans toute la graphics scene
+    if (m_forceFullRange) {
+        visibleZone = boundingRect();
+    } else if (option && !option->exposedRect.isEmpty()) {
+        visibleZone = option->exposedRect;
+    } else if (scene() && !scene()->views().isEmpty()) {
         QGraphicsView *view = scene()->views().first();
         visibleZone = view->mapToScene(view->viewport()->rect()).boundingRect();
-    }else {
-        qDebug() << "Impossible de retrouver la zone visible";
+    } else {
+        visibleZone = boundingRect();
+    }
+
+    if (visibleZone.isEmpty()) {
+        visibleZone = QRectF(0.0, 0.0, m_width, m_height);
     }
 
     Q_ASSERT(visibleZone.width() > 0);
@@ -125,5 +131,13 @@ void RulerItem::setSize(int width, int height, double pixelsPerMs) {
     m_width = width;
     m_height = height;
     m_pixelsPerMs = pixelsPerMs;
+    update();
+}
+
+void RulerItem::setForceFullRange(bool force)
+{
+    if (m_forceFullRange == force)
+        return;
+    m_forceFullRange = force;
     update();
 }

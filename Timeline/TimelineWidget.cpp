@@ -851,6 +851,13 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         ok = pixmap.save(options.filePath, "PNG");
     }
     else {
+        for (QGraphicsItem* item : m_scene->items()) {
+            if (auto* ruler = dynamic_cast<RulerItem*>(item))
+                ruler->setForceFullRange(true);
+            else if (auto* audio = dynamic_cast<AudioVisualizerItem*>(item))
+                audio->setForceFullRange(true);
+        }
+
         const double oldPixelsPerMs = m_mathManager->pixelsPerMs();
         const int oldScroll = m_view->horizontalScrollBar()->value();
 
@@ -866,6 +873,13 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             painter.setRenderHint(QPainter::Antialiasing);
             painter.setRenderHint(QPainter::TextAntialiasing);
             m_scene->render(&painter, QRectF(image.rect()), sourceRect);
+        }
+
+        for (QGraphicsItem* item : m_scene->items()) {
+            if (auto* ruler = dynamic_cast<RulerItem*>(item))
+                ruler->setForceFullRange(false);
+            else if (auto* audio = dynamic_cast<AudioVisualizerItem*>(item))
+                audio->setForceFullRange(false);
         }
 
         m_mathManager->setPixelsPerMs(oldPixelsPerMs);

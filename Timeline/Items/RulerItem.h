@@ -17,6 +17,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(int width, int height, double pixelsPerMs);
+    void setForceFullRange(bool force);
 
     int type() const override { return SLV::TypeRulerItem;}
 
@@ -27,6 +28,7 @@ private:
     double m_pixelsPerMs;
     double m_fps;
     int64_t m_duration;
+    bool m_forceFullRange = false;
     std::vector<double> m_zoomSteps;
     
     void computeZoomSteps(double fps, std::vector<double> &zoomSteps);

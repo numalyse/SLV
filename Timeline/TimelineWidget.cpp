@@ -787,10 +787,28 @@ void TimelineWidget::initAudioVisualizer()
 void TimelineWidget::exportToPngAction()
 {
     QFileInfo fileInfo(p_media->filePath());
-    const QString defaultPath = PrefManager::instance().getPref("Paths", "lp_capture") + '/' +
-                                fileInfo.completeBaseName() + "_timeline.png";
+    // const QString defaultPath = PrefManager::instance().getPref("Paths", "lp_capture") + '/' +
+    //                             fileInfo.completeBaseName() + "_timeline.png";
 
-    TimelineImgExportDialog dialog(defaultPath, this);
+    QString dir = PrefManager::instance().getPref("Paths", "lp_capture");
+    QString initialPath = dir + '/' + fileInfo.completeBaseName() + "_timeline.png";
+    
+    int i = 1;
+    while (QFileInfo::exists(initialPath)) {
+        initialPath = dir + '/' + fileInfo.completeBaseName() + "_timeline (" + QString::number(i) + ").png";
+        ++i;
+    }
+
+    QString savePath = initialPath;
+    if(savePath.isEmpty()){
+        qDebug() << "[TIMELINEWIDGET] Enregistrement de la timeline annulé";
+        return;
+    }
+    if(!savePath.endsWith(".png", Qt::CaseInsensitive)){
+        savePath += ".png";
+    }
+
+    TimelineImgExportDialog dialog(savePath, this);
     if (dialog.exec() != QDialog::Accepted) return;
 
     const TimelineImgExportOptions options = dialog.options();

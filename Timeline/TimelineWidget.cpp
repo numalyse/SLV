@@ -829,6 +829,7 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
     };
 
     QVector<ShotItem*> thumbOffItems;
+    QVector<QPair<ShotItem*, bool>> shotBorderStates;
 
     for (QGraphicsItem* item : m_scene->items()) {
         switch (item->type()) {
@@ -842,17 +843,26 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             if (!options.showAudio) hideItem(item);
             break;
         case SLV::TypeShotItem:
-            if (!options.showShots) {
-                hideItem(item);
-            } else if (!options.showThumbnails) {
-                if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
-                    shotItem->setShowThumbnail(false);
-                    thumbOffItems.append(shotItem);
-                }
-            }
-            break;
         case SLV::TypeAudioShotItem:
-            if (!options.showShots || !options.showAudio) {
+            if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
+                shotBorderStates.append(qMakePair(shotItem, shotItem->showBorder()));
+                const bool showBorder = options.showShots
+                    && (item->type() != SLV::TypeAudioShotItem || options.showAudio)
+                    && options.showShotBorders;
+                shotItem->setShowBorder(showBorder);
+            }
+            if (item->type() == SLV::TypeAudioShotItem) {
+                if (!options.showShots || !options.showAudio) {
+                    hideItem(item);
+                } else if (!options.showThumbnails) {
+                    if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
+                        shotItem->setShowThumbnail(false);
+                        thumbOffItems.append(shotItem);
+                    }
+                }
+                break;
+            }
+            if (!options.showShots) {
                 hideItem(item);
             } else if (!options.showThumbnails) {
                 if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
@@ -938,6 +948,9 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
 
     for (ShotItem* s : std::as_const(thumbOffItems))
         s->setShowThumbnail(true);
+
+    for (const auto& state : std::as_const(shotBorderStates))
+        state.first->setShowBorder(state.second);
 
     for (QGraphicsItem* it : std::as_const(hiddenItems))
         it->show();

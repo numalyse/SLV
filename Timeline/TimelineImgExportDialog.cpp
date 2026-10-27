@@ -51,6 +51,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     addCheck(m_abCheck,         tr("Marqueurs A/B"));
     addCheck(m_cursorCheck,     tr("Curseur de lecture"));
 
+    m_shotBordersCheck = new QCheckBox(tr("Contours des plans vidéo et audio"));
     m_transparentCheck = new QCheckBox(tr("Fond transparent"));
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -63,10 +64,12 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(form);
     mainLayout->addWidget(group);
+    mainLayout->addWidget(m_shotBordersCheck);
     mainLayout->addWidget(m_transparentCheck);
     mainLayout->addWidget(buttons);
 
     connect(m_shotsCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_audioCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
     connect(m_currentViewCheck, &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
     connect(m_pathEdit,         &QLineEdit::textChanged, this, &TimelineImgExportDialog::updateDependencies);
 
@@ -81,6 +84,7 @@ void TimelineImgExportDialog::setOptions(const TimelineImgExportOptions& o)
     m_annotCheck->setChecked(o.showAnnotations);
     m_shotsCheck->setChecked(o.showShots);
     m_thumbnailsCheck->setChecked(o.showThumbnails);
+    m_shotBordersCheck->setChecked(o.showShotBorders);
     m_audioCheck->setChecked(o.showAudio);
     m_abCheck->setChecked(o.showABMarkers);
     m_cursorCheck->setChecked(o.showCursor);
@@ -91,7 +95,9 @@ void TimelineImgExportDialog::setOptions(const TimelineImgExportOptions& o)
 void TimelineImgExportDialog::updateDependencies()
 {
     const bool shots = m_shotsCheck->isChecked();
+    const bool audio = m_audioCheck->isChecked();
     m_thumbnailsCheck->setEnabled(shots);
+    m_shotBordersCheck->setEnabled(shots || audio);
     if (!shots)
         m_thumbnailsCheck->setChecked(false);
 
@@ -125,6 +131,7 @@ TimelineImgExportOptions TimelineImgExportDialog::options() const
     o.showAnnotations       = m_annotCheck->isChecked();
     o.showShots             = m_shotsCheck->isChecked();
     o.showThumbnails        = m_thumbnailsCheck->isChecked();
+    o.showShotBorders       = m_shotBordersCheck->isChecked();
     o.showAudio             = m_audioCheck->isChecked();
     o.showABMarkers         = m_abCheck->isChecked();
     o.showCursor            = m_cursorCheck->isChecked();

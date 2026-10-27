@@ -17,6 +17,7 @@ struct TimelineImgExportOptions
     bool showAnnotations = true;
     bool showShots = true;    
     bool showThumbnails = true;    
+    bool showShotBorders = true;
     bool showAudio = true;
     bool showABMarkers = false;
     bool showCursor = false;
@@ -44,6 +45,7 @@ private:
     QCheckBox* m_rulerCheck;
     QCheckBox* m_shotsCheck;
     QCheckBox* m_thumbnailsCheck;
+    QCheckBox* m_shotBordersCheck;
     QCheckBox* m_audioCheck;
     QCheckBox* m_annotCheck;
     QCheckBox* m_abCheck;

@@ -7,6 +7,7 @@
 class QSpinBox;
 class QCheckBox;
 class QLineEdit;
+class QRadioButton;
 
 struct TimelineImgExportOptions
 {
@@ -51,7 +52,8 @@ private:
     QCheckBox* m_abCheck;
     QCheckBox* m_cursorCheck;
     QCheckBox* m_transparentCheck;
-    QCheckBox* m_currentViewCheck;
+    QRadioButton* m_currentViewRadio = nullptr;
+    QRadioButton* m_fullViewRadio = nullptr;
 };
 
 #endif

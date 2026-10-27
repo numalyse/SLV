@@ -28,10 +28,10 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     connect(browseBtn, &QPushButton::clicked, this, &TimelineImgExportDialog::browse);
 
     m_widthSpin = new QSpinBox(this);
-    m_widthSpin->setRange(200, 32000);
+    m_widthSpin->setRange(480, 32000);
     m_widthSpin->setSingleStep(100);
     m_widthSpin->setSuffix(" px");
-    m_widthSpin->setValue(4000);
+    m_widthSpin->setValue(1920);
 
     m_currentViewCheck = new QCheckBox(tr("Exporter la vue actuelle (zoom et défilement courants)"), this);
 
@@ -46,17 +46,24 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
 
     m_rulerCheck  = new QCheckBox(tr("Règle temporelle"), group);
     m_shotsCheck  = new QCheckBox(tr("Plans"), group);
+    m_thumbnailsCheck = new QCheckBox(tr("Imagettes des plans"), group);
     m_audioCheck  = new QCheckBox(tr("Forme d'onde audio"), group);
     m_annotCheck  = new QCheckBox(tr("Annotations"), group);
     m_abCheck     = new QCheckBox(tr("Marqueurs A/B"), group);
     m_cursorCheck = new QCheckBox(tr("Curseur de lecture"), group);
 
-    for (QCheckBox* c : {m_rulerCheck, m_shotsCheck, m_audioCheck, m_annotCheck, m_abCheck})
+    for (QCheckBox* c : {m_rulerCheck, m_shotsCheck, m_thumbnailsCheck, m_audioCheck, m_annotCheck, m_abCheck})
         c->setChecked(true);
     m_cursorCheck->setChecked(false);
 
-    for (QCheckBox* c : {m_rulerCheck, m_shotsCheck, m_audioCheck, m_annotCheck, m_abCheck, m_cursorCheck})
+    for (QCheckBox* c : {m_rulerCheck, m_shotsCheck, m_thumbnailsCheck, m_audioCheck, m_annotCheck, m_abCheck, m_cursorCheck})
         groupLayout->addWidget(c);
+
+    connect(m_shotsCheck, &QCheckBox::toggled, this, [this](bool checked) {
+        m_thumbnailsCheck->setEnabled(checked);
+        if (!checked)
+            m_thumbnailsCheck->setChecked(false);
+    });
 
     mainLayout->addWidget(group);
 
@@ -100,11 +107,12 @@ TimelineImgExportOptions TimelineImgExportDialog::options() const
 
     optionTL.width = m_widthSpin->value();
     optionTL.showRuler = m_rulerCheck->isChecked();
-    optionTL.showShots = m_shotsCheck->isChecked();
-    optionTL.showAudio = m_audioCheck->isChecked();
     optionTL.showAnnotations = m_annotCheck->isChecked();
-    optionTL.showABMarkers = m_abCheck->isChecked();
-    optionTL.showCursor = m_cursorCheck->isChecked();
+    optionTL.showShots = m_shotsCheck->isChecked();
+    optionTL.showThumbnails = m_thumbnailsCheck->isChecked();
+    optionTL.showAudio = m_audioCheck->isChecked();
+    //optionTL.showABMarkers = m_abCheck->isChecked();
+    //optionTL.showCursor = m_cursorCheck->isChecked();
     optionTL.transparentBackground = m_transparentCheck->isChecked();
     optionTL.currentViewOnly = m_currentViewCheck->isChecked();
     return optionTL;

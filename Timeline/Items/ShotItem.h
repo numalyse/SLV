@@ -36,6 +36,9 @@ public:
         update();
     }
 
+    void setShowThumbnail(bool show);
+    bool showThumbnail() const { return m_showThumbnail; }
+
     int type() const override { return SLV::TypeShotItem; }
 
 protected:
@@ -51,6 +54,7 @@ private:
     double m_widthMs{};
     int m_selectedNumber = 1;
     bool m_selected = false;
+    bool m_showThumbnail = true;
     bool m_selectionNeedUpdate = false;
 
     static constexpr double s_height = 40.0;

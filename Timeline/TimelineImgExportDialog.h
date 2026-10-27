@@ -12,12 +12,13 @@ struct TimelineImgExportOptions
 {
     QString filePath;
     bool currentViewOnly = false; 
-    int  width = 4000;
+    int  width = 1920;
     bool showRuler = true;
-    bool showShots = true;
-    bool showAudio = true;
     bool showAnnotations = true;
-    bool showABMarkers = true;
+    bool showShots = true;    
+    bool showThumbnails = true;    
+    bool showAudio = true;
+    bool showABMarkers = false;
     bool showCursor = false;
     bool transparentBackground = false;
 };
@@ -38,6 +39,7 @@ private:
     QSpinBox*  m_widthSpin;
     QCheckBox* m_rulerCheck;
     QCheckBox* m_shotsCheck;
+    QCheckBox* m_thumbnailsCheck;
     QCheckBox* m_audioCheck;
     QCheckBox* m_annotCheck;
     QCheckBox* m_abCheck;

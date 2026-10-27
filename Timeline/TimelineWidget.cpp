@@ -829,6 +829,13 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             break;
         case SLV::TypeShotItem:
         case SLV::TypeAudioShotItem:
+            if (!options.showShots) {
+                hideItem(item);
+            } else if (!options.showThumbnails) {
+                if (auto* shotItem = dynamic_cast<ShotItem*>(item))
+                    shotItem->setShowThumbnail(false);
+            }
+            break;
         case SLV::TypeTransitionMarkerItem:
             if (!options.showShots) hideItem(item);
             break;
@@ -887,6 +894,11 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         m_view->horizontalScrollBar()->setValue(oldScroll);
 
         ok = image.save(options.filePath, "PNG");
+    }
+
+    for (QGraphicsItem* item : m_scene->items()) {
+        if (auto* shotItem = dynamic_cast<ShotItem*>(item))
+            shotItem->setShowThumbnail(true);
     }
 
     for (QGraphicsItem* it : std::as_const(hiddenItems))

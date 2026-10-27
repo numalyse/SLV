@@ -57,6 +57,9 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->setBrush(QBrush(drawColor));
     p->drawRect(0, topMargin(), m_widthMs, height());
 
+    if (!m_showThumbnail)
+        return;
+
     // to cancel painter horizontal scale to draw pixmap
     const double sx = p->transform().m11();
     if (sx <= 0.0) return;
@@ -87,6 +90,14 @@ void ShotItem::setWidth(double width)
     prepareGeometryChange(); 
     m_widthMs = width;
     updateTextPosition();
+    update();
+}
+
+void ShotItem::setShowThumbnail(bool show)
+{
+    if (m_showThumbnail == show)
+        return;
+    m_showThumbnail = show;
     update();
 }
 

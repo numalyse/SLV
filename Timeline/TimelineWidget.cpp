@@ -810,6 +810,16 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
 
     QDir().mkpath(QFileInfo(options.filePath).absolutePath());
 
+    QVector<QRectF> exportBands;
+    if (options.showRuler)
+        exportBands.append(QRectF(0.0, 0.0, 1.0, 25.0));
+    if (options.showAnnotations)
+        exportBands.append(QRectF(0.0, 30.0, 1.0, 17.0));
+    if (options.showShots)
+        exportBands.append(QRectF(0.0, 50.0, 1.0, 40.0));
+    if (options.showAudio)
+        exportBands.append(QRectF(0.0, 93.0, 1.0, 40.0));
+
     QVector<QGraphicsItem*> hiddenItems;
     auto hideItem = [&hiddenItems](QGraphicsItem* it) {
         if (it && it->isVisible()) {
@@ -832,8 +842,17 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             if (!options.showAudio) hideItem(item);
             break;
         case SLV::TypeShotItem:
-        case SLV::TypeAudioShotItem:
             if (!options.showShots) {
+                hideItem(item);
+            } else if (!options.showThumbnails) {
+                if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
+                    shotItem->setShowThumbnail(false);
+                    thumbOffItems.append(shotItem);
+                }
+            }
+            break;
+        case SLV::TypeAudioShotItem:
+            if (!options.showShots || !options.showAudio) {
                 hideItem(item);
             } else if (!options.showThumbnails) {
                 if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
@@ -866,40 +885,56 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         }
     };
 
-    bool ok = false;
-
-    if (options.currentViewOnly) {
-        const QPixmap pixmap = m_view->viewport()->grab();
-        ok = pixmap.save(options.filePath, "PNG");
-    }
-    else {
+    const double oldPixelsPerMs = m_mathManager->pixelsPerMs();
+    const int oldScroll = m_view->horizontalScrollBar()->value();
+    if (!options.currentViewOnly) {
         setFullRange(true);
-
-        const double oldPixelsPerMs = m_mathManager->pixelsPerMs();
-        const int oldScroll = m_view->horizontalScrollBar()->value();
-
         m_mathManager->setPixelsPerMs(double(options.width) / m_mathManager->duration());
         updateTimelineGeometry();
-
-        const QRectF sourceRect = m_scene->sceneRect();
-        QImage image(sourceRect.size().toSize(), QImage::Format_ARGB32_Premultiplied);
-        image.fill(options.transparentBackground ? Qt::transparent
-                                                 : palette().color(QPalette::Window));
-        {
-            QPainter painter(&image);
-            painter.setRenderHint(QPainter::Antialiasing);
-            painter.setRenderHint(QPainter::TextAntialiasing);
-            m_scene->render(&painter, QRectF(image.rect()), sourceRect);
-        }
-
-        setFullRange(false);
-
-        m_mathManager->setPixelsPerMs(oldPixelsPerMs);
-        updateTimelineGeometry();
-        m_view->horizontalScrollBar()->setValue(oldScroll);
-
-        ok = image.save(options.filePath, "PNG");
     }
+
+    const QRectF sourceRect = options.currentViewOnly
+        ? m_view->mapToScene(m_view->viewport()->rect()).boundingRect()
+        : m_scene->sceneRect();
+    const int imageWidth = options.currentViewOnly ? m_view->viewport()->width() : options.width;
+    const double scale = imageWidth / sourceRect.width();
+
+    QVector<QPair<QRectF, int>> visibleBands;
+    int imageHeight = 0;
+    for (const QRectF& band : std::as_const(exportBands)) {
+        const QRectF sourceBand = QRectF(sourceRect.left(), band.top(),
+                                         sourceRect.width(), band.height()).intersected(sourceRect);
+        if (sourceBand.isEmpty())
+            continue;
+
+        const int bandHeight = qMax(1, qRound(sourceBand.height() * scale));
+        visibleBands.append(qMakePair(sourceBand, bandHeight));
+        imageHeight += bandHeight;
+    }
+
+    QImage image(imageWidth, qMax(1, imageHeight), QImage::Format_ARGB32_Premultiplied);
+    image.fill(options.transparentBackground ? Qt::transparent
+                                             : palette().color(QPalette::Window));
+    {
+        QPainter painter(&image);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+
+        int targetY = 0;
+        for (const auto& band : std::as_const(visibleBands)) {
+            const QRectF targetBand(0.0, targetY, imageWidth, band.second);
+            m_scene->render(&painter, targetBand, band.first);
+            targetY += band.second;
+        }
+    }
+
+    if (!options.currentViewOnly)
+        setFullRange(false);
+    m_mathManager->setPixelsPerMs(oldPixelsPerMs);
+    updateTimelineGeometry();
+    m_view->horizontalScrollBar()->setValue(oldScroll);
+
+    const bool ok = image.save(options.filePath, "PNG");
 
     for (ShotItem* s : std::as_const(thumbOffItems))
         s->setShowThumbnail(true);

@@ -24,6 +24,8 @@ public:
     /// @return If key was found, returns its value otherwise "[key]"
     QString getText(const QString &key) const;
 
+    QString capitalized(const QString &text);
+
     ///@brief Loads both user prefs and default prefs
     void loadPrefs();
 

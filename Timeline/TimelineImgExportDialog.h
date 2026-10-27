@@ -35,6 +35,10 @@ private slots:
     void browse();
 
 private:
+    void setOptions(const TimelineImgExportOptions& o);
+    void updateDependencies();
+    QPushButton* m_okBtn = nullptr;
+
     QLineEdit* m_pathEdit;
     QSpinBox*  m_widthSpin;
     QCheckBox* m_rulerCheck;

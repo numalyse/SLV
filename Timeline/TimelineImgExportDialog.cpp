@@ -1,4 +1,4 @@
-#include "TimelineImgExportDialog.h"
+#include "Timeline/TimelineImgExportDialog.h"
 
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -10,110 +10,124 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QFileDialog>
-#include <QFileInfo>
 
 TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWidget* parent)
     : QDialog(parent)
 {
     setWindowTitle(tr("Exporter la timeline en PNG"));
-    setModal(true);
 
-    auto* mainLayout = new QVBoxLayout(this);
-
-    auto* pathLayout = new QHBoxLayout();
-    m_pathEdit = new QLineEdit(defaultPath, this);
-    auto* browseBtn = new QPushButton(tr("Parcourir..."), this);
-    pathLayout->addWidget(m_pathEdit, 1);
-    pathLayout->addWidget(browseBtn);
+    m_pathEdit = new QLineEdit(defaultPath);
+    auto* browseBtn = new QPushButton(tr("Parcourir..."));
     connect(browseBtn, &QPushButton::clicked, this, &TimelineImgExportDialog::browse);
 
-    m_widthSpin = new QSpinBox(this);
-    m_widthSpin->setRange(480, 32000);
+    auto* pathRow = new QHBoxLayout;
+    pathRow->addWidget(m_pathEdit, 1);
+    pathRow->addWidget(browseBtn);
+
+    m_widthSpin = new QSpinBox;
+    m_widthSpin->setRange(480, 10000);
     m_widthSpin->setSingleStep(100);
     m_widthSpin->setSuffix(" px");
-    m_widthSpin->setValue(1920);
 
-    m_currentViewCheck = new QCheckBox(tr("Exporter la vue actuelle (zoom et défilement courants)"), this);
+    m_currentViewCheck = new QCheckBox(tr("Exporter la vue actuelle (zoom et défilement courants)"));
 
-    auto* form = new QFormLayout();
-    form->addRow(tr("Fichier :"), pathLayout);
+    auto* form = new QFormLayout;
+    form->addRow(tr("Fichier :"), pathRow);
     form->addRow(tr("Largeur de l'image :"), m_widthSpin);
-    mainLayout->addLayout(form);
-    mainLayout->addWidget(m_currentViewCheck);
+    form->addRow(m_currentViewCheck);
 
-    auto* group = new QGroupBox(tr("Éléments à afficher"), this);
+    auto* group = new QGroupBox(tr("Éléments à afficher"));
     auto* groupLayout = new QVBoxLayout(group);
 
-    m_rulerCheck  = new QCheckBox(tr("Règle temporelle"), group);
-    m_shotsCheck  = new QCheckBox(tr("Plans"), group);
-    m_thumbnailsCheck = new QCheckBox(tr("Imagettes des plans"), group);
-    m_audioCheck  = new QCheckBox(tr("Forme d'onde audio"), group);
-    m_annotCheck  = new QCheckBox(tr("Annotations"), group);
-    m_abCheck     = new QCheckBox(tr("Marqueurs A/B"), group);
-    m_cursorCheck = new QCheckBox(tr("Curseur de lecture"), group);
+    auto addCheck = [groupLayout](QCheckBox*& member, const QString& text) {
+        member = new QCheckBox(text);
+        groupLayout->addWidget(member);
+    };
+    addCheck(m_rulerCheck,      tr("Règle temporelle"));
+    addCheck(m_shotsCheck,      tr("Plans"));
+    addCheck(m_thumbnailsCheck, tr("Imagettes des plans"));
+    addCheck(m_audioCheck,      tr("Forme d'onde audio"));
+    addCheck(m_annotCheck,      tr("Annotations"));
+    addCheck(m_abCheck,         tr("Marqueurs A/B"));
+    addCheck(m_cursorCheck,     tr("Curseur de lecture"));
 
-    for (QCheckBox* c : {m_rulerCheck, m_shotsCheck, m_thumbnailsCheck, m_audioCheck, m_annotCheck, m_abCheck})
-        c->setChecked(true);
-    m_cursorCheck->setChecked(false);
+    m_transparentCheck = new QCheckBox(tr("Fond transparent"));
 
-    for (QCheckBox* c : {m_rulerCheck, m_shotsCheck, m_thumbnailsCheck, m_audioCheck, m_annotCheck, m_abCheck, m_cursorCheck})
-        groupLayout->addWidget(c);
-
-    connect(m_shotsCheck, &QCheckBox::toggled, this, [this](bool checked) {
-        m_thumbnailsCheck->setEnabled(checked);
-        if (!checked)
-            m_thumbnailsCheck->setChecked(false);
-    });
-
-    mainLayout->addWidget(group);
-
-    m_transparentCheck = new QCheckBox(tr("Fond transparent"), this);
-    mainLayout->addWidget(m_transparentCheck);
-
-    connect(m_currentViewCheck, &QCheckBox::toggled, this, [this](bool checked) {
-        m_widthSpin->setEnabled(!checked);
-        m_transparentCheck->setEnabled(!checked);
-        if (checked) m_transparentCheck->setChecked(false);
-    });
-
-    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-    buttons->button(QDialogButtonBox::Ok)->setText(tr("Exporter"));
+    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    m_okBtn = buttons->button(QDialogButtonBox::Ok);
+    m_okBtn->setText(tr("Exporter"));
     buttons->button(QDialogButtonBox::Cancel)->setText(tr("Annuler"));
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    auto* mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(form);
+    mainLayout->addWidget(group);
+    mainLayout->addWidget(m_transparentCheck);
     mainLayout->addWidget(buttons);
 
-    auto updateOk = [this, buttons]() {
-        buttons->button(QDialogButtonBox::Ok)->setEnabled(!m_pathEdit->text().trimmed().isEmpty());
-    };
-    connect(m_pathEdit, &QLineEdit::textChanged, this, updateOk);
-    updateOk();
+    connect(m_shotsCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_currentViewCheck, &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_pathEdit,         &QLineEdit::textChanged, this, &TimelineImgExportDialog::updateDependencies);
+
+    setOptions(TimelineImgExportOptions{});  
+}
+
+void TimelineImgExportDialog::setOptions(const TimelineImgExportOptions& o)
+{
+    m_currentViewCheck->setChecked(o.currentViewOnly);
+    m_widthSpin->setValue(o.width);
+    m_rulerCheck->setChecked(o.showRuler);
+    m_annotCheck->setChecked(o.showAnnotations);
+    m_shotsCheck->setChecked(o.showShots);
+    m_thumbnailsCheck->setChecked(o.showThumbnails);
+    m_audioCheck->setChecked(o.showAudio);
+    m_abCheck->setChecked(o.showABMarkers);
+    m_cursorCheck->setChecked(o.showCursor);
+    m_transparentCheck->setChecked(o.transparentBackground);
+    updateDependencies();
+}
+
+void TimelineImgExportDialog::updateDependencies()
+{
+    const bool shots = m_shotsCheck->isChecked();
+    m_thumbnailsCheck->setEnabled(shots);
+    if (!shots)
+        m_thumbnailsCheck->setChecked(false);
+
+    const bool view = m_currentViewCheck->isChecked();
+    m_widthSpin->setEnabled(!view);
+    m_transparentCheck->setEnabled(!view);
+    if (view)
+        m_transparentCheck->setChecked(false);
+
+    m_okBtn->setEnabled(!m_pathEdit->text().trimmed().isEmpty());
 }
 
 void TimelineImgExportDialog::browse()
 {
-    QString path = QFileDialog::getSaveFileName(this, tr("Enregistrer l'image"),
-                                                m_pathEdit->text(), "PNG (*.png)");
+    const QString path = QFileDialog::getSaveFileName(this, tr("Enregistrer l'image"),
+                                                      m_pathEdit->text(), "PNG (*.png)");
     if (!path.isEmpty())
         m_pathEdit->setText(path);
 }
 
 TimelineImgExportOptions TimelineImgExportDialog::options() const
 {
-    TimelineImgExportOptions optionTL;
-    optionTL.filePath = m_pathEdit->text().trimmed();
-    if (QFileInfo(optionTL.filePath).suffix().isEmpty())
-        optionTL.filePath += ".png";
+    TimelineImgExportOptions o;
+    o.filePath = m_pathEdit->text().trimmed();
+    if (!o.filePath.endsWith(".png", Qt::CaseInsensitive))
+        o.filePath += ".png";
 
-    optionTL.width = m_widthSpin->value();
-    optionTL.showRuler = m_rulerCheck->isChecked();
-    optionTL.showAnnotations = m_annotCheck->isChecked();
-    optionTL.showShots = m_shotsCheck->isChecked();
-    optionTL.showThumbnails = m_thumbnailsCheck->isChecked();
-    optionTL.showAudio = m_audioCheck->isChecked();
-    //optionTL.showABMarkers = m_abCheck->isChecked();
-    //optionTL.showCursor = m_cursorCheck->isChecked();
-    optionTL.transparentBackground = m_transparentCheck->isChecked();
-    optionTL.currentViewOnly = m_currentViewCheck->isChecked();
-    return optionTL;
+    o.currentViewOnly       = m_currentViewCheck->isChecked();
+    o.width                 = m_widthSpin->value();
+    o.showRuler             = m_rulerCheck->isChecked();
+    o.showAnnotations       = m_annotCheck->isChecked();
+    o.showShots             = m_shotsCheck->isChecked();
+    o.showThumbnails        = m_thumbnailsCheck->isChecked();
+    o.showAudio             = m_audioCheck->isChecked();
+    o.showABMarkers         = m_abCheck->isChecked();
+    o.showCursor            = m_cursorCheck->isChecked();
+    o.transparentBackground = m_transparentCheck->isChecked();
+    return o;
 }

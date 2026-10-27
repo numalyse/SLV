@@ -808,6 +808,8 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
     if (!m_scene || !m_mathManager || m_mathManager->duration() <= 0)
         return false;
 
+    QDir().mkpath(QFileInfo(options.filePath).absolutePath());
+
     QVector<QGraphicsItem*> hiddenItems;
     auto hideItem = [&hiddenItems](QGraphicsItem* it) {
         if (it && it->isVisible()) {
@@ -815,6 +817,8 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             hiddenItems.append(it);
         }
     };
+
+    QVector<ShotItem*> thumbOffItems;
 
     for (QGraphicsItem* item : m_scene->items()) {
         switch (item->type()) {
@@ -832,8 +836,10 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             if (!options.showShots) {
                 hideItem(item);
             } else if (!options.showThumbnails) {
-                if (auto* shotItem = dynamic_cast<ShotItem*>(item))
+                if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
                     shotItem->setShowThumbnail(false);
+                    thumbOffItems.append(shotItem);
+                }
             }
             break;
         case SLV::TypeTransitionMarkerItem:
@@ -851,6 +857,15 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         }
     }
 
+    auto setFullRange = [this](bool on) {
+        for (QGraphicsItem* item : m_scene->items()) {
+            if (auto* ruler = dynamic_cast<RulerItem*>(item))
+                ruler->setForceFullRange(on);
+            else if (auto* audio = dynamic_cast<AudioVisualizerItem*>(item))
+                audio->setForceFullRange(on);
+        }
+    };
+
     bool ok = false;
 
     if (options.currentViewOnly) {
@@ -858,12 +873,7 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         ok = pixmap.save(options.filePath, "PNG");
     }
     else {
-        for (QGraphicsItem* item : m_scene->items()) {
-            if (auto* ruler = dynamic_cast<RulerItem*>(item))
-                ruler->setForceFullRange(true);
-            else if (auto* audio = dynamic_cast<AudioVisualizerItem*>(item))
-                audio->setForceFullRange(true);
-        }
+        setFullRange(true);
 
         const double oldPixelsPerMs = m_mathManager->pixelsPerMs();
         const int oldScroll = m_view->horizontalScrollBar()->value();
@@ -882,12 +892,7 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
             m_scene->render(&painter, QRectF(image.rect()), sourceRect);
         }
 
-        for (QGraphicsItem* item : m_scene->items()) {
-            if (auto* ruler = dynamic_cast<RulerItem*>(item))
-                ruler->setForceFullRange(false);
-            else if (auto* audio = dynamic_cast<AudioVisualizerItem*>(item))
-                audio->setForceFullRange(false);
-        }
+        setFullRange(false);
 
         m_mathManager->setPixelsPerMs(oldPixelsPerMs);
         updateTimelineGeometry();
@@ -896,10 +901,8 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         ok = image.save(options.filePath, "PNG");
     }
 
-    for (QGraphicsItem* item : m_scene->items()) {
-        if (auto* shotItem = dynamic_cast<ShotItem*>(item))
-            shotItem->setShowThumbnail(true);
-    }
+    for (ShotItem* s : std::as_const(thumbOffItems))
+        s->setShowThumbnail(true);
 
     for (QGraphicsItem* it : std::as_const(hiddenItems))
         it->show();

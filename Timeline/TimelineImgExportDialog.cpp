@@ -11,13 +11,17 @@
 #include <QDialogButtonBox>
 #include <QFileDialog>
 
+#include "PrefManager.h"
+
 TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWidget* parent)
     : QDialog(parent)
 {
-    setWindowTitle(tr("Exporter la timeline en PNG"));
+
+    setWindowTitle(PrefManager::instance().getText("timeline_export_as_img"));
+    setMinimumWidth(600);
 
     m_pathEdit = new QLineEdit(defaultPath);
-    auto* browseBtn = new QPushButton(tr("Parcourir..."));
+    auto* browseBtn = new QPushButton(PrefManager::instance().getText("browse"));
     connect(browseBtn, &QPushButton::clicked, this, &TimelineImgExportDialog::browse);
 
     auto* pathRow = new QHBoxLayout;
@@ -29,35 +33,35 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_widthSpin->setSingleStep(100);
     m_widthSpin->setSuffix(" px");
 
-    m_currentViewCheck = new QCheckBox(tr("Exporter la vue actuelle (zoom et défilement courants)"));
+    m_currentViewCheck = new QCheckBox(PrefManager::instance().getText("timeline_current_view"));
 
     auto* form = new QFormLayout;
-    form->addRow(tr("Fichier :"), pathRow);
-    form->addRow(tr("Largeur de l'image :"), m_widthSpin);
+    form->addRow(PrefManager::instance().getText("filename") + " : ", pathRow);
+    form->addRow(PrefManager::instance().getText("timeline_img_width") + " : ", m_widthSpin);
     form->addRow(m_currentViewCheck);
 
-    auto* group = new QGroupBox(tr("Éléments à afficher"));
+    auto* group = new QGroupBox(PrefManager::instance().getText("export_source_selection_txt"));
     auto* groupLayout = new QVBoxLayout(group);
 
     auto addCheck = [groupLayout](QCheckBox*& member, const QString& text) {
         member = new QCheckBox(text);
         groupLayout->addWidget(member);
     };
-    addCheck(m_rulerCheck,      tr("Règle temporelle"));
-    addCheck(m_shotsCheck,      tr("Plans"));
-    addCheck(m_thumbnailsCheck, tr("Imagettes des plans"));
-    addCheck(m_audioCheck,      tr("Forme d'onde audio"));
-    addCheck(m_annotCheck,      tr("Annotations"));
-    addCheck(m_abCheck,         tr("Marqueurs A/B"));
-    addCheck(m_cursorCheck,     tr("Curseur de lecture"));
+    addCheck(m_rulerCheck,      PrefManager::instance().getText("timeline_ruler"));
+    addCheck(m_shotsCheck,      PrefManager::instance().getText("media_info_section_video"));
+    addCheck(m_thumbnailsCheck, PrefManager::instance().getText("general_timeline_shot_image"));
+    addCheck(m_audioCheck,      PrefManager::instance().getText("media_info_section_audio"));
+    addCheck(m_annotCheck,      PrefManager::instance().getText("tooltip_annotation_button"));
+    addCheck(m_abCheck,         PrefManager::instance().getText("tooltip_ab_markers"));
+    addCheck(m_cursorCheck,     PrefManager::instance().getText("timeline_cursor"));
 
-    m_shotBordersCheck = new QCheckBox(tr("Contours des plans vidéo et audio"));
-    m_transparentCheck = new QCheckBox(tr("Fond transparent"));
+    m_shotBordersCheck = new QCheckBox(PrefManager::instance().getText("shot_borders_option"));
+    m_transparentCheck = new QCheckBox(PrefManager::instance().getText("timeline_transparent_background_option"));
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     m_okBtn = buttons->button(QDialogButtonBox::Ok);
-    m_okBtn->setText(tr("Exporter"));
-    buttons->button(QDialogButtonBox::Cancel)->setText(tr("Annuler"));
+    m_okBtn->setText(PrefManager::instance().getText("tooltip_export"));
+    buttons->button(QDialogButtonBox::Cancel)->setText(PrefManager::instance().getText("cancel_action"));
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -112,7 +116,7 @@ void TimelineImgExportDialog::updateDependencies()
 
 void TimelineImgExportDialog::browse()
 {
-    const QString path = QFileDialog::getSaveFileName(this, tr("Enregistrer l'image"),
+    const QString path = QFileDialog::getSaveFileName(this, PrefManager::instance().getText("timeline_img_save"),
                                                       m_pathEdit->text(), "PNG (*.png)");
     if (!path.isEmpty())
         m_pathEdit->setText(path);

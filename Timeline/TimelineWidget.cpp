@@ -814,10 +814,10 @@ void TimelineWidget::exportToPngAction()
     const TimelineImgExportOptions options = dialog.options();
 
     if (exportToPng(options)) {
-        exportDone("Timeline exportée.", options.filePath);
+        exportDone(PrefManager::instance().getText("timeline_img_exported"), options.filePath);
     } else {
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error"),
-                             "Échec de l'export de la timeline.");
+                             PrefManager::instance().getText("timeline_img_export_failed"));
     }
 }
 

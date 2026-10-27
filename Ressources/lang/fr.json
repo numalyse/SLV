@@ -84,6 +84,7 @@
 
     "tooltip_split_shot" : "Scinder le segment",
     "tooltip_ab_loop": "Créer une boucle A-B",
+    "tooltip_ab_markers" : "Marqueurs A-B",
     "tooltip_merge_with_prev_shot": "Fusionner avec le segment précédent",
     "tooltip_merge_with_next_shot": "Fusionner avec le segment suivant",
     "tooltip_export": "Exporter",
@@ -98,6 +99,8 @@
     "dialog_extract_shots" : "Enregistrer Extraction de segments",
     "dialog_error_extract_shots" : "Une erreur est survenue lors de l'extraction de segments",
 
+    "timeline_ruler" : "Règle temporelle",
+    "timeline_cursor" : "Tête de lecture",
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",
     "timeline_ab_action_1": "Ajouter le marqueur B à la tête de lecture",
@@ -164,11 +167,25 @@
     
     "shot_detail_id_text" : "segment n°",
     "shot" : "segment",
+    "shot_borders_option" : "Afficher les contours des segments",
     "number_of_shots" : "Nombre total de segments",
     "number_of_annotations" : "Nombre total d'annotations",
     "shots" : "segments",
     "export_source_selection_txt" : "Sélectionner le contenu à exporter",
     "average_shot_duration" : "Durée moyenne des segments",
+
+    "timeline_transparent_background_option" : "Fond transparent",
+    "timeline_export_as_img" : "Exporter la timeline en image PNG (*png)",
+    "browse" : "Parcourir...",
+    "timeline_current_view" : "Exporter la vue actuelle de l'interface",
+    "timeline_current_view_tooltip" : "Exporte les segments actuellement visibles à l'écran",
+    "timeline_full_view" : "Exporter la vue complète de la timeline",
+    "timeline_full_view_tooltip" : "Exporte tous les segments de la timeline, y compris ceux n'étant pas visibles à l'écran",
+    "timeline_img_width" : "Largeur de l'image",
+    "timeline_img_save" : "Enregistrer l'image",
+    "timeline_img_exported" : "Image de la timeline exportée avec succès.",
+    "timeline_img_export_failed" : "Échec de l'exportation de l'image de la timeline.",
+    "filename" : "Nom du fichier",
 
     "compo_rule_None" : "Aucun",
     "compo_rule_RuleOfThirds" : "Tiers",

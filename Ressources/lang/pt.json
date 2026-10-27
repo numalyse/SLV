@@ -84,6 +84,7 @@
 
     "tooltip_split_shot" : "Dividir segment",
     "tooltip_ab_loop": "Criar ciclo A-B",
+    "tooltip_ab_markers" : "Marqueadores A-B",
     "tooltip_merge_with_prev_shot": "Fundir com o segment anterior",
     "tooltip_merge_with_next_shot": "Fundir com o segment seguinte",
     "tooltip_export": "Exportar",
@@ -98,6 +99,8 @@
     "dialog_extract_shots" : "Extração de segmentos",
     "dialog_error_extract_shots" : "Ocorreu um erro durante a extração de segmentos",
 
+    "timeline_ruler" : "Régua temporal",
+    "timeline_cursor" : "Cursor",
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
     "timeline_ab_action_0": "Adicionar marcador A no cursor",
     "timeline_ab_action_1": "Adicionar marcador B no cursor",
@@ -164,11 +167,25 @@
 
     "shot_detail_id_text" : "segment n.º",
     "shot" : "segment",
+    "shot_borders_option" : "Mostrar bordas dos segments",
     "number_of_shots" : "Número total de segments",
     "number_of_annotations" : "Número total de anotações",
     "shots" : "segments",
     "export_source_selection_txt" : "Selecionar o conteúdo a exportar",
     "average_shot_duration" : "Duração média dos segments",
+
+    "timeline_transparent_background_option" : "Fundo transparente",
+    "timeline_export_as_img" : "Exportar a linha do tempo como imagem PNG (*png)",
+    "browse" : "Explorar...",
+    "timeline_current_view" : "Exportar a vista atual",
+    "timeline_current_view_tooltip" : "Exportar os segments atualmente visíveis",
+    "timeline_full_view" : "Exportar a linha do tempo completa",
+    "timeline_full_view_tooltip" : "Exportar todos os segments da linha do tempo, incluindo os que não estão visíveis na tela",
+    "timeline_img_width" : "Largura da imagem",
+    "timeline_img_save" : "Salvar imagem",
+    "timeline_img_exported" : "Imagem da linha do tempo exportada com sucesso.",
+    "timeline_img_export_failed" : "Erro ao exportar a imagem da linha do tempo.",
+    "filename" : "Nome do arquivo",
 
     "compo_rule_None" : "Nenhum",
     "compo_rule_RuleOfThirds" : "Regra dos terços",

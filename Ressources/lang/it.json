@@ -84,6 +84,7 @@
 
     "tooltip_split_shot" : "Dividi segmento",
     "tooltip_ab_loop": "Crea loop A-B",
+    "tooltip_ab_markers" : "Marqueadores A-B",
     "tooltip_merge_with_prev_shot": "Unisci con il segmento precedente",
     "tooltip_merge_with_next_shot": "Unisci con il segmento successivo",
     "tooltip_export": "Esporta",
@@ -98,6 +99,8 @@
     "dialog_extract_shots" : "Estrazione dei segmenti",
     "dialog_error_extract_shots" : "Si è verificato un errore durante l'estrazione dei segmenti",
 
+    "timeline_ruler" : "Righello temporale",
+    "timeline_cursor" : "Cursore",
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",
     "timeline_ab_action_1": "Aggiungi marcatore B al cursore",
@@ -164,11 +167,25 @@
 
     "shot_detail_id_text" : "segmento n°",
     "shot" : "segmento",
+    "shot_borders_option" : "Mostra i bordi dei segmenti",
     "number_of_shots" : "Numero totale di segmenti",
     "number_of_annotations" : "Numero totale di annotazioni",
     "shots" : "segmenti",
     "export_source_selection_txt" : "Selezionare il contenuto da esportare",
     "average_shot_duration" : "Durata media dei segmenti",
+
+    "timeline_transparent_background_option" : "Sfondo trasparente",
+    "timeline_export_as_img" : "Esporta la timeline come immagine PNG (*png)",
+    "browse" : "Esplorare...",
+    "timeline_current_view" : "Esporta la vista attuale",
+    "timeline_current_view_tooltip" : "Esporta i segmenti attualmente visibili",
+    "timeline_full_view" : "Esporta la timeline completa",
+    "timeline_full_view_tooltip" : "Esporta tutti i segmenti della timeline, inclusi quelli non visibili a schermo",
+    "timeline_img_width" : "Larghezza dell'immagine",
+    "timeline_img_save" : "Salva immagine",
+    "timeline_img_exported" : "Immagine della timeline esportata con successo.",
+    "timeline_img_export_failed" : "Errore durante l'esportazione dell'immagine della timeline.",
+    "filename" : "Nome file",
 
     "compo_rule_None" : "Nessuno",
     "compo_rule_RuleOfThirds" : "Regola dei terzi",

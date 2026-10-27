@@ -84,6 +84,7 @@
 
     "tooltip_split_shot" : "Segment teilen",
     "tooltip_ab_loop": "A-B-Schleife erstellen",
+    "tooltip_ab_markers" : "A-B-Markierungen",
     "tooltip_merge_with_prev_shot": "Mit vorherigem Segment zusammenführen",
     "tooltip_merge_with_next_shot": "Mit nächstem Segment zusammenführen",
     "tooltip_export": "Exportieren",
@@ -98,6 +99,8 @@
     "dialog_extract_shots" : "Segmentextraktion",
     "dialog_error_extract_shots" : "Bei der Segmentextraktion ist ein Fehler aufgetreten",
 
+    "timeline_ruler" : "Zeitleiste",
+    "timeline_cursor" : "Abspielkopf",
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
     "timeline_ab_action_0": "A-Marker am Abspielkopf setzen",
     "timeline_ab_action_1": "B-Marker am Abspielkopf setzen",
@@ -113,6 +116,7 @@
     "messagebox_extract_selected_shots_completed" : "Extraktion der ausgewählten Segmente abgeschlossen.",
     "messagebox_extract_selected_shots_failed" : "Extraktion der ausgewählten Segmente fehlgeschlagen.",
     "export_running": "Export läuft...",
+
     "export_directory_path_title": "Exportordner auswählen",
     "export_directory_tagimages": "Speicherort für Referenzbilder auswählen",
     "export_subfolder_tagimages": "In einem Unterordner speichern",
@@ -163,12 +167,26 @@
 
     "shot_detail_id_text" : "Segment Nr.",
     "shot" : "Segment",
+    "shot_borders_option" : "Segmentgrenzen anzeigen",
     "number_of_shots" : "Gesamtzahl der Segmente",
     "number_of_annotations" : "Anzahl der Anmerkungen",
     "shots" : "Segmente",
     "export_source_selection_txt" : "Zu exportierenden Inhalt auswählen",
     "average_shot_duration" : "Durchschnittliche Segmentdauer",
 
+    "timeline_transparent_background_option" : "Transparenter Hintergrund",
+    "timeline_export_as_img" : "Timeline als PNG-Bild exportieren (*png)",
+    "browse" : "Durchsuchen...",
+    "timeline_current_view" : "Exportiere die aktuell sichtbare Ansicht der Timeline",
+    "timeline_current_view_tooltip" : "Exportiert nur die Segmente, die auf dem Bildschirm sichtbar sind",
+    "timeline_full_view" : "Exportiere die vollständige Timeline",
+    "timeline_full_view_tooltip" : "Exportiert alle Segmente der Timeline, auch diejenigen, die nicht auf dem Bildschirm sichtbar sind",
+    "timeline_img_width" : "Bildbreite",
+    "timeline_img_save" : "Bild speichern",
+    "timeline_img_exported" : "Timeline-Bild erfolgreich exportiert.",
+    "timeline_img_export_failed" : "Fehler beim Exportieren des Timeline-Bildes.",
+    "filename" : "Dateiname",
+    
     "compo_rule_None" : "Keine",
     "compo_rule_RuleOfThirds" : "Drittelregel",
     "compo_rule_CenterCross" : "Symmetrie",

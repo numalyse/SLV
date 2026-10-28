@@ -146,6 +146,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     connect(m_rulerCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
     connect(m_annotCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
     connect(m_thumbnailsCheck,  &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_shotBordersCheck, &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
     connect(m_currentViewRadio, &QRadioButton::toggled,  this, &TimelineImgExportDialog::updateDependencies);
     connect(m_pathEdit,         &QLineEdit::textChanged, this, &TimelineImgExportDialog::updateDependencies);
 
@@ -166,8 +167,8 @@ QGraphicsView* TimelineImgExportDialog::createPreview()
 
     auto* rulerLine = previewScene->addLine(0, rulerHeight, previewWidth, rulerHeight,
                                             QPen(rulerColor, 2));
-        rulerLine->setZValue(1);
-        m_previewRulerLine = rulerLine;
+    rulerLine->setZValue(1);
+    m_previewRulerLine = rulerLine;
 
     const QFont rulerFont = previewView->font();
     QFontMetricsF rulerFontMetrics(rulerFont);
@@ -351,6 +352,8 @@ void TimelineImgExportDialog::updatePreview()
     const bool showShots = m_shotsCheck->isChecked();
     m_previewFirstShot->setVisible(showShots);
     m_previewSecondShot->setVisible(showShots);
+    m_previewFirstShot->setShowBorder(m_shotBordersCheck->isChecked());
+    m_previewSecondShot->setShowBorder(m_shotBordersCheck->isChecked());
     m_previewFirstShot->setShowThumbnail(showShots && m_thumbnailsCheck->isChecked());
     m_previewSecondShot->setShowThumbnail(false);
     if (showShots) {
@@ -362,6 +365,8 @@ void TimelineImgExportDialog::updatePreview()
     const bool showAudio = m_audioCheck->isChecked();
     m_previewFirstAudioShot->setVisible(showAudio);
     m_previewSecondAudioShot->setVisible(showAudio);
+    m_previewFirstAudioShot->setShowBorder(m_shotBordersCheck->isChecked());
+    m_previewSecondAudioShot->setShowBorder(m_shotBordersCheck->isChecked());
     m_previewAudioVisualizer->setVisible(showAudio);
     if (showAudio) {
         m_previewFirstAudioShot->setPos(0, nextTrackTop - 93);

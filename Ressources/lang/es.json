@@ -99,6 +99,7 @@
     "dialog_extract_shots" : "Extracción de segmentos",
     "dialog_error_extract_shots" : "Se produjo un error durante la extracción de segmentos",
 
+    "timeline_view_choice" : "Selección de vista",
     "timeline_ruler" : "Regla de tiempo",
     "timeline_cursor" : "Cabezal",
     "timeline_split_shot_at_cursor" : "Cortar en el cabezal",
@@ -181,6 +182,7 @@
     "timeline_current_view_tooltip" : "Exportar los segmentos actualmente visibles",
     "timeline_full_view" : "Exportar línea de tiempo completa",
     "timeline_full_view_tooltip" : "Exportar todos los segmentos de la línea de tiempo, incluyendo aquellos no visibles en pantalla",
+    "timeline_tagimage_tooltip" : "Muestra la miniatura del segmento si el ancho del segmento lo permite",
     "timeline_img_width" : "Ancho de la imagen",
     "timeline_img_save" : "Guardar imagen",
     "timeline_img_exported" : "Imagen de la línea de tiempo exportada con éxito.",

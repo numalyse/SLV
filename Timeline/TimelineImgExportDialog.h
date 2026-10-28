@@ -16,6 +16,7 @@ class AudioVisualizerItem;
 class QGraphicsLineItem;
 class QGraphicsSimpleTextItem;
 class ShotItem;
+class QLabel;
 
 struct TimelineImgExportOptions
 {
@@ -61,6 +62,7 @@ private:
     AudioShotItem* m_previewSecondAudioShot = nullptr;
     AudioVisualizerItem* m_previewAudioVisualizer = nullptr;
 
+    QLabel* m_previewLabel;
     QLineEdit* m_pathEdit;
     QSpinBox*  m_widthSpin;
     QCheckBox* m_rulerCheck;

@@ -99,6 +99,7 @@
     "dialog_extract_shots" : "Enregistrer Extraction de segments",
     "dialog_error_extract_shots" : "Une erreur est survenue lors de l'extraction de segments",
 
+    "timeline_view_choice" : "Sélection de la vue",
     "timeline_ruler" : "Règle temporelle",
     "timeline_cursor" : "Tête de lecture",
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
@@ -181,6 +182,7 @@
     "timeline_current_view_tooltip" : "Exporte les segments actuellement visibles à l'écran",
     "timeline_full_view" : "Exporter la vue complète de la timeline",
     "timeline_full_view_tooltip" : "Exporte tous les segments de la timeline, y compris ceux n'étant pas visibles à l'écran",
+    "timeline_tagimage_tooltip" : "Affiche la vignette du segment à condition que la largeur du segment le permette",
     "timeline_img_width" : "Largeur de l'image",
     "timeline_img_save" : "Enregistrer l'image",
     "timeline_img_exported" : "Image de la timeline exportée avec succès.",

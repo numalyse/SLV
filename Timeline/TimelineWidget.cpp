@@ -864,26 +864,13 @@ bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
         case SLV::TypeAudioShotItem:
             if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
                 shotBorderStates.append(qMakePair(shotItem, shotItem->showBorder()));
-                const bool showBorder = options.showShots
-                    && (item->type() != SLV::TypeAudioShotItem || options.showAudio)
-                    && options.showShotBorders;
+                const bool isAudioShot = item->type() == SLV::TypeAudioShotItem;
+                const bool showShot = isAudioShot ? options.showAudio : options.showShots;
+                const bool showBorder = showShot && options.showShotBorders;
                 shotItem->setShowBorder(showBorder);
-            }
-            if (item->type() == SLV::TypeAudioShotItem) {
-                if (!options.showShots || !options.showAudio) {
+                if (!showShot) {
                     hideItem(item);
                 } else if (!options.showThumbnails) {
-                    if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
-                        shotItem->setShowThumbnail(false);
-                        thumbOffItems.append(shotItem);
-                    }
-                }
-                break;
-            }
-            if (!options.showShots) {
-                hideItem(item);
-            } else if (!options.showThumbnails) {
-                if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
                     shotItem->setShowThumbnail(false);
                     thumbOffItems.append(shotItem);
                 }

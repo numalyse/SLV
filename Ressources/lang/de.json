@@ -99,6 +99,7 @@
     "dialog_extract_shots" : "Segmentextraktion",
     "dialog_error_extract_shots" : "Bei der Segmentextraktion ist ein Fehler aufgetreten",
 
+    "timeline_view_choice" : "Ansichtsauswahl",
     "timeline_ruler" : "Zeitleiste",
     "timeline_cursor" : "Abspielkopf",
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
@@ -181,6 +182,7 @@
     "timeline_current_view_tooltip" : "Exportiert nur die Segmente, die auf dem Bildschirm sichtbar sind",
     "timeline_full_view" : "Exportiere die vollständige Timeline",
     "timeline_full_view_tooltip" : "Exportiert alle Segmente der Timeline, auch diejenigen, die nicht auf dem Bildschirm sichtbar sind",
+    "timeline_tagimage_tooltip" : "Zeigt das Vorschaubild des Segments an, sofern die Segmentbreite dies zulässt",
     "timeline_img_width" : "Bildbreite",
     "timeline_img_save" : "Bild speichern",
     "timeline_img_exported" : "Timeline-Bild erfolgreich exportiert.",

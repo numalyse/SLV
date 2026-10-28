@@ -25,6 +25,7 @@
 
 #include "Annotation.h"
 #include "PrefManager.h"
+#include "Timeline/TimelineImgAmplitudeExamples.h"
 #include "Timeline/Items/AnnotationItem.h"
 #include "Timeline/Items/AudioShotItem.h"
 #include "Timeline/Items/AudioVisualizerItem.h"
@@ -53,15 +54,17 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_currentViewRadio->setToolTip(PrefManager::instance().getText("timeline_current_view_tooltip"));
     m_fullViewRadio = new QRadioButton(PrefManager::instance().getText("timeline_full_view"));
     m_fullViewRadio->setToolTip(PrefManager::instance().getText("timeline_full_view_tooltip"));
-    
     auto* viewGroup = new QButtonGroup(this);
-    viewGroup->addButton(m_currentViewRadio);
     viewGroup->addButton(m_fullViewRadio);
+    viewGroup->addButton(m_currentViewRadio);
+
     auto *radioLayout = new QHBoxLayout();
-    radioLayout->addStretch();
-    radioLayout->addWidget(m_currentViewRadio);
+    auto *viewLabel = new QLabel(PrefManager::instance().getText("timeline_view_choice") + " : ");
+    radioLayout->addWidget(viewLabel);
     radioLayout->addStretch();
     radioLayout->addWidget(m_fullViewRadio);
+    radioLayout->addStretch();
+    radioLayout->addWidget(m_currentViewRadio);
     radioLayout->addStretch();
     form->addRow(radioLayout);
 
@@ -107,8 +110,8 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_cursorCheck->hide();
     
     // Preview with elements that will be exported
-    auto* previewLabel = new QLabel(PrefManager::instance().getText("timeline_img_preview_example"));
-    previewLayout->addWidget(previewLabel);
+    m_previewLabel = new QLabel(PrefManager::instance().getText("preview"));
+    previewLayout->addWidget(m_previewLabel);
     m_previewView = createPreview();
     previewLayout->addWidget(m_previewView);
     previewLayout->addStretch();
@@ -121,6 +124,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
 
     // Width spin box
     m_widthSpin = new QSpinBox;
+    m_widthSpin->setFixedWidth(100);
     m_widthSpin->setRange(480, 10000);
     m_widthSpin->setSingleStep(100);
     m_widthSpin->setSuffix(" px");
@@ -135,7 +139,9 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
 
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(form);
+    mainLayout->addSpacing(20);
     mainLayout->addWidget(optionsGroup);
+    mainLayout->addSpacing(20);
     mainLayout->addWidget(m_shotBordersCheck);
     mainLayout->addWidget(m_transparentCheck);
     mainLayout->addLayout(formBottom);
@@ -165,8 +171,7 @@ QGraphicsView* TimelineImgExportDialog::createPreview()
     constexpr qreal rulerHeight = 24.0;
     const QColor rulerColor(181, 181, 181);
 
-    auto* rulerLine = previewScene->addLine(0, rulerHeight, previewWidth, rulerHeight,
-                                            QPen(rulerColor, 2));
+    auto* rulerLine = previewScene->addLine(0, rulerHeight, previewWidth, rulerHeight, QPen(rulerColor, 2));
     rulerLine->setZValue(1);
     m_previewRulerLine = rulerLine;
 
@@ -178,15 +183,15 @@ QGraphicsView* TimelineImgExportDialog::createPreview()
     m_previewRulerStart = rulerStart;
     auto* rulerEnd = previewScene->addSimpleText("XX:XX:XX.XX", rulerFont);
     rulerEnd->setBrush(rulerColor);
-    rulerEnd->setPos(previewWidth - rulerFontMetrics.horizontalAdvance(rulerEnd->text()) - 2,
-                     2);
+    rulerEnd->setPos(previewWidth - rulerFontMetrics.horizontalAdvance(rulerEnd->text()) - 2, 2);
     m_previewRulerEnd = rulerEnd;
 
     Annotation sampleAnnotation{0, 0, tr("Annotation"), QString(), QColor(118, 1, 136), 0};
     auto* annotationItem = new AnnotationItem(sampleAnnotation, 140);
     annotationItem->setPos(45, -30);
-    for (QGraphicsItem* handle : annotationItem->childItems())
+    for (QGraphicsItem* handle : annotationItem->childItems()){
         handle->setVisible(false);
+    }
     previewScene->addItem(annotationItem);
     m_previewAnnotation = annotationItem;
 
@@ -256,65 +261,22 @@ QGraphicsView* TimelineImgExportDialog::createPreview()
     previewScene->addItem(secondAudioShotItem);
     m_previewSecondAudioShot = secondAudioShotItem;
 
-    const QVector<double> amplitudeEnvelope{
-        0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
-        0.10, 0.12, 0.13, 0.12, 0.11, 0.10, 0.11, 0.13,
-        0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
-        0.22, 0.20, 0.26, 0.29, 0.28, 0.25, 0.21, 0.19,
-        0.23, 0.27, 0.30, 0.28, 0.24, 0.21, 0.22, 0.26,
-        0.28, 0.31, 0.33, 0.32, 0.35, 0.37, 0.40, 0.39,
-        0.42, 0.44, 0.45, 0.44, 0.46, 0.49, 0.51, 0.54,
-        0.55, 0.54, 0.52, 0.51, 0.53, 0.52, 0.58, 0.54,
-        0.50, 0.45, 0.41, 0.37, 0.34, 0.31, 0.29, 0.27,
-        0.26, 0.25, 0.24, 0.22, 0.20, 0.19, 0.18, 0.18,
-        0.17, 0.19, 0.21, 0.20, 0.18, 0.17, 0.16, 0.17,
-        0.19, 0.22, 0.24, 0.22, 0.20, 0.18, 0.17, 0.16,
-        0.15, 0.15, 0.14, 0.14, 0.16, 0.22, 0.27, 0.29,
-        0.28, 0.25, 0.21, 0.24, 0.28, 0.32, 0.30, 0.27,
-        0.23, 0.20, 0.25, 0.29, 0.33, 0.37, 0.40, 0.42,
-        0.39, 0.35, 0.31, 0.28, 0.26, 0.22, 0.19, 0.17,
-        0.16, 0.15, 0.18, 0.21, 0.19, 0.16, 0.14, 0.15,
-        0.17, 0.15, 0.13, 0.12, 0.14, 0.13, 0.11, 0.10,
-        0.11, 0.12, 0.10, 0.09, 0.09, 0.10, 0.08, 0.08,
-        0.09, 0.07, 0.07, 0.08, 0.06, 0.06, 0.05, 0.05,
-        0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
-        0.11, 0.10, 0.12, 0.09, 0.13, 0.10, 0.14, 0.11,
-        0.15, 0.15, 0.14, 0.14, 0.16, 0.22, 0.27, 0.25,
-        0.21, 0.25, 0.29, 0.24, 0.28, 0.33, 0.27, 0.31,
-        0.37, 0.30, 0.42, 0.35, 0.46, 0.39, 0.51, 0.43,
-        0.56, 0.47, 0.62, 0.53, 0.68, 0.58, 0.72, 0.61,
-        0.80, 0.84, 0.88, 0.92, 0.95, 0.91, 0.85, 0.78,
-        0.70, 0.62, 0.54, 0.47, 0.41, 0.36, 0.40, 0.45,
-        0.50, 0.52, 0.57, 0.44, 0.49, 0.38, 0.42, 0.31,
-        0.35, 0.26, 0.29, 0.21, 0.24, 0.17, 0.20, 0.14,
-        0.17, 0.12, 0.15, 0.11, 0.14, 0.10, 0.13, 0.11,
-        0.15, 0.10, 0.12, 0.09, 0.13, 0.10, 0.14, 0.11,
-        0.12, 0.09, 0.11, 0.08, 0.12, 0.10, 0.13, 0.09,
-        0.11, 0.08, 0.12, 0.09, 0.14, 0.10, 0.12, 0.09,
-        0.13, 0.10, 0.12, 0.11, 0.15, 0.11, 0.16, 0.12,
-        0.17, 0.13, 0.20, 0.15, 0.24, 0.18, 0.28, 0.22,
-        0.33, 0.26, 0.38, 0.31, 0.44, 0.36, 0.51, 0.42,
-        0.58, 0.48, 0.63, 0.54, 0.69, 0.58, 0.66, 0.74,
-        0.62, 0.70, 0.57, 0.68, 0.76, 0.64, 0.71, 0.59,
-        0.66, 0.55, 0.62, 0.50, 0.57, 0.46, 0.52, 0.41,
-        0.47, 0.37, 0.43, 0.33, 0.38, 0.29, 0.34, 0.26,
-        0.30, 0.23, 0.27, 0.20, 0.24, 0.18, 0.21, 0.16,
-        0.19, 0.14, 0.17, 0.12, 0.15, 0.11, 0.13, 0.09
-        };
-        QVector<double> sampleAmplitudes;
-        sampleAmplitudes.reserve((amplitudeEnvelope.size() - 1) * 8 + 1);
-        for (qsizetype i = 0; i < amplitudeEnvelope.size() - 1; ++i) {
-            const double startAmplitude = amplitudeEnvelope[i];
-            const double amplitudeChange = amplitudeEnvelope[i + 1] - startAmplitude;
-            for (int step = 0; step < 8; ++step)
-                sampleAmplitudes.append(startAmplitude + amplitudeChange * step / 8.0);
+    const auto& amplitudeEnvelope = TimelineImgAmplitudeExamples::amplitudeEnvelope;
+    QVector<double> sampleAmplitudes;
+    sampleAmplitudes.reserve((amplitudeEnvelope.size() - 1) * 8 + 1);
+    for (qsizetype i = 0; i < amplitudeEnvelope.size() - 1; ++i) {
+        const double startAmplitude = amplitudeEnvelope[i];
+        const double amplitudeChange = amplitudeEnvelope[i + 1] - startAmplitude;
+        for (int step = 0; step < 8; ++step){
+            sampleAmplitudes.append(startAmplitude + amplitudeChange * step / 8.0);
         }
-        sampleAmplitudes.append(amplitudeEnvelope.last());
+    }
+    sampleAmplitudes.append(amplitudeEnvelope.last());
 
-        auto* audioVisualizerItem = new AudioVisualizerItem(sampleAmplitudes, previewWidth);
-        audioVisualizerItem->setPos(0, -93);
-        previewScene->addItem(audioVisualizerItem);
-        m_previewAudioVisualizer = audioVisualizerItem;
+    auto* audioVisualizerItem = new AudioVisualizerItem(sampleAmplitudes, previewWidth);
+    audioVisualizerItem->setPos(0, -93);
+    previewScene->addItem(audioVisualizerItem);
+    m_previewAudioVisualizer = audioVisualizerItem;
     
     return previewView;
 }
@@ -327,15 +289,20 @@ void TimelineImgExportDialog::updatePreview()
     constexpr qreal rulerHeight = 24.0;
     constexpr qreal rowSpacing = 4.0;
 
-    qreal nextTrackTop = 0.0;
+    const bool hasVisibleElements = m_rulerCheck->isChecked() || m_annotCheck->isChecked() || m_shotsCheck->isChecked() || m_audioCheck->isChecked();
+    m_previewView->setVisible(hasVisibleElements);
+    if (!hasVisibleElements)
+        return;
+
+    qreal nextElementTop = 0.0;
     if (m_rulerCheck->isChecked()) {
         m_previewRulerLine->setVisible(true);
         m_previewRulerStart->setVisible(true);
         m_previewRulerEnd->setVisible(true);
-        m_previewRulerLine->setPos(0, nextTrackTop);
-        m_previewRulerStart->setPos(2, nextTrackTop + 2);
-        m_previewRulerEnd->setY(nextTrackTop + 2);
-        nextTrackTop += rulerHeight + rowSpacing;
+        m_previewRulerLine->setPos(0, nextElementTop);
+        m_previewRulerStart->setPos(2, nextElementTop + 2);
+        m_previewRulerEnd->setY(nextElementTop + 2);
+        nextElementTop += rulerHeight + rowSpacing;
     } else {
         m_previewRulerLine->setVisible(false);
         m_previewRulerStart->setVisible(false);
@@ -345,8 +312,8 @@ void TimelineImgExportDialog::updatePreview()
     const bool showAnnotations = m_annotCheck->isChecked();
     m_previewAnnotation->setVisible(showAnnotations);
     if (showAnnotations) {
-        m_previewAnnotation->setPos(45, nextTrackTop - 30);
-        nextTrackTop += AnnotationItem::height() + rowSpacing;
+        m_previewAnnotation->setPos(45, nextElementTop - 30);
+        nextElementTop += AnnotationItem::height() + rowSpacing;
     }
 
     const bool showShots = m_shotsCheck->isChecked();
@@ -357,9 +324,9 @@ void TimelineImgExportDialog::updatePreview()
     m_previewFirstShot->setShowThumbnail(showShots && m_thumbnailsCheck->isChecked());
     m_previewSecondShot->setShowThumbnail(false);
     if (showShots) {
-        m_previewFirstShot->setPos(0, nextTrackTop - 50);
-        m_previewSecondShot->setPos(200, nextTrackTop - 50);
-        nextTrackTop += 40.0 + rowSpacing;
+        m_previewFirstShot->setPos(0, nextElementTop - 50);
+        m_previewSecondShot->setPos(200, nextElementTop - 50);
+        nextElementTop += 40.0 + rowSpacing;
     }
 
     const bool showAudio = m_audioCheck->isChecked();
@@ -369,13 +336,13 @@ void TimelineImgExportDialog::updatePreview()
     m_previewSecondAudioShot->setShowBorder(m_shotBordersCheck->isChecked());
     m_previewAudioVisualizer->setVisible(showAudio);
     if (showAudio) {
-        m_previewFirstAudioShot->setPos(0, nextTrackTop - 93);
-        m_previewSecondAudioShot->setPos(200, nextTrackTop - 93);
-        m_previewAudioVisualizer->setPos(0, nextTrackTop - 93);
-        nextTrackTop += 40.0 + rowSpacing;
+        m_previewFirstAudioShot->setPos(0, nextElementTop - 93);
+        m_previewSecondAudioShot->setPos(200, nextElementTop - 93);
+        m_previewAudioVisualizer->setPos(0, nextElementTop - 93);
+        nextElementTop += 40.0 + rowSpacing;
     }
 
-    const qreal sceneHeight = qMax(1.0, nextTrackTop - (nextTrackTop > 0.0 ? rowSpacing : 0.0));
+    const qreal sceneHeight = qMax(1.0, nextElementTop - (nextElementTop > 0.0 ? rowSpacing : 0.0));
     previewScene->setSceneRect(0, 0, previewWidth, sceneHeight);
     m_previewView->setFixedHeight(static_cast<int>(sceneHeight) + 2 * m_previewView->frameWidth());
 }
@@ -404,7 +371,7 @@ void TimelineImgExportDialog::updateDependencies()
     m_thumbnailsCheck->setEnabled(shots);
     m_shotBordersCheck->setEnabled(shots || audio);
     if (!shots)
-        m_thumbnailsCheck->setChecked(false);
+        m_thumbnailsCheck->setEnabled(false);
 
     const bool view = m_currentViewRadio->isChecked();
     m_widthSpin->setEnabled(!view);
@@ -412,7 +379,10 @@ void TimelineImgExportDialog::updateDependencies()
     if (view)
         m_transparentCheck->setChecked(false);
 
-    m_okBtn->setEnabled(!m_pathEdit->text().trimmed().isEmpty());
+    bool AnyOptionSelected = m_rulerCheck->isChecked() || m_annotCheck->isChecked() || shots || audio;
+    m_previewLabel->setVisible(AnyOptionSelected);
+    m_okBtn->setEnabled(AnyOptionSelected && !m_pathEdit->text().trimmed().isEmpty());
+    //m_okBtn->setEnabled(!m_pathEdit->text().trimmed().isEmpty());
     updatePreview();
 }
 

@@ -160,6 +160,7 @@ set(PROJECT_SOURCES
     Timeline/BaseRangeManager.h
     Timeline/AnnotationItemManager.h Timeline/AnnotationItemManager.cpp
     Timeline/TimelineImgExportDialog.h Timeline/TimelineImgExportDialog.cpp
+    Timeline/TimelineImgAmplitudeExamples.h
 
     HelperWidget.h HelperWidget.cpp
     AboutWidget.h AboutWidget.cpp

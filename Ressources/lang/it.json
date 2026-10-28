@@ -99,6 +99,7 @@
     "dialog_extract_shots" : "Estrazione dei segmenti",
     "dialog_error_extract_shots" : "Si è verificato un errore durante l'estrazione dei segmenti",
 
+    "timeline_view_choice" : "Selezione della vista",
     "timeline_ruler" : "Righello temporale",
     "timeline_cursor" : "Cursore",
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
@@ -181,6 +182,7 @@
     "timeline_current_view_tooltip" : "Esporta i segmenti attualmente visibili",
     "timeline_full_view" : "Esporta la timeline completa",
     "timeline_full_view_tooltip" : "Esporta tutti i segmenti della timeline, inclusi quelli non visibili a schermo",
+    "timeline_tagimage_tooltip" : "Mostra la miniatura del segmento se la larghezza del segmento lo consente",
     "timeline_img_width" : "Larghezza dell'immagine",
     "timeline_img_save" : "Salva immagine",
     "timeline_img_exported" : "Immagine della timeline esportata con successo.",

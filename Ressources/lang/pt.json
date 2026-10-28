@@ -116,7 +116,8 @@
     "timeline_selected_shot_count_label" : "segment(s) selecionado(s)",
     "messagebox_extract_selected_shots_completed" : "Extração dos segments selecionados concluída.",
     "messagebox_extract_selected_shots_failed" : "Falha na extração dos segments selecionados.",
-    
+    "timeline_clear_all_selected_shots" : "Limpar todos os segments selecionados",
+
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",
     "export_directory_tagimages": "Selecionar local de salvamento das Imagens-Referência",

@@ -75,6 +75,7 @@ signals:
 
 private:
     void mergeCurrentInto(int ShotItemId);
+    void updateShotToolTips();
 
     QVector<ShotItem*> m_shotItems;
     QVector<AudioShotItem*> m_audioShotItems;

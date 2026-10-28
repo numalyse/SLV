@@ -439,13 +439,12 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
     }
 }
 
-
-
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
     QAction *actionSplit = nullptr;
     QAction *actionExtractShot = nullptr;
+    QAction *actionClearSelectedShots = nullptr;
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -458,6 +457,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
         actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
+        actionClearSelectedShots = menu.addAction(PrefManager::instance().getText("timeline_clear_all_selected_shots"));
     } else 
     {
         actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
@@ -505,10 +505,14 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == actionExtractShot){
         ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
         sequenceExtractor->show();
+        mergeWithNextShotAction();
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);
-    }else if (selectedAction == actionExtractShotsSelected){
+    } else if(selectedAction == actionClearSelectedShots){
+        m_shotManager->clearSelection();
+        updateSelectedShotCount(m_shotManager->getNbShotsSelected());
+    } else if (selectedAction == actionExtractShotsSelected){
 
         QFileInfo fileInfo (p_media->filePath());
 

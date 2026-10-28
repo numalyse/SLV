@@ -13,6 +13,9 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 #include "PrefManager.h"
 
@@ -58,12 +61,16 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     // m_widthSpin->setSuffix(" px");
     // form->addRow(PrefManager::instance().getText("timeline_img_width") + " : ", m_widthSpin);
 
-    auto* group = new QGroupBox(PrefManager::instance().getText("export_source_selection_txt"));
-    auto* groupLayout = new QVBoxLayout(group);
+    auto* optionsGroup = new QGroupBox(PrefManager::instance().getText("export_source_selection_txt"));
+    auto* optionsGeneralLayout = new QHBoxLayout(optionsGroup);
+    auto* optionsCheckableLayout = new QVBoxLayout;
+    optionsGeneralLayout->addLayout(optionsCheckableLayout);
+    auto* previewLayout = new QVBoxLayout;
+    optionsGeneralLayout->addLayout(previewLayout);
 
-    auto addCheck = [groupLayout](QCheckBox*& member, const QString& text) {
+    auto addCheck = [optionsCheckableLayout](QCheckBox*& member, const QString& text) {
         member = new QCheckBox(text);
-        groupLayout->addWidget(member);
+        optionsCheckableLayout->addWidget(member);
     };
     addCheck(m_rulerCheck,      PrefManager::instance().getText("timeline_ruler"));
     addCheck(m_annotCheck,      PrefManager::instance().getText("tooltip_annotation_button"));
@@ -74,7 +81,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     shotsLayout->addWidget(m_shotsCheck);
     shotsLayout->addWidget(m_thumbnailsCheck);
     shotsLayout->addStretch(); 
-    groupLayout->addLayout(shotsLayout);
+    optionsCheckableLayout->addLayout(shotsLayout);
 
     // addCheck(m_shotsCheck,      PrefManager::instance().getText("media_info_section_video"));
     // addCheck(m_thumbnailsCheck, PrefManager::instance().getText("general_timeline_shot_image"));
@@ -83,6 +90,27 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     addCheck(m_abCheck,         PrefManager::instance().getText("tooltip_ab_markers"));
     addCheck(m_cursorCheck,     PrefManager::instance().getText("timeline_cursor"));
     
+    // Don't show these options for now, as it is not interesting for the user to export them
+    // m_abCheck and m_cursorCheck are still available in the code, but not shown in the UI
+    m_abCheck->hide();
+    m_cursorCheck->hide();
+    
+    // Preview with elements that will be exported
+    auto* previewLabel = new QLabel(PrefManager::instance().getText("timeline_img_preview_example"));
+    previewLayout->addWidget(previewLabel);
+    auto* previewScene = new QGraphicsScene(this);
+    auto* previewView = new QGraphicsView(previewScene);
+    previewView->setFixedSize(300, 200);
+    previewLayout->addWidget(previewView);
+
+    // Add a placeholder rectangle to represent the timeline preview
+    previewScene->addRect(0, 0, 280, 180, QPen(Qt::black), QBrush(Qt::lightGray));
+
+    
+
+
+
+    // Shot borders and transparent background checkboxes
     m_shotBordersCheck = new QCheckBox(PrefManager::instance().getText("shot_borders_option"));
     m_transparentCheck = new QCheckBox(PrefManager::instance().getText("timeline_transparent_background_option"));
 
@@ -104,7 +132,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
 
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(form);
-    mainLayout->addWidget(group);
+    mainLayout->addWidget(optionsGroup);
     mainLayout->addWidget(m_shotBordersCheck);
     mainLayout->addWidget(m_transparentCheck);
     mainLayout->addLayout(formBottom);

@@ -109,48 +109,100 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     // Preview with elements that will be exported
     auto* previewLabel = new QLabel(PrefManager::instance().getText("timeline_img_preview_example"));
     previewLayout->addWidget(previewLabel);
-    auto* previewScene = new QGraphicsScene(this);
-    auto* previewView = new QGraphicsView(previewScene);
-    // previewView->setFixedWidth(300);
-    // previewView->setFrameShape(QFrame::NoFrame);
+    m_previewView = createPreview();
+    previewLayout->addWidget(m_previewView);
+    previewLayout->addStretch();
+
+    // Shot borders and transparent background checkboxes
+    m_shotBordersCheck = new QCheckBox(PrefManager::instance().getText("shot_borders_option"));
+    m_transparentCheck = new QCheckBox(PrefManager::instance().getText("timeline_transparent_background_option"));
+
+    auto* formBottom = new QFormLayout;
+
+    // Width spin box
+    m_widthSpin = new QSpinBox;
+    m_widthSpin->setRange(480, 10000);
+    m_widthSpin->setSingleStep(100);
+    m_widthSpin->setSuffix(" px");
+    formBottom->addRow(PrefManager::instance().getText("timeline_img_width") + " : ", m_widthSpin);
+
+    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    m_okBtn = buttons->button(QDialogButtonBox::Ok);
+    m_okBtn->setText(PrefManager::instance().getText("tooltip_export"));
+    buttons->button(QDialogButtonBox::Cancel)->setText(PrefManager::instance().getText("cancel_action"));
+    connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
+    auto* mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(form);
+    mainLayout->addWidget(optionsGroup);
+    mainLayout->addWidget(m_shotBordersCheck);
+    mainLayout->addWidget(m_transparentCheck);
+    mainLayout->addLayout(formBottom);
+    mainLayout->addWidget(buttons);
+
+    connect(m_shotsCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_audioCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_rulerCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_annotCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_thumbnailsCheck,  &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_currentViewRadio, &QRadioButton::toggled,  this, &TimelineImgExportDialog::updateDependencies);
+    connect(m_pathEdit,         &QLineEdit::textChanged, this, &TimelineImgExportDialog::updateDependencies);
+
+    setOptions(TimelineImgExportOptions{});  
+}
+
+QGraphicsView* TimelineImgExportDialog::createPreview()
+{
+    auto* previewView = new QGraphicsView;
+    auto* previewScene = new QGraphicsScene(previewView);
+    previewView->setScene(previewScene);
     previewView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     previewView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     previewView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    //previewView->setBackgroundBrush(Qt::white);
-
-    previewScene->setSceneRect(0, 0, 300, 150);
-    previewLayout->addWidget(previewView);
-
     constexpr qreal previewWidth = 300.0;
     constexpr qreal rulerHeight = 24.0;
     const QColor rulerColor(181, 181, 181);
+
     auto* rulerLine = previewScene->addLine(0, rulerHeight, previewWidth, rulerHeight,
                                             QPen(rulerColor, 2));
-    rulerLine->setZValue(1);
+        rulerLine->setZValue(1);
+        m_previewRulerLine = rulerLine;
 
     const QFont rulerFont = previewView->font();
     QFontMetricsF rulerFontMetrics(rulerFont);
     auto* rulerStart = previewScene->addSimpleText("00:00:00.00", rulerFont);
     rulerStart->setBrush(rulerColor);
     rulerStart->setPos(2, 2);
+    m_previewRulerStart = rulerStart;
     auto* rulerEnd = previewScene->addSimpleText("XX:XX:XX.XX", rulerFont);
     rulerEnd->setBrush(rulerColor);
-    rulerEnd->setPos(previewWidth - rulerFontMetrics.horizontalAdvance(rulerEnd->text()) - 2, 2);
+    rulerEnd->setPos(previewWidth - rulerFontMetrics.horizontalAdvance(rulerEnd->text()) - 2,
+                     2);
+    m_previewRulerEnd = rulerEnd;
 
     Annotation sampleAnnotation{0, 0, tr("Annotation"), QString(), QColor(118, 1, 136), 0};
     auto* annotationItem = new AnnotationItem(sampleAnnotation, 140);
-    annotationItem->setPos(45, 0);
+    annotationItem->setPos(45, -30);
     for (QGraphicsItem* handle : annotationItem->childItems())
         handle->setVisible(false);
     previewScene->addItem(annotationItem);
+    m_previewAnnotation = annotationItem;
 
     Shot firstShot{};
     firstShot.color = QColor(79, 134, 198);
     firstShot.borderColor = QColor(33, 71, 115);
     firstShot.start = 0;
     firstShot.end = 200;
+
+    Shot secondShot{};
+    secondShot.color = QColor(79, 134, 198);
+    secondShot.borderColor = QColor(33, 71, 115);
+    secondShot.start = 200;
+    secondShot.end = 300;
+
     auto* firstShotItem = new ShotItem(firstShot, firstShot.end - firstShot.start);
-    firstShotItem->setPos(firstShot.start, 0);
+    firstShotItem->setPos(firstShot.start, -50);
     QPixmap thumbnail(80, 36);
     thumbnail.fill(QColor(125, 157, 184));
     {
@@ -164,51 +216,44 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
         thumbnailPainter.setClipRect(frame);
         thumbnailPainter.setPen(Qt::NoPen);
         thumbnailPainter.setBrush(iconColor);
-
-        // Sun
         thumbnailPainter.drawEllipse(QPointF(62.0, 11.0), 4.5, 4.5);
-
-        // Mountains
         thumbnailPainter.drawPolygon(QPolygonF{
             QPointF(0.0, 36.0), QPointF(0.0, 30.0), QPointF(20.0, 12.0),
             QPointF(35.0, 27.0), QPointF(52.0, 15.0), QPointF(80.0, 36.0)
         });
-
         thumbnailPainter.restore();
 
-        // Border
         thumbnailPainter.setPen(QPen(iconColor, 1));
         thumbnailPainter.setBrush(Qt::NoBrush);
         thumbnailPainter.drawRect(frame);
     }
     firstShotItem->setThumbnail(thumbnail);
     previewScene->addItem(firstShotItem);
+    m_previewFirstShot = firstShotItem;
 
-    Shot secondShot{};
-    secondShot.color = QColor(79, 134, 198);
-    secondShot.borderColor = QColor(33, 71, 115);
-    secondShot.start = 200;
-    secondShot.end = 300;
     auto* secondShotItem = new ShotItem(secondShot, secondShot.end - secondShot.start);
-    secondShotItem->setPos(secondShot.start, 0);
+    secondShotItem->setPos(secondShot.start, -50);
     secondShotItem->setShowThumbnail(false);
     previewScene->addItem(secondShotItem);
+    m_previewSecondShot = secondShotItem;
 
     AudioShot firstAudioShot;
     firstAudioShot.start = firstShot.start;
     firstAudioShot.end = firstShot.end;
     auto* firstAudioShotItem = new AudioShotItem(firstAudioShot, firstAudioShot.end - firstAudioShot.start);
-    firstAudioShotItem->setPos(0, 0);
+    firstAudioShotItem->setPos(0, -93);
     firstAudioShotItem->setShowThumbnail(false);
     previewScene->addItem(firstAudioShotItem);
+    m_previewFirstAudioShot = firstAudioShotItem;
 
     AudioShot secondAudioShot;
     secondAudioShot.start = secondShot.start;
     secondAudioShot.end = secondShot.end;
     auto* secondAudioShotItem = new AudioShotItem(secondAudioShot, secondAudioShot.end - secondAudioShot.start);
-    secondAudioShotItem->setPos(secondAudioShot.start, 0);
+    secondAudioShotItem->setPos(secondShot.start, -93);
     secondAudioShotItem->setShowThumbnail(false);
     previewScene->addItem(secondAudioShotItem);
+    m_previewSecondAudioShot = secondAudioShotItem;
 
     const QVector<double> amplitudeEnvelope{
         0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
@@ -254,56 +299,80 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
         0.47, 0.37, 0.43, 0.33, 0.38, 0.29, 0.34, 0.26,
         0.30, 0.23, 0.27, 0.20, 0.24, 0.18, 0.21, 0.16,
         0.19, 0.14, 0.17, 0.12, 0.15, 0.11, 0.13, 0.09
-    };
-    QVector<double> sampleAmplitudes;
-    sampleAmplitudes.reserve((amplitudeEnvelope.size() - 1) * 8 + 1);
-    for (qsizetype i = 0; i < amplitudeEnvelope.size() - 1; ++i) {
-        const double startAmplitude = amplitudeEnvelope[i];
-        const double amplitudeChange = amplitudeEnvelope[i + 1] - startAmplitude;
-        for (int step = 0; step < 8; ++step)
-            sampleAmplitudes.append(startAmplitude + amplitudeChange * step / 8.0);
+        };
+        QVector<double> sampleAmplitudes;
+        sampleAmplitudes.reserve((amplitudeEnvelope.size() - 1) * 8 + 1);
+        for (qsizetype i = 0; i < amplitudeEnvelope.size() - 1; ++i) {
+            const double startAmplitude = amplitudeEnvelope[i];
+            const double amplitudeChange = amplitudeEnvelope[i + 1] - startAmplitude;
+            for (int step = 0; step < 8; ++step)
+                sampleAmplitudes.append(startAmplitude + amplitudeChange * step / 8.0);
+        }
+        sampleAmplitudes.append(amplitudeEnvelope.last());
+
+        auto* audioVisualizerItem = new AudioVisualizerItem(sampleAmplitudes, previewWidth);
+        audioVisualizerItem->setPos(0, -93);
+        previewScene->addItem(audioVisualizerItem);
+        m_previewAudioVisualizer = audioVisualizerItem;
+    
+    return previewView;
+}
+
+void TimelineImgExportDialog::updatePreview()
+{
+    auto* previewScene = m_previewView->scene();
+
+    constexpr qreal previewWidth = 300.0;
+    constexpr qreal rulerHeight = 24.0;
+    constexpr qreal rowSpacing = 4.0;
+
+    qreal nextTrackTop = 0.0;
+    if (m_rulerCheck->isChecked()) {
+        m_previewRulerLine->setVisible(true);
+        m_previewRulerStart->setVisible(true);
+        m_previewRulerEnd->setVisible(true);
+        m_previewRulerLine->setPos(0, nextTrackTop);
+        m_previewRulerStart->setPos(2, nextTrackTop + 2);
+        m_previewRulerEnd->setY(nextTrackTop + 2);
+        nextTrackTop += rulerHeight + rowSpacing;
+    } else {
+        m_previewRulerLine->setVisible(false);
+        m_previewRulerStart->setVisible(false);
+        m_previewRulerEnd->setVisible(false);
     }
-    sampleAmplitudes.append(amplitudeEnvelope.last());
 
-    auto* audioVisualizerItem = new AudioVisualizerItem(sampleAmplitudes, previewWidth);
-    audioVisualizerItem->setPos(0, 0);
-    previewScene->addItem(audioVisualizerItem);
+    const bool showAnnotations = m_annotCheck->isChecked();
+    m_previewAnnotation->setVisible(showAnnotations);
+    if (showAnnotations) {
+        m_previewAnnotation->setPos(45, nextTrackTop - 30);
+        nextTrackTop += AnnotationItem::height() + rowSpacing;
+    }
 
+    const bool showShots = m_shotsCheck->isChecked();
+    m_previewFirstShot->setVisible(showShots);
+    m_previewSecondShot->setVisible(showShots);
+    m_previewFirstShot->setShowThumbnail(showShots && m_thumbnailsCheck->isChecked());
+    m_previewSecondShot->setShowThumbnail(false);
+    if (showShots) {
+        m_previewFirstShot->setPos(0, nextTrackTop - 50);
+        m_previewSecondShot->setPos(200, nextTrackTop - 50);
+        nextTrackTop += 40.0 + rowSpacing;
+    }
 
-    // Shot borders and transparent background checkboxes
-    m_shotBordersCheck = new QCheckBox(PrefManager::instance().getText("shot_borders_option"));
-    m_transparentCheck = new QCheckBox(PrefManager::instance().getText("timeline_transparent_background_option"));
+    const bool showAudio = m_audioCheck->isChecked();
+    m_previewFirstAudioShot->setVisible(showAudio);
+    m_previewSecondAudioShot->setVisible(showAudio);
+    m_previewAudioVisualizer->setVisible(showAudio);
+    if (showAudio) {
+        m_previewFirstAudioShot->setPos(0, nextTrackTop - 93);
+        m_previewSecondAudioShot->setPos(200, nextTrackTop - 93);
+        m_previewAudioVisualizer->setPos(0, nextTrackTop - 93);
+        nextTrackTop += 40.0 + rowSpacing;
+    }
 
-    auto* formBottom = new QFormLayout;
-
-    // Width spin box
-    m_widthSpin = new QSpinBox;
-    m_widthSpin->setRange(480, 10000);
-    m_widthSpin->setSingleStep(100);
-    m_widthSpin->setSuffix(" px");
-    formBottom->addRow(PrefManager::instance().getText("timeline_img_width") + " : ", m_widthSpin);
-
-    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    m_okBtn = buttons->button(QDialogButtonBox::Ok);
-    m_okBtn->setText(PrefManager::instance().getText("tooltip_export"));
-    buttons->button(QDialogButtonBox::Cancel)->setText(PrefManager::instance().getText("cancel_action"));
-    connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
-    auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->addLayout(form);
-    mainLayout->addWidget(optionsGroup);
-    mainLayout->addWidget(m_shotBordersCheck);
-    mainLayout->addWidget(m_transparentCheck);
-    mainLayout->addLayout(formBottom);
-    mainLayout->addWidget(buttons);
-
-    connect(m_shotsCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
-    connect(m_audioCheck,       &QCheckBox::toggled,     this, &TimelineImgExportDialog::updateDependencies);
-    connect(m_currentViewRadio, &QRadioButton::toggled,  this, &TimelineImgExportDialog::updateDependencies);
-    connect(m_pathEdit,         &QLineEdit::textChanged, this, &TimelineImgExportDialog::updateDependencies);
-
-    setOptions(TimelineImgExportOptions{});  
+    const qreal sceneHeight = qMax(1.0, nextTrackTop - (nextTrackTop > 0.0 ? rowSpacing : 0.0));
+    previewScene->setSceneRect(0, 0, previewWidth, sceneHeight);
+    m_previewView->setFixedHeight(static_cast<int>(sceneHeight) + 2 * m_previewView->frameWidth());
 }
 
 void TimelineImgExportDialog::setOptions(const TimelineImgExportOptions& o)
@@ -339,6 +408,7 @@ void TimelineImgExportDialog::updateDependencies()
         m_transparentCheck->setChecked(false);
 
     m_okBtn->setEnabled(!m_pathEdit->text().trimmed().isEmpty());
+    updatePreview();
 }
 
 void TimelineImgExportDialog::browse()

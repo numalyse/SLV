@@ -8,6 +8,14 @@ class QSpinBox;
 class QCheckBox;
 class QLineEdit;
 class QRadioButton;
+class QGraphicsItem;
+class QGraphicsView;
+class AnnotationItem;
+class AudioShotItem;
+class AudioVisualizerItem;
+class QGraphicsLineItem;
+class QGraphicsSimpleTextItem;
+class ShotItem;
 
 struct TimelineImgExportOptions
 {
@@ -39,7 +47,19 @@ private slots:
 private:
     void setOptions(const TimelineImgExportOptions& o);
     void updateDependencies();
+    QGraphicsView* createPreview();
+    void updatePreview();
     QPushButton* m_okBtn = nullptr;
+    QGraphicsView* m_previewView = nullptr;
+    QGraphicsLineItem* m_previewRulerLine = nullptr;
+    QGraphicsSimpleTextItem* m_previewRulerStart = nullptr;
+    QGraphicsSimpleTextItem* m_previewRulerEnd = nullptr;
+    AnnotationItem* m_previewAnnotation = nullptr;
+    ShotItem* m_previewFirstShot = nullptr;
+    ShotItem* m_previewSecondShot = nullptr;
+    AudioShotItem* m_previewFirstAudioShot = nullptr;
+    AudioShotItem* m_previewSecondAudioShot = nullptr;
+    AudioVisualizerItem* m_previewAudioVisualizer = nullptr;
 
     QLineEdit* m_pathEdit;
     QSpinBox*  m_widthSpin;

@@ -161,6 +161,10 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
     ButtonLayout->addWidget(m_exportBtn);
 
+    auto* exportImgBtn = new ToolbarButton(this, "export_white", "Exporter la timeline en PNG");
+    connect(exportImgBtn, &ToolbarButton::pressed, this, &TimelineWidget::exportToPngAction);
+    ButtonLayout->addWidget(exportImgBtn);
+
     ButtonLayout->addStretch(1);
 
     m_shotCountLabel = new QLabel(this);
@@ -780,7 +784,184 @@ void TimelineWidget::initAudioVisualizer()
     m_scene->addItem(m_audioVisualizer);
 }
 
+void TimelineWidget::exportToPngAction()
+{
+    QFileInfo fileInfo(p_media->filePath());
+    // const QString defaultPath = PrefManager::instance().getPref("Paths", "lp_capture") + '/' +
+    //                             fileInfo.completeBaseName() + "_timeline.png";
 
+    QString dir = PrefManager::instance().getPref("Paths", "lp_capture");
+    QString initialPath = dir + '/' + fileInfo.completeBaseName() + "_timeline.png";
+    
+    int i = 1;
+    while (QFileInfo::exists(initialPath)) {
+        initialPath = dir + '/' + fileInfo.completeBaseName() + "_timeline (" + QString::number(i) + ").png";
+        ++i;
+    }
+
+    QString savePath = initialPath;
+    if(savePath.isEmpty()){
+        qDebug() << "[TIMELINEWIDGET] Enregistrement de la timeline annulé";
+        return;
+    }
+    if(!savePath.endsWith(".png", Qt::CaseInsensitive)){
+        savePath += ".png";
+    }
+
+    TimelineImgExportDialog dialog(savePath, this);
+    if (dialog.exec() != QDialog::Accepted) return;
+
+    const TimelineImgExportOptions options = dialog.options();
+
+    if (exportToPng(options)) {
+        exportDone(PrefManager::instance().getText("timeline_img_exported"), options.filePath);
+    } else {
+        QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error"),
+                             PrefManager::instance().getText("timeline_img_export_failed"));
+    }
+}
+
+bool TimelineWidget::exportToPng(const TimelineImgExportOptions& options)
+{
+    if (!m_scene || !m_mathManager || m_mathManager->duration() <= 0)
+        return false;
+
+    QDir().mkpath(QFileInfo(options.filePath).absolutePath());
+
+    QVector<QRectF> exportBands;
+    if (options.showRuler)
+        exportBands.append(QRectF(0.0, 0.0, 1.0, 25.0));
+    if (options.showAnnotations)
+        exportBands.append(QRectF(0.0, 30.0, 1.0, 17.0));
+    if (options.showShots)
+        exportBands.append(QRectF(0.0, 50.0, 1.0, 40.0));
+    if (options.showAudio)
+        exportBands.append(QRectF(0.0, 93.0, 1.0, 40.0));
+
+    QVector<QGraphicsItem*> hiddenItems;
+    auto hideItem = [&hiddenItems](QGraphicsItem* it) {
+        if (it && it->isVisible()) {
+            it->hide();
+            hiddenItems.append(it);
+        }
+    };
+
+    QVector<ShotItem*> thumbOffItems;
+    QVector<QPair<ShotItem*, bool>> shotBorderStates;
+
+    for (QGraphicsItem* item : m_scene->items()) {
+        switch (item->type()) {
+        case SLV::TypeRulerItem:
+            if (!options.showRuler) hideItem(item);
+            break;
+        case SLV::TypeCursorItem:
+            if (!options.showCursor) hideItem(item);
+            break;
+        case SLV::TypeAudioVisualizerItem:
+            if (!options.showAudio) hideItem(item);
+            break;
+        case SLV::TypeShotItem:
+        case SLV::TypeAudioShotItem:
+            if (auto* shotItem = dynamic_cast<ShotItem*>(item)) {
+                shotBorderStates.append(qMakePair(shotItem, shotItem->showBorder()));
+                const bool isAudioShot = item->type() == SLV::TypeAudioShotItem;
+                const bool showShot = isAudioShot ? options.showAudio : options.showShots;
+                const bool showBorder = showShot && options.showShotBorders;
+                shotItem->setShowBorder(showBorder);
+                if (!showShot) {
+                    hideItem(item);
+                } else if (!options.showThumbnails) {
+                    shotItem->setShowThumbnail(false);
+                    thumbOffItems.append(shotItem);
+                }
+            }
+            break;
+        case SLV::TypeTransitionMarkerItem:
+            if (!options.showShots) hideItem(item);
+            break;
+        case SLV::TypeAnnotationItem:
+        case SLV::TypeAnnotationHandleItem:
+            if (!options.showAnnotations) hideItem(item);
+            break;
+        case SLV::TypeABMarkerItem:
+            if (!options.showABMarkers) hideItem(item);
+            break;
+        default:
+            break;
+        }
+    }
+
+    auto setFullRange = [this](bool on) {
+        for (QGraphicsItem* item : m_scene->items()) {
+            if (auto* ruler = dynamic_cast<RulerItem*>(item))
+                ruler->setForceFullRange(on);
+            else if (auto* audio = dynamic_cast<AudioVisualizerItem*>(item))
+                audio->setForceFullRange(on);
+        }
+    };
+
+    const double oldPixelsPerMs = m_mathManager->pixelsPerMs();
+    const int oldScroll = m_view->horizontalScrollBar()->value();
+    if (!options.currentViewOnly) {
+        setFullRange(true);
+        m_mathManager->setPixelsPerMs(double(options.width) / m_mathManager->duration());
+        updateTimelineGeometry();
+    }
+
+    const QRectF sourceRect = options.currentViewOnly
+        ? m_view->mapToScene(m_view->viewport()->rect()).boundingRect()
+        : m_scene->sceneRect();
+    const int imageWidth = options.currentViewOnly ? m_view->viewport()->width() : options.width;
+    const double scale = imageWidth / sourceRect.width();
+
+    QVector<QPair<QRectF, int>> visibleBands;
+    int imageHeight = 0;
+    for (const QRectF& band : std::as_const(exportBands)) {
+        const QRectF sourceBand = QRectF(sourceRect.left(), band.top(),
+                                         sourceRect.width(), band.height()).intersected(sourceRect);
+        if (sourceBand.isEmpty())
+            continue;
+
+        const int bandHeight = qMax(1, qRound(sourceBand.height() * scale));
+        visibleBands.append(qMakePair(sourceBand, bandHeight));
+        imageHeight += bandHeight;
+    }
+
+    QImage image(imageWidth, qMax(1, imageHeight), QImage::Format_ARGB32_Premultiplied);
+    image.fill(options.transparentBackground ? Qt::transparent
+                                             : palette().color(QPalette::Window));
+    {
+        QPainter painter(&image);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+
+        int targetY = 0;
+        for (const auto& band : std::as_const(visibleBands)) {
+            const QRectF targetBand(0.0, targetY, imageWidth, band.second);
+            m_scene->render(&painter, targetBand, band.first);
+            targetY += band.second;
+        }
+    }
+
+    if (!options.currentViewOnly)
+        setFullRange(false);
+    m_mathManager->setPixelsPerMs(oldPixelsPerMs);
+    updateTimelineGeometry();
+    m_view->horizontalScrollBar()->setValue(oldScroll);
+
+    const bool ok = image.save(options.filePath, "PNG");
+
+    for (ShotItem* s : std::as_const(thumbOffItems))
+        s->setShowThumbnail(true);
+
+    for (const auto& state : std::as_const(shotBorderStates))
+        state.first->setShowBorder(state.second);
+
+    for (QGraphicsItem* it : std::as_const(hiddenItems))
+        it->show();
+
+    return ok;
+}
 
 void TimelineWidget::exportDone(const QString& text, const QString &outputPath)
 {

@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QGraphicsWidget>
 #include <QGraphicsView>
+#include <QStyleOptionGraphicsItem>
 
 AudioVisualizerItem::AudioVisualizerItem(const QVector<double>& amplitudes, double width, QGraphicsItem* parent)
     : QGraphicsItem(parent), m_width{width}
@@ -42,7 +43,6 @@ QRectF AudioVisualizerItem::boundingRect() const
 
 void AudioVisualizerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(option);
     Q_UNUSED(widget);
 
     p->setRenderHint(QPainter::Antialiasing, false);
@@ -54,12 +54,22 @@ void AudioVisualizerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *opt
     int nAmps = m_amplitudes.size();
     if (nAmps == 0 || pixelWidth <= 0) return;
 
-    QGraphicsView* view = scene()->views().isEmpty() ? nullptr : scene()->views().first();
-    if (!view) return;
+    QRectF exposedSceneRect;
+    if (m_forceFullRange) {
+        exposedSceneRect = boundingRect();
+    } else if (option && !option->exposedRect.isEmpty()) {
+        exposedSceneRect = option->exposedRect;
+    } else {
+        QGraphicsView* view = scene() && !scene()->views().isEmpty() ? scene()->views().first() : nullptr;
+        if (view)
+            exposedSceneRect = view->mapToScene(view->viewport()->rect()).boundingRect();
+        else
+            exposedSceneRect = boundingRect();
+    }
+    if (exposedSceneRect.isEmpty())
+        exposedSceneRect = boundingRect();
 
-    // zone visible dans la scène
-    QRectF visibleSceneRect = view->mapToScene(view->viewport()->rect()).boundingRect();
-    QRectF visibleItemRect = mapFromScene(visibleSceneRect).boundingRect();
+    QRectF visibleItemRect = mapFromScene(exposedSceneRect).boundingRect();
 
     if (nAmps <= pixelWidth) {
 
@@ -156,5 +166,13 @@ void AudioVisualizerItem::setWidth(double width)
         m_columnWidth = width / m_amplitudes.size();
     else
         m_columnWidth = width;
+    update();
+}
+
+void AudioVisualizerItem::setForceFullRange(bool force)
+{
+    if (m_forceFullRange == force)
+        return;
+    m_forceFullRange = force;
     update();
 }

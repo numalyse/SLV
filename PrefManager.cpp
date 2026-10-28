@@ -39,6 +39,12 @@ QString PrefManager::getText(const QString &key) const
     return "[" + key + "]";
 }
 
+QString PrefManager::capitalized(const QString &text)
+{
+    if (text.isEmpty())
+        return text;
+    return text.left(1).toUpper() + text.mid(1);
+}
 
 bool PrefManager::createPreferenceFile(const QString &destFilePath)
 {

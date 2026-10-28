@@ -51,11 +51,14 @@ void ShotItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     QPen borderPen(m_shot.borderColor);
     borderPen.setCosmetic(true); // cosmetic pen, the horizontal scale will not thicken its borders
-    p->setPen(borderPen);
+    p->setPen(m_showBorder ? borderPen : QPen(Qt::NoPen));
     QColor drawColor = m_selected ? m_shot.color.lighter(150) : m_shot.color;
 
     p->setBrush(QBrush(drawColor));
     p->drawRect(0, topMargin(), m_widthMs, height());
+
+    if (!m_showThumbnail)
+        return;
 
     // to cancel painter horizontal scale to draw pixmap
     const double sx = p->transform().m11();
@@ -87,6 +90,23 @@ void ShotItem::setWidth(double width)
     prepareGeometryChange(); 
     m_widthMs = width;
     updateTextPosition();
+    update();
+}
+
+void ShotItem::setShowThumbnail(bool show)
+{
+    if (m_showThumbnail == show)
+        return;
+    m_showThumbnail = show;
+    update();
+}
+
+void ShotItem::setShowBorder(bool show)
+{
+    if (m_showBorder == show)
+        return;
+    m_showBorder = show;
+    m_selectionBox->setVisible(m_showBorder && m_selected);
     update();
 }
 

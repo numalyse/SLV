@@ -3,6 +3,7 @@
 #include "TimeFormatter.h"
 
 #include <QPainter>
+#include <QFontMetricsF>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -15,7 +16,7 @@ RulerItem::RulerItem(int width, int height, double minPxBetweenTicks, double pix
 }
 
 QRectF RulerItem::boundingRect() const {
-    return QRectF(0, 0, m_width, m_height);
+    return QRectF(0, 0, m_width + 2.0, m_height);
 }
 
 /// @brief Initialise les echelles de zoom
@@ -47,16 +48,22 @@ void RulerItem::computeZoomSteps(double fps, std::vector<double>& zoomSteps){
 }
 
 void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    Q_UNUSED(option); 
     Q_UNUSED(widget);
 
     QRectF visibleZone;
-
-    if (scene() && !scene()->views().isEmpty()) { // récupère la largeur du viewport et redessine dedans plutot que dans toute la graphics scene
+    if (m_forceFullRange) {
+        visibleZone = boundingRect();
+    } else if (option && !option->exposedRect.isEmpty()) {
+        visibleZone = option->exposedRect;
+    } else if (scene() && !scene()->views().isEmpty()) {
         QGraphicsView *view = scene()->views().first();
         visibleZone = view->mapToScene(view->viewport()->rect()).boundingRect();
-    }else {
-        qDebug() << "Impossible de retrouver la zone visible";
+    } else {
+        visibleZone = boundingRect();
+    }
+
+    if (visibleZone.isEmpty()) {
+        visibleZone = QRectF(0.0, 0.0, m_width, m_height);
     }
 
     Q_ASSERT(visibleZone.width() > 0);
@@ -90,11 +97,17 @@ void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
     startTime = ( startTime < 0) ? 0 : startTime;
 
     double endTime = visibleZone.right() * msPerPixels;
+    double durationPx = m_duration * m_pixelsPerMs;
 
     // dessin des traits verticaux et du texte
     for(double t = startTime; t <= endTime; t += stepMs) {
 
         double px = t * m_pixelsPerMs;
+        const bool overlapsEndTick = m_duration > 0 && std::abs(px - durationPx) < 0.5;
+        const bool tooCloseToEndTick = t > 0.0 && t < m_duration && m_duration - t < stepMs;
+        if (overlapsEndTick || tooCloseToEndTick) {
+            continue;
+        }
 
          // on snap le temps retrouvé à un temps de la frametime la plus proche => évite d'avoir 2 timecode 00:00:00[00]
         double rawMs = px / m_pixelsPerMs;
@@ -116,6 +129,19 @@ void RulerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
         p->drawText(0.0, 0.0, txt);
         p->restore();
     }
+
+    if (m_duration > 0 && durationPx >= visibleZone.left() - 1.0 && durationPx <= visibleZone.right() + 1.0) {
+        p->drawLine(QPointF(durationPx, m_height / 1.3), QPointF(durationPx, m_height));
+
+        const QString durationLabel = TimeFormatter::msToHHMMSSFF(m_duration, m_fps);
+        const double textWidth = QFontMetricsF(p->font()).horizontalAdvance(durationLabel);
+        const double textX = std::max(2.0, durationPx - textWidth - 2.0);
+
+        p->save();
+        p->translate(textX, 2.0 * m_height / 3.0);
+        p->drawText(0.0, 0.0, durationLabel);
+        p->restore();
+    }
 }
 
 
@@ -125,5 +151,13 @@ void RulerItem::setSize(int width, int height, double pixelsPerMs) {
     m_width = width;
     m_height = height;
     m_pixelsPerMs = pixelsPerMs;
+    update();
+}
+
+void RulerItem::setForceFullRange(bool force)
+{
+    if (m_forceFullRange == force)
+        return;
+    m_forceFullRange = force;
     update();
 }

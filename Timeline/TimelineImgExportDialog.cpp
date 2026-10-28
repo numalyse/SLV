@@ -27,6 +27,7 @@
 #include "PrefManager.h"
 #include "Timeline/Items/AnnotationItem.h"
 #include "Timeline/Items/AudioShotItem.h"
+#include "Timeline/Items/AudioVisualizerItem.h"
 #include "Timeline/Items/ShotItem.h"
 
 TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWidget* parent)
@@ -110,8 +111,8 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     previewLayout->addWidget(previewLabel);
     auto* previewScene = new QGraphicsScene(this);
     auto* previewView = new QGraphicsView(previewScene);
-    previewView->setFixedSize(300, 150);
-    previewView->setFrameShape(QFrame::NoFrame);
+    // previewView->setFixedWidth(300);
+    // previewView->setFrameShape(QFrame::NoFrame);
     previewView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     previewView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     previewView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -151,12 +152,34 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     auto* firstShotItem = new ShotItem(firstShot, firstShot.end - firstShot.start);
     firstShotItem->setPos(firstShot.start, 0);
     QPixmap thumbnail(80, 36);
-    thumbnail.fill(QColor(205, 218, 231));
+    thumbnail.fill(QColor(125, 157, 184));
     {
         QPainter thumbnailPainter(&thumbnail);
-        thumbnailPainter.setPen(QPen(QColor(33, 71, 115), 2));
-        thumbnailPainter.setBrush(QColor(125, 157, 184));
-        thumbnailPainter.drawRect(thumbnail.rect().adjusted(2, 2, -3, -3));
+        thumbnailPainter.setRenderHint(QPainter::Antialiasing, true);
+
+        const QRect frame = thumbnail.rect().adjusted(1, 1, -1, -1);
+        const QColor iconColor(33, 71, 115);
+
+        thumbnailPainter.save();
+        thumbnailPainter.setClipRect(frame);
+        thumbnailPainter.setPen(Qt::NoPen);
+        thumbnailPainter.setBrush(iconColor);
+
+        // Sun
+        thumbnailPainter.drawEllipse(QPointF(62.0, 11.0), 4.5, 4.5);
+
+        // Mountains
+        thumbnailPainter.drawPolygon(QPolygonF{
+            QPointF(0.0, 36.0), QPointF(0.0, 30.0), QPointF(20.0, 12.0),
+            QPointF(35.0, 27.0), QPointF(52.0, 15.0), QPointF(80.0, 36.0)
+        });
+
+        thumbnailPainter.restore();
+
+        // Border
+        thumbnailPainter.setPen(QPen(iconColor, 1));
+        thumbnailPainter.setBrush(Qt::NoBrush);
+        thumbnailPainter.drawRect(frame);
     }
     firstShotItem->setThumbnail(thumbnail);
     previewScene->addItem(firstShotItem);
@@ -187,6 +210,64 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     secondAudioShotItem->setShowThumbnail(false);
     previewScene->addItem(secondAudioShotItem);
 
+    const QVector<double> amplitudeEnvelope{
+        0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
+        0.10, 0.12, 0.13, 0.12, 0.11, 0.10, 0.11, 0.13,
+        0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
+        0.22, 0.20, 0.26, 0.29, 0.28, 0.25, 0.21, 0.19,
+        0.23, 0.27, 0.30, 0.28, 0.24, 0.21, 0.22, 0.26,
+        0.28, 0.31, 0.33, 0.32, 0.35, 0.37, 0.40, 0.39,
+        0.42, 0.44, 0.45, 0.44, 0.46, 0.49, 0.51, 0.54,
+        0.55, 0.54, 0.52, 0.51, 0.53, 0.52, 0.58, 0.54,
+        0.50, 0.45, 0.41, 0.37, 0.34, 0.31, 0.29, 0.27,
+        0.26, 0.25, 0.24, 0.22, 0.20, 0.19, 0.18, 0.18,
+        0.17, 0.19, 0.21, 0.20, 0.18, 0.17, 0.16, 0.17,
+        0.19, 0.22, 0.24, 0.22, 0.20, 0.18, 0.17, 0.16,
+        0.15, 0.15, 0.14, 0.14, 0.16, 0.22, 0.27, 0.29,
+        0.28, 0.25, 0.21, 0.24, 0.28, 0.32, 0.30, 0.27,
+        0.23, 0.20, 0.25, 0.29, 0.33, 0.37, 0.40, 0.42,
+        0.39, 0.35, 0.31, 0.28, 0.26, 0.22, 0.19, 0.17,
+        0.16, 0.15, 0.18, 0.21, 0.19, 0.16, 0.14, 0.15,
+        0.17, 0.15, 0.13, 0.12, 0.14, 0.13, 0.11, 0.10,
+        0.11, 0.12, 0.10, 0.09, 0.09, 0.10, 0.08, 0.08,
+        0.09, 0.07, 0.07, 0.08, 0.06, 0.06, 0.05, 0.05,
+        0.08, 0.09, 0.10, 0.10, 0.12, 0.11, 0.10, 0.09,
+        0.11, 0.10, 0.12, 0.09, 0.13, 0.10, 0.14, 0.11,
+        0.15, 0.15, 0.14, 0.14, 0.16, 0.22, 0.27, 0.25,
+        0.21, 0.25, 0.29, 0.24, 0.28, 0.33, 0.27, 0.31,
+        0.37, 0.30, 0.42, 0.35, 0.46, 0.39, 0.51, 0.43,
+        0.56, 0.47, 0.62, 0.53, 0.68, 0.58, 0.72, 0.61,
+        0.80, 0.84, 0.88, 0.92, 0.95, 0.91, 0.85, 0.78,
+        0.70, 0.62, 0.54, 0.47, 0.41, 0.36, 0.40, 0.45,
+        0.50, 0.52, 0.57, 0.44, 0.49, 0.38, 0.42, 0.31,
+        0.35, 0.26, 0.29, 0.21, 0.24, 0.17, 0.20, 0.14,
+        0.17, 0.12, 0.15, 0.11, 0.14, 0.10, 0.13, 0.11,
+        0.15, 0.10, 0.12, 0.09, 0.13, 0.10, 0.14, 0.11,
+        0.12, 0.09, 0.11, 0.08, 0.12, 0.10, 0.13, 0.09,
+        0.11, 0.08, 0.12, 0.09, 0.14, 0.10, 0.12, 0.09,
+        0.13, 0.10, 0.12, 0.11, 0.15, 0.11, 0.16, 0.12,
+        0.17, 0.13, 0.20, 0.15, 0.24, 0.18, 0.28, 0.22,
+        0.33, 0.26, 0.38, 0.31, 0.44, 0.36, 0.51, 0.42,
+        0.58, 0.48, 0.63, 0.54, 0.69, 0.58, 0.66, 0.74,
+        0.62, 0.70, 0.57, 0.68, 0.76, 0.64, 0.71, 0.59,
+        0.66, 0.55, 0.62, 0.50, 0.57, 0.46, 0.52, 0.41,
+        0.47, 0.37, 0.43, 0.33, 0.38, 0.29, 0.34, 0.26,
+        0.30, 0.23, 0.27, 0.20, 0.24, 0.18, 0.21, 0.16,
+        0.19, 0.14, 0.17, 0.12, 0.15, 0.11, 0.13, 0.09
+    };
+    QVector<double> sampleAmplitudes;
+    sampleAmplitudes.reserve((amplitudeEnvelope.size() - 1) * 8 + 1);
+    for (qsizetype i = 0; i < amplitudeEnvelope.size() - 1; ++i) {
+        const double startAmplitude = amplitudeEnvelope[i];
+        const double amplitudeChange = amplitudeEnvelope[i + 1] - startAmplitude;
+        for (int step = 0; step < 8; ++step)
+            sampleAmplitudes.append(startAmplitude + amplitudeChange * step / 8.0);
+    }
+    sampleAmplitudes.append(amplitudeEnvelope.last());
+
+    auto* audioVisualizerItem = new AudioVisualizerItem(sampleAmplitudes, previewWidth);
+    audioVisualizerItem->setPos(0, 0);
+    previewScene->addItem(audioVisualizerItem);
 
 
     // Shot borders and transparent background checkboxes

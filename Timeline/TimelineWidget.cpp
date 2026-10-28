@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QTimer>
+#include <QShortcut>
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QDesktopServices>
@@ -227,6 +228,16 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
         QMessageBox::warning(this, PrefManager::instance().getText("messagebox_error") , PrefManager::instance().getText("messagebox_extract_selected_shots_failed"));
     });
     connect(m_shotManager, &ShotManager::selectedShotCountUpdated, this, &TimelineWidget::updateSelectedShotCount);
+
+    auto* clearShotSelectionShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    clearShotSelectionShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(clearShotSelectionShortcut, &QShortcut::activated, this, [this]() {
+        if (m_shotManager->getNbShotsSelected() == 0)
+            return;
+
+        m_shotManager->clearSelection();
+        updateSelectedShotCount(m_shotManager->getNbShotsSelected());
+    });
 
     m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
     connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);

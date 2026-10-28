@@ -12,12 +12,22 @@
 #include <QFileDialog>
 #include <QRadioButton>
 #include <QButtonGroup>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QGraphicsLineItem>
+#include <QGraphicsSimpleTextItem>
+#include <QFrame>
+#include <QFontMetricsF>
+#include <QPixmap>
+#include <QPainter>
+#include <QPen>
 
+#include "Annotation.h"
 #include "PrefManager.h"
+#include "Timeline/Items/AnnotationItem.h"
+#include "Timeline/Items/AudioShotItem.h"
+#include "Timeline/Items/ShotItem.h"
 
 TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWidget* parent)
     : QDialog(parent)
@@ -100,13 +110,82 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     previewLayout->addWidget(previewLabel);
     auto* previewScene = new QGraphicsScene(this);
     auto* previewView = new QGraphicsView(previewScene);
-    previewView->setFixedSize(300, 200);
+    previewView->setFixedSize(300, 150);
+    previewView->setFrameShape(QFrame::NoFrame);
+    previewView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    previewView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    previewView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    //previewView->setBackgroundBrush(Qt::white);
+
+    previewScene->setSceneRect(0, 0, 300, 150);
     previewLayout->addWidget(previewView);
 
-    // Add a placeholder rectangle to represent the timeline preview
-    previewScene->addRect(0, 0, 280, 180, QPen(Qt::black), QBrush(Qt::lightGray));
+    constexpr qreal previewWidth = 300.0;
+    constexpr qreal rulerHeight = 24.0;
+    const QColor rulerColor(181, 181, 181);
+    auto* rulerLine = previewScene->addLine(0, rulerHeight, previewWidth, rulerHeight,
+                                            QPen(rulerColor, 2));
+    rulerLine->setZValue(1);
 
-    
+    const QFont rulerFont = previewView->font();
+    QFontMetricsF rulerFontMetrics(rulerFont);
+    auto* rulerStart = previewScene->addSimpleText("00:00:00.00", rulerFont);
+    rulerStart->setBrush(rulerColor);
+    rulerStart->setPos(2, 2);
+    auto* rulerEnd = previewScene->addSimpleText("XX:XX:XX.XX", rulerFont);
+    rulerEnd->setBrush(rulerColor);
+    rulerEnd->setPos(previewWidth - rulerFontMetrics.horizontalAdvance(rulerEnd->text()) - 2, 2);
+
+    Annotation sampleAnnotation{0, 0, tr("Annotation"), QString(), QColor(118, 1, 136), 0};
+    auto* annotationItem = new AnnotationItem(sampleAnnotation, 140);
+    annotationItem->setPos(45, 0);
+    for (QGraphicsItem* handle : annotationItem->childItems())
+        handle->setVisible(false);
+    previewScene->addItem(annotationItem);
+
+    Shot firstShot{};
+    firstShot.color = QColor(79, 134, 198);
+    firstShot.borderColor = QColor(33, 71, 115);
+    firstShot.start = 0;
+    firstShot.end = 200;
+    auto* firstShotItem = new ShotItem(firstShot, firstShot.end - firstShot.start);
+    firstShotItem->setPos(firstShot.start, 0);
+    QPixmap thumbnail(80, 36);
+    thumbnail.fill(QColor(205, 218, 231));
+    {
+        QPainter thumbnailPainter(&thumbnail);
+        thumbnailPainter.setPen(QPen(QColor(33, 71, 115), 2));
+        thumbnailPainter.setBrush(QColor(125, 157, 184));
+        thumbnailPainter.drawRect(thumbnail.rect().adjusted(2, 2, -3, -3));
+    }
+    firstShotItem->setThumbnail(thumbnail);
+    previewScene->addItem(firstShotItem);
+
+    Shot secondShot{};
+    secondShot.color = QColor(79, 134, 198);
+    secondShot.borderColor = QColor(33, 71, 115);
+    secondShot.start = 200;
+    secondShot.end = 300;
+    auto* secondShotItem = new ShotItem(secondShot, secondShot.end - secondShot.start);
+    secondShotItem->setPos(secondShot.start, 0);
+    secondShotItem->setShowThumbnail(false);
+    previewScene->addItem(secondShotItem);
+
+    AudioShot firstAudioShot;
+    firstAudioShot.start = firstShot.start;
+    firstAudioShot.end = firstShot.end;
+    auto* firstAudioShotItem = new AudioShotItem(firstAudioShot, firstAudioShot.end - firstAudioShot.start);
+    firstAudioShotItem->setPos(0, 0);
+    firstAudioShotItem->setShowThumbnail(false);
+    previewScene->addItem(firstAudioShotItem);
+
+    AudioShot secondAudioShot;
+    secondAudioShot.start = secondShot.start;
+    secondAudioShot.end = secondShot.end;
+    auto* secondAudioShotItem = new AudioShotItem(secondAudioShot, secondAudioShot.end - secondAudioShot.start);
+    secondAudioShotItem->setPos(secondAudioShot.start, 0);
+    secondAudioShotItem->setShowThumbnail(false);
+    previewScene->addItem(secondAudioShotItem);
 
 
 

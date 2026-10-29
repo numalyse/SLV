@@ -286,6 +286,7 @@ namespace ProjectExportHelper {
             labels.soundTxt  = QString(); 
         } else {
             labels.item      = txtManager.capitalized(txtManager.getText("shot"));
+            labels.item      = txtManager.getText("shot");
             labels.count     = txtManager.getText("number_of_shots");
             labels.title     = txtManager.getText("shot_detail_title_name");
             labels.startTime = txtManager.getText("shot_detail_start_time_name");

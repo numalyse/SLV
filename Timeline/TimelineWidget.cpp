@@ -521,6 +521,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         const QString saveDir = prefManager.getPref("Paths", "lp_capture");
         const QString baseName = fileInfo.completeBaseName() + "_extractedshots";
         //QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+        const QString baseName = "[extracted segments] " + fileInfo.completeBaseName();
 
         const QString ext = fileInfo.suffix();
 

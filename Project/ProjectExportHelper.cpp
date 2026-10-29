@@ -1021,7 +1021,7 @@ namespace ProjectExportHelper {
         QLabel* sourceLabel = new QLabel(txtManager.getText("export_source_selection_txt"), &dialog);
         layout->addWidget(sourceLabel);
 
-        QRadioButton* shotsRadio = new QRadioButton(txtManager.getText("shots"), &dialog);
+        QRadioButton* shotsRadio = new QRadioButton(txtManager.capitalized(txtManager.getText("shots")), &dialog);
         QRadioButton* annotationsRadio = new QRadioButton(txtManager.getText("annotations"), &dialog);
         shotsRadio->setChecked(true);
         annotationsRadio->setEnabled(hasAnnotations);

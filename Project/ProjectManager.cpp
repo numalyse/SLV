@@ -621,7 +621,7 @@ void ProjectManager::exportProject(){
         selectedPath = QFileDialog::getSaveFileName(
             nullptr,
             prefManager.getText("export_file_path_title"),
-            dialogDir+'/'+m_project->media->fileName() + sourceSuffix + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
+            dialogDir + "/[numaproj export] " + m_project->media->fileName() + sourceSuffix ,
             dialogFilter
         );
     }

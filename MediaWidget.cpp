@@ -406,8 +406,24 @@ void MediaWidget::takeScreenshot()
 
     m_lastSnapshotTime = getCurrentTime();
 
-    QString zoomStr = (m_zoomActivated) ? m_zoomHelper.getZoomStr() : "";
-    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + '_' + TimeFormatter::fileFormatMsToHHMMSSFF(m_lastSnapshotTime, m_media->fps()) + zoomStr +".png";
+    QString capturePath = prefManager.getPref("Paths", "screenshot") + '/' + m_media->fileName() + '_' + TimeFormatter::fileFormatMsToHHMMSSFF(m_lastSnapshotTime, m_media->fps());
+
+    //QString zoomStr = (m_zoomActivated) ? m_zoomHelper.getZoomStr() : ""; Kept it but not used for the user as it wouldn't understand the zoomStr
+    if (m_zoomActivated) {
+        QString zoomStr = "_zoomed";
+        capturePath += zoomStr;
+    }
+    
+    const QString baseCapturePath = capturePath;
+    int i = 1;
+    capturePath = baseCapturePath + ".png";
+
+    if (m_zoomActivated) {
+        while (QFile::exists(capturePath)) {
+            capturePath = baseCapturePath + " (" + QString::number(i++) + ").png";
+        }
+    }
+    
     if(!QDir(prefManager.getPref("Paths", "screenshot")).exists()) QDir().mkdir(prefManager.getPref("Paths", "screenshot"));
 
     QByteArray capturePathBytes = capturePath.toUtf8();

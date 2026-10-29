@@ -617,11 +617,11 @@ void ProjectManager::exportProject(){
         QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
         if(selectedFormat == ExportType::SRC)
             dialogFilter.replace(".src", '.'+mediaPathExtension());
-        QString sourceSuffix = (source == ExportSource::Annotations) ? "_annotations" : "";
+        QString prefixAnnot = (source == ExportSource::Annotations) ? "annotations" : "";
         selectedPath = QFileDialog::getSaveFileName(
             nullptr,
             prefManager.getText("export_file_path_title"),
-            dialogDir + "/[numaproj export] " + m_project->media->fileName() + sourceSuffix ,
+            dialogDir + "/[numaproj export" + prefixAnnot + "] " + m_project->media->fileName(),
             dialogFilter
         );
     }

@@ -315,6 +315,10 @@ void TimelineWidget::updateShotCount(int shotCount)
     m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
 }
 
+QString pad(int value, int maxValue) {
+    return QString::number(value).rightJustified(QString::number(maxValue).size(), '0');
+}
+
 void TimelineWidget::updateSelectedShotCount(int selectedShotCount)
 {
     if(selectedShotCount == 0){
@@ -325,16 +329,20 @@ void TimelineWidget::updateSelectedShotCount(int selectedShotCount)
     m_selectedShotCountLabel->setText(QString::number(selectedShotCount) + " " + PrefManager::instance().getText("timeline_selected_shot_count_label") + ",");
     
     // List of the selected shots, to be displayed in the tooltip
+    int totalShots = m_shotManager->shotItems().size();
     QStringList selectedShotsList;
+    int i = 1;
     for (const auto& shotSelected : m_shotManager->getSelectedShots()) {
         const Shot& shotData = shotSelected.first->shot();
         const int shotId = m_shotManager->shotItems().indexOf(shotSelected.first) + 1;
-        const QString shotInfo = QString("%1 %2 : %3 - %4")
+        const QString shotInfo = QString("[%1] %2 %3 : %4 - %5")
+            .arg(pad(i, selectedShotCount))
             .arg(PrefManager::instance().capitalized(PrefManager::instance().getText("shot")))
-            .arg(shotId)
+            .arg(pad(shotId, totalShots))
             .arg(TimeFormatter::msToHHMMSSFF(shotData.start, m_mathManager->fps()))
             .arg(TimeFormatter::msToHHMMSSFF(shotData.end, m_mathManager->fps()));
         selectedShotsList.append(shotInfo);
+        i++;
     }
     m_selectedShotCountLabel->setToolTip(selectedShotsList.join("\n"));
 }

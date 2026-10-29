@@ -319,9 +319,24 @@ void TimelineWidget::updateSelectedShotCount(int selectedShotCount)
 {
     if(selectedShotCount == 0){
         m_selectedShotCountLabel->setText("");
+        m_selectedShotCountLabel->setToolTip("");
         return;
     }
     m_selectedShotCountLabel->setText(QString::number(selectedShotCount) + " " + PrefManager::instance().getText("timeline_selected_shot_count_label") + ",");
+    
+    // List of the selected shots, to be displayed in the tooltip
+    QStringList selectedShotsList;
+    for (const auto& shotSelected : m_shotManager->getSelectedShots()) {
+        const Shot& shotData = shotSelected.first->shot();
+        const int shotId = m_shotManager->shotItems().indexOf(shotSelected.first) + 1;
+        const QString shotInfo = QString("%1 %2 : %3 - %4")
+            .arg(PrefManager::instance().capitalized(PrefManager::instance().getText("shot")))
+            .arg(shotId)
+            .arg(TimeFormatter::msToHHMMSSFF(shotData.start, m_mathManager->fps()))
+            .arg(TimeFormatter::msToHHMMSSFF(shotData.end, m_mathManager->fps()));
+        selectedShotsList.append(shotInfo);
+    }
+    m_selectedShotCountLabel->setToolTip(selectedShotsList.join("\n"));
 }
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
@@ -519,8 +534,6 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         auto& prefManager = PrefManager::instance();
 
         const QString saveDir = prefManager.getPref("Paths", "lp_capture");
-        const QString baseName = fileInfo.completeBaseName() + "_extractedshots";
-        //QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
         const QString baseName = "[extracted segments] " + fileInfo.completeBaseName();
 
         const QString ext = fileInfo.suffix();

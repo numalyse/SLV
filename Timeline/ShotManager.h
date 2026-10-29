@@ -54,6 +54,7 @@ public:
     void updateSelectedNumbers();
     void addSelected(QPair<ShotItem *, AudioShotItem *> &toBeAdded);
     void removeSelected(int elementIdToRemove, QPair<ShotItem *, AudioShotItem *> &toBeRemoved);
+    QVector<QPair<ShotItem *, AudioShotItem *>> getSelectedShots() const { return m_selectedShots; }
     void clearSelection();
 
     void extractShotsSelected(const QString& outputPath);

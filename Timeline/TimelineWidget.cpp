@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QTimer>
+#include <QShortcut>
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QDesktopServices>
@@ -228,6 +229,16 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     });
     connect(m_shotManager, &ShotManager::selectedShotCountUpdated, this, &TimelineWidget::updateSelectedShotCount);
 
+    auto* clearShotSelectionShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    clearShotSelectionShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(clearShotSelectionShortcut, &QShortcut::activated, this, [this]() {
+        if (m_shotManager->getNbShotsSelected() == 0)
+            return;
+
+        m_shotManager->clearSelection();
+        updateSelectedShotCount(m_shotManager->getNbShotsSelected());
+    });
+
     m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
     connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);
 
@@ -304,13 +315,36 @@ void TimelineWidget::updateShotCount(int shotCount)
     m_shotCountLabel->setText(QString::number(shotCount) + " " + PrefManager::instance().getText("timeline_shot_count_label"));
 }
 
+QString pad(int value, int maxValue) {
+    return QString::number(value).rightJustified(QString::number(maxValue).size(), '0');
+}
+
 void TimelineWidget::updateSelectedShotCount(int selectedShotCount)
 {
     if(selectedShotCount == 0){
         m_selectedShotCountLabel->setText("");
+        m_selectedShotCountLabel->setToolTip("");
         return;
     }
     m_selectedShotCountLabel->setText(QString::number(selectedShotCount) + " " + PrefManager::instance().getText("timeline_selected_shot_count_label") + ",");
+    
+    // List of the selected shots, to be displayed in the tooltip
+    int totalShots = m_shotManager->shotItems().size();
+    QStringList selectedShotsList;
+    int i = 1;
+    for (const auto& shotSelected : m_shotManager->getSelectedShots()) {
+        const Shot& shotData = shotSelected.first->shot();
+        const int shotId = m_shotManager->shotItems().indexOf(shotSelected.first) + 1;
+        const QString shotInfo = QString("[%1] %2 %3 : %4 - %5")
+            .arg(pad(i, selectedShotCount))
+            .arg(PrefManager::instance().capitalized(PrefManager::instance().getText("shot")))
+            .arg(pad(shotId, totalShots))
+            .arg(TimeFormatter::msToHHMMSSFF(shotData.start, m_mathManager->fps()))
+            .arg(TimeFormatter::msToHHMMSSFF(shotData.end, m_mathManager->fps()));
+        selectedShotsList.append(shotInfo);
+        i++;
+    }
+    m_selectedShotCountLabel->setToolTip(selectedShotsList.join("\n"));
 }
 
 /// @brief Agrandi ou rétrécit la scène ou fonction de la molette, recalcul ensuite la position de graphics items
@@ -428,13 +462,12 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
     }
 }
 
-
-
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
     QAction *actionSplit = nullptr;
     QAction *actionExtractShot = nullptr;
+    QAction *actionClearSelectedShots = nullptr;
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
     QAction *actionAB = nullptr;
@@ -447,6 +480,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
         actionExtractShotsSelected = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shots"));
+        actionClearSelectedShots = menu.addAction(PrefManager::instance().getText("timeline_clear_all_selected_shots"));
     } else 
     {
         actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
@@ -494,18 +528,21 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else if(selectedAction == actionExtractShot){
         ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
         sequenceExtractor->show();
+        mergeWithNextShotAction();
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);
-    }else if (selectedAction == actionExtractShotsSelected){
+    } else if(selectedAction == actionClearSelectedShots){
+        m_shotManager->clearSelection();
+        updateSelectedShotCount(m_shotManager->getNbShotsSelected());
+    } else if (selectedAction == actionExtractShotsSelected){
 
         QFileInfo fileInfo (p_media->filePath());
 
         auto& prefManager = PrefManager::instance();
 
         const QString saveDir = prefManager.getPref("Paths", "lp_capture");
-        const QString baseName = fileInfo.completeBaseName() + "_extractedshots";
-        //QString defaultFileName = fileInfo.completeBaseName() + "_extractedshots";
+        const QString baseName = "[extracted segments] " + fileInfo.completeBaseName();
 
         const QString ext = fileInfo.suffix();
 

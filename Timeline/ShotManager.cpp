@@ -236,6 +236,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     // on insère le plan juste apres le plan cut
     m_shotItems.insert(index + 1, newShotItem);
     m_audioShotItems.insert(index + 1, newAudioShotItem);
+    updateShotToolTips();
 
     if(p_media->type() == MediaType::Video){
         if(PrefManager::instance().getPref("General", "Advanced_timeline_options", "general_timeline_shot_image") == "shot_tag_image") {
@@ -289,6 +290,7 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     delete currentAudioShotItem;
     m_currentShotItem = nullptr;
 
+    updateShotToolTips();
     updateShotItemsPosition();
 }
 
@@ -358,6 +360,16 @@ const QVector<Shot> ShotManager::shotItemsData() const
     return data;
 }
 
+void ShotManager::updateShotToolTips()
+{
+    for (qsizetype i = 0; i < m_shotItems.size(); ++i) {
+        const QString toolTip = PrefManager::instance().capitalized(
+                                PrefManager::instance().getText("shot")) + tr(" %1").arg(i + 1);
+        m_shotItems[i]->setToolTip(toolTip);
+        m_audioShotItems[i]->setToolTip(toolTip);
+    }
+}
+
 void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 {
 
@@ -400,6 +412,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
     }
 
+    updateShotToolTips();
 }
 
 void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
@@ -477,6 +490,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
         }
     }
 
+    updateShotToolTips();
     emit shotCountUpdated(shotCount());
 }
 

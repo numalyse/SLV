@@ -65,8 +65,8 @@
     "tooltip_view_3" : "Triple vue",
     "tooltip_view_3_h" : "Trois vues horizontales",
     "tooltip_view_3_v" : "Trois vues verticales",
-    "tooltip_view_3_bot" : "1 en haut, 2 en bas",
-    "tooltip_view_3_top" : "2 en haut, 1 en bas",
+    "tooltip_view_3_bot" : "2 en haut, 1 en bas",
+    "tooltip_view_3_top" : "1 en haut, 2 en bas",
     "tooltip_view_3_left" : "1 à gauche, 2 à droite",
     "tooltip_view_3_right" : "2 à gauche, 1 à droite",
     "tooltip_view_4" : "Quadruple vue",
@@ -116,6 +116,7 @@
     "timeline_selected_shot_count_label" : "segment(s) sélectionné(s)",
     "messagebox_extract_selected_shots_completed" : "Extraction des segments sélectionnés terminée.",
     "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des segments sélectionnés.",
+    "timeline_clear_all_selected_shots" : "Déselectionner tous les segments sélectionnés",
 
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",

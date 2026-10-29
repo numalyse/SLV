@@ -65,8 +65,8 @@
     "tooltip_view_3": "Dreifachansicht",
     "tooltip_view_3_h" : "Drei horizontale Ansichten",
     "tooltip_view_3_v" : "Drei vertikale Ansichten",
-    "tooltip_view_3_bot" : "1 oben, 2 unten",
-    "tooltip_view_3_top" : "2 oben, 1 unten",
+    "tooltip_view_3_bot" : "2 oben, 1 unten",
+    "tooltip_view_3_top" : "1 oben, 2 unten",
     "tooltip_view_3_left" : "1 links, 2 rechts",
     "tooltip_view_3_right" : "2 links, 1 rechts",
     "tooltip_view_4": "Vierfachansicht",
@@ -116,8 +116,9 @@
     "timeline_selected_shot_count_label" : "Ausgewählte(s) Segment(e)",
     "messagebox_extract_selected_shots_completed" : "Extraktion der ausgewählten Segmente abgeschlossen.",
     "messagebox_extract_selected_shots_failed" : "Extraktion der ausgewählten Segmente fehlgeschlagen.",
+    "timeline_clear_all_selected_shots" : "Alle ausgewählten Segmente löschen",
+    
     "export_running": "Export läuft...",
-
     "export_directory_path_title": "Exportordner auswählen",
     "export_directory_tagimages": "Speicherort für Referenzbilder auswählen",
     "export_subfolder_tagimages": "In einem Unterordner speichern",
@@ -167,11 +168,11 @@
     "shot_detail_sound_txt_name" : "Ton",
 
     "shot_detail_id_text" : "Segment Nr.",
-    "shot" : "Segment",
+    "shot" : "segment",
     "shot_borders_option" : "Segmentgrenzen anzeigen",
     "number_of_shots" : "Gesamtzahl der Segmente",
     "number_of_annotations" : "Anzahl der Anmerkungen",
-    "shots" : "Segmente",
+    "shots" : "segmente",
     "export_source_selection_txt" : "Zu exportierenden Inhalt auswählen",
     "average_shot_duration" : "Durchschnittliche Segmentdauer",
 

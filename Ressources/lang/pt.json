@@ -65,8 +65,8 @@
     "tooltip_view_3": "Vista tripla",
     "tooltip_view_3_h" : "Três vistas horizontais",
     "tooltip_view_3_v" : "Três vistas verticais",
-    "tooltip_view_3_bot" : "1 em cima, 2 em baixo",
-    "tooltip_view_3_top" : "2 em cima, 1 em baixo",
+    "tooltip_view_3_bot" : "2 em cima, 1 em baixo",
+    "tooltip_view_3_top" : "1 em cima, 2 em baixo",
     "tooltip_view_3_left" : "1 à esquerda, 2 à direita",
     "tooltip_view_3_right" : "2 à esquerda, 1 à direita",
     "tooltip_view_4": "Vista quádrupla",
@@ -116,7 +116,8 @@
     "timeline_selected_shot_count_label" : "segment(s) selecionado(s)",
     "messagebox_extract_selected_shots_completed" : "Extração dos segments selecionados concluída.",
     "messagebox_extract_selected_shots_failed" : "Falha na extração dos segments selecionados.",
-    
+    "timeline_clear_all_selected_shots" : "Limpar todos os segments selecionados",
+
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",
     "export_directory_tagimages": "Selecionar local de salvamento das Imagens-Referência",

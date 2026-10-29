@@ -423,6 +423,7 @@ namespace ProjectExportHelper {
             timeString.replace(".", "-");
         
             QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + '_' + timeString + ".png");
+            QString mediaNameCropped = mediaName.left(5);
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){

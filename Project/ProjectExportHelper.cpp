@@ -285,7 +285,6 @@ namespace ProjectExportHelper {
             labels.imgTxt    = txtManager.getText("annotation_note");
             labels.soundTxt  = QString(); 
         } else {
-            labels.item      = txtManager.capitalized(txtManager.getText("shot"));
             labels.item      = txtManager.getText("shot");
             labels.count     = txtManager.getText("number_of_shots");
             labels.title     = txtManager.getText("shot_detail_title_name");
@@ -423,8 +422,8 @@ namespace ProjectExportHelper {
             timeString.replace(":", "-");
             timeString.replace(".", "-");
         
-            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + '_' + timeString + ".png");
             QString mediaNameCropped = mediaName.left(5);
+            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + "_" + mediaNameCropped + "_" + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){

@@ -285,7 +285,7 @@ namespace ProjectExportHelper {
             labels.imgTxt    = txtManager.getText("annotation_note");
             labels.soundTxt  = QString(); 
         } else {
-            labels.item      = txtManager.capitalized(txtManager.getText("shot"));
+            labels.item      = txtManager.getText("shot");
             labels.count     = txtManager.getText("number_of_shots");
             labels.title     = txtManager.getText("shot_detail_title_name");
             labels.startTime = txtManager.getText("shot_detail_start_time_name");
@@ -422,7 +422,8 @@ namespace ProjectExportHelper {
             timeString.replace(":", "-");
             timeString.replace(".", "-");
         
-            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + '_' + timeString + ".png");
+            QString mediaNameCropped = mediaName.left(5);
+            QString fileName = QDir(dstPath).filePath("TF" + QString::number(currItemId+1) + "_" + mediaNameCropped + "_" + timeString + ".png");
 
             bool success = cv::imwrite(fileName.toLocal8Bit().constData(), imgData.img, pngParams);
             if(!success){
@@ -1020,7 +1021,7 @@ namespace ProjectExportHelper {
         QLabel* sourceLabel = new QLabel(txtManager.getText("export_source_selection_txt"), &dialog);
         layout->addWidget(sourceLabel);
 
-        QRadioButton* shotsRadio = new QRadioButton(txtManager.getText("shots"), &dialog);
+        QRadioButton* shotsRadio = new QRadioButton(txtManager.capitalized(txtManager.getText("shots")), &dialog);
         QRadioButton* annotationsRadio = new QRadioButton(txtManager.getText("annotations"), &dialog);
         shotsRadio->setChecked(true);
         annotationsRadio->setEnabled(hasAnnotations);

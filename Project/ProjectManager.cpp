@@ -592,7 +592,14 @@ void ProjectManager::exportProject(){
 
         if (isSubfolderChecked()){ // if the user checked the "create subfolder" checkbox, create a subfolder inside the selected directory
             QString mediaBaseName = QFileInfo(m_project->media->filePath()).completeBaseName();
-            QString exportFolderName = "TagImages_" + mediaBaseName;
+            QString exportFolderName = "[numaproj tagframes] " + mediaBaseName;
+
+            int i = 1;
+            while (QDir(selectedPath).exists(exportFolderName)) {
+                exportFolderName = QString("[numaproj tagframes] %1 (%2)").arg(mediaBaseName).arg(i);
+                ++i;
+            }
+
             QString exportDir = QDir(selectedPath).filePath(exportFolderName);
 
             if (!QDir(selectedPath).exists(exportFolderName)) {
@@ -610,11 +617,11 @@ void ProjectManager::exportProject(){
         QString dialogFilter = prefManager.getText(SLV::getExportTypeString(selectedFormat)) ;
         if(selectedFormat == ExportType::SRC)
             dialogFilter.replace(".src", '.'+mediaPathExtension());
-        QString sourceSuffix = (source == ExportSource::Annotations) ? "_annotations" : "";
+        QString prefixAnnot = (source == ExportSource::Annotations) ? "annotations" : "";
         selectedPath = QFileDialog::getSaveFileName(
             nullptr,
             prefManager.getText("export_file_path_title"),
-            dialogDir+'/'+m_project->media->fileName() + sourceSuffix + "_" + SLV::getExportExtensionString(selectedFormat) + "_export",
+            dialogDir + "/[numaproj export" + prefixAnnot + "] " + m_project->media->fileName(),
             dialogFilter
         );
     }

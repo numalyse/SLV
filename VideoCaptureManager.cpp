@@ -13,7 +13,7 @@ void VideoCaptureManager::initMediaTempDirectory()
 
     deleteMediaTempDirectory();
 
-    m_tempDir = new QTemporaryDir(QDir::tempPath() + "/SLV_" + m_mediaFile.baseName() + "_XXXXXX");
+    m_tempDir = new QTemporaryDir(QDir::tempPath() + "/NP_" + m_mediaFile.baseName() + "_XXXXXX");
     if(!m_tempDir->isValid()){
         qWarning() << "initMediaTempDirectory: failed to create temp directory:" << m_tempDir->errorString();
         delete m_tempDir;

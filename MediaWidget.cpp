@@ -222,7 +222,10 @@ bool MediaWidget::eject()
     if (!m_player || !libvlc_media_player_get_media(m_player)) return false;
 
     releaseEventManager();
-
+    
+    m_pendingSubtitleLabel.clear();
+    m_adjustmentsEnabled = false;
+    m_zoomActivated = false;
     m_hflipped = false;
     m_vflipped = false;
     m_currentSubtitlesTrack = -1;

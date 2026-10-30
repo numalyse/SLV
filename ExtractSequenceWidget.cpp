@@ -232,29 +232,16 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
     auto& prefManager = PrefManager::instance();
 
     QString dir = PrefManager::instance().getPref("Paths", "lp_extract_sequence");
-    QString initialPath = dir + '/' 
-        + "[extracted sequence] "
-        + m_media.fileName()
-        + "_"
-        + TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())
-        + "_"
-        + TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps())
-        + "." 
-        + m_media.fileExtension();
+    const QString base = QStringLiteral("%1/[extracted sequence] %2_%3_%4")
+                        .arg(dir,
+                            m_media.fileName(),
+                            TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps()),
+                            TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
+    const QString ext = '.' + m_media.fileExtension();
 
-    int i = 1;
-    while (QFileInfo::exists(initialPath)) {
-        initialPath = dir + '/'
-        + "[extracted sequence] "
-        + m_media.fileName()
-        + "_"
-        + TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())
-        + "_"
-        + TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps())
-        + " (" + QString::number(i) + ")." 
-        + m_media.fileExtension();
-        ++i;
-    }
+    QString initialPath = base + ext;
+    for (int i = 1; QFileInfo::exists(initialPath); ++i)
+    initialPath = QStringLiteral("%1 (%2)%3").arg(base).arg(i).arg(ext);
 
     QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), initialPath);
 

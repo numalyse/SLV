@@ -231,7 +231,13 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
 {
     auto& prefManager = PrefManager::instance();
     QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), prefManager.getPref("Paths", "lp_extract_sequence")
-        + '/' + m_media.fileName()+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())+"_"+TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
+        + '/' 
+        + "[extracted sequence] "
+        + m_media.fileName()
+        + "_"
+        + TimeFormatter::fileFormatMsToHHMMSSFF(m_startTime, m_media.fps())
+        + "_"
+        + TimeFormatter::fileFormatMsToHHMMSSFF(m_endTime, m_media.fps()));
     m_selectedPath = saveSequencePath;
     if(saveSequencePath != ""){
         // On garde seulement la base du nom sans l'extension avec un split

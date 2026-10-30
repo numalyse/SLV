@@ -240,8 +240,9 @@ void ExtractSequenceWidget::confirmExtraction(SequenceExtractionHelper::Extracti
     const QString ext = '.' + m_media.fileExtension();
 
     QString initialPath = base + ext;
-    for (int i = 1; QFileInfo::exists(initialPath); ++i)
-    initialPath = QStringLiteral("%1 (%2)%3").arg(base).arg(i).arg(ext);
+    for (int i = 1; QFileInfo::exists(initialPath); ++i){
+        initialPath = QStringLiteral("%1 (%2)%3").arg(base).arg(i).arg(ext);
+    }
 
     QString saveSequencePath = QFileDialog::getSaveFileName(this, tr("Extract sequence"), initialPath);
 

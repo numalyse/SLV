@@ -106,6 +106,9 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
         break;
 
     case DragMode::None:
+        QGraphicsView::mouseMoveEvent(event);
+        break;
+
     default:
         break;
     }

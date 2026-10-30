@@ -4,6 +4,7 @@
 
 #include <QPainter>
 #include <QGraphicsScene>
+#include <QGraphicsSceneHoverEvent>
 #include <QPen>
 #include <QFontMetrics>
 #include <algorithm>
@@ -12,11 +13,14 @@ AnnotationItem::AnnotationItem(const Annotation& annot, double widthMs, QGraphic
 : QGraphicsItem(parent), m_annot{annot}, m_widthMs{widthMs}
 {
     setZValue(4);
+    setAcceptHoverEvents(true);
 
     m_leftHandle = new AnnotationHandleItem(true, this);
     m_rightHandle = new AnnotationHandleItem(false, this);
     m_leftHandle->setPos(0, s_topMargin);
     m_rightHandle->setPos(m_widthMs, s_topMargin);
+    m_leftHandle->setVisible(false);
+    m_rightHandle->setVisible(false);
 }
 
 QRectF AnnotationItem::boundingRect() const
@@ -65,6 +69,20 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
     p->setPen(qGray(m_annot.color.rgb()) > 128 ? Qt::black : Qt::white);
     p->drawText(QRectF(s_textMargin, s_topMargin, availableWidthPx, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedText);
     p->restore();
+}
+
+void AnnotationItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_leftHandle->setVisible(true);
+    m_rightHandle->setVisible(true);
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void AnnotationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_leftHandle->setVisible(false);
+    m_rightHandle->setVisible(false);
+    QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void AnnotationItem::setWidth(double newWidthMs)

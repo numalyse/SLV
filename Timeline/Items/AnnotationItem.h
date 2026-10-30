@@ -16,6 +16,8 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     int type() const override { return SLV::TypeAnnotationItem; }
 
     Annotation& annotation() { return m_annot; };

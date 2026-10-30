@@ -37,6 +37,24 @@ signals:
     void finishedError();
 
 private:
+    QString getArrangementCode(PlayerLayoutArrangement arrangement)
+    {
+        switch (arrangement) {
+        case Arrangement2H:     return QStringLiteral("2H");
+        case Arrangement2V:     return QStringLiteral("2V");
+        case Arrangement3H:     return QStringLiteral("3H");
+        case Arrangement3V:     return QStringLiteral("3V");
+        case Arrangement3Top:   return QStringLiteral("3T");
+        case Arrangement3Bot:   return QStringLiteral("3B");
+        case Arrangement3Left:  return QStringLiteral("3L");
+        case Arrangement3Right: return QStringLiteral("3R");
+        case Arrangement4:      return QStringLiteral("4");
+        case Arrangement1:
+        case ArrangementUnknown:
+            break;
+        }
+        return {};
+    }
 
     inline void takeGlobalScreenshot(){
         qDebug() << "Global Screenshot";
@@ -46,10 +64,16 @@ private:
         cv::VideoCapture cap;
         int minWidth = 10000000;
         int minHeight = 10000000;
-        QString mergedPath(prefManager.getPref("Paths", "screenshot") + '/');
-        if(!QDir(mergedPath).exists()) QDir().mkdir(mergedPath);
+        
+        //QString mergedPath(prefManager.getPref("Paths", "screenshot") + '/');
+        //if(!QDir(mergedPath).exists()) QDir().mkdir(mergedPath);
+        const QString screenshotDir = prefManager.getPref("Paths", "screenshot") + '/';
+        if(!QDir(screenshotDir).exists()) QDir().mkdir(screenshotDir);
 
         GlobalScreenshotPlayerData currPlayerData;
+
+        QString arr = getArrangementCode(arrangement);
+        QString mergedName = (arrangement != Arrangement1 || ArrangementUnknown ? "[" + arr + "] " : "");
 
         for(size_t IPlayerData = 0; IPlayerData < m_playersData.size(); ++IPlayerData){
             cap.release();
@@ -96,7 +120,7 @@ private:
                 emit finishedError();
                 return;
             }
-            mergedPath += path.left(std::min(5, int(path.size()))) + '_'
+            mergedName += path.left(std::min(5, int(path.size()))) + '_'
                         + TimeFormatter::fileFormatMsToHHMMSSFF(currPlayerData.currentTime, fps) 
                         + (IPlayerData != m_playersData.size()-1 ? "_" : "");
                         
@@ -136,13 +160,13 @@ private:
             Q_ASSERT(resizedScreenshots.size() == 2);
             addBlackPadding(resizedScreenshots[0], resizedScreenshots[1], 0);
             cv::hconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
-            mergedPath += "_2H";
+            //mergedPath += "_2H";
             break;
         case Arrangement2V:
             Q_ASSERT(resizedScreenshots.size() == 2);
             addBlackPadding(resizedScreenshots[0], resizedScreenshots[1], 1);
             cv::vconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
-            mergedPath += "_2V";
+            //mergedPath += "_2V";
             break;
         case Arrangement3H:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -150,7 +174,7 @@ private:
             cv::hconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[2], 0);
             cv::hconcat(mergedScreenshot, resizedScreenshots[2], mergedScreenshot);
-            mergedPath += "_3H";
+            //mergedPath += "_3H";
             break;
         case Arrangement3V:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -158,7 +182,7 @@ private:
             cv::vconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[2], 1);
             cv::vconcat(mergedScreenshot, resizedScreenshots[2], mergedScreenshot);
-            mergedPath += "_3V";
+            //mergedPath += "_3V";
             break;
         case Arrangement3Top:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -166,7 +190,7 @@ private:
             cv::hconcat(resizedScreenshots[1], resizedScreenshots[2], mergedScreenshot);
             addBlackPadding(resizedScreenshots[0], mergedScreenshot, 1);
             cv::vconcat(resizedScreenshots[0], mergedScreenshot, mergedScreenshot);
-            mergedPath += "_3T";
+            //mergedPath += "_3T";
             break;
         case Arrangement3Bot:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -174,7 +198,7 @@ private:
             cv::hconcat(resizedScreenshots[0], resizedScreenshots[1], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[2], 1);
             cv::vconcat(mergedScreenshot, resizedScreenshots[2], mergedScreenshot);
-            mergedPath += "_3B";
+            //mergedPath += "_3B";
             break;
         case Arrangement3Left:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -182,7 +206,7 @@ private:
             cv::vconcat(resizedScreenshots[1], resizedScreenshots[2], mergedScreenshot);
             addBlackPadding(resizedScreenshots[0], mergedScreenshot, 0);
             cv::hconcat(resizedScreenshots[0], mergedScreenshot, mergedScreenshot);
-            mergedPath += "_3L";
+            //mergedPath += "_3L";
             break;
         case Arrangement3Right:
             Q_ASSERT(resizedScreenshots.size() == 3);
@@ -190,7 +214,7 @@ private:
             cv::vconcat(resizedScreenshots[0], resizedScreenshots[2], mergedScreenshot);
             addBlackPadding(mergedScreenshot, resizedScreenshots[1], 0);
             cv::hconcat(mergedScreenshot, resizedScreenshots[1], mergedScreenshot);
-            mergedPath += "_3R";
+            //mergedPath += "_3R";
             break;
         case Arrangement4:
             Q_ASSERT(resizedScreenshots.size() == 4);
@@ -205,7 +229,9 @@ private:
             return;
         }
 
-        mergedPath += ".png";
+        mergedName  += ".png";
+        QString mergedPath = screenshotDir + mergedName;
+
         qDebug() << "final mergedPath : " << mergedPath;
         cv::imwrite(mergedPath.toUtf8().constData(), mergedScreenshot);
         emit finishedSuccess(mergedPath);

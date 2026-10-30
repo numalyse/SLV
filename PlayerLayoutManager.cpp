@@ -932,6 +932,25 @@ void PlayerLayoutManager::startMultiviewRecord()
     emit SignalManager::instance().globalRecordingStarted();
 }
 
+QString getArrangementCode(const PlayerLayoutArrangement& arrangement)
+{
+    switch (arrangement) {
+    case Arrangement2H:     return QStringLiteral("2H");
+    case Arrangement2V:     return QStringLiteral("2V");
+    case Arrangement3H:     return QStringLiteral("3H");
+    case Arrangement3V:     return QStringLiteral("3V");
+    case Arrangement3Top:   return QStringLiteral("3T");
+    case Arrangement3Bot:   return QStringLiteral("3B");
+    case Arrangement3Left:  return QStringLiteral("3L");
+    case Arrangement3Right: return QStringLiteral("3R");
+    case Arrangement4:      return QStringLiteral("4");
+    case Arrangement1:
+    case ArrangementUnknown:
+        break;
+    }
+    return {};
+}
+
 void PlayerLayoutManager::endMultiviewRecord()
 {
     QVector<int> endTimes;
@@ -949,8 +968,10 @@ void PlayerLayoutManager::endMultiviewRecord()
         }
     }
 
+    QString arr = getArrangementCode(m_currentArrangement);
+
     QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
-    const QString base = QStringLiteral("%1/[multiview] %2").arg(dir, namefilesshortcuted);
+    const QString base = QStringLiteral("%1/[multiview %2] %3").arg(dir).arg(arr).arg(namefilesshortcuted);
     const QString ext = ".mp4";
 
     QString initialPath = base+ext;

@@ -85,7 +85,7 @@ InterfaceTab::InterfaceTab(QWidget *parent) : BasePreferenceTab("General", paren
         m_container
     );
 
-    timelineTagFrame->comboBox()->setItemData(0, prefManager.getText("shot_start_image_tooltip"), Qt::ToolTipRole);
+    //timelineTagFrame->comboBox()->setItemData(0, prefManager.getText("shot_start_image_tooltip"), Qt::ToolTipRole);
 
     addPreferenceFrame(timelineTagFrame);
 

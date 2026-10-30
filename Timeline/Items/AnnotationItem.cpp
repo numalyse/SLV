@@ -25,7 +25,11 @@ AnnotationItem::AnnotationItem(const Annotation& annot, double widthMs, QGraphic
 
 QRectF AnnotationItem::boundingRect() const
 {
-    return QRectF(0, s_topMargin, m_widthMs, s_height);
+    if (m_widthMs > 0.0 || m_pixelsPerMs <= 0.0)
+        return QRectF(0, s_topMargin, m_widthMs, s_height);
+
+    const double halfWidthMs = s_minVisibleWidthPx / (2.0 * m_pixelsPerMs);
+    return QRectF(-halfWidthMs, s_topMargin, 2.0 * halfWidthMs, s_height);
 }
 
 void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -42,11 +46,15 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
     p->setBrush(QBrush(m_annot.color));
 
     // the layer transform will resize the item based on its transform
-    p->drawRect(QRectF(0, s_topMargin, m_widthMs, s_height));
-
     // horizontal factor of the parent layer transform
     const double pixelsPerMs = p->transform().m11();
     if (pixelsPerMs <= 0.0) return;
+
+    const double displayWidthMs = m_widthMs > 0.0
+        ? m_widthMs
+        : s_minVisibleWidthPx / pixelsPerMs;
+    const double displayStartMs = m_widthMs > 0.0 ? 0.0 : -displayWidthMs / 2.0;
+    p->drawRect(QRectF(displayStartMs, s_topMargin, displayWidthMs, s_height));
 
     const double availableWidthPx = m_widthMs * pixelsPerMs - 2 * s_textMargin;
     if (availableWidthPx < 20.0) return; // size too small, prevent rendering text
@@ -92,5 +100,13 @@ void AnnotationItem::setWidth(double newWidthMs)
     m_widthMs = newWidthMs;
     m_rightHandle->setX(m_widthMs);
     invalidateTextCache();
+    update();
+}
+
+void AnnotationItem::setPixelsPerMs(double pixelsPerMs)
+{
+    if (m_pixelsPerMs == pixelsPerMs) return;
+    prepareGeometryChange();
+    m_pixelsPerMs = pixelsPerMs;
     update();
 }

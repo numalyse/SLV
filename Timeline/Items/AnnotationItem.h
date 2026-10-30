@@ -20,6 +20,7 @@ public:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     int type() const override { return SLV::TypeAnnotationItem; }
 
+    void setPixelsPerMs(double pixelsPerMs);
     Annotation& annotation() { return m_annot; };
     int annotationId() const { return m_annot.id; };
 
@@ -45,6 +46,7 @@ private:
 
     Annotation m_annot{};
     double m_widthMs{};
+    double m_pixelsPerMs{1.0};
 
     AnnotationHandleItem* m_leftHandle = nullptr;
     AnnotationHandleItem* m_rightHandle = nullptr;
@@ -55,6 +57,7 @@ private:
     static constexpr double s_height = 17.0;
     static constexpr double s_topMargin = 30.0;
     static constexpr double s_textMargin = 4.0;
+    static constexpr double s_minVisibleWidthPx = 4.0;
 };
 
 

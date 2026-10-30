@@ -932,9 +932,9 @@ void PlayerLayoutManager::startMultiviewRecord()
     emit SignalManager::instance().globalRecordingStarted();
 }
 
-QString getArrangementCode(const PlayerLayoutArrangement& arrangement)
+QString PlayerLayoutManager::getArrangementCode()
 {
-    switch (arrangement) {
+    switch (m_currentArrangement) {
     case Arrangement2H:     return QStringLiteral("2H");
     case Arrangement2V:     return QStringLiteral("2V");
     case Arrangement3H:     return QStringLiteral("3H");
@@ -968,7 +968,7 @@ void PlayerLayoutManager::endMultiviewRecord()
         }
     }
 
-    QString arr = getArrangementCode(m_currentArrangement);
+    QString arr = getArrangementCode();
 
     QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
     const QString base = QStringLiteral("%1/[multiview %2] %3").arg(dir).arg(arr).arg(namefilesshortcuted);

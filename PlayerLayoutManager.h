@@ -125,6 +125,7 @@ public slots:
     void disableGlobalToolbarButtons();
     void arrangePlayerLayout(const PlayerLayoutArrangement&);
 
+    QString getArrangementCode();
     void startMultiviewRecord();
     void endMultiviewRecord();
 };

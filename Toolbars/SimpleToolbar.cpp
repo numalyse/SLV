@@ -84,15 +84,15 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "slow_white",  PrefManager::instance().getText("tooltip_speed") + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + "/"
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>",
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + ")</i>",
         "slow_white",
         PrefManager::instance().getText("tooltip_speed") +  "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + "/"
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>");
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + ")</i>");
 
     m_stopBtn->hide();
 

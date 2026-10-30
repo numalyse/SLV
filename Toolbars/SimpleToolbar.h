@@ -126,6 +126,8 @@ private:
 
     void equalizeContainerWidths();
 
+    void updateSliderState(bool state);
+
 protected:
     void createSlider();
     void createTimeTotBtn();

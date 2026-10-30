@@ -334,6 +334,11 @@ void SimpleToolbar::equalizeContainerWidths()
     m_rightContainer->setFixedWidth(w);
 }
 
+void SimpleToolbar::updateSliderState(bool state)
+{
+    m_slider->setEnabled(state);
+}
+
 void SimpleToolbar::resetSlider()
 {
     m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(0,1));
@@ -739,6 +744,13 @@ void SimpleToolbar::createSlider(){
 
     connect(m_seekTimer, &QTimer::timeout, this, [this](){
         emit setPositionRequested(m_slider->value());
+    });
+
+    connect(&SignalManager::instance(), &SignalManager::recordButtonActivated, this, [this]() {
+        updateSliderState(false);
+    });
+    connect(&SignalManager::instance(), &SignalManager::recordButtonDectivated, this, [this]() {
+        updateSliderState(true);
     });
 }
 

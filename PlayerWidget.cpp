@@ -504,12 +504,14 @@ void PlayerWidget::startRecord()
 {
     m_mediaWidget->startRecord();
     emit SignalManager::instance().recordButtonUiUpdate();
+    emit SignalManager::instance().recordButtonActivated();
 }
 
 void PlayerWidget::endRecord()
 {
     m_mediaWidget->endRecord();
     emit SignalManager::instance().recordButtonUiUpdate();
+    emit SignalManager::instance().recordButtonDectivated();
 }
 
 void PlayerWidget::rotate()

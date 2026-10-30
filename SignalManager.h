@@ -58,6 +58,8 @@ signals:
     void playerWidgetMediaDropped(const QStringList&);
     void windowMovedOrResized();
     void recordButtonUiUpdate();
+    void recordButtonActivated();
+    void recordButtonDectivated();
     void addPlaylistItems(const QStringList&);
     void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
     void activateMediaChangeBtn(const bool);

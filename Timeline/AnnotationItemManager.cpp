@@ -35,6 +35,8 @@ void AnnotationItemManager::updateAnnotItemsPosition(){
     const double pixelsPerMs = p_mathManager->pixelsPerMs();
 
     m_layer->setTransform(QTransform::fromScale(pixelsPerMs, 1.0));
+    for (AnnotationItem* item : m_items)
+        item->setPixelsPerMs(pixelsPerMs);
 }
 
 void AnnotationItemManager::onAnnotationAdded(Annotation& annotation){
@@ -114,6 +116,7 @@ void AnnotationItemManager::createAnnotItem(const Annotation& annotation)
     }
 
     AnnotationItem* item = new AnnotationItem(annotation, annotation.end - annotation.start, m_layer);
+    item->setPixelsPerMs(p_mathManager->pixelsPerMs());
 
     m_items.append(item);
     item->setX(annotation.start);

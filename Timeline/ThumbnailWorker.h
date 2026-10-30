@@ -69,7 +69,7 @@ private:
     QWaitCondition m_condition;
     bool m_stop = false;
     bool m_releaseCap = false;
-    int m_frameOffset = 100;
+    int m_frameOffset = 0; // previously 100
 };
 
 

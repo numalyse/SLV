@@ -932,23 +932,52 @@ void PlayerLayoutManager::startMultiviewRecord()
     emit SignalManager::instance().globalRecordingStarted();
 }
 
+QString PlayerLayoutManager::getArrangementCode()
+{
+    switch (m_currentArrangement) {
+    case Arrangement2H:     return QStringLiteral("2H");
+    case Arrangement2V:     return QStringLiteral("2V");
+    case Arrangement3H:     return QStringLiteral("3H");
+    case Arrangement3V:     return QStringLiteral("3V");
+    case Arrangement3Top:   return QStringLiteral("3T");
+    case Arrangement3Bot:   return QStringLiteral("3B");
+    case Arrangement3Left:  return QStringLiteral("3L");
+    case Arrangement3Right: return QStringLiteral("3R");
+    case Arrangement4:      return QStringLiteral("4");
+    case Arrangement1:
+    case ArrangementUnknown:
+        break;
+    }
+    return {};
+}
+
 void PlayerLayoutManager::endMultiviewRecord()
 {
     QVector<int> endTimes;
+
+    QString namefilesshortcuted = "";
 
     for(size_t IPlayer = 0 ; IPlayer < m_activePlayers.size() ; ++IPlayer){
         endTimes.append(m_activePlayers[IPlayer]->mediaWidget()->getCurrentTime());
         m_activePlayers[IPlayer]->toolbar()->slider()->setEnabled(true);
         m_activePlayers[IPlayer]->mediaWidget()->setIsRecording(false);
         m_activePlayers[IPlayer]->pause();
+        namefilesshortcuted += m_activePlayers[IPlayer]->mediaWidget()->media()->fileName().left(5);
+        if (IPlayer != m_activePlayers.size() - 1) {
+            namefilesshortcuted += "_";
+        }
     }
 
-    QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
+    QString arr = getArrangementCode();
 
-    QString initialPath = dir + "/[multiview] video capture.mp4";
+    QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
+    const QString base = QStringLiteral("%1/[multiview %2] %3").arg(dir).arg(arr).arg(namefilesshortcuted);
+    const QString ext = ".mp4";
+
+    QString initialPath = base+ext;
     int i = 1;
-    while(QFileInfo::exists(initialPath)) {
-        initialPath = dir + "/[multiview] video capture (" + QString::number(i) + ").mp4";
+    while (QFileInfo::exists(initialPath)) {
+        initialPath = QStringLiteral("%1 (%2)%3").arg(base).arg(i).arg(ext);
         ++i;
     }
 

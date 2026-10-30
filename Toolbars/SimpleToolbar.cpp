@@ -84,15 +84,15 @@ SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 
     m_speedBtn = new ToolbarToggleHoverButton(this, speedFrameLayout, false, "slow_white",  PrefManager::instance().getText("tooltip_speed") + "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + "/"
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>",
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + ")</i>",
         "slow_white",
         PrefManager::instance().getText("tooltip_speed") +  "<br><i>("
         + PrefManager::instance().getText("tooltip_shortcut")
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + "/"
         + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "decrease_speed") + "/"
-        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + ")</i>");
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "base_speed") + "/"
+        + PrefManager::instance().getPref("Shortcuts", "AdvancedTB", "increase_speed") + ")</i>");
 
     m_stopBtn->hide();
 
@@ -332,6 +332,11 @@ void SimpleToolbar::equalizeContainerWidths()
 
     m_leftContainer->setFixedWidth(w);
     m_rightContainer->setFixedWidth(w);
+}
+
+void SimpleToolbar::updateSliderState(bool state)
+{
+    m_slider->setEnabled(state);
 }
 
 void SimpleToolbar::resetSlider()
@@ -739,6 +744,13 @@ void SimpleToolbar::createSlider(){
 
     connect(m_seekTimer, &QTimer::timeout, this, [this](){
         emit setPositionRequested(m_slider->value());
+    });
+
+    connect(&SignalManager::instance(), &SignalManager::recordButtonActivated, this, [this]() {
+        updateSliderState(false);
+    });
+    connect(&SignalManager::instance(), &SignalManager::recordButtonDectivated, this, [this]() {
+        updateSliderState(true);
     });
 }
 

@@ -43,10 +43,10 @@
             "screenshot" : "Shift + S"
         },
         "AdvancedTB" : {
-            "_order": ["decrease_speed", "increase_speed", "base_speed", "prev_media", "next_media", "loop"],
+            "_order": ["decrease_speed", "base_speed","increase_speed",  "prev_media", "next_media", "loop"],
             "decrease_speed" : "-",
-            "increase_speed" : "+",
             "base_speed" : "=",
+            "increase_speed" : "+",
             "prev_media" : "Up",
             "next_media" : "Down",
             "loop" : "B"

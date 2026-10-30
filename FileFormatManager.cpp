@@ -22,7 +22,7 @@ FileFormatManager::FileFormatManager()
 const bool FileFormatManager::isFormatAccepted(const QString& format)
 {
     const QStringList allowedFormats = getFormatsList("containers_video") + getFormatsList("containers_audio") + getFormatsList("images");
-    return allowedFormats.contains(format);
+    return allowedFormats.contains(format.toLower());
 }
 
 const QString FileFormatManager::getOpenFileDialogFilters()

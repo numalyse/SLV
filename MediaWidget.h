@@ -176,6 +176,8 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
+    void updateMediaGeometry();
+
 signals:
     void vlcTimeChanged(int64_t newTime);
     void activated(MediaWidget* self);

@@ -91,6 +91,7 @@ MediaWidget::MediaWidget(QWidget *parent)
         "--aout=directsound",
         "--no-osd",
         "--no-snapshot-preview",
+        "--avcodec-hw=none",
         pluginArg.c_str(),
         "--verbose=2"
     };
@@ -893,30 +894,11 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
         
         QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
 
-            unsigned width = 0;
-            unsigned height = 0;
-
-            libvlc_video_get_size(mediaWidget->m_player, 0, &width, &height);
-            
-
             if (mediaWidget->m_transformState == TransformState::Idle) {
                 emit mediaWidget->playbackStarted();
             }
 
-            if (width > 0 && height > 0)
-            {
-                double sar = mediaWidget->m_media->sar();
-                double safeSar = (sar > 0) ? sar : 1.0;
-                mediaWidget->m_mediaSize = QSize(width * safeSar, height); // Update size
-
-                const QRect mediaRect = mediaWidget->getMediaDisplayRect();
-                mediaWidget->m_mediaSurface->setGeometry(mediaRect);
-                emit mediaWidget->mediaRectChanged(mediaRect);
-
-                mediaWidget->update();
-                //emit mediaWidget->mediaSizeChanged(mediaWidget->m_mediaSize);
-                //qDebug() << "media size OK:" << width << height;
-            }
+            mediaWidget->updateMediaGeometry();
 
             if (mediaWidget->m_media->audioTracks().isEmpty() && mediaWidget->m_media->subtitlesTracks().isEmpty()){
                 mediaWidget->parseTracks();
@@ -930,7 +912,17 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
     }
     else if (event->type == libvlc_MediaPlayerESAdded)
     {
-        if (event->u.media_player_es_changed.i_type != libvlc_track_text)
+        const int esType = event->u.media_player_es_changed.i_type;
+
+        if (esType == libvlc_track_video) {
+            QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+                emit mediaWidget->hideAudioLogo();
+                mediaWidget->updateMediaGeometry();
+            }, Qt::QueuedConnection);
+            return;
+        }
+
+        if (esType != libvlc_track_text)
             return;
 
         int trackId = event->u.media_player_es_changed.i_id;
@@ -940,6 +932,21 @@ void MediaWidget::onVlcEvent(const libvlc_event_t *event, void *userData)
 
             emit mediaWidget->subtitleTrackAdded(trackId, mediaWidget->m_pendingSubtitleLabel);
             mediaWidget->m_pendingSubtitleLabel.clear();
+        }, Qt::QueuedConnection);
+    }
+    else if (event->type == libvlc_MediaPlayerVout)
+    {
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget]() {
+            mediaWidget->updateMediaGeometry();
+        }, Qt::QueuedConnection);
+    }
+    else if (event->type == libvlc_MediaPlayerLengthChanged)
+    {
+        const int64_t newLength = event->u.media_player_length_changed.new_length;
+        QMetaObject::invokeMethod(mediaWidget, [mediaWidget, newLength]() {
+            if (newLength > 0) {
+                emit mediaWidget->updateSliderRangeRequested(newLength);
+            }
         }, Qt::QueuedConnection);
     }
 }
@@ -1124,6 +1131,8 @@ void MediaWidget::releaseEventManager(){
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
         libvlc_event_detach(m_eventManager, libvlc_MediaPlayerSnapshotTaken, onVlcSnapshot, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerVout, onVlcEvent, this);
+        libvlc_event_detach(m_eventManager, libvlc_MediaPlayerLengthChanged, onVlcEvent, this);
         m_eventManager = nullptr;
     }else {
         qDebug() << "MediaWidget : detach event manager alors que le media player est null";
@@ -1140,6 +1149,8 @@ void MediaWidget::createEventManager(){
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerPaused, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerESAdded, onVlcEvent, this);
         libvlc_event_attach(m_eventManager, libvlc_MediaPlayerSnapshotTaken, onVlcSnapshot, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerVout, onVlcEvent, this);
+        libvlc_event_attach(m_eventManager, libvlc_MediaPlayerLengthChanged, onVlcEvent, this);
     }else {
         qDebug() << "MediaWidget : Create event manager alors que le media player est null";
     }
@@ -1165,4 +1176,43 @@ void MediaWidget::createMedia(const QString& filePath, const bool fromTransform)
 
 
     m_media->parseTracks(m_player);
+}
+
+/// @brief Met à jour la taille d'affichage (avec SAR) de la surface vidéo.
+/// Appelée dès que la vidéo est disponible (Playing, Vout, ESAdded vidéo).
+void MediaWidget::updateMediaGeometry()
+{
+    if (!m_player || !m_media) return;
+
+    unsigned width = 0, height = 0;
+    libvlc_video_get_size(m_player, 0, &width, &height);
+    if (width == 0 || height == 0) return; // vidéo pas encore prête, on réessaiera
+
+    // SAR : d'abord celui de Media, sinon on le lit directement dans les pistes VLC
+    double sar = m_media->sar();
+    if (sar <= 0) {
+        sar = 1.0;
+        libvlc_media_t* vm = libvlc_media_player_get_media(m_player);
+        if (vm) {
+            libvlc_media_track_t** tracks = nullptr;
+            unsigned n = libvlc_media_tracks_get(vm, &tracks);
+            for (unsigned i = 0; i < n; ++i) {
+                if (tracks[i]->i_type == libvlc_track_video
+                    && tracks[i]->video->i_sar_num > 0
+                    && tracks[i]->video->i_sar_den > 0) {
+                    sar = double(tracks[i]->video->i_sar_num) / tracks[i]->video->i_sar_den;
+                    break;
+                }
+            }
+            if (tracks) libvlc_media_tracks_release(tracks, n);
+            libvlc_media_release(vm); // get_media() incrémente le compteur de références
+        }
+    }
+
+    m_mediaSize = QSize(qRound(width * sar), height);
+
+    const QRect mediaRect = getMediaDisplayRect();
+    m_mediaSurface->setGeometry(mediaRect);
+    emit mediaRectChanged(mediaRect);
+    update();
 }

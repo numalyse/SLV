@@ -936,19 +936,27 @@ void PlayerLayoutManager::endMultiviewRecord()
 {
     QVector<int> endTimes;
 
+    QString namefilesshortcuted = "";
+
     for(size_t IPlayer = 0 ; IPlayer < m_activePlayers.size() ; ++IPlayer){
         endTimes.append(m_activePlayers[IPlayer]->mediaWidget()->getCurrentTime());
         m_activePlayers[IPlayer]->toolbar()->slider()->setEnabled(true);
         m_activePlayers[IPlayer]->mediaWidget()->setIsRecording(false);
         m_activePlayers[IPlayer]->pause();
+        namefilesshortcuted += m_activePlayers[IPlayer]->mediaWidget()->media()->fileName().left(5);
+        if (IPlayer != m_activePlayers.size() - 1) {
+            namefilesshortcuted += "_";
+        }
     }
 
     QString dir = PrefManager::instance().getPref("Paths", "lp_multicapture");
+    const QString base = QStringLiteral("%1/[multiview] %2").arg(dir, namefilesshortcuted);
+    const QString ext = ".mp4";
 
-    QString initialPath = dir + "/[multiview] video capture.mp4";
+    QString initialPath = base+ext;
     int i = 1;
-    while(QFileInfo::exists(initialPath)) {
-        initialPath = dir + "/[multiview] video capture (" + QString::number(i) + ").mp4";
+    while (QFileInfo::exists(initialPath)) {
+        initialPath = QStringLiteral("%1 (%2)%3").arg(base).arg(i).arg(ext);
         ++i;
     }
 

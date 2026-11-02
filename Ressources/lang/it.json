@@ -274,7 +274,7 @@
     "annotation_name" : "Nome",
     "annotation_note" : "Nota",
     "annotation_conflict" : "Conflitto con un'altra annotazione",
-    "annotation_conflict_2" : "Timecode di fine non valido",
+    "annotation_conflict_2" : "Il timecode finale deve essere successivo a quello iniziale",
 
     "remove_all" : "Rimuovi tutto",
     "remove_existing_items" : "Rimuovi",

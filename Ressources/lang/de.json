@@ -273,7 +273,7 @@
     "annotation_name" : "Name",
     "annotation_note" : "Notiz",
     "annotation_conflict" : "Konflikt mit einer anderen Anmerkung",
-    "annotation_conflict_2" : "Ungültiger End-Timecode",
+    "annotation_conflict_2" : "Der End-Timecode muss nach dem Start liegen",
 
     "remove_all" : "Alle entfernen",
     "remove_existing_items" : "Entfernen",

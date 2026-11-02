@@ -273,7 +273,7 @@
     "annotation_name" : "Nome",
     "annotation_note" : "Nota",
     "annotation_conflict" : "Conflito com outra anotação",
-    "annotation_conflict_2" : "Timecode de fim inválido",
+    "annotation_conflict_2" : "O timecode final deve ser posterior ao inicial",
 
     "remove_all" : "Remover tudo",
     "remove_existing_items" : "Remover",

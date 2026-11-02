@@ -40,6 +40,7 @@ private:
     /// @brief Creates an annotation item then adds it to the scene and item list
     /// @param annotation 
     void createAnnotItem(const Annotation &annotation);
+    double zeroDurationDisplayWidthMs(const Annotation& annotation) const;
 
     QVector<AnnotationItem*> m_items;
 

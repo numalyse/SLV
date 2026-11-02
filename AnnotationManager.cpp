@@ -5,6 +5,7 @@
 #include <QDebug>
 
 #include <algorithm>
+#include <cmath>
 
 AnnotationManager::AnnotationManager(QObject *parent)
 : QObject(parent)
@@ -24,21 +25,13 @@ std::optional<Annotation> AnnotationManager::findConflict(Annotation &annotation
 
     validateAnnotation(annotation);
 
-    // first element where start > annotation.end
-    auto upperBound = std::upper_bound(p_annotations->begin(), p_annotations->end(), annotation.end, [](int64_t annotEnd, const Annotation& b){
-        return annotEnd < b.start;
-    });
-
-    auto it = upperBound;
-    while (it != p_annotations->begin())
-    {
-        it = std::prev(it);
-        if (it->id == annotation.id)
-            continue; // skip self
-        if (it->end >= annotation.start)
-            return *it; // overlap
-        break; // exit loop no overlap
+    for (const Annotation& existing : *p_annotations) {
+        if (existing.id == annotation.id)
+            continue;
+        if (existing.start < annotation.end && annotation.start < existing.end)
+            return existing;
     }
+
     return std::nullopt;
 }
 
@@ -47,23 +40,17 @@ std::optional<QVector<Annotation>::iterator> AnnotationManager::findInsertPositi
     if (!p_annotations)
         return std::nullopt;
 
-    // first element where start > annotation.end
-    auto upperBound = std::upper_bound(p_annotations->begin(), p_annotations->end(), annotation.end, [](int64_t annotEnd, const Annotation& b){
-        return annotEnd < b.start;
-    });
-
-    // only need to check overlap with the closest predecessor that is not the annotation itself
-    auto it = upperBound;
-    while (it != p_annotations->begin())
-    {
-        it = std::prev(it);
-        if (it->id == annotation.id)
-            continue; // skip self
-        if (it->end >= annotation.start)
+    for (const Annotation& existing : *p_annotations) {
+        if (existing.id == annotation.id)
+            continue;
+        if (existing.start < annotation.end && annotation.start < existing.end)
             return std::nullopt; // overlap
-        break; // exit loop no overlap
     }
-    return upperBound;
+
+    return std::lower_bound(p_annotations->begin(), p_annotations->end(), annotation.start,
+                            [](const Annotation& existing, int64_t annotStart) {
+                                return existing.start < annotStart;
+                            });
 }
 
 void AnnotationManager::setAnnotations(QVector<Annotation> *annotations)
@@ -166,6 +153,8 @@ void AnnotationManager::resizeAnnotation(const Annotation &annotation)
     }
 
     auto upperBound = std::next(it);
+    const int64_t originalStart = it->start;
+    const int64_t originalEnd = it->end;
 
     bool leftMoved = (it->end == annotation.end);
     bool hasNext = (upperBound != p_annotations->end());
@@ -181,13 +170,20 @@ void AnnotationManager::resizeAnnotation(const Annotation &annotation)
     validateAnnotation(*it, leftMoved);
 
     // clamp start and end to neighbour
-    if(hasNext && (*it).end >= (*upperBound).start){
-        it->end = (*upperBound).start - 1;
+    if(hasNext && (*it).end > (*upperBound).start){
+        it->end = (*upperBound).start;
     }
     if(hasPrev){
         auto lowerBound = std::prev(it);
-        if( (*it).start <= (*lowerBound).end )
-            it->start = (*lowerBound).end + 1;
+        if( (*it).start < (*lowerBound).end )
+            it->start = (*lowerBound).end;
+    }
+
+    Media* media = ProjectManager::instance().media();
+    const int64_t duration = media ? media->duration() : 0;
+    if (it->end - it->start < minimumAnnotationDurationMs(duration)) {
+        it->start = originalStart;
+        it->end = originalEnd;
     }
 
     // sends it back to timeline and panel to update ui
@@ -216,7 +212,7 @@ void AnnotationManager::validateAnnotation(Annotation& annotation, bool leftMove
 {
     Media* media = ProjectManager::instance().media();
     const int64_t duration = media ? media->duration() : 0;
-    const int64_t minAnnotDur = (duration > 0) ? qMin(m_minAnnotDurationMs, duration) : m_minAnnotDurationMs;
+    const int64_t minAnnotDur = minimumAnnotationDurationMs(duration);
 
     // check for value < 0
     annotation.start = qMax(annotation.start, int64_t{0});
@@ -244,3 +240,12 @@ void AnnotationManager::validateAnnotation(Annotation& annotation, bool leftMove
     }
 }
 
+int64_t AnnotationManager::minimumAnnotationDurationMs(int64_t mediaDuration) const
+{
+    Media* media = ProjectManager::instance().media();
+    const double fps = media ? media->fps() : 0.0;
+    const int64_t frameDurationMs = fps > 0.0
+        ? std::max<int64_t>(1, static_cast<int64_t>(std::ceil(1000.0 / fps)))
+        : 1;
+    return mediaDuration > 0 ? qMin(frameDurationMs, mediaDuration) : frameDurationMs;
+}

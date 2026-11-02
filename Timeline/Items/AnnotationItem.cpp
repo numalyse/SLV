@@ -21,6 +21,7 @@ AnnotationItem::AnnotationItem(const Annotation& annot, double widthMs, QGraphic
     m_rightHandle->setPos(m_widthMs, s_topMargin);
     m_leftHandle->setVisible(false);
     m_rightHandle->setVisible(false);
+    updateHandlePositions();
 }
 
 QRectF AnnotationItem::boundingRect() const
@@ -28,8 +29,12 @@ QRectF AnnotationItem::boundingRect() const
     if (m_widthMs > 0.0 || m_pixelsPerMs <= 0.0)
         return QRectF(0, s_topMargin, m_widthMs, s_height);
 
-    const double halfWidthMs = s_minVisibleWidthPx / (2.0 * m_pixelsPerMs);
-    return QRectF(-halfWidthMs, s_topMargin, 2.0 * halfWidthMs, s_height);
+    return QRectF(0, s_topMargin, effectiveDisplayWidthMs(m_pixelsPerMs), s_height);
+}
+
+double AnnotationItem::effectiveDisplayWidthMs(double pixelsPerMs) const
+{
+    return std::max(m_zeroDurationDisplayWidthMs, s_minVisibleWidthPx / pixelsPerMs);
 }
 
 void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -52,9 +57,8 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     const double displayWidthMs = m_widthMs > 0.0
         ? m_widthMs
-        : s_minVisibleWidthPx / pixelsPerMs;
-    const double displayStartMs = m_widthMs > 0.0 ? 0.0 : -displayWidthMs / 2.0;
-    p->drawRect(QRectF(displayStartMs, s_topMargin, displayWidthMs, s_height));
+        : effectiveDisplayWidthMs(pixelsPerMs);
+    p->drawRect(QRectF(0.0, s_topMargin, displayWidthMs, s_height));
 
     const double availableWidthPx = m_widthMs * pixelsPerMs - 2 * s_textMargin;
     if (availableWidthPx < 20.0) return; // size too small, prevent rendering text
@@ -98,7 +102,7 @@ void AnnotationItem::setWidth(double newWidthMs)
     if (m_widthMs == newWidthMs) return;
     prepareGeometryChange();
     m_widthMs = newWidthMs;
-    m_rightHandle->setX(m_widthMs);
+    updateHandlePositions();
     invalidateTextCache();
     update();
 }
@@ -108,5 +112,23 @@ void AnnotationItem::setPixelsPerMs(double pixelsPerMs)
     if (m_pixelsPerMs == pixelsPerMs) return;
     prepareGeometryChange();
     m_pixelsPerMs = pixelsPerMs;
+    updateHandlePositions();
     update();
+}
+
+void AnnotationItem::setZeroDurationDisplayWidthMs(double widthMs)
+{
+    if (m_zeroDurationDisplayWidthMs == widthMs) return;
+    prepareGeometryChange();
+    m_zeroDurationDisplayWidthMs = widthMs;
+    updateHandlePositions();
+    update();
+}
+
+void AnnotationItem::updateHandlePositions()
+{
+    const double handleWidthMs = m_widthMs > 0.0
+        ? m_widthMs
+        : effectiveDisplayWidthMs(m_pixelsPerMs);
+    m_rightHandle->setX(handleWidthMs);
 }

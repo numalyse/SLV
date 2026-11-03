@@ -61,7 +61,8 @@ private:
     AnnotationHandleItem* m_leftHandle = nullptr;
     AnnotationHandleItem* m_rightHandle = nullptr;
 
-    QString m_elidedText;
+    QString m_elidedName;
+    QString m_elidedNote;
     int m_elidedForWidth = -1; 
 
     static constexpr double s_height = 17.0;

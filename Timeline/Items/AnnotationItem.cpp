@@ -66,21 +66,40 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     static const QFont s_textFont = []{ QFont f; f.setPointSize(10); return f; }();
     static const QFontMetrics s_textMetrics(s_textFont);
+    static const QFont s_nameFont = []{ QFont f; f.setPointSize(10); f.setBold(true); return f; }();
+    static const QFontMetrics s_nameMetrics(s_nameFont);
 
     const int availableWidthPxInt = static_cast<int>(availableWidthPx);
     if (availableWidthPxInt != m_elidedForWidth) { 
-        QString text = m_annot.name + " " + QString(m_annot.note).replace('\n', " ");
-        m_elidedText = s_textMetrics.elidedText(text, Qt::ElideRight, availableWidthPxInt);
+        const QString note = QString(m_annot.note).replace('\n', " ");
+        const int separatorWidth = s_textMetrics.horizontalAdvance(" ");
+        const int nameWidth = s_nameMetrics.horizontalAdvance(m_annot.name);
+        if (nameWidth + separatorWidth > availableWidthPxInt) {
+            m_elidedName = s_nameMetrics.elidedText(m_annot.name, Qt::ElideRight, availableWidthPxInt);
+            m_elidedNote.clear();
+        } else {
+            m_elidedName = m_annot.name;
+            const int noteWidth = availableWidthPxInt - nameWidth - separatorWidth;
+            m_elidedNote = s_textMetrics.elidedText(note, Qt::ElideRight, noteWidth);
+        }
         m_elidedForWidth = availableWidthPxInt;
     }
 
-    if (m_elidedText.isEmpty()) return;
+    if (m_elidedName.isEmpty() && m_elidedNote.isEmpty()) return;
 
     p->save();
     p->scale(1.0 / pixelsPerMs, 1.0); // cancel painter horizontal scale to draw text
-    p->setFont(s_textFont);
     p->setPen(qGray(m_annot.color.rgb()) > 128 ? Qt::black : Qt::white);
-    p->drawText(QRectF(s_textMargin, s_topMargin, availableWidthPx, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedText);
+    p->setFont(s_nameFont);
+    p->drawText(QRectF(s_textMargin, s_topMargin, availableWidthPx, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedName);
+
+    const double noteX = s_textMargin + s_nameMetrics.horizontalAdvance(m_elidedName)
+        + s_textMetrics.horizontalAdvance(" ");
+    const double noteWidth = availableWidthPx - (noteX - s_textMargin);
+    if (!m_elidedNote.isEmpty() && noteWidth > 0.0) {
+        p->setFont(s_textFont);
+        p->drawText(QRectF(noteX, s_topMargin, noteWidth, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedNote);
+    }
     p->restore();
 }
 

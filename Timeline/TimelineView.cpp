@@ -74,10 +74,16 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
         }
     }else if (event->button() == Qt::RightButton) {
         QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
-        for (auto* item : itemsAtCursor){ 
+        for (auto* item : itemsAtCursor) {
             // emit signal if cursor is on top of a shot item (even if underneath by other item)
-            if(item->type() == SLV::TypeShotItem || item->type() == SLV::TypeAudioShotItem){ 
-                emit itemRightClick( event->globalPos(), item);
+            if (item->type() == SLV::TypeShotItem
+                || item->type() == SLV::TypeAudioShotItem
+                || item->type() == SLV::TypeAnnotationItem) {
+                emit itemRightClick(event->globalPos(), item);
+                break;
+            } else if (item->type() == SLV::TypeAnnotationHandleItem) {
+                auto* handle = static_cast<AnnotationHandleItem*>(item);
+                emit itemRightClick(event->globalPos(), handle->annotParent());
                 break;
             }
         }

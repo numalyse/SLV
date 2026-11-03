@@ -86,6 +86,7 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
 void AnnotationItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
+    setToolTip(m_annot.name.isEmpty() ? m_annot.note : "<b>" + m_annot.name + "</b><br>" + m_annot.note);
     updateHandleVisibility(event->pos());
     QGraphicsItem::hoverEnterEvent(event);
 }

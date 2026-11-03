@@ -45,12 +45,6 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    // cosmetic pen, the horizontal scale will not thicken its borders
-    QPen pen(Qt::black);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->setBrush(QBrush(m_annot.color));
-
     // the layer transform will resize the item based on its transform
     // horizontal factor of the parent layer transform
     const double pixelsPerMs = p->transform().m11();
@@ -59,6 +53,13 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
     const double displayWidthMs = m_widthMs > 0.0
         ? m_widthMs
         : effectiveDisplayWidthMs(pixelsPerMs);
+    const double displayWidthPx = displayWidthMs * pixelsPerMs;
+
+    // Match the outline to the fill when the item is too narrow for a black border.
+    QPen pen(displayWidthPx <= 2.0 ? m_annot.color : QColor(Qt::black));
+    pen.setCosmetic(true);
+    p->setPen(pen);
+    p->setBrush(QBrush(m_annot.color));
     p->drawRect(QRectF(0.0, s_topMargin, displayWidthMs, s_height));
 
     const double availableWidthPx = m_widthMs * pixelsPerMs - 2 * s_textMargin;

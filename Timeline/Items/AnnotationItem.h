@@ -17,6 +17,7 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     int type() const override { return SLV::TypeAnnotationItem; }
 
@@ -49,6 +50,7 @@ private:
     void invalidateTextCache() { m_elidedForWidth = -1; }
     double effectiveDisplayWidthMs(double pixelsPerMs) const;
     void updateHandlePositions();
+    void updateHandleVisibility(const QPointF& mousePos);
 
     Annotation m_annot{};
     double m_widthMs{};
@@ -65,6 +67,7 @@ private:
     static constexpr double s_topMargin = 30.0;
     static constexpr double s_textMargin = 4.0;
     static constexpr double s_minVisibleWidthPx = 5.0;
+    static constexpr double s_handleHoverMarginPx = 8.0;
 };
 
 

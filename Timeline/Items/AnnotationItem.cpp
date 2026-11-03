@@ -85,9 +85,14 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
 void AnnotationItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
-    m_leftHandle->setVisible(true);
-    m_rightHandle->setVisible(true);
+    updateHandleVisibility(event->pos());
     QGraphicsItem::hoverEnterEvent(event);
+}
+
+void AnnotationItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+    updateHandleVisibility(event->pos());
+    QGraphicsItem::hoverMoveEvent(event);
 }
 
 void AnnotationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
@@ -131,4 +136,21 @@ void AnnotationItem::updateHandlePositions()
         ? m_widthMs
         : effectiveDisplayWidthMs(m_pixelsPerMs);
     m_rightHandle->setX(handleWidthMs);
+}
+
+void AnnotationItem::updateHandleVisibility(const QPointF& mousePos)
+{
+    const double pixelsPerMs = m_pixelsPerMs;
+    if (pixelsPerMs <= 0.0) {
+        m_leftHandle->setVisible(false);
+        m_rightHandle->setVisible(false);
+        return;
+    }
+
+    const double mouseX = mousePos.x() * pixelsPerMs;
+    const double widthPx = (m_widthMs > 0.0
+        ? m_widthMs
+        : effectiveDisplayWidthMs(pixelsPerMs)) * pixelsPerMs;
+    m_leftHandle->setVisible(mouseX <= s_handleHoverMarginPx);
+    m_rightHandle->setVisible(widthPx - mouseX <= s_handleHoverMarginPx);
 }

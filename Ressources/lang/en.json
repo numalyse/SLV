@@ -118,7 +118,7 @@
     "messagebox_extract_selected_shots_failed" : "Extraction of selected segments failed.",
     "timeline_clear_all_selected_shots" : "Clear all selected segments",
 
-    "timeline_annot_move_cursor_at" : "Move cursor to annotation",
+    "timeline_annot_move_cursor_at" : "Move cursor to annotation start",
     "timeline_annot_open_info" : "Open annotations panel",
     "timeline_annot_edit_color" : "Edit annotation color",
     "timeline_annot_delete" : "Delete annotation",

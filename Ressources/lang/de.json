@@ -118,7 +118,7 @@
     "messagebox_extract_selected_shots_failed" : "Extraktion der ausgewählten Segmente fehlgeschlagen.",
     "timeline_clear_all_selected_shots" : "Alle ausgewählten Segmente löschen",
 
-    "timeline_annot_move_cursor_at" : "Zum Anfang der Anmerkung springen",
+    "timeline_annot_move_cursor_at" : "Cursor an den Anfang der Anmerkung bewegen",
     "timeline_annot_open_info" : "Anmerkungen panel öffnen",
     "timeline_annot_edit_color" : "Anmerkungsfarbe bearbeiten",
     "timeline_annot_delete" : "Anmerkung löschen",

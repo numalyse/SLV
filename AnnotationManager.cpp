@@ -26,7 +26,7 @@ AnnotationManager::AnnotationManager(QObject *parent)
 #endif
 
     connect(&SignalManager::instance(), &SignalManager::deleteAnnot, this, [this](const Annotation& annotation){
-        deleteAnnotDialog(annotation);
+        annotation.name.isEmpty() && annotation.note.isEmpty() ? removeAnnotation(annotation.id) : deleteAnnotDialog(annotation);
     });
 
 }

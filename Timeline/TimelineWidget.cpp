@@ -3,6 +3,7 @@
 #include "TimeFormatter.h"
 #include "Project/ProjectManager.h"
 #include "PrefManager.h"
+#include "IconHelper.h"
 
 #include "Timeline/Items/RulerItem.h"
 #include "Timeline/Items/CursorItem.h"
@@ -24,6 +25,7 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QAction>
+#include <QActionGroup>
 #include <QTimer>
 #include <QShortcut>
 #include <QProgressDialog>
@@ -613,10 +615,22 @@ void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, Annotation
     QMenu menu;
     QAction *actionAnnotMoveCursorAt = nullptr;
     QAction* actionAnnotOpenInfo = nullptr;
-
     actionAnnotMoveCursorAt = menu.addAction(PrefManager::instance().getText("timeline_annot_move_cursor_at"));
     actionAnnotOpenInfo = menu.addAction(PrefManager::instance().getText("timeline_annot_open_info"));
-
+    actionAnnotOpenInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false);
+    
+    QMenu* submenu = menu.addMenu(PrefManager::instance().getText("timeline_annot_edit_color"));
+    QActionGroup* colorGroup = new QActionGroup(submenu);
+    colorGroup->setExclusive(true);
+    for (const auto& [name, color] : IconHelper::colorPalette()) {
+        QAction* actionColor = submenu->addAction(
+            IconHelper::genIconPreviewColor(color, color == QColor{255, 255, 255, 255}),
+            name);
+        actionColor->setCheckable(true);
+        actionColor->setData(color);
+        colorGroup->addAction(actionColor);
+        actionColor->setChecked(color == item->annotation().color);
+    }
 
     QAction *selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
@@ -625,8 +639,10 @@ void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, Annotation
         moveCursorAt(item);
     } else if (selectedAction == actionAnnotOpenInfo){
         emit SignalManager::instance().toggleNavPanel(PanelType::Annotation);
-    } else if (selectedAction == actionAnnotOpenInfo){
-        
+    } else if (colorGroup->actions().contains(selectedAction)) {
+        Annotation annotation = item->annotation();
+        annotation.color = selectedAction->data().value<QColor>();
+        ProjectManager::instance().annotationManager()->updateAnnotation(annotation);
     } 
 }
 

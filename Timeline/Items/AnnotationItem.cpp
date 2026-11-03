@@ -152,6 +152,13 @@ void AnnotationItem::setZeroDurationDisplayWidthMs(double widthMs)
     update();
 }
 
+void AnnotationItem::setColor(const QColor& color)
+{
+    if (m_annot.color == color) return;
+    m_annot.color = color;
+    update();
+}
+
 void AnnotationItem::updateHandlePositions()
 {
     const double handleWidthMs = m_widthMs > 0.0

@@ -24,6 +24,7 @@ public:
     void setPixelsPerMs(double pixelsPerMs);
     void setZeroDurationDisplayWidthMs(double widthMs);
     void setDraggingHandle(AnnotationHandleItem* handle);
+    void setColor(const QColor& color);
     Annotation& annotation() { return m_annot; };
     int annotationId() const { return m_annot.id; };
 

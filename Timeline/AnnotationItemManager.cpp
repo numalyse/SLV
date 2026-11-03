@@ -4,6 +4,9 @@
 #include "Timeline/Items/AnnotationHandleItem.h"
 #include "Timeline/Items/TimelineLayerItem.h"
 
+#include <algorithm>
+#include <cmath>
+
 AnnotationItemManager::AnnotationItemManager(QGraphicsScene *scene, TimelineView *view, TimelineMath *mathManager, QObject *parent)
 : QObject(parent), p_scene{scene}, p_view{view}, p_mathManager{mathManager}
 {
@@ -53,6 +56,7 @@ void AnnotationItemManager::onAnnotationUpdated(const Annotation& annotation){
     (*it)->updateAnnotation(annotation);
     (*it)->setX(annotation.start);
     (*it)->setWidth(annotation.end - annotation.start);
+    (*it)->setZeroDurationDisplayWidthMs(zeroDurationDisplayWidthMs(annotation));
 }
 
 
@@ -117,7 +121,20 @@ void AnnotationItemManager::createAnnotItem(const Annotation& annotation)
 
     AnnotationItem* item = new AnnotationItem(annotation, annotation.end - annotation.start, m_layer);
     item->setPixelsPerMs(p_mathManager->pixelsPerMs());
+    item->setZeroDurationDisplayWidthMs(zeroDurationDisplayWidthMs(annotation));
 
     m_items.append(item);
     item->setX(annotation.start);
+}
+
+double AnnotationItemManager::zeroDurationDisplayWidthMs(const Annotation& annotation) const
+{
+    const double fps = p_mathManager->fps();
+    if (annotation.end != annotation.start || fps <= 0.0 || annotation.start < 0)
+        return 0.0;
+
+    const double frameIndex = std::round(static_cast<double>(annotation.start) * fps / 1000.0);
+    const auto nextFrameStart = static_cast<int64_t>((frameIndex + 1.0) * 1000.0 / fps);
+    return static_cast<double>(std::max<int64_t>(
+        0, std::min(nextFrameStart, p_mathManager->duration()) - annotation.start));
 }

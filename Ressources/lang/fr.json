@@ -118,6 +118,13 @@
     "messagebox_extract_selected_shots_failed" : "Échec de l'extraction des segments sélectionnés.",
     "timeline_clear_all_selected_shots" : "Déselectionner tous les segments sélectionnés",
 
+    "timeline_annot_move_cursor_at" : "Déplacer le curseur au début de l'annotation",
+    "timeline_annot_open_info" : "Ouvrir le panneau d'annotations",
+    "timeline_annot_edit_color" : "Modifier la couleur de l'annotation",
+    "timeline_annot_delete" : "Supprimer l'annotation",
+    "timeline_annot_delete_ask" : "Supprimer l'annotation ?",
+    "timeline_annot_delete_text" : "Voulez-vous supprimer cette annotation ?",
+
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",
     "export_directory_tagimages": "Sélectionner l'emplacement de sauvegarde des Images-Repères",
@@ -273,7 +280,7 @@
     "annotation_name" : "Nom",
     "annotation_note" : "Note",
     "annotation_conflict" : "Conflit avec une autre annotation",
-    "annotation_conflict_2" : "Timecode de fin invalide",
+    "annotation_conflict_2" : "Le timecode de fin doit être postérieur au début",
 
     "remove_all" : "Tout retirer",
     "remove_existing_items" : "Retirer",

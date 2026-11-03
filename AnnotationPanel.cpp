@@ -130,9 +130,9 @@ void AnnotationPanel::createItem(const Annotation& annotation, bool checkOrder)
     item->refreshThumbnail(); // demande initiale, apres le connect pour ne pas perdre le signal
 
     if(checkOrder){
-        // get first item where start > new annot end
-        auto upperBound = std::upper_bound(m_items.cbegin(), m_items.cend(), annotation.end, [](int64_t annotEnd, AnnotationWidget* annotItem){
-            return annotEnd < annotItem->annot().start;
+        // get first item where start >= new annotation end
+        auto upperBound = std::lower_bound(m_items.cbegin(), m_items.cend(), annotation.end, [](AnnotationWidget* annotItem, int64_t annotEnd){
+            return annotItem->annot().start < annotEnd;
         });
 
         int index = upperBound - m_items.cbegin();
@@ -170,8 +170,8 @@ void AnnotationPanel::onAnnotationUpdated(const Annotation& annotation){
     int oldIndex = it - m_items.cbegin();
     m_items.remove(oldIndex);
 
-    auto upperBound = std::upper_bound(m_items.cbegin(), m_items.cend(), annotation.end, [](int64_t annotEnd, AnnotationWidget* annotItem){
-        return annotEnd < annotItem->annot().start;
+    auto upperBound = std::lower_bound(m_items.cbegin(), m_items.cend(), annotation.end, [](AnnotationWidget* annotItem, int64_t annotEnd){
+        return annotItem->annot().start < annotEnd;
     });
 
     int newIndex = upperBound - m_items.cbegin();

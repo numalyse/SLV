@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
+#include <QCursor>
 #include <QPen>
 #include <QFontMetrics>
 #include <algorithm>
@@ -21,6 +22,7 @@ AnnotationItem::AnnotationItem(const Annotation& annot, double widthMs, QGraphic
     m_rightHandle->setPos(m_widthMs, s_topMargin);
     m_leftHandle->setVisible(false);
     m_rightHandle->setVisible(false);
+    updateHandlePositions();
 }
 
 QRectF AnnotationItem::boundingRect() const
@@ -28,8 +30,12 @@ QRectF AnnotationItem::boundingRect() const
     if (m_widthMs > 0.0 || m_pixelsPerMs <= 0.0)
         return QRectF(0, s_topMargin, m_widthMs, s_height);
 
-    const double halfWidthMs = s_minVisibleWidthPx / (2.0 * m_pixelsPerMs);
-    return QRectF(-halfWidthMs, s_topMargin, 2.0 * halfWidthMs, s_height);
+    return QRectF(0, s_topMargin, effectiveDisplayWidthMs(m_pixelsPerMs), s_height);
+}
+
+double AnnotationItem::effectiveDisplayWidthMs(double pixelsPerMs) const
+{
+    return std::max(m_zeroDurationDisplayWidthMs, s_minVisibleWidthPx / pixelsPerMs);
 }
 
 void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -39,12 +45,6 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     p->setRenderHint(QPainter::Antialiasing, false);
 
-    // cosmetic pen, the horizontal scale will not thicken its borders
-    QPen pen(Qt::black);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->setBrush(QBrush(m_annot.color));
-
     // the layer transform will resize the item based on its transform
     // horizontal factor of the parent layer transform
     const double pixelsPerMs = p->transform().m11();
@@ -52,44 +52,76 @@ void AnnotationItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, 
 
     const double displayWidthMs = m_widthMs > 0.0
         ? m_widthMs
-        : s_minVisibleWidthPx / pixelsPerMs;
-    const double displayStartMs = m_widthMs > 0.0 ? 0.0 : -displayWidthMs / 2.0;
-    p->drawRect(QRectF(displayStartMs, s_topMargin, displayWidthMs, s_height));
+        : effectiveDisplayWidthMs(pixelsPerMs);
+    const double displayWidthPx = displayWidthMs * pixelsPerMs;
+
+    // Match the outline to the fill when the item is too narrow for a black border.
+    QPen pen(displayWidthPx <= 2.0 ? m_annot.color : QColor(Qt::black));
+    pen.setCosmetic(true);
+    p->setPen(pen);
+    p->setBrush(QBrush(m_annot.color));
+    p->drawRect(QRectF(0.0, s_topMargin, displayWidthMs, s_height));
 
     const double availableWidthPx = m_widthMs * pixelsPerMs - 2 * s_textMargin;
     if (availableWidthPx < 20.0) return; // size too small, prevent rendering text
 
     static const QFont s_textFont = []{ QFont f; f.setPointSize(10); return f; }();
     static const QFontMetrics s_textMetrics(s_textFont);
+    static const QFont s_nameFont = []{ QFont f; f.setPointSize(10); f.setBold(true); return f; }();
+    static const QFontMetrics s_nameMetrics(s_nameFont);
 
     const int availableWidthPxInt = static_cast<int>(availableWidthPx);
     if (availableWidthPxInt != m_elidedForWidth) { 
-        QString text = m_annot.name + " " + QString(m_annot.note).replace('\n', " ");
-        m_elidedText = s_textMetrics.elidedText(text, Qt::ElideRight, availableWidthPxInt);
+        const QString note = QString(m_annot.note).replace('\n', " ");
+        const int separatorWidth = s_textMetrics.horizontalAdvance(" ");
+        const int nameWidth = s_nameMetrics.horizontalAdvance(m_annot.name);
+        if (nameWidth + separatorWidth > availableWidthPxInt) {
+            m_elidedName = s_nameMetrics.elidedText(m_annot.name, Qt::ElideRight, availableWidthPxInt);
+            m_elidedNote.clear();
+        } else {
+            m_elidedName = m_annot.name;
+            const int noteWidth = availableWidthPxInt - nameWidth - separatorWidth;
+            m_elidedNote = s_textMetrics.elidedText(note, Qt::ElideRight, noteWidth);
+        }
         m_elidedForWidth = availableWidthPxInt;
     }
 
-    if (m_elidedText.isEmpty()) return;
+    if (m_elidedName.isEmpty() && m_elidedNote.isEmpty()) return;
 
     p->save();
     p->scale(1.0 / pixelsPerMs, 1.0); // cancel painter horizontal scale to draw text
-    p->setFont(s_textFont);
     p->setPen(qGray(m_annot.color.rgb()) > 128 ? Qt::black : Qt::white);
-    p->drawText(QRectF(s_textMargin, s_topMargin, availableWidthPx, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedText);
+    p->setFont(s_nameFont);
+    p->drawText(QRectF(s_textMargin, s_topMargin, availableWidthPx, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedName);
+
+    const double noteX = s_textMargin + s_nameMetrics.horizontalAdvance(m_elidedName)
+        + s_textMetrics.horizontalAdvance(" ");
+    const double noteWidth = availableWidthPx - (noteX - s_textMargin);
+    if (!m_elidedNote.isEmpty() && noteWidth > 0.0) {
+        p->setFont(s_textFont);
+        p->drawText(QRectF(noteX, s_topMargin, noteWidth, s_height), Qt::AlignVCenter | Qt::AlignLeft, m_elidedNote);
+    }
     p->restore();
 }
 
 void AnnotationItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
-    m_leftHandle->setVisible(true);
-    m_rightHandle->setVisible(true);
+    setToolTip(m_annot.name.isEmpty() ? m_annot.note : "<b>" + m_annot.name + "</b><br>" + m_annot.note);
+    updateHandleVisibility(event->pos());
     QGraphicsItem::hoverEnterEvent(event);
+}
+
+void AnnotationItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+    updateHandleVisibility(event->pos());
+    QGraphicsItem::hoverMoveEvent(event);
 }
 
 void AnnotationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     m_leftHandle->setVisible(false);
     m_rightHandle->setVisible(false);
+    unsetCursor();
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
@@ -98,7 +130,7 @@ void AnnotationItem::setWidth(double newWidthMs)
     if (m_widthMs == newWidthMs) return;
     prepareGeometryChange();
     m_widthMs = newWidthMs;
-    m_rightHandle->setX(m_widthMs);
+    updateHandlePositions();
     invalidateTextCache();
     update();
 }
@@ -108,5 +140,57 @@ void AnnotationItem::setPixelsPerMs(double pixelsPerMs)
     if (m_pixelsPerMs == pixelsPerMs) return;
     prepareGeometryChange();
     m_pixelsPerMs = pixelsPerMs;
+    updateHandlePositions();
     update();
+}
+
+void AnnotationItem::setZeroDurationDisplayWidthMs(double widthMs)
+{
+    if (m_zeroDurationDisplayWidthMs == widthMs) return;
+    prepareGeometryChange();
+    m_zeroDurationDisplayWidthMs = widthMs;
+    updateHandlePositions();
+    update();
+}
+
+void AnnotationItem::setColor(const QColor& color)
+{
+    if (m_annot.color == color) return;
+    m_annot.color = color;
+    update();
+}
+
+void AnnotationItem::updateHandlePositions()
+{
+    const double handleWidthMs = m_widthMs > 0.0
+        ? m_widthMs
+        : effectiveDisplayWidthMs(m_pixelsPerMs);
+    m_rightHandle->setX(handleWidthMs);
+}
+
+void AnnotationItem::updateHandleVisibility(const QPointF& mousePos)
+{
+    const double pixelsPerMs = m_pixelsPerMs;
+    if (pixelsPerMs <= 0.0) {
+        m_leftHandle->setVisible(false);
+        m_rightHandle->setVisible(false);
+        return;
+    }
+
+    const double mouseX = mousePos.x() * pixelsPerMs;
+    const double widthPx = (m_widthMs > 0.0
+        ? m_widthMs
+        : effectiveDisplayWidthMs(pixelsPerMs)) * pixelsPerMs;
+    m_leftHandle->setVisible(mouseX <= s_handleHoverMarginPx);
+    m_rightHandle->setVisible(widthPx - mouseX <= s_handleHoverMarginPx);
+    if (m_leftHandle->isVisible() || m_rightHandle->isVisible())
+        setCursor(QCursor(Qt::SplitHCursor));
+    else
+        unsetCursor();
+}
+
+void AnnotationItem::setDraggingHandle(AnnotationHandleItem* handle)
+{
+    m_leftHandle->setVisible(handle == m_leftHandle);
+    m_rightHandle->setVisible(handle == m_rightHandle);
 }

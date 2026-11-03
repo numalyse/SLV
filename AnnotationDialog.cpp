@@ -149,7 +149,7 @@ void AnnotationDialog::accept()
 
     Annotation annot = annotation();
 
-    if (annot.end < annot.start)
+    if (annot.end <= annot.start)
     {
         m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
         m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));

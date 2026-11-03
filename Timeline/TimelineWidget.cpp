@@ -3,6 +3,7 @@
 #include "TimeFormatter.h"
 #include "Project/ProjectManager.h"
 #include "PrefManager.h"
+#include "IconHelper.h"
 
 #include "Timeline/Items/RulerItem.h"
 #include "Timeline/Items/CursorItem.h"
@@ -24,6 +25,7 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QAction>
+#include <QActionGroup>
 #include <QTimer>
 #include <QShortcut>
 #include <QProgressDialog>
@@ -453,11 +455,21 @@ void TimelineWidget::moveCursor(double newCursorPosX)
 
 void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
 {
-    switch( item->type() ) {
-        case SLV::TypeAudioShotItem :
-        case SLV::TypeShotItem :
+    if (!item) return;
+
+    switch (item->type()) {
+        case SLV::TypeAudioShotItem:
+        case SLV::TypeShotItem: {
             ShotItem* shotItem = static_cast<ShotItem*>(item);
             showContextMenuForShot(globalPos, shotItem);
+            break;
+        }
+        case SLV::TypeAnnotationItem: {
+            AnnotationItem* annotItem = static_cast<AnnotationItem*>(item);
+            showContextMenuForAnnot(globalPos, annotItem);
+            break;
+        }
+        default:
             break;
     }
 }
@@ -598,6 +610,48 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     }
 }
 
+void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, AnnotationItem* item)
+{
+    QMenu menu;
+    QAction* actionAnnotMoveCursorAt = nullptr;
+    QAction* actionAnnotOpenInfo = nullptr;
+    actionAnnotMoveCursorAt = menu.addAction(PrefManager::instance().getText("timeline_annot_move_cursor_at"));
+    actionAnnotOpenInfo = menu.addAction(PrefManager::instance().getText("timeline_annot_open_info"));
+    actionAnnotOpenInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false);
+    
+    QMenu* submenu = menu.addMenu(PrefManager::instance().getText("timeline_annot_edit_color"));
+    QActionGroup* colorGroup = new QActionGroup(submenu);
+    colorGroup->setExclusive(true);
+    for (const auto& [name, color] : IconHelper::colorPalette()) {
+        QAction* actionColor = submenu->addAction(
+            IconHelper::genIconPreviewColor(color, color == QColor{255, 255, 255, 255}),
+            name);
+        actionColor->setCheckable(true);
+        actionColor->setData(color);
+        colorGroup->addAction(actionColor);
+        actionColor->setChecked(color == item->annotation().color);
+    }
+
+    QAction* actionAnnotDelete = menu.addAction(PrefManager::instance().getText("timeline_annot_delete"));
+
+    QAction *selectedAction = menu.exec(globalPos);
+    if (!selectedAction) return;
+    
+    if (selectedAction == actionAnnotMoveCursorAt){
+        moveCursorAt(item);
+    } else if (selectedAction == actionAnnotOpenInfo){
+        emit SignalManager::instance().toggleNavPanel(PanelType::Annotation);
+    } else if (colorGroup->actions().contains(selectedAction)) {
+        Annotation annotation = item->annotation();
+        annotation.color = selectedAction->data().value<QColor>();
+        ProjectManager::instance().annotationManager()->updateAnnotation(annotation);
+    } else if (selectedAction == actionAnnotDelete){
+        Annotation annotation = item->annotation();
+        emit SignalManager::instance().deleteAnnot(annotation);
+        //ProjectManager::instance().annotationManager()->deleteAnnotDialog(annotation);
+    }
+}
+
 // public slots
 
 /// @brief Reçoit le temps vlc et met à jour la position en conséquence
@@ -638,6 +692,26 @@ void TimelineWidget::goToShot(int idShot){
     if(timeStart.has_value()){
         emit timelineSetPosition(timeStart.value());
     }
+}
+
+void TimelineWidget::moveCursorAt(QGraphicsItem* item){
+    if (!item || m_abManager->getMarkerCount() == 2) return;
+    
+    int64_t timeStart;
+
+    switch (item->type()) {
+        case SLV::TypeAudioShotItem:
+        case SLV::TypeShotItem:
+            timeStart = static_cast<ShotItem*>(item)->shot().start;
+            break;
+        case SLV::TypeAnnotationItem:
+            timeStart = static_cast<AnnotationItem*>(item)->annotation().start;
+            break;
+        default:
+            return;
+    }
+
+    emit timelineSetPosition(timeStart);
 }
 
 void TimelineWidget::initShotDetail(){

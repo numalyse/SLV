@@ -46,6 +46,7 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::extensionToolbarDisplayShotDetail, this, &NavPanel::displayShotDetail);
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
     connect(&SignalManager::instance(), &SignalManager::displayAnnotationPanel, this, &NavPanel::displayAnnotationPanel);
+    connect(&SignalManager::instance(), &SignalManager::isNavelPanelOpen, this, &NavPanel::isOpen);
 
 }
 

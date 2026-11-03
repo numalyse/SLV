@@ -166,11 +166,20 @@ AnnotationWidget::AnnotationWidget(QWidget *parent, const Annotation &annotation
         auto* annotManager = ProjectManager::instance().annotationManager();
         if(!annotManager) return;
         Annotation annot = editedAnnotation();
+        if (annot.end <= annot.start) {
+            m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+            m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+            m_conflictIcon->setToolTip(PrefManager::instance().getText("annotation_conflict_2"));
+            m_conflictIcon->show();
+            return;
+        }
+
         auto conflict = annotManager->findConflict(annot);
         if(conflict.has_value())
         {
             m_startEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
             m_endEdit->setStyleSheet(QString("border: 2px solid tomato; border-radius: 4px;"));
+            m_conflictIcon->setToolTip(PrefManager::instance().getText("annotation_conflict"));
             m_conflictIcon->show();
         } else
             applyEdits();
@@ -328,6 +337,7 @@ void AnnotationWidget::applyEdits()
 void AnnotationWidget::clearErrorUi()
 {
     m_conflictIcon->hide();
+    m_conflictIcon->setToolTip(PrefManager::instance().getText("annotation_conflict"));
     m_startEdit->setStyleSheet(QString());
     m_endEdit->setStyleSheet(QString());
 }

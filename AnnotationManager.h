@@ -38,7 +38,14 @@ signals:
     void annotationsReset();
 
 private:
+    bool m_isDarkMode = true;
+    QColor m_palbtnColor;
+    QString m_palbtnColorStr;
+
     void validateAnnotation(Annotation& annotation, bool leftMoved = false);
+    int64_t minimumAnnotationDurationMs(int64_t mediaDuration) const;
+
+    void deleteAnnotDialog(const Annotation& annotation);
 
     /// @brief Returns where the annotation would be inserted to keep the vector sorted,
     // or nullopt if it would overlap an existing annotation (itself excluded)
@@ -46,7 +53,6 @@ private:
     /// @return 
     std::optional<QVector<Annotation>::iterator> findInsertPosition(const Annotation& annotation) const;
 
-    const int64_t m_minAnnotDurationMs = 0;
     QVector<Annotation>* p_annotations = nullptr;
     int m_nextId = 0;
 };

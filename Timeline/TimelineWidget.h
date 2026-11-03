@@ -49,6 +49,7 @@ public slots:
     void updateCursorPos(int64_t vlcTime);
     void updateCursorVisually(int sliderValue);
     void goToShot(int);
+    void moveCursorAt(QGraphicsItem *item);
     void mergeWithPrevShotAction();
     void mergeWithNextShotAction();
     void computeMediaAmplitudes(const QString& mediaPath);
@@ -93,6 +94,8 @@ private:
     void applyZoom(double zoomFactor, int mouseX);
 
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
+
+    void showContextMenuForAnnot(const QPoint &globalPos, AnnotationItem *item);
 
     Media* p_media = nullptr; // non owner
     QGraphicsScene* m_scene = nullptr;

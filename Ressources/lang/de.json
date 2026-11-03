@@ -117,7 +117,14 @@
     "messagebox_extract_selected_shots_completed" : "Extraktion der ausgewählten Segmente abgeschlossen.",
     "messagebox_extract_selected_shots_failed" : "Extraktion der ausgewählten Segmente fehlgeschlagen.",
     "timeline_clear_all_selected_shots" : "Alle ausgewählten Segmente löschen",
-    
+
+    "timeline_annot_move_cursor_at" : "Cursor an den Anfang der Anmerkung bewegen",
+    "timeline_annot_open_info" : "Anmerkungen panel öffnen",
+    "timeline_annot_edit_color" : "Anmerkungsfarbe bearbeiten",
+    "timeline_annot_delete" : "Anmerkung löschen",
+    "timeline_annot_delete_ask" : "Anmerkung löschen?",
+    "timeline_annot_delete_text" : "Möchten Sie diese Anmerkung löschen?",
+
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",
     "export_directory_tagimages": "Speicherort für Referenzbilder auswählen",
@@ -273,7 +280,7 @@
     "annotation_name" : "Name",
     "annotation_note" : "Notiz",
     "annotation_conflict" : "Konflikt mit einer anderen Anmerkung",
-    "annotation_conflict_2" : "Ungültiger End-Timecode",
+    "annotation_conflict_2" : "Der End-Timecode muss nach dem Start liegen",
 
     "remove_all" : "Alle entfernen",
     "remove_existing_items" : "Entfernen",

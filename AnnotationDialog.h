@@ -32,7 +32,7 @@ private:
     double m_fps = 1.0;
     int64_t m_maxDuration = 0;
 
-    static constexpr int64_t s_baseDurationMs = 10000;
+    static constexpr int64_t s_baseDurationMs = 1000;
 
     QLabel* m_errorLabel = nullptr;
     QLineEdit* m_startEdit = nullptr;

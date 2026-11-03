@@ -54,6 +54,8 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                 case SLV::TypeAnnotationHandleItem:
                     m_dragMode = DragMode::AnnotationHandle;
                     m_draggedItem = static_cast<AnnotationHandleItem*>(item)->annotParent()->closestHandle(mapToScene(event->pos()).x());
+                    static_cast<AnnotationHandleItem*>(m_draggedItem)->annotParent()->setDraggingHandle(
+                        static_cast<AnnotationHandleItem*>(m_draggedItem));
                     return;
                 case SLV::TypeCursorItem:
                 case SLV::TypeRulerItem:
@@ -72,10 +74,16 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
         }
     }else if (event->button() == Qt::RightButton) {
         QList<QGraphicsItem *> itemsAtCursor = items(event->pos());
-        for (auto* item : itemsAtCursor){ 
+        for (auto* item : itemsAtCursor) {
             // emit signal if cursor is on top of a shot item (even if underneath by other item)
-            if(item->type() == SLV::TypeShotItem || item->type() == SLV::TypeAudioShotItem){ 
-                emit itemRightClick( event->globalPos(), item);
+            if (item->type() == SLV::TypeShotItem
+                || item->type() == SLV::TypeAudioShotItem
+                || item->type() == SLV::TypeAnnotationItem) {
+                emit itemRightClick(event->globalPos(), item);
+                break;
+            } else if (item->type() == SLV::TypeAnnotationHandleItem) {
+                auto* handle = static_cast<AnnotationHandleItem*>(item);
+                emit itemRightClick(event->globalPos(), handle->annotParent());
                 break;
             }
         }
@@ -118,6 +126,10 @@ void TimelineView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_dragMode == DragMode::TimeCursor)
         emit isDragging(false);
+    else if (m_dragMode == DragMode::AnnotationHandle && m_draggedItem) {
+        auto* handle = static_cast<AnnotationHandleItem*>(m_draggedItem);
+        handle->annotParent()->setDraggingHandle(nullptr);
+    }
     
     setCursor(Qt::ArrowCursor);
     m_dragMode = DragMode::None;

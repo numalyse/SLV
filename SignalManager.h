@@ -1,6 +1,7 @@
 #ifndef SIGNALMANAGER_H
 #define SIGNALMANAGER_H
 
+#include "Annotation.h"
 #include "Shot.h"
 #include <QObject>
 #include <vlc/vlc.h>
@@ -73,6 +74,7 @@ signals:
     void globalRecordingStarted();
     void globalRecordingFinished();
     bool isNavelPanelOpen();
+    void deleteAnnot(Annotation& annotation);
 };
 
 

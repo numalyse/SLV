@@ -121,6 +121,9 @@
     "timeline_annot_move_cursor_at" : "Mover cursor para anotação",
     "timeline_annot_open_info" : "Abrir painel de anotações",
     "timeline_annot_edit_color" : "Editar cor da anotação",
+    "timeline_annot_delete" : "Excluir anotação",
+    "timeline_annot_delete_ask" : "Excluir anotação?",
+    "timeline_annot_delete_text" : "Deseja excluir esta anotação?",
 
     "export_running": "Exportação em curso...",
     "export_directory_path_title": "Selecionar pasta de exportação",

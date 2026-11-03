@@ -121,6 +121,9 @@
     "timeline_annot_move_cursor_at" : "Déplacer le curseur au début de l'annotation",
     "timeline_annot_open_info" : "Ouvrir le panneau d'annotations",
     "timeline_annot_edit_color" : "Modifier la couleur de l'annotation",
+    "timeline_annot_delete" : "Supprimer l'annotation",
+    "timeline_annot_delete_ask" : "Supprimer l'annotation ?",
+    "timeline_annot_delete_text" : "Voulez-vous supprimer cette annotation ?",
 
     "export_running": "Exportation en cours...",
     "export_directory_path_title": "Sélectionner un dossier d'exportation",

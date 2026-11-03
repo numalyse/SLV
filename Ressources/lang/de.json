@@ -121,6 +121,9 @@
     "timeline_annot_move_cursor_at" : "Zum Anfang der Anmerkung springen",
     "timeline_annot_open_info" : "Anmerkungen panel öffnen",
     "timeline_annot_edit_color" : "Anmerkungsfarbe bearbeiten",
+    "timeline_annot_delete" : "Anmerkung löschen",
+    "timeline_annot_delete_ask" : "Anmerkung löschen?",
+    "timeline_annot_delete_text" : "Möchten Sie diese Anmerkung löschen?",
 
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",

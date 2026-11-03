@@ -1,15 +1,34 @@
 #include "AnnotationManager.h"
 
 #include "Project/ProjectManager.h"
+#include "SignalManager.h"
 
 #include <QDebug>
 
 #include <algorithm>
 #include <cmath>
+#include <QGuiApplication>
+#include <QStyleHints>
 
 AnnotationManager::AnnotationManager(QObject *parent)
 : QObject(parent)
 {
+    m_isDarkMode = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+
+#ifdef Q_OS_MAC
+    QColor colorBtn = qApp->palette().color(QPalette::Button);
+    QColor enhancedColor = m_isDarkMode ? colorBtn.lighter(150) : colorBtn.darker(150);
+    m_palbtnColor = m_isDarkMode ? enhancedColor : "palette(mid)";
+    m_palbtnColorStr = m_isDarkMode ? QString(enhancedColor.name()) : "palette(mid)";
+#else
+    m_palbtnColor = m_isDarkMode ? "palette(button)" : "palette(mid)";
+    m_palbtnColorStr = m_isDarkMode ? "palette(button)" : "palette(mid)";
+#endif
+
+    connect(&SignalManager::instance(), &SignalManager::deleteAnnot, this, [this](const Annotation& annotation){
+        deleteAnnotDialog(annotation);
+    });
+
 }
 
 const QVector<Annotation>& AnnotationManager::annotations() const
@@ -248,4 +267,108 @@ int64_t AnnotationManager::minimumAnnotationDurationMs(int64_t mediaDuration) co
         ? std::max<int64_t>(1, static_cast<int64_t>(std::floor(1000.0 / fps)))
         : 1;
     return mediaDuration > 0 ? qMin(frameDurationMs, mediaDuration) : frameDurationMs;
+}
+
+void AnnotationManager::deleteAnnotDialog(const Annotation& annotation)
+{
+    auto& prefManager = PrefManager::instance();
+
+    QDialog dialog;
+    dialog.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    dialog.setAttribute(Qt::WA_TranslucentBackground);
+    dialog.setFixedSize(500,220);
+    dialog.setObjectName("dialogWindow");
+    dialog.setStyleSheet(
+        "#dialogWindow {"
+            "background-color: transparent;"
+        "}"
+    );
+
+    QVBoxLayout outerLayout(&dialog);
+    outerLayout.setContentsMargins(0,0,0,0);
+
+    QWidget* container = new QWidget;
+    container->setObjectName("dialogContainer");
+
+    container->setStyleSheet(
+        "#dialogContainer {"
+            "background-color: palette(Window);"
+            "border: 2px solid " + m_palbtnColorStr + ";"
+            "border-radius: 20px;"
+        "}"
+    );
+
+    outerLayout.addWidget(container);
+
+    QVBoxLayout layout(container);
+    layout.setContentsMargins(20,20,20,20);
+
+    QLabel* titleLabel = new QLabel;
+    titleLabel->setAlignment(Qt::AlignCenter);
+    titleLabel->setText(prefManager.getText("timeline_annot_delete_ask"));
+
+    QFont titleFont = titleLabel->font();
+    titleFont.setPointSize(12);
+    titleFont.setBold(true);
+    titleLabel->setFont(titleFont);
+    layout.addWidget(titleLabel);
+
+    QLabel* textLabel = new QLabel;
+    QFont textFont = textLabel->font();
+    textFont.setPointSize(10);
+    textLabel->setFont(textFont);
+    textLabel->setAlignment(Qt::AlignCenter);
+    textLabel->setTextFormat(Qt::RichText);
+    textLabel->setText(prefManager.getText("timeline_annot_delete_text") + "<br>" + "<i>"+ prefManager.getText("delete_all_items_confirm") +"</i><br>");
+    layout.addWidget(textLabel);
+
+    QHBoxLayout* btnLayout = new QHBoxLayout;
+    QPushButton* deleteAllBtn = new QPushButton(prefManager.getText("remove"));
+    QPushButton* cancelBtn = new QPushButton(prefManager.getText("generic_dialog_btn_cancel"));
+
+    QFont btnFont = deleteAllBtn->font();
+    btnFont.setPointSize(10);
+    btnFont.setBold(true);
+
+    deleteAllBtn->setFont(btnFont);
+    cancelBtn->setFont(btnFont);
+
+    deleteAllBtn->setFixedSize(200,40);
+    cancelBtn->setFixedSize(200,40);
+
+    deleteAllBtn->setStyleSheet("QPushButton{"
+        "   background-color: tomato;"
+        "   border: 1px solid tomato;"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: salmon;"
+        "   border: 2px solid salmon;"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    cancelBtn->setStyleSheet("QPushButton{"
+        "   background-color: palette(Window);"
+        "   border: 1px solid " + m_palbtnColorStr + ";"
+        "   border-radius: 4px;"
+        "}"
+        "QPushButton:hover{"
+        "   background-color: " + m_palbtnColorStr + ";"
+        "   border: 2px solid " + m_palbtnColorStr + ";"
+        "   border-radius: 4px;"
+        "}"
+    );
+
+    connect(deleteAllBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+    connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+    btnLayout->addWidget(deleteAllBtn);
+    btnLayout->setSpacing(20);
+    btnLayout->addWidget(cancelBtn);
+    layout.addLayout(btnLayout);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        removeAnnotation(annotation.id);
+    }
 }

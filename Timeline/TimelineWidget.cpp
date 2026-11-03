@@ -613,7 +613,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
 void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, AnnotationItem* item)
 {
     QMenu menu;
-    QAction *actionAnnotMoveCursorAt = nullptr;
+    QAction* actionAnnotMoveCursorAt = nullptr;
     QAction* actionAnnotOpenInfo = nullptr;
     actionAnnotMoveCursorAt = menu.addAction(PrefManager::instance().getText("timeline_annot_move_cursor_at"));
     actionAnnotOpenInfo = menu.addAction(PrefManager::instance().getText("timeline_annot_open_info"));
@@ -632,6 +632,8 @@ void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, Annotation
         actionColor->setChecked(color == item->annotation().color);
     }
 
+    QAction* actionAnnotDelete = menu.addAction(PrefManager::instance().getText("timeline_annot_delete"));
+
     QAction *selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
     
@@ -643,7 +645,11 @@ void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, Annotation
         Annotation annotation = item->annotation();
         annotation.color = selectedAction->data().value<QColor>();
         ProjectManager::instance().annotationManager()->updateAnnotation(annotation);
-    } 
+    } else if (selectedAction == actionAnnotDelete){
+        Annotation annotation = item->annotation();
+        emit SignalManager::instance().deleteAnnot(annotation);
+        //ProjectManager::instance().annotationManager()->deleteAnnotDialog(annotation);
+    }
 }
 
 // public slots

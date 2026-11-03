@@ -118,6 +118,10 @@
     "messagebox_extract_selected_shots_failed" : "Falló la extracción de los segmentos seleccionados.",
     "timeline_clear_all_selected_shots" : "Limpiar todos los segmentos seleccionados",
 
+    "timeline_annot_move_cursor_at" : "Mover el cabezal al inicio de la anotación",
+    "timeline_annot_open_info" : "Abrir panel de anotaciones",
+    "timeline_annot_edit_color" : "Editar color de anotación",
+
     "export_running": "Exportación en curso...",
     "export_directory_path_title": "Seleccionar carpeta de exportación",
     "export_directory_tagimages": "Seleccionar la ubicación de guardado de las Imágenes-Referencia",

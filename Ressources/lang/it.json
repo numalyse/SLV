@@ -118,6 +118,10 @@
     "messagebox_extract_selected_shots_failed" : "Si è verificato un errore durante l'estrazione dei segmenti selezionati.",
     "timeline_clear_all_selected_shots" : "Cancella tutti i segmenti selezionati",
 
+    "timeline_annot_move_cursor_at" : "Sposta il cursore all'inizio dell'annotazione",
+    "timeline_annot_open_info" : "Apri il pannello delle annotazioni",
+    "timeline_annot_edit_color" : "Modifica il colore dell'annotazione",
+
     "export_running": "Esportazione in corso...",
     "export_directory_path_title": "Seleziona cartella di esportazione",
     "export_directory_tagimages": "Seleziona la posizione di salvataggio delle Immagini-Riferimento",

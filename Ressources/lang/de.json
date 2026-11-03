@@ -117,7 +117,11 @@
     "messagebox_extract_selected_shots_completed" : "Extraktion der ausgewählten Segmente abgeschlossen.",
     "messagebox_extract_selected_shots_failed" : "Extraktion der ausgewählten Segmente fehlgeschlagen.",
     "timeline_clear_all_selected_shots" : "Alle ausgewählten Segmente löschen",
-    
+
+    "timeline_annot_move_cursor_at" : "Zum Anfang der Anmerkung springen",
+    "timeline_annot_open_info" : "Anmerkungen panel öffnen",
+    "timeline_annot_edit_color" : "Anmerkungsfarbe bearbeiten",
+
     "export_running": "Export läuft...",
     "export_directory_path_title": "Exportordner auswählen",
     "export_directory_tagimages": "Speicherort für Referenzbilder auswählen",

@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
+#include <QCursor>
 #include <QPen>
 #include <QFontMetrics>
 #include <algorithm>
@@ -99,6 +100,7 @@ void AnnotationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     m_leftHandle->setVisible(false);
     m_rightHandle->setVisible(false);
+    unsetCursor();
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
@@ -153,6 +155,10 @@ void AnnotationItem::updateHandleVisibility(const QPointF& mousePos)
         : effectiveDisplayWidthMs(pixelsPerMs)) * pixelsPerMs;
     m_leftHandle->setVisible(mouseX <= s_handleHoverMarginPx);
     m_rightHandle->setVisible(widthPx - mouseX <= s_handleHoverMarginPx);
+    if (m_leftHandle->isVisible() || m_rightHandle->isVisible())
+        setCursor(QCursor(Qt::SplitHCursor));
+    else
+        unsetCursor();
 }
 
 void AnnotationItem::setDraggingHandle(AnnotationHandleItem* handle)

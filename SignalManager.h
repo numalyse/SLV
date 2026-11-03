@@ -72,6 +72,7 @@ signals:
     void playFirstPlaylistItem();
     void globalRecordingStarted();
     void globalRecordingFinished();
+    bool isNavelPanelOpen();
 };
 
 

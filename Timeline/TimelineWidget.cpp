@@ -624,7 +624,9 @@ void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, Annotation
     if (selectedAction == actionAnnotMoveCursorAt){
         moveCursorAt(item);
     } else if (selectedAction == actionAnnotOpenInfo){
-        // to do
+        emit SignalManager::instance().toggleNavPanel(PanelType::Annotation);
+    } else if (selectedAction == actionAnnotOpenInfo){
+        
     } 
 }
 

@@ -23,6 +23,7 @@ public:
 
     void setPixelsPerMs(double pixelsPerMs);
     void setZeroDurationDisplayWidthMs(double widthMs);
+    void setDraggingHandle(AnnotationHandleItem* handle);
     Annotation& annotation() { return m_annot; };
     int annotationId() const { return m_annot.id; };
 

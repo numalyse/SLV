@@ -154,3 +154,9 @@ void AnnotationItem::updateHandleVisibility(const QPointF& mousePos)
     m_leftHandle->setVisible(mouseX <= s_handleHoverMarginPx);
     m_rightHandle->setVisible(widthPx - mouseX <= s_handleHoverMarginPx);
 }
+
+void AnnotationItem::setDraggingHandle(AnnotationHandleItem* handle)
+{
+    m_leftHandle->setVisible(handle == m_leftHandle);
+    m_rightHandle->setVisible(handle == m_rightHandle);
+}

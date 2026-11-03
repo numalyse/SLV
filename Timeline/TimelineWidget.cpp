@@ -458,6 +458,11 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
     if (!item) return;
 
     switch (item->type()) {
+        case SLV::TypeCursorItem: {
+            CursorItem* cursorItem = static_cast<CursorItem*>(item);
+            showContextMenuForCursor(globalPos, cursorItem);
+            break;
+        }
         case SLV::TypeAudioShotItem:
         case SLV::TypeShotItem: {
             ShotItem* shotItem = static_cast<ShotItem*>(item);
@@ -474,17 +479,51 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
     }
 }
 
+void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorItem* item ){
+    Q_UNUSED(item);
+
+    QMenu menu;
+    QAction* actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
+    QAction* actionAB = nullptr;
+    QAction* deleteABMarkers = nullptr;
+    QAction* actionExtractAB = nullptr;
+
+    switch (m_abManager->getMarkerCount())
+    {
+    case 0:
+        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
+        break;
+    case 1:
+        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
+        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+        break;
+    case 2:
+        actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
+        break;
+    }
+
+    QAction* selectedAction = menu.exec(globalPos);
+    if (!selectedAction) return;
+
+    if (selectedAction == actionSplit) {
+        splitShotAtCursor();
+    } else if (selectedAction == actionAB) {
+        ABAction();
+    } else if (selectedAction == deleteABMarkers) {
+        m_abManager->deleteMarkers();
+    } else if (selectedAction == actionExtractAB) {
+        m_abManager->extractLoop();
+    }
+}
+
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
 {
     QMenu menu;
-    QAction *actionSplit = nullptr;
     QAction *actionExtractShot = nullptr;
     QAction *actionClearSelectedShots = nullptr;
     QAction *mergeWithPreviousShot = nullptr;
     QAction *mergeWithNextShot = nullptr;
-    QAction *actionAB = nullptr;
-    QAction *deleteABMarkers = nullptr;
-    QAction *actionExtractAB = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
     QAction* actionOpenShotInfo = nullptr;
@@ -495,7 +534,6 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         actionClearSelectedShots = menu.addAction(PrefManager::instance().getText("timeline_clear_all_selected_shots"));
     } else 
     {
-        actionSplit = menu.addAction(PrefManager::instance().getText("timeline_split_shot_at_cursor"));
         actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
         actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
 
@@ -505,35 +543,12 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         if(m_showMergeWithNextShotBtn){
             mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
         }
-
-        switch (m_abManager->getMarkerCount())
-        {
-        case 0:
-            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_0"));
-            break;
-        case 1:
-            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_1"));
-            deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-            break;
-        case 2:
-            actionAB = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
-            actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
-            break;
-        }
     }
 
     QAction *selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
     
-    if (selectedAction == actionSplit){
-        splitShotAtCursor();
-    } else if (selectedAction == actionAB){
-        ABAction();
-    } else if (selectedAction == deleteABMarkers){
-        m_abManager->deleteMarkers();
-    } else if (selectedAction == actionExtractAB){
-        m_abManager->extractLoop();
-    } else if (selectedAction == mergeWithPreviousShot){
+    if (selectedAction == mergeWithPreviousShot){
         mergeWithPrevShotAction();
     } else if(selectedAction == mergeWithNextShot){
         mergeWithNextShotAction();

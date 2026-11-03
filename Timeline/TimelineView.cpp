@@ -78,7 +78,9 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             // emit signal if cursor is on top of a shot item (even if underneath by other item)
             if (item->type() == SLV::TypeShotItem
                 || item->type() == SLV::TypeAudioShotItem
-                || item->type() == SLV::TypeAnnotationItem) {
+                || item->type() == SLV::TypeAnnotationItem
+                || item->type() == SLV::TypeABMarkerItem
+                || item->type() == SLV::TypeCursorItem) {
                 emit itemRightClick(event->globalPos(), item);
                 break;
             } else if (item->type() == SLV::TypeAnnotationHandleItem) {

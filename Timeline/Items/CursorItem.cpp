@@ -1,10 +1,14 @@
 #include "CursorItem.h"
 
 #include <QPainter>
+#include <QGraphicsScene>
+#include <QGraphicsSceneHoverEvent>
+#include <QCursor>
 
 CursorItem::CursorItem(int height, QGraphicsItem* parent) : QGraphicsItem(parent), m_height{height}
 {
     setZValue(5);
+    setAcceptHoverEvents(true);
 }
 
 QRectF CursorItem::boundingRect() const {
@@ -26,10 +30,27 @@ void CursorItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWid
 
 }
 
-
 void CursorItem::setHeight(int height) {
     if (m_height == height) return;
     prepareGeometryChange(); 
     m_height = height;
     update();
+}
+
+
+void CursorItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    setCursor(QCursor(Qt::SizeHorCursor));
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void CursorItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+    QGraphicsItem::hoverMoveEvent(event);
+}
+
+void CursorItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    unsetCursor();
+    QGraphicsItem::hoverLeaveEvent(event);
 }

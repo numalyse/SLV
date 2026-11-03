@@ -31,7 +31,7 @@ void RangeMarkerItem::paint(QPainter *p, const QStyleOptionGraphicsItem *option,
 
 void RangeMarkerItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
-    setCursor(Qt::PointingHandCursor);
+    setCursor(Qt::SizeHorCursor);
 }
 
 void RangeMarkerItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)

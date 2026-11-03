@@ -93,8 +93,8 @@ private slots:
 private:
     void applyZoom(double zoomFactor, int mouseX);
 
+    void showContextMenuForCursor(const QPoint &globalPos, CursorItem *item);
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
-
     void showContextMenuForAnnot(const QPoint &globalPos, AnnotationItem *item);
 
     Media* p_media = nullptr; // non owner

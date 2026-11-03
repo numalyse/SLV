@@ -245,7 +245,7 @@ int64_t AnnotationManager::minimumAnnotationDurationMs(int64_t mediaDuration) co
     Media* media = ProjectManager::instance().media();
     const double fps = media ? media->fps() : 0.0;
     const int64_t frameDurationMs = fps > 0.0
-        ? std::max<int64_t>(1, static_cast<int64_t>(std::ceil(1000.0 / fps)))
+        ? std::max<int64_t>(1, static_cast<int64_t>(std::floor(1000.0 / fps)))
         : 1;
     return mediaDuration > 0 ? qMin(frameDurationMs, mediaDuration) : frameDurationMs;
 }

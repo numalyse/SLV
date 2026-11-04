@@ -363,8 +363,7 @@ const QVector<Shot> ShotManager::shotItemsData() const
 void ShotManager::updateShotToolTips()
 {
     for (qsizetype i = 0; i < m_shotItems.size(); ++i) {
-        const QString toolTip = PrefManager::instance().capitalized(
-                                PrefManager::instance().getText("shot")) + tr(" %1").arg(i + 1);
+        const QString toolTip = PrefManager::instance().capitalized(PrefManager::instance().getText("shot")) + tr(" %1 \n").arg(i + 1);
         m_shotItems[i]->setToolTip(toolTip);
         m_audioShotItems[i]->setToolTip(toolTip);
     }

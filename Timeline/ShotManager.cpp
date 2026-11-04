@@ -3,6 +3,7 @@
 #include "ShotManager.h"
 #include "TimeFormatter.h"
 #include "PrefManager.h"
+#include "UserConfig.h"
 #include "Timeline/Items/TimelineLayerItem.h"
 
 #include <QtAssert>
@@ -362,8 +363,15 @@ const QVector<Shot> ShotManager::shotItemsData() const
 
 void ShotManager::updateShotToolTips()
 {
+    const QString keyShortcut = QStringLiteral("%1 + %2")
+                                .arg(UserConfig::instance().mainControlKeyString())
+                                .arg(PrefManager::instance().titleCase(PrefManager::instance().getText("left_click")));
     for (qsizetype i = 0; i < m_shotItems.size(); ++i) {
-        const QString toolTip = PrefManager::instance().capitalized(PrefManager::instance().getText("shot")) + tr(" %1 \n").arg(i + 1);
+        const QString toolTip = QStringLiteral("%1 %2 <br><i>%3 %4</i>")
+                                .arg(PrefManager::instance().capitalized(PrefManager::instance().getText("shot")))
+                                .arg(i + 1)
+                                .arg(keyShortcut)
+                                .arg(PrefManager::instance().getText("to_select"));
         m_shotItems[i]->setToolTip(toolTip);
         m_audioShotItems[i]->setToolTip(toolTip);
     }

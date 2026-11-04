@@ -521,6 +521,8 @@ void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorIte
     QAction* actionAB = nullptr;
     QAction* deleteABMarkers = nullptr;
     QAction* actionExtractAB = nullptr;
+    QAction *mergeWithPreviousShot = nullptr;
+    QAction *mergeWithNextShot = nullptr;
 
     switch (m_abManager->getMarkerCount())
     {
@@ -537,6 +539,15 @@ void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorIte
         break;
     }
 
+    if (m_showMergeWithPrevShotBtn)
+    {
+        mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
+    }
+    if (m_showMergeWithNextShotBtn)
+    {
+        mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
+    }
+
     QAction* selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
 
@@ -548,6 +559,10 @@ void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorIte
         m_abManager->deleteMarkers();
     } else if (selectedAction == actionExtractAB) {
         m_abManager->extractLoop();
+    } else if (selectedAction == mergeWithPreviousShot){
+        mergeWithPrevShotAction();
+    } else if(selectedAction == mergeWithNextShot){
+        mergeWithNextShotAction();
     }
 }
 
@@ -556,8 +571,6 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QMenu menu;
     QAction *actionExtractShot = nullptr;
     QAction *actionClearSelectedShots = nullptr;
-    QAction *mergeWithPreviousShot = nullptr;
-    QAction *mergeWithNextShot = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
     QAction* actionOpenShotInfo = nullptr;
@@ -571,26 +584,14 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
         actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
         actionOpenShotInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false || SignalManager::instance().typeCurrentPanel() != PanelType::ShotDetail);
         actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
-
-        if(m_showMergeWithPrevShotBtn){
-            mergeWithPreviousShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_previous_shot"));
-        }
-        if(m_showMergeWithNextShotBtn){
-            mergeWithNextShot = menu.addAction(PrefManager::instance().getText("timeline_merge_with_next_shot"));
-        }
     }
 
     QAction *selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
     
-    if (selectedAction == mergeWithPreviousShot){
-        mergeWithPrevShotAction();
-    } else if(selectedAction == mergeWithNextShot){
-        mergeWithNextShotAction();
-    } else if(selectedAction == actionExtractShot){
+    if(selectedAction == actionExtractShot){
         ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
         sequenceExtractor->show();
-        mergeWithNextShotAction();
     } else if(selectedAction == actionOpenShotInfo){
         moveCursor(m_mathManager->timeToPos(item->shot().start));
         emit SignalManager::instance().displayNavPanel(PanelType::ShotDetail);

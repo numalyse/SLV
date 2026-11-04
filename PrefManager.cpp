@@ -46,6 +46,23 @@ QString PrefManager::capitalized(const QString &text)
     return text.left(1).toUpper() + text.mid(1);
 }
 
+QString PrefManager::titleCase(const QString &text)
+{
+    QString result = text;
+    bool newWord = true;
+
+    for (QChar &c : result) {
+        if (c.isLetter()) {
+            if (newWord)
+                c = c.toUpper();
+            newWord = false;
+        } else {
+            newWord = c.isSpace() || c == '-' || c == '\'' || c == QChar(0x2019);
+        }
+    }
+    return result;
+}
+
 bool PrefManager::createPreferenceFile(const QString &destFilePath)
 {
     QFileInfo fileInfo(destFilePath);

@@ -253,6 +253,14 @@
     "activate" : "Ativar",
     "deactivate" : "Desativar",
 
+    "left" : "esquerda",
+    "right" : "direita",
+
+    "left_click": "clique esquerdo",
+    "right_click": "clique direito",
+
+    "to_select" : "para selecionar",
+
     "playlist" : "Lista de reprodução",
     "tooltip_loop_playlist": "Modo de repetição",
     "tooltip_shuffle_playlist": "Modo aleatório",

@@ -10,6 +10,7 @@
 #include "Preference/PreferenceDialog.h"
 #include "FileFormatManager.h"
 #include "Help/HelpDialog.h"
+#include "UserConfig.h"
 
 #include <QToolBar>
 #include <vlc/vlc.h>
@@ -38,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    UserConfig::instance().initialize();
     ui->setupUi(this);
     //this->setCentralWidget(ui->centralwidget);
 

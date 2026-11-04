@@ -27,6 +27,7 @@ public:
     bool isDarkMode() const;
     QColor paletteButtonColor() const;
     QString paletteButtonColorString() const;
+    QString mainControlKeyString() const;
 
 private:
     UserConfig() = default;
@@ -35,6 +36,7 @@ private:
     bool m_isDarkMode = true;
     QColor m_paletteButtonColor;
     QString m_paletteButtonColorString;
+    QString m_mainControlKeyString;
 };
 
 #endif // USERCONFIG_H

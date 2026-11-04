@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QPalette>
 #include <QStyleHints>
+#include <QKeySequence>
 
 void UserConfig::initialize()
 {
@@ -28,6 +29,17 @@ void UserConfig::initialize()
     m_paletteButtonColor = QColor(m_isDarkMode ? "palette(button)" : "palette(mid)");
     m_paletteButtonColorString = m_isDarkMode ? "palette(button)" : "palette(mid)";
 #endif
+
+    m_mainControlKeyString = QKeySequence(QKeyCombination(Qt::CTRL | Qt::Key_A))
+                                 .toString(QKeySequence::NativeText);
+    const QString nativeAKey = QKeySequence(Qt::Key_A).toString(QKeySequence::NativeText);
+    if (m_mainControlKeyString.endsWith(nativeAKey))
+    {
+        m_mainControlKeyString.chop(nativeAKey.size());
+        if (m_mainControlKeyString.endsWith(QLatin1Char('+'))){
+            m_mainControlKeyString.chop(1);
+        }
+    }
 }
 
 UserConfig::OperatingSystem UserConfig::operatingSystem() const
@@ -49,3 +61,10 @@ QString UserConfig::paletteButtonColorString() const
 {
     return m_paletteButtonColorString;
 }
+
+QString UserConfig::mainControlKeyString() const
+{
+    return m_mainControlKeyString;
+}
+
+

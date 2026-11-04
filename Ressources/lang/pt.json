@@ -260,6 +260,7 @@
     "right_click": "clique direito",
 
     "to_select" : "para selecionar",
+    "to_unselect" : "para desmarcar",
 
     "playlist" : "Lista de reprodução",
     "tooltip_loop_playlist": "Modo de repetição",

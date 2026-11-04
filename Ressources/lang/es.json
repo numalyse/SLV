@@ -260,6 +260,7 @@
     "right_click": "clic derecho",
 
     "to_select" : "para seleccionar",
+    "to_unselect" : "para deseleccionar",
 
     "playlist" : "Lista de reproducción",
     "tooltip_loop_playlist": "Modo bucle",

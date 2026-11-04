@@ -261,6 +261,7 @@
     "right_click": "click destro",
 
     "to_select" : "per selezionare",
+    "to_unselect" : "per deselezionare",
 
     "playlist" : "Playlist",
     "tooltip_loop_playlist": "Modalità loop",

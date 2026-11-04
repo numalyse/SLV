@@ -260,6 +260,7 @@
     "right_click": "clic droit",
 
     "to_select" : "pour sélectionner",
+    "to_unselect" : "pour désélectionner",
 
     "playlist" : "Playlist",
     "tooltip_loop_playlist": "Mode boucle",

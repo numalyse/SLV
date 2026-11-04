@@ -443,6 +443,7 @@ void TimelineWidget::moveCursor(double newCursorPosX)
     m_vlcTime = targetTime;
 
     m_cursor->setPos(m_mathManager->timeToPos(m_vlcTime), m_cursor->pos().y());
+    m_cursor->setToolTip(TimeFormatter::msToHHMMSSFF(m_vlcTime, p_media->fps()));
 
     emit timelineSliderPositionRequested(m_vlcTime);
 

@@ -3,6 +3,7 @@
 #include "PrefManager.h"
 #include "SequenceExtractionHelper.h"
 #include "Project/ProjectManager.h"
+#include "TimeFormatter.h"
 
 #include <algorithm> 
 
@@ -98,6 +99,8 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight)
 {
     if (m_markers.size() != 1) {
         BaseRangeManager::cycleMarkers(time, markerHeight);
+        for (ABMarkerItem* marker : m_markers)
+            updateMarkerToolTip(marker);
     } else {
         int64_t maxDuration = p_mathManager->duration(); 
 
@@ -119,6 +122,7 @@ void ABManager::cycleMarkers(int64_t time, int markerHeight)
         }
 
         ABMarkerItem* newMarker = new ABMarkerItem(markerHeight, newTime);
+        updateMarkerToolTip(newMarker);
 
         if (newMarker->time() >= m_markers[0]->time()) {
             m_markers.append(newMarker); 
@@ -156,4 +160,11 @@ void ABManager::changeMarkerTime(ABMarkerItem *marker, const int64_t time){
     } else {
         BaseRangeManager::changeMarkerTime(marker, time);
     }
+
+    updateMarkerToolTip(marker);
+}
+
+void ABManager::updateMarkerToolTip(ABMarkerItem* marker)
+{
+    marker->setToolTip(TimeFormatter::msToHHMMSSFF(marker->time(), p_mathManager->fps()));
 }

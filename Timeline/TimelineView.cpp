@@ -127,6 +127,11 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
 
     case DragMode::ABMarker:
         emit abMarkerDragged(static_cast<ABMarkerItem*>(m_draggedItem), mapToScene(event->pos()).x());
+        if (m_draggedItem) {
+            const QString tooltip = m_draggedItem->toolTip();
+            if (!tooltip.isEmpty())
+                QToolTip::showText(event->globalPosition().toPoint(), tooltip, viewport());
+        }
         break;
 
     case DragMode::AnnotationHandle:
@@ -144,10 +149,13 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
 
 void TimelineView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (m_dragMode == DragMode::TimeCursor) {
+    if (m_dragMode == DragMode::TimeCursor)
         emit isDragging(false);
+
+    if (m_dragMode == DragMode::TimeCursor || m_dragMode == DragMode::ABMarker)
         QToolTip::hideText();
-    } else if (m_dragMode == DragMode::AnnotationHandle && m_draggedItem) {
+
+    if (m_dragMode == DragMode::AnnotationHandle && m_draggedItem) {
         auto* handle = static_cast<AnnotationHandleItem*>(m_draggedItem);
         handle->annotParent()->setDraggingHandle(nullptr);
     }

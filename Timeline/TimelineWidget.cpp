@@ -459,6 +459,10 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
     if (!item) return;
 
     switch (item->type()) {
+        case SLV::TypeABMarkerItem: {
+            ABMarkerItem* abItem = static_cast<ABMarkerItem*>(item);
+            showContextMenuForABMarker(globalPos, abItem);
+        }
         case SLV::TypeCursorItem: {
             CursorItem* cursorItem = static_cast<CursorItem*>(item);
             showContextMenuForCursor(globalPos, cursorItem);
@@ -477,6 +481,34 @@ void TimelineWidget::itemRightClick(QPoint globalPos, QGraphicsItem * item)
         }
         default:
             break;
+    }
+}
+
+void TimelineWidget::showContextMenuForABMarker(const QPoint& globalPos, ABMarkerItem* item){
+    Q_UNUSED(item);
+
+    QMenu menu;
+    QAction* deleteABMarkers = nullptr;
+    QAction* actionExtractAB = nullptr;
+
+    switch (m_abManager->getMarkerCount())
+    {
+    case 1:
+        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+        break;
+    case 2:
+        deleteABMarkers = menu.addAction(PrefManager::instance().getText("timeline_ab_action_2"));
+        actionExtractAB = menu.addAction(PrefManager::instance().getText("timeline_ab_extract"));
+        break;
+    }
+
+    QAction* selectedAction = menu.exec(globalPos);
+    if (!selectedAction) return;
+
+    if (selectedAction == deleteABMarkers) {
+        m_abManager->deleteMarkers();
+    } else if (selectedAction == actionExtractAB) {
+        m_abManager->extractLoop();
     }
 }
 

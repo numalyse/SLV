@@ -93,6 +93,7 @@ private slots:
 private:
     void applyZoom(double zoomFactor, int mouseX);
 
+    void showContextMenuForABMarker(const QPoint &globalPos, ABMarkerItem *item);
     void showContextMenuForCursor(const QPoint &globalPos, CursorItem *item);
     void showContextMenuForShot(const QPoint& globalPos, ShotItem *item);
     void showContextMenuForAnnot(const QPoint &globalPos, AnnotationItem *item);

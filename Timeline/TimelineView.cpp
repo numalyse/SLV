@@ -76,12 +76,12 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                     emit isDragging(true);
                     emit cursorPositionRequested(mapToScene(event->pos()).x());
                     return;
-                case SLV::TypeShotItem:
-                    emit shotSelectionRequested(static_cast<ShotItem*>(item), nullptr, true);
-                    return;
-                case SLV::TypeAudioShotItem:
-                    emit shotSelectionRequested(nullptr, static_cast<AudioShotItem*>(item), true);
-                    return;
+                // case SLV::TypeShotItem:
+                //     emit shotSelectionRequested(static_cast<ShotItem*>(item), nullptr, true);
+                //     return;
+                // case SLV::TypeAudioShotItem:
+                //     emit shotSelectionRequested(nullptr, static_cast<AudioShotItem*>(item), true);
+                //     return;
                 }
             }
         }

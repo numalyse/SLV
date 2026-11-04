@@ -79,6 +79,8 @@ signals:
 
     // panel - shot
     void extensionToolbarDisplayShotDetail();
+    
+
 
     // position
     void simpleToolbarUpdateCursorPosition(int);

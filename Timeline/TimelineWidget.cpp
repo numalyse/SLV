@@ -566,7 +566,7 @@ void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorIte
     }
 }
 
-void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item )
+void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item)
 {
     QMenu menu;
     QAction *actionExtractShot = nullptr;
@@ -582,7 +582,8 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else 
     {
         actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
-        actionOpenShotInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false || SignalManager::instance().typeCurrentPanel() != PanelType::ShotDetail);
+        bool isCurrentShot = m_shotManager->getCurrentShot() == item;
+        actionOpenShotInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false || SignalManager::instance().typeCurrentPanel() != PanelType::ShotDetail || !isCurrentShot);
         actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
     }
 

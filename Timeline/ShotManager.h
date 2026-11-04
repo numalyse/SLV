@@ -63,6 +63,8 @@ public:
 
     const int getCurrentShotId(){ return m_shotItems.indexOf(m_currentShotItem); }
     
+    ShotItem* getCurrentShot(){ return m_currentShotItem; }
+
     VideoCaptureManager& videoCaptureManager() { return m_videoCaptureManager; }
 
 signals:

@@ -51,7 +51,6 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                 case SLV::TypeABMarkerItem:
                     m_dragMode = DragMode::ABMarker;
                     m_draggedItem = item;
-                    setCursor(Qt::ClosedHandCursor);
                     return;
                 case SLV::TypeAnnotationHandleItem:
                     m_dragMode = DragMode::AnnotationHandle;

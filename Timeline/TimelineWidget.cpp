@@ -536,6 +536,7 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     } else 
     {
         actionOpenShotInfo = menu.addAction(PrefManager::instance().getText("tooltip_shot_detail_button"));
+        actionOpenShotInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false || SignalManager::instance().typeCurrentPanel() != PanelType::ShotDetail);
         actionExtractShot = menu.addAction(PrefManager::instance().getText("timeline_extract_selected_shot"));
 
         if(m_showMergeWithPrevShotBtn){
@@ -633,7 +634,7 @@ void TimelineWidget::showContextMenuForAnnot(const QPoint& globalPos, Annotation
     QAction* actionAnnotOpenInfo = nullptr;
     actionAnnotMoveCursorAt = menu.addAction(PrefManager::instance().getText("timeline_annot_move_cursor_at"));
     actionAnnotOpenInfo = menu.addAction(PrefManager::instance().getText("timeline_annot_open_info"));
-    actionAnnotOpenInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false);
+    actionAnnotOpenInfo->setEnabled(SignalManager::instance().isNavelPanelOpen() == false || SignalManager::instance().typeCurrentPanel() != PanelType::Annotation);
     
     QMenu* submenu = menu.addMenu(PrefManager::instance().getText("timeline_annot_edit_color"));
     QActionGroup* colorGroup = new QActionGroup(submenu);

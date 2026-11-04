@@ -74,6 +74,7 @@ signals:
     void globalRecordingStarted();
     void globalRecordingFinished();
     bool isNavelPanelOpen();
+    PanelType typeCurrentPanel();
     void deleteAnnot(Annotation& annotation);
 };
 

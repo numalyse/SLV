@@ -246,6 +246,7 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), projectMedia->duration(), projectMedia->fps());
     m_ruler->setPos(0, 0);
+    m_ruler->setToolTip(PrefManager::instance().getText("timeline_ruler_tooltip"));
     m_scene->addItem(m_ruler);
 
     m_cursor = new CursorItem(m_sceneHeight);
@@ -410,7 +411,7 @@ void TimelineWidget::updateTimelineGeometry()
         m_sceneWidth,
         m_rulerHeight,
         m_mathManager->pixelsPerMs()
-        );
+    );
 
     m_abManager->updateMarkersPosition();
 

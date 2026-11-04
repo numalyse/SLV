@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "Selezione della vista",
     "timeline_ruler" : "Righello temporale",
+    "timeline_ruler_tooltip" : "Clicca per spostare il cursore qui",
     "timeline_cursor" : "Cursore",
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",

@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "Seleção de vista",
     "timeline_ruler" : "Régua temporal",
+    "timeline_ruler_tooltip" : "Clique para mover o cursor aqui",
     "timeline_cursor" : "Cursor",
     "timeline_split_shot_at_cursor" : "Cortar no cursor",
     "timeline_ab_action_0": "Adicionar marcador A no cursor",

@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "Sélection de la vue",
     "timeline_ruler" : "Règle temporelle",
+    "timeline_ruler_tooltip" : "Cliquer pour déplacer la tête de lecture ici",
     "timeline_cursor" : "Tête de lecture",
     "timeline_split_shot_at_cursor" : "Découper à la tête de lecture",
     "timeline_ab_action_0": "Ajouter le marqueur A à la tête de lecture",

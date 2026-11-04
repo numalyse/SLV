@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "Ansichtsauswahl",
     "timeline_ruler" : "Zeitleiste",
+    "timeline_ruler_tooltip" : "Klicken Sie hier, um den Abspielkopf zu verschieben",
     "timeline_cursor" : "Abspielkopf",
     "timeline_split_shot_at_cursor" : "Am Abspielkopf schneiden",
     "timeline_ab_action_0": "A-Marker am Abspielkopf setzen",

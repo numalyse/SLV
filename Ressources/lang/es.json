@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "Selección de vista",
     "timeline_ruler" : "Regla de tiempo",
+    "timeline_ruler_tooltip" : "Haga clic para mover la cabeza de reproducción aquí",
     "timeline_cursor" : "Cabezal",
     "timeline_split_shot_at_cursor" : "Cortar en el cabezal",
     "timeline_ab_action_0": "Añadir marcador A en el cabezal",

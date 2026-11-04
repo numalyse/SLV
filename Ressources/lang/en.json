@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "View selection",
     "timeline_ruler" : "Temporal ruler",
+    "timeline_ruler_tooltip" : "Click to move the cursor here",
     "timeline_cursor" : "Cursor",
     "timeline_split_shot_at_cursor" : "Cut at cursor",
     "timeline_ab_action_0": "Add marker A at cursor",

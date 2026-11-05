@@ -270,9 +270,13 @@
     "file_playlist" : "Lista de reproducción XSPF",
     "tooltip_import_playlist" : "Importar una lista de reproducción",
     "sort_AZ_playlist" : "A → Z",
+    "tooltip_sort_AZ_playlist" : "Los archivos se ordenan alfabéticamente\nPara garantizar el orden numérico, se requiere un cero inicial\nSin cero inicial: 1, 10, 11, 2, 3 (incorrecto)\nCon cero inicial: 01, 02, 03, 10, 11 (correcto)",
     "sort_ZA_playlist" : "Z → A",
+    "sort_ZA_playlist_tooltip" : "Los archivos se ordenan en orden alfabético inverso\nPara garantizar el orden numérico, se requiere un cero inicial\nSin cero inicial: 3, 2, 11, 10, 1 (incorrecto)\nCon cero inicial: 11, 10, 03, 02, 01 (correcto)",
     "sort_addition_down_playlist" : "Por orden de adición ascendente ↓",
+    "sort_addition_down_playlist_tooltip" : "Los archivos se ordenan según el orden de adición en la lista de reproducción\nEl primero agregado llega primero\nLos nombres de los archivos no importan",
     "sort_addition_up_playlist" : "Por orden de adición descendente ↑",
+    "sort_addition_up_playlist_tooltip" : "Los archivos se ordenan según el orden inverso de adición en la lista de reproducción\nEl último agregado llega primero\nLos nombres de los archivos no importan",
     "tooltip_add_item_playlist" : "Añadir medio",
     
     "delete" : "Eliminar",

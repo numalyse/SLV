@@ -270,9 +270,13 @@
     "file_playlist" : "Liste de lecture XSPF",
     "tooltip_import_playlist" : "Importer une playlist",
     "sort_AZ_playlist" : "A → Z",
+    "sort_AZ_playlist_tooltip" : "Les fichiers sont triés par ordre alphabétique\nAfin garantir l'ordre numérique, l'ajout d'un zéro préfixe est nécessaire\nSans zéro préfixe : 1, 10, 11, 2, 3 (incorrect)\nAvec zéro préfixe : 01, 02, 03, 10, 11 (correct)",
     "sort_ZA_playlist" : "Z → A",
+    "sort_ZA_playlist_tooltip" : "Les fichiers sont triés par ordre alphabétique inverse\nAfin garantir l'ordre numérique, l'ajout d'un zéro préfixe est nécessaire\nSans zéro préfixe : 3, 2, 11, 10, 1 (incorrect)\nAvec zéro préfixe : 11, 10, 03, 02, 01 (correct)",
     "sort_addition_down_playlist" : "Par ajout croissant ↓",
+    "sort_addition_down_playlist_tooltip" : "Les fichiers sont triés selon l'ordre d'ajout dans la playlist\nLe premier ajouté arrive en premier\nLe nom des fichiers n'a pas d'importance",
     "sort_addition_up_playlist" : "Par ajout décroissant ↑",
+    "sort_addition_up_playlist_tooltip" : "Les fichiers sont triés selon l'ordre inverse d'ajout dans la playlist\nLe dernier ajouté arrive en premier\nLe nom des fichiers n'a pas d'importance",
     "tooltip_add_item_playlist" : "Ajouter un média",
 
     "delete" : "Supprimer",

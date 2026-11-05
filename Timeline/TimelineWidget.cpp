@@ -242,7 +242,10 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     });
 
     m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
-    connect(m_view, &TimelineView::annotationHandleDragged, m_annotItemManager, &AnnotationItemManager::onAnnotationHandleDragged);
+    connect(m_view, &TimelineView::annotationHandleDragged, this,
+        [this](AnnotationHandleItem* handle, double posX) {
+            m_annotItemManager->onAnnotationHandleDragged(handle, posX, m_shotManager->shotItems());
+        });
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), projectMedia->duration(), projectMedia->fps());
     m_ruler->setPos(0, 0);

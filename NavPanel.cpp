@@ -47,6 +47,7 @@ NavPanel::NavPanel(ThumbnailWorker* thumbnailWorker, QWidget *parent)
     connect(&SignalManager::instance(), &SignalManager::displayPlaylist, this, &NavPanel::displayPlaylist);
     connect(&SignalManager::instance(), &SignalManager::displayAnnotationPanel, this, &NavPanel::displayAnnotationPanel);
     connect(&SignalManager::instance(), &SignalManager::isNavelPanelOpen, this, &NavPanel::isOpen);
+    connect(&SignalManager::instance(), &SignalManager::typeCurrentPanel, this, &NavPanel::getPanel);
 
 }
 
@@ -99,6 +100,18 @@ void NavPanel::setPanel(PanelType type)
         break;
     }
     m_currentPanel = type;
+}
+
+PanelType NavPanel::getPanel()
+{
+    QWidget* currentWidget = m_sideWidget->currentWidget();
+    if (currentWidget == m_playlistWidget) {
+        return PanelType::Playlist;
+    } else if (currentWidget == m_shotDetail) {
+        return PanelType::ShotDetail;
+    } else if (currentWidget == m_annotationPanel) {
+    return PanelType::Annotation;
+    }
 }
 
 void NavPanel::displayShotDetail()

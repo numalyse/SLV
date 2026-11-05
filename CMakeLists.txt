@@ -127,6 +127,7 @@ set(PROJECT_SOURCES
     ToolbarButtons/ToolbarToggleHoverButton.h ToolbarButtons/ToolbarToggleHoverButton.cpp
 
     PrefManager.h PrefManager.cpp
+    UserConfig.h UserConfig.cpp
     TimeFormatter.h
     IconHelper.h
     VlcParseHelper.h

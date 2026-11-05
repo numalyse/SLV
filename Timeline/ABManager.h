@@ -30,6 +30,8 @@ public slots:
     void dragMarker(ABMarkerItem* marker, const double pos);
 
 private:
+    void updateMarkerToolTip(ABMarkerItem* marker);
+
     enum class LoopState {
         Idle,   // jamais entré dans al loop
         InLoop  // lecture bouclée entre A et B

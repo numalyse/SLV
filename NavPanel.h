@@ -24,7 +24,9 @@ public:
     const bool isOpen(){return m_isOpen;}
     PanelType currentPanel() const {return m_currentPanel;}
     void setPanel(PanelType type);
-    AnnotationPanel* annotationPanel() {return m_annotationPanel; };
+    PanelType getPanel();
+    AnnotationPanel *annotationPanel() { return m_annotationPanel; };
+
 private:
 
     bool m_isOpen = false;

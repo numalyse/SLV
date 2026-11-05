@@ -26,6 +26,8 @@ public:
 
     QString capitalized(const QString &text);
 
+    QString titleCase(const QString &text);
+
     ///@brief Loads both user prefs and default prefs
     void loadPrefs();
 

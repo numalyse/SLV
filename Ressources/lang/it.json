@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "Selezione della vista",
     "timeline_ruler" : "Righello temporale",
+    "timeline_ruler_tooltip" : "Clicca per spostare il cursore qui",
     "timeline_cursor" : "Cursore",
     "timeline_split_shot_at_cursor" : "Taglia al cursore",
     "timeline_ab_action_0": "Aggiungi marcatore A al cursore",
@@ -252,6 +253,15 @@
 
     "activate" : "Attiva",
     "deactivate" : "Disattiva",
+
+    "left" : "sinistra",
+    "right" : "destra",
+
+    "left_click": "click sinistro",
+    "right_click": "click destro",
+
+    "to_select" : "per selezionare",
+    "to_unselect" : "per deselezionare",
 
     "playlist" : "Playlist",
     "tooltip_loop_playlist": "Modalità loop",

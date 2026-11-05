@@ -101,6 +101,7 @@
 
     "timeline_view_choice" : "View selection",
     "timeline_ruler" : "Temporal ruler",
+    "timeline_ruler_tooltip" : "Click to move the cursor here",
     "timeline_cursor" : "Cursor",
     "timeline_split_shot_at_cursor" : "Cut at cursor",
     "timeline_ab_action_0": "Add marker A at cursor",
@@ -251,6 +252,15 @@
 
     "activate" : "Activate",
     "deactivate" : "Deactivate",
+
+    "left" : "left",
+    "right" : "right",
+
+    "left_click": "left click",
+    "right_click": "right click",
+
+    "to_select" : "to select",
+    "to_unselect" : "to unselect",
     
     "playlist" : "Playlist",
     "tooltip_loop_playlist" : "Loop mode",

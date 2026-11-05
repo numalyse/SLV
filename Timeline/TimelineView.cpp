@@ -4,9 +4,11 @@
 #include "Timeline/Items/ABMarkerItem.h"
 #include "Timeline/Items/AnnotationHandleItem.h"
 #include "Timeline/Items/AudioShotItem.h"
+#include "Timeline/Items/CursorItem.h"
 
 #include <QDebug>
 #include <QScrollBar>
+#include <QToolTip>
 
 TimelineView::TimelineView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent)
 {
@@ -49,7 +51,6 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                 case SLV::TypeABMarkerItem:
                     m_dragMode = DragMode::ABMarker;
                     m_draggedItem = item;
-                    setCursor(Qt::ClosedHandCursor);
                     return;
                 case SLV::TypeAnnotationHandleItem:
                     m_dragMode = DragMode::AnnotationHandle;
@@ -58,17 +59,29 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
                         static_cast<AnnotationHandleItem*>(m_draggedItem));
                     return;
                 case SLV::TypeCursorItem:
-                case SLV::TypeRulerItem:
                     m_dragMode = DragMode::TimeCursor;
+                    m_draggedItem = item;
                     emit isDragging(true);
                     emit cursorPositionRequested(mapToScene(event->pos()).x());
                     return;
-                case SLV::TypeShotItem:
-                    emit shotSelectionRequested(static_cast<ShotItem*>(item), nullptr, true);
+                case SLV::TypeRulerItem:
+                    m_dragMode = DragMode::TimeCursor;
+                    m_draggedItem = nullptr;
+                    for (QGraphicsItem* sceneItem : scene()->items()) {
+                        if (sceneItem->type() == SLV::TypeCursorItem) {
+                            m_draggedItem = sceneItem;
+                            break;
+                        }
+                    }
+                    emit isDragging(true);
+                    emit cursorPositionRequested(mapToScene(event->pos()).x());
                     return;
-                case SLV::TypeAudioShotItem:
-                    emit shotSelectionRequested(nullptr, static_cast<AudioShotItem*>(item), true);
-                    return;
+                // case SLV::TypeShotItem:
+                //     emit shotSelectionRequested(static_cast<ShotItem*>(item), nullptr, true);
+                //     return;
+                // case SLV::TypeAudioShotItem:
+                //     emit shotSelectionRequested(nullptr, static_cast<AudioShotItem*>(item), true);
+                //     return;
                 }
             }
         }
@@ -78,7 +91,9 @@ void TimelineView::mousePressEvent(QMouseEvent *event)
             // emit signal if cursor is on top of a shot item (even if underneath by other item)
             if (item->type() == SLV::TypeShotItem
                 || item->type() == SLV::TypeAudioShotItem
-                || item->type() == SLV::TypeAnnotationItem) {
+                || item->type() == SLV::TypeAnnotationItem
+                || item->type() == SLV::TypeABMarkerItem
+                || item->type() == SLV::TypeCursorItem) {
                 emit itemRightClick(event->globalPos(), item);
                 break;
             } else if (item->type() == SLV::TypeAnnotationHandleItem) {
@@ -103,10 +118,20 @@ void TimelineView::mouseMoveEvent(QMouseEvent *event)
     
     case DragMode::TimeCursor:
         emit cursorPositionRequested(mapToScene(event->pos()).x());
+        if (m_draggedItem && m_draggedItem->type() == SLV::TypeCursorItem) {
+            const QString tooltip = static_cast<CursorItem*>(m_draggedItem)->toolTip();
+            if (!tooltip.isEmpty())
+                QToolTip::showText(event->globalPosition().toPoint(), tooltip, viewport());
+        }
         break;
 
     case DragMode::ABMarker:
         emit abMarkerDragged(static_cast<ABMarkerItem*>(m_draggedItem), mapToScene(event->pos()).x());
+        if (m_draggedItem) {
+            const QString tooltip = m_draggedItem->toolTip();
+            if (!tooltip.isEmpty())
+                QToolTip::showText(event->globalPosition().toPoint(), tooltip, viewport());
+        }
         break;
 
     case DragMode::AnnotationHandle:
@@ -126,7 +151,11 @@ void TimelineView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_dragMode == DragMode::TimeCursor)
         emit isDragging(false);
-    else if (m_dragMode == DragMode::AnnotationHandle && m_draggedItem) {
+
+    if (m_dragMode == DragMode::TimeCursor || m_dragMode == DragMode::ABMarker)
+        QToolTip::hideText();
+
+    if (m_dragMode == DragMode::AnnotationHandle && m_draggedItem) {
         auto* handle = static_cast<AnnotationHandleItem*>(m_draggedItem);
         handle->annotParent()->setDraggingHandle(nullptr);
     }

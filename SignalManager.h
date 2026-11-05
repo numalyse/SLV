@@ -42,39 +42,68 @@ private:
     SignalManager(QObject* parent = nullptr) : QObject(parent){};
 
 signals:
+    // window
+    void windowMovedOrResized();
+
+    // media
     void mediaWidgetMediaFinished();
-    void toggleNavPanel(PanelType type);
-    void displayNavPanel(PanelType type);
-    void extensionToolbarDisplayShotDetail();
-    void displayPlaylist();
-    void playlistEjectPlayer();
-    void simpleToolbarUpdateCursorPosition(int);
-    void timelineSetPosition(int64_t);
-    void playerWidgetSelectFileCanceled();
     void mediaVolumeChanged(const QString&);
     void mediaSpeedChanged(const QString&);
-    void formLineEditPlay();
-    void formLineEditPause();
     void newArrangementRequested(const PlayerLayoutArrangement&);
-    void playerWidgetMediaDropped(const QStringList&);
-    void windowMovedOrResized();
-    void recordButtonUiUpdate();
-    void recordButtonActivated();
-    void recordButtonDectivated();
-    void addPlaylistItems(const QStringList&);
-    void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
     void activateMediaChangeBtn(const bool);
     void updateMediaChangeButtons(bool canGoPrevious, bool canGoNext);
+
+    // player 
+    void playerWidgetSelectFileCanceled();
+    void playerWidgetMediaDropped(const QStringList&);
+
+    // panel
+    void displayNavPanel(PanelType type);
+    void toggleNavPanel(PanelType type);
+    bool isNavelPanelOpen();
+    PanelType typeCurrentPanel();
+
+    // panel - playlist
+    void displayPlaylist();
+    void playlistEjectPlayer();
+    void addPlaylistItems(const QStringList&);
     void requestPlaylistSize();
     void requestPlaylistNextMedia();
     void requestPlaylistNextMediaAutoplay();
     void playlistSizeResponse();
-    void displayAnnotationPanel();
     void playFirstPlaylistItem();
+
+    // panel - annot
+    void displayAnnotationPanel();
+    void deleteAnnot(Annotation& annotation);
+
+    // panel - shot
+    void extensionToolbarDisplayShotDetail();
+    
+
+
+    // position
+    void simpleToolbarUpdateCursorPosition(int);
+    void timelineSetPosition(int64_t);
+    
+    // adjustments
+    void adjustmentChanged(const libvlc_video_adjust_option_t, const float);
+
+    // formLine
+    void formLineEditPlay();
+    void formLineEditPause();
+    
+    // single record  
+    void recordButtonUiUpdate();
+    void recordButtonActivated();
+    void recordButtonDectivated();
+
+    // global record
     void globalRecordingStarted();
     void globalRecordingFinished();
-    bool isNavelPanelOpen();
-    void deleteAnnot(Annotation& annotation);
+    
+
+
 };
 
 

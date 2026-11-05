@@ -2,6 +2,7 @@
 
 #include "Project/ProjectManager.h"
 #include "Timeline/Items/AnnotationHandleItem.h"
+#include "Timeline/Items/ShotItem.h"
 #include "Timeline/Items/TimelineLayerItem.h"
 
 #include <algorithm>
@@ -90,8 +91,16 @@ void AnnotationItemManager::rebuild(){
     } 
 }
 
-void AnnotationItemManager::onAnnotationHandleDragged(AnnotationHandleItem *handle, double posX)
+void AnnotationItemManager::onAnnotationHandleDragged(
+    AnnotationHandleItem *handle,
+    double posX,
+    const QVector<ShotItem*>& shotItems)
 {
+    if (!handle) {
+        qDebug() << "[Timeline][AnnotationItemManager] handle dragged : handle is null";
+        return;
+    }
+
     const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
     const int id = handle->annotParent()->annotationId();
 
@@ -103,6 +112,24 @@ void AnnotationItemManager::onAnnotationHandleDragged(AnnotationHandleItem *hand
 
     Annotation annot = *it;
     int64_t newTime = p_mathManager->posToTimeSnapped(posX);
+
+    constexpr double snapTolerancePx = 8.0;
+    double closestBoundaryDistancePx = snapTolerancePx;
+    int64_t closestBoundary = 0;
+    bool hasClosestBoundary = false;
+    for (ShotItem* shotItem : shotItems) {
+        for (const int64_t boundary : {shotItem->shot().start, shotItem->shot().end}) {
+            const double distancePx = std::abs(posX - p_mathManager->timeToPos(boundary));
+            if (distancePx <= closestBoundaryDistancePx) {
+                closestBoundaryDistancePx = distancePx;
+                closestBoundary = boundary;
+                hasClosestBoundary = true;
+            }
+        }
+    }
+    if (hasClosestBoundary)
+        newTime = closestBoundary;
+
     if (handle->isLeft())
         annot.start = newTime;
     else

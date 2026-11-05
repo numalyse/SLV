@@ -3,6 +3,7 @@
 #include "ShotManager.h"
 #include "TimeFormatter.h"
 #include "PrefManager.h"
+#include "UserConfig.h"
 #include "Timeline/Items/TimelineLayerItem.h"
 
 #include <QtAssert>
@@ -128,6 +129,7 @@ void ShotManager::toggleSelection(ShotItem* shotItemToSelect, AudioShotItem* aud
         qDebug() << " [SHOTMANAGER]  Selected shot " << ISelectedShots << " : " << m_selectedShots[ISelectedShots].first->shot().start << " - " << m_selectedShots[ISelectedShots].first->shot().end;
     }
 
+    updateShotToolTips();
     emit selectedShotCountUpdated(static_cast<int>(m_selectedShots.size()));
 }
 
@@ -362,9 +364,18 @@ const QVector<Shot> ShotManager::shotItemsData() const
 
 void ShotManager::updateShotToolTips()
 {
+    const QString keyShortcut = QStringLiteral("%1 + %2")
+                                .arg(UserConfig::instance().mainControlKeyString())
+                                .arg(PrefManager::instance().titleCase(PrefManager::instance().getText("left_click")));
     for (qsizetype i = 0; i < m_shotItems.size(); ++i) {
-        const QString toolTip = PrefManager::instance().capitalized(
-                                PrefManager::instance().getText("shot")) + tr(" %1").arg(i + 1);
+        const QPair<ShotItem*, AudioShotItem*> shotPair {m_shotItems[i], m_audioShotItems[i]};
+        const QString selectionText = PrefManager::instance().getText(
+            m_selectedShots.contains(shotPair) ? "to_unselect" : "to_select");
+        const QString toolTip = QStringLiteral("%1 %2 <br><i>%3 %4</i>")
+                                .arg(PrefManager::instance().capitalized(PrefManager::instance().getText("shot")))
+                                .arg(i + 1)
+                                .arg(keyShortcut)
+                                .arg(selectionText);
         m_shotItems[i]->setToolTip(toolTip);
         m_audioShotItems[i]->setToolTip(toolTip);
     }

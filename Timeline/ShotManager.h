@@ -13,6 +13,7 @@
 
 #include <QObject>
 #include <QGraphicsScene>
+#include <QHash>
 #include <QPair>
 #include <QString>
 
@@ -79,8 +80,12 @@ signals:
 private:
     void mergeCurrentInto(int ShotItemId);
     void updateShotToolTips();
+    void setupTagImageTooltip(ShotItem* shotItem);
+    void removeTagImageRequestsForItem(ShotItem* shotItem);
 
     QVector<ShotItem*> m_shotItems;
+    QHash<int, ShotItem*> m_tagImageRequests;
+    int m_nextTagImageRequestId = 0;
     QVector<AudioShotItem*> m_audioShotItems;
 
     QGraphicsItem* m_layer = nullptr;

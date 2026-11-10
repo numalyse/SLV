@@ -8,6 +8,11 @@
 #include <QPixmap>
 #include <QGraphicsTextItem>
 #include <QGraphicsRectItem>
+#include <QPointer>
+#include <functional>
+
+class QGraphicsSceneHoverEvent;
+class QWidget;
 
 class ShotItem : public QGraphicsItem
 {
@@ -15,8 +20,15 @@ public:
     explicit ShotItem(Shot shot, double width, QGraphicsItem* parent = nullptr);
     ~ShotItem();
 
+    void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+
     QColor getTagImageColor(const QPixmap &pixmap) const;
     void setThumbnail(const QPixmap &pixmap);
+    void setTagImage(const QPixmap& pixmap);
+    void clearTagImage();
+    void setTagImageRequestHandler(std::function<void()> handler);
+    void setHoverTooltipText(const QString& text);
 
     QRectF boundingRect() const override;
     void paint(QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -49,13 +61,22 @@ protected:
     virtual double topMargin() const { return s_topMargin; }
 
 private:
+    void requestTagImageIfNeeded();
+    void updateToolTip();
+
     Shot m_shot;
     QPixmap m_pixmap;
+    QPixmap m_tagImage;
+    QPointer<QWidget> m_toolTipWidget;
+    std::function<void()> m_tagImageRequestHandler;
+    QString m_hoverTooltipTextValue;
     QGraphicsRectItem* m_selectionBox = nullptr;
     QGraphicsTextItem* m_selectionText = nullptr;
     double m_widthMs{};
     int m_selectedNumber = 1;
     bool m_selected = false;
+    bool m_isHovered = false;
+    bool m_tagImageRequested = false;
     bool m_showThumbnail = true;
     bool m_showBorder = true;
     bool m_selectionNeedUpdate = false;

@@ -214,6 +214,8 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
     auto oldEnd =  baseShot.end;
     baseShot.end = cutTime - 1; 
     baseShot.tagImageTime = baseShot.middle();
+    removeTagImageRequestsForItem(m_currentShotItem);
+    m_currentShotItem->clearTagImage();
     m_audioShotItems[index]->shot().end = cutTime - 1;
 
     double newWidth1 = baseShot.end - baseShot.start;
@@ -225,6 +227,7 @@ void ShotManager::splitShotAt( int64_t cutTime ) {
 
     double width2 = newShotData.end - newShotData.start;
     ShotItem* newShotItem = new ShotItem(newShotData, width2, m_layer);
+    setupTagImageTooltip(newShotItem);
     newShotItem->setPos(newShotData.start, m_currentShotItem->y());
 
     AudioShot newAudioShotData = AudioShot{};
@@ -271,6 +274,8 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     item->shot().soundTxt += "\n" + m_currentShotItem->shot().soundTxt; // add the note of the current shot to the merged shot
 
     item->shot().tagImageTime = item->shot().middle(); // updates the tagimage to the middle of the merged shot
+    removeTagImageRequestsForItem(item);
+    item->clearTagImage();
 
     AudioShotItem* audioItem = m_audioShotItems[ShotItemId];
     audioItem->shot().start = item->shot().start;
@@ -288,6 +293,7 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
     ShotItem* currentAudioShotItem = m_audioShotItems[m_shotItems.indexOf(m_currentShotItem)];
     m_shotItems.removeOne(m_currentShotItem);
     m_audioShotItems.removeOne(static_cast<AudioShotItem*>(currentAudioShotItem));
+    removeTagImageRequestsForItem(m_currentShotItem);
     delete m_currentShotItem;
     delete currentAudioShotItem;
     m_currentShotItem = nullptr;
@@ -376,8 +382,37 @@ void ShotManager::updateShotToolTips()
                                 .arg(i + 1)
                                 .arg(keyShortcut)
                                 .arg(selectionText);
-        m_shotItems[i]->setToolTip(toolTip);
+        m_shotItems[i]->setHoverTooltipText(toolTip);
         m_audioShotItems[i]->setToolTip(toolTip);
+    }
+}
+
+void ShotManager::setupTagImageTooltip(ShotItem* shotItem)
+{
+    shotItem->setTagImageRequestHandler([this, shotItem]() {
+        if (p_media->type() != MediaType::Video || p_media->filePath().isEmpty())
+            return;
+
+        const int requestId = m_nextTagImageRequestId++;
+        m_tagImageRequests.insert(requestId, shotItem);
+        p_thumbnailWorker->requestThumbnail(
+            ThumbnailWorker::Requester::TagImage,
+            requestId,
+            shotItem->shot().tagImageTime,
+            0,
+            p_media->filePath(),
+            {240, 135},
+            p_media->sar());
+    });
+}
+
+void ShotManager::removeTagImageRequestsForItem(ShotItem* shotItem)
+{
+    for (auto it = m_tagImageRequests.begin(); it != m_tagImageRequests.end();) {
+        if (it.value() == shotItem)
+            it = m_tagImageRequests.erase(it);
+        else
+            ++it;
     }
 }
 
@@ -386,6 +421,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 
     clearSelection();
 
+    m_tagImageRequests.clear();
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
@@ -399,6 +435,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
         int64_t shotLength = (IShot.end - IShot.start);
 
         ShotItem* shot = new ShotItem(IShot, shotLength, m_layer);
+        setupTagImageTooltip(shot);
         AudioShot audioShot{};
         audioShot.start = IShot.start;
         audioShot.end = IShot.end;
@@ -429,6 +466,7 @@ void ShotManager::setShotItemsData(const QVector<Shot> &shots)
 void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 {
 
+    m_tagImageRequests.clear();
     qDeleteAll(m_shotItems);
     m_shotItems.clear();
     qDeleteAll(m_audioShotItems);
@@ -453,6 +491,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
 
         // position et largeur en ms : le transform de la couche fait la conversion en pixels
         ShotItem* shotItem = new ShotItem(shot, lengthShot, m_layer);
+        setupTagImageTooltip(shotItem);
         AudioShotItem* audioShotItem = new AudioShotItem(audioShot, lengthShot, m_layer);
 
         shotItem->setX(startShot);
@@ -482,6 +521,7 @@ void ShotManager::createShotItemsFromCuts(const std::vector<int> &cuts)
     audioShot.title = ""; audioShot.start = startShot; audioShot.end = p_mathManager->duration();
 
     ShotItem* shotItem = new ShotItem(shot, lengthShot, m_layer);
+    setupTagImageTooltip(shotItem);
     AudioShotItem* audioShotItem = new AudioShotItem(audioShot, lengthShot, m_layer);
     shotItem->setX(startShot);
     audioShotItem->setX(startShot);
@@ -531,6 +571,18 @@ QColor getNewBorderColor(const QColor& color)
 }
 
 void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image){
+
+    if (requester == ThumbnailWorker::Requester::TagImage) {
+        auto it = m_tagImageRequests.find(requestId);
+        if (it == m_tagImageRequests.end())
+            return;
+
+        ShotItem* shotItem = it.value();
+        m_tagImageRequests.erase(it);
+        if (m_shotItems.contains(shotItem))
+            shotItem->setTagImage(QPixmap::fromImage(image));
+        return;
+    }
 
     if(requester != ThumbnailWorker::Requester::TimelineShot) return;
 

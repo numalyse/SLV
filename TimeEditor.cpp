@@ -72,7 +72,7 @@ void TimeEditor::createButtons(const int sliderMax)
         }
     });
     connect(m_secondsEdit, &QLineEdit::inputRejected, this, [this](){
-        qDebug() << "omg ?";
+        qDebug() << "input rejected";
     });
     connect(m_framesEdit, &QLineEdit::textChanged, this, [this](const QString& str){
         if(m_framesEdit->hasFocus()){

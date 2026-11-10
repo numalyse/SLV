@@ -94,6 +94,7 @@ void AnnotationItemManager::rebuild(){
 void AnnotationItemManager::onAnnotationHandleDragged(
     AnnotationHandleItem *handle,
     double posX,
+    double playheadPosX,
     const QVector<ShotItem*>& shotItems)
 {
     if (!handle) {
@@ -114,21 +115,26 @@ void AnnotationItemManager::onAnnotationHandleDragged(
     int64_t newTime = p_mathManager->posToTimeSnapped(posX);
 
     constexpr double snapTolerancePx = 8.0;
-    double closestBoundaryDistancePx = snapTolerancePx;
-    int64_t closestBoundary = 0;
-    bool hasClosestBoundary = false;
+    double closestSnapDistancePx = snapTolerancePx;
+    int64_t closestSnapTime = 0;
+    bool hasClosestSnap = false;
+    const auto considerSnap = [&](double snapPosX, int64_t snapTime) {
+        const double distancePx = std::abs(posX - snapPosX);
+        if (distancePx <= closestSnapDistancePx) {
+            closestSnapDistancePx = distancePx;
+            closestSnapTime = snapTime;
+            hasClosestSnap = true;
+        }
+    };
+
+    considerSnap(playheadPosX, p_mathManager->posToTimeSnapped(playheadPosX));
     for (ShotItem* shotItem : shotItems) {
         for (const int64_t boundary : {shotItem->shot().start, shotItem->shot().end}) {
-            const double distancePx = std::abs(posX - p_mathManager->timeToPos(boundary));
-            if (distancePx <= closestBoundaryDistancePx) {
-                closestBoundaryDistancePx = distancePx;
-                closestBoundary = boundary;
-                hasClosestBoundary = true;
-            }
+            considerSnap(p_mathManager->timeToPos(boundary), boundary);
         }
     }
-    if (hasClosestBoundary)
-        newTime = closestBoundary;
+    if (hasClosestSnap)
+        newTime = closestSnapTime;
 
     if (handle->isLeft())
         annot.start = newTime;

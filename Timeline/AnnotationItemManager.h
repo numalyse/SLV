@@ -28,7 +28,11 @@ public slots:
     /// @brief Remove all items from the scene, and recreate items based on project annotations
     void rebuild();
 
-    void onAnnotationHandleDragged(AnnotationHandleItem* handle, double posX, const QVector<ShotItem*>& shotItems);
+    void onAnnotationHandleDragged(
+        AnnotationHandleItem* handle,
+        double posX,
+        double playheadPosX,
+        const QVector<ShotItem*>& shotItems);
 
 signals:
     void addAnnotationRequested(Annotation& annotation);

@@ -396,7 +396,7 @@ void ShotManager::setupTagImageTooltip(ShotItem* shotItem)
         const int requestId = m_nextTagImageRequestId++;
         m_tagImageRequests.insert(requestId, shotItem);
         p_thumbnailWorker->requestThumbnail(
-            ThumbnailWorker::Requester::TagImage,
+            ThumbnailWorker::Requester::ShotDetail,
             requestId,
             shotItem->shot().tagImageTime,
             0,
@@ -572,15 +572,14 @@ QColor getNewBorderColor(const QColor& color)
 
 void ShotManager::updateThumbnail(ThumbnailWorker::Requester requester, int requestId, const QImage& image){
 
-    if (requester == ThumbnailWorker::Requester::TagImage) {
+    if (requester == ThumbnailWorker::Requester::ShotDetail) {
         auto it = m_tagImageRequests.find(requestId);
-        if (it == m_tagImageRequests.end())
-            return;
-
-        ShotItem* shotItem = it.value();
-        m_tagImageRequests.erase(it);
-        if (m_shotItems.contains(shotItem))
-            shotItem->setTagImage(QPixmap::fromImage(image));
+        if (it != m_tagImageRequests.end()) {
+            ShotItem* shotItem = it.value();
+            m_tagImageRequests.erase(it);
+            if (m_shotItems.contains(shotItem))
+                shotItem->setTagImage(QPixmap::fromImage(image));
+        }
         return;
     }
 

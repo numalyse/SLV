@@ -85,7 +85,7 @@ private:
 
     QVector<ShotItem*> m_shotItems;
     QHash<int, ShotItem*> m_tagImageRequests;
-    int m_nextTagImageRequestId = 0;
+    int m_nextTagImageRequestId = 1;
     QVector<AudioShotItem*> m_audioShotItems;
 
     QGraphicsItem* m_layer = nullptr;

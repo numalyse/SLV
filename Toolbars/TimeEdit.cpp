@@ -2,17 +2,23 @@
 #include "TimeEdit.h"
 #include "TimeValidator.h"
 #include "PrefManager.h"
+#include "TimeFormatter.h"
 
 #include <QPropertyAnimation>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QKeyEvent>
+#include <QRegularExpression>
 #include <QStyleHints>
+#include <algorithm>
+#include <cmath>
 
 TimeEdit::TimeEdit(const QString &txt, QWidget *parent, const bool hasAnimations) : QLineEdit(parent), m_hasAnimations(hasAnimations)
 {
     setText(txt);
-    setInputMask("99:99:99.99");
-    setValidator(new TimeValidator(this));
+    setInputMask("99:99:99.99;0");
+    m_timeValidator = new TimeValidator(this);
+    setValidator(m_timeValidator);
     setFocusPolicy(Qt::ClickFocus);
     
     setFixedWidth(TimeEdit::s_widthMin);
@@ -51,6 +57,74 @@ TimeEdit::TimeEdit(const QString &txt, QWidget *parent, const bool hasAnimations
         }
     });
 
+}
+
+void TimeEdit::setFrameRate(double fps)
+{
+    if (fps <= 0.0) {
+        return;
+    }
+
+    m_fps = fps;
+}
+
+void TimeEdit::setMaximumTime(int64_t time)
+{
+    m_maxTime = std::max<int64_t>(0, time);
+}
+
+void TimeEdit::normalizeTimecode()
+{
+    if (m_normalizingTimecode) {
+        return;
+    }
+
+    QStringList parts = text().split(QRegularExpression("[:.]"));
+    if (parts.size() != 4) {
+        return;
+    }
+
+    const int currentCursorPosition = cursorPosition();
+    int values[4];
+    for (int i = 0; i < 4; ++i) {
+        bool isNumeric = false;
+        values[i] = parts[i].replace(' ', '0').toInt(&isNumeric);
+        if (!isNumeric) {
+            values[i] = 0;
+        }
+    }
+
+    const int framesPerSecond = std::max(1, static_cast<int>(std::lround(m_fps)));
+    values[0] = std::clamp(values[0], 0, 99);
+    values[1] = std::clamp(values[1], 0, 59);
+    values[2] = std::clamp(values[2], 0, 59);
+    values[3] = std::clamp(values[3], 0, framesPerSecond - 1);
+
+    const QString timecode = QString("%1:%2:%3.%4")
+                                 .arg(values[0], 2, 10, QChar('0'))
+                                 .arg(values[1], 2, 10, QChar('0'))
+                                 .arg(values[2], 2, 10, QChar('0'))
+                                 .arg(values[3], 2, 10, QChar('0'));
+    const int64_t time = std::min(TimeFormatter::HHMMSSFFToMs(timecode, m_fps), m_maxTime);
+    m_normalizingTimecode = true;
+    setText(TimeFormatter::msToHHMMSSFF(time, m_fps));
+    setCursorPosition(std::min(currentCursorPosition, static_cast<int>(text().size())));
+    m_normalizingTimecode = false;
+}
+
+void TimeEdit::keyPressEvent(QKeyEvent* event)
+{
+    const int oldCursorPosition = cursorPosition();
+    const bool isDigit = event->text().size() == 1 && event->text().at(0).isDigit();
+    QLineEdit::keyPressEvent(event);
+
+    if (!isDigit || (oldCursorPosition != 1 && oldCursorPosition != 4 && oldCursorPosition != 7)) {
+        return;
+    }
+
+    const int nextFieldPosition = oldCursorPosition == 1 ? 3 : oldCursorPosition == 4 ? 6 : 9;
+    normalizeTimecode();
+    setCursorPosition(nextFieldPosition);
 }
 
 void TimeEdit::focusInEvent(QFocusEvent *e)

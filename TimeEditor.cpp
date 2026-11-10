@@ -63,9 +63,9 @@ void TimeEditor::createButtons(const int sliderMax)
     });
     connect(m_secondsEdit, &QLineEdit::textChanged, this, [this](const QString& str){
         if(m_secondsEdit->hasFocus()){
+            const bool shouldAdvanceToFrames = m_secondsEdit->cursorPosition() >= 2;
             onTimeEditsChanged(2);
-            qDebug() << "CURSOR POS : " << m_secondsEdit->cursorPosition();
-            if(m_secondsEdit->cursorPosition() >= 2){
+            if(shouldAdvanceToFrames){
                 m_framesEdit->setFocus();
                 m_framesEdit->setCursorPosition(0);
             }
@@ -122,8 +122,8 @@ void TimeEditor::initUiLayout()
     m_minutesEdit->setValidator(new TimeValidator(this));
     m_secondsEdit->setInputMask("99");
     m_secondsEdit->setValidator(new TimeValidator(this));
-    m_hoursEdit->setInputMask("99");
-    m_hoursEdit->setValidator(new TimeValidator(this));
+    m_framesEdit->setInputMask("99");
+    m_framesEdit->setValidator(new TimeValidator(this));
 
     QVBoxLayout *hourButtonsLayout = new QVBoxLayout();
     hourButtonsLayout->addWidget(m_hoursPlus);

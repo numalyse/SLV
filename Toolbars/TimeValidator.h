@@ -11,7 +11,6 @@ public:
     explicit TimeValidator(QObject* parent = nullptr);
     QValidator::State validate(QString &input, int &pos) const override;
     void fixup(QString &input) const override;
-
 };
 
 #endif

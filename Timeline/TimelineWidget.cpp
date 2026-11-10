@@ -434,6 +434,33 @@ void TimelineWidget::updateTimelineGeometry()
 void TimelineWidget::moveCursor(double newCursorPosX)
 {
     int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
+    constexpr double snapTolerancePx = 8.0;
+    double closestSnapDistancePx = snapTolerancePx;
+    int64_t closestSnapTime = 0;
+    bool hasClosestSnap = false;
+    const auto considerSnap = [&](int64_t snapTime) {
+        const double distancePx = std::abs(newCursorPosX - m_mathManager->timeToPos(snapTime));
+        if (distancePx <= closestSnapDistancePx) {
+            closestSnapDistancePx = distancePx;
+            closestSnapTime = snapTime;
+            hasClosestSnap = true;
+        }
+    };
+
+    for (ShotItem* shotItem : m_shotManager->shotItems()) {
+        considerSnap(shotItem->shot().start);
+        considerSnap(shotItem->shot().end);
+    }
+
+    const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
+    for (const Annotation& annotation : annotations) {
+        considerSnap(annotation.start);
+        considerSnap(annotation.end);
+    }
+
+    if (hasClosestSnap)
+        newCursorTime = closestSnapTime;
+
     auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
 
     int64_t targetTime = clampedTime.value_or(newCursorTime);

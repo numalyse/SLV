@@ -904,9 +904,13 @@ void Playlist::createSortBtn()
     m_sortButtons = new QButtonGroup();
 
     QRadioButton* sortAdditionDownRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_addition_down_playlist"));
+    sortAdditionDownRadioBtn->setToolTip(PrefManager::instance().getText("sort_addition_down_playlist_tooltip"));
     QRadioButton* sortAdditionUpRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_addition_up_playlist"));
-    QRadioButton* sortAZRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_AZ_playlist"));
-    QRadioButton* sortZARadioBtn = new QRadioButton(PrefManager::instance().getText("sort_ZA_playlist"));
+    sortAdditionUpRadioBtn->setToolTip(PrefManager::instance().getText("sort_addition_up_playlist_tooltip"));
+    QRadioButton* sortAZRadioBtn = new QRadioButton(PrefManager::instance().getText("sort_AZ_playlist") + " (01 → 100+)");
+    sortAZRadioBtn->setToolTip(PrefManager::instance().getText("sort_AZ_playlist_tooltip"));
+    QRadioButton* sortZARadioBtn = new QRadioButton(PrefManager::instance().getText("sort_ZA_playlist") + " (100+ → 01)");
+    sortZARadioBtn->setToolTip(PrefManager::instance().getText("sort_ZA_playlist_tooltip"));
 
     sortAdditionDownRadioBtn->setChecked(true);
 

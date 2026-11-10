@@ -270,9 +270,13 @@
     "file_playlist" : "XSPF Playlist",
     "tooltip_import_playlist" : "Playlist importieren",
     "sort_AZ_playlist" : "A → Z",
+    "sort_AZ_playlist_tooltip" : "Die Dateien werden in alphabetischer Reihenfolge sortiert.\nUm die numerische Reihenfolge zu gewährleisten, ist das Hinzufügen einer führenden Null erforderlich.\nOhne führende Null: 1, 10, 11, 2, 3 (falsch)\nMit führender Null: 01, 02, 03, 10, 11 (richtig)",
     "sort_ZA_playlist" : "Z → A",
+    "sort_ZA_playlist_tooltip" : "Die Dateien werden in umgekehrter alphabetischer Reihenfolge sortiert.\nUm die numerische Reihenfolge zu gewährleisten, ist das Hinzufügen einer führenden Null erforderlich.\nOhne führende Null: 3, 2, 11, 10, 1 (falsch)\nMit führender Null: 11, 10, 03, 02, 01 (richtig)",
     "sort_addition_down_playlist" : "Nach Hinzufügung aufsteigend ↓",
+    "sort_addition_down_playlist_tooltip" : "Die Dateien werden nach der Reihenfolge der Hinzufügung in der Playlist sortiert.\nDie zuerst hinzugefügte Datei kommt zuerst.\nDie Dateinamen sind nicht relevant.",
     "sort_addition_up_playlist" : "Nach Hinzufügung absteigend ↑",
+    "sort_addition_up_playlist_tooltip" : "Die Dateien werden nach der Reihenfolge der Hinzufügung in der Playlist sortiert.\nDie zuletzt hinzugefügte Datei kommt zuerst.\nDie Dateinamen sind nicht relevant.",
     "tooltip_add_item_playlist" : "Medium hinzufügen",
 
     "delete" : "Löschen",

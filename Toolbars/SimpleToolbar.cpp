@@ -21,6 +21,7 @@
 #include <QMetaType>
 #include <QFileDialog>
 #include <QPoint>
+#include <algorithm>
 
 SimpleToolbar::SimpleToolbar(QWidget *parent) : Toolbar(parent)
 {
@@ -341,6 +342,8 @@ void SimpleToolbar::updateSliderState(bool state)
 
 void SimpleToolbar::resetSlider()
 {
+    m_media_duration = 0;
+    m_timeEdit->setMaximumTime(0);
     m_timeEdit->setText(TimeFormatter::msToHHMMSSFF(0,1));
     m_durationBtn->setText(TimeFormatter::msToHHMMSSFF(0,1));
     m_slider->setRange(0,0);
@@ -365,6 +368,7 @@ void SimpleToolbar::updateSliderRange(int64_t mediaDuration){
         m_slider->setMaximum(mediaDuration);
     }
     m_media_duration = mediaDuration;
+    m_timeEdit->setMaximumTime(mediaDuration);
     updateDurationText();
 
 }
@@ -389,6 +393,7 @@ void SimpleToolbar::updateSliderValue(int64_t currentTime){
 
 void SimpleToolbar::updateFps(double newFps){
     m_media_fps = newFps;
+    m_timeEdit->setFrameRate(newFps);
 }
 
 void SimpleToolbar::playUiUpdate()
@@ -682,16 +687,20 @@ void SimpleToolbar::createTimeEdit(){
     });
 
     connect(m_timeEdit, &TimeEdit::focusOut, this, [this](){
+        m_timeEdit->normalizeTimecode();
         m_editingTime = false;
+        const int64_t requestedTime = TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps);
+        emit setPositionRequested(std::min(requestedTime, m_media_duration));
     });
 
     connect(m_timeEdit, &QLineEdit::textEdited, this, [this](){
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps));
+        const int64_t requestedTime = TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps);
+        emit setPositionRequested(std::min(requestedTime, m_media_duration));
     });
 
     connect(m_timeEdit, &QLineEdit::returnPressed, [this]() {
-        m_timeEdit->clearFocus(); 
-        emit setPositionRequested(TimeFormatter::HHMMSSFFToMs(m_timeEdit->text(), m_media_fps));
+        m_timeEdit->normalizeTimecode();
+        m_timeEdit->clearFocus();
     });
 }
 

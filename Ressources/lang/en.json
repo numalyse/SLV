@@ -270,9 +270,13 @@
     "file_playlist" : "XSPF playlist",
     "tooltip_import_playlist" : "Import playlist",
     "sort_AZ_playlist" : "A → Z",
+    "sort_AZ_playlist_tooltip" : "Files are sorted in alphabetical order\nTo ensure numerical order, a leading zero is required\nWithout leading zero: 1, 10, 11, 2, 3 (incorrect)\nWith leading zero: 01, 02, 03, 10, 11 (correct)",
     "sort_ZA_playlist" : "Z → A",
+    "sort_ZA_playlist_tooltip" : "Files are sorted in reverse alphabetical order\nTo ensure numerical order, a leading zero is required\nWithout leading zero: 3, 2, 11, 10, 1 (incorrect)\nWith leading zero: 11, 10, 03, 02, 01 (correct)",
     "sort_addition_down_playlist" : "By ascending addition ↓",
+    "sort_addition_down_playlist_tooltip" : "Files are sorted according to the order of addition in the playlist\nThe first added comes first\nThe file names do not matter",
     "sort_addition_up_playlist" : "By descending addition ↑",
+    "sort_addition_up_playlist_tooltip" : "Files are sorted according to the reverse order of addition in the playlist\nThe last added comes first\nThe file names do not matter",
     "tooltip_add_item_playlist" : "Add media",
 
     "delete" : "Delete",

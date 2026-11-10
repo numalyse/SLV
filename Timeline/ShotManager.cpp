@@ -300,6 +300,7 @@ void ShotManager::mergeCurrentInto(int ShotItemId){
 
     updateShotToolTips();
     updateShotItemsPosition();
+    emit selectedShotCountUpdated(static_cast<int>(m_selectedShots.size()));
 }
 
 void ShotManager::mergeCurrentWithPrevShot(int64_t cursorTime)
@@ -323,6 +324,7 @@ void ShotManager::mergeCurrentWithNextShot(int64_t cursorTime)
     mergeCurrentInto(indexOfNext);
     clearSelection();
     updateCurrentShot(cursorTime);
+    emit shotCountUpdated(shotCount());
 }
 
 

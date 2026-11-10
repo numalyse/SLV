@@ -58,18 +58,15 @@ void ShotItem::setTagImage(const QPixmap& pixmap)
 {
     m_tagImage = pixmap;
     m_tagImageRequested = true;
-    if (m_isHovered)
-        updateToolTip();
+    updateToolTip();
 }
 
 void ShotItem::clearTagImage()
 {
     m_tagImage = QPixmap();
     m_tagImageRequested = false;
-    if (m_isHovered) {
-        requestTagImageIfNeeded();
-        updateToolTip();
-    }
+    updateToolTip();
+    requestTagImageIfNeeded();
 }
 
 void ShotItem::setTagImageRequestHandler(std::function<void()> handler)

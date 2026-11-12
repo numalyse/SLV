@@ -2,12 +2,20 @@
 
 #include <QPainter>
 #include <QGraphicsScene>
+#include <QGraphicsSceneHoverEvent>
 #include <QPen>
+#include <QCursor>
+#include <QBuffer>
+#include <QIODevice>
+#include <QToolTip>
+#include <QWidget>
+#include <utility>
 
 ShotItem::ShotItem(Shot shot, double width, QGraphicsItem* parent)
 : QGraphicsItem(parent), m_shot{shot}, m_widthMs{width}, m_baseColor{m_shot.color}
 {
     setZValue(0);
+    setAcceptHoverEvents(true);
 
     // to keep the shotItem undearneath the audio visualizer but to have our "selected m_selectedNumber above the visualizer"
     // we create an item that will follow shotItem but with a different z value 
@@ -29,6 +37,80 @@ ShotItem::ShotItem(Shot shot, double width, QGraphicsItem* parent)
 ShotItem::~ShotItem()
 {
     delete m_selectionBox;
+}
+
+void ShotItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_isHovered = true;
+    m_toolTipWidget = event->widget();
+    requestTagImageIfNeeded();
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void ShotItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    m_isHovered = false;
+    m_toolTipWidget.clear();
+    QGraphicsItem::hoverLeaveEvent(event);
+}
+
+void ShotItem::setTagImage(const QPixmap& pixmap)
+{
+    m_tagImage = pixmap;
+    m_tagImageRequested = true;
+    updateToolTip();
+}
+
+void ShotItem::clearTagImage()
+{
+    m_tagImage = QPixmap();
+    m_tagImageRequested = false;
+    updateToolTip();
+    requestTagImageIfNeeded();
+}
+
+void ShotItem::setTagImageRequestHandler(std::function<void()> handler)
+{
+    m_tagImageRequestHandler = std::move(handler);
+}
+
+void ShotItem::setHoverTooltipText(const QString& text)
+{
+    m_hoverTooltipTextValue = text;
+    updateToolTip();
+}
+
+void ShotItem::requestTagImageIfNeeded()
+{
+    if (m_tagImageRequested)
+        return;
+
+    m_tagImageRequested = true;
+    if (m_tagImageRequestHandler)
+        m_tagImageRequestHandler();
+}
+
+void ShotItem::updateToolTip()
+{
+    if (m_hoverTooltipTextValue.isEmpty() && !m_tagImageRequestHandler)
+        return;
+
+    QString toolTip = m_hoverTooltipTextValue;
+    if (!m_tagImage.isNull()) {
+        QByteArray imageData;
+        QBuffer buffer(&imageData);
+        if (buffer.open(QIODevice::WriteOnly) && m_tagImage.save(&buffer, "PNG")) {
+            const QString imageUrl = QStringLiteral("data:image/png;base64,%1")
+                                         .arg(QString::fromLatin1(imageData.toBase64()));
+            toolTip.prepend(QStringLiteral("<img src=\"%1\"><br>").arg(imageUrl));
+        } else {
+            qWarning() << "[ShotItem] Impossible d'encoder la tag image du tooltip";
+        }
+    }
+
+    setToolTip(toolTip);
+    if (m_isHovered)
+        QToolTip::showText(QCursor::pos(), toolTip, m_toolTipWidget);
 }
 
 

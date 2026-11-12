@@ -119,6 +119,7 @@
     "messagebox_extract_selected_shots_failed" : "Falló la extracción de los segmentos seleccionados.",
     "timeline_clear_all_selected_shots" : "Limpiar todos los segmentos seleccionados",
 
+    "timeline_shot_move_cursor_at" : "Mover el cabezal al inicio del segmento",
     "timeline_annot_move_cursor_at" : "Mover el cabezal al inicio de la anotación",
     "timeline_annot_open_info" : "Abrir panel de anotaciones",
     "timeline_annot_edit_color" : "Editar color de anotación",

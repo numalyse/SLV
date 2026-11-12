@@ -191,7 +191,7 @@ void ShotDetail::toggleShotControlButtons(bool state)
 
 void ShotDetail::onThumbnailReady(ThumbnailWorker::Requester requester, int requestId, const QImage& image)
 {
-    if(requester != ThumbnailWorker::Requester::ShotDetail)
+    if(requester != ThumbnailWorker::Requester::ShotDetail || requestId != 0)
         return;
 
     m_tagImage->clear();

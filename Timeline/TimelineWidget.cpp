@@ -244,7 +244,8 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     m_annotItemManager = new AnnotationItemManager(m_scene, m_view, m_mathManager, this);
     connect(m_view, &TimelineView::annotationHandleDragged, this,
         [this](AnnotationHandleItem* handle, double posX) {
-            m_annotItemManager->onAnnotationHandleDragged(handle, posX, m_shotManager->shotItems());
+            m_annotItemManager->onAnnotationHandleDragged(
+                handle, posX, m_cursor->pos().x(), m_shotManager->shotItems());
         });
 
     m_ruler = new RulerItem(m_sceneWidth, m_rulerHeight, m_minPxBetweenTicks, m_mathManager->pixelsPerMs(), projectMedia->duration(), projectMedia->fps());
@@ -433,6 +434,35 @@ void TimelineWidget::updateTimelineGeometry()
 void TimelineWidget::moveCursor(double newCursorPosX)
 {
     int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
+    /*
+    constexpr double snapTolerancePx = 8.0;
+    double closestSnapDistancePx = snapTolerancePx;
+    int64_t closestSnapTime = 0;
+    bool hasClosestSnap = false;
+    const auto considerSnap = [&](int64_t snapTime) {
+        const double distancePx = std::abs(newCursorPosX - m_mathManager->timeToPos(snapTime));
+        if (distancePx <= closestSnapDistancePx) {
+            closestSnapDistancePx = distancePx;
+            closestSnapTime = snapTime;
+            hasClosestSnap = true;
+        }
+    };
+
+    for (ShotItem* shotItem : m_shotManager->shotItems()) {
+        considerSnap(shotItem->shot().start);
+        considerSnap(shotItem->shot().end);
+    }
+
+    const QVector<Annotation>& annotations = ProjectManager::instance().annotationManager()->annotations();
+    for (const Annotation& annotation : annotations) {
+        considerSnap(annotation.start);
+        considerSnap(annotation.end);
+    }
+
+    if (hasClosestSnap)
+        newCursorTime = closestSnapTime;
+    */
+
     auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
 
     int64_t targetTime = clampedTime.value_or(newCursorTime);
@@ -572,11 +602,14 @@ void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorIte
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item)
 {
     QMenu menu;
+    QAction *actionCursorMoveAt = nullptr;
     QAction *actionExtractShot = nullptr;
     QAction *actionClearSelectedShots = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
     QAction* actionOpenShotInfo = nullptr;
+
+    actionCursorMoveAt = menu.addAction(PrefManager::instance().getText("timeline_shot_move_cursor_at"));
 
     if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
@@ -593,7 +626,9 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
     
-    if(selectedAction == actionExtractShot){
+    if(selectedAction == actionCursorMoveAt){
+        moveCursorAt(item);
+    } else if(selectedAction == actionExtractShot){
         ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
         sequenceExtractor->show();
     } else if(selectedAction == actionOpenShotInfo){

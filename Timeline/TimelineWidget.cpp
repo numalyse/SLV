@@ -602,11 +602,14 @@ void TimelineWidget::showContextMenuForCursor(const QPoint& globalPos, CursorIte
 void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* item)
 {
     QMenu menu;
+    QAction *actionCursorMoveAt = nullptr;
     QAction *actionExtractShot = nullptr;
     QAction *actionClearSelectedShots = nullptr;
     QAction *actionExtractShotsSelected = nullptr;
     // Pour ouvrir le nav panel sur le plan sélectionné
     QAction* actionOpenShotInfo = nullptr;
+
+    actionCursorMoveAt = menu.addAction(PrefManager::instance().getText("timeline_shot_move_cursor_at"));
 
     if ( m_shotManager->getNbShotsSelected() > 0 ) // if we selected shots, only shows "extract selected shots"
     {
@@ -623,7 +626,9 @@ void TimelineWidget::showContextMenuForShot(const QPoint& globalPos, ShotItem* i
     QAction *selectedAction = menu.exec(globalPos);
     if (!selectedAction) return;
     
-    if(selectedAction == actionExtractShot){
+    if(selectedAction == actionCursorMoveAt){
+        moveCursorAt(item);
+    } else if(selectedAction == actionExtractShot){
         ExtractSequenceWidget* sequenceExtractor = new ExtractSequenceWidget(*p_media, this, item->shot().start, item->shot().end); // TODO give current track for audio extraction
         sequenceExtractor->show();
     } else if(selectedAction == actionOpenShotInfo){

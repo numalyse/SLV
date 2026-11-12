@@ -434,6 +434,7 @@ void TimelineWidget::updateTimelineGeometry()
 void TimelineWidget::moveCursor(double newCursorPosX)
 {
     int64_t newCursorTime = m_mathManager->posToTimeSnapped(newCursorPosX);
+    /*
     constexpr double snapTolerancePx = 8.0;
     double closestSnapDistancePx = snapTolerancePx;
     int64_t closestSnapTime = 0;
@@ -460,6 +461,7 @@ void TimelineWidget::moveCursor(double newCursorPosX)
 
     if (hasClosestSnap)
         newCursorTime = closestSnapTime;
+    */
 
     auto clampedTime = m_abManager->clampToLoopRange(newCursorTime);
 

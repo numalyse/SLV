@@ -126,6 +126,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_transparentCheck = new QCheckBox(PrefManager::instance().getText("timeline_transparent_background_option"));
 
     auto* formBottom = new QFormLayout;
+    formBottom->setLabelAlignment(Qt::AlignLeft);
 
     // Width spin box
     m_widthSpin = new QSpinBox;
@@ -133,6 +134,8 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_widthSpin->setRange(480, 10000);
     m_widthSpin->setSingleStep(100);
     m_widthSpin->setSuffix(" px");
+    m_widthSpin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //m_widthSpin->setAlignment(Qt::AlignRight);
     formBottom->addRow(PrefManager::instance().getText("timeline_img_width") + " : ", m_widthSpin);
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

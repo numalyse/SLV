@@ -177,6 +177,7 @@ QGraphicsView* TimelineImgExportDialog::createPreview()
     previewView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     previewView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     constexpr qreal previewWidth = 300.0;
+    previewView->setFixedWidth(static_cast<int>(previewWidth) + 2 * previewView->frameWidth());
     constexpr qreal rulerHeight = 24.0;
     const QColor rulerColor(181, 181, 181);
 
@@ -353,6 +354,7 @@ void TimelineImgExportDialog::updatePreview()
 
     const qreal sceneHeight = qMax(1.0, nextElementTop - (nextElementTop > 0.0 ? rowSpacing : 0.0));
     previewScene->setSceneRect(0, 0, previewWidth, sceneHeight);
+    m_previewView->setFixedWidth(static_cast<int>(previewWidth) + 2 * m_previewView->frameWidth());
     m_previewView->setFixedHeight(static_cast<int>(sceneHeight) + 2 * m_previewView->frameWidth());
 }
 

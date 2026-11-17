@@ -39,15 +39,20 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     setMinimumWidth(600);
 
     m_pathEdit = new QLineEdit(defaultPath);
+    m_pathEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     auto* browseBtn = new QPushButton(PrefManager::instance().getText("browse"));
     connect(browseBtn, &QPushButton::clicked, this, &TimelineImgExportDialog::browse);
 
-    auto* pathRow = new QHBoxLayout;
+    auto* pathWidget = new QWidget(this);
+    auto* pathRow = new QHBoxLayout(pathWidget);
+    pathRow->setContentsMargins(0, 0, 0, 0);
     pathRow->addWidget(m_pathEdit, 1);
     pathRow->addWidget(browseBtn);
-    
+
     auto* form = new QFormLayout;
-    form->addRow(PrefManager::instance().getText("filename") + " : ", pathRow);
+    form->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    form->addRow(PrefManager::instance().getText("filename") + " : ", pathWidget);
     
     // Radio buttons for view selection
     m_currentViewRadio = new QRadioButton(PrefManager::instance().getText("timeline_current_view"));

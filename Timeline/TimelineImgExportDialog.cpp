@@ -127,6 +127,7 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
 
     auto* formBottom = new QFormLayout;
     formBottom->setLabelAlignment(Qt::AlignLeft);
+    formBottom->setFormAlignment(Qt::AlignLeft);
 
     // Width spin box
     m_widthSpin = new QSpinBox;

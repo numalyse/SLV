@@ -159,14 +159,48 @@ TimelineWidget::TimelineWidget(ThumbnailWorker* thumbnailWorker, Media* projectM
     ButtonLayout->addWidget(m_addAnnotBtn);
 
     ButtonLayout->addWidget(makeSeparator());
+    
+    QVBoxLayout *exportLayout = new QVBoxLayout();
 
-    m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export"));
+    m_exportBtn = new ToolbarButton(this, "export_white", pref.getText("tooltip_export_project"));
     connect(m_exportBtn, &ToolbarButton::pressed, &ProjectManager::instance(), &ProjectManager::exportProject);
-    ButtonLayout->addWidget(m_exportBtn);
+    //ButtonLayout->addWidget(m_exportBtn);
+    exportLayout->addWidget(m_exportBtn);
 
-    auto* exportImgBtn = new ToolbarButton(this, "export_white", "Exporter la timeline en PNG");
-    connect(exportImgBtn, &ToolbarButton::pressed, this, &TimelineWidget::exportToPngAction);
-    ButtonLayout->addWidget(exportImgBtn);
+    auto* m_exportTimelineBtn = new ToolbarButton(this, "timeline_on_white", pref.getText("timeline_export_as_img"));
+    connect(m_exportTimelineBtn, &ToolbarButton::pressed, this, &TimelineWidget::exportToPngAction);
+    //ButtonLayout->addWidget(m_exportTimelineBtn);
+    exportLayout->addWidget(m_exportTimelineBtn);
+
+    m_exportBtn->setText(" " + pref.getText("tooltip_export_project"));
+    m_exportTimelineBtn->setText(" " + pref.getText("tooltip_export_timeline"));
+    m_exportBtn->setMinimumSize(QSize(0, 0));
+    m_exportTimelineBtn->setMinimumSize(QSize(0, 0));
+    m_exportBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    m_exportTimelineBtn->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    
+    int maxWidth = std::max({
+        m_exportBtn->sizeHint().width(),
+        m_exportTimelineBtn->sizeHint().width()
+    }) + 2;
+    
+    m_exportBtn->setFixedWidth(maxWidth);
+    m_exportTimelineBtn->setFixedWidth(maxWidth);
+    m_exportBtn->setIconSize(QSize(18, 18));
+    m_exportTimelineBtn->setIconSize(QSize(18, 18));
+    m_exportBtn->setStyleSheet("text-align:left;");
+    m_exportTimelineBtn->setStyleSheet("text-align:left;");
+    
+    m_exportationBtn = new ToolbarToggleHoverButton(
+        this,
+        exportLayout,
+        false,
+        "export_white",
+        PrefManager::instance().getText("tooltip_export"),
+        "export_white",
+        PrefManager::instance().getText("tooltip_export")
+    );
+    ButtonLayout->addWidget(m_exportationBtn);
 
     ButtonLayout->addStretch(1);
 

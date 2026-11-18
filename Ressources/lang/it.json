@@ -88,6 +88,9 @@
     "tooltip_merge_with_prev_shot": "Unisci con il segmento precedente",
     "tooltip_merge_with_next_shot": "Unisci con il segmento successivo",
     "tooltip_export": "Esporta",
+    "tooltip_export_project": "Esporta progetto",
+    "tooltip_export_tagframes": "Esporta Immagini-Riferimento",
+    "tooltip_export_timeline": "Esporta timeline",
 
     "tooltip_reposition_toolbar" : "Ripristina la posizione della barra degli strumenti",
 

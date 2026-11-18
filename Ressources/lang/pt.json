@@ -88,6 +88,9 @@
     "tooltip_merge_with_prev_shot": "Fundir com o segment anterior",
     "tooltip_merge_with_next_shot": "Fundir com o segment seguinte",
     "tooltip_export": "Exportar",
+    "tooltip_export_project": "Exportar projeto",
+    "tooltip_export_tagframes": "Exportar Imagens-Referência",
+    "tooltip_export_timeline": "Exportar linha do tempo",
 
     "tooltip_reposition_toolbar" : "Repor a posição da barra de ferramentas",
 

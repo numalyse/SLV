@@ -232,7 +232,6 @@
         <file alias="stop_white">icons/stop_white.png</file>
         <file alias="stop_gray">icons/stop_gray.png</file>
         <file alias="stop">icons/stop.png</file>
-        <file alias="test">icons/test.png</file>
         <file alias="timeline_off_white">icons/timeline_off_white.png</file>
         <file alias="timeline_off_gray">icons/timeline_off_gray.png</file>
         <file alias="timeline_off">icons/timeline_off.png</file>

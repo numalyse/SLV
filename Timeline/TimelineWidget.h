@@ -21,6 +21,7 @@
 #include "Timeline/Items/AudioVisualizerItem.h"
 
 #include "ToolbarButtons/ToolbarButton.h"
+#include "ToolbarButtons/ToolbarToggleHoverButton.h"
 
 #include <QWidget>
 #include <QGraphicsScene>
@@ -121,6 +122,8 @@ private:
     ToolbarButton* m_mergeWithNextShotBtn = nullptr;
     bool m_showMergeWithNextShotBtn = false;
     ToolbarButton* m_exportBtn = nullptr;
+    ToolbarButton* m_exportTimelineBtn = nullptr;
+    ToolbarToggleHoverButton* m_exportationBtn = nullptr;
     ToolbarButton* m_shotInfo = nullptr;
     ToolbarButton* m_toPrevShotBtn = nullptr;
     ToolbarButton* m_toNextShotBtn = nullptr;

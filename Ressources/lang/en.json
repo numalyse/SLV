@@ -88,6 +88,9 @@
     "tooltip_merge_with_prev_shot": "Merge with previous segment",
     "tooltip_merge_with_next_shot": "Merge with next segment",
     "tooltip_export": "Export",
+    "tooltip_export_project": "Export project",
+    "tooltip_export_tagframes": "Export Tag Frames",
+    "tooltip_export_timeline": "Export timeline",
 
     "tooltip_reposition_toolbar" : "Reset toolbar position",
 

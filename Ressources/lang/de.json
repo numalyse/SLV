@@ -88,6 +88,9 @@
     "tooltip_merge_with_prev_shot": "Mit vorherigem Segment zusammenführen",
     "tooltip_merge_with_next_shot": "Mit nächstem Segment zusammenführen",
     "tooltip_export": "Exportieren",
+    "tooltip_export_project" : "Projekt exportieren",
+    "tooltip_export_tagframes" : "Tag Frames exportieren",
+    "tooltip_export_timeline" : "Timeline exportieren",
 
     "tooltip_reposition_toolbar" : "Position der Werkzeugleiste zurücksetzen",
 

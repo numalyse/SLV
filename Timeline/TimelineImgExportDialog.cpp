@@ -39,15 +39,20 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     setMinimumWidth(600);
 
     m_pathEdit = new QLineEdit(defaultPath);
+    m_pathEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     auto* browseBtn = new QPushButton(PrefManager::instance().getText("browse"));
     connect(browseBtn, &QPushButton::clicked, this, &TimelineImgExportDialog::browse);
 
-    auto* pathRow = new QHBoxLayout;
+    auto* pathWidget = new QWidget(this);
+    auto* pathRow = new QHBoxLayout(pathWidget);
+    pathRow->setContentsMargins(0, 0, 0, 0);
     pathRow->addWidget(m_pathEdit, 1);
     pathRow->addWidget(browseBtn);
-    
+
     auto* form = new QFormLayout;
-    form->addRow(PrefManager::instance().getText("filename") + " : ", pathRow);
+    form->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+    form->addRow(PrefManager::instance().getText("filename") + " : ", pathWidget);
     
     // Radio buttons for view selection
     m_currentViewRadio = new QRadioButton(PrefManager::instance().getText("timeline_current_view"));
@@ -121,6 +126,8 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_transparentCheck = new QCheckBox(PrefManager::instance().getText("timeline_transparent_background_option"));
 
     auto* formBottom = new QFormLayout;
+    formBottom->setLabelAlignment(Qt::AlignLeft);
+    formBottom->setFormAlignment(Qt::AlignLeft);
 
     // Width spin box
     m_widthSpin = new QSpinBox;
@@ -128,6 +135,8 @@ TimelineImgExportDialog::TimelineImgExportDialog(const QString& defaultPath, QWi
     m_widthSpin->setRange(480, 10000);
     m_widthSpin->setSingleStep(100);
     m_widthSpin->setSuffix(" px");
+    m_widthSpin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //m_widthSpin->setAlignment(Qt::AlignRight);
     formBottom->addRow(PrefManager::instance().getText("timeline_img_width") + " : ", m_widthSpin);
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -168,6 +177,7 @@ QGraphicsView* TimelineImgExportDialog::createPreview()
     previewView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     previewView->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     constexpr qreal previewWidth = 300.0;
+    previewView->setFixedWidth(static_cast<int>(previewWidth) + 2 * previewView->frameWidth());
     constexpr qreal rulerHeight = 24.0;
     const QColor rulerColor(181, 181, 181);
 
@@ -344,6 +354,7 @@ void TimelineImgExportDialog::updatePreview()
 
     const qreal sceneHeight = qMax(1.0, nextElementTop - (nextElementTop > 0.0 ? rowSpacing : 0.0));
     previewScene->setSceneRect(0, 0, previewWidth, sceneHeight);
+    m_previewView->setFixedWidth(static_cast<int>(previewWidth) + 2 * m_previewView->frameWidth());
     m_previewView->setFixedHeight(static_cast<int>(sceneHeight) + 2 * m_previewView->frameWidth());
 }
 

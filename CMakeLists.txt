@@ -245,6 +245,8 @@ set(ADDITIONAL_SOURCES
     Help/Content/TimelineContent.h Help/Content/TimelineContent.cpp 
     Help/Content/MultiviewContent.h Help/Content/MultiviewContent.cpp 
     Help/Content/ToolbarsContent.h Help/Content/ToolbarsContent.cpp 
+    Help/Content/AnnotationsContent.h Help/Content/AnnotationsContent.cpp 
+    Help/Content/ParametersContent.h Help/Content/ParametersContent.cpp 
 
     # Project extras si manquants
     SequenceExtractionHelper.h

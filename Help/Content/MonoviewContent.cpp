@@ -11,7 +11,15 @@ MonoviewContent::MonoviewContent(QWidget* parent)
     : CategoryBase("help_menu_classic_category", parent)
 {
     QString presentationTitle = "help_menu_presentation_label";
-    QString openMedia = "help_menu_open_file_label";
+    QString openMediaTitle = "help_menu_open_file_label";
+    QString controlMediaTitle = "help_menu_control_media_label";
+    QString paramMediaTitle = "help_menu_param_media_label";
+    QString zoomMediaTitle = "help_menu_zoom_media_label";
+    QString altMediaTitle = "help_menu_alt_media_label";
+    QString drawingModeTitle = "help_menu_drawingmode_label";
+    QString compoRulesTitle = "help_menu_comporules_label";
+    QString screenshotTitle = "help_menu_screenshot_label";
+    QString recordingTitle = "help_menu_recording_label";
     QString extractSequenceTitle = "help_menu_extract_sequence_label";
 
     addSubcategory(
@@ -20,14 +28,49 @@ MonoviewContent::MonoviewContent(QWidget* parent)
     );
 
     addSubcategory(
-        openMedia,
-        openmedia(openMedia)
+        openMediaTitle,
+        openMedia(openMediaTitle)
     );
 
-    // addSubcategory(
-    //     "Player",
-    //     player(openMedia)
-    // );
+    addSubcategory(
+        controlMediaTitle,
+        controlMedia(controlMediaTitle)
+    );
+
+    addSubcategory(
+        paramMediaTitle,
+        paramMedia(paramMediaTitle)
+    );
+
+    addSubcategory(
+        zoomMediaTitle,
+        zoomMedia(zoomMediaTitle)
+    );
+
+    addSubcategory(
+        altMediaTitle,
+        altMedia(altMediaTitle)
+    );
+
+    addSubcategory(
+        drawingModeTitle,
+        drawingMode(drawingModeTitle)
+    );
+
+    addSubcategory(
+        compoRulesTitle,
+        compoRules(compoRulesTitle)
+    );
+
+    addSubcategory(
+        screenshotTitle,
+        screenshot(screenshotTitle)
+    );
+
+    addSubcategory(
+        recordingTitle,
+        recording(recordingTitle)
+    );
 
     addSubcategory(
         extractSequenceTitle,
@@ -57,52 +100,39 @@ QWidget* MonoviewContent::presentation(const QString& subcategoryName)
     widget->addTextFromLangQMAP({
         {"fr", 
             "Le mode mono-vue est le mode d'affichage par défaut du lecteur multimédia.\n"
-            "Il permet de visualiser un seul média à la fois et d'utiliser différents outils pour travailler et interagir avec celui-ci. \n"
-            "Sa barre d'outils peut être étendue afin d'accéder à des fonctionnalités supplémentaires. \n"
-            "Parmi ces outils, il est notamment possible d'accéder à une timeline détaillée, permettant de naviguer plus précisément dans le média et de visualiser son déroulement.\n"
-            "Il est également possible d'accéder à un affichage en playlist, permettant d'enchaîner la lecture de plusieurs médias à la suite."
+            "Il permet de visualiser un seul média à la fois et de disposer des outils nécessaires pour travailler et interagir avec lui.\n"
+            "\n"
+            "Sa barre d’outils, semblable à celle d’autres logiciels de lecture vidéo courants, peut être étendue afin d’accéder à des fonctionnalités supplémentaires, plus techniques.\n"
+            "\n"
+            "Parmi celles-ci, une timeline détaillée permet de visualiser et de naviguer plus précisément dans le média : elle donne un repérage fin de la position de lecture et facilite le déplacement vers un moment précis.\n"
+            
         },
         {"en", 
             "Single-view mode is the default display mode of the media player.\n"
-            "It allows you to view one media item at a time and use various tools to work with and interact with it. \n"
-            "Its toolbar can be expanded to access additional features. \n"
-            "These tools include access to a detailed timeline, allowing you to navigate more precisely through the media and view its progression.\n"
-            "It is also possible to switch to a playlist view, allowing multiple media items to be played back one after another."
+            
         },
         {"es", 
             "El modo de vista única es el modo de visualización predeterminado del reproductor multimedia.\n"
-            "Permite visualizar un solo contenido multimedia a la vez y utilizar diferentes herramientas para trabajar e interactuar con él. \n"
-            "Su barra de herramientas se puede ampliar para acceder a funciones adicionales. \n"
-            "Entre estas herramientas, se puede acceder a una línea de tiempo detallada, que permite navegar con mayor precisión por el contenido multimedia y visualizar su desarrollo.\n"
-            "También es posible acceder a una vista de lista de reproducción, que permite reproducir varios contenidos multimedia uno tras otro."
+            
         },
         {"de", 
             "Der Einzelansichtsmodus ist der standardmäßige Anzeigemodus des Medienplayers.\n"
-            "Er ermöglicht die Anzeige eines einzelnen Mediums und die Verwendung verschiedener Werkzeuge, um damit zu arbeiten und zu interagieren. \n"
-            "Die Symbolleiste kann erweitert werden, um auf zusätzliche Funktionen zuzugreifen. \n"
-            "Zu diesen Werkzeugen gehört unter anderem eine detaillierte Zeitleiste, mit der sich präziser durch das Medium navigieren und dessen Ablauf anzeigen lässt.\n"
-            "Außerdem kann eine Wiedergabelistenansicht geöffnet werden, in der mehrere Medien nacheinander abgespielt werden können."
+            
         },
         {"it", 
             "La modalità a visualizzazione singola è la modalità di visualizzazione predefinita del lettore multimediale.\n"
-            "Consente di visualizzare un solo contenuto multimediale alla volta e di utilizzare diversi strumenti per lavorare e interagire con esso. \n"
-            "La barra degli strumenti può essere estesa per accedere a funzionalità aggiuntive. \n"
-            "Tra questi strumenti è possibile accedere a una timeline dettagliata, che consente di navigare con maggiore precisione nel contenuto multimediale e di visualizzarne lo svolgimento.\n"
-            "È inoltre possibile accedere a una visualizzazione in playlist, che consente di riprodurre più contenuti multimediali uno dopo l'altro."
+            
         },
         {"pt", 
             "O modo de visualização única é o modo de apresentação predefinido do leitor multimédia.\n"
-            "Permite visualizar um único conteúdo multimédia de cada vez e utilizar diferentes ferramentas para trabalhar e interagir com o mesmo. \n"
-            "A barra de ferramentas pode ser expandida para aceder a funcionalidades adicionais. \n"
-            "Entre estas ferramentas, é possível aceder a uma linha do tempo detalhada, que permite navegar com maior precisão pelo conteúdo multimédia e visualizar o seu desenvolvimento.\n"
-            "Também é possível aceder a uma visualização em lista de reprodução, permitindo reproduzir vários conteúdos multimédia em sequência."
+            
         }
     });
 
     return widget;
 }
 
-QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
+QWidget* MonoviewContent::openMedia(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 
@@ -218,7 +248,7 @@ QWidget* MonoviewContent::openmedia(const QString& subcategoryName)
     return widget;
 }
 
-QWidget* MonoviewContent::player(const QString& subcategoryName)
+QWidget* MonoviewContent::controlMedia(const QString& subcategoryName)
 {
     auto* widget = new ContentBase(this, categoryName(), subcategoryName);
 

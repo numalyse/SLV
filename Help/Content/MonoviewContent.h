@@ -12,8 +12,15 @@ public:
 
 private:
     QWidget *presentation(const QString &subcategoryName);
-    QWidget *openmedia(const QString &subcategoryName);
-    QWidget* player(const QString& subcategoryName);
+    QWidget *openMedia(const QString &subcategoryName);
+    QWidget *controlMedia(const QString& subcategoryName);
+    QWidget *paramMedia(const QString& subcategoryName);
+    QWidget *zoomMedia(const QString& subcategoryName);
+    QWidget *altMedia(const QString& subcategoryName);
+    QWidget *drawingMode(const QString& subcategoryName);
+    QWidget *compoRules(const QString& subcategoryName);
+    QWidget *screenshot(const QString& subcategoryName);
+    QWidget *recording(const QString& subcategoryName);
     QWidget *extractSequence(const QString &subcategoryName);
 };
 
